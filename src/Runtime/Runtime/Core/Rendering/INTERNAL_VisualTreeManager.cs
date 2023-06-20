@@ -641,7 +641,7 @@ if(nextSibling != undefined) {
                         // Raise the "PropertyChanged" event
                         propertyMetadata.PropertyChangedCallback(
                             dependencyObject,
-                            new DependencyPropertyChangedEventArgs(value, value, property));
+                            new DependencyPropertyChangedEventArgs(value, value, property, propertyMetadata));
                     }
                 }
 

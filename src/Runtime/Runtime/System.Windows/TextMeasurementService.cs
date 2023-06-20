@@ -41,8 +41,6 @@ namespace Windows.UI.Xaml
                               string emptyVal);
 
         void CreateMeasurementText(UIElement parent);
-
-        bool IsTextMeasureDivID(string id);
     }
 
     /// <summary>
@@ -54,15 +52,11 @@ namespace Windows.UI.Xaml
         private object textBlockReference;
         private TextBlock associatedTextBlock;
 
-        private string measureTextBlockElementID;
-
         private string savedWhiteSpace;
         private Thickness savedTextBlockPadding;
 
         public TextMeasurementService()
         {
-            measureTextBlockElementID = "";
-
             savedWhiteSpace = "pre";
             savedTextBlockPadding = new Thickness(double.NegativeInfinity);
         }
@@ -95,14 +89,8 @@ namespace Windows.UI.Xaml
 
             associatedTextBlock.Text = "A";
 
-            measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                 $"document.measureTextBlockElement={INTERNAL_InteropImplementation.GetVariableStringForJS(textBlockReference)}");
-        }
-
-        public bool IsTextMeasureDivID(string id)
-        {
-            return measureTextBlockElementID == id;
         }
 
         public Size MeasureTextBlock(string uid,

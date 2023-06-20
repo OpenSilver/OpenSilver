@@ -349,6 +349,26 @@ namespace Windows.UI.Xaml
         
         #region ActualWidth / ActualHeight
 
+        private static PropertyMetadata _actualWidthMetadata = new ReadOnlyPropertyMetadata(0d, GetActualWidth);
+
+        private static readonly DependencyPropertyKey ActualWidthPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ActualWidth),
+                typeof(double),
+                typeof(FrameworkElement),
+                _actualWidthMetadata);
+
+        private static object GetActualWidth(DependencyObject d)
+        {
+            FrameworkElement fe = (FrameworkElement)d;
+            return fe.HasWidthEverChanged ? fe.RenderSize.Width : 0d;
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ActualWidth"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ActualWidthProperty = ActualWidthPropertyKey.DependencyProperty;
+
         /// <summary>
         /// Gets the rendered width of a <see cref="FrameworkElement"/>.
         /// </summary>
@@ -358,6 +378,26 @@ namespace Windows.UI.Xaml
         /// </returns>
         public double ActualWidth => RenderSize.Width;
 
+        private static PropertyMetadata _actualHeightMetadata = new ReadOnlyPropertyMetadata(0d, GetActualHeight);
+
+        private static readonly DependencyPropertyKey ActualHeightPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ActualHeight),
+                typeof(double),
+                typeof(FrameworkElement),
+                _actualHeightMetadata);
+
+        private static object GetActualHeight(DependencyObject d)
+        {
+            FrameworkElement fe = (FrameworkElement)d;
+            return fe.HasHeightEverChanged ? fe.RenderSize.Height : 0d;
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ActualHeight"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ActualHeightProperty = ActualHeightPropertyKey.DependencyProperty;
+
         /// <summary>
         /// Gets the rendered height of a <see cref="FrameworkElement"/>.
         /// </summary>
@@ -366,41 +406,6 @@ namespace Windows.UI.Xaml
         /// encountered if the object has not been loaded and undergone a layout pass.
         /// </returns>
         public double ActualHeight => RenderSize.Height;
-
-        public static readonly DependencyProperty ActualWidthProperty =
-            DependencyProperty.Register(
-                nameof(ActualWidth),
-                typeof(double),
-                typeof(FrameworkElement),
-                null);
-
-        public static readonly DependencyProperty ActualHeightProperty =
-            DependencyProperty.Register(
-                nameof(ActualHeight),
-                typeof(double),
-                typeof(FrameworkElement),
-                null);
-
-        bool _isSubsribedToSizeChanged = false;
-        internal void SubscribeToSizeChanged()
-        {
-            if (!_isSubsribedToSizeChanged)
-            {
-                SizeChanged += (s, e) =>
-                {
-                    if (((double)GetValue(ActualWidthProperty)) != e.NewSize.Width)
-                    {
-                        SetValue(ActualWidthProperty, e.NewSize.Width);
-                    }
-
-                    if (((double)GetValue(ActualHeightProperty)) != e.NewSize.Height)
-                    {
-                        SetValue(ActualHeightProperty, e.NewSize.Height);
-                    }
-                };
-                _isSubsribedToSizeChanged = true;
-            }
-        }
 
         /// <summary>
         /// Gets the rendered size of a FrameworkElement.

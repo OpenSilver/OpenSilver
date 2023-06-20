@@ -44,9 +44,13 @@ namespace Windows.UI.Xaml.Controls
     /// TextBlockName.Text = "Some text.";
     /// </code>
     /// </example>
-    [ContentProperty("Inlines")]
+    [ContentProperty(nameof(Inlines))]
     public partial class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
     {
+        private bool _isTextChanging;
+        private Size _measuredSize;
+        private Size _noWrapSize = Size.Empty;
+
         internal override int VisualChildrenCount
         {
             get { return this.Inlines.Count; }
@@ -61,11 +65,7 @@ namespace Windows.UI.Xaml.Controls
 
             return (Inline)this.Inlines[index];
         }
-
-        private bool _isTextChanging;
-
-        private Size _measuredSize;
-
+        
         public TextBlock()
         {
             this.IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
@@ -335,33 +335,26 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private Size noWrapSize = Size.Empty;
-
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            // Skip when loading or changed on TextMeasurement Div.
-            if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
-                return;
+            base.OnPropertyChanged(e);
 
-            FrameworkPropertyMetadata metadata = e.Property.GetMetadata(DependencyObjectType) as FrameworkPropertyMetadata;
-
-            if (metadata != null)
+            if (e.Metadata is FrameworkPropertyMetadata metadata)
             {
                 if (metadata.AffectsMeasure)
                 {
-                    noWrapSize = Size.Empty;
+                    _noWrapSize = Size.Empty;
                 }
             }
-            base.OnPropertyChanged(e);
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
 
-            if (noWrapSize == Size.Empty)
+            if (_noWrapSize == Size.Empty)
             {
-                noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+                _noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(
                     uniqueIdentifier,
                     "pre",
                     string.Empty,
@@ -370,13 +363,13 @@ namespace Windows.UI.Xaml.Controls
                     string.Empty);
             }
 
-            if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
+            if (TextWrapping == TextWrapping.NoWrap || _noWrapSize.Width <= availableSize.Width)
             {
-                _measuredSize = noWrapSize;
-                return noWrapSize;
+                _measuredSize = _noWrapSize;
+                return _noWrapSize;
             }
 
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+            Size textSize = Application.Current.TextMeasurementService.MeasureTextBlock(
                 uniqueIdentifier,
                 TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
                 TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
@@ -384,8 +377,8 @@ namespace Windows.UI.Xaml.Controls
                 availableSize.Width,
                 string.Empty);
 
-            _measuredSize = TextSize;
-            return TextSize;
+            _measuredSize = textSize;
+            return textSize;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
