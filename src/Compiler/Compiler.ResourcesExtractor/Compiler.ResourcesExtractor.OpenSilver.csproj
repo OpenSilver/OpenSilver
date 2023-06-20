@@ -5,6 +5,7 @@
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <AssemblyName>OpenSilver.Compiler.Resources</AssemblyName>
     <RootNamespace>OpenSilver.Compiler.Resources</RootNamespace>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

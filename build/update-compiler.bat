@@ -45,7 +45,9 @@ CALL :copyDll Compiler Mono.Cecil.Pdb
 CALL :copyDll Compiler Mono.Cecil.Rocks
 copy %repoPath%\src\Targets\OpenSilver.targets %destDirSL%\build >NUL
 copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirSL%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.GenerateAssemblyInfo.targets %destDirSL%\build >NUL
 copy %repoPath%\src\Targets\OpenSilver.targets %destDirUWP%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.GenerateAssemblyInfo.targets %destDirUWP%\build >NUL
 copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirUWP%\build >NUL
 
 EXIT /B 0

@@ -33,6 +33,12 @@ namespace OpenSilver.Compiler.Common
             return ((_stopwatch.ElapsedMilliseconds + 1L) / 1000).ToString(CultureInfo.InvariantCulture);
         }
 
+        public TimeSpan StopAndGetElapsedTime()
+        {
+            _stopwatch.Stop();
+            return _stopwatch.Elapsed;
+        }
+
         public void Dispose()
         {
             _stopwatch.Stop();

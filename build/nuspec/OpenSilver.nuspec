@@ -66,6 +66,7 @@
     <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" />
     <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
+    <file src="../../src/Targets/OpenSilver.GenerateAssemblyInfo.targets" target="build/OpenSilver.GenerateAssemblyInfo.targets" />
 
     <!-- OpenSilver compiler -->
     <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />

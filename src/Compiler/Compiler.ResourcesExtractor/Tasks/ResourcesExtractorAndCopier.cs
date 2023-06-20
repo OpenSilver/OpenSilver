@@ -73,26 +73,30 @@ namespace OpenSilver.Compiler.Resources
             string coreAssemblyFiles,
             out List<string> listOfCopiedResXFiles)
         {
+            const string operationName = "C#/XAML for HTML5: ResourcesExtractorAndCopier";
+
+            // Validate input strings:
+            if (string.IsNullOrEmpty(sourceAssembly))
+            {
+                logger.WriteMessage($"{operationName} failed: '{nameof(sourceAssembly)}' cannot be null or empty.");
+                listOfCopiedResXFiles = null;
+                return false;
+            }
+
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
-            string operationName = "C#/XAML for HTML5: ResourcesExtractorAndCopier";
-            try
+            using (var executionTimeMeasuring = new ExecutionTimeMeasuring())
             {
-                using (var executionTimeMeasuring = new ExecutionTimeMeasuring())
+                try
                 {
-                    // Validate input strings:
-                    if (string.IsNullOrEmpty(sourceAssembly))
-                        throw new Exception(operationName + " failed because the source assembly argument is invalid.");
-
                     //------- DISPLAY THE PROGRESS -------
-                    logger.WriteMessage(operationName + " started for assembly \"" + sourceAssembly + "\".");
+                    logger.WriteMessage($"{operationName} started for assembly '{sourceAssembly}'.");
 
                     // Determine the absolute output path:
                     string outputPathAbsolute = PathsHelper.GetOutputPathAbsolute(sourceAssembly, outputRootPath);
 
                     // Create a separate AppDomain so that the types loaded for reflection can be unloaded when done.
-                    bool isSuccess = false;
                     using (var storage = new MonoCecilAssemblyStorage())
                     {
                         // Load for the core assemblies first:
@@ -110,7 +114,7 @@ namespace OpenSilver.Compiler.Resources
                         HashSet<string> simpleNameOfAssembliesToIgnore = new HashSet<string>(arrayWithSimpleNameOfAssembliesToIgnore);
 
                         // Do the extraction and copy:
-                        isSuccess = ExtractResources(
+                        ExtractResources(
                             sourceAssembly,
                             outputPathAbsolute,
                             outputResourcesPath,
@@ -121,20 +125,23 @@ namespace OpenSilver.Compiler.Resources
                     }
 
                     //------- DISPLAY THE PROGRESS -------
-                    logger.WriteMessage(operationName + (isSuccess ? " completed in " + executionTimeMeasuring.StopAndGetTimeInSeconds() + " seconds." : " failed."));
+                    logger.WriteMessage(
+                        $"{operationName} completed in {executionTimeMeasuring.StopAndGetElapsedTime().TotalMilliseconds} ms.");
 
-                    return isSuccess;
+                    return true;
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.WriteError(operationName + " failed: " + ex.ToString());
-                listOfCopiedResXFiles = null;
-                return false;
+                catch (Exception ex)
+                {
+                    logger.WriteMessage(
+                        $"{operationName} failed after {executionTimeMeasuring.StopAndGetElapsedTime().TotalMilliseconds} ms: {ex}");
+
+                    listOfCopiedResXFiles = null;
+                    return false;
+                }
             }
         }
 
-        private static bool ExtractResources(
+        private static void ExtractResources(
             string assemblyPath,
             string outputPathAbsolute,
             string outputResourcesPath,
@@ -148,7 +155,8 @@ namespace OpenSilver.Compiler.Resources
 
             foreach (string assemblySimpleName in assemblySimpleNames)
             {
-                if (simpleNameOfAssembliesToIgnore.Contains(assemblySimpleName))
+                if (simpleNameOfAssembliesToIgnore.Contains(assemblySimpleName) ||
+                    !ShouldExtractResourcesFromAssembly(storage, assemblySimpleName))
                 {
                     continue;
                 }
@@ -193,8 +201,36 @@ namespace OpenSilver.Compiler.Resources
                     }
                 }
             }
+        }
+
+        private static bool ShouldExtractResourcesFromAssembly(MonoCecilAssemblyStorage storage, string assemblyName)
+        {
+            if (!storage.LoadedAssemblySimpleNameToAssembly.TryGetValue(assemblyName, out AssemblyDefinition asm)
+                || !IsOpenSilverAssembly(asm))
+            {
+                return false;
+            }
+
+            CustomAttribute ca = asm.CustomAttributes.FirstOrDefault(IsOpenSilverResourceExposureAttribute);
+
+            if (ca is not null)
+            {
+                CustomAttributeArgument arg = ca.ConstructorArguments[0];
+                return (bool)arg.Value;
+            }
 
             return true;
         }
+
+        private static bool IsOpenSilverAssembly(AssemblyDefinition asm) =>
+            asm.HasCustomAttributes && asm.CustomAttributes.Any(IsOpenSilverAssemblyAttribute);
+
+        private static bool IsOpenSilverAssemblyAttribute(CustomAttribute ca) =>
+            ca.AttributeType.FullName == "OpenSilver.Runtime.CompilerServices.OpenSilverAssemblyAttribute" &&
+            ca.AttributeType.Scope.Name == "OpenSilver";
+
+        private static bool IsOpenSilverResourceExposureAttribute(CustomAttribute ca) =>
+            ca.AttributeType.FullName == "OpenSilver.Runtime.CompilerServices.OpenSilverResourceExposureAttribute" &&
+            ca.AttributeType.Scope.Name == "OpenSilver";
     }
 }

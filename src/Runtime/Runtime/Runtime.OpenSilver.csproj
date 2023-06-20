@@ -108,6 +108,8 @@
 		<Compile Include="OpenSilver\Internal\Xaml\ServiceProviderContext.cs" />
 		<Compile Include="OpenSilver\IO\MemoryFileInfo.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
+		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverAssemblyAttribute.cs" />
+		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverResourceExposureAttribute.cs" />
 		<Compile Include="OpenSilver\Utility\FrugalMap.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
