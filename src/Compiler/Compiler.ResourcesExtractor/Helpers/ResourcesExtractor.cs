@@ -38,7 +38,7 @@ namespace OpenSilver.Compiler.Resources.Helpers
             }
         }
 
-        public Dictionary<string, byte[]> GetManifestResources(MonoCecilAssemblyStorage storage, string assemblySimpleName, HashSet<string> supportedExtensionsLowerCase)
+        public Dictionary<string, byte[]> GetManifestResources(MonoCecilAssemblyStorage storage, string assemblySimpleName)
         {
             if (!storage.LoadedAssemblySimpleNameToAssembly.ContainsKey(assemblySimpleName))
                 throw new Exception(AssemblyNotInListOfLoadedAssemblies);
@@ -46,7 +46,7 @@ namespace OpenSilver.Compiler.Resources.Helpers
             var assembly = storage.LoadedAssemblySimpleNameToAssembly[assemblySimpleName];
 
             var manifestResourceNames = assembly.MainModule.Resources.Select(r => r.Name);
-            var resourceFiles = (from fn in manifestResourceNames where supportedExtensionsLowerCase.Contains(GetExtension(fn.ToLower())) select fn).ToArray();
+            var resourceFiles = manifestResourceNames.Where(x => GetExtension(x.ToLower()) != ".xaml").ToArray();
             var result = new Dictionary<string, byte[]>();
 
             foreach (var resourceFile in resourceFiles)

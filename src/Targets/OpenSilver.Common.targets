@@ -88,7 +88,7 @@
   Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
   ============================================================-->
   <PropertyGroup Condition="'$(CompilerBuildNumber)'==''">
-    <CompilerBuildNumber>12</CompilerBuildNumber>
+    <CompilerBuildNumber>13</CompilerBuildNumber>
   </PropertyGroup>
   <PropertyGroup Condition="'$(IsSecondPass)'==''">
     <IsSecondPass>False</IsSecondPass>
@@ -513,7 +513,6 @@
       OutputRootPath="$(ResourcesRootOutput)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp"
-      SupportedExtensions=".js|.css|.png|.jpg|.gif|.ico|.mp4|.ogv|.webm|.3gp|.mp3|.ogg|.txt|.xml|.ttf|.woff|.woff2|.cur|.config|.ClientConfig|.htm|.html|.svg"
       CoreAssemblyFiles="$(MSBuildThisFileDirectory)..\lib\netstandard2.0\OpenSilver.dll"
       >
       <Output TaskParameter="CopiedResXFiles" PropertyName="CopiedResXFiles"/>
