@@ -64,8 +64,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     void ChangeLogicalParent(DependencyObject newParent);
 
-    void SubscribeToSizeChanged();
-
     void LoadResources();
 
     void UnloadResources();

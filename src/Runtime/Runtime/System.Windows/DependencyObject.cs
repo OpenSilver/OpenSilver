@@ -571,6 +571,23 @@ namespace Windows.UI.Xaml
         {
         }
 
+        internal void NotifyPropertyChange(DependencyPropertyChangedEventArgs e)
+        {
+            if (e.Metadata is not null && e.Metadata.PropertyChangedCallback is not null)
+            {
+                e.Metadata.PropertyChangedCallback(this, e);
+            }
+
+            //---------------------
+            // Update bindings if any:
+            //---------------------
+
+            InvalidateDependents(e);
+
+            // Raise the InvalidateMeasure or InvalidateArrange
+            OnPropertyChanged(e);
+        }
+
         internal void SetLocalStyleValue(DependencyProperty dp, object value)
         {
             Debug.Assert(dp != null);
