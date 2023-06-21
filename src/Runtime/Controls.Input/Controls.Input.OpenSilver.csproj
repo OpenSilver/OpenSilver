@@ -10,7 +10,6 @@
     <Configurations>SL;UWP</Configurations>
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <OpenSilverVersion>1.1.0</OpenSilverVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Optimize>true</Optimize>
     <DefineTrace>true</DefineTrace>
@@ -107,8 +106,6 @@
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-
-  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)' == 'SL' " />
-  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)' == 'UWP' " />
+  <Import Project="$(OpenSilverTargets)" />
 
 </Project>

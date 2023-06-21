@@ -35,4 +35,6 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <Import Project="$(OpenSilverGenerateAssemblyInfoTargets)" />
+
 </Project>

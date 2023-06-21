@@ -17,4 +17,6 @@
     <ProjectReference Include="..\..\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
+  <Import Project="$(OpenSilverGenerateAssemblyInfoTargets)" />
+
 </Project>

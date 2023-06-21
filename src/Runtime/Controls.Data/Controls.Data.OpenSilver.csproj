@@ -11,13 +11,10 @@
     <Configurations>SL;UWP</Configurations>
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <OpenSilverVersion>1.1.0</OpenSilverVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
-
-
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION</DefineConstants>
@@ -25,7 +22,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
   </PropertyGroup>
-
 
   <ItemGroup>
     <Compile Include="..\Runtime\OpenSilver\Internal\RectangleAdapter.cs" Link="Helpers\RectangleAdapter.cs" />
@@ -137,7 +133,6 @@
     </EmbeddedResource>
   </ItemGroup>
 
-
   <ItemGroup>
     <Content Include="themes\generic.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -156,9 +151,6 @@
   </ItemGroup>
   
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-
-  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
-  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
-
+  <Import Project="$(OpenSilverTargets)" />
 
 </Project>
