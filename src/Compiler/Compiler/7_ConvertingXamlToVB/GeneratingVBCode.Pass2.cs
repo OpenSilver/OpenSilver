@@ -124,7 +124,7 @@ namespace OpenSilver.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"Public Shared Function {MethodName}({TemplateOwner} As Global.{_metadata.SystemWindowsNS}.FrameworkElement, {XamlContext} As {XamlContextClass}) As Global.{_metadata.SystemWindowsNS}.FrameworkElement")
+                    builder.AppendLine($"Public Shared Function {MethodName}({TemplateOwner} As Global.{_metadata.SystemWindowsNS}.IFrameworkElement, {XamlContext} As {XamlContextClass}) As Global.{_metadata.SystemWindowsNS}.IFrameworkElement")
                         .Append(StringBuilder.ToString());
                     builder.AppendLine($"Return {Root}")
                         .AppendLine("End Function");
@@ -549,15 +549,11 @@ namespace OpenSilver.Compiler
                                             // C# EVENT
                                             //------------
 
-                                            string eventHandlerType = _reflectionOnSeparateAppDomain.GetEventHandlerType(
-                                                memberName, namespaceName, localTypeName, assemblyNameIfAny
-                                            );
-
                                             parameters.StringBuilder.AppendLine(
                                                 string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3})",
                                                     RuntimeHelperClass,
                                                     parameters.CurrentXamlContext,
-                                                    parameters.ComponentConnector.Connect(elementTypeInCSharp, attributeLocalName, eventHandlerType, attributeValue),
+                                                    parameters.ComponentConnector.Connect(elementTypeInCSharp, attributeLocalName, attributeValue),
                                                     elementUniqueNameOrThisKeyword)
                                             );
 
