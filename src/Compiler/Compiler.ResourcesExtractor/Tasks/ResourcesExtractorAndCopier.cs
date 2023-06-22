@@ -42,9 +42,6 @@ namespace OpenSilver.Compiler.Resources
         [Required]
         public string AssembliesToIgnore { get; set; }
 
-        [Required]
-        public string SupportedExtensions { get; set; }
-
         public string CoreAssemblyFiles { get; set; }
 
         [Output]
@@ -60,7 +57,6 @@ namespace OpenSilver.Compiler.Resources
                 OutputRootPath,
                 OutputResourcesPath,
                 AssembliesToIgnore,
-                SupportedExtensions,
                 new LoggerThatUsesTaskOutput(this),
                 CoreAssemblyFiles,
                 out List<string> listOfCopiedResXFiles);
@@ -73,7 +69,6 @@ namespace OpenSilver.Compiler.Resources
             string outputRootPath,
             string outputResourcesPath,
             string assembliesToIgnore,
-            string supportedExtensions,
             ILogger logger,
             string coreAssemblyFiles,
             out List<string> listOfCopiedResXFiles)
@@ -113,8 +108,6 @@ namespace OpenSilver.Compiler.Resources
                         // Prepare some dictionaries:
                         string[] arrayWithSimpleNameOfAssembliesToIgnore = assembliesToIgnore != null ? assembliesToIgnore.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries) : new string[] { };
                         HashSet<string> simpleNameOfAssembliesToIgnore = new HashSet<string>(arrayWithSimpleNameOfAssembliesToIgnore);
-                        string[] arrayOfSupportedExtensions = supportedExtensions != null ? supportedExtensions.ToLowerInvariant().Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries) : new string[] { };
-                        HashSet<string> supportedExtensionsLowercase = new HashSet<string>(arrayOfSupportedExtensions);
 
                         // Do the extraction and copy:
                         isSuccess = ExtractResources(
@@ -122,7 +115,6 @@ namespace OpenSilver.Compiler.Resources
                             outputPathAbsolute,
                             outputResourcesPath,
                             simpleNameOfAssembliesToIgnore,
-                            supportedExtensionsLowercase,
                             logger,
                             storage,
                             out listOfCopiedResXFiles);
@@ -147,7 +139,6 @@ namespace OpenSilver.Compiler.Resources
             string outputPathAbsolute,
             string outputResourcesPath,
             HashSet<string> simpleNameOfAssembliesToIgnore,
-            HashSet<string> supportedExtensionsLowercase,
             ILogger logger,
             MonoCecilAssemblyStorage storage,
             out List<string> resXFilesCopied)
@@ -166,7 +157,7 @@ namespace OpenSilver.Compiler.Resources
                 // Process JavaScript, CSS, Image, Video, Audio files:
                 //-----------------------------------------------
 
-                Dictionary<string, byte[]> jsAndCssFiles = new ResourcesExtractor().GetManifestResources(storage, assemblySimpleName, supportedExtensionsLowercase);
+                Dictionary<string, byte[]> jsAndCssFiles = new ResourcesExtractor().GetManifestResources(storage, assemblySimpleName);
 
                 // Copy files:
                 foreach (KeyValuePair<string, byte[]> file in jsAndCssFiles)

@@ -16,7 +16,6 @@
 			OutputRootPath="wwwroot\"
 			OutputResourcesPath="resources\"
 			AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp"
-			SupportedExtensions=".js|.css|.png|.jpg|.gif|.ico|.mp4|.ogv|.webm|.3gp|.mp3|.ogg|.txt|.xml|.ttf|.woff|.cur|.config|.ClientConfig|.htm|.html|.svg"
 			CoreAssemblyFiles="$(OutputPath)\OpenSilver.dll">
 			<Output TaskParameter="CopiedResXFiles" PropertyName="CopiedResXFiles"/>
 			<Output TaskParameter="IsSuccess" PropertyName="ResourceExtractorAndCopierIsSuccess"/>

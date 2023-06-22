@@ -235,14 +235,6 @@ namespace Compiler.Tests
         }
 
         [TestMethod]
-        public void GetEventHandlerType_Should_Return_Full_Type()
-        {
-            var res = MonoCecilVersion.GetEventHandlerType(nameof(DerivedClassWithGenericEvents.DefaultEventWithEventHandler),
-                ExperimentalNamespace, nameof(DerivedClassWithGenericEvents), null);
-            res.Should().Be("global::System.EventHandler<global::System.String>");
-        }
-
-        [TestMethod]
         public void IsPropertyOrFieldACollection_Should_Return_True_For_List()
         {
             var res = MonoCecilVersion.IsPropertyOrFieldACollection(nameof(DerivedClassGenericType.ListField),

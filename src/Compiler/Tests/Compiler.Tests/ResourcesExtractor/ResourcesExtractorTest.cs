@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 
-using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Compiler.Common.Helpers;
@@ -43,11 +42,7 @@ namespace Compiler.Tests.ResourcesExtractor
         [TestMethod]
         public void GetManifestResources_Should_Include_File_Js()
         {
-            var res = ResourcesExtractor.GetManifestResources(Storage, ExperimentalSubjectName,
-                new HashSet<string>
-                {
-                    ".js", ".css", ".png", ".jpg", ".gif"
-                });
+            var res = ResourcesExtractor.GetManifestResources(Storage, ExperimentalSubjectName);
             res.ContainsKey("Experimental.file.js").Should().BeTrue();
         }
     }
