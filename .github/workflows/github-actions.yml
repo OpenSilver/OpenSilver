@@ -56,7 +56,7 @@ jobs:
         run: echo "::set-output name=version::${{ env.next-release-version }}-preview-${{ steps.format-suffix.outputs.suffix }}"
       - name: Build Simulator
         working-directory: build
-        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly
+        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
       - name: Pack OpenSilver
         working-directory: build
         run: |
