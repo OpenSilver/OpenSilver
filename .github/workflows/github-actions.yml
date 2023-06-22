@@ -44,6 +44,7 @@ jobs:
         run: |
           cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
           cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
+          cp src/Targets/OpenSilver.GenerateAssemblyInfo.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
       - name: Build OpenSilver
         working-directory: build
         run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore

@@ -44,8 +44,10 @@ jobs:
         run: |
           cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
           cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
+          cp src/Targets/OpenSilver.GenerateAssemblyInfo.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
           cp src/Targets/OpenSilver.UwpCompatible.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
           cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
+          cp src/Targets/OpenSilver.GenerateAssemblyInfo.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
       # There is the TestApplication for SL version in the Solution, so we need to build the latest SL package
       - name: Build OpenSilver
         working-directory: build
