@@ -84,6 +84,13 @@
   <PropertyGroup>
     <IsOpenSilver>true</IsOpenSilver>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
+    <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
+    <IsRazorProject  Condition="'$(UsingMicrosoftNETSdkRazor)'=='true'">True</IsRazorProject>
+    <SkipResourcesExtractorAndCopier Condition="'$(SkipResourcesExtractorAndCopier)' == '' And '$(IsBrowserProject)' != 'True'">true</SkipResourcesExtractorAndCopier>
+  </PropertyGroup>
   
   <!--============================================================
   Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
@@ -211,11 +218,6 @@
 	  <!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
-	<PropertyGroup>
-	  <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
-	  <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
-	  <IsRazorProject  Condition="'$(UsingMicrosoftNETSdkRazor)'=='true'">True</IsRazorProject>
-	</PropertyGroup>
     <Exec
       Condition="'$(IsBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
       Command="explorer.exe https://opensilver.net/permalinks/update/alpha7.aspx" Timeout="2000" ContinueOnError="True"></Exec>
@@ -258,11 +260,6 @@
     <!--============================================================
       Change the Build Action of JS/CSS/Image/Video/Audio/Text/Xml/Font files from ["Content", "Resource"] to "EmbeddedResource" in case the developer has not already done so.
       ============================================================-->
-
-    <PropertyGroup>
-      <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
-      <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
-    </PropertyGroup>
 
     <ItemGroup Condition="'$(IsBrowserProject)' == 'False'">
       <EmbeddedResource Include="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
