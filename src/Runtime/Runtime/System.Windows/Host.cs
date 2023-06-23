@@ -18,12 +18,12 @@ using System.Windows.Interop;
 using CSHTML5.Internal;
 
 #if MIGRATION
-namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
+namespace System.Windows
 #else
-namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
+namespace Windows.UI.Xaml
 #endif
 {
-    public partial class Host
+    public class Host
     {
         private readonly bool _hookupEvents;
         private readonly JavaScriptCallback _hashChangeCallback;
@@ -37,7 +37,6 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         internal Host(bool hookupEvents)
         {
             _hookupEvents = hookupEvents;
-            _content = new Content(_hookupEvents);
 
             _navigationState = GetBrowserNavigationState();
             _hashChangeCallback = JavaScriptCallback.Create(OnNavigationChanged, true);
@@ -161,33 +160,5 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 
             return initParams;
         }
-
-        //// Summary:
-        ////     Gets the background color value that was applied to the Silverlight plug-in
-        ////     as part of instantiation settings.
-        ////
-        //// Returns:
-        ////     The background color for the Silverlight plug-in.
-        //public Color Background { get; }
-        ////
-        //// Summary:
-        ////     Gets a value that indicates whether the hosted Silverlight plug-in has finished
-        ////     loading.
-        ////
-        //// Returns:
-        ////     true if the plug-in has finished loading; otherwise, false.
-        //public bool IsLoaded { get; }
-        //// Summary:
-        ////     Returns a value that indicates whether the installed Silverlight plug-in
-        ////     supports the specified version.
-        ////
-        //// Parameters:
-        ////   versionStr:
-        ////     The version to check, in the form of major.minor.build.revision See Remarks
-        ////     for more information about the string form.
-        ////
-        //// Returns:
-        ////     true if the version can be supported by the installation; otherwise, false.
-        //public bool IsVersionSupported(string versionStr);
     }
 }

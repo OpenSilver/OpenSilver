@@ -50,7 +50,7 @@ namespace OpenSilver.Internal
         /// <returns></returns>
         public static IResizeObserverAdapter Create()
         {
-            if (Application.Current.Host.Settings.UseResizeSensor || Interop.IsRunningInTheSimulator)
+            if (Interop.IsRunningInTheSimulator)
             {
                 return new ResizeSensorAdapter();
             }
@@ -84,7 +84,7 @@ namespace OpenSilver.Internal
         /// <summary>
         /// An implementation of the <see cref="IResizeObserverAdapter"/> using the ResizeSensor js library.
         /// </summary>
-        private class ResizeSensorAdapter : IResizeObserverAdapter
+        private sealed class ResizeSensorAdapter : IResizeObserverAdapter
         {
             private bool _isObserved;
             private object _resizeSensor;
@@ -136,7 +136,7 @@ namespace OpenSilver.Internal
         /// <summary>
         /// An implementation of the <see cref="IResizeObserverAdapter"/> using the standard ResizeObserver API.
         /// </summary>
-        private class ResizeObserverAdapter : IResizeObserverAdapter
+        private sealed class ResizeObserverAdapter : IResizeObserverAdapter
         {
             // Holds the reference to the observer js object.
             private static object _observerJsReference;

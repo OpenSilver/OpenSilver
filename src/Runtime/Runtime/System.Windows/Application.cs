@@ -57,8 +57,9 @@ namespace Windows.UI.Xaml
     {
         private static Dictionary<string, string> _resourcesCache = null;
         private ApplicationLifetimeObjectsCollection lifetime_objects;
-        private Window _mainWindow;
+        private readonly Window _mainWindow;
         private ResourceDictionary _resources;
+        private Host _host;
         private Dictionary<object, object> _implicitResourcesCache;
 
         // Says if App.Resources has any implicit styles
@@ -698,21 +699,11 @@ namespace Windows.UI.Xaml
         }
 
         #endregion
-
-        private Host _host = new Host(true);
-
+        
         /// <summary>
         /// Gets various details about the application's host.
         /// </summary>
-        public Host Host
-        {
-            get
-            {
-                if (_host == null)
-                    _host = new Host(true);
-                return _host;
-            }
-        }
+        public Host Host => _host ??= new Host(true);
 
 #if CSHTML5NETSTANDARD
         /// <summary>
