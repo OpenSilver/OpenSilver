@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -15,21 +14,23 @@
 using System;
 using CSHTML5;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if !MIGRATION
+using Windows.Foundation;
 using Windows.UI.Xaml.Interop;
 #endif
 
 #if MIGRATION
 namespace System.Windows.Interop
 #else
-namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
+namespace Windows.UI.Xaml
 #endif
 {
-    public partial class Content
+    public class Content
     {
         private readonly JavaScriptCallback _fullscreenchangeCallback;
-        private readonly JavaScriptCallback _windowresizeCallback;
+        private readonly IResizeObserverAdapter _resizeObserver;
 
         public Content() : this(null)
         {
@@ -40,16 +41,13 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             if (app is not null)
             {
                 _fullscreenchangeCallback = JavaScriptCallback.Create(FullScreenChangedCallback, true);
-                _windowresizeCallback = JavaScriptCallback.Create(WindowResizeCallback, true);
 
                 // Hooks the FullScreenChanged event
                 OpenSilver.Interop.ExecuteJavaScriptVoid(
                     $"document.addEventListener('fullscreenchange', {INTERNAL_InteropImplementation.GetVariableStringForJS(_fullscreenchangeCallback)})");
 
-                // Hooks the Resized event
-                string sRoot = INTERNAL_InteropImplementation.GetVariableStringForJS(app.GetRootDiv());
-                OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"new ResizeSensor({sRoot}, {INTERNAL_InteropImplementation.GetVariableStringForJS(_windowresizeCallback)})");
+                _resizeObserver = ResizeObserverFactory.Create();
+                _resizeObserver.Observe(app.GetRootDiv(), OnContentSizeChanged);
 
                 // WORKINPROGRESS
                 // Add Zoomed event
@@ -59,24 +57,12 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         /// <summary>
         /// Gets the browser-determined height of the content area.
         /// </summary>
-        public double ActualHeight
-        {
-            get
-            {
-                return Application.Current.MainWindow.ActualHeight;
-            }
-        }
+        public double ActualHeight => Application.Current.MainWindow.ActualHeight;
 
         /// <summary>
         /// Gets the browser-determined width of the Silverlight content area.
         /// </summary>
-        public double ActualWidth
-        {
-            get
-            {
-                return Application.Current.MainWindow.ActualWidth;
-            }
-        }
+        public double ActualWidth => Application.Current.MainWindow.ActualWidth;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the page is displaying in full-screen mode.
@@ -128,7 +114,6 @@ if (requestMethod) {
         /// </returns>
         public double ZoomFactor => OpenSilver.Interop.ExecuteJavaScriptDouble("window.devicePixelRatio", false);
 
-
         /// <summary>
         /// Occurs when the browser enters or exits full-screen mode.
         /// </summary>
@@ -143,19 +128,15 @@ if (requestMethod) {
         /// Called when the full screen mode changes.
         /// Fires the <see cref="FullScreenChanged"/> event.
         /// </summary>
-        private void FullScreenChangedCallback()
-        {
+        private void FullScreenChangedCallback() =>
             FullScreenChanged?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
-        }
 
         /// <summary>
         /// Called when the window gets resized.
         /// Fires the <see cref="Resized"/> event.
         /// </summary>
-        private void WindowResizeCallback()
-        {
+        private void OnContentSizeChanged(Size size) =>
             Resized?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
-        }
 
         /// <summary>
         /// Gets or sets a value that indicates the behavior of full-screen mode.

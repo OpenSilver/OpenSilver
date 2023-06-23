@@ -32,7 +32,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 
 namespace System
 {
-    public partial class Settings
+    public class Settings
     {
         private readonly Lazy<bool> _windowless = new Lazy<bool>(() =>
         {
@@ -90,6 +90,8 @@ namespace System
         /// instead of the ResizeObserver API to listen for size change event in Html.
         /// </summary>
         /// <remarks>Should probably be removed once we get the ResizeObserver fully working.</remarks>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool UseResizeSensor { get; set; }
 
         public bool EnableInteropLogging
