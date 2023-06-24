@@ -850,51 +850,81 @@
     
     <!-- ScrollViewer -->
     <Style TargetType="ScrollViewer">
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
-        <Setter Property="VerticalContentAlignment" Value="Top" />
-        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
-        <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Top" />
+        <Setter Property="VerticalScrollBarVisibility"
+                Value="Visible" />
+        <Setter Property="Padding"
+                Value="4" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="0.5,1"
+                                     StartPoint="0.5,0">
+                    <GradientStop Color="#FFA3AEB9"
+                                  Offset="0" />
+                    <GradientStop Color="#FF8399A9"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF718597"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF617584"
+                                  Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollViewer">
-                    <Border CornerRadius="2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border CornerRadius="2"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid Background="{TemplateBinding Background}">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <ScrollContentPresenter x:Name="ScrollContentPresenter"
                                                     Cursor="{TemplateBinding Cursor}"
                                                     Margin="{TemplateBinding Padding}"
-                                                    ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                                    ContentTemplate="{TemplateBinding ContentTemplate}" />
 
-                            <Rectangle Grid.Column="1" Grid.Row="1" Fill="#FFE9EEF4"/>
+                            <Border Grid.Column="1"
+                                    Grid.Row="1"
+                                    Background="#FFE9EEF4" />
 
-                            <ScrollBar x:Name="VerticalScrollBar" Width="18"
+                            <ScrollBar x:Name="VerticalScrollBar"
+                                       Width="18"
                                        IsTabStop="False"
                                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                                       Grid.Column="1" Grid.Row="0" Orientation="Vertical"
+                                       Grid.Column="1"
+                                       Grid.Row="0"
+                                       Orientation="Vertical"
                                        ViewportSize="{TemplateBinding ViewportHeight}"
                                        Maximum="{TemplateBinding ScrollableHeight}"
                                        Minimum="0"
                                        Value="{TemplateBinding VerticalOffset}"
-                                       Margin="0,-1,0,-1"/>
+                                       Margin="0,-1,-1,-1" />
 
-                            <ScrollBar x:Name="HorizontalScrollBar" Height="18"
+                            <ScrollBar x:Name="HorizontalScrollBar"
+                                       Height="18"
                                        IsTabStop="False"
                                        Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
-                                       Grid.Column="0" Grid.Row="1" Orientation="Horizontal"
+                                       Grid.Column="0"
+                                       Grid.Row="1"
+                                       Orientation="Horizontal"
                                        ViewportSize="{TemplateBinding ViewportWidth}"
                                        Maximum="{TemplateBinding ScrollableWidth}"
                                        Minimum="0"
                                        Value="{TemplateBinding HorizontalOffset}"
-                                       Margin="-1,0,-1,0"/>
-
+                                       Margin="-1,0,-1,-1" />
                         </Grid>
                     </Border>
                 </ControlTemplate>
