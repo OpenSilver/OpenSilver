@@ -269,7 +269,10 @@ namespace Windows.UI.Xaml.Controls
             switch (e.Key)
             {
                 case Key.Enter:
-                    KeyboardCloseDropDown(true);
+                    if (ItemsControlFromItemContainer(FocusManager.GetFocusedElement() as DependencyObject) == this)
+                    {
+                        KeyboardCloseDropDown(true);
+                    }
                     break;
                 case Key.Escape:
                     KeyboardCloseDropDown(false);
