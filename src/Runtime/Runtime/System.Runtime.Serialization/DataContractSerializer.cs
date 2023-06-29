@@ -131,9 +131,25 @@ namespace System.Runtime.Serialization
         public string SerializeToString(object obj, bool indentXml = false, bool omitXmlDeclaration = false)
         {
             return (omitXmlDeclaration ? "" : (@"<?xml version=""1.0"" encoding=""UTF-8""?>" + Environment.NewLine)) +
-                this.SerializeToXDocument(obj).ToString(indentXml ? SaveOptions.None : SaveOptions.DisableFormatting);
+                this.SerializeToXmlDocument(obj).OuterXml;
         }
 
+        public XmlDocument SerializeToXmlDocument(object obj)
+        {
+            XmlDocument doc = null;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                this.SerializePrivate(ms, obj);
+                using (StreamReader sr = new StreamReader(ms))
+                {
+                    ms.Seek(0, SeekOrigin.Begin);
+                    string xml = sr.ReadToEnd();
+                    doc = new XmlDocument();
+                    doc.LoadXml(xml);
+                }
+            }
+            return doc;
+        }
         public XDocument SerializeToXDocument(object obj)
         {
             XDocument doc = null;
@@ -165,6 +181,10 @@ namespace System.Runtime.Serialization
             }
             return o;
         }
+        public object DeserializeFromXmlNode(XmlNode xElement)
+        {
+            return this.DeserializeFromString(xElement.OuterXml);
+        }
 
         public object DeserializeFromXElement(XElement xElement)
         {
@@ -185,13 +205,16 @@ namespace System.Runtime.Serialization
 
         private object DeserializePrivate(Stream s)
         {
+            var settings = new XmlReaderSettings();
+            settings.CheckCharacters = false;
+            var reader = XmlReader.Create(s, settings);
             if (this._useXmlSerializerFormat)
             {
-                return this._xmlSerializer.Deserialize(XmlReader.Create(s));
+                return this._xmlSerializer.Deserialize(reader);
             }
             else
             {
-                return this._dataContractSerializer.ReadObject(XmlReader.Create(s), false);
+                return this._dataContractSerializer.ReadObject(reader, false);
             }
         }
     }
