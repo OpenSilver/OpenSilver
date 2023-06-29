@@ -106,7 +106,7 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Padding"
-                Value="6,2,30,2" />
+                Value="6,2,25,2" />
         <Setter Property="Cursor"
                 Value="Hand" />
         <Setter Property="HorizontalContentAlignment"
@@ -209,6 +209,7 @@
                                           Visibility="Visible"
                                           Stroke="{TemplateBinding Foreground}"
                                           Fill="{TemplateBinding Foreground}"
+                                          Margin="0,0,6,0"
                                           Width="5"
                                           Height="3"
                                           StrokeThickness="1"
