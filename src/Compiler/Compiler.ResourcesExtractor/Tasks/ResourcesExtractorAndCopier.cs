@@ -147,7 +147,6 @@ namespace OpenSilver.Compiler.Resources
                                 outputRootPath,
                                 outputResourcesPath,
                                 assembliesToIgnore,
-                                supportedExtensions,
                                 logger,
                                 coreAssemblyFiles,
                                 out listOfCopiedResXFiles);
