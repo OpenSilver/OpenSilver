@@ -18,6 +18,17 @@ set sourceBase=%repoPath%\src\Compiler
 set destDirSL=%repoPath%\src\packages\OpenSilver.%STABLE_VERSION%
 set destDirUWP=%repoPath%\src\packages\OpenSilver.UWPCompatible.%STABLE_VERSION%
 
+echo. 
+echo %ESC%[95mCopying targets.%ESC%[0m
+echo.
+
+copy %repoPath%\src\Targets\OpenSilver.targets %destDirSL%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirSL%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.GenerateAssemblyInfo.targets %destDirSL%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.targets %destDirUWP%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.GenerateAssemblyInfo.targets %destDirUWP%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirUWP%\build >NUL
+
 taskkill /f /im "msbuild.exe" >NUL
 
 echo. 
@@ -31,7 +42,7 @@ msbuild slnf/Compiler.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
 taskkill /f /im "msbuild.exe" >NUL
 
 echo. 
-echo %ESC%[95mCopying Compiler DLLs and targets.%ESC%[0m
+echo %ESC%[95mCopying Compiler DLLs.%ESC%[0m
 echo.
 
 CALL :copyDll Compiler OpenSilver.Compiler
@@ -43,12 +54,6 @@ CALL :copyDll Compiler Mono.Cecil
 CALL :copyDll Compiler Mono.Cecil.Mdb
 CALL :copyDll Compiler Mono.Cecil.Pdb
 CALL :copyDll Compiler Mono.Cecil.Rocks
-copy %repoPath%\src\Targets\OpenSilver.targets %destDirSL%\build >NUL
-copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirSL%\build >NUL
-copy %repoPath%\src\Targets\OpenSilver.GenerateAssemblyInfo.targets %destDirSL%\build >NUL
-copy %repoPath%\src\Targets\OpenSilver.targets %destDirUWP%\build >NUL
-copy %repoPath%\src\Targets\OpenSilver.GenerateAssemblyInfo.targets %destDirUWP%\build >NUL
-copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirUWP%\build >NUL
 
 EXIT /B 0
 :copyDll
