@@ -339,8 +339,8 @@ namespace Windows.UI.Xaml.Controls
 
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            // Skip when loading or changed on TextMeasurement Div.
-            if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
+            // Skip when loading
+            if (INTERNAL_OuterDomElement == null)
                 return;
 
             FrameworkPropertyMetadata metadata = e.Property.GetMetadata(DependencyObjectType) as FrameworkPropertyMetadata;
@@ -361,7 +361,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (noWrapSize == Size.Empty)
             {
-                noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+                noWrapSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
                     uniqueIdentifier,
                     "pre",
                     string.Empty,
@@ -376,7 +376,7 @@ namespace Windows.UI.Xaml.Controls
                 return noWrapSize;
             }
 
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+            Size TextSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
                 uniqueIdentifier,
                 TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
                 TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",

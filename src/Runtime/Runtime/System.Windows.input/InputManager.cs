@@ -95,10 +95,8 @@ internal sealed class InputManager
 
         if (Current == null)
         {
-            string sRootElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
-                INTERNAL_HtmlDomManager.GetApplicationRootDomElement());
             string sHandler = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_handler);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sRootElement}, {sHandler});");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sHandler});");
         }
     }
 
@@ -106,6 +104,12 @@ internal sealed class InputManager
     /// Return the input manager associated with the current context.
     /// </summary>
     public static InputManager Current { get; } = new InputManager();
+
+    internal void RegisterRoot(object element)
+    {
+        string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(element);
+        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.registerRoot({sElement});");
+    }
 
     internal ModifierKeys GetKeyboardModifiers()
     {

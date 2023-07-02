@@ -1086,9 +1086,7 @@ namespace Windows.UI.Xaml
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             // Skip when loading or changed on TextMeasurement Div.
-            if (this.INTERNAL_OuterDomElement == null || 
-                Application.Current.TextMeasurementService.IsTextMeasureDivID(
-                    ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
+            if (INTERNAL_OuterDomElement == null)
             {
                 return;
             }

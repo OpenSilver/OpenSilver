@@ -494,16 +494,6 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
 
         private void UpdateDomText(string text)
         {
-            if (INTERNAL_OuterDomElement != null &&
-                Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier))
-            {
-                if (_contentEditableDiv == null)
-                    return;
-
-                INTERNAL_HtmlDomManager.SetContentString(this, text);
-                return;
-            }
-
             if (_contentEditableDiv == null)
                 return;
 
@@ -516,7 +506,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
         protected override Size MeasureOverride(Size availableSize)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+            Size TextSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
                 uniqueIdentifier,
                 Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
                 Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",

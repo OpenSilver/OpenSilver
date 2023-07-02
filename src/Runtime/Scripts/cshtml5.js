@@ -82,38 +82,23 @@ if (div.style.display == "grid") {
 // DEFINE OTHER SCRIPTS
 //------------------------------
 
-document.getXamlRoot = function () {
-    let xamlRoot = document.getElementById("opensilver-root");
-    if (!xamlRoot) {
-        xamlRoot = document.getElementById("cshtml5-root");
+document.getAppParams = function (element) {
+    if (element) {
+        return JSON.stringify(
+            Array.from(
+                element.getElementsByTagName("param"),
+                function (p) { return { Name: p.name, Value: p.value }; }
+            )
+        );
     }
-    return xamlRoot;
-}
 
-document.clearXamlRoot = function () {
-    const children = document.getXamlRoot().children;
-
-    for (i = children.length - 1; i >= 0; i--) {
-        if (children[i].tagName !== "PARAM") {
-            children[i].remove();
-        }
-    }
-}
-
-document.getAppParams = function () {
-    return JSON.stringify(
-        Array.from(
-            document.getXamlRoot().getElementsByTagName("param"),
-            function (p) { return { Name: p.name, Value: p.value }; }
-        )
-    );
+    return JSON.stringify([]);
 }
 
 document.ResXFiles = {};
 
 document.jsObjRef = {};
 document.callbackCounterForSimulator = 0;
-document.measureTextBlockElement = null;
 
 document.performanceCounters = [];
 
@@ -387,7 +372,7 @@ document.setFocus = function (element) {
     });
 };
 
-document.createInputManager = function (root, callback) {
+document.createInputManager = function (callback) {
     if (document.inputManager) return;
 
     // This must remain synchronyzed with the EVENTS enum defined in InputManager.cs.
@@ -454,11 +439,7 @@ document.createInputManager = function (root, callback) {
         return e.timeStamp - _lastTouchEndTimeStamp < 500;
     };
 
-    function initDom(root) {
-
-        // Make sure the root div is keyboard focusable, so that we can tab into the app.
-        root.tabIndex = Math.max(root.tabIndex, 0);
-
+    function initDom() {
         document.addEventListener('mousedown', function (e) {
             if (!e.isHandled) {
                 switch (e.button) {
@@ -515,56 +496,60 @@ document.createInputManager = function (root, callback) {
             callback('', EVENTS.WINDOW_BLUR, e);
             _modifiers = MODIFIERKEYS.NONE;
         });
-
-        root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
-
-        root.addEventListener('mousemove', function (e) {
-            if (shouldIgnoreMouseEvent(e)) return;
-
-            e.isHandled = true;
-            const target = _mouseCapture || e.target;
-            callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
-        });
-
-        root.addEventListener('wheel', function (e) {
-            e.isHandled = true;
-            callback(getClosestElementId(e.target), EVENTS.WHEEL, e);
-        });
-
-        root.addEventListener('mousedown', function (e) {
-            if (shouldIgnoreMouseEvent(e)) return;
-
-            e.isHandled = true;
-            let id = (_mouseCapture === null || e.target === _mouseCapture) ? getClosestElementId(e.target) : '';
-            switch (e.button) {
-                case 0:
-                    callback(id, EVENTS.MOUSE_LEFT_DOWN, e);
-                    break;
-                case 2:
-                    callback(id, EVENTS.MOUSE_RIGHT_DOWN, e);
-                    break;
-            }
-        });
-
-        root.addEventListener('mouseup', function (e) {
-            if (shouldIgnoreMouseEvent(e)) return;
-
-            e.isHandled = true;
-            const target = _mouseCapture || e.target;
-            switch (e.button) {
-                case 0:
-                    callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
-                    break;
-                case 2:
-                    callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
-                    break;
-            }
-        });
     };
 
-    initDom(root);
+    initDom();
 
     document.inputManager = {
+        registerRoot: function (root) {
+            // Make sure the root div is keyboard focusable, so that we can tab into the app.
+            root.tabIndex = Math.max(root.tabIndex, 0);
+
+            root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
+
+            root.addEventListener('mousemove', function (e) {
+                if (shouldIgnoreMouseEvent(e)) return;
+
+                e.isHandled = true;
+                const target = _mouseCapture || e.target;
+                callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
+            });
+
+            root.addEventListener('wheel', function (e) {
+                e.isHandled = true;
+                callback(getClosestElementId(e.target), EVENTS.WHEEL, e);
+            });
+
+            root.addEventListener('mousedown', function (e) {
+                if (shouldIgnoreMouseEvent(e)) return;
+
+                e.isHandled = true;
+                let id = (_mouseCapture === null || e.target === _mouseCapture) ? getClosestElementId(e.target) : '';
+                switch (e.button) {
+                    case 0:
+                        callback(id, EVENTS.MOUSE_LEFT_DOWN, e);
+                        break;
+                    case 2:
+                        callback(id, EVENTS.MOUSE_RIGHT_DOWN, e);
+                        break;
+                }
+            });
+
+            root.addEventListener('mouseup', function (e) {
+                if (shouldIgnoreMouseEvent(e)) return;
+
+                e.isHandled = true;
+                const target = _mouseCapture || e.target;
+                switch (e.button) {
+                    case 0:
+                        callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
+                        break;
+                    case 2:
+                        callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
+                        break;
+                }
+            });
+        },
         addListeners: function (element, isFocusable) {
             const view = typeof element === 'string' ? document.getElementById(element) : element;
             if (!view) return;
@@ -732,8 +717,8 @@ document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMa
     }
 }
 
-document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, maxWidth, emptyVal) {
-    var element = document.measureTextBlockElement;
+document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflowWrap, padding, maxWidth, emptyVal) {
+    var element = document.getElementById(measureElementId);
     var elToMeasure = document.getElementById(uid);
     if (element && elToMeasure) {
         var computedStyle = getComputedStyle(elToMeasure);

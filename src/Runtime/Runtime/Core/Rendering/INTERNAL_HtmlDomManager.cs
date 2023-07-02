@@ -47,20 +47,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store = new Dictionary<string, WeakReference<UIElement>>(2048);
         }
 
-        private static object _rootDomElement;
-
-        public static object GetApplicationRootDomElement()
-        {
-            _rootDomElement ??= OpenSilver.Interop.ExecuteJavaScriptAsync("document.getXamlRoot()");
-
-            if (_rootDomElement == null)
-            {
-                const string ROOT_NAME = "opensilver-root";
-                throw new Exception("The application root DOM element was not found. To fix this issue, please add a DIV with the ID '" + ROOT_NAME + "' to the HTML page.");
-            }
-
-            return _rootDomElement;
-        }
+        public static object GetApplicationRootDomElement() => Application.Current?.GetRootDiv();
 
         internal static UIElement GetElementById(string id)
         {

@@ -42,6 +42,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Dispatcher = Windows.UI.Core.CoreDispatcher;
 #endif
 
 #if MIGRATION
@@ -56,13 +57,17 @@ namespace Windows.UI.Xaml
     public partial class Application
     {
         private static Dictionary<string, string> _resourcesCache = null;
-        private ApplicationLifetimeObjectsCollection lifetime_objects;
-        private Window _mainWindow;
+
+        private readonly Window _mainWindow;
+        private readonly INTERNAL_HtmlDomElementReference _rootDiv;
+        
+        private ApplicationLifetimeObjectsCollection _lifetimeObjects;
         private ResourceDictionary _resources;
         private Dictionary<object, object> _implicitResourcesCache;
+        private Host _host;
 
         // Says if App.Resources has any implicit styles
-        internal bool HasImplicitStylesInResources { get; set; }        
+        internal bool HasImplicitStylesInResources { get; set; }
 
         /// <summary>
         /// Gets the Application object for the current application.
@@ -71,12 +76,22 @@ namespace Windows.UI.Xaml
 
         internal INTERNAL_XamlResourcesHandler XamlResourcesHandler { get; } = new INTERNAL_XamlResourcesHandler();
 
-        internal ITextMeasurementService TextMeasurementService { get; private set; }
-
         public Application()
+            : this("opensilver-root")
         {
+        }
+
+        public Application(string rootDivId)
+        {
+            if (string.IsNullOrEmpty(rootDivId))
+            {
+                throw new ArgumentNullException(nameof(rootDivId));
+            }
+
+            _rootDiv = new INTERNAL_HtmlDomElementReference(rootDivId, null);
+
             // Keep a reference to the app:
-            Application.Current = this;
+            Current = this;
 
             // Initialize Deployment
             _ = Deployment.Current;
@@ -110,35 +125,11 @@ namespace Windows.UI.Xaml
             INTERNAL_FontsHelper.DefaultCssFontFamily = OpenSilver.Interop.ExecuteJavaScriptString(
                 "window.getComputedStyle(document.getElementsByTagName('body')[0]).getPropertyValue(\"font-family\")");
 
-
-            TextMeasurementService = new TextMeasurementService();
-
-            // Initialize the window:
-            if (_mainWindow == null) // Note: it could be != null if the user clicks "Restart" from the Simulator advanced options.
-            {
-                _mainWindow = new Window(true, true);
-                Window.Current = _mainWindow;
-                object applicationRootDomElement = INTERNAL_HtmlDomManager.GetApplicationRootDomElement();
-                _mainWindow.AttachToDomElement(applicationRootDomElement);
-
-#if !CSHTML5NETSTANDARD
-                // Workaround an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
-                if (INTERNAL_HtmlDomManager.IsFirefox())
-                {
-                    _mainWindow.SizeChanged += MainWindow_SizeChanged;
-                    _timerForWorkaroundFireFoxIssue.Interval = new TimeSpan(0, 0, 2);
-                    _timerForWorkaroundFireFoxIssue.Tick += TimerForWorkaroundFireFoxIssue_Tick;
-                }
-#endif
-            }
+            Window.Current = _mainWindow = new Window(true);
+            _mainWindow.AttachToDomElement(_rootDiv);
 
             // We call the "Startup" event and the "OnLaunched" method using the Dispatcher, because usually the user registers the "Startup" event in the constructor of the "App.cs" class, which is derived from "Application.cs", and therefore when we arrive here the event is not yet registered. Executing the code in the Dispatcher ensures that the constructor of the "App.cs" class has finished before running the code.
-#if MIGRATION
-            Dispatcher
-#else
-            CoreDispatcher
-#endif
-                .CurrentDispatcher.BeginInvoke(() =>
+            Dispatcher.CurrentDispatcher.BeginInvoke(() =>
             {
                 StartAppServices();
 
@@ -152,18 +143,7 @@ namespace Windows.UI.Xaml
 
         }
 
-        public IList ApplicationLifetimeObjects
-        {
-            get
-            {
-                if (lifetime_objects == null)
-                {
-                    lifetime_objects = new ApplicationLifetimeObjectsCollection();
-                }
-
-                return lifetime_objects;
-            }
-        }
+        public IList ApplicationLifetimeObjects => _lifetimeObjects ??= new ApplicationLifetimeObjectsCollection();
 
         private void StartAppServices()
         {
@@ -191,15 +171,16 @@ namespace Windows.UI.Xaml
             public string Value { get; set; }
         }
 
-        private static IDictionary<string, string> GetAppParams()
+        private IDictionary<string, string> GetAppParams()
         {
             var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             HTMLParam[] paramsArray;
             try
             {
+                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(_rootDiv);
                 paramsArray = JsonSerializer.Deserialize<HTMLParam[]>(
-                    OpenSilver.Interop.ExecuteJavaScriptString("document.getAppParams()"));
+                    OpenSilver.Interop.ExecuteJavaScriptString($"document.getAppParams({sElement});"));
             }
             catch
             {
@@ -216,71 +197,6 @@ namespace Windows.UI.Xaml
 
             return new ReadOnlyDictionary<string, string>(parameters);
         }
-
-        #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
-
-#if !CSHTML5NETSTANDARD
-        DispatcherTimer _timerForWorkaroundFireFoxIssue = new DispatcherTimer();
-        ChildWindow _childWindowForWorkaroundFireFoxIssue;
-
-        void MainWindow_SizeChanged(object sender, WindowSizeChangedEventArgs e)
-        {
-            INTERNAL_WorkAroundFirefoxDisappearingUI();
-        }
-
-        public void INTERNAL_WorkAroundFirefoxDisappearingUI() //todo: move this method to the "PublicAPI" folder?
-        {
-            // Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
-            if (_childWindowForWorkaroundFireFoxIssue == null) // Avoids entering multiple times on a single resize.
-            {
-                _childWindowForWorkaroundFireFoxIssue = new ChildWindow() { Opacity = 0 };
-                _childWindowForWorkaroundFireFoxIssue.Show();
-                _timerForWorkaroundFireFoxIssue.Start();
-            }
-        }
-
-#if MIGRATION
-        void TimerForWorkaroundFireFoxIssue_Tick(object sender, EventArgs e)
-#else
-        void TimerForWorkaroundFireFoxIssue_Tick(object sender, object e)
-#endif
-        {
-            // Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
-            _childWindowForWorkaroundFireFoxIssue.Dispatcher.BeginInvoke(() =>
-            {
-                _timerForWorkaroundFireFoxIssue.Stop();
-                _childWindowForWorkaroundFireFoxIssue.Close();
-                _childWindowForWorkaroundFireFoxIssue = null;
-            });
-        }
-#endif
-
-        #endregion
-
-        /// <summary>
-        /// Injects the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why).
-        /// </summary>
-        static void InjectDataContractSerializerIntoXmlSerializer()
-        {
-
-#if !FOR_DESIGN_TIME && !CSHTML5NETSTANDARD && !BRIDGE //Note: in case of "Design Time", we reference the .NET Framework version of "System.xml.dll", so the code below would not compile because the specified members of XmlSerializer would be missing.
-            XmlSerializer.MethodToSerializeUsingDataContractSerializer = (obj, type) => { return (new DataContractSerializer(type, useXmlSerializerFormat: true)).SerializeToString(obj); };
-            XmlSerializer.MethodToDeserializeUsingDataContractSerializer = (str, type) => { return (new DataContractSerializer(type, useXmlSerializerFormat: true)).DeserializeFromString(str); };
-#endif
-        }
-
-#if !CSHTML5NETSTANDARD
-#if !BRIDGE
-        [JSIL.Meta.JSIgnore]
-#else
-        [Bridge.External]
-#endif
-        static void RedirectAlertToMessageBox_SimulatorOnly()
-        {
-            // Fix the freezing of the Simulator when calling 'alert' using the "Interop.ExecuteJavaScript()" method by redirecting the JavaScript "alert" to the Simulator message box:
-            CSHTML5.Interop.ExecuteJavaScript(@"window.alert =  function(msg){ $0(msg); }", (Action<object>)((msg) => { MessageBox.Show(msg.ToString()); }));
-        }
-#endif
 
         /// <summary>
         /// Gets a collection of application-scoped resources, such as styles, templates,
@@ -394,43 +310,25 @@ namespace Windows.UI.Xaml
         /// </summary>
         public event StartupEventHandler Startup;
 
-        //protected virtual void InitializeComponent()
-        //{
-        //}
-
         /// <summary>
-        /// Gets or sets the main application UI. This is an alias for: Window.Current.Content
+        /// Gets or sets the main application UI. This is an alias for the 
+        /// <see cref="Window.Content"/> of this application's <see cref="MainWindow"/>.
         /// </summary>
         public UIElement RootVisual
         {
-            get
-            {
-                return Window.Current.Content;
-            }
-            set
-            {
-                Window.Current.Content = value as FrameworkElement;
-            }
+            get => _mainWindow.Content;
+            set => _mainWindow.Content = value as FrameworkElement;
         }
-
-        /// <summary>
-        /// Occurs just before an application shuts down and cannot be canceled.
-        /// </summary>
-        //public event EventHandler Exit;
 
         //returns the html window element
         internal object GetWindow() => INTERNAL_HtmlDomManager.GetHtmlWindow();
 
+        internal INTERNAL_HtmlDomElementReference GetRootDiv() => _rootDiv;
+
         /// <summary>
         /// Gets the application main window.
         /// </summary>
-        public Window MainWindow
-        {
-            get
-            {
-                return Window.Current;
-            }
-        }
+        public Window MainWindow => _mainWindow;
 
         // Exceptions:
         //   System.ArgumentNullException:
@@ -699,22 +597,11 @@ namespace Windows.UI.Xaml
 
         #endregion
 
-        private Host _host = new Host(true);
-
         /// <summary>
         /// Gets various details about the application's host.
         /// </summary>
-        public Host Host
-        {
-            get
-            {
-                if (_host == null)
-                    _host = new Host(true);
-                return _host;
-            }
-        }
+        public Host Host => _host ??= new Host(this);
 
-#if CSHTML5NETSTANDARD
         /// <summary>
         /// The entry point of the application needs to be wrapped by this method
         /// to ensure correction functioning of the application.
@@ -725,6 +612,5 @@ namespace Windows.UI.Xaml
             entryPoint();
             INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
         }
-#endif
     }
 }

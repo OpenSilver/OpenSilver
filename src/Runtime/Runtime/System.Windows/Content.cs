@@ -31,13 +31,13 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         private readonly JavaScriptCallback _fullscreenchangeCallback;
         private readonly JavaScriptCallback _windowresizeCallback;
 
-        public Content() : this(false)
+        public Content() : this(null)
         {
         }
 
-        internal Content(bool hookupEvents)
+        internal Content(Application app)
         {
-            if (hookupEvents)
+            if (app is not null)
             {
                 _fullscreenchangeCallback = JavaScriptCallback.Create(FullScreenChangedCallback, true);
                 _windowresizeCallback = JavaScriptCallback.Create(WindowResizeCallback, true);
@@ -47,8 +47,9 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
                     $"document.addEventListener('fullscreenchange', {INTERNAL_InteropImplementation.GetVariableStringForJS(_fullscreenchangeCallback)})");
 
                 // Hooks the Resized event
+                string sRoot = INTERNAL_InteropImplementation.GetVariableStringForJS(app.GetRootDiv());
                 OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"new ResizeSensor(document.getXamlRoot(), {INTERNAL_InteropImplementation.GetVariableStringForJS(_windowresizeCallback)})");
+                    $"new ResizeSensor({sRoot}, {INTERNAL_InteropImplementation.GetVariableStringForJS(_windowresizeCallback)})");
 
                 // WORKINPROGRESS
                 // Add Zoomed event

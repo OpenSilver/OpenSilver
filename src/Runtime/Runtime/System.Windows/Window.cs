@@ -21,11 +21,11 @@ using CSHTML5.Internal;
 using CSHTML5;
 
 #if MIGRATION
-using System.Windows.Controls;
+using System.Windows.Input;
 #else
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Core;
 using Windows.Foundation;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -49,9 +49,8 @@ namespace Windows.UI.Xaml
         /// </summary>
         public Window() : this(false) { }
 
-        internal Window(bool hookUpEvents, bool isMainWindow = false)
+        internal Window(bool hookUpEvents)
         {
-            IsMainWindow = isMainWindow;
             if (hookUpEvents)
             {
                 new DOMEventManager(
@@ -68,7 +67,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal bool IsMainWindow { get; set; } //This has been added to differentiate between the MainWindow (created with the application) and the subsequent ones, as there are some things that only need to be done once (so only by the main window), or that should only be done on the main window.
+        internal ITextMeasurementService TextMeasurementService { get; private set; }
 
         internal override int VisualChildrenCount
         {
@@ -139,11 +138,6 @@ namespace Windows.UI.Xaml
             // Create the DIV that will correspond to the root of the window visual tree:
             var windowRootDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", rootDomElement, this, out object windowRootDiv);
 
-            if (IsMainWindow) // note: position = "absolute" caused issues in the Xaml into Blazor POC where the elements did not occupy the space they took, making other elements of the page behave as if they weren't there.
-                              //        In SL, the new windows are obviously in new windows so the concept of taking space doesn't apply. The closest behaviour would use "absolute" so we might need a way to decide which one we want. 
-            {
-                windowRootDivStyle.position = "absolute"; 
-            }
             windowRootDivStyle.width = "100%";
             windowRootDivStyle.height = "100%";
             windowRootDivStyle.overflowX = "hidden";
@@ -158,6 +152,8 @@ namespace Windows.UI.Xaml
             _isLoaded = true;
             IsConnectedToLiveTree = true;
             UpdateIsVisible();
+
+            TextMeasurementService = new TextMeasurementService(this);
 
             // Attach the window content, if any:
             object content = Content;
@@ -259,41 +255,6 @@ namespace Windows.UI.Xaml
 #endif
                 // We can now revert the "ParentWindow" to null (cf. comment above):
                 this.INTERNAL_ParentWindow = null;
-
-
-                // Reset the print area so that it becomes the window root control:
-#if OPENSILVER
-                if (false)
-#elif BRIDGE
-                if (!CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-                {
-                    if (CSHTML5.Native.Html.Printing.PrintManager.IsDefaultPrintArea)
-                    {
-                        CSHTML5.Native.Html.Printing.PrintManager.ResetPrintArea();
-                    }
-                }
-
-                if (IsMainWindow) // Note we only need to create this once with the MainWindow (also, trying to do it again from another window will cause Exceptions since the next call tries to detach the measurement TextBlock from "this" passed as argument, but "this" is not the same window as the one it had been attached to)
-                {
-                    Application.Current.TextMeasurementService.CreateMeasurementText(this);
-                }
-
-                /*
-                // Invalidate when content changed
-                InvalidateMeasure();
-                InvalidateArrange();
-
-                // At the first contentChanged, InvaliateMeasure/Arrange does not work because IsArrangeValid and IsMeasureValid is false.
-                if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
-                {
-                    Debug.WriteLine("Delayed CalculateWindowLayout");
-                    // On the simulator, Window Bounds height is zero at the startup.
-                    Task.Delay(500).ContinueWith(t => CalculateWindowLayout());
-                }
-                else
-                    CalculateWindowLayout();*/
-                // Disabled for CustomLayout
             }
         }
 
@@ -344,6 +305,11 @@ namespace Windows.UI.Xaml
             throw new InvalidOperationException("\"CreateDomElement\" should not be called for the Window object.");
         }
 
+        public override void INTERNAL_AttachToDomEvents()
+        {
+            InputManager.Current.RegisterRoot(INTERNAL_RootDomElement);
+            base.INTERNAL_AttachToDomEvents();
+        }
 
         #region Closing event
 
