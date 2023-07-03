@@ -177,7 +177,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
 #endregion Methods
          
-#if DEBUG && MIGRATION
+#if DEBUG
         internal void PrintChildren()
         {
             foreach (UIElement element in this.Children)
