@@ -505,7 +505,6 @@
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextHintingMode.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextOptions.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextRenderingMode.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\VisualTreeHelper.cs" />
 		<Compile Include="System.Windows\ResourceDictionaryCollection.cs" />
 		<Compile Include="System.Windows\ResourcesChangeInfo.cs" />
 		<Compile Include="System.Windows\TreeWalkHelper.cs" />

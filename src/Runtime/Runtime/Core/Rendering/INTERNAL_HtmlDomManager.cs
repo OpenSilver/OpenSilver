@@ -843,39 +843,6 @@ parentElement.appendChild(child);";
 
         }
 
-        internal static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
-        {
-            string[] elements;
-            if (subtree != null)
-            {
-                string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(OpenSilver.Interop.GetDiv(subtree));
-                elements = JsonSerializer.Deserialize<string[]>(
-                    OpenSilver.Interop.ExecuteJavaScriptString(
-                        $"window.elementsFromPointOpensilver({intersectingPoint.X.ToInvariantString()},{intersectingPoint.Y.ToInvariantString()},{sDiv})"));
-            }
-            else
-            {
-                elements = JsonSerializer.Deserialize<string[]>(
-                    OpenSilver.Interop.ExecuteJavaScriptString(
-                        $"window.elementsFromPointOpensilver({intersectingPoint.X.ToInvariantString()},{intersectingPoint.Y.ToInvariantString()},null)"));
-            }
-
-            for (int i = elements.Length - 1; i >= 0; i--)
-            {
-                if (_store.TryGetValue(elements[i], out var elemWeakRef))
-                {
-                    if (elemWeakRef.TryGetTarget(out var uie))
-                    {
-                        yield return uie;
-                    }
-                    else
-                    {
-                        _store.Remove(elements[i]);
-                    }
-                }
-            }
-        }
-
         public static UIElement GetUIElementFromDomElement(object domElementRef)
         {
             UIElement result = null;

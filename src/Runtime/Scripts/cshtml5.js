@@ -1399,27 +1399,22 @@ var jsilConfig = {
 };
 
 window.elementsFromPointOpensilver = function (x, y, element) {
+    if (!element) element = document.body;
     const elements = [];
-    if (element == undefined || element == null) {
-        element = document.body;
-    } else if (typeof element === 'string') {
-        element = document.getElementById(element);
-    }
     const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, null, false);
     let currentNode = walker.currentNode;
     while (currentNode) {
-        if (currentNode.className && currentNode.id && currentNode.getBoundingClientRect) {
-            const visualBound = currentNode.getBoundingClientRect();
-            if (PerformHitTest(x, y, visualBound)) {
-                elements.push(currentNode.id);
-            }
+        const xamlid = currentNode.getAttribute('xamlid');
+        if (xamlid && PerformHitTest(x, y, currentNode)) {
+            elements.push(xamlid);
         }
         currentNode = walker.nextNode();
     }
-    return JSON.stringify(elements);
+    return JSON.stringify(elements.reverse());
 };
 
-function PerformHitTest(x, y, rect) {
+function PerformHitTest(x, y, element) {
+    const rect = element.getBoundingClientRect();
     return rect.x <= x && x <= rect.x + rect.width && rect.y <= y && y <= rect.y + rect.height;
 }
 

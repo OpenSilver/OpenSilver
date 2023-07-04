@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Linq;
-using System.Reflection;
-using System.Windows.Markup;
+using System.Text.Json;
 using DotNetForHtml5.Core;
+using CSHTML5;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+
 #if MIGRATION
-using System.Windows;
 using System.Windows.Controls.Primitives;
 #else
 using Windows.Foundation;
@@ -39,7 +37,7 @@ namespace Windows.UI.Xaml.Media
     /// Provides utility methods that can used to traverse object relationships (along
     /// child object or parent object axes) in the visual tree.
     /// </summary>
-    public sealed partial class VisualTreeHelper
+    public sealed class VisualTreeHelper
     {
         /// <summary>
         /// Returns an object's root object in the visual tree.
@@ -153,15 +151,23 @@ namespace Windows.UI.Xaml.Media
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
         {
             var list = new List<UIElement>();
-            foreach (UIElement uie in INTERNAL_HtmlDomManager.FindElementsInHostCoordinates(intersectingPoint, subtree))
+            foreach (string id in FindElementsInHostCoordinatesNative(intersectingPoint, subtree))
             {
-                if (uie.EnablePointerEvents)
+                if (INTERNAL_HtmlDomManager.GetElementById(id) is UIElement uie)
                 {
                     list.Add(uie);
                 }
             }
-
             return list;
+        }
+
+        private static string[] FindElementsInHostCoordinatesNative(Point intersectingPoint, UIElement subtree)
+        {
+            string x = intersectingPoint.X.ToInvariantString();
+            string y = intersectingPoint.Y.ToInvariantString();
+            string div = subtree is null ? "null" : INTERNAL_InteropImplementation.GetVariableStringForJS(OpenSilver.Interop.GetDiv(subtree));
+            return JsonSerializer.Deserialize<string[]>(
+                OpenSilver.Interop.ExecuteJavaScriptString($"window.elementsFromPointOpensilver({x}, {y}, {div});"));
         }
 
         /// <summary>
