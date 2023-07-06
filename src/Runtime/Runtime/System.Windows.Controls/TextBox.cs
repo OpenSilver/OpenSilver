@@ -55,6 +55,34 @@ namespace System.Windows.Controls
         private FrameworkElement _contentElement;
         private ITextViewHost<TextBoxView> _textViewHost;
 
+        static TextBox()
+        {
+            JavaScriptCallback javaScriptCallback = JavaScriptCallback.Create((Action<string>)(activeElement =>
+            {
+                IDisposable jsObjectReference = OpenSilver.Interop.ExecuteJavaScript(
+                    $"document.getElementById('{activeElement}')");
+                UIElement uiElement = INTERNAL_HtmlDomManager.GetUIElementFromDomElement(jsObjectReference);
+
+                if (uiElement is TextBoxView textBoxView)
+                {
+                    textBoxView.Host.RaiseSelectionChanged();
+                }
+            }), true);
+            string sAction = OpenSilver.Interop.GetVariableStringForJS(javaScriptCallback);
+
+            // The selectionchange event listener is added to the whole document
+            // and will be triggered every time the page Selection changes (anywhere)
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $@"document.addEventListener('selectionchange', () => {{
+                    const activeElement = document.activeElement;
+
+                    if (activeElement) {{
+                        {sAction}(activeElement.id);
+                    }}
+                }});"
+            );
+        }
+
         public TextBox()
         {
             DefaultStyleKey = typeof(TextBox);
@@ -790,8 +818,12 @@ namespace System.Windows.Controls
             }
         }
 
-        [OpenSilver.NotImplemented]
         public event RoutedEventHandler SelectionChanged;
+
+        internal void RaiseSelectionChanged()
+        {
+            SelectionChanged?.Invoke(this, new RoutedEventArgs());
+        }
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionForegroundProperty =
