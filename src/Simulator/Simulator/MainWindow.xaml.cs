@@ -594,7 +594,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                     string xamlRoot = null;
                     try
                     {
-                        xamlRoot = await CallJSMethodAndReturnValueAsync("document", "getXamlRoot");
+                        xamlRoot = (await MainWebBrowser.CoreWebView2.ExecuteScriptWithResultAsync(
+                            "document.getElementById('opensilver-root')")).ResultAsJson;
                     }
                     catch (Exception ex)
                     {
@@ -987,8 +988,9 @@ Click OK to continue.";
             }
         }
 
-        private async void SetupSimulatorHostObject(string name, object callback)
+        private async void SetupSimulatorHostObject(object callback)
         {
+            const string name = "onCallBack";
             await Dispatcher.InvokeAsync(() =>
             {
                 MainWebBrowser.CoreWebView2.AddHostObjectToScript(name, callback);
@@ -1217,7 +1219,8 @@ Click OK to continue.";
                     string cshtml5DomRootElement = null;
                     try
                     {
-                        cshtml5DomRootElement = await CallJSMethodAndReturnValueAsync(htmlDocument, "getXamlRoot");
+                        cshtml5DomRootElement = (await MainWebBrowser.CoreWebView2.ExecuteScriptWithResultAsync(
+                            $"{htmlDocument}.getElementById('opensilver-root')")).ResultAsJson;
                     }
                     catch (Exception ex)
                     {
@@ -1245,12 +1248,6 @@ Click OK to continue.";
             {
                 MessageBox.Show(ex.ToString());
             }
-        }
-
-        async Task<string> CallJSMethodAndReturnValueAsync(string instance, string methodname)
-        {
-            var result = await MainWebBrowser.CoreWebView2.ExecuteScriptWithResultAsync($"{instance}.{methodname}()");
-            return result.ResultAsJson;
         }
 
         async Task SetJSPropertyAsync(string instance, string propertyName, object value)

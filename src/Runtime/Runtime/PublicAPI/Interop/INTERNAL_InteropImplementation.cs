@@ -56,7 +56,7 @@ namespace CSHTML5
 
             if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                INTERNAL_Simulator.SimulatorCallbackSetup("onCallback", new OnCallbackSimulator());
+                INTERNAL_Simulator.SimulatorCallbackSetup(new OnCallbackSimulator());
             }
 
             _isInitialized = true;

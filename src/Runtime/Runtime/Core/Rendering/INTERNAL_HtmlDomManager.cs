@@ -843,55 +843,20 @@ parentElement.appendChild(child);";
         /// in the visual tree composition at the specified point.</returns>
         public static UIElement FindElementInHostCoordinates_UsedBySimulatorToo(double x, double y) // IMPORTANT: If you rename this method or change its signature, make sure to rename its dynamic call in the Simulator.
         {
-            string xs = x.ToInvariantString();
-            string ys = y.ToInvariantString();
-            string js;
-
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                js = $@"
-                    (function(){{
-                        var domElementAtCoordinates = document.elementFromPoint({xs}, {ys});
-                        if (!domElementAtCoordinates || domElementAtCoordinates === document.documentElement)
-                        {{
-                            return null;
-                        }}
-                        else
-                        {{
-                            return domElementAtCoordinates;
-                        }}
-                    }}())
-                ";
-            }
-            else
-            {
-                js = $@"
-                    (function(){{
-                        var domElementsAtCoordinates = document.elementsFromPoint({xs}, {ys});
-                        if (!domElementsAtCoordinates || domElementsAtCoordinates.length == 0)
-                        {{
-                            return null;
-                        }}
-
-                        var firstItem = domElementsAtCoordinates[0];
-                        if (firstItem === document.documentElement)
-                        {{
-                            return null;
-                        }}
-                        if (firstItem.id && firstItem.id === 'XamlInspectorOverlay')
-                        {{
-                            return domElementsAtCoordinates.length > 1 ? domElementsAtCoordinates[1] : null;
-                        }}
-
-                        return firstItem;
-                    }}())
-                ";
-            }
-
-            using (var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript(js))
-            {
+            using (var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
+(function(){{
+    var domElementAtCoordinates = document.elementFromPoint({x.ToInvariantString()}, {y.ToInvariantString()});
+    if (!domElementAtCoordinates || domElementAtCoordinates === document.documentElement)
+    {{
+        return null;
+    }}
+    else
+    {{
+        return domElementAtCoordinates;
+    }}
+}}())"))
                 return GetUIElementFromDomElement(domElementAtCoordinates);
-            }
+
         }
 
         public static UIElement GetUIElementFromDomElement(object domElementRef)

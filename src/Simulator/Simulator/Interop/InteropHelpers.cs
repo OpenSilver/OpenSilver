@@ -66,7 +66,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             InjectPropertyValue("SimulatorProxy", simulatorProxy, coreAssembly);
         }
 
-        internal static void InjectSimulatorCallbackSetup(Action<string, object> callbackSetup, Assembly coreAssembly)
+        internal static void InjectSimulatorCallbackSetup(Action<object> callbackSetup, Assembly coreAssembly)
         {
             InjectPropertyValue("SimulatorCallbackSetup", callbackSetup, coreAssembly);
         }

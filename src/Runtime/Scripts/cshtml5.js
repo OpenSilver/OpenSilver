@@ -649,13 +649,13 @@ document.eventCallback = function (callbackId, args, sync) {
     const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
     document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
     if (sync) {
-        const v = window.onCallBack.OnCallbackFromJavaScriptWithResult(callbackId, idWhereCallbackArgsAreStored, argsArray);
+        const v = window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, true);
         delete document.jsObjRef[idWhereCallbackArgsAreStored];
         return v;
     } else {
         setTimeout(
             function () {
-                window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray);
+                window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, false);
             }, 1);
     }
 }

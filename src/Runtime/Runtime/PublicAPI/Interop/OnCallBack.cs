@@ -33,26 +33,17 @@ namespace CSHTML5.Internal
 
         // This method can be removed later. Now it is used for easier migration from old opensilver.js to new one
         [JSInvokable]
-        public static object OnCallbackFromJavaScriptWithResult(
+        public static object OnCallbackFromJavaScript(
             int callbackId,
             string idWhereCallbackArgsAreStored,
             object[] callbackArgsObject)
         {
             return OnCallbackFromJavaScriptBrowser(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                returnValue: true);
+                false);
         }
 
         [JSInvokable]
-        public static void OnCallbackFromJavaScript(
-            int callbackId,
-            string idWhereCallbackArgsAreStored,
-            object[] callbackArgsObject)
-        {
-            OnCallbackFromJavaScriptBrowser(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                returnValue: false);
-        }
-
-        private static object OnCallbackFromJavaScriptBrowser(
+        public static object OnCallbackFromJavaScriptBrowser(
             int callbackId,
             string idWhereCallbackArgsAreStored,
             object[] callbackArgsObject,

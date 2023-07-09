@@ -14,22 +14,35 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DotNetForHtml5.Core
 {
-#if CSHTML5NETSTANDARD //todo: remove this directive and use the "InternalsVisibleTo" attribute instead.
-    public
-#else
-    internal
-#endif
-        static class INTERNAL_Simulator
+    public static class INTERNAL_Simulator
     {
         // Note: all the properties here are populated by the Simulator, which "injects" stuff here when the application is launched in the Simulator.
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic HtmlDocument { internal get; set; }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic DOMDocument { internal get; set; }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic WpfMediaElementFactory { internal get; set; }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Func<object, object> ConvertBrowserResult { get; set; }
 
         // BeginInvoke of the WebControl's Dispatcher
         public static Action<Action> WebControlDispatcherBeginInvoke
@@ -154,7 +167,7 @@ namespace DotNetForHtml5.Core
         }
 #endif
 
-        public static Action<string, object> SimulatorCallbackSetup
+        public static Action<object> SimulatorCallbackSetup
         {
             get;
             set;
