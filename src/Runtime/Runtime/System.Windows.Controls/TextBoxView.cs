@@ -24,6 +24,7 @@ using System.Windows.Input;
 using Windows.Foundation;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Input;
+using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 #endif
 
 #if MIGRATION
@@ -514,6 +515,57 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
                 availableSize.Width,
                 "M");
             return TextSize;
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+
+            if (e.Handled)
+            {
+                return;
+            }
+            e.Handled = true;
+
+#if MIGRATION
+            // This is to not trigger other events like Telerik DragDrop when selecting text
+            CaptureMouse();
+#else
+            CapturePointer(e.Pointer);
+#endif
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+
+            if (e.Handled)
+            {
+                return;
+            }
+            e.Handled = true;
+
+#if MIGRATION
+            ReleaseMouseCapture();
+#else
+            ReleasePointerCapture(e.Pointer);
+#endif
         }
     }
 }
