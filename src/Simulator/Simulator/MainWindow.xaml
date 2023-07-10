@@ -9,7 +9,8 @@
         WindowStartupLocation="Manual"
         ShowIconOnTitleBar="True"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
-        Left="100" Top="5">
+        Left="100" Top="5"
+        KeyUp="MetroWindow_KeyUp">
     <mahapps:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -492,6 +492,21 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             //MainWebBrowser.Browser.LoadHTML(new LoadHTMLParams(simulatorRootHtml, "UTF-8", baseURL + "/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
         }
 
+        private void SyncXamlInspectorVisibility()
+        {
+            bool xamlInspectorVisible = Properties.Settings.Default.XamlInspectorVisible;
+            if (xamlInspectorVisible &&
+                _entryPointAssembly != null &&
+                XamlInspectionTreeViewInstance.TryRefresh(_entryPointAssembly, XamlPropertiesPaneInstance))
+            {
+                MainGridSplitter.Visibility = Visibility.Visible;
+                BorderForXamlInspection.Visibility = Visibility.Visible;
+                ButtonViewXamlTree.Visibility = Visibility.Collapsed;
+                ContainerForXamlInspectorToolbar.Visibility = Visibility.Visible;
+                ButtonHideXamlTree.Visibility = Visibility.Visible;
+            }
+        }
+
         private void CoreWebView2_WebResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs e)
         {
             string uriString = e.Request?.Uri?.Replace("[PARENT]", "..");
@@ -557,6 +572,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                     }
 
                     HideLoadingMessage();
+
+                    SyncXamlInspectorVisibility();
 
                     UpdateWebBrowserAndWebPageSizeBasedOnCurrentState();
                 }), DispatcherPriority.ApplicationIdle); // We do so in order to give the time to the rendering engine to display the "Loading..." message.
@@ -1376,6 +1393,10 @@ Click OK to continue.";
                 ContainerForXamlInspectorToolbar.Visibility = Visibility.Visible;
                 ButtonHideXamlTree.Visibility = Visibility.Visible;
 
+                // Save opened state
+                Properties.Settings.Default.XamlInspectorVisible = true;
+                Properties.Settings.Default.Save();
+
                 // We activate the element picker by default:
                 StartElementPickerForInspection();
             }
@@ -1406,6 +1427,10 @@ Click OK to continue.";
             ColumnForGridSplitter.Width = GridLength.Auto;
             ColumnForXamlInspection.Width = GridLength.Auto;
             ColumnForXamlPropertiesPane.Width = GridLength.Auto;
+
+            // Save closed state
+            Properties.Settings.Default.XamlInspectorVisible = false;
+            Properties.Settings.Default.Save();
 
             // Ensure that the element picker is not activated:
             StopElementPickerForInspection();
@@ -1574,6 +1599,21 @@ Click OK to continue.";
         private void CheckBoxCORS_Unchecked(object sender, RoutedEventArgs e)
         {
             CrossDomainCallsHelper.IsBypassCORSErrors = false;
+        }
+
+        private void MetroWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.F11 && e.KeyboardDevice.Modifiers == System.Windows.Input.ModifierKeys.None)
+            {
+                if (BorderForXamlInspection.Visibility == Visibility.Visible)
+                {
+                    ButtonHideXamlTree_Click(sender, e);
+                }
+                else
+                {
+                    ButtonViewXamlTree_Click(sender, e);
+                }
+            }
         }
     }
 }
