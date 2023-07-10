@@ -496,6 +496,36 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Gets or sets the custom validation summary
+        /// </summary>
+        public ValidationSummary CustomValidationSummary {
+            get { return (ValidationSummary)GetValue(CustomValidationSummaryProperty); }
+            set { SetValue(CustomValidationSummaryProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the ExternalValidationSummary dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CustomValidationSummaryProperty =
+            DependencyProperty.Register("CustomValidationSummary", 
+                typeof(ValidationSummary),
+                typeof(DataForm),
+                new PropertyMetadata(OnCustomValidationSummaryPropertyChanged));
+
+        /// <summary>
+        /// ExternalValidationSummary property changed handler.
+        /// </summary>
+        /// <param name="d">DataForm that changed its ExternalValidationSummary value.</param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs for this event.</param>
+        private static void OnCustomValidationSummaryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var dataform = d as DataForm;
+            if (dataform is null)
+                return;
+
+            dataform._validationSummary = (ValidationSummary)e.NewValue; ;
+         }
+
+        /// <summary>
         /// Identifies the Header dependency property.
         /// </summary>
         public static readonly DependencyProperty HeaderProperty =
@@ -2396,8 +2426,10 @@ namespace Windows.UI.Xaml.Controls
             {
                 this._validationSummary.Errors.CollectionChanged -= new NotifyCollectionChangedEventHandler(this.OnValidationSummaryErrorsCollectionChanged);
             }
-
-            this._validationSummary = GetTemplateChild(DATAFORM_elementValidationSummary) as ValidationSummary;
+            else
+            {
+                this._validationSummary = GetTemplateChild(DATAFORM_elementValidationSummary) as ValidationSummary;
+            }
 
             if (this._validationSummary != null)
             {
