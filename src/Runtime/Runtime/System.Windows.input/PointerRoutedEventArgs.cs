@@ -201,7 +201,7 @@ namespace Windows.UI.Xaml.Input
                 // Returns the pointer coordinates relative to the "relativeTo" element:
                 //-----------------------------------
 
-                UIElement rootVisual = Application.Current?.RootVisual;
+                UIElement rootVisual = Window.GetWindow(relativeTo)?.Content;
                 if (rootVisual != null)
                 {
                     return rootVisual.TransformToVisual(relativeTo).Transform(origin);
