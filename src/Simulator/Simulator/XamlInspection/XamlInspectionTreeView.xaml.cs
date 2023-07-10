@@ -130,6 +130,23 @@ namespace OpenSilver.Simulator.XamlInspection
             _hasBeenFullyExpanded = true;
         }
 
+        public void CollapseAllNodes()
+        {
+            XamlTree.SelectedItemChanged -= TreeView_SelectedItemChanged;
+
+            foreach (object item in this.XamlTree.Items)
+            {
+                TreeViewItem treeViewItem = this.XamlTree.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                if (treeViewItem != null)
+                {
+                    CollapseTreeViewItems(treeViewItem);
+                }
+            }
+
+            XamlTree.SelectedItemChanged += TreeView_SelectedItemChanged;
+            _hasBeenFullyExpanded = false;
+        }
+
         public void ExpandToNode(TreeNode fromNode, TreeNode toNode)
         {
             var nodeBranch = new Stack<TreeNode>();
@@ -536,6 +553,20 @@ namespace OpenSilver.Simulator.XamlInspection
                 return (TreeViewItem)ClickedItem;
             else
                 return null;
+        }
+
+        void CollapseTreeViewItems(TreeViewItem treeViewItem)
+        {
+            foreach (TreeNode childTreeNode in treeViewItem.Items.OfType<TreeNode>())
+            {
+                if (treeViewItem.ItemContainerGenerator.ContainerFromItem(childTreeNode) is TreeViewItem childTreeViewItem &&
+                    childTreeViewItem.HasItems)
+                {
+                    CollapseTreeViewItems(childTreeViewItem);
+                }
+            }
+
+            treeViewItem.IsExpanded = false;
         }
 
         public List<TreeNode> GetAllNonLoadedChildren(TreeNode treeNode, TreeNode downToNode, List<TreeNode> nonLoadedChildren)

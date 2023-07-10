@@ -163,6 +163,7 @@
                                     <Button.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Expand All Nodes" Cursor="Hand" Click="ButtonExpandAllNodes_Click"/>
+                                            <MenuItem Header="Collapse All Nodes" Cursor="Hand" Click="ButtonCollapseAllNodes_Click"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                 </Button>

@@ -1426,6 +1426,11 @@ Click OK to continue.";
             XamlInspectionTreeViewInstance.ExpandAllNodes();
         }
 
+        void ButtonCollapseAllNodes_Click(object sender, RoutedEventArgs e)
+        {
+            XamlInspectionTreeViewInstance.CollapseAllNodes();
+        }
+
         void SaveDisplaySize()
         {
             //-----------
