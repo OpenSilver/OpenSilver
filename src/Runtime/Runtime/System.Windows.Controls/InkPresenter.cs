@@ -21,6 +21,7 @@ using OpenSilver.Internal;
 using System.Windows.Ink;
 using System.Windows.Input;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Ink;
 using Windows.UI.Xaml.Input;
 #endif
@@ -46,41 +47,36 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public InkPresenter()
         {
-            Loaded += InkPresenter_Loaded;
+            SizeChanged += new SizeChangedEventHandler(OnSizeChanged);
         }
 
-        private void InkPresenter_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!IsLoaded)
-            {
-                return;
-            }
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e) => ResetCanvas(e.NewSize);
 
-            ResetCanvas();
-        }
-
-        private void ResetCanvas()
+        private void ResetCanvas(Size renderSize)
         {
-            if (_canvasDom == null) return;
+            if (_canvasDom is null) return;
 
             // 1 - get current size of the canvas
             // 2 - increase the actual size of our canvas
             // 3 - ensure all drawing operations are scaled
             // 4 - scale everything down using CSS
             string sCanvas = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDom);
+            string width = Math.Ceiling(renderSize.Width).ToInvariantString();
+            string height = Math.Ceiling(renderSize.Height).ToInvariantString();
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-@$"(function(cvs) {{ let rect = cvs.getBoundingClientRect();
-cvs.width = rect.width * window.devicePixelRatio;
-cvs.height = rect.height * window.devicePixelRatio;
+@$"(function(cvs) {{
+cvs.width = {width} * window.devicePixelRatio;
+cvs.height = {height} * window.devicePixelRatio;
 let ctx = cvs.getContext('2d');
 ctx.imageSmoothingEnabled = true;
 ctx.webkitImageSmoothingEnabled = true;
 ctx.mozImageSmoothingEnabled = true;
 ctx.msImageSmoothingEnabled = true;
 ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-cvs.style.width = rect.width + 'px';
-cvs.style.height = rect.height + 'px';
-ctx.strokeStyle='#222222'; ctx.lineWidth='4';
+cvs.style.width = {width} + 'px';
+cvs.style.height = {height} + 'px';
+ctx.strokeStyle = '#222222';
+ctx.lineWidth = '4';
 ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
         }
 
@@ -158,7 +154,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
 
         private void DrawAllStrokes()
         {            
-            ResetCanvas();
+            ResetCanvas(RenderSize);
 
             foreach (var stroke in Strokes)
             {
