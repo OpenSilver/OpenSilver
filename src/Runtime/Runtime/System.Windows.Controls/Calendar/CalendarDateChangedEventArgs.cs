@@ -12,24 +12,23 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Provides data for the <see cref="Calendar.DisplayDateChanged" /> event. 
-    /// </summary>	
+    /// Provides data for the <see cref="Calendar.DisplayDateChanged" /> event.
+    /// </summary>
+    /// <QualityBand>Mature</QualityBand>
     public class CalendarDateChangedEventArgs : RoutedEventArgs
     {
         /// <summary>
-        /// Getsor sets the date that was previously displayed.
+        /// Gets the date that was previously displayed.
         /// </summary>
-        /// <returns>
-        /// The date previously displayed. 
-        /// </returns>		
+        /// <value>
+        /// The date previously displayed.
+        /// </value>
         public DateTime? RemovedDate { get; private set; }
 
         /// <summary>
-        /// Gets or sets the date to be newly displayed.
+        /// Gets the date to be newly displayed.
         /// </summary>
-        /// <returns>
-        /// The new date to display.
-        /// </returns>		
+        /// <value>The new date to display.</value>
         public DateTime? AddedDate { get; private set; }
 
         /// <summary>
@@ -42,8 +41,8 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="addedDate">The date to be newly displayed.</param>
         internal CalendarDateChangedEventArgs(DateTime? removedDate, DateTime? addedDate)
         {
-            this.RemovedDate = removedDate;
-            this.AddedDate = addedDate;
+            RemovedDate = removedDate;
+            AddedDate = addedDate;
         }
     }
 }

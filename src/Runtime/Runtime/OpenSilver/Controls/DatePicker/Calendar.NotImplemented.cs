@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -15,16 +14,17 @@
 using System;
 
 #if MIGRATION
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 #else
+using Windows.UI;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+namespace OpenSilver.Controls
 {
     /// <summary>
     /// Represents a control that enables a user to select a date by using a visual calendar display.
@@ -37,164 +37,79 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A collection of dates that cannot be selected. The default value is an empty collection.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public CalendarBlackoutDatesCollection BlackoutDates { get; private set; }
 
         /// <summary>
-        /// Identifies the <see cref="P:System.Windows.Controls.Calendar.DisplayDate" /> dependency property.
+        /// Identifies the <see cref="DisplayDate" /> dependency property.
         /// </summary>
         /// <returns>
-        /// The identifier for the <see cref="P:System.Windows.Controls.Calendar.DisplayDate" /> dependency property.
+        /// The identifier for the <see cref="DisplayDate" /> dependency property.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty DisplayDateProperty = DependencyProperty.Register(nameof(DisplayDate), typeof(DateTime), typeof(Calendar), new PropertyMetadata(DateTime.Today, OnDisplayDateChanged));
-
-        private static void OnDisplayDateChanged(
-            DependencyObject d,
-            DependencyPropertyChangedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        [NotImplemented]
+        public static readonly DependencyProperty DisplayDateProperty = DependencyProperty.Register(nameof(DisplayDate), typeof(DateTime), typeof(Calendar), new PropertyMetadata(DateTime.Today));
 
         /// <summary>Occurs when the <see cref="DisplayDate" /> property is changed.</summary>     
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public event EventHandler<CalendarDateChangedEventArgs> DisplayDateChanged;
 
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Style CalendarDayButtonStyle { get; set; }
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.Control.IsTabStop dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.Control.IsTabStop dependency property.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty IsTabStopProperty = DependencyProperty.Register(nameof(IsTabStop), typeof(bool), typeof(Calendar), new PropertyMetadata(true));
 
-        //
-        // Summary:
-        //     Gets or sets a value that indicates whether a control is included in tab navigation.
-        //
-        // Returns:
-        //     true if the control is included in tab navigation; otherwise, false. The default
-        //     is true.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public bool IsTabStop
         {
             get { return (bool)GetValue(IsTabStopProperty); }
             set { SetValue(IsTabStopProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.Control.Background dependency property
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.Control.Background dependency
-        //     property.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(Calendar), new PropertyMetadata((object)null));
 
-        //
-        // Summary:
-        //     Gets or sets a brush that provides the background of the control.
-        //
-        // Returns:
-        //     The brush that provides the background of the control. The default is null.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Brush Background
         {
             get { return (Brush)GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.Control.Padding dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.Control.Padding dependency property.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(Thickness), typeof(Calendar), new PropertyMetadata(new Thickness()));
 
-        //
-        // Summary:
-        //     Gets or sets the padding inside a control.
-        //
-        // Returns:
-        //     The amount of space between the content of a System.Windows.Controls.Control
-        //     and its System.Windows.FrameworkElement.Margin or System.Windows.Controls.Border.
-        //     The default is a thickness of 0 on all four sides.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Thickness Padding
         {
             get { return (Thickness)GetValue(PaddingProperty); }
             set { SetValue(PaddingProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.Control.BorderThickness dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.Control.BorderThickness dependency
-        //     property.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty BorderThicknessProperty = DependencyProperty.Register(nameof(BorderThickness), typeof(Thickness), typeof(Calendar), new PropertyMetadata(new Thickness()));
 
-        //
-        // Summary:
-        //     Gets or sets the border thickness of a control.
-        //
-        // Returns:
-        //     A thickness value; the default is a thickness of 0 on all four sides.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Thickness BorderThickness
         {
             get { return (Thickness)GetValue(BorderThicknessProperty); }
             set { SetValue(BorderThicknessProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.Control.BorderBrush dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.Control.BorderBrush dependency
-        //     property.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty BorderBrushProperty = DependencyProperty.Register(nameof(BorderBrush), typeof(Brush), typeof(Calendar), new PropertyMetadata((object)null));
 
-        //
-        // Summary:
-        //     Gets or sets a brush that describes the border background of a control.
-        //
-        // Returns:
-        //     The brush that is used to fill the control's border; the default is null.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Brush BorderBrush
         {
             get { return (Brush)GetValue(BorderBrushProperty); }
             set { SetValue(BorderBrushProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.Control.Template dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.Control.Template dependency property.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty TemplateProperty = DependencyProperty.Register(nameof(Template), typeof(ControlTemplate), typeof(Calendar), new PropertyMetadata((object)null));
 
-        //
-        // Summary:
-        //     Gets or sets a control template.
-        //
-        // Returns:
-        //     The template that defines the appearance of the System.Windows.Controls.Control.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public ControlTemplate Template
         {
             get { return (ControlTemplate)GetValue(TemplateProperty); }
@@ -208,13 +123,14 @@ namespace Windows.UI.Xaml.Controls
         /// The brush that paints the foreground of the control.
         /// The default value is System.Windows.Media.Colors.Black.
         /// </remarks>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Brush Foreground
         {
             get { return (Brush)GetValue(ForegroundProperty); }
             set { SetValue(ForegroundProperty, value); }
         }
 
+        [NotImplemented]
         public static readonly DependencyProperty ForegroundProperty =
             DependencyProperty.Register("Foreground", typeof(Brush), typeof(Calendar), new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
@@ -224,17 +140,18 @@ namespace Windows.UI.Xaml.Controls
         /// <remarks>
         /// The font used to display text in the control. The default is the "Portable User Interface".
         /// </remarks>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public FontFamily FontFamily
         {
             get { return (FontFamily)GetValue(FontFamilyProperty); }
             set { SetValue(FontFamilyProperty, value); }
         }
 
+        [NotImplemented]
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register("FontFamily", typeof(FontFamily), typeof(Calendar), new PropertyMetadata(new FontFamily("Portable User Interface")));
 
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public double FontSize
         {
             get { return (double)GetValue(FontSizeProperty); }
@@ -244,7 +161,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="Control.FontSize"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(Calendar), new PropertyMetadata(11d));
 
         /// <summary>
@@ -253,7 +170,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value indicating what length of time the <see cref="Calendar" /> should display.
         /// </returns>        
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public CalendarMode DisplayMode
         {
             get
@@ -264,7 +181,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 SetValue(DisplayModeProperty, value);
             }
-        }        
+        }
 
         /// <summary>
         /// Identifies the <see cref="DisplayMode" /> dependency property.
@@ -272,7 +189,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="DisplayMode" /> dependency property.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty DisplayModeProperty =
             DependencyProperty.Register(
                 nameof(DisplayMode),
@@ -283,7 +200,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Occurs when the <see cref="DisplayMode" /> property is changed. 
         /// </summary>       
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public event EventHandler<CalendarModeChangedEventArgs> DisplayModeChanged;
 
         /// <summary>
@@ -292,7 +209,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value that indicates the current selection mode. The default is <see cref="CalendarSelectionMode.SingleDate" />.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public CalendarSelectionMode SelectionMode
         {
             get
@@ -311,7 +228,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The identifier for the <see cref="SelectionMode" /> dependency property.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty SelectionModeProperty =
             DependencyProperty.Register(
                 nameof(SelectionMode),
@@ -326,7 +243,7 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="SelectedDatesCollection"/> object that contains the currently
         /// selected dates. The default is an empty collection.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public SelectedDatesCollection SelectedDates { get; private set; }
     }
 }

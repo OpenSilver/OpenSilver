@@ -12,27 +12,30 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Provides data for the <see cref="Calendar.DisplayModeChanged" /> event. 
-    /// </summary>	
+    /// Provides data for the <see cref="Calendar.DisplayModeChanged" /> event.
+    /// </summary>
+    /// <QualityBand>Mature</QualityBand>
     public class CalendarModeChangedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Gets the previous mode of the <see cref="Calendar" />.
         /// </summary>
-        /// <returns>
-        /// A <see cref="CalendarMode" /> representing the previous mode. 
-        /// </returns>
+        /// <value>
+        /// A <see cref="CalendarMode" /> representing the previous mode.
+        /// </value>
         public CalendarMode OldMode { get; private set; }
 
         /// <summary>
         /// Gets the new mode of the <see cref="Calendar" />.
         /// </summary>
-        /// <returns>A <see cref="CalendarMode" /> representing the new mode. 
-        /// </returns>
+        /// <value>
+        /// A <see cref="CalendarMode" /> the new mode.
+        /// </value>
         public CalendarMode NewMode { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CalendarModeChangedEventArgs" /> class. 
+        /// Initializes a new instance of the <see cref="CalendarModeChangedEventArgs" />
+        /// class.
         /// </summary>
         /// <param name="oldMode">The previous mode.</param>
         /// <param name="newMode">The new mode.</param>

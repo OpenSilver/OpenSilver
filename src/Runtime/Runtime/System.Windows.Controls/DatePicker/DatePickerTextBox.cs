@@ -1,16 +1,7 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
 using System.Diagnostics;
@@ -18,8 +9,9 @@ using System.Globalization;
 
 #if MIGRATION
 using System.Windows.Input;
+using System.Windows.Markup;
 #else
-using Windows.UI.Xaml.Input;
+using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 #endif
 
 #if MIGRATION
@@ -40,19 +32,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
     [TemplateVisualState(Name = VisualStates.StateUnwatermarked, GroupName = VisualStates.GroupWatermark)]
     [TemplateVisualState(Name = VisualStates.StateWatermarked, GroupName = VisualStates.GroupWatermark)]
     [TemplatePart(Name = DatePickerTextBox.ElementContentName, Type = typeof(ContentControl))]
-    public sealed class DatePickerTextBox : TextBox
+    public sealed partial class DatePickerTextBox : TextBox
     {
-        private const string DefaultWatermarkText = "<enter text here>";
-
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
         private const string ElementContentName = "Watermark";
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="DatePickerTextBox" />
-        /// class.
+        /// Initializes a new instance of the <see cref="DatePickerTextBox" /> class.
         /// </summary>
         public DatePickerTextBox()
         {
@@ -152,9 +140,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Builds the visual tree for the
-        /// <see cref="DatePickerTextBox" />
-        /// when a new template is applied.
+        /// Builds the visual tree for the <see cref="DatePickerTextBox" /> when a new 
+        /// template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -171,14 +158,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
             ChangeVisualState(false);
         }
 
-#region Watermark
+        #region Watermark
         /// <summary>
         /// Gets or sets the Watermark content.
         /// </summary>
         /// <value>The watermark.</value>
         public object Watermark
         {
-            get { return (object)GetValue(WatermarkProperty); }
+            get { return GetValue(WatermarkProperty); }
             set { SetValue(WatermarkProperty, value); }
         }
 
@@ -191,7 +178,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 typeof(object),
                 typeof(DatePickerTextBox),
                 new PropertyMetadata(OnWatermarkPropertyChanged));
-#endregion
+        #endregion
 
         /// <summary>
         /// Inherited code: Requires comment.
@@ -235,7 +222,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 if (!string.IsNullOrEmpty(this.Text))
                 {
-                    //Select(0, this.Text.Length);
+                    Select(0, this.Text.Length);
                 }
 
                 ChangeVisualState();
@@ -277,11 +264,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-#if MIGRATION
         private void OnMouseEnter(object sender, MouseEventArgs e)
-#else
-        private void OnMouseEnter(object sender, PointerRoutedEventArgs e)
-#endif
         {
             IsHovered = true;
 
@@ -296,11 +279,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-#if MIGRATION
         private void OnMouseLeave(object sender, MouseEventArgs e)
-#else
-        private void OnMouseLeave(object sender, PointerRoutedEventArgs e)
-#endif
         {
             IsHovered = false;
 
@@ -341,8 +320,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="args">
-        /// The <see cref="DependencyPropertyChangedEventArgs"/>
-        /// instance containing the event data.
+        /// The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.
         /// </param>
         private static void OnWatermarkPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
@@ -358,7 +336,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private void SetDefaults()
         {
             IsEnabled = true;
-            this.Watermark = DefaultWatermarkText;
+            this.Watermark = "<enter text here>";
         }
     }
 }

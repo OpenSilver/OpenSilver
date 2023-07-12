@@ -6,12 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
-#if MIGRATION
-using ModifierKeys = System.Windows.Input.ModifierKeys;
-#else
+#if !MIGRATION
 using ModifierKeys = Windows.System.VirtualKeyModifiers;
 #endif
 
@@ -110,7 +107,6 @@ namespace Windows.UI.Xaml.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         /// <param name="ctrl">Inherited code: Requires comment 1.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Inherited mature control.")]
         public static void GetMetaKeyState(out bool ctrl)
         {
             ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;

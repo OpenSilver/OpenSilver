@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -16,19 +15,19 @@ using System;
 using System.Globalization;
 
 #if MIGRATION
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 #else
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.System;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+namespace OpenSilver.Controls
 {
     public partial class DatePicker : INTERNAL_DateTimePickerBase
     {
@@ -249,7 +248,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-
         private string DateTimeToString(DateTime d)
         {
             DateTimeFormatInfo currentDateFormat = GetCurrentDateFormat();
@@ -302,11 +300,7 @@ namespace Windows.UI.Xaml.Controls
 
         private DateTimeFormatInfo GetCurrentDateFormat()
         {
-#if OPENSILVER
             return DateTimeHelper.GetCurrentDateFormat();
-#elif BRIDGE
-            return CultureInfo.CurrentCulture.DateTimeFormat;
-#endif
         }
 
 #if MIGRATION
