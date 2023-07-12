@@ -12,6 +12,8 @@ using System.Windows.Input;
 #else
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
+using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
+using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 #endif
 
 #if MIGRATION
@@ -21,7 +23,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
     /// <summary>
-    /// Represents a day on a <see cref="T:System.Windows.Controls.Calendar" />.
+    /// Represents a day on a <see cref="Calendar" />.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
     [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
@@ -40,7 +42,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     [TemplateVisualState(Name = CalendarDayButton.StateBlackoutDay, GroupName = CalendarDayButton.GroupBlackout)]
     public sealed class CalendarDayButton : Button
     {
-#region Visual States
+        #region Visual States
         /// <summary>
         /// Identifies the Today state.
         /// </summary>
@@ -70,7 +72,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Name of the BlackoutDay state group.
         /// </summary>
         internal const string GroupBlackout = "BlackoutDayStates";
-#endregion Visual States
+        #endregion Visual States
 
         /// <summary>
         /// Default content for the CalendarDayButton.
@@ -94,7 +96,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         // REMOVE_RTM: This field should be removed after Jolt Bug#20180 is fixed.
         private bool _ignoringMouseOverState;
 
-#region internal bool IsBlackout
+        #region internal bool IsBlackout
         /// <summary>
         /// A value indicating whether this is a blackout date.
         /// </summary>
@@ -112,9 +114,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsBlackout
+        #endregion internal bool IsBlackout
 
-#region internal bool IsToday
+        #region internal bool IsToday
         /// <summary>
         /// A value indicating whether this button represents today.
         /// </summary>
@@ -133,9 +135,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsToday
+        #endregion internal bool IsToday
 
-#region internal bool IsCurrent
+        #region internal bool IsCurrent
         /// <summary>
         /// A value indicating whether the button is the focused element on the
         /// Calendar control.
@@ -155,9 +157,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsCurrent
+        #endregion internal bool IsCurrent
 
-#region internal bool IsInactive
+        #region internal bool IsInactive
         /// <summary>
         /// A value indicating whether the button is inactive.
         /// </summary>
@@ -175,9 +177,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsInactive
+        #endregion internal bool IsInactive
 
-#region internal bool IsSelected
+        #region internal bool IsSelected
         /// <summary>
         /// A value indicating whether the button is selected.
         /// </summary>
@@ -195,18 +197,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsSelected
+        #endregion internal bool IsSelected
 
         /// <summary>
         /// Occurs when the left mouse button is pressed (or when the tip of the
         /// stylus touches the tablet PC) while the mouse pointer is over a
         /// UIElement.
         /// </summary>
-#if MIGRATION
         public event MouseButtonEventHandler CalendarDayButtonMouseDown;
-#else
-        public event PointerEventHandler CalendarDayButtonMouseDown;
-#endif
 
         /// <summary>
         /// Occurs when the left mouse button is released (or the tip of the
@@ -214,16 +212,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// stylus) is over a UIElement (or while a UIElement holds mouse
         /// capture).
         /// </summary>
-#if MIGRATION
         public event MouseButtonEventHandler CalendarDayButtonMouseUp;
-#else
-        public event PointerEventHandler CalendarDayButtonMouseUp;
-#endif
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.Primitives.CalendarDayButton" />
-        /// class.
+        /// Initializes a new instance of the <see cref="CalendarDayButton" /> class.
         /// </summary>
         public CalendarDayButton()
             : base()
@@ -246,9 +238,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Builds the visual tree for the
-        /// <see cref="T:System.Windows.Controls.Primitives.CalendarDayButton" />
-        /// when a new template is applied.
+        /// Builds the visual tree for the <see cref="CalendarDayButton" /> when a new 
+        /// template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -291,7 +282,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// is over this control.
         /// </summary>
         /// <param name="e">The event data. </param>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// e is a null reference (Nothing in Visual Basic).
         /// </exception>
         /// <remarks>
@@ -304,8 +295,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </remarks>
 #if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(MouseButtonEventArgs e)
+#endif
         {
+#if MIGRATION
             base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
 
             MouseButtonEventHandler handler = CalendarDayButtonMouseDown;
             if (null != handler)
@@ -313,18 +311,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 handler(this, e);
             }
         }
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-        {
-            base.OnPointerPressed(e);
-
-            PointerEventHandler handler = CalendarDayButtonMouseDown;
-            if (null != handler)
-            {
-                handler(this, e);
-            }
-        }
-#endif
 
         /// <summary>
         /// Provides handling for the MouseLeftButtonUp event that occurs when
@@ -332,7 +318,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// this control. 
         /// </summary>
         /// <param name="e">The event data.</param>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// e is a null reference (Nothing in Visual Basic).
         /// </exception>
         /// <remarks>
@@ -345,8 +331,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </remarks>
 #if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(MouseButtonEventArgs e)
+#endif
         {
+#if MIGRATION
             base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
 
             MouseButtonEventHandler handler = CalendarDayButtonMouseUp;
             if (null != handler)
@@ -354,18 +347,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 handler(this, e);
             }
         }
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-        {
-            base.OnPointerReleased(e);
-
-            PointerEventHandler handler = CalendarDayButtonMouseUp;
-            if (null != handler)
-            {
-                handler(this, e);
-            }
-        }
-#endif
 
         /// <summary>
         /// We need to simulate the MouseLeftButtonUp event for the
@@ -374,19 +355,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// release.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-#if MIGRATION
         internal void SendMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             e.Handled = false;
+#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-        }
 #else
-        internal void SendMouseLeftButtonUp(PointerRoutedEventArgs e)
-        {
-            e.Handled = false;
             base.OnPointerReleased(e);
-        }
 #endif
+        }
 
         /// <summary>
         /// Ensure the button is not in the MouseOver state.

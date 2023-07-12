@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,38 +11,24 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 #if MIGRATION
-using System.Windows;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
+using System.Windows.Controls;
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Controls;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+namespace OpenSilver.Controls
 {
-    public sealed partial class SelectedDatesCollection : ObservableCollection<DateTime>
+    public sealed class SelectedDatesCollection : ObservableCollection<DateTime>
     {
-        private Collection<object> _addedItems;
-        private Collection<object> _removedItems;
+        private readonly Collection<object> _addedItems;
+        private readonly Collection<object> _removedItems;
 
-        private INTERNAL_CalendarOrClockBase _owner;
+        private readonly INTERNAL_CalendarOrClockBase _owner;
 
         /// <summary>
         /// Initializes a new instance of the CalendarSelectedDatesCollection class.
@@ -51,14 +36,14 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="owner"></param>
         public SelectedDatesCollection(INTERNAL_CalendarOrClockBase owner)
         {
-            this._owner = owner;
-            this._addedItems = new Collection<object>();
-            this._removedItems = new Collection<object>();
+            _owner = owner;
+            _addedItems = new Collection<object>();
+            _removedItems = new Collection<object>();
         }
 
         private void RaiseSelectionChanged(IList removedItems, IList addedItems)
         {
-            this._owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+            _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
         }
 
         /// <summary>
@@ -74,7 +59,5 @@ namespace Windows.UI.Xaml.Controls
 
             RaiseSelectionChanged(_removedItems, _addedItems);
         }
-
-        //todo : Add / Remove / Set ...
     }
 }

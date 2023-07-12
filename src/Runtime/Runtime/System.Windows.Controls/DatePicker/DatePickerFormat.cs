@@ -12,8 +12,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Specifies date formats for a
-    /// <see cref="DatePicker" />.
+    /// Specifies date formats for a <see cref="DatePicker" />.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
     public enum DatePickerFormat

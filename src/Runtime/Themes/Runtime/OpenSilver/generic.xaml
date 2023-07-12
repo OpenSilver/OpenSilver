@@ -1,5 +1,4 @@
-﻿<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultContentControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultItemsControlStyle.xaml" />
@@ -7,7 +6,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonSpinnerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultChildWindowStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultComboBoxStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultExpanderStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultGridSplitterStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHyperlinkButtonStyle.xaml" />
@@ -27,14 +25,14 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRepeatButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedContentControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultBusyIndicatorStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerTextBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultListBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedItemsControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTreeViewStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTreeViewItemStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultCalendarDayButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDragDecoratorStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRichTextBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_ContextMenuStyles.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyles.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

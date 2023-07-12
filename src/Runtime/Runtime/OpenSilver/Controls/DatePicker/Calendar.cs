@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,27 +11,19 @@
 *  
 \*====================================================================================*/
 
-
+using System;
 using CSHTML5;
 using CSHTML5.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 #if MIGRATION
+using System.Windows;
 using System.Windows.Controls;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+namespace OpenSilver.Controls
 {
     public partial class Calendar : INTERNAL_CalendarOrClockBase
     {
@@ -45,10 +36,10 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="P:System.Windows.Controls.Calendar.SelectedDate" /> dependency property.
+        /// Identifies the <see cref="SelectedDate" /> dependency property.
         /// </summary>
         /// <returns>
-        /// The identifier for the <see cref="P:System.Windows.Controls.Calendar.SelectedDate" /> dependency property.
+        /// The identifier for the <see cref="SelectedDate" /> dependency property.
         /// </returns>
         public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register(nameof(SelectedDate), typeof(DateTime?), typeof(Calendar), new PropertyMetadata(OnSelectedDateChanged));
 
@@ -58,12 +49,12 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The date currently selected. The default is null.
         /// </returns>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// The given date is outside the range specified by <see cref="P:System.Windows.Controls.Calendar.DisplayDateStart" /> and <see cref="P:System.Windows.Controls.Calendar.DisplayDateEnd" />
-        /// -or-The given date is in the <see cref="P:System.Windows.Controls.Calendar.BlackoutDates" /> collection.
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The given date is outside the range specified by <see cref="DisplayDateStart" /> and <see cref="DisplayDateEnd" />
+        /// -or-The given date is in the <see cref="BlackoutDates" /> collection.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// If set to anything other than null when <see cref="P:System.Windows.Controls.Calendar.SelectionMode" /> is set to <see cref="F:System.Windows.Controls.CalendarSelectionMode.None" />.
+        /// <exception cref="InvalidOperationException">
+        /// If set to anything other than null when <see cref="SelectionMode" /> is set to <see cref="CalendarSelectionMode.None" />.
         /// </exception>
         public DateTime? SelectedDate
         {
@@ -97,14 +88,14 @@ namespace Windows.UI.Xaml.Controls
             object div = INTERNAL_InnerDomElement;
 
             // Render the control: Calendar only
-            _flatpickrInstance = OpenSilver.Interop.ExecuteJavaScript(@"flatpickr($0, {
+            _flatpickrInstance = Interop.ExecuteJavaScript(@"flatpickr($0, {
                 inline: true, 
                 dateFormat: ""YYYY-MM-DD HH:MM"",
                 defaultDate: $1
                 })", div, GetJsDate(defaultDate));
 
             // Register the JS events:
-            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.onChange.push(function(args) {
+            Interop.ExecuteJavaScriptVoid(@"$0.config.onChange.push(function(args) {
                 var date = args[0];
                 if(date !== undefined)
                 {
@@ -113,18 +104,18 @@ namespace Windows.UI.Xaml.Controls
                     var year = date.getFullYear();
                     $1(year, month, day);
                 }
-            });", flushQueue:false, _flatpickrInstance, (Action<object, object, object>)OnJavaScriptEvent_Change);
+            });", flushQueue: false, _flatpickrInstance, (Action<object, object, object>)OnJavaScriptEvent_Change);
 
-            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.onMonthChange.push(function(args) {
+            Interop.ExecuteJavaScriptVoid(@"$0.config.onMonthChange.push(function(args) {
                 $1();
-            });", flushQueue:false, _flatpickrInstance, (Action)OnMonthChange);
+            });", flushQueue: false, _flatpickrInstance, (Action)OnMonthChange);
 
             RefreshTodayHighlight(IsTodayHighlighted);
 
             // Enable click event
-            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.calendarContainer.style.pointerEvents = 'auto'", flushQueue:false, _flatpickrInstance);
+            Interop.ExecuteJavaScriptVoid(@"$0.calendarContainer.style.pointerEvents = 'auto'", flushQueue: false, _flatpickrInstance);
             // Hide the input area:
-            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.style.display = 'none'", flushQueue:false, div);
+            Interop.ExecuteJavaScriptVoid(@"$0.style.display = 'none'", flushQueue: false, div);
         }
 
         void OnJavaScriptEvent_Change(object year, object month, object day)
@@ -173,8 +164,8 @@ namespace Windows.UI.Xaml.Controls
             if (isLoaded)
             {
                 string borderColor = isTodayHighlighted ? "transparent" : "";
-                OpenSilver.Interop.ExecuteJavaScriptVoid(@"var todaySpan = $0.calendarContainer.querySelector('span.today'); 
-                            if(todaySpan) todaySpan.style.borderColor = $1", flushQueue:false, _flatpickrInstance, borderColor);
+                Interop.ExecuteJavaScriptVoid(@"var todaySpan = $0.calendarContainer.querySelector('span.today');
+if(todaySpan) todaySpan.style.borderColor = $1", flushQueue: false, _flatpickrInstance, borderColor);
             }
         }
 
@@ -202,10 +193,6 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets or sets the date to display
         /// </summary>
-        // Exceptions:
-        //   System.ArgumentOutOfRangeException:
-        //     The given date is not in the range specified by System.Windows.Controls.Calendar.DisplayDateStart
-        //     and System.Windows.Controls.Calendar.DisplayDateEnd.
         public DateTime DisplayDate
         {
             get { return _displayDate; }
@@ -216,12 +203,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateStart == null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.minDate = undefined", flushQueue:false, this._flatpickrInstance);
+                Interop.ExecuteJavaScriptVoid(@"$0.config.minDate = undefined", flushQueue: false, this._flatpickrInstance);
             }
             else
             {
                 DateTime nonNullDateStart = (DateTime)dateStart;
-                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.minDate = $1", flushQueue:false, this._flatpickrInstance, GetJsDate(nonNullDateStart));
+                Interop.ExecuteJavaScriptVoid(@"$0.config.minDate = $1", flushQueue: false, this._flatpickrInstance, GetJsDate(nonNullDateStart));
             }
         }
 
@@ -229,12 +216,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateEnd == null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = undefined", flushQueue:false, this._flatpickrInstance);
+                Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = undefined", flushQueue: false, this._flatpickrInstance);
             }
             else
             {
                 DateTime nonNullDateEnd = (DateTime)dateEnd;
-                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = $1", flushQueue:false, this._flatpickrInstance, GetJsDate(nonNullDateEnd));
+                Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = $1", flushQueue: false, this._flatpickrInstance, GetJsDate(nonNullDateEnd));
             }
         }
 
@@ -242,7 +229,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateTime == null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = undefined", flushQueue:false, this._flatpickrInstance);
+                Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = undefined", flushQueue: false, this._flatpickrInstance);
             }
             else
             {
@@ -251,13 +238,13 @@ namespace Windows.UI.Xaml.Controls
                 {
                     throw new ArgumentOutOfRangeException("The given date is not in the range specified by System.Windows.Controls.Calendar.DisplayDateStart and System.Windows.Controls.Calendar.DisplayDateEnd");
                 }
-                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.jumpToDate($1)", flushQueue:false, this._flatpickrInstance, GetJsDate(nonNullDate));
+                Interop.ExecuteJavaScriptVoid(@"$0.jumpToDate($1)", flushQueue: false, this._flatpickrInstance, GetJsDate(nonNullDate));
             }
         }
 
         static object GetJsDate(DateTime dateTime)
         {
-            using(var date = OpenSilver.Interop.ExecuteJavaScript("new Date($0,$1,$2)", dateTime.Year, dateTime.Month - 1, dateTime.Day))
+            using (var date = Interop.ExecuteJavaScript("new Date($0,$1,$2)", dateTime.Year, dateTime.Month - 1, dateTime.Day))
                 return date;
         }
     }
