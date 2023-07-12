@@ -5,7 +5,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 #if MIGRATION
 using System.Windows.Automation.Provider;
@@ -17,20 +16,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.Column", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.ColumnSpan", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.ContainingGrid", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.Row", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.RowSpan", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IInvokeProvider.Invoke()", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ISelectionItemProvider.AddToSelection()", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ISelectionItemProvider.IsSelected", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ISelectionItemProvider.RemoveFromSelection()", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ISelectionItemProvider.Select()", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ISelectionItemProvider.SelectionContainer", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ITableItemProvider.GetColumnHeaderItems()", Justification = "WPF Compatibility")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ITableItemProvider.GetRowHeaderItems()", Justification = "WPF Compatibility")]
-
 #if MIGRATION
 namespace System.Windows.Automation.Peers
 #else
@@ -38,9 +23,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
     /// <summary>
-    /// Exposes
-    /// <see cref="T:System.Windows.Controls.Primitives.CalendarDayButton" />
-    /// types to UI Automation.
+    /// Exposes <see cref="CalendarDayButton" /> types to UI Automation.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
     public partial class CalendarDayButtonAutomationPeer :
@@ -98,7 +81,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// </value>
         int IGridItemProvider.Column
         {
-            get { return (int)OwningCalendarDayButton.GetValue(Grid.ColumnProperty); }
+            get { return (int) OwningCalendarDayButton.GetValue(Grid.ColumnProperty); }
         }
 
         /// <summary>
@@ -113,8 +96,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
 
         /// <summary>
-        /// Gets a UI Automation provider that implements
-        /// <see cref="T:System.Windows.Automation.Provider.IGridProvider" />
+        /// Gets a UI Automation provider that implements <see cref="IGridProvider" />
         /// and that represents the container of the cell or item.
         /// </summary>
         /// <value>
@@ -138,8 +120,8 @@ namespace Windows.UI.Xaml.Automation.Peers
             {
                 // we decrement the Row value by one since the first row is
                 // composed of DayTitles
-                Debug.Assert((int)OwningCalendarDayButton.GetValue(Grid.RowProperty) > 0, "Row should be greater than 0");
-                return (int)OwningCalendarDayButton.GetValue(Grid.RowProperty) - 1;
+                Debug.Assert((int) OwningCalendarDayButton.GetValue(Grid.RowProperty) > 0, "Row should be greater than 0");
+                return (int) OwningCalendarDayButton.GetValue(Grid.RowProperty) - 1;
             }
         }
 
@@ -162,8 +144,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
 
         /// <summary>
-        /// Gets the UI Automation provider that implements
-        /// <see cref="T:System.Windows.Automation.Provider.ISelectionProvider" />
+        /// Gets the UI Automation provider that implements <see cref="ISelectionProvider" />
         /// and that acts as the container for the calling object.
         /// </summary>
         /// <value>The UI Automation provider.</value>
@@ -173,15 +154,12 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer" />
+        /// Initializes a new instance of the <see cref="CalendarDayButtonAutomationPeer" />
         /// class.
         /// </summary>
         /// <param name="owner">
-        /// The
-        /// <see cref="T:System.Windows.Controls.Primitives.CalendarDayButton" />
-        /// instance that is associated with this
-        /// <see cref="T:System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer" />.
+        /// The <see cref="CalendarDayButton" /> instance that is associated with this
+        /// <see cref="CalendarDayButtonAutomationPeer" />.
         /// </param>
         public CalendarDayButtonAutomationPeer(CalendarDayButton owner)
             : base(owner)
@@ -189,8 +167,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
 
         /// <summary>
-        /// Gets the control pattern implementation for this
-        /// <see cref="T:System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer" />.
+        /// Gets the control pattern implementation for this <see cref="CalendarDayButtonAutomationPeer" />.
         /// </summary>
         /// <param name="patternInterface">
         /// One of the enumeration values.
@@ -231,7 +208,6 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// <returns>The string that contains the type of control.</returns>
         protected override string GetLocalizedControlTypeCore()
         {
-            //todo: replace with resource CalendarAutomationPeer_DayButtonLocalizedControlType
             return "day button";
         }
 
@@ -323,19 +299,44 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// Sends a request to activate the control and to initiate its single,
         /// unambiguous action.
         /// </summary>
-        [OpenSilver.NotImplemented]
         void IInvokeProvider.Invoke()
         {
-            throw new NotImplementedException();
+            if (EnsureSelection())
+            {
+                OwningCalendar.SelectedDates.Clear();
+
+                if (OwningCalendarDayButton.DataContext != null)
+                {
+                    OwningCalendar.SelectedDates.Add((DateTime) OwningCalendarDayButton.DataContext);
+                    OwningCalendar.OnDayClick((DateTime) OwningCalendarDayButton.DataContext);
+                }
+            }
         }
 
         /// <summary>
         /// Adds the current element to the collection of selected items.
         /// </summary>
-        [OpenSilver.NotImplemented]
         void ISelectionItemProvider.AddToSelection()
         {
-            throw new NotImplementedException();
+            // Return if the item is already selected
+            CalendarDayButton button = OwningCalendarDayButton;
+            if (button.IsSelected)
+            {
+                return;
+            }
+
+            Calendar calendar = OwningCalendar;
+            if (EnsureSelection() && button.DataContext != null)
+            {
+                if (calendar.SelectionMode == CalendarSelectionMode.SingleDate)
+                {
+                    calendar.SelectedDate = (DateTime)button.DataContext;
+                }
+                else
+                {
+                    calendar.SelectedDates.Add((DateTime)button.DataContext);
+                }
+            }
         }
 
         /// <summary>
@@ -353,7 +354,7 @@ namespace Windows.UI.Xaml.Automation.Peers
             Calendar calendar = OwningCalendar;
             if (calendar != null && button.DataContext != null)
             {
-                calendar.SelectedDate = null;
+                calendar.SelectedDates.Remove((DateTime) button.DataContext);
             }
         }
 
@@ -367,9 +368,10 @@ namespace Windows.UI.Xaml.Automation.Peers
                 Calendar calendar = OwningCalendar;
                 CalendarDayButton button = OwningCalendarDayButton;
 
+                calendar.SelectedDates.Clear();
                 if (button.DataContext != null)
                 {
-                    calendar.SelectedDate = (DateTime)button.DataContext;
+                    calendar.SelectedDates.Add((DateTime)button.DataContext);
                 }
             }
         }
@@ -394,9 +396,8 @@ namespace Windows.UI.Xaml.Automation.Peers
             Calendar calendar = OwningCalendar;
             return !button.IsBlackout &&
                 button.Visibility != Visibility.Collapsed &&
-                calendar != null;
-            //todo add selectionMode
-            //&&  calendar.SelectionMode != CalendarSelectionMode.None;
+                calendar != null &&
+                calendar.SelectionMode != CalendarSelectionMode.None;
         }
 
         /// <summary>

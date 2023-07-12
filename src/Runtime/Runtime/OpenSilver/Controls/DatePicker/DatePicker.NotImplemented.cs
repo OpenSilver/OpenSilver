@@ -15,16 +15,16 @@
 using System;
 
 #if MIGRATION
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+namespace OpenSilver.Controls
 {
     /// <summary>
     /// Represents a control that allows the user to select a date.
@@ -37,16 +37,16 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A collection of dates that cannot be selected. The default value is an empty collection.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public CalendarBlackoutDatesCollection BlackoutDates { get; private set; }
 
         /// <summary>
-        /// Identifies the <see cref="P:System.Windows.Controls.DatePicker.SelectionBackground" /> dependency property.
+        /// Identifies the <see cref="SelectionBackground" /> dependency property.
         /// </summary>
         /// <returns>
-        /// The identifier for the <see cref="P:System.Windows.Controls.DatePicker.SelectionBackground" /> dependency property.
+        /// The identifier for the <see cref="SelectionBackground" /> dependency property.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register(nameof(SelectionBackground), typeof(Brush), typeof(DatePicker), null);
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The background used for selected dates.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Brush SelectionBackground
         {
             get => (Brush)GetValue(SelectionBackgroundProperty);
@@ -63,12 +63,12 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="P:System.Windows.Controls.DatePicker.DisplayDateStart" /> dependency property.
+        /// Identifies the <see cref="DisplayDateStart" /> dependency property.
         /// </summary>
         /// <returns>
-        /// The identifier for the <see cref="P:System.Windows.Controls.DatePicker.DisplayDateStart" /> dependency property.
+        /// The identifier for the <see cref="DisplayDateStart" /> dependency property.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty DisplayDateStartProperty = DependencyProperty.Register(nameof(DisplayDateStart), typeof(DateTime?), typeof(DatePicker), new PropertyMetadata(OnDisplayDateStartChanged));
 
         /// <summary>
@@ -77,19 +77,15 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The first date to display.
         /// </returns>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public DateTime? DisplayDateStart
         {
             get => (DateTime?)GetValue(DisplayDateStartProperty);
             set => SetValue(DisplayDateStartProperty, value);
         }
 
-        //
-        // Summary:
-        //     Occurs when the drop-down System.Windows.Controls.Calendar is closed.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public event RoutedEventHandler CalendarClosed;
-        
 
         private static void OnDisplayDateStartChanged(
             DependencyObject d,
@@ -98,17 +94,12 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Occurs when the drop-down
-        /// <see cref="T:System.Windows.Controls.Calendar" /> is opened.
+        /// Occurs when the drop-down <see cref="Calendar" /> is opened.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public event RoutedEventHandler CalendarOpened;
 
-        /// <summary>
-        /// Occurs when <see cref="P:System.Windows.Controls.DatePicker.Text" /> is assigned
-        /// a value that cannot be interpreted as a date.
-        /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public event EventHandler<DatePickerDateValidationErrorEventArgs> DateValidationError;
 
         #region DisplayDate
@@ -121,11 +112,11 @@ namespace Windows.UI.Xaml.Controls
         /// </value>
         /// <exception cref="ArgumentOutOfRangeException">
         /// The specified date is not in the range defined by
-        /// <see cref="DatePicker.DisplayDateStart" />
+        /// <see cref="DisplayDateStart" />
         /// and
-        /// <see cref="DatePicker.DisplayDateEnd" />.
+        /// <see cref="DisplayDateEnd" />.
         /// </exception>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public DateTime DisplayDate
         {
             get { return (DateTime)GetValue(DisplayDateProperty); }
@@ -133,14 +124,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="DatePicker.DisplayDate" />
+        /// Identifies the <see cref="DisplayDate" />
         /// dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the <see cref="DatePicker.DisplayDate" />
+        /// The identifier for the <see cref="DisplayDate" />
         /// dependency property.
         /// </value>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty DisplayDateProperty =
             DependencyProperty.Register(
             "DisplayDate",
@@ -163,7 +154,7 @@ namespace Windows.UI.Xaml.Controls
         /// Gets or sets the last date to be displayed.
         /// </summary>
         /// <value>The last date to display.</value>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public DateTime? DisplayDateEnd
         {
             get { return (DateTime?)GetValue(DisplayDateEndProperty); }
@@ -171,14 +162,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="DatePicker.DisplayDateEnd" />
+        /// Identifies the <see cref="DisplayDateEnd" />
         /// dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the <see cref="DatePicker.DisplayDateEnd" />
+        /// The identifier for the <see cref="DisplayDateEnd" />
         /// dependency property.
         /// </value>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty DisplayDateEndProperty =
             DependencyProperty.Register(
             "DisplayDateEnd",
@@ -199,7 +190,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets or sets a value that indicates whether the current date will be highlighted.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public bool IsTodayHighlighted
         {
             get { return (bool)GetValue(IsTodayHighlightedProperty); }
@@ -209,7 +200,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the IsTodayHighlighted dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty IsTodayHighlightedProperty =
             DependencyProperty.Register(
             "IsTodayHighlighted",
@@ -217,24 +208,11 @@ namespace Windows.UI.Xaml.Controls
             typeof(DatePicker),
             null);
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Controls.DatePicker.CalendarStyle dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.DatePicker.CalendarStyle dependency
-        //     property.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public static readonly DependencyProperty CalendarStyleProperty =
             DependencyProperty.Register("CalendarStyle", typeof(Style), typeof(DatePicker), null);
 
-        //
-        // Summary:
-        //     Gets or sets the style that is used when rendering the calendar.
-        //
-        // Returns:
-        //     The style that is used when rendering the calendar.
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public Style CalendarStyle
         {
             get => (Style)GetValue(CalendarStyleProperty);
