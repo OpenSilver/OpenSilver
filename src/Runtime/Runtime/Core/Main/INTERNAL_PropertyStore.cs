@@ -696,20 +696,7 @@ namespace CSHTML5.Internal
             // Call the PropertyChangedCallback if any:
             //---------------------
 
-            var args = new DependencyPropertyChangedEventArgs(oldValue, newValue, dp);
-            if (metadata != null && metadata.PropertyChangedCallback != null)
-            {
-                metadata.PropertyChangedCallback(depObj, args);
-            }
-
-            //---------------------
-            // Update bindings if any:
-            //---------------------
-
-            depObj.InvalidateDependents(args);
-
-            // Raise the InvalidateMeasure or InvalidateArrange
-            depObj.OnPropertyChanged(args);
+            depObj.NotifyPropertyChange(new DependencyPropertyChangedEventArgs(oldValue, newValue, dp, metadata));
         }
 
         private static bool Equals(DependencyProperty dp, object obj1, object obj2)
@@ -814,7 +801,7 @@ namespace CSHTML5.Internal
                 CSSEquivalent cssEquivalent = typeMetadata.GetCSSEquivalent(sender);
                 if (cssEquivalent != null)
                 {
-                    ApplyPropertyChanged(sender, cssEquivalent, oldValue, newValue);
+                    ApplyPropertyChanged(sender, typeMetadata, cssEquivalent, oldValue, newValue);
                 }
             }
 
@@ -825,13 +812,18 @@ namespace CSHTML5.Internal
                 {
                     foreach (CSSEquivalent cssEquivalent in cssEquivalents)
                     {
-                        ApplyPropertyChanged(sender, cssEquivalent, oldValue, newValue);
+                        ApplyPropertyChanged(sender, typeMetadata, cssEquivalent, oldValue, newValue);
                     }
                 }
             }
         }
 
-        private static void ApplyPropertyChanged(DependencyObject sender, CSSEquivalent cssEquivalent, object oldValue, object newValue)
+        private static void ApplyPropertyChanged(
+            DependencyObject sender,
+            PropertyMetadata metadata,
+            CSSEquivalent cssEquivalent,
+            object oldValue,
+            object newValue)
         {
             //if (cssEquivalent.ApplyWhenControlHasTemplate) //Note: this is to handle the case of a Control with a ControlTemplate (some properties must not be applied on the control itself)
 
@@ -852,7 +844,9 @@ namespace CSHTML5.Internal
                         //var castedValue = DynamicCast(newValue, propertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
                         //uiElement.SetVisualStateValue(cssEquivalent.DependencyProperty, castedValue);
 
-                        cssEquivalent.CallbackMethod(cssEquivalent.UIElement, new DependencyPropertyChangedEventArgs(oldValue, newValue, cssEquivalent.DependencyProperty));
+                        cssEquivalent.CallbackMethod(
+                            cssEquivalent.UIElement,
+                            new DependencyPropertyChangedEventArgs(oldValue, newValue, cssEquivalent.DependencyProperty, metadata));
                     }
                     else
                     {
