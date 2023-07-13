@@ -109,7 +109,5 @@ public partial class FrameworkElement : IInternalFrameworkElement
 
     void IInternalFrameworkElement.RemoveLogicalChild(object child) => RemoveLogicalChild(child);
 
-    void IInternalFrameworkElement.SubscribeToSizeChanged() => SubscribeToSizeChanged();
-
     void IInternalFrameworkElement.UnloadResources() => UnloadResources();
 }
