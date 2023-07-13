@@ -340,7 +340,7 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnPropertyChanged(e);
 
-            if (e.Property.GetMetadata(DependencyObjectType) is FrameworkPropertyMetadata metadata)
+            if (e.Metadata is FrameworkPropertyMetadata metadata)
             {
                 if (metadata.AffectsMeasure)
                 {
