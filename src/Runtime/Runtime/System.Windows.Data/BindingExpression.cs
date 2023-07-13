@@ -248,15 +248,6 @@ namespace Windows.UI.Xaml.Data
                 _targetPropertyListener = new DependencyPropertyChangedListener(Target, TargetProperty, UpdateSourceCallback);
             }
 
-            if (BindingSource is IInternalFrameworkElement fe)
-            {
-                if (ParentBinding.XamlPath == "ActualWidth" || ParentBinding.XamlPath == "ActualHeight"
-                    || ParentBinding.XamlPath == "ActualSizeX" || ParentBinding.XamlPath == "ActualSizeY" || ParentBinding.XamlPath == "ActualSizeZ")
-                {
-                    fe.SubscribeToSizeChanged();
-                }
-            }
-
             // FindSource should find the source now. Otherwise, the PropertyPathNodes
             // shoud do the work (their properties will change when the source will
             // become available)

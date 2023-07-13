@@ -72,10 +72,11 @@ namespace Windows.UI.Xaml.Controls
         {
             // Initialize the _templateCache to the default value for TemplateProperty.
             // If the default value is non-null then wire it to the current instance.
-            ControlTemplate defaultValue = (ControlTemplate)TemplateProperty.GetDefaultValue(this);
+            PropertyMetadata metadata = TemplateProperty.GetMetadata(DependencyObjectType);
+            ControlTemplate defaultValue = (ControlTemplate)metadata.GetDefaultValue(this, TemplateProperty);
             if (defaultValue != null)
             {
-                OnTemplateChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, TemplateProperty));
+                OnTemplateChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, TemplateProperty, metadata));
             }
         }
 
