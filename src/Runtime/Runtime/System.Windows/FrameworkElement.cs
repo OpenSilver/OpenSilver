@@ -376,10 +376,11 @@ namespace Windows.UI.Xaml
         {
             // Initialize the _styleCache to the default value for StyleProperty.
             // If the default value is non-null then wire it to the current instance.
-            Style defaultValue = (Style)StyleProperty.GetDefaultValue(this);
+            PropertyMetadata metadata = StyleProperty.GetMetadata(DependencyObjectType);
+            Style defaultValue = (Style)metadata.GetDefaultValue(this, StyleProperty);
             if (defaultValue != null)
             {
-                OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty));
+                OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty, metadata));
             }
 
             if (((FlowDirection)FlowDirectionProperty.GetDefaultValue(this)) == FlowDirection.RightToLeft)
@@ -1090,15 +1091,9 @@ namespace Windows.UI.Xaml
 
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            // Skip when loading or changed on TextMeasurement Div.
-            if (INTERNAL_OuterDomElement == null)
-            {
-                return;
-            }
+            base.OnPropertyChanged(e);
 
-            var metadata = e.Property.GetMetadata(DependencyObjectType) as FrameworkPropertyMetadata;
-            
-            if (metadata != null)
+            if (e.Metadata is FrameworkPropertyMetadata metadata)
             {
                 if (metadata.AffectsMeasure)
                 {
@@ -1108,11 +1103,6 @@ namespace Windows.UI.Xaml
                 if (metadata.AffectsArrange)
                 {
                     InvalidateArrange();
-                }
-
-                if (metadata.AffectsRender)
-                {
-                    //InvalidateVisual();
                 }
 
                 if (metadata.AffectsParentMeasure)
@@ -1296,8 +1286,8 @@ namespace Windows.UI.Xaml
         // free bit = 0x00000200,
         NeedsClipBounds = 0x00000400,
 
-        //HasWidthEverChanged = 0x00000800,
-        //HasHeightEverChanged = 0x00001000,
+        HasWidthEverChanged = 0x00000800,
+        HasHeightEverChanged = 0x00001000,
         // free bit = 0x00002000,
         // free bit = 0x00004000,
 

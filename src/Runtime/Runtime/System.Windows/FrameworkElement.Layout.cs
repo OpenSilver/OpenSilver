@@ -578,6 +578,32 @@ namespace Windows.UI.Xaml
 
         internal sealed override void OnRenderSizeChanged(SizeChangedInfo info)
         {
+            //first, invalidate ActualWidth and/or ActualHeight
+            //Note: if any handler of invalidation will dirtyfy layout,
+            //subsequent handlers will run on effectively dirty layouts
+            //we only guarantee cleaning between elements, not between handlers here
+            if (info.WidthChanged)
+            {
+                HasWidthEverChanged = true;
+                NotifyPropertyChange(
+                    new DependencyPropertyChangedEventArgs(
+                        info.PreviousSize.Width,
+                        info.NewSize.Width,
+                        ActualWidthProperty,
+                        _actualWidthMetadata));
+            }
+
+            if (info.HeightChanged)
+            {
+                HasHeightEverChanged = true;
+                NotifyPropertyChange(
+                    new DependencyPropertyChangedEventArgs(
+                        info.PreviousSize.Height,
+                        info.NewSize.Height,
+                        ActualHeightProperty,
+                        _actualHeightMetadata));
+            }
+
             SizeChanged?.Invoke(this, new SizeChangedEventArgs(info.PreviousSize, info.NewSize));
         }
 
@@ -648,6 +674,18 @@ namespace Windows.UI.Xaml
         {
             get { return ReadInternalFlag(InternalFlags.NeedsClipBounds); }
             set { WriteInternalFlag(InternalFlags.NeedsClipBounds, value); }
+        }
+
+        private bool HasWidthEverChanged
+        {
+            get { return ReadInternalFlag(InternalFlags.HasWidthEverChanged); }
+            set { WriteInternalFlag(InternalFlags.HasWidthEverChanged, value); }
+        }
+
+        private bool HasHeightEverChanged
+        {
+            get { return ReadInternalFlag(InternalFlags.HasHeightEverChanged); }
+            set { WriteInternalFlag(InternalFlags.HasHeightEverChanged, value); }
         }
 
         private Size _unclippedDesiredSize;
