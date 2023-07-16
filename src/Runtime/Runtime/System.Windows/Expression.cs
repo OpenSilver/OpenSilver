@@ -32,15 +32,6 @@ namespace Windows.UI.Xaml
         internal abstract object GetValue(DependencyObject d, DependencyProperty dp);
 
         /// <summary>
-        ///     Allows Expression to store set values
-        /// </summary>
-        /// <param name="d">DependencyObject being set</param>
-        /// <param name="dp">Property being set</param>
-        /// <param name="value">Value being set</param>
-        /// <returns>true if Expression handled storing of the value</returns>
-        internal abstract void SetValue(DependencyObject d, DependencyProperty dp, object value);
-
-        /// <summary>
         ///     Check if this Expression can set values
         /// </summary>
         /// <param name="d">DependencyObject being set</param>

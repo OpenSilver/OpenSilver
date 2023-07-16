@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
 #if MIGRATION
@@ -22,7 +20,7 @@ namespace Windows.UI.Xaml.Data
 #endif
 {
     /// <summary>
-    /// Provides the static <see cref="BindingOperations.SetBinding(DependencyObject, DependencyProperty, Binding)" />
+    /// Provides the static <see cref="SetBinding(DependencyObject, DependencyProperty, Binding)" />
     /// method.
     /// </summary>
     public static class BindingOperations
@@ -38,22 +36,33 @@ namespace Windows.UI.Xaml.Data
         {
             // the signature of this method is slightly different: it takes a "Binding" instead of "BindingBase", 
             // and it returns a "BindingExpression" instead of a "BindingExpressionBase".
-            if (target == null)
+            if (target is null)
             {
-                throw new ArgumentNullException("target");
+                throw new ArgumentNullException(nameof(target));
             }
-            if (dp == null)
+            if (dp is null)
             {
-                throw new ArgumentNullException("dp");
+                throw new ArgumentNullException(nameof(dp));
             }
-            if (binding == null)
+            if (binding is null)
             {
-                throw new ArgumentNullException("binding");
+                throw new ArgumentNullException(nameof(binding));
             }
 
             // Create the BindingExpression from the Binding
-            BindingExpression expr = new BindingExpression(binding, dp);
-            target.SetValue(dp, expr);
+            var expr = new BindingExpression(binding, dp)
+            {
+                IsUpdatingValue = true
+            };
+
+            try
+            {
+                target.SetValue(dp, expr);
+            }
+            finally
+            {
+                expr.IsUpdatingValue = false;
+            }
 
             // Return the newly created BindingExpression
             return expr;
@@ -61,14 +70,15 @@ namespace Windows.UI.Xaml.Data
 
         public static BindingExpression GetBindingExpression(DependencyObject target, DependencyProperty dp)
         {
-            if (target == null)
+            if (target is null)
             {
-                throw new ArgumentNullException("target");
+                throw new ArgumentNullException(nameof(target));
             }
-            if (dp == null)
+            if (dp is null)
             {
-                throw new ArgumentNullException("dp");
+                throw new ArgumentNullException(nameof(dp));
             }
+
             return target.ReadLocalValue(dp) as BindingExpression;
         }
     }

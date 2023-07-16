@@ -94,11 +94,6 @@ namespace Windows.UI.Xaml
             listener?.Dispose();
         }
 
-        internal override void SetValue(DependencyObject d, DependencyProperty dp, object value)
-        {
-            return;
-        }
-
         private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
             _target.ApplyExpression(_targetProperty, this, false);
