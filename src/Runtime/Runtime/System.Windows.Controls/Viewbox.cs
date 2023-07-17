@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Diagnostics;
 using System.Windows.Markup;
@@ -24,10 +22,6 @@ using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 #endif
 
-//-----------------------------------------------------------------------------------------------
-// Credits: Silverlight 3 Toolkit + Nick Lightfoot contribution (cf. CSHTML5 ZenDesk ticket #575)
-//-----------------------------------------------------------------------------------------------
-
 #if MIGRATION
 namespace System.Windows.Controls
 #else
@@ -35,27 +29,23 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Defines a content decorator that can stretch and scale a single child to
-    /// fill the available space.
+    /// Defines a content decorator that can stretch and scale a single child to fill
+    /// the available space.
     /// </summary>
-    [ContentProperty("Child")]
-    public partial class Viewbox : ContentControl
+    [TemplatePart(Name = ChildElementName, Type = typeof(ContentPresenter))]
+    [ContentProperty(nameof(Child))]
+    public class Viewbox : ContentControl
     {
+        private const string ChildElementName = "Child";
+
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.Viewbox" /> class.
+        /// Initializes a new instance of the <see cref="Viewbox" /> class.
         /// </summary>
         public Viewbox()
         {
-            // Set default style:
-            this.DefaultStyleKey = typeof(Viewbox);
-
-            this.SizeChanged += OnSizeChanged;
-
-            // Load the default template
-            //Template = DefaultTemplate = XamlReader.Load(DefaultTemplateMarkup) as ControlTemplate;
-            //ApplyTemplate();
-            //IsTabStop = false;         
+            DefaultStyleKey = typeof(Viewbox);
+            IsTabStop = false;
+            SizeChanged += OnSizeChanged;
         }
 
         /// <summary>
@@ -64,117 +54,112 @@ namespace Windows.UI.Xaml.Controls
         private ContentPresenter ChildElement { get; set; }
 
         /// <summary>
-        /// Gets or sets the Canvas element so that the child does not force its size on the parent.
-        /// </summary>
-        private Canvas RootCanvas { get; set; }
-
-        /// <summary>
         /// Gets or sets the transformation on the ChildElement used to scale the
         /// Child content.
         /// </summary>
         private ScaleTransform Scale { get; set; }
 
         /// <summary>
-        /// Gets or sets the single child element of a Viewbox element.
+        /// Gets or sets the single child element of a <see cref="Viewbox"/> element.
         /// </summary>
-        /// <value>
-        /// The single child element of a Viewbox element.
-        /// </value>
-        /// <remarks>
-        /// Child must be an alias of ContentControl.Content property to ensure 
-        /// continuous namescope, ie, named element within Viewbox can be found.
-        /// </remarks>
+        /// <returns>
+        /// The single child element of a <see cref="Viewbox"/> element.
+        /// </returns>
         public UIElement Child
         {
-            get { return (UIElement)GetValue(ChildProperty); }
-            set { SetValue(ChildProperty, value); }
+            get => (UIElement)GetValue(ChildProperty);
+            set => SetValue(ChildProperty, value);
         }
 
         /// <summary>
         /// Identifies the <see cref="Child"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ChildProperty =
-            DependencyProperty.Register("Child", typeof(UIElement), typeof(Viewbox), new PropertyMetadata(OnChildChanged));
+            DependencyProperty.Register(
+                nameof(Child),
+                typeof(UIElement),
+                typeof(Viewbox),
+                new PropertyMetadata(OnChildChanged));
 
         private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = (Viewbox)d;
-            control.Content = e.NewValue;
+            ((Viewbox)d).Content = e.NewValue;
         }
 
         /// <summary>
-        /// Gets or sets the Stretch mode, which determines how content
-        /// fits into the available space. The default is Stretch.Uniform.
+        /// Gets or sets the <see cref="Stretch"/> mode, which determines how content
+        /// fits into the available space.
         /// </summary>
         /// <value>
-        /// A Stretch mode, which determines how content fits in the
-        /// available space. The default is Stretch.Uniform.
+        /// A <see cref="Stretch"/> mode, which determines how content fits in the
+        /// available space. The default is <see cref="Stretch.Uniform"/>.
         /// </value>
         public Stretch Stretch
         {
-            get { return (Stretch)GetValue(StretchProperty); }
-            set { SetValue(StretchProperty, value); }
+            get => (Stretch)GetValue(StretchProperty);
+            set => SetValue(StretchProperty, value);
         }
 
         /// <summary>
-        /// Identifies the Viewbox.Stretch dependency property.
+        /// Identifies the <see cref="Stretch"/> dependency property.
         /// </summary>
-        /// <value>
-        /// The identifier for the Viewbox.Stretch dependency
-        /// property.
-        /// </value>
         public static readonly DependencyProperty StretchProperty =
             DependencyProperty.Register(
-                "Stretch",
+                nameof(Stretch),
                 typeof(Stretch),
                 typeof(Viewbox),
-                new FrameworkPropertyMetadata(Stretch.Uniform, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+                new FrameworkPropertyMetadata(Stretch.Uniform, FrameworkPropertyMetadataOptions.AffectsMeasure),
+                IsValidStretchValue);
 
         /// <summary>
-        /// Gets or sets the StretchDirection, which determines how scaling
-        /// is applied to the contents of a Viewbox. The default is
-        /// StretchDirection.Both.
+        /// Check whether the passed in object value is a valid Stretch enum value.
+        /// </summary>
+        /// <param name="o">The object typed value to be checked.</param>
+        /// <returns>True if o is a valid Stretch enum value, false o/w.</returns>
+        private static bool IsValidStretchValue(object o)
+        {
+            Stretch s = (Stretch)o;
+            return s == Stretch.None || s == Stretch.Uniform || s == Stretch.Fill || s == Stretch.UniformToFill;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Controls.StretchDirection"/>, which determines how
+        /// scaling is applied to the contents of a <see cref="Viewbox"/>.
         /// </summary>
         /// <value>
-        /// A StretchDirection, which determines how scaling is applied to the
-        /// contents of a Viewbox. The default is StretchDirection.Both.
+        /// A <see cref="Controls.StretchDirection"/>, which determines how scaling is applied
+        /// to the contents of a <see cref="Viewbox"/>. The default is <see cref="StretchDirection.Both"/>.
         /// </value>
         public StretchDirection StretchDirection
         {
-            get { return (StretchDirection)GetValue(StretchDirectionProperty); }
-            set { SetValue(StretchDirectionProperty, value); }
+            get => (StretchDirection)GetValue(StretchDirectionProperty);
+            set => SetValue(StretchDirectionProperty, value);
         }
 
         /// <summary>
-        /// Identifies the Viewbox.StretchDirection dependency property.
+        /// Identifies the <see cref="StretchDirection"/> dependency property.
         /// </summary>
-        /// <value>
-        /// The identifier for the Viewbox.StretchDirection dependency property.
-        /// </value>
         public static readonly DependencyProperty StretchDirectionProperty =
             DependencyProperty.Register(
-                "StretchDirection",
+                nameof(StretchDirection),
                 typeof(StretchDirection),
                 typeof(Viewbox),
-                new FrameworkPropertyMetadata(StretchDirection.Both, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, OnStretchDirectionPropertyChanged));
+                new FrameworkPropertyMetadata(StretchDirection.Both, FrameworkPropertyMetadataOptions.AffectsMeasure),
+                IsValidStretchDirectionValue);
 
         /// <summary>
-        /// StretchDirectionProperty property changed handler.
+        /// Check whether the passed in object value is a valid StretchDirection enum value.
         /// </summary>
-        /// <param name="d">Viewbox that changed its StretchDirection.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnStretchDirectionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <param name="o">The object typed value to be checked.</param>
+        /// <returns>True if o is a valid StretchDirection enum value, false o/w.</returns>
+        private static bool IsValidStretchDirectionValue(object o)
         {
-            Viewbox viewBox = (Viewbox)d;
-            if (e.NewValue != e.OldValue)
-            {
-                // The StretchDirection property affects measuring
-                viewBox.InvalidateMeasure();
-            }
+            StretchDirection sd = (StretchDirection)o;
+            return sd == StretchDirection.UpOnly || sd == StretchDirection.DownOnly || sd == StretchDirection.Both;
         }
 
         /// <summary>
-        /// Builds the visual tree for the Viewbox control when a new
+        /// Builds the visual tree for the <see cref="Viewbox"/> control when a new
         /// template is applied.
         /// </summary>
 #if MIGRATION
@@ -184,12 +169,8 @@ namespace Windows.UI.Xaml.Controls
 #endif
         {
             // Get the element that contains the content:
-            ChildElement = GetTemplateChild("Child") as ContentPresenter;
+            ChildElement = GetTemplateChild(ChildElementName) as ContentPresenter;
             Debug.Assert(ChildElement != null, "The required template part Child was not found!");
-
-            // Get the root of the template, which is chosen so that it does not force its size on the content:
-            RootCanvas = GetTemplateChild("RootCanvas") as Canvas;
-            Debug.Assert(RootCanvas != null, "The required template part RootCanvas was not found!");
 
             // Create the transformation to scale the container
             if (ChildElement != null)
@@ -281,18 +262,6 @@ namespace Windows.UI.Xaml.Controls
             return new Size(scaleX, scaleY);
         }
 
-        ///// <summary>
-        ///// XAML markup used to define the write-once Viewbox template.
-        ///// </summary>
-        //private const string DefaultTemplateMarkup =
-        //    "<ControlTemplate " +
-        //      "xmlns=\"http://schemas.microsoft.com/client/2007\" " +
-        //      "xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\">" +
-        //        "<ContentPresenter x:Name=\"Child\" " +
-        //          "HorizontalAlignment=\"{TemplateBinding HorizontalAlignment}\" " +
-        //          "VerticalAlignment=\"{TemplateBinding VerticalAlignment}\"/>" +
-        //    "</ControlTemplate>";
-
         /// <summary>
         /// Measures the child element of a Viewbox to prepare for arranging
         /// it during the ArrangeOverride pass.
@@ -365,8 +334,5 @@ namespace Windows.UI.Xaml.Controls
             }
             return finalSize;
         }
-
     }
-
 }
-
