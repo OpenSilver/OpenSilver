@@ -42,7 +42,6 @@ using static System.ServiceModel.INTERNAL_WebMethodsCaller;
 
 #if MIGRATION
 using System.Windows;
-using System.Data;
 #else
 using Windows.UI.Xaml;
 #endif
@@ -1411,14 +1410,11 @@ namespace System.ServiceModel
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(response);
 
-                XmlNamespaceManager nsmgr = new XmlNamespaceManager(document.NameTable);
-                nsmgr.AddNamespace("ns", ns);
+                XmlNamespaceManager xmlnsManager = new XmlNamespaceManager(document.NameTable);
+                xmlnsManager.AddNamespace("ns", ns);
 
-                //XElement envelopeElement = XDocument.Parse(responseAsString).Root;
-                XmlNode headerElement = document.DocumentElement.SelectSingleNode("ns:Header", nsmgr);
-                XmlNode bodyElement = document.DocumentElement.SelectSingleNode("ns:Body", nsmgr);
-
-                XmlNode faultElement = bodyElement.SelectSingleNode("ns:Fault", nsmgr);
+                XmlNode bodyElement = document.DocumentElement.SelectSingleNode("ns:Body", xmlnsManager);
+                XmlNode faultElement = bodyElement.SelectSingleNode("ns:Fault", xmlnsManager);
 
                 if (faultElement == null)
                 {
@@ -1538,41 +1534,41 @@ namespace System.ServiceModel
                 // be able to support their custom ones).
 
                 VerifyThatResponseIsNotNullOrEmpty(responseAsString);
-                string _namespace;
+                string NS;
                 if (soapVersion == "1.1")
                 {
-                    _namespace = "http://schemas.xmlsoap.org/soap/envelope/";
+                    NS = "http://schemas.xmlsoap.org/soap/envelope/";
                 }
                 else
                 {
                     Debug.Assert(soapVersion == "1.2",
                                     string.Format("Unexpected soap version ({0}) !", soapVersion));
-                    _namespace = "http://www.w3.org/2003/05/soap-envelope";
+                    NS = "http://www.w3.org/2003/05/soap-envelope";
                 }
 
 
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(responseAsString);
 
-                XmlNamespaceManager NS = new XmlNamespaceManager(document.NameTable);
-                NS.AddNamespace("ns", _namespace);
+                XmlNamespaceManager xmlnsManager = new XmlNamespaceManager(document.NameTable);
+                xmlnsManager.AddNamespace("ns", NS);
 
                 XmlNode envelopeElement = document.DocumentElement;
-                XmlNode headerElement = envelopeElement.SelectSingleNode("ns:Header", NS);
-                XmlNode bodyElement = envelopeElement.SelectSingleNode("ns:Body", NS);
+                XmlNode headerElement = envelopeElement.SelectSingleNode("ns:Header", xmlnsManager);
+                XmlNode bodyElement = envelopeElement.SelectSingleNode("ns:Body", xmlnsManager);
 
 
 #if OPENSILVER
                 // Error parsing, if applicable
                 if (soapVersion == "1.2")
                 {
-                    XmlNode faultElement = bodyElement.SelectSingleNode("ns:Fault", NS);
+                    XmlNode faultElement = bodyElement.SelectSingleNode("ns:Fault", xmlnsManager);
 
                     if (faultElement != null)
                     {
-                        XmlNode codeElement = faultElement.SelectSingleNode("ns:Code", NS);
-                        XmlNode reasonElement = faultElement.SelectSingleNode("ns:Reason", NS);
-                        XmlNode detailElement = faultElement.SelectSingleNode("ns:Detail", NS);
+                        XmlNode codeElement = faultElement.SelectSingleNode("ns:Code", xmlnsManager);
+                        XmlNode reasonElement = faultElement.SelectSingleNode("ns:Reason", xmlnsManager);
+                        XmlNode detailElement = faultElement.SelectSingleNode("ns:Detail", xmlnsManager);
 
                         FaultCode faultCode = new FaultCode(codeElement.FirstChild.InnerText);
                         FaultReason faultReason = new FaultReason(reasonElement.FirstChild.InnerText);
