@@ -362,8 +362,9 @@ img.src = {sHtml5Path};");
 
     internal sealed class SynchronyzedStore<T>
     {
-        private readonly object _lock = new object();
-        private readonly List<T> _items;
+        private readonly object _lock = new();
+        private readonly Dictionary<int, T> _items;
+        private int _slot;
 
         public SynchronyzedStore()
             : this(8192)
@@ -372,23 +373,27 @@ img.src = {sHtml5Path};");
 
         public SynchronyzedStore(int initialCapacity)
         {
-            _items = new List<T>(initialCapacity);
+            _items = new Dictionary<int, T>(initialCapacity);
         }
 
         public int Add(T item)
         {
             lock (_lock)
             {
-                _items.Add(item);
-                return _items.Count - 1;
+                int slot = _slot++;
+                _items.Add(slot, item);
+                return slot;
             }
         }
 
         public void Clean(int index)
         {
-            _items[index] = default;
+            lock (_lock)
+            {
+                _items.Remove(index);
+            }
         }
 
-        public T Get(int index) => _items[index];
+        public T Get(int index) => _items.TryGetValue(index, out T value) ? value : default;
     }
 }
