@@ -5,34 +5,26 @@
     }
 }
 
-let loadingIndicatorWrapper = document.createElement("div");
-loadingIndicatorWrapper.classList.add("loading-indicator-wrapper");
-document.getElementById("app").appendChild(loadingIndicatorWrapper);
+(function () {
+    let loadingIndicatorWrapper = document.createElement("div");
+    loadingIndicatorWrapper.classList.add("loading-indicator-wrapper");
+    document.getElementById("app").appendChild(loadingIndicatorWrapper);
 
-let loadingIndicator = document.createElement("div");
-loadingIndicator.classList.add("loading-indicator");
-loadingIndicatorWrapper.appendChild(loadingIndicator);
+    let loadingIndicator = document.createElement("div");
+    loadingIndicator.classList.add("loading-indicator");
+    loadingIndicatorWrapper.appendChild(loadingIndicator);
 
-for (let i = 0; i < 16; i++) {
-    let loadingIndicatorBall = document.createElement("div");
-    loadingIndicatorBall.classList.add("loading-indicator-ball");
-    loadingIndicator.appendChild(loadingIndicatorBall);
-}
-
-let loadingIndicatorPercentageContainer = document.createElement("div");
-loadingIndicatorPercentageContainer.classList.add("loading-indicator-percentage-container");
-loadingIndicator.appendChild(loadingIndicatorPercentageContainer);
-
-let loadingIndicatorPercentage = document.createElement("div");
-loadingIndicatorPercentage.id = "loading-indicator-percentage";
-loadingIndicatorPercentageContainer.appendChild(loadingIndicatorPercentage);
-
-let cleanUpTimer = setInterval(function () {
-    if (!loadingIndicatorWrapper.isConnected) {
-        clearInterval(cleanUpTimer);
-        loadingIndicatorPercentage = null;
-        loadingIndicatorPercentageContainer = null;
-        loadingIndicator = null;
-        loadingIndicatorWrapper = null;
+    for (let i = 0; i < 16; i++) {
+        let loadingIndicatorBall = document.createElement("div");
+        loadingIndicatorBall.classList.add("loading-indicator-ball");
+        loadingIndicator.appendChild(loadingIndicatorBall);
     }
-}, 1000);
+
+    let loadingIndicatorPercentageContainer = document.createElement("div");
+    loadingIndicatorPercentageContainer.classList.add("loading-indicator-percentage-container");
+    loadingIndicator.appendChild(loadingIndicatorPercentageContainer);
+
+    let loadingIndicatorPercentage = document.createElement("div");
+    loadingIndicatorPercentage.id = "loading-indicator-percentage";
+    loadingIndicatorPercentageContainer.appendChild(loadingIndicatorPercentage);
+})();
