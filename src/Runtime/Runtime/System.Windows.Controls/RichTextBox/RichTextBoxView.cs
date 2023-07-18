@@ -39,7 +39,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal sealed class RichTextBoxView : FrameworkElement, ITextBoxView
+    internal sealed class RichTextBoxView : FrameworkElement
     {
         private static bool _quillJSInitialized;
 

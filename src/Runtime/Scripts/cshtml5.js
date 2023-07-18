@@ -1126,6 +1126,7 @@ document.textboxHelpers = (function () {
                 const start = e.shiftKey ? (view.selectionDirection === 'forward' ? view.selectionStart : view.selectionEnd) : view.value.length;
                 const end = view.value.length;
                 view.setSelectionRange(start, end, 'forward');
+                view.scrollTo(view.scrollWidth, view.scrollHeight);
                 return true;
             }
         } else {
@@ -1133,6 +1134,7 @@ document.textboxHelpers = (function () {
                 const start = 0;
                 const end = e.shiftKey ? (view.selectionDirection === 'forward' ? view.selectionStart : view.selectionEnd) : 0;
                 view.setSelectionRange(start, end, 'backward');
+                view.scrollTo(0, 0);
                 return true;
             }
         }
@@ -1171,7 +1173,7 @@ document.textboxHelpers = (function () {
 
     return {
         createView: function (id, parentId) {
-            const view = document.createElementSafe('textarea', id, parentId, -1);
+            const view = document.createLayoutElement('textarea', id, parentId, -1);
             view.style.fontSize = 'inherit';
             view.style.fontFamily = 'inherit';
             view.style.color = 'inherit';
