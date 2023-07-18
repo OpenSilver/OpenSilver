@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Controls
         private readonly TextSelection _selection;
         private FrameworkElement _contentElement;
         private ScrollViewer _scrollViewer;
-        private ITextBoxViewHost<RichTextBoxView> _textViewHost;
+        private ITextViewHost<RichTextBoxView> _textViewHost;
         private ScrollBarVisibility _verticalScrollBarVisibility = ScrollBarVisibility.Auto;
         private ScrollBarVisibility _horizontalScrollBarVisibility = ScrollBarVisibility.Hidden;        
 
@@ -426,7 +426,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void InitializeContentElement()
         {
-            _textViewHost = TextBox.GetContentHost<RichTextBoxView>(_contentElement);
+            _textViewHost = TextViewHostProvider.From<RichTextBoxView>(_contentElement);
 
             if (_textViewHost != null)
             {

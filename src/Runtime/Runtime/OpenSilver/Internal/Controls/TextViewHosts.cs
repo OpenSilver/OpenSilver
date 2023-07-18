@@ -24,138 +24,172 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 #endif
 
-namespace OpenSilver.Internal.Controls
+namespace OpenSilver.Internal.Controls;
+
+internal interface ITextViewHost<T>
+    where T : FrameworkElement
 {
-    internal interface ITextBoxView { }
+    T View { get; }
 
-    internal interface ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    void AttachView(T view);
+
+    void DetachView();
+}
+
+internal static class TextViewHostProvider
+{
+    internal static ITextViewHost<T> From<T>(FrameworkElement contentElement)
+        where T : FrameworkElement
     {
-        T View { get; }
-
-        void AttachView(T view);
-
-        void DetachView();
+        return contentElement switch
+        {
+            ContentControl cc => new TextViewHost_ContentControl<T>(cc),
+            ContentPresenter cp => new TextViewHost_ContentPresenter<T>(cp),
+            Border border => new TextViewHost_Border<T>(border),
+            UserControl uc => new TextViewHost_UserControl<T>(uc),
+            Panel panel => new TextViewHost_Panel<T>(panel),
+            ItemsControl ic => new TextViewHost_ItemsControl<T>(ic),
+            _ when IsContentPropertyHost(contentElement, out string contentPropertyName) => new TextViewHost_ContentProperty<T>(contentElement, contentPropertyName),
+            _ => null,
+        };
     }
 
-    internal sealed class TextBoxViewHost_ContentControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    private static bool IsContentPropertyHost(FrameworkElement host, out string contentPropertyName)
+    {
+        ContentPropertyAttribute contentProp = (ContentPropertyAttribute)host
+            .GetType()
+            .GetCustomAttributes(typeof(ContentPropertyAttribute), true)
+            .FirstOrDefault();
+
+        if (contentProp != null)
+        {
+            contentPropertyName = contentProp.Name;
+            return true;
+        }
+
+        contentPropertyName = null;
+        return false;
+    }
+
+    private sealed class TextViewHost_ContentControl<T> : ITextViewHost<T> where T : FrameworkElement
     {
         private readonly ContentControl _host;
         private T _view;
 
-        internal TextBoxViewHost_ContentControl(ContentControl host)
+        internal TextViewHost_ContentControl(ContentControl host)
         {
             _host = host;
         }
 
-        T ITextBoxViewHost<T>.View => _view;
+        T ITextViewHost<T>.View => _view;
 
-        void ITextBoxViewHost<T>.AttachView(T view)
+        void ITextViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Content = view;
         }
 
-        void ITextBoxViewHost<T>.DetachView()
+        void ITextViewHost<T>.DetachView()
         {
             _view = null;
             _host.Content = null;
         }
     }
 
-    internal sealed class TextBoxViewHost_Border<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    private sealed class TextViewHost_Border<T> : ITextViewHost<T> where T : FrameworkElement
     {
         private readonly Border _host;
         private T _view;
 
-        internal TextBoxViewHost_Border(Border host)
+        internal TextViewHost_Border(Border host)
         {
             _host = host;
         }
 
-        T ITextBoxViewHost<T>.View => _view;
+        T ITextViewHost<T>.View => _view;
 
-        void ITextBoxViewHost<T>.AttachView(T view)
+        void ITextViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Child = view;
         }
 
-        void ITextBoxViewHost<T>.DetachView()
+        void ITextViewHost<T>.DetachView()
         {
             _view = null;
             _host.Child = null;
         }
     }
 
-    internal sealed class TextBoxViewHost_ContentPresenter<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    private sealed class TextViewHost_ContentPresenter<T> : ITextViewHost<T> where T : FrameworkElement
     {
         private readonly ContentPresenter _host;
         private T _view;
 
-        internal TextBoxViewHost_ContentPresenter(ContentPresenter host)
+        internal TextViewHost_ContentPresenter(ContentPresenter host)
         {
             _host = host;
         }
 
-        T ITextBoxViewHost<T>.View => _view;
+        T ITextViewHost<T>.View => _view;
 
-        void ITextBoxViewHost<T>.AttachView(T view)
+        void ITextViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Content = view;
         }
 
-        void ITextBoxViewHost<T>.DetachView()
+        void ITextViewHost<T>.DetachView()
         {
             _view = null;
             _host.Content = null;
         }
     }
 
-    internal sealed class TextBoxViewHost_UserControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    private sealed class TextViewHost_UserControl<T> : ITextViewHost<T> where T : FrameworkElement
     {
         private readonly UserControl _host;
         private T _view;
 
-        internal TextBoxViewHost_UserControl(UserControl host)
+        internal TextViewHost_UserControl(UserControl host)
         {
             _host = host;
         }
 
-        T ITextBoxViewHost<T>.View => _view;
+        T ITextViewHost<T>.View => _view;
 
-        void ITextBoxViewHost<T>.AttachView(T view)
+        void ITextViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Content = view;
         }
 
-        void ITextBoxViewHost<T>.DetachView()
+        void ITextViewHost<T>.DetachView()
         {
             _view = null;
             _host.Content = null;
         }
     }
 
-    internal sealed class TextBoxViewHost_Panel<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    private sealed class TextViewHost_Panel<T> : ITextViewHost<T> where T : FrameworkElement
     {
         private readonly Panel _host;
         private T _view;
 
-        internal TextBoxViewHost_Panel(Panel host)
+        internal TextViewHost_Panel(Panel host)
         {
             _host = host;
         }
 
-        T ITextBoxViewHost<T>.View => _view;
+        T ITextViewHost<T>.View => _view;
 
-        void ITextBoxViewHost<T>.AttachView(T view)
+        void ITextViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Children.Add(view);
         }
 
-        void ITextBoxViewHost<T>.DetachView()
+        void ITextViewHost<T>.DetachView()
         {
             T view = _view;
             _view = null;
@@ -163,19 +197,19 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal sealed class TextBoxViewHost_ItemsControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    private sealed class TextViewHost_ItemsControl<T> : ITextViewHost<T> where T : FrameworkElement
     {
         private readonly ItemsControl _host;
         private T _view;
 
-        internal TextBoxViewHost_ItemsControl(ItemsControl host)
+        internal TextViewHost_ItemsControl(ItemsControl host)
         {
             _host = host;
         }
 
-        T ITextBoxViewHost<T>.View => _view;
+        T ITextViewHost<T>.View => _view;
 
-        void ITextBoxViewHost<T>.AttachView(T view)
+        void ITextViewHost<T>.AttachView(T view)
         {
             if (_host.HasItems)
             {
@@ -186,7 +220,7 @@ namespace OpenSilver.Internal.Controls
             _host.Items.Add(view);
         }
 
-        void ITextBoxViewHost<T>.DetachView()
+        void ITextViewHost<T>.DetachView()
         {
             T view = _view;
             _view = null;
@@ -194,7 +228,7 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal sealed class TextBoxViewHost_ContentProperty<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    private sealed class TextViewHost_ContentProperty<T> : ITextViewHost<T> where T : FrameworkElement
     {
         private readonly FrameworkElement _host;
         private readonly string _contentPropertyName;
@@ -202,15 +236,15 @@ namespace OpenSilver.Internal.Controls
         private bool _isInitialized;
         private MethodInfo _setMethod;
 
-        internal TextBoxViewHost_ContentProperty(FrameworkElement host, string contentPropertyName)
+        internal TextViewHost_ContentProperty(FrameworkElement host, string contentPropertyName)
         {
             _host = host;
             _contentPropertyName = contentPropertyName;
         }
 
-        T ITextBoxViewHost<T>.View => _view;
+        T ITextViewHost<T>.View => _view;
 
-        void ITextBoxViewHost<T>.AttachView(T view)
+        void ITextViewHost<T>.AttachView(T view)
         {
             EnsureInitialized();
 
@@ -221,7 +255,7 @@ namespace OpenSilver.Internal.Controls
             }
         }
 
-        void ITextBoxViewHost<T>.DetachView()
+        void ITextViewHost<T>.DetachView()
         {
             EnsureInitialized();
 

@@ -16,14 +16,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Text;
-using OpenSilver.Internal;
 using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 #else
@@ -157,21 +157,6 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
 
             INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
-        }
-
-        internal static void SetUIElementContentString(UIElement uiElement, string newText)
-        {
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_OuterDomElement).UniqueIdentifier;
-            string javaScriptCodeToExecute = $@"
-var element = document.getElementById(""{uniqueIdentifier}"");
-if (element)
-{{
-element.value = ""{EscapeStringForUseInJavaScript(newText)}"";
-element.style.visibility=""collapse"";
-setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifier}""); if (element2) {{ element2.style.visibility=""visible""; }} }}, 0);
-}}";
-
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         public static string GetTextBoxText(object domElementRef)

@@ -20,6 +20,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media.Effects;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows;
