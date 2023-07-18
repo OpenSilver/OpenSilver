@@ -280,6 +280,22 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                 $"document.setDomAttribute(\"{uid}\",\"{attributeName}\",{value})");
         }
 
+        internal static void AddCSSClass(object domElementRef, string className)
+        {
+            Debug.Assert(domElementRef is not null);
+
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.classList.add('{className}');");
+        }
+
+        internal static void RemoveCSSClass(object domElementRef, string className)
+        {
+            Debug.Assert(domElementRef is not null);
+
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.classList.remove('{className}');");
+        }
+
         internal static void SetCSSStyleProperty(object domElementRef, string propertyName, string value)
         {
             Debug.Assert(domElementRef != null);
