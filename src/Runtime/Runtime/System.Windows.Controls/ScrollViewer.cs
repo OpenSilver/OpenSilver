@@ -41,9 +41,14 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = ElementVerticalScrollBarName, Type = typeof(ScrollBar))]
     public sealed class ScrollViewer : ContentControl
     {
+        internal const double LineDelta = 16.0; // Default physical amount to scroll with one Up/Down/Left/Right key
+        internal const double WheelDelta = 48.0; // Default physical amount to scroll with one MouseWheel.
+
         private const string ElementScrollContentPresenterName = "ScrollContentPresenter";
         private const string ElementHorizontalScrollBarName = "HorizontalScrollBar";
         private const string ElementVerticalScrollBarName = "VerticalScrollBar";
+
+        private IScrollInfo _scrollInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollViewer"/> class.
@@ -68,7 +73,20 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         internal ScrollBar ElementVerticalScrollBar { get; private set; }
 
-        internal IScrollInfo ScrollInfo { get; set; }
+        internal IScrollInfo ScrollInfo
+        {
+            get { return _scrollInfo; }
+            set
+            {
+                _scrollInfo = value;
+                if (_scrollInfo is not null)
+                {
+                    _scrollInfo.CanHorizontallyScroll = HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled;
+                    _scrollInfo.CanVerticallyScroll = VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
+                    InvalidateScrollInfo();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value that contains the horizontal offset of the scrolled content.
@@ -181,7 +199,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(ScrollBarVisibility),
                 typeof(ScrollViewer),
                 new PropertyMetadata(ScrollBarVisibility.Visible, OnScrollBarVisibilityChanged));
-        
+
         /// <summary>
         /// Scrolls the content that is within the <see cref="ScrollViewer"/> to the 
         /// specified horizontal offset position.
@@ -412,7 +430,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-        
+
         private static readonly DependencyPropertyKey ScrollableHeightPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(ScrollableHeight),

@@ -25,7 +25,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Represents the main scrollable region inside a <see cref="ScrollViewer"/>
     /// control.
     /// </summary>
-    public partial interface IScrollInfo
+    public interface IScrollInfo
     {
         #region Public Methods
 

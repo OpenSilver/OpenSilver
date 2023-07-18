@@ -50,6 +50,12 @@
 		<Compile Include="Core\Main\EffectiveValueEntry.cs" />
 		<Compile Include="Core\Main\EmptyEnumerator.cs" />
 		<Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\ScrollData.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.IScrollInfo.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\TextViewHosts.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\TextBoxView.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\PasswordBoxView.cs" />
 		<Compile Include="OpenSilver\Internal\DefaultValueFactory.cs" />
 		<Compile Include="OpenSilver\Internal\DependencyObjectType.cs" />
 		<Compile Include="OpenSilver\Internal\KnownBoxes.cs" />
@@ -76,7 +82,6 @@
 		<Compile Include="OpenSilver\Internal\StringBuilderFactory.cs" />
 		<Compile Include="OpenSilver\Internal\VisualStateGroupCollection.cs" />
 		<Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />
-		<Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
 		<Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
 		<Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
 		<Compile Include="OpenSilver\Internal\Data\IPropertyPathNode.cs" />
@@ -219,7 +224,6 @@
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\ListBoxDragDropTarget.cs" />
-		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\INTERNAL_TextContainerRichTextBox.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
@@ -403,7 +407,6 @@
 		<Compile Include="System.Windows.Automation.Peers\ExpanderAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\TreeViewAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\TreeViewItemAutomationPeer.cs" />
-		<Compile Include="System.Windows.Controls\TextBoxView.cs" />
 		<Compile Include="System.Windows.Controls\CalendarExtensions.cs" />
 		<Compile Include="System.Windows.Controls\DatePickerFormat.cs" />
 		<Compile Include="System.Windows.Controls\InteractionHelper.cs" />
@@ -591,7 +594,7 @@
 		<Compile Include="System.Windows.Controls\VirtualizingStackPanel.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
-		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IScrollInfo.cs" />
+		<Compile Include="System.Windows.Controls.Primitives\IScrollInfo.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\LayoutInformation.cs" />
 		<Compile Include="System.Windows.Data\CollectionViewGroup.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Block.cs" />
