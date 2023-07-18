@@ -13,8 +13,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Windows.Markup;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -67,7 +65,7 @@ namespace Windows.UI.Xaml.Controls
         private bool _isFocused;
         private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
-        private ITextBoxViewHost<TextBoxView> _textViewHost;
+        private ITextViewHost<TextBoxView> _textViewHost;
 
         public TextBox()
         {
@@ -92,9 +90,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty AcceptsReturnProperty =
             DependencyProperty.Register(
-                nameof(AcceptsReturn), 
-                typeof(bool), 
-                typeof(TextBox), 
+                nameof(AcceptsReturn),
+                typeof(bool),
+                typeof(TextBox),
                 new PropertyMetadata(false, OnAcceptsReturnChanged));
 
         private static void OnAcceptsReturnChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -121,9 +119,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty AcceptsTabProperty =
             DependencyProperty.Register(
-                nameof(AcceptsTab), 
-                typeof(bool), 
-                typeof(TextBox), 
+                nameof(AcceptsTab),
+                typeof(bool),
+                typeof(TextBox),
                 new PropertyMetadata(false));
 
         /// <summary>
@@ -140,9 +138,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty PlaceholderTextProperty =
             DependencyProperty.Register(
-                nameof(PlaceholderText), 
-                typeof(string), 
-                typeof(TextBox), 
+                nameof(PlaceholderText),
+                typeof(string),
+                typeof(TextBox),
                 new PropertyMetadata(string.Empty));
 
         /// <summary>
@@ -159,10 +157,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(
-                nameof(Text), 
-                typeof(string), 
+                nameof(Text),
+                typeof(string),
                 typeof(TextBox),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextChanged, CoerceText));
+                new PropertyMetadata(string.Empty, OnTextChanged, CoerceText));
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -174,7 +172,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                tb._textViewHost?.View.OnTextChanged((string)e.NewValue);
+                tb._textViewHost?.View.SetTextNative((string)e.NewValue);
             }
 
             tb.OnTextChanged(new TextChangedEventArgs() { OriginalSource = tb });
@@ -199,9 +197,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty TextAlignmentProperty =
             DependencyProperty.Register(
-                nameof(TextAlignment), 
-                typeof(TextAlignment), 
-                typeof(TextBox), 
+                nameof(TextAlignment),
+                typeof(TextAlignment),
+                typeof(TextBox),
                 new PropertyMetadata(TextAlignment.Left, OnTextAlignmentChanged));
 
         private static void OnTextAlignmentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -228,9 +226,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty CaretBrushProperty =
             DependencyProperty.Register(
-                nameof(CaretBrush), 
-                typeof(Brush), 
-                typeof(TextBox), 
+                nameof(CaretBrush),
+                typeof(Brush),
+                typeof(TextBox),
                 new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
         /// <summary>
@@ -481,7 +479,7 @@ namespace Windows.UI.Xaml.Controls
                 tb._textViewHost.View.OnIsSpellCheckEnabledChanged((bool)e.NewValue);
             }
         }
-        
+
         public string SelectedText
         {
             get => _textViewHost?.View.SelectedText ?? string.Empty;
@@ -674,17 +672,13 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Handled)
+            {
                 return;
+            }
 
             base.OnKeyDown(e);
 
-            if (_textViewHost is null) return;
-
-            if (_textViewHost.View.OnKeyDownNative(e.UIEventArg))
-            {
-                e.Handled = true;
-                e.Cancellable = false;
-            }
+            _textViewHost?.View.ProcessKeyDown(e);
         }
 
         protected override void OnTextInput(TextCompositionEventArgs e)
@@ -710,18 +704,14 @@ namespace Windows.UI.Xaml.Controls
 
         internal void UpdateTextProperty(string text)
         {
-            if (_textViewHost != null)
+            _isProcessingInput = true;
+            try
             {
-                _isProcessingInput = true;
-                try
-                {
-                    _textViewHost.View.InvalidateMeasure();
-                    SetCurrentValue(TextProperty, text);
-                }
-                finally
-                {
-                    _isProcessingInput = false;
-                }
+                SetCurrentValue(TextProperty, text);
+            }
+            finally
+            {
+                _isProcessingInput = false;
             }
         }
 
@@ -805,7 +795,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void InitializeContentElement()
         {
-            _textViewHost = GetContentHost<TextBoxView>(_contentElement);
+            _textViewHost = TextViewHostProvider.From<TextBoxView>(_contentElement);
 
             if (_textViewHost != null)
             {
@@ -822,57 +812,6 @@ namespace Windows.UI.Xaml.Controls
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
-        }
-
-        internal static ITextBoxViewHost<T> GetContentHost<T>(FrameworkElement contentElement) where T : FrameworkElement, ITextBoxView
-        {
-            if (contentElement is ContentControl cc)
-            {
-                return new TextBoxViewHost_ContentControl<T>(cc);
-            }
-            else if (contentElement is ContentPresenter cp)
-            {
-                return new TextBoxViewHost_ContentPresenter<T>(cp);
-            }
-            else if (contentElement is Border border)
-            {
-                return new TextBoxViewHost_Border<T>(border);
-            }
-            else if (contentElement is UserControl uc)
-            {
-                return new TextBoxViewHost_UserControl<T>(uc);
-            }
-            else if (contentElement is Panel panel)
-            {
-                return new TextBoxViewHost_Panel<T>(panel);
-            }
-            else if (contentElement is ItemsControl ic)
-            {
-                return new TextBoxViewHost_ItemsControl<T>(ic);
-            }
-            else if (IsContentPropertyHost(contentElement, out string contentPropertyName))
-            {
-                return new TextBoxViewHost_ContentProperty<T>(contentElement, contentPropertyName);
-            }
-
-            return null;
-        }
-
-        private static bool IsContentPropertyHost(FrameworkElement host, out string contentPropertyName)
-        {
-            ContentPropertyAttribute contentProp = (ContentPropertyAttribute)host
-                .GetType()
-                .GetCustomAttributes(typeof(ContentPropertyAttribute), true)
-                .FirstOrDefault();
-
-            if (contentProp != null)
-            {
-                contentPropertyName = contentProp.Name;
-                return true;
-            }
-
-            contentPropertyName = null;
-            return false;
         }
 
         [OpenSilver.NotImplemented]

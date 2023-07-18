@@ -12,14 +12,14 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -33,14 +33,8 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public sealed class ScrollContentPresenter : ContentPresenter, IScrollInfo
     {
-        private const double LineDelta = 16.0; // Default physical amount to scroll with one Up/Down/Left/Right key
-        private const double WheelDelta = 48.0; // Default physical amount to scroll with one MouseWheel.
-
-        bool canHorizontallyScroll;
-        bool canVerticallyScroll;
-        Point cachedOffset;
-        Size viewport;
-        Size extents;
+        private IScrollInfo _scrollInfo;
+        private ScrollData _scrollData;
 
         /// <summary>
         /// Gets or sets the <see cref="ScrollViewer"/> element that controls scrolling
@@ -49,7 +43,11 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The <see cref="ScrollViewer"/> element that controls scrolling behavior.
         /// </returns>
-        public ScrollViewer ScrollOwner { get; set; }
+        public ScrollViewer ScrollOwner
+        {
+            get { return IsScrollClient ? _scrollData._scrollOwner : null; }
+            set { if (IsScrollClient) _scrollData._scrollOwner = value; }
+        }
 
         /// <summary>
         /// Gets or sets a value that indicates whether scrolling on the horizontal axis
@@ -60,12 +58,12 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool CanHorizontallyScroll
         {
-            get { return canHorizontallyScroll; }
+            get { return IsScrollClient ? _scrollData._canHorizontallyScroll : false; }
             set
             {
-                if (canHorizontallyScroll != value)
+                if (IsScrollClient && _scrollData._canHorizontallyScroll != value)
                 {
-                    canHorizontallyScroll = value;
+                    _scrollData._canHorizontallyScroll = value;
                     InvalidateMeasure();
                 }
             }
@@ -80,12 +78,12 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool CanVerticallyScroll
         {
-            get { return canVerticallyScroll; }
+            get { return IsScrollClient ? _scrollData._canVerticallyScroll : false; }
             set
             {
-                if (canVerticallyScroll != value)
+                if (IsScrollClient && _scrollData._canVerticallyScroll != value)
                 {
-                    canVerticallyScroll = value;
+                    _scrollData._canVerticallyScroll = value;
                     InvalidateMeasure();
                 }
             }
@@ -97,10 +95,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The distance the content has been scrolled horizontally.
         /// </returns>
-        public double HorizontalOffset
-        {
-            get; private set;
-        }
+        public double HorizontalOffset => IsScrollClient ? _scrollData._computedOffset.X : 0.0;
 
         /// <summary>
         /// Sets the distance the content has been scrolled horizontally.
@@ -110,11 +105,13 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         public void SetHorizontalOffset(double offset)
         {
-            if (!CanHorizontallyScroll || cachedOffset.X == offset)
-                return;
+            if (!IsScrollClient) return;
 
-            cachedOffset.X = offset;
-            InvalidateArrange();
+            if (_scrollData._canHorizontallyScroll && !DoubleUtil.AreClose(_scrollData._offset.X, offset))
+            {
+                _scrollData._offset.X = offset;
+                InvalidateArrange();
+            }
         }
 
         /// <summary>
@@ -123,10 +120,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The distance the content has been scrolled vertically.
         /// </returns>
-        public double VerticalOffset
-        {
-            get; private set;
-        }
+        public double VerticalOffset => IsScrollClient ? _scrollData._computedOffset.Y : 0.0;
 
         /// <summary>
         /// Sets the distance the content has been scrolled vertically.
@@ -136,11 +130,13 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         public void SetVerticalOffset(double offset)
         {
-            if (!CanVerticallyScroll || cachedOffset.Y == offset)
-                return;
+            if (!IsScrollClient) return;
 
-            cachedOffset.Y = offset;
-            InvalidateArrange();
+            if (_scrollData._canVerticallyScroll && !DoubleUtil.AreClose(_scrollData._offset.Y, offset))
+            {
+                _scrollData._offset.Y = offset;
+                InvalidateArrange();
+            }
         }
 
         /// <summary>
@@ -149,10 +145,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The horizontal size of the extent.
         /// </returns>
-        public double ExtentWidth
-        {
-            get { return extents.Width; }
-        }
+        public double ExtentWidth => IsScrollClient ? _scrollData._extent.Width : 0.0;
 
         /// <summary>
         /// Gets the vertical size of the extent.
@@ -160,10 +153,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The vertical size of the extent.
         /// </returns>
-        public double ExtentHeight
-        {
-            get { return extents.Height; }
-        }
+        public double ExtentHeight => IsScrollClient ? _scrollData._extent.Height : 0.0;
 
         /// <summary>
         /// Gets the horizontal size of the viewport.
@@ -171,10 +161,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The horizontal size of the viewport.
         /// </returns>
-        public double ViewportWidth
-        {
-            get { return viewport.Width; }
-        }
+        public double ViewportWidth => IsScrollClient ? _scrollData._viewport.Width : 0.0;
 
         /// <summary>
         /// Gets the vertical size of the viewport.
@@ -182,36 +169,12 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The vertical size of the viewport.
         /// </returns>
-        public double ViewportHeight
-        {
-            get { return viewport.Height; }
-        }
+        public double ViewportHeight => IsScrollClient ? _scrollData._viewport.Height : 0.0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollContentPresenter"/> class.
         /// </summary>
         public ScrollContentPresenter() { }
-
-        bool ClampOffsets()
-        {
-            bool changed = false;
-            double result = CanHorizontallyScroll ? Math.Min(cachedOffset.X, ExtentWidth - ViewportWidth) : 0;
-            result = Math.Max(0, result);
-            if (result != HorizontalOffset)
-            {
-                HorizontalOffset = result;
-                changed = true;
-            }
-
-            result = CanVerticallyScroll ? Math.Min(cachedOffset.Y, ExtentHeight - ViewportHeight) : 0;
-            result = Math.Max(0, result);
-            if (result != VerticalOffset)
-            {
-                VerticalOffset = result;
-                changed = true;
-            }
-            return changed;
-        }
 
         /// <summary>
         /// Builds the visual tree for the <see cref="ScrollContentPresenter"/>
@@ -225,65 +188,114 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
-            ScrollViewer sv = TemplatedParent as ScrollViewer;
-            if (sv == null)
-                return;
-
-            IScrollInfo info = Content as IScrollInfo;
-            if (info == null)
+            if (TemplatedParent is ScrollViewer sv)
             {
-                var presenter = Content as ItemsPresenter;
-                if (presenter != null)
+                IScrollInfo info = Content as IScrollInfo;
+                if (info is null)
                 {
-                    presenter.ApplyTemplate();
-                    if (presenter.TemplateChild != null)
+                    if (Content is ItemsPresenter presenter)
                     {
-                        info = presenter.TemplateChild as IScrollInfo;
+                        presenter.ApplyTemplate();
+                        if (presenter.TemplateChild != null)
+                        {
+                            info = presenter.TemplateChild as IScrollInfo;
+                        }
                     }
                 }
+
+                if (info is null)
+                {
+                    info = this;
+                    EnsureScrollData();
+                }
+
+                // Detach any differing previous IScrollInfo from ScrollViewer
+                if (info != _scrollInfo && _scrollInfo is not null)
+                {
+                    if (IsScrollClient) _scrollData = null;
+                    else _scrollInfo.ScrollOwner = null;
+                }
+
+                _scrollInfo = info;
+                info.ScrollOwner = sv;
+                sv.ScrollInfo = info;
             }
-            info = info ?? this;
-            info.CanHorizontallyScroll = sv.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled;
-            info.CanVerticallyScroll = sv.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
-            info.ScrollOwner = sv;
-            info.ScrollOwner.ScrollInfo = info;
-            sv.InvalidateScrollInfo();
+            else if (_scrollInfo is not null)
+            {
+                if (_scrollInfo.ScrollOwner is not null)
+                {
+                    _scrollInfo.ScrollOwner.ScrollInfo = null;
+                }
+
+                _scrollInfo.ScrollOwner = null;
+                _scrollInfo = null;
+                _scrollData = null;
+            }
         }
+
+        private bool IsScrollClient => _scrollInfo == this;
+
+        private ScrollData EnsureScrollData() => _scrollData ??= new ScrollData();
 
         protected override Size MeasureOverride(Size constraint)
         {
-            UIElement _contentRoot = this.Content as UIElement;
-            if (null == ScrollOwner || _contentRoot == null)
-                return base.MeasureOverride(constraint);
+            Size desiredSize;
 
-            Size ideal = new Size(
-                CanHorizontallyScroll ? double.PositiveInfinity : constraint.Width,
-                CanVerticallyScroll ? double.PositiveInfinity : constraint.Height
-            );
+            if (!IsScrollClient)
+            {
+                desiredSize = base.MeasureOverride(constraint);
+            }
+            else
+            {
+                var childConstraint = new Size(
+                    _scrollData._canHorizontallyScroll ? double.PositiveInfinity : constraint.Width,
+                    _scrollData._canVerticallyScroll ? double.PositiveInfinity : constraint.Height);
 
-            _contentRoot.Measure(ideal);
-            UpdateExtents(constraint, _contentRoot.DesiredSize);
+                desiredSize = base.MeasureOverride(childConstraint);
+            }
 
-            return constraint.Min(extents);
+            // If we're handling scrolling (as the physical scrolling client, validate properties.
+            if (IsScrollClient)
+            {
+                UpdateExtents(constraint, desiredSize);
+            }
+
+            desiredSize.Width = Math.Min(constraint.Width, desiredSize.Width);
+            desiredSize.Height = Math.Min(constraint.Height, desiredSize.Height);
+
+            return desiredSize;
         }
 
         protected override Size ArrangeOverride(Size arrangeSize)
         {
-            UIElement _contentRoot = this.Content as UIElement;
-            if (null == ScrollOwner || _contentRoot == null)
-                return base.ArrangeOverride(arrangeSize);
+            // Verifies IScrollInfo properties & invalidates ScrollViewer if necessary.
+            if (IsScrollClient)
+            {
+                UpdateExtents(arrangeSize, _scrollData._extent);
+            }
 
-            if (ClampOffsets())
-                ScrollOwner.InvalidateScrollInfo();
+            int count = VisualChildrenCount;
 
-            Size desired = _contentRoot.DesiredSize;
-            Point start = new Point(
-                -HorizontalOffset,
-                -VerticalOffset
-            );
+            if (count > 0)
+            {
+                if (GetVisualChild(0) is UIElement child)
+                {
+                    var childRect = new Rect(child.DesiredSize);
 
-            _contentRoot.Arrange(new Rect(start, desired.Max(arrangeSize)));
-            UpdateExtents(arrangeSize, extents);
+                    if (IsScrollClient)
+                    {
+                        childRect.X = -HorizontalOffset;
+                        childRect.Y = -VerticalOffset;
+                    }
+
+                    //this is needed to stretch the child to arrange space,
+                    childRect.Width = Math.Max(childRect.Width, arrangeSize.Width);
+                    childRect.Height = Math.Max(childRect.Height, arrangeSize.Height);
+
+                    child.Arrange(childRect);
+                }
+            }
+
             return arrangeSize;
         }
 
@@ -292,15 +304,41 @@ namespace Windows.UI.Xaml.Controls
             return base.GetLayoutClip(layoutSlotSize) ?? new Rect(RenderSize);
         }
 
-        void UpdateExtents(Size viewport, Size extents)
+        private void UpdateExtents(Size viewport, Size extents)
         {
-            bool changed = this.viewport != viewport || this.extents != extents;
-            this.viewport = viewport;
-            this.extents = extents;
+            Debug.Assert(IsScrollClient);
+
+            bool changed = !DoubleUtil.AreClose(_scrollData._viewport, viewport) || !DoubleUtil.AreClose(_scrollData._extent, extents);
+            _scrollData._viewport = viewport;
+            _scrollData._extent = extents;
 
             changed |= ClampOffsets();
+
             if (changed)
+            {
                 ScrollOwner.InvalidateScrollInfo();
+            }
+        }
+
+        private bool ClampOffsets()
+        {
+            bool changed = false;
+            double result = CanHorizontallyScroll ? Math.Min(_scrollData._offset.X, ExtentWidth - ViewportWidth) : 0;
+            result = Math.Max(0, result);
+            if (!DoubleUtil.AreClose(result, _scrollData._computedOffset.X))
+            {
+                _scrollData._computedOffset.X = result;
+                changed = true;
+            }
+
+            result = CanVerticallyScroll ? Math.Min(_scrollData._offset.Y, ExtentHeight - ViewportHeight) : 0;
+            result = Math.Max(0, result);
+            if (!DoubleUtil.AreClose(result, _scrollData._computedOffset.Y))
+            {
+                _scrollData._computedOffset.Y = result;
+                changed = true;
+            }
+            return changed;
         }
 
         /// <summary>
@@ -309,7 +347,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void LineDown()
         {
-            SetVerticalOffset(VerticalOffset + LineDelta);
+            if (IsScrollClient) SetVerticalOffset(VerticalOffset + ScrollViewer.LineDelta);
         }
 
         /// <summary>
@@ -318,7 +356,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void LineLeft()
         {
-            SetHorizontalOffset(HorizontalOffset - LineDelta);
+            if (IsScrollClient) SetHorizontalOffset(HorizontalOffset - ScrollViewer.LineDelta);
         }
 
         /// <summary>
@@ -327,7 +365,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void LineRight()
         {
-            SetHorizontalOffset(HorizontalOffset + LineDelta);
+            if (IsScrollClient) SetHorizontalOffset(HorizontalOffset + ScrollViewer.LineDelta);
         }
 
         /// <summary>
@@ -336,7 +374,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void LineUp()
         {
-            SetVerticalOffset(VerticalOffset - LineDelta);
+            if (IsScrollClient) SetVerticalOffset(VerticalOffset - ScrollViewer.LineDelta);
         }
 
         // FIXME: how does one invoke MouseWheelUp/Down/etc? Need to figure out proper scrolling amounts
@@ -345,7 +383,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelDown()
         {
-            SetVerticalOffset(VerticalOffset + WheelDelta);
+            if (IsScrollClient) SetVerticalOffset(VerticalOffset + ScrollViewer.WheelDelta);
         }
 
         /// <summary>
@@ -353,7 +391,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelLeft()
         {
-            SetHorizontalOffset(HorizontalOffset - WheelDelta);
+            if (IsScrollClient) SetHorizontalOffset(HorizontalOffset - ScrollViewer.WheelDelta);
         }
 
         /// <summary>
@@ -361,7 +399,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelRight()
         {
-            SetHorizontalOffset(HorizontalOffset + WheelDelta);
+            if (IsScrollClient) SetHorizontalOffset(HorizontalOffset + ScrollViewer.WheelDelta);
         }
 
         /// <summary>
@@ -369,7 +407,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelUp()
         {
-            SetVerticalOffset(VerticalOffset - WheelDelta);
+            if (IsScrollClient) SetVerticalOffset(VerticalOffset - ScrollViewer.WheelDelta);
         }
 
         /// <summary>
@@ -377,7 +415,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void PageDown()
         {
-            SetVerticalOffset(VerticalOffset + ViewportHeight);
+            if (IsScrollClient) SetVerticalOffset(VerticalOffset + ViewportHeight);
         }
 
         /// <summary>
@@ -385,7 +423,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void PageLeft()
         {
-            SetHorizontalOffset(HorizontalOffset - ViewportWidth);
+            if (IsScrollClient) SetHorizontalOffset(HorizontalOffset - ViewportWidth);
         }
 
         /// <summary>
@@ -393,7 +431,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void PageRight()
         {
-            SetHorizontalOffset(HorizontalOffset + ViewportWidth);
+            if (IsScrollClient) SetHorizontalOffset(HorizontalOffset + ViewportWidth);
         }
 
         /// <summary>
@@ -401,7 +439,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void PageUp()
         {
-            SetVerticalOffset(VerticalOffset - ViewportHeight);
+            if (IsScrollClient) SetVerticalOffset(VerticalOffset - ViewportHeight);
         }
 
         /// <summary>
@@ -420,6 +458,17 @@ namespace Windows.UI.Xaml.Controls
         public Rect MakeVisible(UIElement visual, Rect rectangle)
         {
             throw new NotImplementedException();
+        }
+
+        private sealed class ScrollData
+        {
+            internal ScrollViewer _scrollOwner;
+            internal bool _canHorizontallyScroll;
+            internal bool _canVerticallyScroll;
+            internal Point _offset;
+            internal Point _computedOffset;
+            internal Size _viewport;
+            internal Size _extent;
         }
     }
 }
