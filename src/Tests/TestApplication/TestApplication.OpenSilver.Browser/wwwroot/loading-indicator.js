@@ -26,3 +26,13 @@ loadingIndicator.appendChild(loadingIndicatorPercentageContainer);
 let loadingIndicatorPercentage = document.createElement("div");
 loadingIndicatorPercentage.id = "loading-indicator-percentage";
 loadingIndicatorPercentageContainer.appendChild(loadingIndicatorPercentage);
+
+let cleanUpTimer = setInterval(function () {
+    if (!loadingIndicatorWrapper.isConnected) {
+        clearInterval(cleanUpTimer);
+        loadingIndicatorPercentage = null;
+        loadingIndicatorPercentageContainer = null;
+        loadingIndicator = null;
+        loadingIndicatorWrapper = null;
+    }
+}, 1000);
