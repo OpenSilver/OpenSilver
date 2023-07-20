@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
+
 #if MIGRATION
 namespace System.Windows.Documents
 #else
@@ -20,23 +22,21 @@ namespace Windows.UI.Xaml.Documents
 	/// <summary>
 	/// An abstract class that provides a base for all block-level content elements.
 	/// </summary>
-    [OpenSilver.NotImplemented]
 	public abstract class Block : TextElement
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Block" /> class. 
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		protected Block()
 		{
 		}
 
 		/// <summary>
-		/// Identifies the <see cref="Block.LineHeight" /> dependency property.
+		/// Identifies the <see cref="LineHeight" /> dependency property.
 		/// </summary>
 		public static readonly DependencyProperty LineHeightProperty =
 			DependencyProperty.Register(
-				"LineHeight",
+				nameof(LineHeight),
 				typeof(double),
 				typeof(Block),
 				new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure));
@@ -52,17 +52,17 @@ namespace Windows.UI.Xaml.Documents
         [OpenSilver.NotImplemented]
 		public double LineHeight
 		{
-			get { return (double)this.GetValue(LineHeightProperty); }
-			set { this.SetValue(LineHeightProperty, value); }
+			get => (double)GetValue(LineHeightProperty);
+			set => SetValue(LineHeightProperty, value);
 		}
 
 		/// <summary>
-		/// Identifies the <see cref="Block.LineStackingStrategy" /> dependency property.
+		/// Identifies the <see cref="LineStackingStrategy" /> dependency property.
 		/// </summary>
         [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty LineStackingStrategyProperty =
 			DependencyProperty.Register(
-				"LineStackingStrategy",
+				nameof(LineStackingStrategy),
 				typeof(LineStackingStrategy),
 				typeof(Block),
 				new PropertyMetadata(LineStackingStrategy.MaxHeight));
@@ -75,30 +75,42 @@ namespace Windows.UI.Xaml.Documents
         [OpenSilver.NotImplemented]
 		public LineStackingStrategy LineStackingStrategy
 		{
-			get { return (LineStackingStrategy)this.GetValue(LineStackingStrategyProperty); }
-			set { this.SetValue(LineStackingStrategyProperty, value); }
+			get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
+			set => SetValue(LineStackingStrategyProperty, value);
 		}
 
 		/// <summary>
-		/// Identifies the <see cref="Block.TextAlignment" /> dependency property.
+		/// Identifies the <see cref="TextAlignment" /> dependency property.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty TextAlignmentProperty =
 			DependencyProperty.Register(
-				"TextAlignment",
+				nameof(TextAlignment),
 				typeof(TextAlignment),
 				typeof(Block),
-				new PropertyMetadata(TextAlignment.Left));
+				new PropertyMetadata(TextAlignment.Left)
+				{
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var block = (Block)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(block.INTERNAL_OuterDomElement);
+                        style.textAlign = (TextAlignment)newValue switch
+                        {
+                            TextAlignment.Center => "center",
+                            TextAlignment.Right => "right",
+                            TextAlignment.Justify => "justify",
+                            _ => "left",
+                        };
+                    },
+                });
 
 		/// <summary>
 		/// Gets or sets the horizontal alignment of the text content. 
 		/// The default is <see cref="TextAlignment.Left" />.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public TextAlignment TextAlignment
 		{
-			get { return (TextAlignment)this.GetValue(TextAlignmentProperty); }
-			set { this.SetValue(TextAlignmentProperty, value); }
+			get => (TextAlignment)GetValue(TextAlignmentProperty);
+			set => SetValue(TextAlignmentProperty, value);
 		}
 
 		internal abstract string GetContainerText();

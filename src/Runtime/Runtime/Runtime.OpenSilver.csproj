@@ -59,6 +59,14 @@
 		<Compile Include="OpenSilver\Controls\DatePicker\DatePicker.cs" />
 		<Compile Include="OpenSilver\Controls\DatePicker\DatePicker.NotImplemented.cs" />
 		<Compile Include="OpenSilver\Controls\DatePicker\SelectedDatesCollection.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBox.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerParagraph.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBlock.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerSection.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainer.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainersHelper.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerSpan.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerTextBlock.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\ScrollData.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.IScrollInfo.cs" />
@@ -229,7 +237,7 @@
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\ListBoxDragDropTarget.cs" />
-		<Compile Include="System.Windows.Controls\RichTextBox\INTERNAL_TextContainerRichTextBox.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBlock.NotImplemented.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillRange.cs" />
@@ -413,9 +421,6 @@
 		<Compile Include="System.Windows.Controls\TreeView.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewItem.cs" />
 		<Compile Include="System.Windows.Controls\ScrollViewerExtensions.cs" />
-		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerParagraph.cs" />
-		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerRichTextBlock.cs" />
-		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerSection.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Typography.cs" />
 		<Compile Include="System.Windows.Media\Polygon.cs" />
 		<Compile Include="System.Windows\Expression.cs" />
@@ -454,7 +459,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlock.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBlock.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlockOverflow.cs" />
 		<Compile Include="System.Windows.Controls\Separator.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
@@ -467,7 +472,7 @@
 		<Compile Include="System.Windows.Data\CollectionView.cs" />
 		<Compile Include="System.Windows.Data\ListCollectionView.cs" />
 		<Compile Include="PagedCollectionView\PropertyGroupDescription.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\BlockCollection.cs" />
+		<Compile Include="System.Windows.Documents\BlockCollection.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\LogicalDirection.cs" />
 		<Compile Include="System.Windows.Documents\Paragraph.cs" />
@@ -588,7 +593,7 @@
 		<Compile Include="System.Windows.Controls.Primitives\IScrollInfo.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\LayoutInformation.cs" />
 		<Compile Include="System.Windows.Data\CollectionViewGroup.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Block.cs" />
+		<Compile Include="System.Windows.Documents\Block.cs" />
     <Compile Include="System.Windows.Input\InputManager.cs" />
     <Compile Include="System.Windows.Input\FocusManager.cs" />
 		<Compile Include="System.Windows.Input\WORKINPROGRESS\Touch.cs" />
@@ -938,10 +943,6 @@
 		<Compile Include="System.Windows.Documents\Hyperlink.cs" />
 		<Compile Include="System.Windows.Documents\Inline.cs" />
 		<Compile Include="System.Windows.Documents\InlineCollection.cs" />
-		<Compile Include="System.Windows.Documents\INTERNAL_TextContainer.cs" />
-		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerHelper.cs" />
-		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerSpan.cs" />
-		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerTextBlock.cs" />
 		<Compile Include="System.Windows.Documents\Italic.cs" />
 		<Compile Include="System.Windows.Documents\Line​Break.cs" />
 		<Compile Include="System.Windows.Documents\Run.cs" />
