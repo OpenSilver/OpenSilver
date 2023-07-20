@@ -13,6 +13,7 @@
 
 using System.Windows.Markup;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Documents;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -31,10 +32,10 @@ namespace Windows.UI.Xaml.Documents
         /// </summary>
         public Paragraph()
         {
-            this.Inlines = new InlineCollection(this);
+            Inlines = new InlineCollection(this);
         }
 
-        internal override string TagName => "p";
+        internal override string TagName => "section";
 
         /// <summary>
         /// Gets an <see cref="InlineCollection"/> containing the top-level <see cref="Inline"/>
@@ -53,7 +54,7 @@ namespace Windows.UI.Xaml.Documents
 
         internal override string GetContainerText()
         {
-            return new INTERNAL_TextContainerParagraph(this).Text;
+            return new TextContainerParagraph(this).Text;
         }
     }
 }

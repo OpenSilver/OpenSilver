@@ -13,6 +13,7 @@
 
 using System.Windows.Markup;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Documents;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -65,7 +66,7 @@ namespace Windows.UI.Xaml.Documents
 
 		internal override string GetContainerText()
 		{
-			return new INTERNAL_TextContainerSection(this).Text;
+			return new TextContainerSection(this).Text;
 		}
 	}
 }
