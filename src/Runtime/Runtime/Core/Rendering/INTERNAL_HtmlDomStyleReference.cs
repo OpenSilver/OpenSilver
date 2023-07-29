@@ -166,8 +166,8 @@ namespace CSHTML5.Internal
         public string lineHeight { set { SetStylePropertyValue("lineHeight", value); } }
         public string margin { set { SetStylePropertyValue("margin", value); } }
         public string marginBottom { set { SetStylePropertyValue("marginBottom", value); } }
-        public string marginLeft { set { SetStylePropertyValue("marginLeft", value); } }
-        public string marginRight { set { SetStylePropertyValue("marginRight", value); } }
+        public string marginLeft { set { SetStylePropertyValue("marginInlineStart", value); } }
+        public string marginRight { set { SetStylePropertyValue("marginInlineEnd", value); } }
         public string marginTop { set { SetStylePropertyValue("marginTop", value); } }
         public string minHeight { set { SetStylePropertyValue("minHeight", value); } }
         public string minWidth { set { SetStylePropertyValue("minWidth", value); } }
@@ -191,8 +191,8 @@ namespace CSHTML5.Internal
         public string overflowY { set { SetStylePropertyValue("overflowY", value); } }
         public string padding { set { SetStylePropertyValue("padding", value); } }
         public string paddingBottom { set { SetStylePropertyValue("paddingBottom", value); } }
-        public string paddingLeft { set { SetStylePropertyValue("paddingLeft", value); } }
-        public string paddingRight { set { SetStylePropertyValue("paddingRight", value); } }
+        public string paddingLeft { set { SetStylePropertyValue("paddingInlineStart", value); } }
+        public string paddingRight { set { SetStylePropertyValue("paddingInlineEnd", value); } }
         public string paddingTop { set { SetStylePropertyValue("paddingTop", value); } }
         public string position { set { SetStylePropertyValue("position", value); } }
         public string pointerEvents { set { SetStylePropertyValue("pointerEvents", value); } }

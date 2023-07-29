@@ -1025,15 +1025,9 @@ namespace Windows.UI.Xaml
 
         #endregion Triggers
 
-        #region Work in progress
+        #region FlowDirection
 
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty FlowDirectionProperty =
-            DependencyProperty.Register(
-                nameof(FlowDirection),
-                typeof(FlowDirection),
-                typeof(FrameworkElement),
-                new PropertyMetadata(FlowDirection.LeftToRight));
+        internal virtual FlowDirection FlowDirectionCore => FlowDirection.LeftToRight;
 
         /// <summary>
         /// Gets or sets the direction that text and other user interface 
@@ -1044,18 +1038,76 @@ namespace Windows.UI.Xaml
         /// parent element, as a value of the enumeration. The default value 
         /// is <see cref="FlowDirection.LeftToRight" />.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public FlowDirection FlowDirection
         {
-            get
+            get => (FlowDirection)this.GetValue(FrameworkElement.FlowDirectionProperty);
+            set => this.SetValue(FrameworkElement.FlowDirectionProperty, (Enum)value);
+        }
+
+        public static readonly DependencyProperty FlowDirectionProperty =
+            DependencyProperty.Register(
+                nameof(FlowDirection),
+                typeof(FlowDirection),
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(FlowDirection.LeftToRight, FrameworkPropertyMetadataOptions.Inherits, FlowDirection_Changed, CoerceFlowDirection)
+                {
+                    MethodToUpdateDom = FlowDirection_MethodToUpdateDom
+                });
+
+        private static void FlowDirection_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            FrameworkElement fe = (FrameworkElement)d;
+            fe.FlowDirectionChanged?.Invoke(fe, e);
+            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
+        }
+
+        private static object CoerceFlowDirection(DependencyObject d, object baseValue)
+        {
+            if (!(baseValue is FlowDirection))
+                return FlowDirection.LeftToRight;
+
+            return baseValue;
+        }
+
+        public event DependencyPropertyChangedEventHandler FlowDirectionChanged;
+
+        private static void FlowDirection_MethodToUpdateDom(DependencyObject d, object newValue)
+        {
+            var element = (FrameworkElement)d;
+            element.ManageFlowDirection((FlowDirection)newValue);
+        }
+
+        protected internal virtual void ManageFlowDirection(FlowDirection flowDirection)
+        {
+            const string directionAttribute = "dir";
+            const string rightToLeft = "rtl";
+            const string leftToRight = "ltr";
+
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                return (FlowDirection)this.GetValue(FrameworkElement.FlowDirectionProperty);
-            }
-            set
-            {
-                this.SetValue(FrameworkElement.FlowDirectionProperty, (Enum)value);
+                if (flowDirection == FlowDirection.LeftToRight)
+                {
+                    var parent = (this.Parent ?? VisualTreeHelper.GetParent(this)) as FrameworkElement;
+
+                    if (parent?.FlowDirection == FlowDirection.RightToLeft)
+                    {
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, directionAttribute, leftToRight);
+                    }
+                    else
+                    {
+                        INTERNAL_HtmlDomManager.RemoveDomElementAttribute(INTERNAL_OuterDomElement, directionAttribute, forceSimulatorExecuteImmediately: true);                        
+                    }
+                }
+                else
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, directionAttribute, rightToLeft);
+                }
             }
         }
+
+        #endregion
+
+        #region Work in progress
 
         /// <summary>
         /// Identifies the <see cref="Language"/> dependency property.

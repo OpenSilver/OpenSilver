@@ -163,10 +163,10 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
                     style.textAlign = "center";
                     break;
                 case TextAlignment.Left:
-                    style.textAlign = "left";
+                    style.textAlign = "start";
                     break;
                 case TextAlignment.Right:
-                    style.textAlign = "right";
+                    style.textAlign = "end";
                     break;
                 case TextAlignment.Justify:
                     style.textAlign = "justify";
