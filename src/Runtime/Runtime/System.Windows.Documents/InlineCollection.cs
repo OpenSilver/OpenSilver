@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -28,49 +20,35 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    public partial class InlineCollection : TextElementCollection<Inline>, IList
+    /// <summary>
+    /// Represents a collection of <see cref="Inline"/> elements.
+    /// </summary>
+    public class InlineCollection : TextElementCollection<Inline>, IList
     {
-        #region Constructor
         internal InlineCollection(DependencyObject owner) : base(owner)
         {
-
         }
-        #endregion
 
-        #region Public Methods
         public void Add(string text)
-        {
-            this.AddInternal(text);
-        }
-        #endregion
-
-        #region Internal Properties
-        internal Inline FirstElement
-        {
-            get
-            {
-                if (this.Count == 0)
-                {
-                    return null; //note: maybe throw an exception ?
-                }
-                return (Inline)this[0];
-            }
-        }
-        #endregion
-
-        #region Internal Methods
-        private void AddInternal(string text)
         {
             if (text == null)
             {
-                throw new ArgumentNullException("text");
+                throw new ArgumentNullException(nameof(text));
             }
-            Run run = new Run()
-            {
-                Text = text
-            };
-            this.Add(run);
+
+            Add(new Run { Text = text });
         }
-        #endregion
+
+        internal sealed override int AddImpl(object value)
+        {
+            Inline inline = value switch
+            {
+                string text => new Run { Text = text ?? string.Empty },
+                Inline i => i,
+                _ => null,
+            };
+
+            return base.AddImpl(inline);
+        }
     }
 }

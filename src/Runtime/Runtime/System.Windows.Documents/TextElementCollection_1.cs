@@ -110,10 +110,7 @@ namespace Windows.UI.Xaml.Documents
 
         int IList.Add(object value)
         {
-            T item = value as T;
-            int index = this.Count;
-            this.AddInternal(index, item);
-            return index;
+            return AddImpl(value);
         }
 
         public void Clear()
@@ -229,11 +226,19 @@ namespace Windows.UI.Xaml.Documents
             }
         }
 
+        internal virtual int AddImpl(object value)
+        {
+            T item = value as T;
+            int index = this.Count;
+            this.AddInternal(index, item);
+            return index;
+        }
+
         private void AddInternal(int index, T item)
         {
             if (item == null)
             {
-                throw new ArgumentNullException("item");
+                throw new ArgumentNullException(nameof(item));
             }
             this._collection.Insert(index, item);
             this.SetVisualParent(item);
