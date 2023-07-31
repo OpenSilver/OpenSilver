@@ -30,7 +30,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Xaml.Schema;
@@ -744,8 +743,7 @@ namespace System.Xaml
                 // FIXME: this could be generalized by some means, but I cannot find any.
                 if (xt.UnderlyingType == typeof(XamlType) && value is string)
                     value = ResolveTypeFromName((string)value);
-                if (xt.UnderlyingType == typeof(Inline) && value is string)
-                    value = new Run() { Text = (string)value };
+
                 // FIXME: this could be generalized by some means, but I cannot find any.
                 if (xt.UnderlyingType == typeof(Type))
                     value = new TypeExtension((string)value).ProvideValue(service_provider);
@@ -900,20 +898,20 @@ namespace System.Xaml
 
         void HandleBeginInit(object value)
         {
-            var si = value as ISupportInitialize;
-            if (si == null)
-                return;
-            si.BeginInit ();
-            source.OnAfterBeginInit (value);
+			var si = value as ISupportInitialize;
+			if (si == null)
+				return;
+			si.BeginInit ();
+			source.OnAfterBeginInit (value);
         }
 
         void HandleEndInit(object value)
         {
-            var si = value as ISupportInitialize;
-            if (si == null)
-                return;
-            si.EndInit ();
-            source.OnAfterEndInit (value);
+			var si = value as ISupportInitialize;
+			if (si == null)
+				return;
+			si.EndInit ();
+			source.OnAfterEndInit (value);
         }
 
         public void WriteDeferred(XamlDeferringLoader loader, XamlNodeList nodeList, bool setValue)
