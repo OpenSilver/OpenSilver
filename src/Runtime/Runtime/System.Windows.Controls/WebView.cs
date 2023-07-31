@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             object outerDiv;
-            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
+            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomLayoutElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
             outerDivStyle.width = "100%";
             outerDivStyle.height = "100%";
 

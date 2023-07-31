@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,17 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
-using Bridge;
-#endif
-
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Collections;
 using System.Diagnostics;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Media;
+#else
 using Windows.Foundation;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -90,9 +85,8 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class Grid : Panel
     {
-        internal object _innerDiv;
-        internal ColumnDefinitionCollection _columnDefinitionsOrNull;
-        internal RowDefinitionCollection _rowDefinitionsOrNull;
+        private ColumnDefinitionCollection _columnDefinitionsOrNull;
+        private RowDefinitionCollection _rowDefinitionsOrNull;
 
         /// <summary>
         /// Initializes a new instance of the Grid class.
@@ -117,7 +111,6 @@ namespace Windows.UI.Xaml.Controls
 
         void ColumnDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            ColumnDefinitions_CollectionChanged_CSSVersion(sender, e);
             InvalidateDefinitions();
         }
 
@@ -139,73 +132,7 @@ namespace Windows.UI.Xaml.Controls
 
         void RowDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            RowDefinitions_CollectionChanged_CSSVersion(sender, e);
             InvalidateDefinitions();
-        }
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            return CreateDomElement_CSSVersion(parentRef, out domElementWhereToPlaceChildren);
-        }
-
-        internal override void INTERNAL_UpdateDomStructureIfNecessary()
-        {
-            //Note: when arriving here, we have already checked that the Grid is in the Visual Tree.
-            Grid_InternalHelpers.RefreshAllColumnsVisibility_CSSVersion(this);
-        }
-
-        internal protected override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            base.INTERNAL_OnDetachedFromVisualTree();
-
-            _innerDiv = null;
-        }
-
-        internal void LocallyManageChildrenChanged()
-        {
-            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
-                return;
-
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-            LocallyManageChildrenChanged_CSSVersion();
-#if PERFSTAT
-            Performance.Counter("Grid.LocallyManageChildrenChanged", t0);
-#endif
-        }
-
-        internal override void OnChildrenAdded(UIElement newChild, int index)
-        {
-            base.OnChildrenAdded(newChild, index);
-            this.LocallyManageChildrenChanged();
-        }
-
-        internal override void OnChildrenRemoved(UIElement oldChild, int index)
-        {
-            base.OnChildrenRemoved(oldChild, index);
-            this.LocallyManageChildrenChanged();
-        }
-
-        internal override void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
-        {
-            if (oldChild == newChild)
-            {
-                return;
-            }
-
-            base.OnChildrenReplaced(oldChild, newChild, index);
-            this.LocallyManageChildrenChanged();
-        }
-
-        internal override void OnChildrenReset()
-        {
-            base.OnChildrenReset();
-
-            if (this.HasChildren)
-            {
-                this.LocallyManageChildrenChanged();
-            }
         }
 
         #region ****************** Attached Properties ******************
@@ -219,6 +146,7 @@ namespace Windows.UI.Xaml.Controls
         {
             element.SetValue(RowProperty, value);
         }
+
         /// <summary>
         /// Gets the value of the Grid.Row XAML attached property from the specified
         /// FrameworkElement.
@@ -229,35 +157,42 @@ namespace Windows.UI.Xaml.Controls
         {
             return (int)element.GetValue(RowProperty);
         }
+
         /// <summary>
         /// Identifies the Grid.Row XAML attached property.
         /// </summary>
         public static readonly DependencyProperty RowProperty =
-            DependencyProperty.RegisterAttached("Row", typeof(int), typeof(UIElement), new PropertyMetadata(0, Row_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.RegisterAttached(
+                "Row",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(0, OnCellAttachedPropertyChanged));
 
-        static void Row_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnCellAttachedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Row_Changed_CSSVersion(d, e);
+            if (d is UIElement child &&
+                VisualTreeHelper.GetParent(child) is Grid grid)
+            {
+                grid.InvalidateMeasure();
+            }
         }
 
         public static void SetRowSpan(UIElement element, int value)
         {
             element.SetValue(RowSpanProperty, value);
         }
+
         public static int GetRowSpan(UIElement element)
         {
             return (int)element.GetValue(RowSpanProperty);
         }
 
         public static readonly DependencyProperty RowSpanProperty =
-            DependencyProperty.RegisterAttached("RowSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, RowSpan_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        static void RowSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            RowSpan_Changed_CSSVersion(d, e);
-        }
+            DependencyProperty.RegisterAttached(
+                "RowSpan",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(1, OnCellAttachedPropertyChanged));
 
         /// <summary>
         /// Sets the value of the Grid.Column XAML attached property on the specified FrameworkElement.
@@ -268,6 +203,7 @@ namespace Windows.UI.Xaml.Controls
         {
             element.SetValue(ColumnProperty, value);
         }
+        
         /// <summary>
         /// Gets the value of the Grid.Column XAML attached property from the specified
         /// FrameworkElement.
@@ -278,53 +214,49 @@ namespace Windows.UI.Xaml.Controls
         {
             return (int)element.GetValue(ColumnProperty);
         }
+        
         /// <summary>
         /// Identifies the Grid.Column XAML attached property
         /// </summary>
         public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.RegisterAttached("Column", typeof(int), typeof(UIElement), new PropertyMetadata(0, Column_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        static void Column_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Column_Changed_CSSVersion(d, e);
-        }
-
+            DependencyProperty.RegisterAttached(
+                "Column",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(0, OnCellAttachedPropertyChanged));
 
         public static void SetColumnSpan(UIElement element, int value)
         {
             element.SetValue(ColumnSpanProperty, value);
         }
+
         public static int GetColumnSpan(UIElement element)
         {
             return (int)element.GetValue(ColumnSpanProperty);
         }
 
         public static readonly DependencyProperty ColumnSpanProperty =
-            DependencyProperty.RegisterAttached("ColumnSpan", typeof(int), typeof(UIElement), new PropertyMetadata(1, ColumnSpan_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        static void ColumnSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ColumnSpan_Changed_CSSVersion(d, e);
-        }
+            DependencyProperty.RegisterAttached(
+                "ColumnSpan",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(1, OnCellAttachedPropertyChanged));
 
         #endregion
 
-        internal double GetColumnActualWidth(ColumnDefinition columnDefinition)
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty ShowGridLinesProperty =
+            DependencyProperty.Register(
+                nameof(ShowGridLines),
+                typeof(bool),
+                typeof(Grid),
+                new PropertyMetadata(false));
+
+        [OpenSilver.NotImplemented]
+        public bool ShowGridLines
         {
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                return 0;
-
-            return GetColumnActualWidth_CSSVersion(columnDefinition);
-        }
-
-        internal double GetRowActualHeight(RowDefinition rowDefinition)
-        {
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                return 0;
-
-            return GetRowActualHeight_CSSVersion(rowDefinition);
+            get { return (bool)GetValue(ShowGridLinesProperty); }
+            set { SetValue(ShowGridLinesProperty, value); }
         }
 
         // private
@@ -1764,112 +1696,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 m_ppTempDefinitions = null;
                 m_cTempDefinitions = 0;
-            }
-        }
-
-        internal override bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Width))
-            {
-                return false;
-            }
-
-            if (child.HorizontalAlignment != HorizontalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (ColumnDefinitions.Count == 0)
-            {
-                return false;
-            }
-
-            int columnSpan = GetColumnSpan(child);
-            int childColumn = GetColumn(child);
-            if (columnSpan == 0)
-            {
-                return false;
-            }
-
-            int effectiveColumnSpan = Math.Min(columnSpan, ColumnDefinitions.Count - childColumn);
-            bool onAutoColumnDefinition = false;
-            for (int i = 0; i < effectiveColumnSpan; i++)
-            {
-                if (ColumnDefinitions[childColumn + i].Width.IsStar)
-                {
-                    return false;
-                }
-
-                if (ColumnDefinitions[childColumn + i].Width.IsAuto)
-                {
-                    onAutoColumnDefinition = true;
-                }
-            }
-
-            return onAutoColumnDefinition;
-        }
-
-        internal override bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Height))
-            {
-                return false;
-            }
-
-            if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (RowDefinitions.Count == 0)
-            {
-                return false;
-            }
-
-            int rowSpan = GetRowSpan(child);
-            int childRow = GetRow(child);
-            if (rowSpan == 0)
-            {
-                return false;
-            }
-
-            int effectiveRowSpan = Math.Min(rowSpan, RowDefinitions.Count - childRow);
-            bool onAutoRowDefinition = false;
-            for (int i = 0; i < effectiveRowSpan; i++)
-            {
-                if (RowDefinitions[childRow + i].Height.IsStar)
-                {
-                    return false;
-                }
-
-                if (RowDefinitions[childRow + i].Height.IsAuto)
-                {
-                    onAutoRowDefinition = true;
-                }
-            }
-
-            return onAutoRowDefinition;
-        }
-    }
-
-    internal sealed class GridNotLogical : Grid
-    {
-        protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
-        {
-            return base.CreateUIElementCollection(null);
-        }
-
-        /// <summary> 
-        /// Returns enumerator to logical children.
-        /// </summary>
-        /*protected*/ internal override IEnumerator LogicalChildren
-        {
-            get
-            {
-                // Note: Since children are displayed in a grid in our implementation,
-                // this panel's children are not logical children. There are the logical
-                // children of the grid they are displayed in.
-                return EmptyEnumerator.Instance;
             }
         }
     }

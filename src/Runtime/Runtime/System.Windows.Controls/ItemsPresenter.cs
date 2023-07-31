@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -103,12 +102,9 @@ namespace Windows.UI.Xaml.Controls
         {
             ItemsPresenter ip = (ItemsPresenter)d;
             ip.ClearPanel();
-            FrameworkElement.UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+            UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(ip))
-            {
-                ip.InvalidateMeasureInternal();
-            }
+            ip.InvalidateMeasure();
         }
 
         private void ClearPanel()
@@ -162,8 +158,7 @@ namespace Windows.UI.Xaml.Controls
         {
             // something has changed that affects the ItemsPresenter.
             // Re-measure.  This will recalculate everything from scratch.
-            this.InvalidateMeasureInternal();
-            _ = (this.TemplateChild as Panel)?.Children;
+            InvalidateMeasure();
         }
 
         internal static ItemsPresenter FromPanel(Panel panel)
