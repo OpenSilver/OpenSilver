@@ -197,7 +197,7 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object div);
+            var style = INTERNAL_HtmlDomManager.CreateDomLayoutElementAppendItAndGetStyle("div", parentRef, this, out object div);
             style.lineHeight = "0px";
             _imageDiv = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt(div, this);
             domElementWhereToPlaceChildren = null;

@@ -109,7 +109,6 @@ namespace Windows.UI.Xaml.Controls
                 uniqueIdentifier,
                 "pre",
                 string.Empty,
-                Margin,
                 availableSize.Width,
                 pwdLength > 0 ? new string('•', pwdLength) : "M");
             return TextSize;
@@ -153,7 +152,8 @@ namespace Windows.UI.Xaml.Controls
 
         private object AddPasswordInputDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var passwordFieldStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("input", parentRef, this, out object passwordField);
+            var passwordFieldStyle = INTERNAL_HtmlDomManager.CreateDomLayoutElementAppendItAndGetStyle(
+                "input", parentRef, this, out object passwordField);
 
             _passwordInputField = passwordField;
 
@@ -167,6 +167,7 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.color = "inherit"; //This is to inherit the foreground value from parent div.
             passwordFieldStyle.width = "100%";
             passwordFieldStyle.height = "100%";
+            passwordFieldStyle.padding = "0px";
 
             INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password");
 

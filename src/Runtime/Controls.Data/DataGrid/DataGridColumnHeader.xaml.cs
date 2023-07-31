@@ -77,7 +77,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public DataGridColumnHeader()
         {
-            CustomLayout = true;
 #if MIGRATION
             this.LostMouseCapture += new MouseEventHandler(DataGridColumnHeader_LostMouseCapture);
             this.MouseLeftButtonDown += new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonDown);

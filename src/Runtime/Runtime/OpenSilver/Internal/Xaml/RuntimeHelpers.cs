@@ -257,11 +257,10 @@ namespace OpenSilver.Internal.Xaml
             }
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage, true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void UIElement_SetKeepHiddenInFirstRender(UIElement uie, bool value)
         {
-            Debug.Assert(uie != null);
-            uie.KeepHiddenInFirstRender = value;
         }
     }
 }

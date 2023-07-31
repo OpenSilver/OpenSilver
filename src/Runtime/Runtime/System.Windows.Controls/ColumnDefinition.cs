@@ -228,23 +228,8 @@ namespace Windows.UI.Xaml.Controls
         {
             var columnDefinition = (ColumnDefinition)d;
 
-            Grid grid = columnDefinition.Parent;
-
-            if (grid != null
-                && INTERNAL_VisualTreeManager.IsElementInVisualTree(grid))
-            {
-                //-------------
-                // CSS Grid
-                //-------------
-
-                // We refresh all the columns:
-                Grid_InternalHelpers.RefreshAllColumnsWidth_CSSVersion(grid);
-            }
-
             columnDefinition.Parent?.InvalidateMeasure();
         }
-
-        #region ActualWidth / ActualHeight
 
         /// <summary>
         /// Gets the rendered width of a FrameworkElement. The FrameworkElement must be in the visual tree,
@@ -254,61 +239,8 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (Parent != null)
-                {
-                    if (Parent.UseCustomLayout)
-                    {
-                        return _measureArrangeSize;
-                    }
-                    else
-                    {
-                        return Parent.GetColumnActualWidth(this);
-                    }
-                }
-
-                return double.NaN;
+                return Parent is not null ? _measureArrangeSize : double.NaN;
             }
-        }
-
-        ///// <summary>
-        ///// Gets the rendered height of a FrameworkElement. The FrameworkElement must be in the visual tree,
-        ///// otherwise this property will return double.NaN.
-        ///// </summary>
-        //public double ActualHeight
-        //{
-        //    get
-        //    {
-        //        return Parent.GetColumnActualHeight(this);
-        //    }
-        //}
-
-        #endregion
-
-
-        internal Visibility Visibility
-        {
-            get { return (Visibility)GetValue(VisibilityProperty); }
-            set { SetValue(VisibilityProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Visibility.  This enables animation, styling, binding, etc...
-        internal static readonly DependencyProperty VisibilityProperty =
-            DependencyProperty.Register(
-                nameof(Visibility), 
-                typeof(Visibility), 
-                typeof(ColumnDefinition),
-                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
-
-        private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ColumnDefinition columnDefinition = (ColumnDefinition)d;
-
-            if (columnDefinition.Parent != null)
-            {
-                Grid_InternalHelpers.RefreshColumnVisibility(columnDefinition.Parent, columnDefinition, (Visibility)e.NewValue);
-            }
-
-            columnDefinition.Parent?.InvalidateMeasure();
         }
     }
 }

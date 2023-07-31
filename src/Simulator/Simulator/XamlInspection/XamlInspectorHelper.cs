@@ -109,9 +109,9 @@ namespace OpenSilver.Simulator.XamlInspection
                     if (currMaxLevel > 0 || maxTreeLevel == -1)
                     {
                         if (maxTreeLevel != -1) currMaxLevel--;
-                        foreach (dynamic item in visualChildrenInformation.Values) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
+                        foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
                         {
-                            var childElement = item.INTERNAL_UIElement;
+                            var childElement = item;
                             if (childElement != null)
                             {
                                 if (treeNode.Title == "Window" && (GetTitleFromElement(childElement) == "TextBlock" || GetTitleFromElement(childElement) == "TextBox"))
@@ -155,9 +155,9 @@ namespace OpenSilver.Simulator.XamlInspection
                 IDictionary visualChildrenInformation = parentElement.INTERNAL_VisualChildrenInformation as IDictionary;
                 if (visualChildrenInformation != null)
                 {
-                    foreach (dynamic item in visualChildrenInformation.Values) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
+                    foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
                     {
-                        var childElement = item.INTERNAL_UIElement;
+                        var childElement = item;
                         if (childElement != null)
                         {
                             var treeNode = new TreeNode()
