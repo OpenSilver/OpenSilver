@@ -186,7 +186,7 @@ document.createTextBlockElement = function (id, parentElement, wrap) {
 
     if (newElement) {
         newElement.style['overflow'] = 'hidden';
-        newElement.style['textAlign'] = 'left';
+        newElement.style['textAlign'] = 'start';
         newElement.style['boxSizing'] = 'border-box';
         if (wrap) {
             newElement.style['overflowWrap'] = 'break-word';

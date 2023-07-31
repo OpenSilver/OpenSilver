@@ -963,13 +963,13 @@ namespace Windows.UI.Xaml
                 var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_OuterDomElement);
                 if (margin.Left >= 0)
                 {
-                    styleOfBoxSizingElement.paddingLeft = $"{margin.Left.ToInvariantString()}px";
-                    styleOfBoxSizingElement.marginLeft = string.Empty;
+                    styleOfBoxSizingElement.paddingInlineStart = $"{margin.Left.ToInvariantString()}px";
+                    styleOfBoxSizingElement.marginInlineStart = string.Empty;
                 }
                 else
                 {
-                    styleOfBoxSizingElement.paddingLeft = string.Empty;
-                    styleOfBoxSizingElement.marginLeft = $"{margin.Left.ToInvariantString()}px";
+                    styleOfBoxSizingElement.paddingInlineStart = string.Empty;
+                    styleOfBoxSizingElement.marginInlineStart = $"{margin.Left.ToInvariantString()}px";
                 }
 
                 if (margin.Top >= 0)
@@ -985,13 +985,13 @@ namespace Windows.UI.Xaml
 
                 if (margin.Right >= 0)
                 {
-                    styleOfBoxSizingElement.paddingRight = $"{margin.Right.ToInvariantString()}px";
-                    styleOfBoxSizingElement.marginRight = string.Empty;
+                    styleOfBoxSizingElement.paddingInlineEnd = $"{margin.Right.ToInvariantString()}px";
+                    styleOfBoxSizingElement.marginInlineEnd = string.Empty;
                 }
                 else
                 {
-                    styleOfBoxSizingElement.paddingRight = string.Empty;
-                    styleOfBoxSizingElement.marginRight = $"{margin.Right.ToInvariantString()}px";
+                    styleOfBoxSizingElement.paddingInlineEnd = string.Empty;
+                    styleOfBoxSizingElement.marginInlineEnd = $"{margin.Right.ToInvariantString()}px";
                     styleOfBoxSizingElement.width = "auto";
                 }
 

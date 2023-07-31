@@ -142,6 +142,8 @@ namespace TestApplication
 
             Tests.Add(new Test("OpenFileDialog", "OpenFileDialog"));
             Tests.Add(new Test("PopupWindow", "PopupWindow"));
+
+            Tests.Add(new Test("RightToLeft", "RightToLeft"));
         }
     }
 }

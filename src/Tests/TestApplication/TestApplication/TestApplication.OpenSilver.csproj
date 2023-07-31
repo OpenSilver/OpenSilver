@@ -224,6 +224,9 @@
     <Compile Include="Tests\Right ClickTest.xaml.cs">
       <DependentUpon>Right ClickTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\RightToLeftTest.xaml.cs">
+      <DependentUpon>RightToLeftTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\SandboxTest.xaml.cs">
       <DependentUpon>SandboxTest.xaml</DependentUpon>
     </Compile>
@@ -651,6 +654,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\PopupZIndexTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\RightToLeftTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\TextBlockTest.xaml">

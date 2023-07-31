@@ -1025,15 +1025,44 @@ namespace Windows.UI.Xaml
 
         #endregion Triggers
 
-        #region Work in progress
+        #region FlowDirection
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Identifies the <see cref="FlowDirection"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty FlowDirectionProperty =
             DependencyProperty.Register(
                 nameof(FlowDirection),
                 typeof(FlowDirection),
                 typeof(FrameworkElement),
-                new PropertyMetadata(FlowDirection.LeftToRight));
+                new FrameworkPropertyMetadata(
+                    FlowDirection.LeftToRight,
+                    FrameworkPropertyMetadataOptions.Inherits,
+                    null,
+                    CoerceFlowDirection)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        const string DIR = "dir";
+                        const string RTL = "rtl";
+                        const string LTR = "ltr";
+
+                        var fe = (FrameworkElement)d;
+                        var direction = (FlowDirection)newValue;
+
+                        if (VisualTreeHelper.GetParent(fe) is FrameworkElement parent
+                            && parent.FlowDirection == direction)
+                        {
+                            INTERNAL_HtmlDomManager.RemoveAttribute(fe.INTERNAL_OuterDomElement, DIR);
+                            return;
+                        }
+
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(
+                            fe.INTERNAL_OuterDomElement,
+                            DIR,
+                            direction == FlowDirection.LeftToRight ? LTR : RTL);
+                    },
+                });
 
         /// <summary>
         /// Gets or sets the direction that text and other user interface 
@@ -1044,18 +1073,21 @@ namespace Windows.UI.Xaml
         /// parent element, as a value of the enumeration. The default value 
         /// is <see cref="FlowDirection.LeftToRight" />.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public FlowDirection FlowDirection
         {
-            get
-            {
-                return (FlowDirection)this.GetValue(FrameworkElement.FlowDirectionProperty);
-            }
-            set
-            {
-                this.SetValue(FrameworkElement.FlowDirectionProperty, (Enum)value);
-            }
+            get => (FlowDirection)GetValue(FlowDirectionProperty);
+            set => SetValue(FlowDirectionProperty, value);
         }
+
+        private static object CoerceFlowDirection(DependencyObject d, object baseValue)
+        {
+            FlowDirection direction = (FlowDirection)baseValue;
+            return (direction != FlowDirection.RightToLeft) ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
+        }
+        
+        #endregion
+
+        #region Work in progress
 
         /// <summary>
         /// Identifies the <see cref="Language"/> dependency property.
