@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml.Controls
     /// Provides a framework for <see cref="Panel"/> elements that virtualize
     /// their visual children.
     /// </summary>
-    public abstract partial class VirtualizingPanel : Panel
+    public abstract class VirtualizingPanel : Panel
     {
         /// <summary>
         /// Gets a value that identifies the <see cref="ItemContainerGenerator"/>
@@ -50,10 +50,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="VirtualizingPanel"/> class.
         /// </summary>
-        protected VirtualizingPanel()
-        {
-            this.ClipToBounds = true;
-        }
+        protected VirtualizingPanel() { }
 
         /// <summary>
         /// Adds the specified <see cref="UIElement"/> to the <see cref="Panel.Children"/>
@@ -140,21 +137,12 @@ namespace Windows.UI.Xaml.Controls
 
         internal override void GenerateChildren()
         {
-            if (!IsCustomLayoutRoot && !IsUnderCustomLayout)
-            {
-                base.GenerateChildren();
-            }
             // Do nothing. Subclasses will use the exposed generator to generate children.
         }
 
         // This method returns a bool to indicate if or not the panel layout is affected by this collection change
         internal override bool OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
         {
-            if (!IsCustomLayoutRoot && !IsUnderCustomLayout)
-            {
-                return base.OnItemsChangedInternal(sender, args);
-            }
-
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:

@@ -430,7 +430,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public DataPager()
         {
-            CustomLayout = true;
             this.DefaultStyleKey = typeof(DataPager);
 
             // Listening to the IsEnabled changes so the DataPager states can be updated accordingly.

@@ -484,8 +484,7 @@
                                       HorizontalAlignment="Center"
                                       Grid.Column="1" />
                         <!-- Value is being synched in code, because of inability to do TwoWay TemplateBinding -->
-                        <Popup x:Name="Popup"
-                               CustomLayout="True">
+                        <Popup x:Name="Popup">
                             <Border x:Name="PopupRoot"
                                     BorderBrush="#FF8d8b8b"
                                     BorderThickness="1">

@@ -382,6 +382,11 @@ namespace Windows.UI.Xaml
                 OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty));
             }
 
+            if (((FlowDirection)FlowDirectionProperty.GetDefaultValue(this)) == FlowDirection.RightToLeft)
+            {
+                IsRightToLeft = true;
+            }
+
             Application app = Application.Current;
             if (app != null && app.HasImplicitStylesInResources)
             {
@@ -488,46 +493,14 @@ namespace Windows.UI.Xaml
         /// <returns>The "root" dom element of the FrameworkElement.</returns>
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            //------------------
-            // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
-            //------------------
-
-            object div1;
-            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            if (!this.IsUnderCustomLayout)
-            {
-                object div2 = INTERNAL_HtmlDomManager.CreateFrameworkDomElementAndAppendIt(div1, this, false);
-                domElementWhereToPlaceChildren = div2;
-
-                if (this.IsCustomLayoutRoot)
-                {
-                    div1style.position = "relative";
-                }
-            }
-            else
-            {
-                domElementWhereToPlaceChildren = div1;
-            }
-            return div1;
+            return CreateDomElementInternal(parentRef, out domElementWhereToPlaceChildren);
         }
 
-        //BRIDGETODO
-        // Bridge bug : when we use virtual, override & out/base in a function, bridge doesn't compile
-        // so delete this class when the bug is resolved
-        public object CreateDomElement_WorkaroundBridgeInheritanceBug(object parentRef, out object domElementWhereToPlaceChildren)
+        internal object CreateDomElementInternal(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            //------------------
-            // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
-            //------------------
-
-            object div1;
-            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            object div2;
-            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
-            div2style.width = "100%";
-            div2style.height = "100%";
-            domElementWhereToPlaceChildren = div2;
-            return div1;
+            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
+            domElementWhereToPlaceChildren = div;
+            return div;
         }
 
         // Internal helper so the FrameworkElement could see the
@@ -598,19 +571,6 @@ namespace Windows.UI.Xaml
 #endif
         {
             
-        }
-
-        // Note: the returned Size is unused for now.
-        internal override sealed Size MeasureCore()
-        {
-            if (!this.ApplyTemplate())
-            {
-                if (this.TemplateChild != null)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
-                }
-            }
-            return new Size();
         }
 
         //
@@ -1038,7 +998,7 @@ namespace Windows.UI.Xaml
                 new FrameworkPropertyMetadata(
                     FlowDirection.LeftToRight,
                     FrameworkPropertyMetadataOptions.Inherits,
-                    null,
+                    OnFlowDirectionChanged,
                     CoerceFlowDirection)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
@@ -1075,8 +1035,15 @@ namespace Windows.UI.Xaml
         /// </returns>
         public FlowDirection FlowDirection
         {
-            get => (FlowDirection)GetValue(FlowDirectionProperty);
+            get => IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
             set => SetValue(FlowDirectionProperty, value);
+        }
+
+        private static void OnFlowDirectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var fe = (FrameworkElement)d;
+            // Cache the new value as a bit to optimize accessing the FlowDirection property's CLR accessor
+            fe.IsRightToLeft = ((FlowDirection)e.NewValue) == FlowDirection.RightToLeft;
         }
 
         private static object CoerceFlowDirection(DependencyObject d, object baseValue)
@@ -1084,7 +1051,13 @@ namespace Windows.UI.Xaml
             FlowDirection direction = (FlowDirection)baseValue;
             return (direction != FlowDirection.RightToLeft) ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
         }
-        
+
+        internal bool IsRightToLeft
+        {
+            get { return ReadInternalFlag(InternalFlags.IsRightToLeft); }
+            set { WriteInternalFlag(InternalFlags.IsRightToLeft, value); }
+        }
+
         #endregion
 
         #region Work in progress
@@ -1276,8 +1249,6 @@ namespace Windows.UI.Xaml
             {
                 UpdateThemeStyleProperty();
             }
-
-            InvalidateMeasureInternal();
         }
 
         // Extracts the required flag and returns
@@ -1372,7 +1343,7 @@ namespace Windows.UI.Xaml
 
         // FlowDirection is set to RightToLeft (0 == LeftToRight, 1 == RightToLeft)
         // This is an optimization to speed reading the FlowDirection property
-        //IsRightToLeft = 0x20000000,
+        IsRightToLeft = 0x20000000,
 
         ShouldLookupImplicitStyles = 0x40000000,
 

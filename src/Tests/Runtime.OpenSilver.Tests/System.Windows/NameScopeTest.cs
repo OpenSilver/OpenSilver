@@ -404,6 +404,7 @@ namespace Windows.UI.Xaml.Tests
                 name3.ApplyTemplate();
                 itemsControl.ApplyTemplate();
                 itemsControl.TemplateChild.ApplyTemplate();
+                _ = itemsControl.ItemsHost.Children; // generate children
                 control1.ApplyTemplate();
                 control2.ApplyTemplate();
                 presenter.ApplyTemplate();

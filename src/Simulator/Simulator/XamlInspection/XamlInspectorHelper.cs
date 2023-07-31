@@ -85,9 +85,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 IDictionary visualChildrenInformation = uiElement.INTERNAL_VisualChildrenInformation as IDictionary;
                 if (visualChildrenInformation != null)
                 {
-                    foreach (dynamic item in visualChildrenInformation.Values) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
+                    foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
                     {
-                        var childElement = item.INTERNAL_UIElement;
+                        var childElement = item;
                         if (childElement != null)
                         {
                             treeNode.Children.Add(RecursivelyAddElementsToTree(childElement, isNodeForXamlSourcePath, ref NbTreeViewElement));

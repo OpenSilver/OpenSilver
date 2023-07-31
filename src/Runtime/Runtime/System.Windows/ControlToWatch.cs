@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml
             Point position = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
             Size size = _control switch
             {
-                FrameworkElement fe => fe.INTERNAL_GetActualWidthAndHeight(),
+                FrameworkElement fe => fe.RenderSize,
                 _ => new Size(),
             };
 

@@ -391,7 +391,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 
 #if MIGRATION
             this.DefaultStyleKey = (object)typeof(Chart);
-            CustomLayout = true;
 #endif
         }
 

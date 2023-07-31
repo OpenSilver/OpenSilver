@@ -226,36 +226,9 @@ namespace Windows.UI.Xaml.Controls
         private static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var rowDefinition = (RowDefinition)d;
-            Grid grid = rowDefinition.Parent;
-
-            if (grid != null
-                && INTERNAL_VisualTreeManager.IsElementInVisualTree(grid))
-            {
-                //-------------
-                // CSS Grid
-                //-------------
-
-                // We refresh all the rows:
-                Grid_InternalHelpers.RefreshAllRowsHeight_CSSVersion(grid);
-            }
 
             rowDefinition.Parent?.InvalidateMeasure();
         }
-
-
-        #region ActualWidth / ActualHeight
-
-        ///// <summary>
-        ///// Gets the rendered width of a FrameworkElement. The FrameworkElement must be in the visual tree,
-        ///// otherwise this property will return double.NaN.
-        ///// </summary>
-        //public double ActualWidth
-        //{
-        //    get
-        //    {
-        //        return Parent.GetRowActualWidth(this);
-        //    }
-        //}
 
         /// <summary>
         /// Gets the rendered height of a FrameworkElement. The FrameworkElement must be in the visual tree,
@@ -265,22 +238,8 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (Parent != null)
-                {
-                    if (Parent.UseCustomLayout)
-                    {
-                        return _measureArrangeSize;
-                    }
-                    else
-                    {
-                        return Parent.GetRowActualHeight(this);
-                    }
-                }
-
-                return double.NaN;
+                return Parent is not null ? _measureArrangeSize : double.NaN;
             }
         }
-
-        #endregion
     }
 }

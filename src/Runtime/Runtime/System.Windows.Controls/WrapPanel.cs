@@ -63,10 +63,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Orientation),
                 typeof(Orientation),
                 typeof(WrapPanel),
-                new PropertyMetadata(Orientation.Horizontal, OnOrientationPropertyChanged)
-                {
-                    MethodToUpdateDom2 = WrapPanelHelper.OnOrientationChanged,
-                });
+                new PropertyMetadata(Orientation.Horizontal, OnOrientationPropertyChanged));
 
         /// <summary>
         /// OrientationProperty property changed handler.
@@ -483,16 +480,6 @@ namespace Windows.UI.Xaml.Controls
                 get { return _orientation != Orientation.Horizontal ? Direct : Indirect; }
                 set { if (_orientation != Orientation.Horizontal) Direct = value; else Indirect = value; }
             }
-        }
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            return WrapPanelHelper.CreateDomElement(this, Orientation, parentRef, out domElementWhereToPlaceChildren);
-        }
-
-        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
-        {
-            return WrapPanelHelper.CreateDomChildWrapper(this, Orientation, parentRef, out domElementWhereToPlaceChild, index);
         }
     }
 }
