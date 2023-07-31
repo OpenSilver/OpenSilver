@@ -15,8 +15,10 @@ using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
+using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -66,6 +68,23 @@ namespace Windows.UI.Xaml.Documents
         {
             get { return (int)GetValue(CharacterSpacingProperty); }
             set { SetValue(CharacterSpacingProperty, value); }
+        }
+
+        internal FrameworkElement GetLayoutParent()
+        {
+            DependencyObject parent = this;
+
+            do
+            {
+                parent = VisualTreeHelper.GetParent(parent);
+                if (parent is not TextElement)
+                {
+                    break;
+                }
+            }
+            while (parent is not null);
+
+            return parent as FrameworkElement;
         }
     }
 }

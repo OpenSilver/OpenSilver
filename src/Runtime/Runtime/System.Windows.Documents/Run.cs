@@ -16,6 +16,12 @@ using System.Windows.Markup;
 using CSHTML5.Internal;
 
 #if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Documents
 #else
 namespace Windows.UI.Xaml.Documents
@@ -44,22 +50,28 @@ namespace Windows.UI.Xaml.Documents
                 nameof(Text), 
                 typeof(string), 
                 typeof(Run),
-                new PropertyMetadata(string.Empty, OnTextPropertyChanged));
+                new PropertyMetadata(string.Empty, OnTextChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        INTERNAL_HtmlDomManager.SetContentString((Run)d, (string)newValue);
+                    },
+                });
 
-        private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Run run = (Run)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(run))
+
+            switch (run.GetLayoutParent())
             {
-                INTERNAL_HtmlDomManager.SetContentString(run, (string)e.NewValue);
-            }
-        }
+                case TextBlock tb:
+                    tb.InvalidateCacheAndMeasure();
+                    break;
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            INTERNAL_HtmlDomManager.SetContentString(this, this.Text);
+                case FrameworkElement fe:
+                    fe.InvalidateMeasure();
+                    break;
+            };
         }
     }
 }

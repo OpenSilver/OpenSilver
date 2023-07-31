@@ -470,16 +470,6 @@ namespace Windows.UI.Xaml.Shapes
             }
         }
 
-        private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
-        {
-            // Only cases where resizing the window MAY resize the shape is if the shape is "Stretched" AND it does not have a size in pixels defined:
-            if ((this.HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(this.Width))
-                || (this.VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(this.Height)))
-            {
-                ScheduleRedraw();
-            }
-        }
-
         private void Shape_SizeChanged(object sender, SizeChangedEventArgs e) //Note: this is called when adding the shape into the visual tree.
         {
             ScheduleRedraw();
@@ -557,14 +547,6 @@ namespace Windows.UI.Xaml.Shapes
                                                                             out yOffsetToApplyAfterMultiplication, 
                                                                             out shape._marginOffsets);
 
-            if (strech == Stretch.None)
-            {
-                Thickness margin = shape.Margin;
-                Margin_MethodToUpdateDom(shape, new Thickness(margin.Left + shape._marginOffsets.X,
-                                                              margin.Top + shape._marginOffsets.Y,
-                                                              margin.Right, 
-                                                              margin.Bottom));
-            }
             sizeX = Math.Max(1, maxX - minX) * horizontalMultiplicator;
             sizeY = Math.Max(1, maxY - minY) * verticalMultiplicator;
         }

@@ -15,7 +15,6 @@ using System;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Collections.Generic;
-using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -127,10 +126,7 @@ namespace Windows.UI.Xaml.Controls
                 ctrl.UpdateDataContext();
             }
 
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(ctrl))
-            {
-                ctrl.InvalidateMeasureInternal();
-            }
+            ctrl.InvalidateMeasure();
         }
 
         /// <summary>
@@ -165,10 +161,7 @@ namespace Windows.UI.Xaml.Controls
             // if ContentTemplate is really changing, remove the old template
             ctrl.Template = null;
 
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(ctrl))
-            {
-                ctrl.InvalidateMeasureInternal();
-            }
+            ctrl.InvalidateMeasure();
         }
 
         /// <summary>
@@ -196,10 +189,7 @@ namespace Windows.UI.Xaml.Controls
             ContentPresenter cp = (ContentPresenter)d;
             UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(cp))
-            {
-                cp.InvalidateMeasureInternal();
-            }
+            cp.InvalidateMeasure();
         }
 
         // Internal Helper so the FrameworkElement could see this property

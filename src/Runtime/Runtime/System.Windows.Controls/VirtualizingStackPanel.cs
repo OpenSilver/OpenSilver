@@ -71,10 +71,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Orientation), 
                 typeof(Orientation), 
                 typeof(VirtualizingStackPanel), 
-                new PropertyMetadata(Orientation.Vertical, OrientationChanged)
-                {
-                    MethodToUpdateDom2 = StackPanelHelper.OnOrientationChanged,
-                });
+                new PropertyMetadata(Orientation.Vertical, OrientationChanged));
 
         /// <summary>
         /// Gets or sets a value that describes the horizontal or vertical orientation of
@@ -251,6 +248,7 @@ namespace Windows.UI.Xaml.Controls
 
             // Ensure we always touch ItemContainerGenerator as by accessing this property
             // we hook up to some events on it.
+            EnsureGenerator();
             IItemContainerGenerator generator = ItemContainerGenerator;
             if (owner.Items.Count > 0)
             {
@@ -917,15 +915,5 @@ namespace Windows.UI.Xaml.Controls
                 ScrollOwner.InvalidateScrollInfo();
         }
         #endregion "IScrollInfo"
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            return StackPanelHelper.CreateDomElement(this, Orientation, parentRef, out domElementWhereToPlaceChildren);
-        }
-
-        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
-        {
-            return StackPanelHelper.CreateDomChildWrapper(this, Orientation, parentRef, out domElementWhereToPlaceChild, index);
-        }
     }
 }

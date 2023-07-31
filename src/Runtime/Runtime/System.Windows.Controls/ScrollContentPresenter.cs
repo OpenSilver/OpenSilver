@@ -188,13 +188,9 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScrollContentPresenter"/>
-        /// class.
+        /// Initializes a new instance of the <see cref="ScrollContentPresenter"/> class.
         /// </summary>
-        public ScrollContentPresenter()
-        {
-            this.ClipToBounds = true;
-        }
+        public ScrollContentPresenter() { }
 
         bool ClampOffsets()
         {
@@ -289,6 +285,11 @@ namespace Windows.UI.Xaml.Controls
             _contentRoot.Arrange(new Rect(start, desired.Max(arrangeSize)));
             UpdateExtents(arrangeSize, extents);
             return arrangeSize;
+        }
+
+        internal override Rect? GetLayoutClip(Size layoutSlotSize)
+        {
+            return base.GetLayoutClip(layoutSlotSize) ?? new Rect(RenderSize);
         }
 
         void UpdateExtents(Size viewport, Size extents)

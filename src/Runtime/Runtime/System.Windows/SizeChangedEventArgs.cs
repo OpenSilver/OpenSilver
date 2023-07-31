@@ -30,28 +30,25 @@ namespace Windows.UI.Xaml
     /// </summary>
     public sealed partial class SizeChangedEventArgs : RoutedEventArgs
     {
-        Size _newSize;
-
         public SizeChangedEventArgs(Size newSize)
         {
-            _newSize = newSize;
+            NewSize = newSize;
+        }
+
+        internal SizeChangedEventArgs(Size previousSize, Size newSize)
+        {
+            PreviousSize = previousSize;
+            NewSize = newSize;
         }
 
         /// <summary>
         /// Gets the new size of the object reporting the size change.
         /// </summary>
-        public Size NewSize
-        {
-            get
-            {
-                return _newSize;
-            }
-        }
+        public Size NewSize { get; }
 
         /// <summary>
         /// Gets the previous size of the object reporting the size change.
         /// </summary>
-        [OpenSilver.NotImplemented]
-        public Size PreviousSize { get; private set; }
+        public Size PreviousSize { get; }
     }
 }

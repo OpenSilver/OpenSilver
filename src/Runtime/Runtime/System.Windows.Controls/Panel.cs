@@ -203,7 +203,7 @@ namespace Windows.UI.Xaml.Controls
 
         #region Children Management
 
-        internal virtual void OnChildrenReset()
+        internal void OnChildrenReset()
         {
             if (this.INTERNAL_VisualChildrenInformation != null)
             {
@@ -233,17 +233,17 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal virtual void OnChildrenAdded(UIElement newChild, int index)
+        internal void OnChildrenAdded(UIElement newChild, int index)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
         }
 
-        internal virtual void OnChildrenRemoved(UIElement oldChild, int index)
+        internal void OnChildrenRemoved(UIElement oldChild, int index)
         {
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
         }
 
-        internal virtual void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
+        internal void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
         {
             if (oldChild == newChild)
             {
@@ -477,7 +477,6 @@ namespace Windows.UI.Xaml.Controls
 
                 if (affectsLayout)
                 {
-                    // todo
                     InvalidateMeasure();
                 }
             }
@@ -647,7 +646,14 @@ namespace Windows.UI.Xaml.Controls
                     {
                         return; // in some cases Children collection can be changed during attach process
                     }
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this, i);
+
+                    UIElement child = newChildren[i];
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this, i);
+
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                    child.InvalidateMeasure();
+                    child.InvalidateArrange();
                 }
 
                 int remaining = newChildren.Count - to;

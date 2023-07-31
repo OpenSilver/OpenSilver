@@ -510,7 +510,6 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
                 uniqueIdentifier,
                 Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
                 Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
-                Margin,
                 availableSize.Width,
                 "M");
             return TextSize;

@@ -224,6 +224,22 @@ namespace OpenSilver.Internal
         }
 
         /// <summary>
+        /// Compares two rectangles for fuzzy equality.  This function
+        /// helps compensate for the fact that double values can 
+        /// acquire error when operated upon
+        /// </summary>
+        /// <param name='rect1'>The first rectangle to compare</param>
+        /// <param name='rect2'>The second rectangle to compare</param>
+        /// <returns>Whether or not the two rectangles are equal</returns>
+        internal static bool AreClose(Rect? rect1, Rect? rect2)
+        {
+            if (!rect1.HasValue) return !rect2.HasValue;
+            if (!rect2.HasValue) return !rect1.HasValue;
+
+            return AreClose(rect1.Value, rect2.Value);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="val"></param>

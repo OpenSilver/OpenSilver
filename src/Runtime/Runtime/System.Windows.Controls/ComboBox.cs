@@ -194,12 +194,6 @@ namespace Windows.UI.Xaml.Controls
             //this will enable virtualization in combo box without templating the whole style
             if (_popup != null)
             {
-                //reason for following if condition is backward compatibility, till now we had to define template and manually set custom layout of popup to true
-                //and thus we don't need to set custom layout for combo box to make this work.
-                if (UseCustomLayout)
-                {
-                    _popup.CustomLayout = true;
-                }
                 _popup.MaxHeight = MaxDropDownHeight;
 
                 //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
@@ -230,7 +224,6 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
-                _contentPresenter.ClipToBounds = true;
             }
 
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;

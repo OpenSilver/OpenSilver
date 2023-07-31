@@ -356,8 +356,7 @@ namespace CSHTML5.Native.Html.Controls
             // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
             //------------------
 
-            object div1;
-            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("canvas", parentRef, this, out div1);
+            object div1 = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("canvas", parentRef, this);
             domElementWhereToPlaceChildren = div1;
 
             // Use the div2 as the js canvas object

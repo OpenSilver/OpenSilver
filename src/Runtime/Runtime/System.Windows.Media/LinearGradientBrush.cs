@@ -235,7 +235,7 @@ namespace Windows.UI.Xaml.Media
             if (!(parent == null) && parent is FrameworkElement)
             {
                 FrameworkElement parentAsFrameworkElement = (FrameworkElement)parent;
-                Size actualSize = parentAsFrameworkElement.INTERNAL_GetActualWidthAndHeight();
+                Size actualSize = parentAsFrameworkElement.RenderSize;
                 width = actualSize.Width;
                 height = actualSize.Height;
             }

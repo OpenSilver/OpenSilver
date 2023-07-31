@@ -33,7 +33,7 @@ namespace CSHTML5.Native.Html.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            object outerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            object outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
             _jsDiv = domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", outerDiv, this);
             return outerDiv;
         }

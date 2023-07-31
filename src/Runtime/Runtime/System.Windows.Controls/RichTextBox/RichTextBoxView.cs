@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
 
             domElementWhereToPlaceChildren = null;
 
-            object div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
             object quillContainer = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", div, this);
 
             string script = "let options = {"
@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
-        protected override Size MeasureOverride(Size availableSize) => INTERNAL_GetActualWidthAndHeight();
+        protected override Size MeasureOverride(Size availableSize) => GetBoundingClientSize();
 
         internal sealed override void AddEventListeners()
         {

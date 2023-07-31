@@ -550,7 +550,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (!double.IsNaN(offset) && !double.IsInfinity(offset))
             {
-                _dragValue += (IsDirectionReversed || FlowDirection == FlowDirection.RightToLeft) ? -offset : offset;
+                _dragValue += IsDirectionReversed ? -offset : offset;
 
                 double newValue = Math.Min(Maximum, Math.Max(Minimum, _dragValue));
 
