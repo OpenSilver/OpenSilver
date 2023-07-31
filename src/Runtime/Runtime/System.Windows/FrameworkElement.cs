@@ -1027,7 +1027,42 @@ namespace Windows.UI.Xaml
 
         #region FlowDirection
 
-        internal virtual FlowDirection FlowDirectionCore => FlowDirection.LeftToRight;
+        /// <summary>
+        /// Identifies the <see cref="FlowDirection"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FlowDirectionProperty =
+            DependencyProperty.Register(
+                nameof(FlowDirection),
+                typeof(FlowDirection),
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(
+                    FlowDirection.LeftToRight,
+                    FrameworkPropertyMetadataOptions.Inherits,
+                    null,
+                    CoerceFlowDirection)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        const string DIR = "dir";
+                        const string RTL = "rtl";
+                        const string LTR = "ltr";
+
+                        var fe = (FrameworkElement)d;
+                        var direction = (FlowDirection)newValue;
+
+                        if (VisualTreeHelper.GetParent(fe) is FrameworkElement parent
+                            && parent.FlowDirection == direction)
+                        {
+                            INTERNAL_HtmlDomManager.RemoveAttribute(fe.INTERNAL_OuterDomElement, DIR);
+                            return;
+                        }
+
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(
+                            fe.INTERNAL_OuterDomElement,
+                            DIR,
+                            direction == FlowDirection.LeftToRight ? LTR : RTL);
+                    },
+                });
 
         /// <summary>
         /// Gets or sets the direction that text and other user interface 
@@ -1040,71 +1075,16 @@ namespace Windows.UI.Xaml
         /// </returns>
         public FlowDirection FlowDirection
         {
-            get => (FlowDirection)this.GetValue(FrameworkElement.FlowDirectionProperty);
-            set => this.SetValue(FrameworkElement.FlowDirectionProperty, (Enum)value);
-        }
-
-        public static readonly DependencyProperty FlowDirectionProperty =
-            DependencyProperty.Register(
-                nameof(FlowDirection),
-                typeof(FlowDirection),
-                typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(FlowDirection.LeftToRight, FrameworkPropertyMetadataOptions.Inherits, FlowDirection_Changed, CoerceFlowDirection)
-                {
-                    MethodToUpdateDom = FlowDirection_MethodToUpdateDom
-                });
-
-        private static void FlowDirection_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-            fe.FlowDirectionChanged?.Invoke(fe, e);
-            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
+            get => (FlowDirection)GetValue(FlowDirectionProperty);
+            set => SetValue(FlowDirectionProperty, value);
         }
 
         private static object CoerceFlowDirection(DependencyObject d, object baseValue)
         {
-            if (!(baseValue is FlowDirection))
-                return FlowDirection.LeftToRight;
-
-            return baseValue;
+            FlowDirection direction = (FlowDirection)baseValue;
+            return (direction != FlowDirection.RightToLeft) ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
         }
-
-        public event DependencyPropertyChangedEventHandler FlowDirectionChanged;
-
-        private static void FlowDirection_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var element = (FrameworkElement)d;
-            element.ManageFlowDirection((FlowDirection)newValue);
-        }
-
-        protected internal virtual void ManageFlowDirection(FlowDirection flowDirection)
-        {
-            const string directionAttribute = "dir";
-            const string rightToLeft = "rtl";
-            const string leftToRight = "ltr";
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                if (flowDirection == FlowDirection.LeftToRight)
-                {
-                    var parent = (this.Parent ?? VisualTreeHelper.GetParent(this)) as FrameworkElement;
-
-                    if (parent?.FlowDirection == FlowDirection.RightToLeft)
-                    {
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, directionAttribute, leftToRight);
-                    }
-                    else
-                    {
-                        INTERNAL_HtmlDomManager.RemoveDomElementAttribute(INTERNAL_OuterDomElement, directionAttribute, forceSimulatorExecuteImmediately: true);                        
-                    }
-                }
-                else
-                {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, directionAttribute, rightToLeft);
-                }
-            }
-        }
-
+        
         #endregion
 
         #region Work in progress
