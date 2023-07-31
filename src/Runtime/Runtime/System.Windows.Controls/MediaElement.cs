@@ -436,9 +436,7 @@ namespace Windows.UI.Xaml.Controls
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             domElementWhereToPlaceChildren = null;
-            object outerDiv;
-            dynamic outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
-            return outerDiv;
+            return INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
         }
 
         static string GetExtension(string uriString)

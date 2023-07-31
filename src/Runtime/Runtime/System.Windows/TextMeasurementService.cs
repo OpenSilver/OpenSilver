@@ -12,18 +12,14 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
-using OpenSilver.Internal;
 using CSHTML5;
 using CSHTML5.Internal;
-using System.Diagnostics;
+using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Text;
+#if !MIGRATION
 using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION
@@ -37,7 +33,6 @@ namespace Windows.UI.Xaml
         Size MeasureText(string uid,
                          string whiteSpace,
                          string overflowWrap,
-                         Thickness padding,
                          double maxWidth,
                          string emptyVal);
     }
@@ -47,104 +42,50 @@ namespace Windows.UI.Xaml
     /// </summary>
     internal sealed class TextMeasurementService : ITextMeasurementService
     {
-        private INTERNAL_HtmlDomStyleReference textBlockDivStyle;
-        private object textBlockReference;
-        private TextBlock associatedTextBlock;
+        private readonly string _measurerId;
 
-        private string measureTextBlockElementID;
-
-        private string savedWhiteSpace;
-        private Thickness savedTextBlockPadding;
-
-        public TextMeasurementService(UIElement parent)
+        public TextMeasurementService(Window parent)
         {
             Debug.Assert(parent is not null);
 
-            measureTextBlockElementID = "";
-            savedWhiteSpace = "pre";
-            savedTextBlockPadding = new Thickness(double.NegativeInfinity);
-
-            CreateMeasurementText(parent);
-        }
-
-        private void CreateMeasurementText(UIElement parent)
-        {
-            associatedTextBlock = new TextBlock
+            string id = CreateMeasurementText(parent);
+            if (string.IsNullOrEmpty(id))
             {
-                // Prevent the TextBlock from using an implicit style that could mess up the layout
-                Style = null
-            };
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBlock, parent);
-
-            bool hasMarginDiv = false;
-            if (associatedTextBlock.INTERNAL_AdditionalOutsideDivForMargins != null)
-            {
-                hasMarginDiv = true;
-
-                var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(associatedTextBlock.INTERNAL_AdditionalOutsideDivForMargins);
-                wrapperDivStyle.position = "absolute";
-                wrapperDivStyle.visibility = "hidden";
-                wrapperDivStyle.left = "-100000px";
-                wrapperDivStyle.top = "-100000px";
+                throw new InvalidOperationException();
             }
 
-            textBlockReference = associatedTextBlock.INTERNAL_OuterDomElement;
-            textBlockDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBlockReference);
-            textBlockDivStyle.position = "absolute";
-            textBlockDivStyle.visibility = "hidden";
-            textBlockDivStyle.height = "";
-            textBlockDivStyle.width = "";
-            textBlockDivStyle.borderWidth = "1";
-            textBlockDivStyle.whiteSpace = "pre";
-            textBlockDivStyle.left = hasMarginDiv ? "0px" : "-100000px";
-            textBlockDivStyle.top = hasMarginDiv ? "0px" : "-100000px";
+            _measurerId = id;
+        }
 
-            associatedTextBlock.Text = "A";
+        private string CreateMeasurementText(Window parent)
+        {
+            Debug.Assert(parent.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference);
 
-            measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
+            string sParent = INTERNAL_InteropImplementation.GetVariableStringForJS(parent.INTERNAL_OuterDomElement);
+            return OpenSilver.Interop.ExecuteJavaScriptString($"document.createMeasurementService({sParent});");
         }
 
         public Size MeasureText(string uid,
                                 string whiteSpace,
                                 string overflowWrap,
-                                Thickness padding,
                                 double maxWidth,
                                 string emptyVal)
         {
-            if (textBlockReference == null)
+            string strMaxWidth = (double.IsNaN(maxWidth) || double.IsInfinity(maxWidth))
+                ? string.Empty : $"{maxWidth.ToInvariantString()}px";
+
+            string strTextSize = OpenSilver.Interop.ExecuteJavaScriptString(
+                $"document.measureTextBlock('{_measurerId}','{uid}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
+
+            int index = strTextSize?.IndexOf('|') ?? -1;
+            if (index > -1)
             {
-                return new Size();
+                return new Size(
+                    double.Parse(strTextSize.Substring(0, index), CultureInfo.InvariantCulture),
+                    double.Parse(strTextSize.Substring(index + 1), CultureInfo.InvariantCulture));
             }
 
-            string strPadding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
-            string strMaxWidth = double.IsNaN(maxWidth) || double.IsInfinity(maxWidth) ? string.Empty : $"{maxWidth.ToInvariantString()}px";
-
-            if (savedWhiteSpace == whiteSpace)
-                whiteSpace = string.Empty;
-            else
-                savedWhiteSpace = whiteSpace;
-
-            if (savedTextBlockPadding == padding)
-                strPadding = "";
-            else
-                savedTextBlockPadding = padding;
-
-            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{measureTextBlockElementID}"",""{uid}"",""{whiteSpace}"",""{overflowWrap}"",""{strPadding}"",""{strMaxWidth}"",""{emptyVal}"")";
-            string strTextSize = OpenSilver.Interop.ExecuteJavaScriptString(javaScriptCodeToExecute);
-            Size measuredSize;
-            int sepIndex = strTextSize != null ? strTextSize.IndexOf('|') : -1;
-            if (sepIndex > -1)
-            {
-                double actualWidth = double.Parse(strTextSize.Substring(0, sepIndex), CultureInfo.InvariantCulture);
-                double actualHeight = double.Parse(strTextSize.Substring(sepIndex + 1), CultureInfo.InvariantCulture);
-                measuredSize = new Size(actualWidth + 1, actualHeight);
-            }
-            else
-            {
-                measuredSize = new Size(0, 0);
-            }
-
-            return measuredSize;
+            return new Size(0, 0);
         }
     }
 }

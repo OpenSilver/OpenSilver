@@ -604,21 +604,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 // Create the popup root:
                 _popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(this, parentWindow);
-                if (UseCustomLayout)
-                {
-                    _popupRoot.CustomLayout = true;
-                }
 
                 UpdatePopupParent();
 
                 // Create a surrounding border to enable positioning and alignment:
                 _outerBorder = CreateContainer();
-
-                // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
-                _outerBorder.Loaded += (s, e) =>
-                {
-                    _popupRoot?.SetLayoutSize();
-                };
 
                 _popupRoot.Content = _outerBorder;
 
@@ -641,14 +631,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 // Force layout update to prevent the popup content from briefly appearing in
                 // the top left corner of the screen.
-                if (UseCustomLayout)
-                {
-                    UpdateLayout();
-                }
-                else
-                {
-                    INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
-                }
+                UpdateLayout();
             }
         }
 
@@ -799,12 +782,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         protected override Size ArrangeOverride(Size finalSize)
         {
             _controlToWatch?.InvokeCallback();
-
-            if (_popupRoot != null)
-            {
-                _popupRoot.InvalidateMeasure();
-                _popupRoot.InvalidateArrange();
-            }
             return finalSize;
         }
 
@@ -823,24 +800,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
     internal sealed class NonLogicalContainer : ContentPresenter
     {
+        private FrameworkElement _templateChild;
+
         public NonLogicalContainer()
         {
             ContentTemplate = UIElementContentTemplate;
-        }
-
-#if MIGRATION
-        public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
-        {
-            base.OnApplyTemplate();
-
-            if (VisualTreeHelper.GetChildrenCount(this) > 0
-                && VisualTreeHelper.GetChild(this, 0) is UIElement child)
-            {
-                child.UpdateIsVisible();
-            }
         }
 
         internal override FrameworkElement TemplateChild
@@ -849,23 +813,54 @@ namespace Windows.UI.Xaml.Controls.Primitives
             set
             {
                 if (_templateChild == value) return;
-                    
-                if (_templateChild != null)
-                {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_templateChild, this);
-                    SynchronizeForceInheritProperties(_templateChild, this);
-                }
+
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_templateChild, this);
+                RemoveVisualChild(_templateChild);
 
                 _templateChild = value;
 
-                if (_templateChild != null)
-                {
-                    SynchronizeForceInheritProperties(_templateChild, this);
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
-                }
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
+                AddVisualChild(_templateChild);
             }
         }
 
-        private FrameworkElement _templateChild;
+        private new void AddVisualChild(UIElement child)
+        {
+            if (child == null)
+            {
+                return;
+            }
+
+            if (VisualTreeHelper.GetParent(child) != null)
+            {
+                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+            }
+
+            HasVisualChildren = true;
+
+            //
+            // Resume layout.
+            //
+            PropagateResumeLayout(this, child);
+
+            SynchronizeForceInheritProperties(child, this);
+        }
+
+        private new void RemoveVisualChild(UIElement child)
+        {
+            if (child == null || VisualTreeHelper.GetParent(child) == null)
+            {
+                return;
+            }
+
+            if (VisualChildrenCount == 0)
+            {
+                HasVisualChildren = false;
+            }
+
+            PropagateSuspendLayout(child);
+
+            SynchronizeForceInheritProperties(child, this);
+        }
     }
 }

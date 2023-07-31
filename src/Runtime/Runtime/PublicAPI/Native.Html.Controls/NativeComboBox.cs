@@ -478,7 +478,7 @@ namespace CSHTML5.Native.Html.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var select = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("select", parentRef, this);
+            var select = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("select", parentRef, this);
             domElementWhereToPlaceChildren = select;
             this._nativeComboBoxDomElement = select;
 

@@ -13,7 +13,6 @@
 
 using System;
 using System.Windows.Input;
-using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -40,14 +39,11 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = ElementScrollContentPresenterName, Type = typeof(ScrollContentPresenter))]
     [TemplatePart(Name = ElementHorizontalScrollBarName, Type = typeof(ScrollBar))]
     [TemplatePart(Name = ElementVerticalScrollBarName, Type = typeof(ScrollBar))]
-    public sealed partial class ScrollViewer : ContentControl
+    public sealed class ScrollViewer : ContentControl
     {
         private const string ElementScrollContentPresenterName = "ScrollContentPresenter";
         private const string ElementHorizontalScrollBarName = "HorizontalScrollBar";
         private const string ElementVerticalScrollBarName = "VerticalScrollBar";
-
-        double _verticalOffset = 0;
-        double _horizontalOffset = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollViewer"/> class.
@@ -55,58 +51,6 @@ namespace Windows.UI.Xaml.Controls
         public ScrollViewer()
         {
             DefaultStyleKey = typeof(ScrollViewer);
-
-            IsVisibleChanged += ScrollViewer_IsVisibleChanged;
-        }
-
-        private void ScrollViewer_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            bool newValue = (bool)e.NewValue;
-            if (newValue)
-            {
-                UpdateDomHorizontalOffset(this.INTERNAL_OuterDomElement);
-                UpdateDomVerticalOffset(this.INTERNAL_OuterDomElement);
-            }
-        }
-
-        internal override FrameworkTemplate TemplateCache
-        {
-            get
-            {
-                if (IsCustomLayoutRoot || IsUnderCustomLayout)
-                {
-                    return base.TemplateCache;
-                }
-
-                return null;
-            }
-            set
-            {
-                base.TemplateCache = value;
-            }
-        }
-
-        internal override FrameworkTemplate TemplateInternal
-        {
-            get
-            {
-                if (IsCustomLayoutRoot || IsUnderCustomLayout)
-                {
-                    return base.TemplateInternal;
-                }
-
-                return null;
-            }
-        }
-
-        // Note: we need to force this to true because template are disabled
-        // for ScrollViewers.
-        internal override bool EnablePointerEventsCore
-        {
-            get
-            {
-                return true;
-            }
         }
 
         /// <summary> 
@@ -124,53 +68,45 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         internal ScrollBar ElementVerticalScrollBar { get; private set; }
 
-        internal IScrollInfo ScrollInfo
-        {
-            get; set;
-        }
+        internal IScrollInfo ScrollInfo { get; set; }
 
         /// <summary>
         /// Gets a value that contains the horizontal offset of the scrolled content.
         /// </summary>
-        /// <returns>The horizontal offset of the scrolled content. The default value is 0.0.</returns>
+        /// <returns>
+        /// The horizontal offset of the scrolled content. The default value is 0.0.
+        /// </returns>
         public double HorizontalOffset
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(HorizontalOffsetProperty);
-                }
-
-                // Note: we did not create a DependencyProperty because we do not want to slow down the scroll by calling SetValue during the scroll.
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    _horizontalOffset = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.scrollLeft");
-                }
-                return _horizontalOffset;
-            }
-            private set { SetValue(HorizontalOffsetProperty, value); }
+            get => (double)GetValue(HorizontalOffsetProperty);
+            private set => SetValue(HorizontalOffsetPropertyKey, value);
         }
+
+        private static readonly DependencyPropertyKey HorizontalOffsetPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(HorizontalOffset),
+                typeof(double),
+                typeof(ScrollViewer),
+                new PropertyMetadata(0.0));
 
         /// <summary>
         /// Identifies the <see cref="HorizontalOffset"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register(
-                nameof(HorizontalOffset),
-                typeof(double),
-                typeof(ScrollViewer),
-                new PropertyMetadata(0.0, OnScrollInfoDependencyPropertyChanged));
+        public static readonly DependencyProperty HorizontalOffsetProperty = HorizontalOffsetPropertyKey.DependencyProperty;
 
         /// <summary>
-        /// Gets or sets a value that indicates whether a horizontal <see cref="ScrollBar"/> should be displayed.
+        /// Gets or sets a value that indicates whether a horizontal <see cref="ScrollBar"/> 
+        /// should be displayed.
         /// </summary>
-        /// <returns>A <see cref="ScrollBarVisibility"/> value that indicates whether a horizontal <see cref="ScrollBar"/> should be displayed. The default value is <see cref="ScrollBarVisibility.Hidden"/>.</returns>
+        /// <returns>
+        /// A <see cref="ScrollBarVisibility"/> value that indicates whether a
+        /// horizontal <see cref="ScrollBar"/> should be displayed. The default 
+        /// value is <see cref="ScrollBarVisibility.Hidden"/>.
+        /// </returns>
         public ScrollBarVisibility HorizontalScrollBarVisibility
         {
-            get { return (ScrollBarVisibility)GetValue(HorizontalScrollBarVisibilityProperty); }
-            set { SetValue(HorizontalScrollBarVisibilityProperty, value); } //todo: use this to set the appearance of the horizontalScrollBar for the content (probably using overflow from Html).
+            get => (ScrollBarVisibility)GetValue(HorizontalScrollBarVisibilityProperty);
+            set => SetValue(HorizontalScrollBarVisibilityProperty, value);
         }
 
         /// <summary>
@@ -181,17 +117,14 @@ namespace Windows.UI.Xaml.Controls
                 nameof(HorizontalScrollBarVisibility),
                 typeof(ScrollBarVisibility),
                 typeof(ScrollViewer),
-                new PropertyMetadata(ScrollBarVisibility.Disabled, OnScrollBarVisibilityChanged)
-                {
-                    MethodToUpdateDom2 = UpdateDomOnHSBVisibilityChanged,
-                });
+                new PropertyMetadata(ScrollBarVisibility.Disabled, OnScrollBarVisibilityChanged));
 
         private static void OnScrollBarVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is ScrollViewer scrollViewer)
             {
                 scrollViewer.InvalidateMeasure();
-                if (scrollViewer.ScrollInfo != null)
+                if (scrollViewer.ScrollInfo is not null)
                 {
                     scrollViewer.ScrollInfo.CanHorizontallyScroll = scrollViewer.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled;
                     scrollViewer.ScrollInfo.CanVerticallyScroll = scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
@@ -200,64 +133,43 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private static void UpdateDomOnHSBVisibilityChanged(DependencyObject d, object oldValue, object newValue)
-        {
-            if (d is ScrollViewer sv && !sv.IsUnderCustomLayout)
-            {
-                sv.ApplyHorizontalSettings(
-                    (ScrollBarVisibility)newValue,
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_OuterDomElement),
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_InnerDomElement));
-            }
-        }
-
-        private static void OnScrollInfoDependencyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-        }
-
         /// <summary>
         /// Gets a value that contains the vertical offset of the scrolled content.
         /// </summary>
-        /// <returns>The vertical offset of the scrolled content. The default value is 0.0.</returns>
+        /// <returns>
+        /// The vertical offset of the scrolled content. The default value is 0.0.
+        /// </returns>
         public double VerticalOffset
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(VerticalOffsetProperty);
-                }
-
-                // Note: we did not create a DependencyProperty because we do not want to slow down the scroll by calling SetValue during the scroll.
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    _verticalOffset = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.scrollTop");
-                }
-
-                return _verticalOffset;
-            }
-            private set { SetValue(VerticalOffsetProperty, value); }
+            get => (double)GetValue(VerticalOffsetProperty);
+            private set => SetValue(VerticalOffsetPropertyKey, value);
         }
+
+        private static readonly DependencyPropertyKey VerticalOffsetPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(VerticalOffset),
+                typeof(double),
+                typeof(ScrollViewer),
+                new PropertyMetadata(0.0));
 
         /// <summary>
         /// Identifies the <see cref="VerticalOffset"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register(
-                nameof(VerticalOffset),
-                typeof(double),
-                typeof(ScrollViewer),
-                new PropertyMetadata(0.0, OnScrollInfoDependencyPropertyChanged));
+        public static readonly DependencyProperty VerticalOffsetProperty = VerticalOffsetPropertyKey.DependencyProperty;
 
         /// <summary>
-        /// Gets or sets a value that indicates whether a vertical <see cref="ScrollBar"/> should be displayed.
+        /// Gets or sets a value that indicates whether a vertical <see cref="ScrollBar"/> 
+        /// should be displayed.
         /// </summary>
-        /// <returns>A <see cref="ScrollBarVisibility"/> value that indicates whether a vertical <see cref="ScrollBar"/> should be displayed. The default value is <see cref="ScrollBarVisibility.Visible"/>.</returns>
+        /// <returns>
+        /// A <see cref="ScrollBarVisibility"/> value that indicates whether a 
+        /// vertical <see cref="ScrollBar"/> should be displayed. The default 
+        /// value is <see cref="ScrollBarVisibility.Visible"/>.
+        /// </returns>
         public ScrollBarVisibility VerticalScrollBarVisibility
         {
-            get { return (ScrollBarVisibility)GetValue(VerticalScrollBarVisibilityProperty); }
-            set { SetValue(VerticalScrollBarVisibilityProperty, value); } //todo: use this to set the appearance of the horizontalScrollBar for the content (probably using overflow from Html).
+            get => (ScrollBarVisibility)GetValue(VerticalScrollBarVisibilityProperty);
+            set => SetValue(VerticalScrollBarVisibilityProperty, value);
         }
 
         /// <summary>
@@ -268,214 +180,39 @@ namespace Windows.UI.Xaml.Controls
                 nameof(VerticalScrollBarVisibility),
                 typeof(ScrollBarVisibility),
                 typeof(ScrollViewer),
-                new PropertyMetadata(ScrollBarVisibility.Visible, OnScrollBarVisibilityChanged)
-                {
-                    MethodToUpdateDom2 = UpdateDomOnVSBVisibilityChanged
-                });
-
-        private static void UpdateDomOnVSBVisibilityChanged(DependencyObject d, object oldValue, object newValue)
-        {
-            if (d is ScrollViewer sv && !sv.IsUnderCustomLayout)
-            {
-                sv.ApplyVerticalSettings(
-                    (ScrollBarVisibility)newValue,
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_OuterDomElement),
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_InnerDomElement));
-            }
-        }
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object outerDiv);
-            outerDivStyle.height = "100%";
-            outerDivStyle.width = "100%";
-
-            if (!IsCustomLayoutRoot && !IsUnderCustomLayout)
-            {
-                outerDivStyle.overflowX = "scroll";
-                outerDivStyle.overflowY = "scroll";
-            }
-
-            //Update the scrollviewer position when we insert again the scrollviewer in the visual tree
-            if (_verticalOffset != 0)
-            {
-                UpdateDomVerticalOffset(outerDiv);
-            }
-            if (_horizontalOffset != 0)
-            {
-                UpdateDomHorizontalOffset(outerDiv);
-            }
-
-            var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
-            innerDivStyle.display = "grid";
-
-            ApplyHorizontalSettings(HorizontalScrollBarVisibility, outerDivStyle, innerDivStyle);
-            ApplyVerticalSettings(VerticalScrollBarVisibility, outerDivStyle, innerDivStyle);
-
-            domElementWhereToPlaceChildren = innerDiv;
-            return outerDiv;
-        }
-
-        private void ApplyHorizontalSettings(
-            ScrollBarVisibility horizontalScrollBarVisibility,
-            INTERNAL_HtmlDomStyleReference outerDivStyle,
-            INTERNAL_HtmlDomStyleReference innerDivStyle)
-        {
-            // if it's under customlayout, it works with Measure & Arrange.
-            if (IsCustomLayoutRoot || IsUnderCustomLayout)
-                return;
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                //-------------------------------------
-                // Handle the "Overflow X" CSS property:
-                //-------------------------------------
-
-                switch (horizontalScrollBarVisibility)
-                {
-                    case ScrollBarVisibility.Disabled:
-                        outerDivStyle.overflowX = "hidden";
-                        innerDivStyle.width = "100%";
-                        innerDivStyle.minWidth = string.Empty;
-                        break;
-
-                    case ScrollBarVisibility.Auto:
-                        outerDivStyle.overflowX = "auto";
-                        innerDivStyle.width = "fit-content";
-                        innerDivStyle.minWidth = "100%";
-                        break;
-
-                    case ScrollBarVisibility.Hidden:
-                        outerDivStyle.overflowX = "hidden";
-                        innerDivStyle.width = "100%";
-                        innerDivStyle.minWidth = string.Empty;
-                        break;
-
-                    case ScrollBarVisibility.Visible:
-                        outerDivStyle.overflowX = "scroll";
-                        innerDivStyle.width = "fit-content";
-                        innerDivStyle.minWidth = "100%";
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private void ApplyVerticalSettings(
-            ScrollBarVisibility verticalScrollBarVisibility,
-            INTERNAL_HtmlDomStyleReference outerDivStyle,
-            INTERNAL_HtmlDomStyleReference innerDivStyle)
-        {
-            // if it's under customlayout, it works with Measure & Arrange.
-            if (IsCustomLayoutRoot || IsUnderCustomLayout)
-                return;
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                //-------------------------------------
-                // Handle the "Overflow Y" CSS property:
-                //-------------------------------------
-
-                switch (verticalScrollBarVisibility)
-                {
-                    case ScrollBarVisibility.Disabled:
-                        outerDivStyle.overflowY = "hidden";
-                        innerDivStyle.height = "100%";
-                        innerDivStyle.minHeight = string.Empty;
-                        break;
-
-                    case ScrollBarVisibility.Auto:
-                        outerDivStyle.overflowY = "auto";
-                        innerDivStyle.height = "fit-content";
-                        innerDivStyle.minHeight = "100%";
-                        break;
-
-                    case ScrollBarVisibility.Hidden:
-                        outerDivStyle.overflowY = "hidden";
-                        innerDivStyle.height = "100%";
-                        innerDivStyle.minHeight = string.Empty;
-                        break;
-
-                    case ScrollBarVisibility.Visible:
-                        outerDivStyle.overflowY = "scroll";
-                        innerDivStyle.height = "fit-content";
-                        innerDivStyle.minHeight = "100%";
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
+                new PropertyMetadata(ScrollBarVisibility.Visible, OnScrollBarVisibilityChanged));
+        
+        /// <summary>
+        /// Scrolls the content that is within the <see cref="ScrollViewer"/> to the 
+        /// specified horizontal offset position.
+        /// </summary>
+        /// <param name="offset">
+        /// The position that the content scrolls to.
+        /// </param>
+        public void ScrollToHorizontalOffset(double offset) => SetScrollOffset(Orientation.Horizontal, offset);
 
         /// <summary>
-        /// Scrolls the content that is within the <see cref="ScrollViewer"/> to the specified horizontal offset position.
+        /// Scrolls the content that is within the <see cref="ScrollViewer"/> to the 
+        /// specified vertical offset position.
         /// </summary>
-        /// <param name="offset">The position that the content scrolls to.</param>
-        public void ScrollToHorizontalOffset(double offset)
-        {
-            //_horizontalOffset is there so we can remember changes of the value even if the ScrollViewer is not in the visual tree
-            _horizontalOffset = offset;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                UpdateDomHorizontalOffset(INTERNAL_OuterDomElement);
-            }
-
-            SetScrollOffset(Orientation.Horizontal, offset);
-        }
+        /// <param name="offset">
+        /// The position that the content scrolls to.
+        /// </param>
+        public void ScrollToVerticalOffset(double offset) => SetScrollOffset(Orientation.Vertical, offset);
 
         /// <summary>
-        /// If the ScrollViewer is Visible, sets the scrollLeft property to the value held in _horizontalOffset.
-        /// If the ScrollViewer is Collapsed, it will set _isHorizontalOffsetInvalid to true,
-        /// so that we know the current value of this.INTERNAL_OuterDomElement.scrollLeft is invalid and needs to be set when changing the visibility.
+        /// Gets the value of the <see cref="HorizontalScrollBarVisibility"/> dependency property 
+        /// from a specified element.
         /// </summary>
-        /// <param name="div">The dom element on which to set the scrollLeft (normally the ScrollViewer's OuterDomElement)</param>
-        internal void UpdateDomHorizontalOffset(object div)
-        {
-            if (div != null && Visibility == Visibility.Visible)
-            {
-                INTERNAL_HtmlDomManager.SetDomElementProperty(div, "scrollLeft", _horizontalOffset);
-            }
-        }
-
-        /// <summary>
-        /// Scrolls the content that is within the <see cref="ScrollViewer"/> to the specified vertical offset position.
-        /// </summary>
-        /// <param name="offset">The position that the content scrolls to.</param>
-        public void ScrollToVerticalOffset(double offset)
-        {
-            //_verticalOffset is there so we can remember changes of the value even if the ScrollViewer is not in the visual tree
-            _verticalOffset = offset;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                UpdateDomVerticalOffset(INTERNAL_OuterDomElement);
-            }
-
-            SetScrollOffset(Orientation.Vertical, offset);
-        }
-
-        /// <summary>
-        /// If the ScrollViewer is Visible, sets the scrollTop property to the value held in _verticalOffset.
-        /// If the ScrollViewer is Collapsed, it will set _isVerticalOffsetInvalid to true,
-        /// so that we know the current value of this.INTERNAL_OuterDomElement.scrollTop is invalid and needs to be set when changing the visibility.
-        /// </summary>
-        /// <param name="div">The dom element on which to set the scrollTop (normally the ScrollViewer's OuterDomElement)</param>
-        internal void UpdateDomVerticalOffset(object div)
-        {
-            if (div != null && Visibility == Visibility.Visible)
-            {
-                INTERNAL_HtmlDomManager.SetDomElementProperty(div, "scrollTop", _verticalOffset);
-            }
-        }
-
-        /// <summary>
-        /// Gets the value of the <see cref="HorizontalScrollBarVisibility"/> dependency property from a specified element.
-        /// </summary>
-        /// <returns>The value of the <see cref="HorizontalScrollBarVisibility"/> dependency property.</returns>
-        /// <param name="element">The element from which the property value is read.</param>
-        /// <exception cref="ArgumentNullException"> <paramref name="element"/> is null.</exception>
+        /// <returns>
+        /// The value of the <see cref="HorizontalScrollBarVisibility"/> dependency property.
+        /// </returns>
+        /// <param name="element">
+        /// The element from which the property value is read.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
         public static ScrollBarVisibility GetHorizontalScrollBarVisibility(DependencyObject element)
         {
             if (element is null)
@@ -487,11 +224,18 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Sets the value of the <see cref="HorizontalScrollBarVisibility"/> dependency property to a specified element.
+        /// Sets the value of the <see cref="HorizontalScrollBarVisibility"/> dependency property 
+        /// to a specified element.
         /// </summary>
-        /// <param name="element">The element on which to set the property value.</param>
-        /// <param name="horizontalScrollBarVisibility">The property value to set.</param>
-        /// <exception cref="ArgumentNullException"> <paramref name="element"/> is null.</exception>
+        /// <param name="element">
+        /// The element on which to set the property value.
+        /// </param>
+        /// <param name="horizontalScrollBarVisibility">
+        /// The property value to set.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
         public static void SetHorizontalScrollBarVisibility(DependencyObject element, ScrollBarVisibility horizontalScrollBarVisibility)
         {
             if (element is null)
@@ -503,11 +247,18 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Gets the value of the <see cref="VerticalScrollBarVisibility"/> dependency property from a specified element.
+        /// Gets the value of the <see cref="VerticalScrollBarVisibility"/> dependency property 
+        /// from a specified element.
         /// </summary>
-        /// <returns>The value of the <see cref="VerticalScrollBarVisibility"/> dependency property.</returns>
-        /// <param name="element">The element from which the property value is read.</param>
-        /// <exception cref="ArgumentNullException"> <paramref name="element"/> is null.</exception>
+        /// <returns>
+        /// The value of the <see cref="VerticalScrollBarVisibility"/> dependency property.
+        /// </returns>
+        /// <param name="element">
+        /// The element from which the property value is read.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
         public static ScrollBarVisibility GetVerticalScrollBarVisibility(DependencyObject element)
         {
             if (element is null)
@@ -519,11 +270,18 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Sets the value of the <see cref="VerticalScrollBarVisibility"/> dependency property to a specified element.
+        /// Sets the value of the <see cref="VerticalScrollBarVisibility"/> dependency property 
+        /// to a specified element.
         /// </summary>
-        /// <param name="element">The element on which to set the property value.</param>
-        /// <param name="verticalScrollBarVisibility">The property value to set.</param>
-        /// <exception cref="ArgumentNullException"> <paramref name="element"/> is null.</exception>
+        /// <param name="element">
+        /// The element on which to set the property value.
+        /// </param>
+        /// <param name="verticalScrollBarVisibility">
+        /// The property value to set.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="element"/> is null.
+        /// </exception>
         public static void SetVerticalScrollBarVisibility(DependencyObject element, ScrollBarVisibility verticalScrollBarVisibility)
         {
             if (element is null)
@@ -542,27 +300,25 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
-            if (!this.IsCustomLayoutRoot && !this.IsUnderCustomLayout)
-                return;
-
             ElementScrollContentPresenter = GetTemplateChild(ElementScrollContentPresenterName) as ScrollContentPresenter;
             ElementHorizontalScrollBar = GetTemplateChild(ElementHorizontalScrollBarName) as ScrollBar;
             ElementVerticalScrollBar = GetTemplateChild(ElementVerticalScrollBarName) as ScrollBar;
 
-            if (null != ElementHorizontalScrollBar)
+            if (ElementHorizontalScrollBar is not null)
             {
                 ElementHorizontalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Horizontal, e); };
             }
-            if (null != ElementVerticalScrollBar)
+            if (ElementVerticalScrollBar is not null)
             {
                 ElementVerticalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Vertical, e); };
             }
+
             UpdateScrollbarVisibility();
         }
 
-        void SetScrollOffset(Orientation orientation, double value)
+        private void SetScrollOffset(Orientation orientation, double value)
         {
-            if (ScrollInfo != null)
+            if (ScrollInfo is not null)
             {
                 double scrollable = (orientation == Orientation.Horizontal) ? ScrollableWidth : ScrollableHeight;
                 double clamped = Math.Max(value, 0);
@@ -585,7 +341,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">A ScrollEventArgs that contains the event data.</param> 
         private void HandleScroll(Orientation orientation, ScrollEventArgs e)
         {
-            if (ScrollInfo != null)
+            if (ScrollInfo is not null)
             {
                 bool horizontal = orientation == Orientation.Horizontal;
 
@@ -637,7 +393,7 @@ namespace Windows.UI.Xaml.Controls
         /// <remarks>Similar to WPF's corresponding ScrollViewer method.</remarks>
         internal void ScrollInDirection(Key key)
         {
-            if (ScrollInfo != null)
+            if (ScrollInfo is not null)
             {
                 switch (key)
                 {
@@ -656,16 +412,18 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-
-        /// <summary>
-        /// Identifies the <see cref="ScrollableHeight"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ScrollableHeightProperty =
-            DependencyProperty.Register(
+        
+        private static readonly DependencyPropertyKey ScrollableHeightPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(ScrollableHeight),
                 typeof(double),
                 typeof(ScrollViewer),
                 new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Identifies the <see cref="ScrollableHeight"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ScrollableHeightProperty = ScrollableHeightPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that represents the vertical size of the area that can be scrolled;
@@ -676,33 +434,21 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public double ScrollableHeight
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(ScrollableHeightProperty);
-                }
-
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.scrollHeight - {sDomElement}.clientHeight");
-                }
-
-                return 0.0;
-            }
-            private set { SetValue(ScrollableHeightProperty, value); }
+            get => (double)GetValue(ScrollableHeightProperty);
+            private set => SetValue(ScrollableHeightPropertyKey, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="ScrollableWidth"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ScrollableWidthProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey ScrollableWidthPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(ScrollableWidth),
                 typeof(double),
                 typeof(ScrollViewer),
                 new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Identifies the <see cref="ScrollableWidth"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ScrollableWidthProperty = ScrollableWidthPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that represents the horizontal size of the area that can be scrolled;
@@ -713,33 +459,21 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public double ScrollableWidth
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(ScrollableWidthProperty);
-                }
-
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.scrollWidth - {sDomElement}.clientWidth");
-                }
-
-                return 0.0;
-            }
-            private set { SetValue(ScrollableWidthProperty, value); }
+            get => (double)GetValue(ScrollableWidthProperty);
+            private set => SetValue(ScrollableWidthPropertyKey, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="ViewportHeight"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ViewportHeightProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey ViewportHeightPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(ViewportHeight),
                 typeof(double),
                 typeof(ScrollViewer),
                 new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Identifies the <see cref="ViewportHeight"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ViewportHeightProperty = ViewportHeightPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that contains the vertical size of the viewable content.
@@ -749,99 +483,97 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public double ViewportHeight
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(ViewportHeightProperty);
-                }
-
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.clientHeight");
-                }
-
-                return 0.0;
-            }
-            private set { SetValue(ViewportHeightProperty, value); }
+            get => (double)GetValue(ViewportHeightProperty);
+            private set => SetValue(ViewportHeightPropertyKey, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="ViewportWidth"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ViewportWidthProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey ViewportWidthPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(ViewportWidth),
                 typeof(double),
                 typeof(ScrollViewer),
                 new PropertyMetadata(0.0));
 
         /// <summary>
+        /// Identifies the <see cref="ViewportWidth"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ViewportWidthProperty = ViewportWidthPropertyKey.DependencyProperty;
+
+        /// <summary>
         /// Gets a value that contains the horizontal size of the viewable content.
         /// </summary>
-        /// <returns>The horizontal size of the viewable content. The default value is 0.0.</returns>
+        /// <returns>
+        /// The horizontal size of the viewable content. The default value is 0.0.
+        /// </returns>
         public double ViewportWidth
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(ViewportWidthProperty);
-                }
-
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.clientWidth");
-                }
-
-                return 0.0;
-            }
-            private set { SetValue(ViewportWidthProperty, value); }
+            get => (double)GetValue(ViewportWidthProperty);
+            private set => SetValue(ViewportWidthPropertyKey, value);
         }
+
+        private static readonly DependencyPropertyKey ComputedHorizontalScrollBarVisibilityPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ComputedHorizontalScrollBarVisibility),
+                typeof(Visibility),
+                typeof(ScrollViewer),
+                null);
 
         /// <summary>
         /// Identifies the <see cref="ComputedHorizontalScrollBarVisibility"/> dependency property.
         /// </summary>
-        /// <returns>The identifier for the <see cref="ComputedHorizontalScrollBarVisibility"/> dependency property.</returns>
-        public static readonly DependencyProperty ComputedHorizontalScrollBarVisibilityProperty = DependencyProperty.Register("ComputedHorizontalScrollBarVisibility", typeof(Visibility), typeof(ScrollViewer), null);
+        public static readonly DependencyProperty ComputedHorizontalScrollBarVisibilityProperty =
+            ComputedHorizontalScrollBarVisibilityPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that indicates whether the horizontal <see cref="ScrollBar"/> is visible.
         /// </summary>
-        /// <returns>A <see cref="Visibility"/> that indicates whether the horizontal scroll bar is visible. The default value is <see cref="Visibility.Visible"/>.</returns>
+        /// <returns>
+        /// A <see cref="Visibility"/> that indicates whether the horizontal scroll bar is visible.
+        /// The default value is <see cref="Visibility.Visible"/>.
+        /// </returns>
         public Visibility ComputedHorizontalScrollBarVisibility
         {
-            get { return (Visibility)this.GetValue(ComputedHorizontalScrollBarVisibilityProperty); }
-            private set { this.SetValue(ComputedHorizontalScrollBarVisibilityProperty, value); }
+            get => (Visibility)GetValue(ComputedHorizontalScrollBarVisibilityProperty);
+            private set => SetValue(ComputedHorizontalScrollBarVisibilityPropertyKey, value);
         }
+
+        private static readonly DependencyPropertyKey ComputedVerticalScrollBarVisibilityPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ComputedVerticalScrollBarVisibility),
+                typeof(Visibility),
+                typeof(ScrollViewer),
+                null);
 
         /// <summary>
         /// Identifies the <see cref="ComputedVerticalScrollBarVisibility"/> dependency property.
         /// </summary>
-        /// <returns>The identifier for the <see cref="ComputedVerticalScrollBarVisibility"/> dependency property.</returns>
-        public static readonly DependencyProperty ComputedVerticalScrollBarVisibilityProperty = DependencyProperty.Register("ComputedVerticalScrollBarVisibility", typeof(Visibility), typeof(ScrollViewer), null);
+        public static readonly DependencyProperty ComputedVerticalScrollBarVisibilityProperty =
+            ComputedVerticalScrollBarVisibilityPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that indicates whether the vertical <see cref="ScrollBar"/> is visible.
         /// </summary>
-        /// <returns>A <see cref="Visibility"/> that indicates whether the vertical scroll bar is visible. The default value is <see cref="Visibility.Visible"/>.</returns>
+        /// <returns>
+        /// A <see cref="Visibility"/> that indicates whether the vertical scroll bar is visible.
+        /// The default value is <see cref="Visibility.Visible"/>.
+        /// </returns>
         public Visibility ComputedVerticalScrollBarVisibility
         {
-            get { return (Visibility)this.GetValue(ComputedVerticalScrollBarVisibilityProperty); }
-            private set { this.SetValue(ComputedVerticalScrollBarVisibilityProperty, value); }
+            get => (Visibility)GetValue(ComputedVerticalScrollBarVisibilityProperty);
+            private set => SetValue(ComputedVerticalScrollBarVisibilityPropertyKey, value);
         }
 
-        /// <summary>
-        /// Identifier for the <see cref="ExtentHeight"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ExtentHeightProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey ExtentHeightPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(ExtentHeight),
                 typeof(double),
                 typeof(ScrollViewer),
                 new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Identifier for the <see cref="ExtentHeight"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ExtentHeightProperty = ExtentHeightPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets the vertical size of all the content for display in the <see cref="ScrollViewer"/>.
@@ -851,33 +583,21 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public double ExtentHeight
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(ExtentHeightProperty);
-                }
-
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.scrollHeight");
-                }
-
-                return 0.0;
-            }
-            private set { SetValue(ExtentHeightProperty, value); }
+            get => (double)GetValue(ExtentHeightProperty);
+            private set => SetValue(ExtentHeightPropertyKey, value);
         }
 
-        /// <summary>
-        /// Identifier for the <see cref="ExtentWidth"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ExtentWidthProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey ExtentWidthPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(ExtentWidth),
                 typeof(double),
                 typeof(ScrollViewer),
                 new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Identifier for the <see cref="ExtentWidth"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ExtentWidthProperty = ExtentWidthPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets the horizontal size of all the content for display in the <see cref="ScrollViewer"/>.
@@ -887,22 +607,8 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public double ExtentWidth
         {
-            get
-            {
-                if (UseCustomLayout)
-                {
-                    return (double)GetValue(ExtentWidthProperty);
-                }
-
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.scrollWidth");
-                }
-
-                return 0.0;
-            }
-            private set { SetValue(ExtentWidthProperty, value); }
+            get => (double)GetValue(ExtentWidthProperty);
+            private set => SetValue(ExtentWidthPropertyKey, value);
         }
 
         /// <summary>
@@ -910,7 +616,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void InvalidateScrollInfo()
         {
-            if (ScrollInfo != null)
+            if (ScrollInfo is not null)
             {
                 // ScrollBar visibility has to be updated before ViewportHeight/Width, because
                 // that will trigger ScrollBar control sizing which depends on ScrollBar ActualWidth/Height
@@ -936,46 +642,29 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        void UpdateScrollbarVisibility()
+        private void UpdateScrollbarVisibility()
         {
             // Update horizontal ScrollBar 
-            Visibility horizontalVisibility;
-            switch (HorizontalScrollBarVisibility)
+            Visibility horizontalVisibility = HorizontalScrollBarVisibility switch
             {
-                case ScrollBarVisibility.Visible:
-                    horizontalVisibility = Visibility.Visible;
-                    break;
-                case ScrollBarVisibility.Disabled:
-                case ScrollBarVisibility.Hidden:
-                    horizontalVisibility = Visibility.Collapsed;
-                    break;
-                default:  // Avoids compiler warning about uninitialized variable
-                case ScrollBarVisibility.Auto:
-                    horizontalVisibility = ScrollInfo == null || ScrollInfo.ExtentWidth <= ScrollInfo.ViewportWidth ? Visibility.Collapsed : Visibility.Visible;
-                    break;
-            }
+                ScrollBarVisibility.Visible => Visibility.Visible,
+                ScrollBarVisibility.Disabled or ScrollBarVisibility.Hidden => Visibility.Collapsed,
+                _ => (ScrollInfo is null || ScrollInfo.ExtentWidth <= ScrollInfo.ViewportWidth) ? Visibility.Collapsed : Visibility.Visible,
+            };
 
             if (horizontalVisibility != ComputedHorizontalScrollBarVisibility)
             {
                 ComputedHorizontalScrollBarVisibility = horizontalVisibility;
                 InvalidateMeasure();
             }
+
             // Update vertical ScrollBar
-            Visibility verticalVisibility;
-            switch (VerticalScrollBarVisibility)
+            Visibility verticalVisibility = VerticalScrollBarVisibility switch
             {
-                case ScrollBarVisibility.Visible:
-                    verticalVisibility = Visibility.Visible;
-                    break;
-                case ScrollBarVisibility.Disabled:
-                case ScrollBarVisibility.Hidden:
-                    verticalVisibility = Visibility.Collapsed;
-                    break;
-                default:  // Avoids compiler warning about uninitialized variable
-                case ScrollBarVisibility.Auto:
-                    verticalVisibility = ScrollInfo == null || ScrollInfo.ExtentHeight <= ScrollInfo.ViewportHeight ? Visibility.Collapsed : Visibility.Visible;
-                    break;
-            }
+                ScrollBarVisibility.Visible => Visibility.Visible,
+                ScrollBarVisibility.Disabled or ScrollBarVisibility.Hidden => Visibility.Collapsed,
+                _ => (ScrollInfo is null || ScrollInfo.ExtentHeight <= ScrollInfo.ViewportHeight) ? Visibility.Collapsed : Visibility.Visible,
+            };
 
             if (verticalVisibility != ComputedVerticalScrollBarVisibility)
             {
@@ -983,31 +672,25 @@ namespace Windows.UI.Xaml.Controls
                 InvalidateMeasure();
             }
         }
-        void UpdateScrollBar(Orientation orientation, double value)
+
+        private void UpdateScrollBar(Orientation orientation, double value)
         {
-            try
+            // Update relevant ScrollBar
+            if (orientation == Orientation.Horizontal)
             {
-                // Update relevant ScrollBar
-                if (orientation == Orientation.Horizontal)
+                HorizontalOffset = value;
+                if (ElementHorizontalScrollBar is not null)
                 {
-                    HorizontalOffset = value;
-                    if (ElementHorizontalScrollBar != null)
-                    {
-                        ElementHorizontalScrollBar.Value = value;
-                    }
-                }
-                else
-                {
-                    VerticalOffset = value;
-                    if (ElementVerticalScrollBar != null)
-                    {
-                        ElementVerticalScrollBar.Value = value;
-                    }
+                    ElementHorizontalScrollBar.Value = value;
                 }
             }
-            finally
+            else
             {
-
+                VerticalOffset = value;
+                if (ElementVerticalScrollBar is not null)
+                {
+                    ElementVerticalScrollBar.Value = value;
+                }
             }
         }
 
@@ -1041,27 +724,25 @@ namespace Windows.UI.Xaml.Controls
             base.OnPointerWheelChanged(e);
 #endif
 
-            if (!e.Handled && ScrollInfo != null)
+            if (e.Handled || ScrollInfo is null || e.Delta == 0)
             {
-#if MIGRATION
-                if (e.Delta < 0)
-#else
-                if (e.GetCurrentPoint(null).Properties.MouseWheelDelta < 0)
-#endif
-                {
-                    ScrollInfo.MouseWheelDown();
-                }
-#if MIGRATION
-                else if (0 < e.Delta)
-#else
-                else if (0 < e.GetCurrentPoint(null).Properties.MouseWheelDelta)
-#endif
-                {
-                    ScrollInfo.MouseWheelUp();
-                }
-
-                e.Handled = true;
+                return;
             }
+
+            if (e.Delta < 0)
+            {
+                if (ScrollInfo.VerticalOffset == ScrollableHeight) return;
+
+                ScrollInfo.MouseWheelDown();
+            }
+            else if (e.Delta > 0)
+            {
+                if (ScrollInfo.VerticalOffset == 0) return;
+
+                ScrollInfo.MouseWheelUp();
+            }
+
+            e.Handled = true;
         }
 
         private bool TemplatedParentHandlesScrolling => TemplatedParent is Control c && c.HandlesScrolling;
@@ -1069,12 +750,14 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Responds to the KeyDown event. 
         /// </summary> 
-        /// <param name="e">Provides data for KeyEventArgs.</param>
+        /// <param name="e">
+        /// Provides data for KeyEventArgs.
+        /// </param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
 
-            if (ScrollInfo != null && !e.Handled && !TemplatedParentHandlesScrolling)
+            if (ScrollInfo is not null && !e.Handled && !TemplatedParentHandlesScrolling)
             {
                 // Parent is not going to handle scrolling; do so here 
                 bool control = ModifierKeys.Control == (Keyboard.Modifiers & ModifierKeys.Control);

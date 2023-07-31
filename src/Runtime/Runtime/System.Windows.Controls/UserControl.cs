@@ -15,7 +15,6 @@ using System;
 using System.Collections;
 using System.Windows.Markup;
 using OpenSilver.Internal.Controls;
-using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -90,10 +89,7 @@ namespace Windows.UI.Xaml.Controls
             uc.RemoveLogicalChild(e.OldValue);
             uc.AddLogicalChild(e.NewValue);
 
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uc))
-            {
-                uc.InvalidateMeasureInternal();
-            }
+            uc.InvalidateMeasure();
         }
 
         /// <summary>

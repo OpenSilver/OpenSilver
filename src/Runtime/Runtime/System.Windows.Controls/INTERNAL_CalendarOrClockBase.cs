@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Controls
 
         public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
             var innerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", outerDiv, this);
             domElementWhereToPlaceChildren = innerDiv;
             return outerDiv;

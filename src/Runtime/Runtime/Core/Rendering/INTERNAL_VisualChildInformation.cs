@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,18 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace CSHTML5.Internal
 {
@@ -36,9 +23,6 @@ namespace CSHTML5.Internal
         // a table cell).
         // Note: for structures that don't require the creation of "wrappers" around their children, those two fields must be left blank.
 
-        public UIElement INTERNAL_UIElement { get; set; }
-        public object INTERNAL_OptionalChildWrapper_OuterDomElement { get; set; } // This is used to remove the child (and its parent-specific wrapper) from the DOM.
-        public object INTERNAL_OptionalChildWrapper_ChildWrapperInnerDomElement { get; set; } // This is used to place grand-children inside.
+        public object INTERNAL_OptionalChildWrapper_OuterDomElement { get; set; }
     }
-
 }

@@ -179,6 +179,8 @@ namespace Windows.UI.Xaml.Input
 
         internal Point GetPosition(UIElement relativeTo)
             => GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
+
+        internal int Delta => GetCurrentPoint(null).Properties.MouseWheelDelta;
 #endif
 
         internal static Point GetPosition(Point origin, UIElement relativeTo)

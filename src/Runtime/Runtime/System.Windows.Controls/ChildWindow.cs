@@ -799,12 +799,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this.Overlay != null)
             {
-                if (e.NewSize.Height != this.Overlay.Height)
+                if (e.NewSize.Height != this.Overlay.ActualHeight)
                 {
                     this._desiredContentHeight = e.NewSize.Height;
                 }
 
-                if (e.NewSize.Width != this.Overlay.Width)
+                if (e.NewSize.Width != this.Overlay.ActualWidth)
                 {
                     this._desiredContentWidth = e.NewSize.Width;
                 }
@@ -1603,34 +1603,28 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this.Overlay != null && Application.Current != null && Application.Current.Host != null && Application.Current.Host.Content != null)
             {
-#if SILVERLIGHT
                 this.Height = Application.Current.Host.Content.ActualHeight;
                 this.Width = Application.Current.Host.Content.ActualWidth;
-#endif
-                Rect bounds = Window.Current.Bounds;
-                this.Overlay.Height = bounds.Height;
-                this.Overlay.Width = bounds.Width;
 
-                if (this.ContentRoot == null) return;
+                if (Application.Current.Host.Settings.EnableAutoZoom)
+                {
+                    double zoomFactor = Application.Current.Host.Content.ZoomFactor;
+                    if (zoomFactor != 0)
+                    {
+                        this.Height /= zoomFactor;
+                        this.Width /= zoomFactor;
+                    }
+                }
 
-#if !SILVERLIGHT
-                // We set the size of the ContentRoot to be the same size that the user specified for the ChildWindow itself (this is due to the fact that the size of the ChildWindow is automatically changed to fit the screen so that the overlay fits the screen):
+                this.Overlay.Height = this.Height;
+                this.Overlay.Width = this.Width;
 
-                if (!double.IsNaN(this._widthThatWasInitiallySpecified))
+                if (this.ContentRoot != null)
                 {
                     this.ContentRoot.Width = this._desiredContentWidth;
-                }
-
-                if (!double.IsNaN(this._heightThatWasInitiallySpecified))
-                {
                     this.ContentRoot.Height = this._desiredContentHeight;
+                    this.ContentRoot.Margin = this._desiredMargin;
                 }
-
-#else
-                this.ContentRoot.Width = this._desiredContentWidth;
-                this.ContentRoot.Height = this._desiredContentHeight;
-#endif
-                this.ContentRoot.Margin = this._desiredMargin;
             }
         }
 

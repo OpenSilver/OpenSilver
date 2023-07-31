@@ -120,22 +120,18 @@ namespace System
         /// The DOM elements are created later, when the control becomes visible.
         /// Enabling this option results in significantly improved performance if there are many hidden elements.
         /// </summary>
-        public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded
-        {
-            get { return INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded; }
-            set { INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded = value; }
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded { get; set; }
 
         /// <summary>
         /// Wait a few moments before creating the DOM elements for the UI elements that are not visible.
         /// The goal is to give the time to the browser engine to draw the visible ones, in order to improve the perceived performance.
         /// The DOM elements are created immediately after the browser engine has finished drawing (when the UI thread is available).
         /// </summary>
-        public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast
-        {
-            get { return INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast; }
-            set { INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast = value; }
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast { get; set; }
 
         /// <summary>
         /// Gets or sets the number of children in a Panel to render progressively in a batch.
