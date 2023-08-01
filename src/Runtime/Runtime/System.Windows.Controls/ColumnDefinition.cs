@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -30,137 +21,46 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Defines column-specific properties that apply to Grid objects.
+    /// Defines column-specific properties that apply to <see cref="Grid"/> objects.
     /// </summary>
-    public sealed partial class ColumnDefinition : DependencyObject, IDefinitionBase
+    public sealed class ColumnDefinition : DependencyObject, IDefinitionBase
     {
+        private double _effectiveMinSize;
+        private double _sizeCache;
+        private double _finalOffset;
+        private GridUnitType _effectiveUnitType;
         internal Grid Parent;
+
         public ColumnDefinition()
         {
             _effectiveMinSize = 0;
             _effectiveUnitType = GridUnitType.Auto;
-            _measureArrangeSize = 0;
             _finalOffset = 0;
             _sizeCache = 0;
         }
-        
-        double IDefinitionBase.MinLength { get { return MinWidth; } }
-        double IDefinitionBase.MaxLength { get { return MaxWidth; } }
-        GridLength IDefinitionBase.Length { get { return Width; } }
-        
-        private double _effectiveMinSize;
-        private double _measureArrangeSize;
-        private double _sizeCache;
-        private double _finalOffset;
-
-        private GridUnitType _effectiveUnitType;
-
-        double IDefinitionBase.GetUserMaxSize()
-        {
-            return MaxWidth;
-        }
-
-        double IDefinitionBase.GetUserMinSize()
-        {
-            return MinWidth;
-        }
-
-        GridUnitType IDefinitionBase.GetUserSizeType()
-        {
-            return Width.GridUnitType;
-        }
-
-        double IDefinitionBase.GetUserSizeValue()
-        {
-            return Width.Value;
-        }
-
-        void IDefinitionBase.UpdateEffectiveMinSize(double newValue)
-        {
-            _effectiveMinSize = Math.Max(_effectiveMinSize, newValue);
-        }
-
-        void IDefinitionBase.SetEffectiveUnitType(GridUnitType type)
-        {
-            _effectiveUnitType = type;
-        }
-        void IDefinitionBase.SetEffectiveMinSize(double value)
-        {
-            _effectiveMinSize = value;
-        }
-
-        double IDefinitionBase.GetEffectiveMinSize()
-        {
-            return _effectiveMinSize;
-        }
-
-        GridUnitType IDefinitionBase.GetEffectiveUnitType()
-        {
-            return _effectiveUnitType;
-        }
-
-        void IDefinitionBase.SetMeasureArrangeSize(double value)
-        {
-            _measureArrangeSize = value;
-        }
-
-        double IDefinitionBase.GetMeasureArrangeSize()
-        {
-            return _measureArrangeSize;
-        }
-
-        void IDefinitionBase.SetSizeCache(double value)
-        {
-            _sizeCache = value;
-        }
-
-        double IDefinitionBase.GetSizeCache()
-        {
-            return _sizeCache;
-        }
-
-        double IDefinitionBase.GetPreferredSize()
-        {
-            return
-                (_effectiveUnitType != GridUnitType.Auto
-                 && _effectiveMinSize < _measureArrangeSize)
-                    ? _measureArrangeSize
-                    : _effectiveMinSize;
-        }
-
-        double IDefinitionBase.GetFinalOffset()
-        {
-            return _finalOffset;
-        }
-
-        void IDefinitionBase.SetFinalOffset(double value)
-        {
-            _finalOffset = value;
-        }
-
 
         /// <summary>
-        /// Returns a copy of the current ColumnDefinition.
+        /// Returns a copy of the current <see cref="ColumnDefinition"/>.
         /// </summary>
-        /// <returns>A copy of the current ColumnDefinition.</returns>
-        public ColumnDefinition Clone()
-        {
-            return new ColumnDefinition()
+        public ColumnDefinition Clone() =>
+            new()
             {
-                //Parent = this.Parent,
-                MinWidth = this.MinWidth,
-                MaxWidth = this.MaxWidth,
-                Width = this.Width.Clone()
+                MinWidth = MinWidth,
+                MaxWidth = MaxWidth,
+                Width = Width.Clone()
             };
-        }
 
         /// <summary>
-        /// Gets or sets a value that represents the maximum width of a ColumnDefinition. Returns a Double that represents the maximum width in pixels. The default is PositiveInfinity.
+        /// Gets or sets a value that represents the maximum width of a <see cref="ColumnDefinition"/>.
         /// </summary>
+        /// <returns>
+        /// A <see cref="double"/> that represents the maximum width in pixels. The default is 
+        /// <see cref="double.PositiveInfinity"/>.
+        /// </returns>
         public double MaxWidth
         {
-            get { return (double)GetValue(MaxWidthProperty); }
-            set { SetValue(MaxWidthProperty, value); }
+            get => (double)GetValue(MaxWidthProperty);
+            set => SetValue(MaxWidthProperty, value);
         }
 
         /// <summary>
@@ -168,24 +68,27 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty MaxWidthProperty =
             DependencyProperty.Register(
-                nameof(MaxWidth), 
-                typeof(double), 
+                nameof(MaxWidth),
+                typeof(double),
                 typeof(ColumnDefinition),
-                new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed),
+                new PropertyMetadata(double.PositiveInfinity, OnMaxWidthChanged),
                 FrameworkElement.IsMaxWidthHeightValid);
 
-        private static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnMaxWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((ColumnDefinition)d).Parent?.InvalidateMeasure();
         }
 
         /// <summary>
-        /// Gets or sets a value that represents the minimum width of a ColumnDefinition. Returns a Double that represents the minimum width in pixels. The default is 0.
+        /// Gets or sets a value that represents the minimum width of a <see cref="ColumnDefinition"/>.
         /// </summary>
+        /// <returns>
+        /// A <see cref="double"/> that represents the minimum width in pixels. The default is 0.
+        /// </returns>
         public double MinWidth
         {
-            get { return (double)GetValue(MinWidthProperty); }
-            set { SetValue(MinWidthProperty, value); }
+            get => (double)GetValue(MinWidthProperty);
+            set => SetValue(MinWidthProperty, value);
         }
 
         /// <summary>
@@ -193,25 +96,30 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty MinWidthProperty =
             DependencyProperty.Register(
-                nameof(MinWidth), 
-                typeof(double), 
+                nameof(MinWidth),
+                typeof(double),
                 typeof(ColumnDefinition),
-                new PropertyMetadata(0d, MinWidth_Changed),
+                new PropertyMetadata(0d, OnMinWidthChanged),
                 FrameworkElement.IsMinWidthHeightValid);
 
-        private static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnMinWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((ColumnDefinition)d).Parent?.InvalidateMeasure();
         }
 
         /// <summary>
-        /// Gets the calculated width of a ColumnDefinition element, or sets the GridLength value of a row that is defined by the ColumnDefinition.
-        /// Returns the GridLength that represents the width of the row. The default value is 1.0
+        /// Gets the calculated width of a <see cref="ColumnDefinition"/> element,
+        /// or sets the <see cref="GridLength"/> value of a column that is defined by the
+        /// <see cref="ColumnDefinition"/>.
         /// </summary>
+        /// <returns>
+        /// The <see cref="GridLength"/> that represents the width of the column. The default
+        /// value is 1.0.
+        /// </returns>
         public GridLength Width
         {
-            get { return (GridLength)GetValue(WidthProperty); }
-            set { SetValue(WidthProperty, value); }
+            get => (GridLength)GetValue(WidthProperty);
+            set => SetValue(WidthProperty, value);
         }
 
         /// <summary>
@@ -219,28 +127,79 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty WidthProperty =
             DependencyProperty.Register(
-                nameof(Width), 
-                typeof(GridLength), 
+                nameof(Width),
+                typeof(GridLength),
                 typeof(ColumnDefinition),
-                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), Width_Changed));
+                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), OnWidthChanged));
 
-        private static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var columnDefinition = (ColumnDefinition)d;
-
-            columnDefinition.Parent?.InvalidateMeasure();
+            ((ColumnDefinition)d).Parent?.InvalidateMeasure();
         }
+
+        private static readonly DependencyPropertyKey ActualWidthPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(ActualWidth),
+                typeof(double),
+                typeof(ColumnDefinition),
+                new PropertyMetadata(0.0));
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly DependencyProperty ActualWidthProperty = ActualWidthPropertyKey.DependencyProperty;
 
         /// <summary>
-        /// Gets the rendered width of a FrameworkElement. The FrameworkElement must be in the visual tree,
-        /// otherwise this property will return double.NaN.
+        /// Gets a value that represents the actual calculated width of a <see cref="ColumnDefinition"/>.
         /// </summary>
+        /// <returns>
+        /// A <see cref="double"/> that represents the actual calculated width in pixels. The default is 0.
+        /// </returns>
         public double ActualWidth
         {
-            get
-            {
-                return Parent is not null ? _measureArrangeSize : double.NaN;
-            }
+            get => (double)GetValue(ActualWidthProperty);
+            private set => SetValue(ActualWidthPropertyKey, value);
         }
+
+        double IDefinitionBase.MinLength => MinWidth;
+
+        double IDefinitionBase.MaxLength => MaxWidth;
+
+        GridLength IDefinitionBase.Length => Width;
+
+        double IDefinitionBase.GetUserMaxSize() => MaxWidth;
+
+        double IDefinitionBase.GetUserMinSize() => MinWidth;
+
+        GridUnitType IDefinitionBase.GetUserSizeType() => Width.GridUnitType;
+
+        double IDefinitionBase.GetUserSizeValue() => Width.Value;
+
+        void IDefinitionBase.UpdateEffectiveMinSize(double newValue) => _effectiveMinSize = Math.Max(_effectiveMinSize, newValue);
+
+        void IDefinitionBase.SetEffectiveUnitType(GridUnitType type) => _effectiveUnitType = type;
+
+        void IDefinitionBase.SetEffectiveMinSize(double value) => _effectiveMinSize = value;
+
+        double IDefinitionBase.GetEffectiveMinSize() => _effectiveMinSize;
+
+        GridUnitType IDefinitionBase.GetEffectiveUnitType() => _effectiveUnitType;
+
+        void IDefinitionBase.SetMeasureArrangeSize(double value) => ActualWidth = value;
+
+        double IDefinitionBase.GetMeasureArrangeSize() => ActualWidth;
+
+        void IDefinitionBase.SetSizeCache(double value) => _sizeCache = value;
+
+        double IDefinitionBase.GetSizeCache() => _sizeCache;
+
+        double IDefinitionBase.GetPreferredSize()
+        {
+            double actualWidth = ActualWidth;
+            return (_effectiveUnitType != GridUnitType.Auto && _effectiveMinSize < actualWidth)
+                ? actualWidth : _effectiveMinSize;
+        }
+
+        double IDefinitionBase.GetFinalOffset() => _finalOffset;
+
+        void IDefinitionBase.SetFinalOffset(double value) => _finalOffset = value;
     }
 }
