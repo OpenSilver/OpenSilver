@@ -383,6 +383,39 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(ForegroundProperty, value);
         }
 
+        /// <summary>
+        /// Identifies the <see cref="CharacterSpacing"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CharacterSpacingProperty =
+            TextElementProperties.CharacterSpacingProperty.AddOwner(
+                typeof(RichTextBlock),
+                new FrameworkPropertyMetadata(
+                    0,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var rtb = (RichTextBlock)d;
+                        double value = (int)newValue / 1000.0;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
+                        style.letterSpacing = $"{value.ToInvariantString()}em";
+                    },
+                });
+
+        /// <summary>
+        /// Gets or sets the distance between characters of text in the control measured
+        /// in 1000ths of the font size.
+        /// </summary>
+        /// <returns>
+        /// The distance between characters of text in the control measured in 1000ths of
+        /// the font size. The default is 0.
+        /// </returns>
+        public int CharacterSpacing
+        {
+            get => (int)GetValue(CharacterSpacingProperty);
+            set => SetValue(CharacterSpacingProperty, value);
+        }
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.Wrap);

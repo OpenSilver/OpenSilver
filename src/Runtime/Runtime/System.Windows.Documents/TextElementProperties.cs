@@ -36,4 +36,11 @@ internal static class TextElementProperties
             typeof(FontWeight),
             typeof(TextElementProperties),
             new PropertyMetadata(FontWeights.Normal) { Inherits = true, });
+
+    public static readonly DependencyProperty CharacterSpacingProperty =
+        DependencyProperty.RegisterAttached(
+            "CharacterSpacing",
+            typeof(int),
+            typeof(TextElementProperties),
+            new PropertyMetadata(0) { Inherits = true, });
 }

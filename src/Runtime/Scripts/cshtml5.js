@@ -704,6 +704,7 @@ document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflo
         element.style.fontWeight = computedStyle.fontWeight;
         element.style.fontFamily = computedStyle.fontFamily;
         element.style.fontStyle = computedStyle.fontStyle;
+        element.style.letterSpacing = computedStyle.letterSpacing;
 
         element.style.whiteSpace = whiteSpace;
         element.style.overflowWrap = overflowWrap;
@@ -1179,6 +1180,7 @@ document.textboxHelpers = (function () {
             view.style.fontSize = 'inherit';
             view.style.fontFamily = 'inherit';
             view.style.color = 'inherit';
+            view.style.letterSpacing = 'inherit';
             view.style.resize = 'none';
             view.style.outline = 'none';
             view.style.border = 'none';

@@ -767,27 +767,26 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Identifies the <see cref="CharacterSpacing"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CharacterSpacingProperty =
-            DependencyProperty.Register(
-                nameof(CharacterSpacing),
-                typeof(int),
+            TextElementProperties.CharacterSpacingProperty.AddOwner(
                 typeof(Control),
-                new PropertyMetadata(0));
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits));
 
-        //
-        // Summary:
-        //     Gets or sets the distance between characters of text in the control measured
-        //     in 1000ths of the font size.
-        //
-        // Returns:
-        //     The distance between characters of text in the control measured in 1000ths of
-        //     the font size. The default is 0.
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets or sets the distance between characters of text in the control measured
+        /// in 1000ths of the font size.
+        /// </summary>
+        /// <returns>
+        /// The distance between characters of text in the control measured in 1000ths of
+        /// the font size. The default is 0.
+        /// </returns>
         public int CharacterSpacing
         {
-            get { return (int)GetValue(CharacterSpacingProperty); }
-            set { SetValue(CharacterSpacingProperty, value); }
+            get => (int)GetValue(CharacterSpacingProperty);
+            set => SetValue(CharacterSpacingProperty, value);
         }
 
         [OpenSilver.NotImplemented]
@@ -809,18 +808,6 @@ namespace Windows.UI.Xaml.Controls
             get { return (FontStretch)GetValue(FontStretchProperty); }
             set { SetValue(FontStretchProperty, value); }
         }
-
-        ////
-        //// Summary:
-        ////     Called before the System.Windows.UIElement.TextInput event occurs.
-        ////
-        //// Parameters:
-        ////   e:
-        ////     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
-        //protected virtual void OnTextInput(TextCompositionEventArgs e)
-        //{
-
-        //}
 
         [OpenSilver.NotImplemented]
         protected virtual void OnDrop(DragEventArgs e)

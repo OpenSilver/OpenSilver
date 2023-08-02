@@ -43,21 +43,6 @@ namespace Windows.UI.Xaml.Controls
 		[OpenSilver.NotImplemented]
 		public double BaselineOffset { get; private set; }
 
-        [OpenSilver.NotImplemented]
-		public static readonly DependencyProperty CharacterSpacingProperty =
-			DependencyProperty.Register(
-				"CharacterSpacing",
-				typeof(int),
-				typeof(TextBlock),
-				new PropertyMetadata(0));
-
-        [OpenSilver.NotImplemented]
-		public int CharacterSpacing
-		{
-			get { return (int)this.GetValue(CharacterSpacingProperty); }
-			set { this.SetValue(CharacterSpacingProperty, value); }
-		}
-
 		[OpenSilver.NotImplemented]
 		public FontSource FontSource { get; set; }
 	}

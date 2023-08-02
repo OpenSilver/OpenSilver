@@ -13,6 +13,8 @@
 
 using System;
 using OpenSilver.Internal.Controls;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -53,6 +55,22 @@ namespace Windows.UI.Xaml.Controls
         private bool _isFocused;
         private FrameworkElement _contentElement;
         private ITextViewHost<PasswordBoxView> _textViewHost;
+
+        static PasswordBox()
+        {
+            CharacterSpacingProperty.OverrideMetadata(
+                typeof(PasswordBox),
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var pwb = (PasswordBox)d;
+                        double value = (int)newValue / 1000.0;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(pwb.INTERNAL_OuterDomElement);
+                        style.letterSpacing = $"{value.ToInvariantString()}em";
+                    },
+                });
+        }
 
         public PasswordBox()
         {
