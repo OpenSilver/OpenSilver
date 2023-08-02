@@ -109,6 +109,7 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
         passwordFieldStyle.fontFamily = "inherit"; // Not inherited by default for "input" DOM elements
         passwordFieldStyle.fontSize = "inherit"; // Not inherited by default for "input" DOM elements
         passwordFieldStyle.color = "inherit"; //This is to inherit the foreground value from parent div.
+        passwordFieldStyle.letterSpacing = "inherit"; // Not inherited by default for "input" DOM elements
         passwordFieldStyle.width = "100%";
         passwordFieldStyle.height = "100%";
         passwordFieldStyle.padding = "0px";
