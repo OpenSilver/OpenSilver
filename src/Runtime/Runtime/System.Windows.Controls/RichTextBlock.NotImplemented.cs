@@ -31,32 +31,6 @@ namespace Windows.UI.Xaml.Controls
     public sealed partial class RichTextBlock : FrameworkElement
     {
         /// <summary>
-        /// Identifies the <see cref="CharacterSpacing"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CharacterSpacingProperty =
-            DependencyProperty.Register(
-                nameof(CharacterSpacing),
-                typeof(int),
-                typeof(RichTextBlock),
-                new PropertyMetadata(0));
-
-        /// <summary>
-        /// Gets or sets the distance between characters of text in the control measured
-        /// in 1000ths of the font size.
-        /// </summary>
-        /// <returns>
-        /// The distance between characters of text in the control measured in 1000ths of
-        /// the font size. The default is 0.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public int CharacterSpacing
-        {
-            get => (int)GetValue(CharacterSpacingProperty);
-            set => SetValue(CharacterSpacingProperty, value);
-        }
-
-        /// <summary>
         /// Identifies the <see cref="FontStretch"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]

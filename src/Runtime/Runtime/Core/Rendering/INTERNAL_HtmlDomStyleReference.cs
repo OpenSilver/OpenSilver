@@ -75,6 +75,7 @@ namespace CSHTML5.Internal
         public string height { get { return GetCSSProperty("height"); } set { SetStylePropertyValue("height", value); } }
         public string left { set { SetStylePropertyValue("left", value); } }
         public string lineHeight { set { SetStylePropertyValue("lineHeight", value); } }
+        public string letterSpacing { set { SetStylePropertyValue("letterSpacing", value); } }
         public string margin { set { SetStylePropertyValue("margin", value); } }
         public string marginBottom { set { SetStylePropertyValue("marginBottom", value); } }
         public string marginLeft { set { SetStylePropertyValue("marginLeft", value); } }

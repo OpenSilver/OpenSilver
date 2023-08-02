@@ -14,6 +14,8 @@
 using System;
 using System.ComponentModel;
 using OpenSilver.Internal.Controls;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -66,6 +68,22 @@ namespace Windows.UI.Xaml.Controls
         private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
         private ITextViewHost<TextBoxView> _textViewHost;
+
+        static TextBox()
+        {
+            CharacterSpacingProperty.OverrideMetadata(
+                typeof(TextBox),
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBox)d;
+                        double value = (int)newValue / 1000.0;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.letterSpacing = $"{value.ToInvariantString()}em";
+                    },
+                });
+        }
 
         public TextBox()
         {
