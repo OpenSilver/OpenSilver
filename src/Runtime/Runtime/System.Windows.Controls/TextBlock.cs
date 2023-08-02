@@ -62,6 +62,22 @@ namespace Windows.UI.Xaml.Controls
 
             return (Inline)Inlines[index];
         }
+
+        static TextBlock()
+        {
+            CharacterSpacingProperty.OverrideMetadata(
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        double value = (int)newValue / 1000.0;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.letterSpacing = $"{value.ToInvariantString()}em";
+                    },
+                });
+        }
         
         public TextBlock()
         {
@@ -298,25 +314,21 @@ namespace Windows.UI.Xaml.Controls
                 nameof(LineHeight),
                 typeof(double),
                 typeof(TextBlock),
-                new PropertyMetadata(0d)
+                new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    MethodToUpdateDom = (instance, value) =>
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        double valueAsDouble = (double)value;
-                        if (valueAsDouble < 0)
-                        {
-                            throw new ArgumentException("TextBlock.LineHeight is set to a non-positive value.");
-                        }
-                        if (valueAsDouble > 0)
-                        {
-                            ((TextBlock)instance).UpdateCSSLineHeight(value.ToString() + "px");
-                        }
-                        else
-                        {
-                            ((TextBlock)instance).UpdateCSSLineHeight("normal"); //todo: adapt this to what the value would exactly be in Silverlight (probably something like "125%" but I'm not sure of the exact value)
-                        }
-                    }
-                });
+                        var tb = (TextBlock)d;
+                        double v = (double)newValue;
+                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement).lineHeight =
+                            v switch
+                            {
+                                0.0 => "normal",
+                                _ => $"{v.ToInvariantString()}px",
+                            };
+                    },
+                },
+                IsValidLineHeight);
 
         /// <summary>
         /// Gets or sets the height of each line of content.
@@ -327,13 +339,10 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(LineHeightProperty, value); 
         }
 
-        private void UpdateCSSLineHeight(string value)
+        private static bool IsValidLineHeight(object o)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
-                domStyle.lineHeight = value ?? "";
-            }
+            double d = (double)o;
+            return !double.IsNaN(d) && d >= 0;
         }
 
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -351,7 +360,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
+            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
 
             if (_noWrapSize == Size.Empty)
             {
