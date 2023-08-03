@@ -183,18 +183,6 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Gets a value that represents the offset in pixels from the top of the content
-        /// to the baseline of the first paragraph. The baseline of the paragraph is the
-        /// baseline of the first line in it.
-        /// </summary>
-        /// <returns>
-        /// The computed baseline for the first paragraph, or 0 if the <see cref="RichTextBlock"/>
-        /// is empty.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public double BaselineOffset { get; }
-
-        /// <summary>
         /// Gets a <see cref="TextPointer"/> that indicates the end of content
         /// in the <see cref="RichTextBlock"/>.
         /// </summary>
