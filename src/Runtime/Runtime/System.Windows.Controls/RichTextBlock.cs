@@ -416,6 +416,27 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(CharacterSpacingProperty, value);
         }
 
+        /// <summary>
+        /// Gets a value that represents the offset in pixels from the top of the content
+        /// to the baseline of the first paragraph. The baseline of the paragraph is the
+        /// baseline of the first line in it.
+        /// </summary>
+        /// <returns>
+        /// The computed baseline for the first paragraph, or 0 if the <see cref="RichTextBlock"/>
+        /// is empty.
+        /// </returns>
+        public double BaselineOffset => GetBaseLineOffset(this);
+
+        private static double GetBaseLineOffset(RichTextBlock rtb)
+        {
+            if (rtb.Blocks.Count > 0)
+            {
+                return TextElementProperties.GetBaseLineOffsetNative(rtb);
+            }
+
+            return 0.0;
+        }
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.Wrap);

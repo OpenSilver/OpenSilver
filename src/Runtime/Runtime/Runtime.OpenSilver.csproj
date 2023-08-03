@@ -464,7 +464,6 @@
 		<Compile Include="System.Windows.Controls\Separator.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextBlock.cs" />
 		<Compile Include="System.Windows.Controls\TextSearch.cs" />
 		<Compile Include="OpenSilver\Controls\TimePicker.NotImplemented.cs" />
 		<Compile Include="OpenSilver\Controls\TimePickerPopup.cs" />
