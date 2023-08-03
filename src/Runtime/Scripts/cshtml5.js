@@ -727,6 +727,15 @@ document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflo
     return "0|0";
 }
 
+document.getBaseLineOffset = (function () {
+    const ctx = document.createElement('canvas').getContext('2d');
+    return function (element) {
+        if (!element) return 0.0;
+        ctx.font = getComputedStyle(element).font;
+        return ctx.measureText('').fontBoundingBoxAscent;
+    };
+})();
+
 document.setContentString = function (id, text, removeTextWrapping) {
     var el = document.getElementById(id);
     if (el) {
