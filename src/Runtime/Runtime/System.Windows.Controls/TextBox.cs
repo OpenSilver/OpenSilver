@@ -19,12 +19,14 @@ using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Input;
 #else
 using Windows.Foundation;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
 using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
@@ -496,6 +498,27 @@ namespace Windows.UI.Xaml.Controls
             {
                 tb._textViewHost.View.OnIsSpellCheckEnabledChanged((bool)e.NewValue);
             }
+        }
+
+        /// <summary>
+        /// Gets a value by which each line of text is offset from a baseline.
+        /// </summary>
+        /// <returns>
+        /// The amount by which each line of text is offset from the baseline, in device
+        /// independent pixels. <see cref="double.NaN"/> indicates that an optimal baseline offset
+        /// is automatically calculated from the current font characteristics. The default
+        /// is <see cref="double.NaN"/>.
+        /// </returns>
+        public double BaselineOffset => GetBaseLineOffset(this);
+
+        private static double GetBaseLineOffset(TextBox textbox)
+        {
+            if (textbox._textViewHost?.View is TextBoxView view)
+            {
+                return TextElementProperties.GetBaseLineOffsetNative(view);
+            }
+
+            return 0.0;
         }
 
         public string SelectedText
