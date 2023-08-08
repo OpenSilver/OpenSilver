@@ -57,8 +57,7 @@ namespace CSHTML5.Internal
                         && parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
                     {
                         // Remove the element from the DOM:
-                        string stringForDebugging = !IsRunningInJavaScript() ? "Removing " + child.GetType().ToString() : null;
-                        INTERNAL_HtmlDomManager.RemoveFromDom(child.INTERNAL_OuterDomElement, stringForDebugging);
+                        INTERNAL_HtmlDomManager.RemoveFromDom(child.INTERNAL_OuterDomElement);
 
                         // Remove the parent-specific wrapper around the child in the DOM (if any):
                         var optionalChildWrapper_OuterDomElement = parent.INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;

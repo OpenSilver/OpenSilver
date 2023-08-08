@@ -49,6 +49,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store = new Dictionary<string, WeakReference<UIElement>>(2048);
         }
 
+        internal static bool SyncRenderingWithLayout { get; set; } = false;
+
         public static object GetApplicationRootDomElement() => Application.Current?.GetRootDiv();
 
         internal static UIElement GetElementById(string id)
@@ -77,19 +79,31 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store.Remove(htmlDomElRef.UniqueIdentifier);
         }
 
-        public static void RemoveFromDom(object domNode, string commentForDebugging = null)
+        public static void RemoveFromDom(object domNode)
         {
             var htmlDomElRef = (INTERNAL_HtmlDomElementReference)domNode;
-            var javaScriptCodeToExecute = $@"
-                var element = document.getElementById(""{htmlDomElRef.UniqueIdentifier}"");
-                if (element) element.parentNode.removeChild(element);";
-            ExecuteJavaScript(javaScriptCodeToExecute, commentForDebugging); // IMPORTANT: This cannot be replaced by "INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode" because the element may no longer be in the tree when we try to remove it (cf. issues we had with the Grid on 2015.08.26)
+
+            if (SyncRenderingWithLayout)
+            {
+                LayoutManager.Current.UIRenderer.RemoveRootComponent(htmlDomElRef);
+            }
+            else
+            {
+                RemoveNodeNative(htmlDomElRef);
+            }
+
             if (htmlDomElRef.Parent != null)
             {
                 htmlDomElRef.Parent.FirstChild = null;
             }
 
             RemoveFromGlobalStore(htmlDomElRef);
+        }
+
+        internal static void RemoveNodeNative(INTERNAL_HtmlDomElementReference domNode)
+        {
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(domNode);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.remove();");
         }
 
         public static INTERNAL_HtmlDomElementReference GetParentDomElement(object domElementRef)

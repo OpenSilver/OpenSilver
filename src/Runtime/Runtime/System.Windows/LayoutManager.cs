@@ -12,7 +12,9 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Threading;
@@ -48,16 +50,20 @@ namespace Windows.UI.Xaml
         private bool _inFireLayoutUpdated;
         private bool _inFireSizeChanged;
         private bool _firePostLayoutEvents;
-
+        
         private LayoutManager(Dispatcher dispatcher)
         {
             Debug.Assert(dispatcher != null);
             Dispatcher = dispatcher;
+
+            UIRenderer = new UIRenderer();
         }
 
         public static LayoutManager Current { get; } = new LayoutManager(Dispatcher.CurrentDispatcher);
 
         public Dispatcher Dispatcher { get; }
+
+        internal UIRenderer UIRenderer { get; }
 
         internal InternalMeasureQueue MeasureQueue => _measureQueue ??= new InternalMeasureQueue();
 
@@ -76,6 +82,8 @@ namespace Windows.UI.Xaml
             {
                 return;
             }
+
+            UIRenderer.ProcessRenderQueue();
 
             int cnt = 0;
             bool gotException = true;
@@ -683,5 +691,27 @@ namespace Windows.UI.Xaml
         private ListItem _pocket;
         private int _pocketSize;
         private int _count;
+    }
+
+    internal sealed class UIRenderer
+    {
+        private readonly Queue<INTERNAL_HtmlDomElementReference> _disposeQueue = new();
+
+        public void RemoveRootComponent(INTERNAL_HtmlDomElementReference element)
+        {
+            Debug.Assert(element is not null);
+            _disposeQueue.Enqueue(element);
+        }
+
+        public void ProcessRenderQueue()
+        {
+            while (_disposeQueue.Count > 0)
+            {
+                var node = _disposeQueue.Dequeue();
+                INTERNAL_HtmlDomManager.RemoveNodeNative(node);
+            }
+
+            _disposeQueue.Clear();
+        }
     }
 }

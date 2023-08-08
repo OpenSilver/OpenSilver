@@ -94,6 +94,13 @@ namespace System
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool UseResizeSensor { get; set; }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool SyncRenderingWithLayout
+        {
+            get { return INTERNAL_HtmlDomManager.SyncRenderingWithLayout; }
+            set { INTERNAL_HtmlDomManager.SyncRenderingWithLayout = value; }
+        }
+
         public bool EnableInteropLogging
         {
             get { return INTERNAL_ExecuteJavaScript.EnableInteropLogging; }
