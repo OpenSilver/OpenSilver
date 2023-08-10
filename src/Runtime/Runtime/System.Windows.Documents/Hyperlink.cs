@@ -14,11 +14,11 @@
 using System;
 using System.Windows.Browser;
 using System.Windows.Input;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
 #else
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -33,22 +33,20 @@ namespace Windows.UI.Xaml.Documents
     /// </summary>
     public sealed class Hyperlink : Span
     {
-        Uri _uri;
+        private JavaScriptCallback _clickCallback;
 
         /// <summary>
         /// Initializes a new instance of the Hyperlink class.
         /// </summary>
         public Hyperlink()
         {
-            this.Foreground = new SolidColorBrush(Color.FromArgb(245, 26, 13, 171)); //todo: move this to a default style.
-            this.Cursor = Cursors.Hand; //todo: move this to a default style.
+            Foreground = new SolidColorBrush(Color.FromArgb(245, 26, 13, 171)); //todo: move this to a default style.
+            Cursor = Cursors.Hand; //todo: move this to a default style.
 
 #if MIGRATION
-            this.MouseLeftButtonDown += Hyperlink_MouseLeftButtonDown;
-            this.TextDecorations = System.Windows.TextDecorations.Underline;
+            TextDecorations = Windows.TextDecorations.Underline;
 #else
-            this.PointerPressed += Hyperlink_PointerPressed;
-            this.TextDecorations = Windows.UI.Text.TextDecorations.Underline;
+            TextDecorations = Windows.UI.Text.TextDecorations.Underline;
 #endif
         }
 
@@ -60,31 +58,55 @@ namespace Windows.UI.Xaml.Documents
         public event RoutedEventHandler Click;
 
         /// <summary>
+        /// Identifies the <see cref="NavigateUri"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty NavigateUriProperty =
+            DependencyProperty.Register(
+                nameof(NavigateUri),
+                typeof(Uri),
+                typeof(Hyperlink),
+                new PropertyMetadata((object)null));
+
+        /// <summary>
         /// Gets or sets a URI to navigate to when the Hyperlink
         /// is activated. The default is null.
         /// </summary>
         public Uri NavigateUri
         {
-            get { return _uri; }
-            set { _uri = value; }
+            get => (Uri)GetValue(NavigateUriProperty);
+            set => SetValue(NavigateUriProperty, value);
         }
 
-#if MIGRATION
-        void Hyperlink_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-#else
-        void Hyperlink_PointerPressed(object sender, PointerRoutedEventArgs e)
-#endif
+        public override void INTERNAL_AttachToDomEvents()
         {
-            if (Click != null)
-            {
-                Click(this, new RoutedEventArgs
-                {
-                    OriginalSource = this
-                });
-            }
+            base.INTERNAL_AttachToDomEvents();
 
-            if (_uri != null)
-                HtmlPage.Window.Navigate(_uri, "_blank");
+            _clickCallback = JavaScriptCallback.Create(OnClickNative, true);
+
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            string sClickCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_clickCallback);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"{sDiv}.addEventListener('click', function (e) {{ {sClickCallback}(); }});");
+        }
+
+        public override void INTERNAL_DetachFromDomEvents()
+        {
+            base.INTERNAL_DetachFromDomEvents();
+
+            _clickCallback?.Dispose();
+            _clickCallback = null;
+        }
+
+        private void OnClickNative() => OnClick();
+
+        internal void OnClick()
+        {
+            Click?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
+
+            if (NavigateUri is Uri uri)
+            {
+                HtmlPage.Window.Navigate(uri, "_blank");
+            }
         }
 
         [OpenSilver.NotImplemented]
