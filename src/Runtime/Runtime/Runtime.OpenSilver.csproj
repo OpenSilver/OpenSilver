@@ -20,7 +20,12 @@
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
 	</PropertyGroup>
-
+	
+	<PropertyGroup>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
 		<DefineConstants>TRACE;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;GD_WIP</DefineConstants>
 	</PropertyGroup>
