@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Documents
     public sealed class Hyperlink : Span
     {
         private JavaScriptCallback _clickCallback;
-        
+
         /// <summary>
         /// Initializes a new instance of the Hyperlink class.
         /// </summary>
