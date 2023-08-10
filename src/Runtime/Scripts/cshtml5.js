@@ -260,7 +260,6 @@ document.createTextElement = function (id, tagName, parent) {
 
     const textElement = document.createElement(tagName);
     textElement.setAttribute('id', id);
-    textElement.setAttribute('xamlid', id);
 
     if (index < 0 || index >= parent.children.length) {
         parent.appendChild(textElement);

@@ -44,11 +44,11 @@ namespace Windows.UI.Xaml.Documents
 
         internal virtual string TagName => "span";
 
-        //internal sealed override void AddEventListeners() { }
+        internal sealed override void AddEventListeners() { }
 
-        //internal sealed override UIElement MouseTarget => null;
+        internal sealed override UIElement MouseTarget => null;
 
-        //internal sealed override UIElement KeyboardTarget => null;
+        internal sealed override UIElement KeyboardTarget => null;
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
             => domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateTextElementDomElementAndAppendIt(parentRef, this);
