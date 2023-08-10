@@ -36,15 +36,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// </summary>
     public class ButtonBase : ContentControl
     {
-        // We need to keep a strong reference to the handler otherwise it can be
-        // garbage collected to early if the command used by this button implements
-        // the CanExecuteChanged event with a weak event pattern.
-        private readonly EventHandler _canExecuteChangedHandler;
+        private WeakEventListener<ButtonBase, ICommand, EventArgs> _canExecuteChangedListener;
 
         public ButtonBase()
         {
-            _canExecuteChangedHandler = new EventHandler(OnCanExecuteChanged);
-
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Interval = new TimeSpan(0, 0, 5); // See comment where this variable is defined.
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Tick += TimerToReleaseCaptureAutomaticallyIfNoMouseUpEvent_Tick;
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
@@ -119,8 +114,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Identifies the <see cref="ButtonBase.Command"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Command"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CommandProperty =
             DependencyProperty.Register(
@@ -132,30 +126,28 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ButtonBase b = (ButtonBase)d;
-            b.OnCommandChanged((ICommand)e.OldValue, (ICommand)e.NewValue);
+            b.OnCommandChanged((ICommand)e.NewValue);
         }
 
-        private void OnCommandChanged(ICommand oldCommand, ICommand newCommand)
+        private void OnCommandChanged(ICommand newCommand)
         {
-            if (oldCommand != null)
+            if (_canExecuteChangedListener != null)
             {
-                UnhookCommand(oldCommand);
+                _canExecuteChangedListener.Detach();
+                _canExecuteChangedListener = null;
             }
+
             if (newCommand != null)
             {
-                HookCommand(newCommand);
+                _canExecuteChangedListener = new(this, newCommand)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnCanExecuteChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.CanExecuteChanged -= listener.OnEvent,
+                };
+
+                newCommand.CanExecuteChanged += _canExecuteChangedListener.OnEvent;
             }
-        }
 
-        private void UnhookCommand(ICommand command)
-        {
-            command.CanExecuteChanged -= _canExecuteChangedHandler;
-            UpdateCanExecute();
-        }
-
-        private void HookCommand(ICommand command)
-        {
-            command.CanExecuteChanged += _canExecuteChangedHandler;
             UpdateCanExecute();
         }
 
