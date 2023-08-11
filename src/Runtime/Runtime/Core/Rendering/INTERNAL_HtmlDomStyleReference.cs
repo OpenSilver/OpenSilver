@@ -12,49 +12,16 @@
 *  
 \*====================================================================================*/
 
-
-//#define CHECK_THAT_ID_EXISTS 
-//#define PERFORMANCE_ANALYSIS
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
 using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Globalization;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.Foundation;
-#endif
 
 namespace CSHTML5.Internal
 {
-    // Note: this class is intented to be used by the Simulator only, not when compiled to JavaScript.
-#if !BRIDGE
-    [JSIgnore]
-#else
-    [External]
-#endif
-
-#if CSHTML5NETSTANDARD
     public class INTERNAL_HtmlDomStyleReference : DynamicObject
-#else
-    internal class INTERNAL_HtmlDomStyleReference : DynamicObject
-#endif
     {
-#if PERFORMANCE_ANALYSIS
-        static Dictionary<string, int> NumberOfTimesEachDynamicMemberIsCalled = new Dictionary<string, int>();
-#endif
-
+#pragma warning disable IDE1006 // Naming Styles
         internal string Uid { get; }
 
-        // Note: It's important that the constructor stays Private because we need to recycle the instances that correspond to the same ID using the "GetInstance" public static method, so thateach ID always corresponds to the same instance. This is useful to ensure that private fields such as "_display" work propertly.
         internal INTERNAL_HtmlDomStyleReference(string elementId)
         {
             Uid = elementId;
@@ -66,65 +33,15 @@ namespace CSHTML5.Internal
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            //            string javaScriptCodeToExecute = string.Format(@"
-            //                    var element = document.getElementByIdSafe(""{0}"");
-            //                    element.style.{1} = ""{2}"";
-            //                ", _domElementUniqueIdentifier, binder.Name, value);
-
-            SetStylePropertyValue(binder.Name, (value ?? "").ToString());
-
-            //System.Diagnostics.Debug.WriteLine("Style property: " + binder.Name);
-
-#if PERFORMANCE_ANALYSIS
-            if (NumberOfTimesEachDynamicMemberIsCalled.ContainsKey(binder.Name))
-                NumberOfTimesEachDynamicMemberIsCalled[binder.Name] = NumberOfTimesEachDynamicMemberIsCalled[binder.Name] + 1;
-            else
-                NumberOfTimesEachDynamicMemberIsCalled.Add(binder.Name, 1);
-#endif
-
-#if CHECK_THAT_ID_EXISTS
-            var domElement = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("document.getElementByIdSafe(\"" + _domElementUniqueIdentifier + "\")");
-            if (domElement == null)
-                throw new Exception("DOM element ID not found: " + _domElementUniqueIdentifier);
-#endif
-
+            SetStylePropertyValue(binder.Name, (value ?? string.Empty).ToString());
             return true;
         }
 
-        void SetStylePropertyValue(string propertyName, string propertyValue)
-        {
-            string javaScriptCodeToExecute = $@"document.setDomStyle(""{Uid}"", ""{propertyName}"", ""{propertyValue}"")";
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
-        }
-
-        void SetTransformPropertyValue(string propertyValue)
-        {
-            string javaScriptCodeToExecute = $@"document.setDomTransform(""{Uid}"", ""{propertyValue}"")";
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
-        }
-
-        void SetTransformOriginPropertyValue(string propertyValue)
-        {
-            string javaScriptCodeToExecute = $@"document.setDomTransformOrigin(""{Uid}"", ""{propertyValue}"")";
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
-        }
-
-        //        string GetStylePropertyValue(string propertyName)
-        //        {
-        //            return ExecuteJavaScriptWithResult(
-        //                    string.Format(@"
-        //var element = document.getElementByIdSafe(""{0}"");
-        //if (element)
-        //    return element.style.{1};
-        //else
-        //    return """";", _domElementUniqueIdentifier, propertyName));
-        //        }
-
-        string _display = "block";
-        string _width = "";
-        string _height = "";
-        string _maxWidth = "";
-        string _maxHeight = "";
+        private string _display = "block";
+        private string _width = "";
+        private string _height = "";
+        private string _maxWidth = "";
+        private string _maxHeight = "";
 
         public string background { set { SetStylePropertyValue("background", value); } }
         public string backgroundColor { set { SetStylePropertyValue("backgroundColor", value); } }
@@ -228,6 +145,26 @@ namespace CSHTML5.Internal
         public string flexShrink { set { SetStylePropertyValue("flexShrink", value); } }
         public string flexBasis { set { SetStylePropertyValue("flexBasis", value); } }
 
+        internal void setProperty(string propertyName, string value) =>
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+                $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}');");
+
+        internal void setProperty(string propertyName, string value, string priority) =>
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+                $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}', '{priority}');");
+
+        private void SetStylePropertyValue(string propertyName, string value) =>
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+                $"document.setDomStyle('{Uid}', '{propertyName}', '{value}');");
+
+        private void SetTransformPropertyValue(string propertyValue) =>
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+                $"document.setDomTransform('{Uid}', '{propertyValue}');");
+
+        private void SetTransformOriginPropertyValue(string propertyValue) =>
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+                $"document.setDomTransformOrigin('{Uid}', '{propertyValue}');");
+
         //-----------------------------------------------------------------------
         // Usage stats for To-Do Calendar (number of types each property is set):
         //-----------------------------------------------------------------------
@@ -257,5 +194,6 @@ namespace CSHTML5.Internal
         //verticalAlign, 552
         //whiteSpace, 378
         //width, 6973
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

@@ -312,6 +312,13 @@ document.setDomStyle = function (id, propertyName, value) {
     element.style[propertyName] = value;
 }
 
+document.setStyleProperty = function (id, propertyName, value, priority) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.style.setProperty(propertyName, value, priority);
+    }
+};
+
 document.setDomTransform = function (id, value) {
     const element = document.getElementById(id);
     if (!element)
