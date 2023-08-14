@@ -13,12 +13,7 @@
 
 using System;
 using System.Collections.Generic;
-
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
-#endif
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,111 +22,99 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Represents a collection of PathSegment objects that can be individually accessed
-    /// by index.
+    /// Represents a collection of <see cref="PathSegment"/> objects that can
+    /// be individually accessed by index.
     /// </summary>
-    public sealed partial class PathSegmentCollection : PresentationFrameworkCollection<PathSegment>
+    public sealed class PathSegmentCollection : PresentationFrameworkCollection<PathSegment>
     {
-        private Path _parentPath;
+        private Geometry _parentGeometry;
 
         /// <summary>
-        /// Initializes a new instance that is empty.
+        /// Initializes a new instance of the <see cref="PathSegmentCollection"/> class.
         /// </summary>
-        public PathSegmentCollection() : base(false)
+        public PathSegmentCollection()
+            : base(true)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance that is empty and has the specified initial capacity.
+        /// Initializes a new instance of the <see cref="PathSegmentCollection"/> class with 
+        /// the specified capacity, or the number of <see cref="PathSegment"/> objects the 
+        /// collection is initially capable of storing.
         /// </summary>
-        /// <param name="capacity"> int - The number of elements that the new list is initially capable of storing. </param>
-        public PathSegmentCollection(int capacity) : base(capacity, false)
+        /// <param name="capacity">
+        /// The number of <see cref="PathSegment"/> objects that the collection is initially 
+        /// capable of storing.
+        /// </param>
+        public PathSegmentCollection(int capacity)
+            : base(capacity, true)
         {
         }
 
         /// <summary>
-        /// Creates a PathSegmentCollection with all of the same elements as collection
+        /// Initializes a new instance of the <see cref="PathSegmentCollection"/> class with 
+        /// the specified collection of <see cref="PathSegment"/> objects.
         /// </summary>
-        public PathSegmentCollection(IEnumerable<PathSegment> segments) : base(segments, false)
+        /// <param name="segments">
+        /// The collection of <see cref="PathSegment"/> objects that make up the 
+        /// <see cref="PathSegmentCollection"/>.
+        /// </param>
+        public PathSegmentCollection(IEnumerable<PathSegment> segments)
+            : base(segments, true)
         {
         }
 
         internal override void AddOverride(PathSegment segment)
         {
-            if (this._parentPath != null)
-            {
-                segment.SetParentPath(this._parentPath);
-            }
-
-            this.AddDependencyObjectInternal(segment);
-            this.NotifyParent();
+            SetParentGeometry(segment, _parentGeometry);
+            AddDependencyObjectInternal(segment);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.GetItemInternal(index).SetParentPath(null);
-            this.RemoveAtDependencyObjectInternal(index);
-            this.NotifyParent();
+            SetParentGeometry(GetItemInternal(index), null);
+            RemoveAtDependencyObjectInternal(index);
         }
 
         internal override void InsertOverride(int index, PathSegment segment)
         {
-            if (this._parentPath != null)
-            {
-                segment.SetParentPath(this._parentPath);
-            }
-
-            this.InsertDependencyObjectInternal(index, segment);
-            this.NotifyParent();
+            SetParentGeometry(segment, _parentGeometry);
+            InsertDependencyObjectInternal(index, segment);
         }
 
         internal override void ClearOverride()
         {
-            foreach (PathSegment segment in this)
+            foreach (var segment in this)
             {
-                segment.SetParentPath(null);
+                SetParentGeometry(segment, null);
             }
-
-            this.ClearDependencyObjectInternal();
-            this.NotifyParent();
+            ClearDependencyObjectInternal();
         }
 
-        internal override PathSegment GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override PathSegment GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, PathSegment segment)
         {
-            if (this._parentPath != null)
-            {
-                PathSegment oldItem = this[index];
-                oldItem.SetParentPath(null);
-                segment.SetParentPath(this._parentPath);
-            }
-
-            this.SetItemDependencyObjectInternal(index, segment);
-            this.NotifyParent();
+            SetParentGeometry(GetItemInternal(index), null);
+            SetParentGeometry(segment, _parentGeometry);
+            SetItemDependencyObjectInternal(index, segment);
         }
 
-        internal void SetParentPath(Path path)
+        internal void SetParentGeometry(Geometry geometry)
         {
-            if (this._parentPath != path)
+            if (_parentGeometry == geometry) return;
+
+            _parentGeometry = geometry;
+            foreach (var segment in this)
             {
-                this._parentPath = path;
-                foreach (PathSegment segment in this)
-                {
-                    segment.SetParentPath(path);
-                }
+                segment.SetParentGeometry(geometry);
             }
         }
 
-        private void NotifyParent()
+        private static void SetParentGeometry(PathSegment segment, Geometry geometry)
         {
-            if (this._parentPath != null)
-            {
-                this._parentPath.ScheduleRedraw();
-            }
+            Debug.Assert(segment is not null);
+            segment.SetParentGeometry(geometry);
         }
     }
 }

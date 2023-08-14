@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,14 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using System.Collections.Generic;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Shapes;
+#else
 using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -26,98 +28,45 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Represents a line drawn between two points, which can be part of a PathFigure
-    /// within Path data.
+    /// Represents a line drawn between two points, which can be part of a <see cref="PathFigure"/>
+    /// within <see cref="Path"/> data.
     /// </summary>
-    public sealed partial class LineSegment : PathSegment
+    public sealed class LineSegment : PathSegment
     {
-        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LineSegment"/> class.
+        /// </summary>
+        public LineSegment() { }
 
         /// <summary>
-        /// Initializes a new instance of the LineSegment class.
+        /// Identifies the <see cref="Point"/> dependency property.
         /// </summary>
-        public LineSegment()
-        {
-
-        }
-
-        #endregion
-
-        #region Dependency Properties
+        public static readonly DependencyProperty PointProperty =
+            DependencyProperty.Register(
+                nameof(Point),
+                typeof(Point),
+                typeof(LineSegment),
+                new PropertyMetadata(new Point(), PropertyChanged));
 
         /// <summary>
         /// Gets or sets the end point of the line segment.
         /// </summary>
+        /// <returns>
+        /// The end point of the line segment. The default is a <see cref="Point"/> with 
+        /// value 0,0.
+        /// </returns>
         public Point Point
         {
-            get { return (Point)GetValue(PointProperty); }
-            set { SetValue(PointProperty, value); }
+            get => (Point)GetValue(PointProperty);
+            set => SetValue(PointProperty, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="LineSegment.Point"/> dependency 
-        /// property.
-        /// </summary>
-        public static readonly DependencyProperty PointProperty =
-            DependencyProperty.Register(
-                nameof(Point), 
-                typeof(Point), 
-                typeof(LineSegment), 
-                new PropertyMetadata(new Point(), Point_Changed));
-
-        private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)
         {
-            LineSegment segment = (LineSegment)d;
-            if (segment.ParentPath != null)
-            {
-                segment.ParentPath.ScheduleRedraw();
-            }
+            // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#lineto_path_commands
+            yield return "L";
+            yield return Point.X.ToString(formatProvider);
+            yield return Point.Y.ToString(formatProvider);
         }
-
-        #endregion
-
-        #region Overriden Methods
-
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
-                                               double yOffsetToApplyBeforeMultiplication, 
-                                               double xOffsetToApplyAfterMultiplication, 
-                                               double yOffsetToApplyAfterMultiplication, 
-                                               double horizontalMultiplicator, 
-                                               double verticalMultiplicator, 
-                                               object canvasDomElement, 
-                                               Point previousLastPoint)
-        {
-            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-
-            // tell the context that there should be a line from the starting point to this point
-            //context.lineTo((Point.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-            //               (Point.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-            //Note: we replaced the code above with the one below because Bridge.NET has an issue when adding "0" to an Int64 (as of May 1st, 2020), so it is better to first multiply and then add, rather than the contrary:
-            context.lineTo(Point.X * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
-                           Point.Y * verticalMultiplicator  + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-
-            return Point;
-        }
-
-        internal override Point GetMaxXY()
-        {
-            return new Point(Point.X, Point.X);
-        }
-
-        internal override Point GetMinMaxXY(ref double minX, 
-                                            ref double maxX, 
-                                            ref double minY, 
-                                            ref double maxY, 
-                                            Point startingPoint)
-        {
-            minX = Math.Min(minX, Point.X);
-            maxX = Math.Max(maxX, Point.X);
-            minY = Math.Min(minY, Point.Y);
-            maxY = Math.Max(maxY, Point.Y);
-            return Point;
-        }
-
-        #endregion
-
     }
 }

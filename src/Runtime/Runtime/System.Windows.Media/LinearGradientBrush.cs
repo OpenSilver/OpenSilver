@@ -14,13 +14,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Shapes;
+#else
 using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -36,24 +41,27 @@ namespace Windows.UI.Xaml.Media
     {
         private readonly bool _isClone;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinearGradientBrush"/> class.
+        /// </summary>
         public LinearGradientBrush() { }
 
         /// <summary>
-        /// Initializes a new instance of the LinearGradientBrush class that has the
-        /// specified GradientStopCollection and angle.
+        /// Initializes a new instance of the <see cref="LinearGradientBrush"/> class
+        /// that has the specified <see cref="GradientStopCollection"/> and angle.
         /// </summary>
-        /// <param name="gradientStopCollection">The GradientStops to set on this brush.</param>
+        /// <param name="gradientStopCollection">
+        /// The <see cref="GradientBrush.GradientStops"/> to set on this brush.
+        /// </param>
         /// <param name="angle">
-        /// A System.Double that represents the angle, in degrees, of the gradient. A
-        /// value of 0 creates a horizontal gradient, and a value of 90 creates a vertical
-        /// gradient. Negative values are permitted, as are values over 360 (which are
-        /// treated as mod 360).
+        /// A System.Double that represents the angle, in degrees, of the gradient. A value
+        /// of 0 creates a horizontal gradient, and a value of 90 creates a vertical gradient.
+        /// Negative values are permitted, as are values over 360 (are treated as mod 360).
         /// </param>
         public LinearGradientBrush(GradientStopCollection gradientStopCollection, double angle)
         {
             GradientStops = gradientStopCollection;
-
-            _angle = -angle;
+            EndPoint = EndPointFromAngle(angle);
         }
 
         private LinearGradientBrush(LinearGradientBrush original)
@@ -65,70 +73,68 @@ namespace Windows.UI.Xaml.Media
             EndPoint = original.EndPoint;
         }
 
-        private double _angle; //degrees
+        /// <summary>
+        /// Identifies the <see cref="EndPoint"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty EndPointProperty =
+            DependencyProperty.Register(
+                nameof(EndPoint),
+                typeof(Point),
+                typeof(LinearGradientBrush),
+                new PropertyMetadata(new Point(1, 1)));
 
         /// <summary>
         /// Gets or sets the ending two-dimensional coordinates of the linear gradient.
         /// </summary>
+        /// <returns>
+        /// The ending two-dimensional coordinates of the linear gradient. The default is
+        /// a  <see cref="Point"/> with value 1,1.
+        /// </returns>
         public Point EndPoint
         {
-            get { return (Point)GetValue(EndPointProperty); }
-            set { SetValue(EndPointProperty, value); }
+            get => (Point)GetValue(EndPointProperty);
+            set => SetValue(EndPointProperty, value);
         }
 
         /// <summary>
-        /// Identifies the EndPoint dependency property.
+        /// Identifies the <see cref="StartPoint"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty EndPointProperty =
+        public static readonly DependencyProperty StartPointProperty =
             DependencyProperty.Register(
-                nameof(EndPoint), 
-                typeof(Point), 
-                typeof(LinearGradientBrush), 
-                new PropertyMetadata(new Point(1, 1), EndPoint_Changed));
-
-        private static void EndPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((LinearGradientBrush)d).RecalculateAngle();
-        }
+                nameof(StartPoint),
+                typeof(Point),
+                typeof(LinearGradientBrush),
+                new PropertyMetadata(new Point()));
 
         /// <summary>
         /// Gets or sets the starting two-dimensional coordinates of the linear gradient.
         /// </summary>
+        /// <returns>
+        /// The starting two-dimensional coordinates for the linear gradient. The default
+        /// is a <see cref="Point"/> with value 0,0.
+        /// </returns>
         public Point StartPoint
         {
-            get { return (Point)GetValue(StartPointProperty); }
-            set { SetValue(StartPointProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the StartPoint dependency property.
-        /// </summary>
-        public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register(
-                nameof(StartPoint), 
-                typeof(Point), 
-                typeof(LinearGradientBrush), 
-                new PropertyMetadata(new Point(), StartPoint_Changed));
-
-        private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((LinearGradientBrush)d).RecalculateAngle();
+            get => (Point)GetValue(StartPointProperty);
+            set => SetValue(StartPointProperty, value);
         }
 
         bool ICloneOnAnimation<LinearGradientBrush>.IsClone => _isClone;
 
         LinearGradientBrush ICloneOnAnimation<LinearGradientBrush>.Clone() => new LinearGradientBrush(this);
 
+        private Point EndPointFromAngle(double angle)
+        {
+            // Convert the angle from degrees to radians
+            angle = angle * (1.0 / 180.0) * Math.PI;
+
+            return (new Point(Math.Cos(angle), Math.Sin(angle)));
+        }
+
         internal override Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(INTERNAL_ToHtmlString(parent));
 
-        private void RecalculateAngle()
-        {
-            // todo: should that not take into consideration the size of the element 
-            // (meaning that if it is twice as wide than it is high, the angle will
-            // be different)?
-            _angle = Math.Atan2(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y) * 180.0 / Math.PI - 90.0; 
-        }
+        internal override ISvgBrush GetSvgElement() => new SvgLinearGradient(this);
 
         private void ToHtmlStringForAbsoluteMappingMode(DependencyObject parent, out string gradientStopsString, out double alpha)
         {
@@ -581,6 +587,49 @@ namespace Windows.UI.Xaml.Media
                 "-moz-" + baseString,
                 baseString,
             };
+        }
+
+        private sealed class SvgLinearGradient : ISvgBrush
+        {
+            private readonly LinearGradientBrush _brush;
+            private INTERNAL_HtmlDomElementReference _gradientRef;
+
+            public SvgLinearGradient(LinearGradientBrush lgb)
+            {
+                _brush = lgb ?? throw new ArgumentNullException(nameof(lgb));
+            }
+
+            public string GetBrush(Shape shape)
+            {
+                if (_gradientRef is null)
+                {
+                    _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(
+                        shape.DefsElement, "linearGradient");
+
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "x1", _brush.StartPoint.X.ToInvariantString());
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "y1", _brush.StartPoint.Y.ToInvariantString());
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "x2", _brush.EndPoint.X.ToInvariantString());
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "y2", _brush.EndPoint.Y.ToInvariantString());
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "gradientUnits", ConvertBrushMappingModeToString(_brush.MappingMode));
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "spreadMethod", ConvertSpreadMethodToString(_brush.SpreadMethod));
+
+                    var stops = _brush.GetGradientStops()
+                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.INTERNAL_ToHtmlString(_brush.Opacity)}\" />");
+
+                    string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_gradientRef);
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
+                }
+
+                return $"url(#{_gradientRef.UniqueIdentifier})";
+            }
+
+            public void DestroyBrush(Shape shape)
+            {
+                Debug.Assert(_gradientRef is not null);
+
+                INTERNAL_HtmlDomManager.RemoveNodeNative(_gradientRef);
+                _gradientRef = null;
+            }
         }
     }
 }
