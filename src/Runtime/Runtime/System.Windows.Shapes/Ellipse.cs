@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,14 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenSilver.Internal;
+
 #if MIGRATION
 using System.Windows.Media;
 #else
-using Windows.UI.Xaml.Media;
 using Windows.Foundation;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -35,73 +30,112 @@ namespace Windows.UI.Xaml.Shapes
     /// <summary>
     /// Draws an ellipse.
     /// </summary>
-    /// <exclude/>
-    public partial class Ellipse : Shape
+    public class Ellipse : Shape
     {
-        //dynamic canvasDomElement;
-
         static Ellipse()
         {
             StretchProperty.OverrideMetadata(
                 typeof(Ellipse),
-                new FrameworkPropertyMetadata(Stretch.Fill)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                });
+                new FrameworkPropertyMetadata(Stretch.Fill, FrameworkPropertyMetadataOptions.AffectsMeasure));
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Ellipse"/> class.
+        /// </summary>
+        public Ellipse() { }
+
+        internal sealed override string SvgTagName => "ellipse";
+
+        protected override Size MeasureOverride(Size availableSize)
         {
-            return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
-
-            //domElementWhereToPlaceChildren = null;
-            //var canvas = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("canvas", parentRef, this);
-            //return canvas;
-        }
-
-        //protected internal override void INTERNAL_OnAttachedToVisualTree()
-        //{
-        //    ScheduleRedraw();
-        //}
-
-        protected internal override void Redraw()
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            if (Stretch == Stretch.UniformToFill)
             {
-                double xOffsetToApplyBeforeMultiplication;
-                double yOffsetToApplyBeforeMultiplication;
-                double xOffsetToApplyAfterMultiplication;
-                double yOffsetToApplyAfterMultiplication;
-                double sizeX;
-                double sizeY;
-                double horizontalMultiplicator;
-                double verticalMultiplicator;
-                Size shapeActualSize;
-                Shape.GetShapeInfos(this, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out sizeX, out sizeY, out horizontalMultiplicator, out verticalMultiplicator, out shapeActualSize);
-
-                ApplyMarginToFixNegativeCoordinates(new Point());
-                if (Stretch == Media.Stretch.None)
+                double width = Width;
+                if (double.IsNaN(width))
                 {
-                    ApplyMarginToFixNegativeCoordinates(_marginOffsets);
+                    width = availableSize.Width;
+                    if (double.IsInfinity(width))
+                    {
+                        width = 0.0;
+                    }
                 }
 
-                //todo: size might not perfectly match that of she designer. (so it might be very different from it in big ellipses?)
-                INTERNAL_ShapesDrawHelpers.PrepareEllipse(_canvasDomElement, sizeX, sizeY, sizeX / 2 + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, sizeY / 2 + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication);
+                double height = Height;
+                if (double.IsNaN(height))
+                {
+                    height = availableSize.Height;
+                    if (double.IsInfinity(height))
+                    {
+                        height = 0.0;
+                    }
+                }
 
-                //todo: make sure the parameters below are correct.
-                Shape.DrawFillAndStroke(this, "evenodd", xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, xOffsetToApplyAfterMultiplication + sizeX, yOffsetToApplyAfterMultiplication + sizeY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
-
-
-                //dynamic context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
-                //if (fillValue != null || (fillValue is string && !string.IsNullOrWhiteSpace((string)fillValue)))
-                //{
-                //    context.fill("evenodd"); //note: remember: always fill before stroke, otherwise the filling will hide the stroke.
-                //}
-                //if (StrokeThickness > 0 && Stroke != null)
-                //{
-                //    context.stroke();
-                //}
+                return new Size(width, height);
             }
+
+            return GetNaturalSize();
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            double penThickness = GetStrokeThickness();
+            
+            double rx = Math.Max(0, finalSize.Width - penThickness) / 2;
+            double ry = Math.Max(0, finalSize.Height - penThickness) / 2;
+
+            switch (Stretch)
+            {
+                case Stretch.None:
+                    // A 0 Rect.Width and Rect.Height rectangle
+                    //rect.Width = rect.Height = 0;
+                    rx = ry = 0;
+                    break;
+                
+                case Stretch.Uniform:
+                    // The maximal square that fits in the final box
+                    if (rx > ry)
+                    {
+                        rx = ry;
+                    }
+                    else
+                    {
+                        ry = rx;
+                    }
+                    break;
+
+                case Stretch.UniformToFill:
+                    // The minimal square that fills the final box
+                    if (rx < ry)
+                    {
+                        rx = ry;
+                    }
+                    else
+                    {
+                        ry = rx;
+                    }
+                    break;
+
+                case Stretch.Fill:
+                default:
+                    // The most common case: a rectangle that fills the box.
+                    // rect has already been initialized for that.
+                    break;
+            }
+
+            SetSvgAttribute("cx", (rx + penThickness / 2).ToInvariantString());
+            SetSvgAttribute("cy", (ry + penThickness / 2).ToInvariantString());
+            SetSvgAttribute("rx", rx.ToInvariantString());
+            SetSvgAttribute("ry", ry.ToInvariantString());
+
+            return finalSize;
+        }
+
+        internal sealed override Size GetNaturalSize()
+        {
+            double width = Width;
+            double height = Height;
+
+            return new Size(double.IsNaN(width) ? 0.0 : width, double.IsNaN(height) ? 0.0 : height);
         }
     }
 }

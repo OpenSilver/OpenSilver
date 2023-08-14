@@ -51,6 +51,14 @@ body {
     text-decoration: var(--mouse-over-decoration, underline) !important;
 }
 
+.uielement-shape {
+    pointer-events: none !important;
+    fill: none; /* CSS default value is black */
+    fill-rule: evenodd; /* CSS default value is nonzero, and evenodd is the default value of every shape */
+    stroke: none; /* CSS default value is black */
+    stroke-miterlimit: 10; /* CSS default value is 4 */
+}
+
 /* Media query used for printing (cf. "CSHTML5.Native.Html.Printing.PrintManager") */
 @media print {
     body {

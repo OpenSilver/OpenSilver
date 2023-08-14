@@ -12,15 +12,15 @@
 \*====================================================================================*/
 
 using System;
-using System.Linq;
 using System.Collections.Specialized;
+using System.Linq;
 using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
 #else
-using Windows.UI.Xaml.Media;
 using Windows.Foundation;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -30,23 +30,16 @@ namespace Windows.UI.Xaml.Shapes
 #endif
 {
     /// <summary>
-    /// Draws a series of connected straight lines.
+    /// Draws a polygon, which is a connected series of lines that form a closed shape.
     /// </summary>
-    public sealed class Polyline : Shape
+    public sealed class Polygon : Shape
     {
-        private WeakEventListener<Polyline, PointCollection, NotifyCollectionChangedEventArgs> _pointsCollectionChanged;
-
-        static Polyline()
-        {
-            StretchProperty.OverrideMetadata(
-                typeof(Polyline),
-                new FrameworkPropertyMetadata(Stretch.Fill, FrameworkPropertyMetadataOptions.AffectsMeasure));
-        }
+        private WeakEventListener<Polygon, PointCollection, NotifyCollectionChangedEventArgs> _pointsCollectionChanged;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Polyline"/> class.
+        /// Initializes a new instance of the <see cref="Polygon"/> class.
         /// </summary>
-        public Polyline() { }
+        public Polygon() { }
 
         /// <summary>
         /// Identifies the <see cref="FillRule"/> dependency property.
@@ -55,17 +48,17 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(FillRule),
                 typeof(FillRule),
-                typeof(Polyline),
+                typeof(Polygon),
                 new PropertyMetadata(FillRule.EvenOdd)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Polyline)d).SetFillRuleAttribute((FillRule)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Polygon)d).SetFillRuleAttribute((FillRule)newValue),
                 });
 
         /// <summary>
         /// Gets or sets a value that specifies how the interior fill of the shape is determined.
         /// </summary>
         /// <returns>
-        /// A value of the enumeration that specifies the fill behavior. The default is <see cref="FillRule.EvenOdd"/>.
+        /// A value of the enumeration. The default is <see cref="FillRule.EvenOdd"/>.
         /// </returns>
         public FillRule FillRule
         {
@@ -80,15 +73,15 @@ namespace Windows.UI.Xaml.Shapes
             DependencyProperty.Register(
                 nameof(Points),
                 typeof(PointCollection),
-                typeof(Polyline),
+                typeof(Polygon),
                 new FrameworkPropertyMetadata(
                     new PFCDefaultValueFactory<Point>(
                         static () => new PointCollection(),
                         static (d, dp) =>
                         {
-                            Polyline polyline = (Polyline)d;
+                            Polygon polygon = (Polygon)d;
                             var points = new PointCollection();
-                            polyline.OnPointsChanged(null, points);
+                            polygon.OnPointsChanged(null, points);
                             return points;
                         }),
                     FrameworkPropertyMetadataOptions.AffectsMeasure,
@@ -97,26 +90,27 @@ namespace Windows.UI.Xaml.Shapes
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        Polyline polyline = (Polyline)d;
+                        Polygon polygon = (Polygon)d;
                         if (newValue is PointCollection points)
                         {
-                            polyline.SetSvgAttribute(
+                            polygon.SetSvgAttribute(
                                 "points",
                                 string.Join(" ", points.Select(static p => $"{p.X.ToInvariantString()},{p.Y.ToInvariantString()}")));
                         }
                         else
                         {
-                            polyline.RemoveSvgAttribute("points");
+                            polygon.RemoveSvgAttribute("points");
                         }
                     },
                 });
 
         /// <summary>
-        /// Gets or sets a collection that contains the vertex points of the <see cref="Polyline"/>.
+        /// Gets or sets a collection that contains the vertex points of the polygon.
         /// </summary>
         /// <returns>
-        /// A collection of <see cref="Point"/> structures that describe the vertex points
-        /// of the <see cref="Polyline"/>. The default is null.
+        /// A collection of <see cref="Point"/> structures that describes the vertex points
+        /// of the polygon. The default is null. The value can be expressed as a string as
+        /// described in "pointSet Grammar" below.
         /// </returns>
         public PointCollection Points
         {
@@ -126,7 +120,7 @@ namespace Windows.UI.Xaml.Shapes
 
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((Polyline)d).OnPointsChanged((PointCollection)e.OldValue, (PointCollection)e.NewValue);
+            ((Polygon)d).OnPointsChanged((PointCollection)e.OldValue, (PointCollection)e.NewValue);
         }
 
         private static object CoercePoints(DependencyObject d, object baseValue)
@@ -155,7 +149,7 @@ namespace Windows.UI.Xaml.Shapes
             }
         }
 
-        internal sealed override string SvgTagName => "polyline";
+        internal sealed override string SvgTagName => "polygon";
 
         /// <summary>
         /// Get the natural size of the geometry that defines this shape

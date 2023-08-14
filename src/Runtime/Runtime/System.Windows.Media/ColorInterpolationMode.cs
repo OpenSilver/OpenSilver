@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System;
+
 #if MIGRATION
 namespace System.Windows.Media
 #else
@@ -18,22 +20,18 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Specifies the coordinate system used by a <see cref="Brush"/>.
+    /// Determines how the colors in a gradient are interpolated.
     /// </summary>
-    public enum BrushMappingMode
+    public enum ColorInterpolationMode
     {
         /// <summary>
-        /// The coordinate system is not relative to a bounding box. Values are interpreted
-        /// directly in local space.
+        /// Colors are interpolated in the scRGB color space
         /// </summary>
-        Absolute = 0,
+        ScRgbLinearInterpolation = 0,
 
         /// <summary>
-        /// The coordinate system is relative to a bounding box: 0 indicates 0 percent of
-        /// the bounding box, and 1 indicates 100 percent of the bounding box. For example,
-        /// (0.5, 0.5) describes a point in the middle of the bounding box, and (1, 1) describes
-        /// a point at the bottom right of the bounding box.
+        /// Colors are interpolated in the sRGB color space
         /// </summary>
-        RelativeToBoundingBox = 1,
+        SRgbLinearInterpolation = 1
     }
 }

@@ -994,16 +994,19 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion pointer-events
+        internal virtual void SetPointerEventsImpl() =>
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement)
+                .pointerEvents = EnablePointerEvents ? "auto" : "none";
 
         internal static void SetPointerEvents(UIElement element)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                style.pointerEvents = element.EnablePointerEvents ? "auto" : "none";
+                element.SetPointerEventsImpl();
             }
         }
+
+#endregion pointer-events
 
 #region AllowDrop
 

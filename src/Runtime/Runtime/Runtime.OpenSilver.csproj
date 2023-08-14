@@ -286,6 +286,7 @@
 		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Wasm.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Simulator.cs" />
+		<Compile Include="System.Windows.Media\ColorInterpolationMode.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
@@ -423,7 +424,7 @@
 		<Compile Include="System.Windows.Controls\TreeViewItem.cs" />
 		<Compile Include="System.Windows.Controls\ScrollViewerExtensions.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Typography.cs" />
-		<Compile Include="System.Windows.Media\Polygon.cs" />
+		<Compile Include="System.Windows.Shapes\Polygon.cs" />
 		<Compile Include="System.Windows\Expression.cs" />
 		<Compile Include="System.Windows\TemplateBindingExtension.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\CheckAndDownloadUpdateCompletedEventArgs.cs" />
@@ -646,7 +647,6 @@
 		<Compile Include="Core\Other\HashSet2_1.cs" />
 		<Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
 		<Compile Include="Core\Other\INTERNAL_FontsHelper.cs" />
-		<Compile Include="Core\Other\INTERNAL_ShapesDrawHelpers.cs" />
 		<Compile Include="Core\Other\INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.cs" />
 		<Compile Include="Core\Other\INTERNAL_XamlResourcesHandler.cs" />
 		<Compile Include="Core\Other\ISet2_1.cs" />
@@ -1063,7 +1063,7 @@
 		<Compile Include="System.Windows.Media\VisualTreeHelper.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\BitmapCache.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheMode.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\GeometryCollection.cs" />
+		<Compile Include="System.Windows.Media\GeometryCollection.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\Projection.cs" />
 		<Compile Include="System.Windows.Media\RectangleGeometry.cs" />
 		<Compile Include="System.Windows.Navigation\NavigatedEventHandler.cs" />

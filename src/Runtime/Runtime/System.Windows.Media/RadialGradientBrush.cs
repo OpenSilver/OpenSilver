@@ -14,13 +14,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Shapes;
+#else
 using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -30,129 +35,144 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Paints an area with a radial gradient. A focal point defines the beginning
-    /// of the gradient, and a circle defines the end point of the gradient.
+    /// Paints an area with a radial gradient. A focal point defines the beginning of
+    /// the gradient, and a circle defines the end point of the gradient.
     /// </summary>
     public sealed class RadialGradientBrush : GradientBrush
     {
         /// <summary>
-        /// Initializes a new instance of the System.Windows.Media.RadialGradientBrush
-        /// class.
+        /// Initializes a new instance of the <see cref="RadialGradientBrush"/> class.
         /// </summary>
         public RadialGradientBrush() {}
-       
+
         /// <summary>
-        /// Initializes a new instance of the System.Windows.Media.RadialGradientBrush
-        /// class that has the specified gradient stops.
+        /// Initializes a new instance of the <see cref="RadialGradientBrush"/> class
+        /// that has the specified gradient stops.
         /// </summary>
-        /// <param name="gradientStopCollection">The gradient stops to set on this brush.</param>
+        /// <param name="gradientStopCollection">
+        /// The gradient stops to set on this brush.
+        /// </param>
         public RadialGradientBrush(GradientStopCollection gradientStopCollection)
         {
             GradientStops = gradientStopCollection;
         }
-  
+
         /// <summary>
-        /// Initializes a new instance of the System.Windows.Media.RadialGradientBrush
-        /// class with the specified start and stop colors.
+        /// Initializes a new instance of the <see cref="RadialGradientBrush"/> class
+        /// with the specified start and stop colors.
         /// </summary>
         /// <param name="startColor">
-        /// Color value at the focus (System.Windows.Media.RadialGradientBrush.GradientOrigin)
-        /// of the radial gradient.
+        /// Color value at the focus (<see cref="GradientOrigin"/>) of the radial gradient.
         /// </param>
-        /// <param name="endColor">Color value at the outer edge of the radial gradient.</param>
+        /// <param name="endColor">
+        /// Color value at the outer edge of the radial gradient.
+        /// </param>
         public RadialGradientBrush(Color startColor, Color endColor)
         {
-            GradientStopCollection gradientStops = new GradientStopCollection();
-            gradientStops.Add(new GradientStop() { Color = startColor, Offset = 0 });
-            gradientStops.Add(new GradientStop() { Color = endColor, Offset = 1 });
-            GradientStops = gradientStops;
+            GradientStops = new GradientStopCollection
+            {
+                new GradientStop { Color = startColor, Offset = 0 },
+                new GradientStop { Color = endColor, Offset = 1 },
+            };
         }
 
         /// <summary>
-        /// Gets or sets the center of the outermost circle of the radial gradient.
-        /// </summary>
-        public Point Center
-        {
-            get { return (Point)GetValue(CenterProperty); }
-            set { SetValue(CenterProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="RadialGradientBrush.Center"/> dependency
-        /// property.
+        /// Identifies the <see cref="Center"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CenterProperty =
             DependencyProperty.Register(
-                nameof(Center), 
-                typeof(Point), 
-                typeof(RadialGradientBrush), 
+                nameof(Center),
+                typeof(Point),
+                typeof(RadialGradientBrush),
                 new PropertyMetadata(new Point(0.5, 0.5)));
 
         /// <summary>
-        /// Gets or sets the location of the two-dimensional focal point that defines
-        /// the beginning of the gradient.
-        /// The default is (0.5, 0.5).
+        /// Gets or sets the center of the outer circle of the radial gradient.
         /// </summary>
-        public Point GradientOrigin
+        /// <returns>
+        /// The two-dimensional point located at the center of the radial gradient. The default
+        /// value is a <see cref="Point"/> with value 0.5,0.5.
+        /// </returns>
+        public Point Center
         {
-            get { return (Point)GetValue(GradientOriginProperty); }
-            set { SetValue(GradientOriginProperty, value); }
+            get => (Point)GetValue(CenterProperty);
+            set => SetValue(CenterProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RadialGradientBrush.GradientOrigin"/> dependency
-        /// property.
+        /// Identifies the <see cref="GradientOrigin"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty GradientOriginProperty =
             DependencyProperty.Register(
-                nameof(GradientOrigin), 
-                typeof(Point), 
-                typeof(RadialGradientBrush), 
+                nameof(GradientOrigin),
+                typeof(Point),
+                typeof(RadialGradientBrush),
                 new PropertyMetadata(new Point(0.5, 0.5)));
 
         /// <summary>
-        /// Gets or sets the horizontal radius of the outermost circle of the radial
+        /// Gets or sets the location of the focal point that defines the beginning of the
         /// gradient.
         /// </summary>
-        public double RadiusX
+        /// <returns>
+        /// The two-dimensional point located at the center of the radial gradient. The default
+        /// value is a <see cref="Point"/> with value 0.5,0.5.
+        /// </returns>
+        public Point GradientOrigin
         {
-            get { return (double)GetValue(RadiusXProperty); }
-            set { SetValue(RadiusXProperty, value); }
+            get => (Point)GetValue(GradientOriginProperty);
+            set => SetValue(GradientOriginProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RadialGradientBrush.RadiusX"/> dependency
-        /// property.
+        /// Identifies the <see cref="RadiusX"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty RadiusXProperty =
             DependencyProperty.Register(
-                nameof(RadiusX), 
-                typeof(double), 
-                typeof(RadialGradientBrush), 
+                nameof(RadiusX),
+                typeof(double),
+                typeof(RadialGradientBrush),
                 new PropertyMetadata(0.5));
 
         /// <summary>
-        /// Gets or sets the vertical radius of the outermost circle of a radial gradient.
+        /// Gets or sets the horizontal radius of the outer circle of the radial gradient.
         /// </summary>
-        public double RadiusY
+        /// <returns>
+        /// The horizontal radius of the outermost circle of the radial gradient. The default
+        /// is 0.5.
+        /// </returns>
+        public double RadiusX
         {
-            get { return (double)GetValue(RadiusYProperty); }
-            set { SetValue(RadiusYProperty, value); }
+            get => (double)GetValue(RadiusXProperty);
+            set => SetValue(RadiusXProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RadialGradientBrush.RadiusY"/> dependency
-        /// property.
+        /// Identifies the <see cref="RadiusY"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty RadiusYProperty =
             DependencyProperty.Register(
-                nameof(RadiusY), 
-                typeof(double), 
-                typeof(RadialGradientBrush), 
+                nameof(RadiusY),
+                typeof(double),
+                typeof(RadialGradientBrush),
                 new PropertyMetadata(0.5));
+
+        /// <summary>
+        /// Gets or sets the vertical radius of the outer circle of a radial gradient.
+        /// </summary>
+        /// <returns>
+        /// The vertical radius of the outer circle of a radial gradient. The default is
+        /// 0.5.
+        /// </returns>
+        public double RadiusY
+        {
+            get => (double)GetValue(RadiusYProperty);
+            set => SetValue(RadiusYProperty, value);
+        }
 
         internal override Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(INTERNAL_ToHtmlString(parent));
+
+        internal override ISvgBrush GetSvgElement() => new SvgRadialGradient(this);
 
         private string GetGradientStopsString()
         {
@@ -184,7 +204,7 @@ namespace Windows.UI.Xaml.Media
                 gradientStopsString, //{4}
                 percentageSymbol); //{5}
 
-            if(SpreadMethod == GradientSpreadMethod.Repeat)
+            if (SpreadMethod == GradientSpreadMethod.Repeat)
             {
                 gradientString = "repeating-" + gradientString;
             }
@@ -204,6 +224,51 @@ namespace Windows.UI.Xaml.Media
                 "-moz-" + gradientString,
                 gradientString,
             };
+        }
+
+        private sealed class SvgRadialGradient : ISvgBrush
+        {
+            private readonly RadialGradientBrush _brush;
+            private INTERNAL_HtmlDomElementReference _gradientRef;
+
+            public SvgRadialGradient(RadialGradientBrush rgb)
+            {
+                _brush = rgb ?? throw new ArgumentNullException(nameof(rgb));
+            }
+
+            public string GetBrush(Shape shape)
+            {
+                if (_gradientRef is null)
+                {
+                    _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(
+                        shape.DefsElement, "radialGradient");
+
+                    // TODO: support ellipse shaped radial on SVG using a gradientTransform.
+                    double radius = (_brush.RadiusX + _brush.RadiusY) / 2d;
+
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "cx", _brush.Center.X.ToInvariantString());
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "cy", _brush.Center.Y.ToInvariantString());
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "r", radius.ToInvariantString());
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "gradientUnits", ConvertBrushMappingModeToString(_brush.MappingMode));
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "spreadMethod", ConvertSpreadMethodToString(_brush.SpreadMethod));
+
+                    var stops = _brush.GetGradientStops()
+                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.INTERNAL_ToHtmlString(_brush.Opacity)}\" />");
+
+                    string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_gradientRef);
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
+                }
+
+                return $"url(#{_gradientRef.UniqueIdentifier})";
+            }
+
+            public void DestroyBrush(Shape shape)
+            {
+                Debug.Assert(_gradientRef is not null);
+
+                INTERNAL_HtmlDomManager.RemoveNodeNative(_gradientRef);
+                _gradientRef = null;
+            }
         }
     }
 }

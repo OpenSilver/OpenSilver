@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,14 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
 #else
-using Windows.UI.Xaml.Media;
 using Windows.Foundation;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -28,230 +27,181 @@ namespace System.Windows.Shapes
 namespace Windows.UI.Xaml.Shapes
 #endif
 {
-
     /// <summary>
     /// Draws a rectangle shape, which can have a stroke and a fill.
     /// </summary>
-    /// <example>
-    /// <code lang="XAML" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    /// <StackPanel x:Name="MyStackPanel">
-    ///     <Rectangle Width="120" Height="40" Fill="#FFB9E58D" HorizontalAlignment="Left"/>
-    /// </StackPanel>
-    /// </code>
-    /// <code lang="C#">
-    /// Rectangle rect = new Rectangle() { Width = 60, Height = 30, Fill = new SolidColorBrush(Windows.UI.Colors.Blue) };
-    /// MyStackPanel.Children.Add(rect);
-    /// </code>
-    /// </example>
-    public partial class Rectangle : Shape
+    public class Rectangle : Shape
     {
         static Rectangle()
         {
             StretchProperty.OverrideMetadata(
                 typeof(Rectangle),
-                new FrameworkPropertyMetadata(Stretch.Fill)
+                new FrameworkPropertyMetadata(Stretch.Fill, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Rectangle"/> class.
+        /// </summary>
+        public Rectangle() { }
+
+        /// <summary>
+        /// Identifies the <see cref="RadiusX"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty RadiusXProperty =
+            DependencyProperty.Register(
+                nameof(RadiusX),
+                typeof(double),
+                typeof(Rectangle),
+                new PropertyMetadata(0.0)
                 {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet,
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        Rectangle rect = (Rectangle)d;
+                        double rx = (double)newValue;
+                        rect.SetSvgAttribute("rx", rx.ToInvariantString());
+                    },
                 });
-        }
-
-        #region former implementation
-        //dynamic _innerDiv; //we use this one so that de "display:table" do not keep us from having the borders.
-
-        ///// <summary>
-        ///// Initializes a new instance of the Rectangle class.
-        ///// </summary>
-        //public Rectangle() : base() { }
-
-        //protected internal override void INTERNAL_OnAttachedToVisualTree()
-        //{
-        //    ManageStrokeChanged();
-        //    ManageStrokeThicknessChanged();
-        //}
-
-        //public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        //{
-        //    object div1;
-
-        //    dynamic outerStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-        //    outerStyle.boxSizing = "border-box";
-        //    outerStyle.borderCollapse = "separate";
-
-        //    dynamic innerStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out _innerDiv);
-        //    innerStyle.width = "100%";
-        //    innerStyle.height = "100%";
-        //    innerStyle.borderStyle = "solid";
-        //    innerStyle.borderWidth = "0px";
-
-        //    domElementWhereToPlaceChildren = null;
-        //    return div1;
-        //}
-
-        //protected internal override void ManageStrokeChanged()
-        //{
-        //    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-        //    {
-        //        var outerStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
-
-        //        if (Stroke is SolidColorBrush)
-        //        {
-        //            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv).borderColor = ((SolidColorBrush)Stroke).INTERNAL_ToHtmlString();
-        //            var strokeThickness = this.StrokeThickness;
-        //            outerStyle.paddingBottom = strokeThickness * 2 + "px";
-        //            outerStyle.paddingRight = strokeThickness * 2 + "px";
-        //        }
-        //        else if (Stroke == null)
-        //        {
-        //            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv).borderColor = "";
-        //            outerStyle.paddingBottom = "0px";
-        //            outerStyle.paddingRight = "0px";
-        //        }
-        //        else
-        //        {
-        //            throw new NotSupportedException("The specified brush is not supported.");
-        //        }
-        //    }
-        //}
-
-        //protected internal override void ManageStrokeThicknessChanged()
-        //{
-        //    if (Stroke != null)
-        //    {
-        //        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-        //        {
-        //            dynamic innerStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv);
-        //            innerStyle.borderWidth = StrokeThickness + "px";
-
-        //            dynamic outerStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
-        //            outerStyle.paddingBottom = StrokeThickness * 2 + "px";
-        //            outerStyle.paddingRight = StrokeThickness * 2 + "px";
-        //        }
-        //    }
-        //}
-
-        //internal override void ManageFill_Changed()
-        //{
-        //    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-        //        if (Fill is SolidColorBrush)
-        //            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv).backgroundColor = ((SolidColorBrush)Fill).INTERNAL_ToHtmlString();
-        //}
-
-        #endregion
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
-
-            //domElementWhereToPlaceChildren = null;
-            //var canvas = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("canvas", parentRef, this);
-            //return canvas;
-        }
-
-        //protected internal override void INTERNAL_OnAttachedToVisualTree()
-        //{
-        //    ScheduleRedraw();
-        //}
-
-        protected internal override void Redraw()
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                double xOffsetToApplyBeforeMultiplication;
-                double yOffsetToApplyBeforeMultiplication;
-                double xOffsetToApplyAfterMultiplication;
-                double yOffsetToApplyAfterMultiplication;
-                double sizeX;
-                double sizeY;
-                double horizontalMultiplicator;
-                double verticalMultiplicator;
-                Size shapeActualSize;
-                Shape.GetShapeInfos(this, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out sizeX, out sizeY, out horizontalMultiplicator, out verticalMultiplicator, out shapeActualSize);
-
-                ApplyMarginToFixNegativeCoordinates(new Point());
-                if (Stretch == Media.Stretch.None)
-                {
-                    ApplyMarginToFixNegativeCoordinates(_marginOffsets);
-                }
-
-                var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
-                double x = xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication;
-                double y = yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication;
-                double width = sizeX;
-                double height = sizeY;
-
-                // Values greater than half the rectangle's width/height are treated as though equal to half the rectangle's width/height.
-                // Negative values are treated as positive values.
-                double radiusX = Math.Abs(RadiusX) > width / 2 ? width / 2 : Math.Abs(RadiusX);
-                double radiusY = Math.Abs(RadiusY) > height / 2 ? height / 2 : Math.Abs(RadiusY);
-
-                if (radiusX == 0 || radiusY == 0)
-                {
-                    // Just draw a rectangle if one of radiuses is 0
-                    context.rect(x, y, width, height);
-                }
-                else
-                {
-                    context.moveTo(x + radiusX, y);
-                    context.lineTo(x + width - radiusX, y);
-                    context.ellipse(x + width - radiusX, y + radiusY, radiusX, radiusY, Math.PI, Math.PI / 2, Math.PI);
-                    context.lineTo(x + width, y + height - radiusY);
-                    context.ellipse(x + width - radiusX, y + height - radiusY, radiusX, radiusY, Math.PI, Math.PI, 3 * Math.PI / 2);
-                    context.lineTo(x + radiusX, y + height);
-                    context.ellipse(x + radiusX, y + height - radiusY, radiusX, radiusY, Math.PI, 3 * Math.PI / 2, 2 * Math.PI);
-                    context.lineTo(x, y + radiusY);
-                    context.ellipse(x + radiusX, y + radiusY, radiusX, radiusY, Math.PI, 2 * Math.PI, Math.PI / 2);
-                }
-
-                //todo: make sure the parameters below are correct.
-                Shape.DrawFillAndStroke(this, "evenodd", xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, xOffsetToApplyAfterMultiplication + sizeX, yOffsetToApplyAfterMultiplication + sizeY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
-
-                //context.fill("evenodd"); //note: remember: always fill before stroke, otherwise the filling will hide the stroke.
-                //if (StrokeThickness > 0 && Stroke != null)
-                //{
-                //    context.stroke();
-                //}
-            }
-        }
 
         /// <summary>
         /// Gets or sets the x-axis radius of the ellipse that is used to round the corners
         /// of the rectangle.
         /// </summary>
+        /// <returns>
+        /// The x-axis radius of the ellipse that is used to round the corners of the rectangle.
+        /// </returns>
         public double RadiusX
         {
-            get { return (double)GetValue(RadiusXProperty); }
-            set { SetValue(RadiusXProperty, value); }
+            get => (double)GetValue(RadiusXProperty);
+            set => SetValue(RadiusXProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="Rectangle.RadiusX"/> dependency property.
+        /// Identifies the <see cref="RadiusY"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty RadiusXProperty = 
+        public static readonly DependencyProperty RadiusYProperty =
             DependencyProperty.Register(
-                nameof(RadiusX), 
-                typeof(double), 
-                typeof(Rectangle), 
-                new PropertyMetadata(0d));
+                nameof(RadiusY),
+                typeof(double),
+                typeof(Rectangle),
+                new PropertyMetadata(0.0)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        Rectangle rect = (Rectangle)d;
+                        double ry = (double)newValue;
+                        rect.SetSvgAttribute("ry", ry.ToInvariantString());
+                    },
+                });
 
         /// <summary>
         /// Gets or sets the y-axis radius of the ellipse that is used to round the corners
         /// of the rectangle.
-        /// The default is 0.
         /// </summary>
+        /// <returns>
+        /// The y-axis radius of the ellipse that is used to round the corners of the rectangle.
+        /// The default is 0.
+        /// </returns>
         public double RadiusY
         {
-            get { return (double)GetValue(RadiusYProperty); }
-            set { SetValue(RadiusYProperty, value); }
+            get => (double)GetValue(RadiusYProperty);
+            set => SetValue(RadiusYProperty, value);
         }
-        
-        /// <summary>
-        /// Identifies the <see cref="Rectangle.RadiusY"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty RadiusYProperty = 
-            DependencyProperty.Register(
-                nameof(RadiusY), 
-                typeof(double), 
-                typeof(Rectangle), 
-                new PropertyMetadata(0d));
+
+        internal sealed override string SvgTagName => "rect";
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (Stretch == Stretch.UniformToFill)
+            {
+                double width = Width;
+                if (double.IsNaN(width))
+                {
+                    width = availableSize.Width;
+                    if (double.IsInfinity(width))
+                    {
+                        width = 0.0;
+                    }
+                }
+
+                double height = Height;
+                if (double.IsNaN(height))
+                {
+                    height = availableSize.Height;
+                    if (double.IsInfinity(height))
+                    {
+                        height = 0.0;
+                    }
+                }
+
+                return new Size(width, height);
+            }
+
+            return GetNaturalSize();
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            double penThickness = GetStrokeThickness();
+            double margin = penThickness / 2;
+
+            var rect = new Rect(
+                margin,
+                margin,
+                Math.Max(0, finalSize.Width - penThickness),
+                Math.Max(0, finalSize.Height - penThickness));
+
+            switch (Stretch)
+            {
+                case Stretch.None:
+                    // A 0 Rect.Width and Rect.Height rectangle
+                    rect.Width = rect.Height = 0;
+                    break;
+
+                case Stretch.Uniform:
+                    // The maximal square that fits in the final box
+                    if (rect.Width > rect.Height)
+                    {
+                        rect.Width = rect.Height;
+                    }
+                    else
+                    {
+                        rect.Height = rect.Width;
+                    }
+                    break;
+
+                case Stretch.UniformToFill:
+                    // The minimal square that fills the final box
+                    if (rect.Width < rect.Height)
+                    {
+                        rect.Width = rect.Height;
+                    }
+                    else
+                    {
+                        rect.Height = rect.Width;
+                    }
+                    break;
+
+                case Stretch.Fill:
+                default:
+                    // The most common case: a rectangle that fills the box.
+                    // rect has already been initialized for that.
+                    break;
+            }
+
+            SetSvgAttribute("x", rect.X.ToInvariantString());
+            SetSvgAttribute("y", rect.Y.ToInvariantString());
+            SetSvgAttribute("width", rect.Width.ToInvariantString());
+            SetSvgAttribute("height", rect.Height.ToInvariantString());
+
+            return finalSize;
+        }
+
+        internal sealed override Size GetNaturalSize()
+        {
+            double width = Width;
+            double height = Height;
+
+            return new Size(double.IsNaN(width) ? 0.0 : width, double.IsNaN(height) ? 0.0 : height);
+        }
     }
 }

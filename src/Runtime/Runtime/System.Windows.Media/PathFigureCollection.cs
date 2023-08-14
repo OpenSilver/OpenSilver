@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -27,99 +28,98 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Represents a collection of PathFigure objects that collectively make up the
-    /// geometry of a PathGeometry.
+    /// Represents a collection of <see cref="PathFigure"/> objects that collectively
+    /// make up the geometry of a <see cref="PathGeometry"/>.
     /// </summary>
-    public sealed partial class PathFigureCollection : PresentationFrameworkCollection<PathFigure>
+    public sealed class PathFigureCollection : PresentationFrameworkCollection<PathFigure>
     {
-        private Path _parentPath;
+        private Geometry _parentGeometry;
 
         /// <summary>
-        /// Initializes a new instance that is empty.
+        /// Initializes a new instance of the <see cref="PathFigureCollection"/> class.
         /// </summary>
-        public PathFigureCollection() : base(false)
+        public PathFigureCollection()
+            : base(true)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance that is empty and has the specified initial capacity.
+        /// Initializes a new instance of the <see cref="PathFigureCollection"/> class that 
+        /// can initially contain the specified number of <see cref="PathFigure"/> objects.
         /// </summary>
-        /// <param name="capacity">int - The number of elements that the new list is initially capable of storing.</param>
-        public PathFigureCollection(int capacity) : base(capacity, false)
+        /// <param name="capacity">
+        /// The initial capacity of this <see cref="PathFigureCollection"/>.
+        /// </param>
+        public PathFigureCollection(int capacity)
+            : base(capacity, true)
         {
         }
 
         /// <summary>
-        /// Creates a PathFigureCollection with all of the same elements as collection
+        /// Initializes a new instance of the <see cref="PathFigureCollection"/> class 
+        /// that contains the specified <see cref="PathFigure"/> objects.
         /// </summary>
-        public PathFigureCollection(IEnumerable<PathFigure> figures) : base(figures, false)
+        /// <param name="figures">
+        /// The collection of <see cref="PathFigure"/> objects which collectively make 
+        /// up the geometry of the <see cref="Path"/>.
+        /// </param>
+        public PathFigureCollection(IEnumerable<PathFigure> figures)
+            : base(figures, true)
         {
         }
 
         internal override void AddOverride(PathFigure figure)
         {
-            figure.SetParentPath(this._parentPath);
-            this.AddDependencyObjectInternal(figure);
-            this.NotifyParent();
+            SetParentGeometry(figure, _parentGeometry);
+            AddDependencyObjectInternal(figure);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.GetItemInternal(index).SetParentPath(null);
-            this.RemoveAtDependencyObjectInternal(index);
-            this.NotifyParent();
+            SetParentGeometry(GetItemInternal(index), null);
+            RemoveAtDependencyObjectInternal(index);
         }
 
         internal override void InsertOverride(int index, PathFigure figure)
         {
-            figure.SetParentPath(this._parentPath);
-            this.InsertDependencyObjectInternal(index, figure);
-            this.NotifyParent();
+            SetParentGeometry(figure, _parentGeometry);
+            InsertDependencyObjectInternal(index, figure);
         }
 
         internal override void ClearOverride()
         {
             foreach (PathFigure figure in this)
             {
-                figure.SetParentPath(null);
+                SetParentGeometry(figure, null);
             }
 
-            this.ClearDependencyObjectInternal();
-            this.NotifyParent();
+            ClearDependencyObjectInternal();
         }
 
-        internal override PathFigure GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override PathFigure GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, PathFigure figure)
         {
-            PathFigure oldItem = this.GetItemInternal(index);
-            oldItem.SetParentPath(null);
-            figure.SetParentPath(this._parentPath);
-            this.SetItemDependencyObjectInternal(index, figure);
-            this.NotifyParent();
+            SetParentGeometry(GetItemInternal(index), null);
+            SetParentGeometry(figure, _parentGeometry);
+            SetItemDependencyObjectInternal(index, figure);
         }
 
-        internal void SetParentPath(Path path)
+        internal void SetParentGeometry(Geometry geometry)
         {
-            if (this._parentPath != path)
+            if (_parentGeometry == geometry) return;
+
+            _parentGeometry = geometry;
+            foreach (var figure in this)
             {
-                this._parentPath = path;
-                foreach (PathFigure figure in this)
-                {
-                    figure.SetParentPath(path);
-                }
+                figure.SetParentGeometry(geometry);
             }
         }
 
-        private void NotifyParent()
+        private static void SetParentGeometry(PathFigure figure, Geometry geometry)
         {
-            if (this._parentPath != null)
-            {
-                this._parentPath.ScheduleRedraw();
-            }
+            Debug.Assert(figure is not null);
+            figure.SetParentGeometry(geometry);
         }
     }
 }

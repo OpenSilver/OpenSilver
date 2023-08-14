@@ -23,8 +23,10 @@ using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
+using System.Windows.Shapes;
 #else
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -37,7 +39,7 @@ namespace Windows.UI.Xaml.Media
     /// Defines objects used to paint graphical objects. Classes that derive from
     /// Brush describe how the area is painted.
     /// </summary>
-    public partial class Brush : DependencyObject,
+    public class Brush : DependencyObject,
         IHasAccessToPropertiesWhereItIsUsed2,
 #pragma warning disable CS0618 // Type or member is obsolete
         IHasAccessToPropertiesWhereItIsUsed
@@ -45,7 +47,9 @@ namespace Windows.UI.Xaml.Media
     {
         private static readonly BrushHolder _holder = new();
         private readonly int _id;
-        
+        private HashSet<KeyValuePair<DependencyObject, DependencyProperty>> _propertiesWhereUsedObsolete;
+        private Dictionary<WeakDependencyObjectWrapper, HashSet<DependencyProperty>> _propertiesWhereUsed;
+
         protected Brush()
         {
             _id = _holder.Add(this);
@@ -73,19 +77,20 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the Opacity dependency property.
+        /// Identifies the <see cref="Opacity"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty OpacityProperty =
-            DependencyProperty.Register("Opacity", typeof(double), typeof(Brush), new PropertyMetadata(1d));
-
-        private HashSet<KeyValuePair<DependencyObject, DependencyProperty>> _propertiesWhereUsedObsolete;
+            DependencyProperty.Register(
+                nameof(Opacity),
+                typeof(double),
+                typeof(Brush),
+                new PropertyMetadata(1.0));
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
                 => _propertiesWhereUsedObsolete ??= new();
-
-        private Dictionary<WeakDependencyObjectWrapper, HashSet<DependencyProperty>> _propertiesWhereUsed;
-
+        
         Dictionary<WeakDependencyObjectWrapper, HashSet<DependencyProperty>> IHasAccessToPropertiesWhereItIsUsed2.PropertiesWhereUsed
             => _propertiesWhereUsed ??= new();
 
@@ -157,6 +162,29 @@ namespace Windows.UI.Xaml.Media
                             uiElement,
                             parentPropertyToValueToHtmlConverter));
                     }
+                    else if (dependencyProperty == Shape.FillProperty || dependencyProperty == Shape.StrokeProperty)
+                    {
+                        result.Add(ProcessCSSEquivalent(
+                            new CSSEquivalent
+                            {
+                                CallbackMethod = static (d, args) =>
+                                {
+                                    Shape shape = (Shape)d;
+                                    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
+                                    {
+                                        var metadata = args.Property.GetMetadata(shape.DependencyObjectType);
+                                        if (metadata?.MethodToUpdateDom2 is MethodToUpdateDom2 updateDOM)
+                                        {
+                                            object currentValue = d.GetValue(args.Property);
+                                            updateDOM(shape, currentValue, currentValue);
+                                        }
+                                    }
+                                },
+                                DependencyProperty = dependencyProperty,
+                            },
+                            uiElement,
+                            parentPropertyToValueToHtmlConverter));
+                    }
                     else
                     {
                         result.Add(ProcessCSSEquivalent(
@@ -186,34 +214,55 @@ namespace Windows.UI.Xaml.Media
         internal virtual Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(string.Empty);
 
-#region Transform, RelativeTransform (Not supported yet)
-        /// <summary>Identifies the <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property. </summary>
-        /// <returns>The <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property identifier.</returns>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty RelativeTransformProperty = DependencyProperty.Register("RelativeTransform", typeof(Transform), typeof(Brush), null);
+        internal virtual ISvgBrush GetSvgElement() => DefaultSvgBrush.Instance;
 
-        /// <summary>Gets or sets the transformation that is applied to the brush using relative coordinates. </summary>
-        /// <returns>The transformation that is applied to the brush using relative coordinates. The default value is null.</returns>
+        /// <summary>
+        /// Identifies the <see cref="RelativeTransform" /> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty RelativeTransformProperty =
+            DependencyProperty.Register(
+                nameof(RelativeTransform),
+                typeof(Transform),
+                typeof(Brush),
+                null);
+
+        /// <summary>
+        /// Gets or sets the transformation that is applied to the brush using relative coordinates.
+        /// </summary>
+        /// <returns>
+        /// The transformation that is applied to the brush using relative coordinates. The default value is null.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public Transform RelativeTransform
         {
-            get { return (Transform)this.GetValue(Brush.RelativeTransformProperty); }
-            set { this.SetValue(Brush.RelativeTransformProperty, (DependencyObject)value); }
+            get { return (Transform)GetValue(RelativeTransformProperty); }
+            set { SetValue(RelativeTransformProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="Transform"/> dependency property.
+        /// </summary>
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty TransformProperty = DependencyProperty.Register("Transform", typeof(Transform), typeof(Brush), null);
+        public static readonly DependencyProperty TransformProperty =
+            DependencyProperty.Register(
+                nameof(Transform),
+                typeof(Transform),
+                typeof(Brush),
+                null);
 
         /// <summary>
-        ///     Transform - Transform.  Default value is Transform.Identity.
+        /// Gets or sets the transformation that is applied to the brush.
         /// </summary>
+        /// <returns>
+        /// The transformation to apply to the brush.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public Transform Transform
         {
             get { return (Transform)GetValue(TransformProperty); }
             set { SetValue(TransformProperty, value); }
         }
-        #endregion
 
         // if true, log PropertiesWhereUsed updates (how many dead weak references we removed)
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -222,6 +271,17 @@ namespace Windows.UI.Xaml.Media
         // if = 0, don't update at all (so you can test before/after scenarios)
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static int UpdateBrushWeakReferencesSecs { get; set; } = 30;
+
+        private sealed class DefaultSvgBrush : ISvgBrush
+        {
+            private DefaultSvgBrush() { }
+
+            public static DefaultSvgBrush Instance { get; } = new();
+
+            public void DestroyBrush(Shape shape) { }
+
+            public string GetBrush(Shape shape) => "none";
+        }
 
         private sealed class BrushHolder
         {
@@ -307,5 +367,11 @@ namespace Windows.UI.Xaml.Media
                 }
             }
         }
+    }
+
+    internal interface ISvgBrush
+    {
+        string GetBrush(Shape shape);
+        void DestroyBrush(Shape shape);
     }
 }
