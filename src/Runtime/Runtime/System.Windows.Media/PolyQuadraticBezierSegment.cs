@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,14 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using OpenSilver.Internal;
 using System.Windows.Markup;
+using System.Collections.Specialized;
+using System.Collections.Generic;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
+#if !MIGRATION
 using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -32,136 +30,88 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a set of quadratic Bezier segments.
     /// </summary>
-    [ContentProperty("Points")]
-    public sealed partial class PolyQuadraticBezierSegment : PathSegment
+    [ContentProperty(nameof(Points))]
+    public sealed class PolyQuadraticBezierSegment : PathSegment
     {
-        #region Constructor
-
         /// <summary>
-        /// Initializes a new instance of the PolyQuadraticBezierSegment class.
+        /// Initializes a new instance of the <see cref="PolyQuadraticBezierSegment"/> class.
         /// </summary>
-        public PolyQuadraticBezierSegment()
-        {
-
-        }
-
-        #endregion
-
-        #region Dependency Properties
+        public PolyQuadraticBezierSegment() { }
 
         /// <summary>
-        /// Gets or sets the Point collection that defines this PolyQuadraticBezierSegment
-        /// object.
-        /// </summary>
-        public PointCollection Points
-        {
-            get { return (PointCollection)GetValue(PointsProperty); }
-            set { SetValue(PointsProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="PolyQuadraticBezierSegment.Points"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Points"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register(
-                nameof(Points), 
-                typeof(PointCollection), 
-                typeof(PolyQuadraticBezierSegment), 
-                new PropertyMetadata(null, Points_Changed));
+                nameof(Points),
+                typeof(PointCollection),
+                typeof(PolyQuadraticBezierSegment),
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<Point>(
+                        static () => new PointCollection(),
+                        static (d, dp) =>
+                        {
+                            PolyQuadraticBezierSegment segment = (PolyQuadraticBezierSegment)d;
+                            var points = new PointCollection();
+                            points.CollectionChanged += new NotifyCollectionChangedEventHandler(segment.OnPointsCollectionChanged);
+                            return points;
+                        }),
+                    OnPointsChanged,
+                    CoercePoints));
 
-        private static void Points_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the <see cref="PointCollection"/> that defines this <see cref="PolyQuadraticBezierSegment"/>
+        /// object.
+        /// </summary>
+        /// <returns>
+        /// A collection of points that defines the shape of this <see cref="PolyQuadraticBezierSegment"/>
+        /// object. The default value is an empty collection.
+        /// </returns>
+        public PointCollection Points
         {
-            //todo: find a way to know when the points changed in the collection
+            get => (PointCollection)GetValue(PointsProperty);
+            set => SetValue(PointsProperty, value);
+        }
+
+        private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
             PolyQuadraticBezierSegment segment = (PolyQuadraticBezierSegment)d;
-            if (segment.ParentPath != null)
+            if (e.OldValue is PointCollection oldPoints)
             {
-                segment.ParentPath.ScheduleRedraw();
+                oldPoints.CollectionChanged -= new NotifyCollectionChangedEventHandler(segment.OnPointsCollectionChanged);
+            }
+            if (e.NewValue is PointCollection newPoints)
+            {
+                newPoints.CollectionChanged += new NotifyCollectionChangedEventHandler(segment.OnPointsCollectionChanged);
+            }
+
+            PropertyChanged(d, e);
+        }
+
+        private static object CoercePoints(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new PointCollection();
+        }
+
+        private void OnPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateParentGeometry();
+
+        internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)
+        {
+            // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#quadratic_b%C3%A9zier_curve
+            var points = Points;
+
+            if (points.Count % 2 != 0)
+            {
+                throw new InvalidOperationException("PolyQuadraticBezierSegment points must use pair points.");
+            }
+
+            yield return "Q";
+
+            for (var i = 0; i < points.Count; i++)
+            {
+                yield return points[i].X.ToString(formatProvider);
+                yield return points[i].Y.ToString(formatProvider);
             }
         }
-
-        #endregion
-
-        #region Overriden Methods
-
-        internal override void SetParentPath(Path path)
-        {
-            base.SetParentPath(path);
-            Points.SetParentShape(path);
-        }
-
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
-                                               double yOffsetToApplyBeforeMultiplication, 
-                                               double xOffsetToApplyAfterMultiplication, 
-                                               double yOffsetToApplyAfterMultiplication, 
-                                               double horizontalMultiplicator, 
-                                               double verticalMultiplicator, 
-                                               object canvasDomElement, 
-                                               Point previousLastPoint)
-        {
-            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-            int i = 0;
-            Point lastPoint = previousLastPoint;
-            while (i < Points.Count - 1)
-            {
-                double controlPoint1X = Points[i].X;
-                double controlPoint1Y = Points[i].Y;
-                ++i;
-                lastPoint = Points[i];
-                double endPointX = lastPoint.X;
-                double endPointY = lastPoint.Y;
-                ++i;
-
-                // tell the context that there should be a cubic bezier curve from the starting 
-                // point to this point, with the two previous points as control points.
-                //context.quadraticCurveTo(
-                //    (controlPoint1X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-                //    (controlPoint1Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                //    (endPointX + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-                //    (endPointY + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-                //Note: we replaced the code above with the one below because Bridge.NET has an issue when adding "0" to an Int64 (as of May 1st, 2020), so it is better to first multiply and then add, rather than the contrary:
-                context.quadraticCurveTo(
-                    controlPoint1X * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
-                    controlPoint1Y * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                    endPointX * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
-                    endPointY * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-            }
-            return lastPoint;
-        }
-
-        internal override Point GetMaxXY() //todo: make this give the size of the actual curve, not the control points.
-        {
-            Point currentMax = new Point(double.NegativeInfinity, double.NegativeInfinity);
-            foreach (Point point in Points)
-            {
-                if (point.X > currentMax.X)
-                {
-                    currentMax.X = point.X;
-                }
-                if (point.Y > currentMax.Y)
-                {
-                    currentMax.Y = point.Y;
-                }
-            }
-            return currentMax;
-        }
-
-        internal override Point GetMinMaxXY(ref double minX, 
-                                            ref double maxX, 
-                                            ref double minY, 
-                                            ref double maxY, 
-                                            Point startingPoint)
-        {
-            foreach (Point point in Points)
-            {
-                minX = Math.Min(minX, point.X);
-                maxX = Math.Max(maxX, point.X);
-                minY = Math.Min(minY, point.Y);
-                maxY = Math.Max(maxY, point.Y);
-            }
-            return Points.Count == 0 ? startingPoint : Points[Points.Count - 1];
-        }
-
-        #endregion
     }
 }
