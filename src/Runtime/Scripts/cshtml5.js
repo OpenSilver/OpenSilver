@@ -244,25 +244,51 @@ document.createTextElement = function (id, tagName, parent) {
     parent.appendChild(textElement);
 };
 
-document.createShapeOuterElement = function (id, parentElement) {
-    const newElement = document.createLayoutElement('div', id, parentElement, -1);
+document.createShapeElement = function (svgId, shapeId, defsId, svgTagName, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
 
-    if (newElement) {
-        newElement.style.lineHeight = '0';     // Line height is not needed in shapes because it causes layout issues.
-        newElement.style.fontSize = '0';       //this allows this div to be as small as we want (for some reason in Firefox, what contains a canvas has a height of at least about (1 + 1/3) * fontSize)
-    }
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('uielement-shape');
+    svg.classList.add('uielement-unarranged');
+    svg.setAttribute('id', svgId);
+    Object.defineProperty(svg, 'xamlid', {
+        value: svgId,
+        writable: false,
+    });
+    Object.defineProperty(svg, 'dump', {
+        get() { return document.dumpProperties(svgId); }
+    });
+    const shape = document.createElementNS('http://www.w3.org/2000/svg', svgTagName);
+    shape.setAttribute('id', shapeId);
+    shape.setAttribute('vector-effect', 'non-scaling-stroke');
+    Object.defineProperty(shape, 'xamlid', {
+        value: shapeId,
+        writable: false,
+    });
+    svg.appendChild(shape);
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.setAttribute('id', defsId);
+    svg.appendChild(defs);
+    parent.appendChild(svg);
 };
 
-document.createShapeInnerElement = function (id, parent) {
-    if (typeof parent === 'string') parent = document.getElementById(parent);
-    if (parent === null) return null;
+document.createSvgElement = function (id, tagName, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
 
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('id', id);
-    canvas.style.width = '0px';
-    canvas.style.height = '0px';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+    svg.setAttribute('id', id);
 
-    parent.appendChild(canvas);
+    parent.appendChild(svg);
+};
+
+document.getBBox = function (svgElement) {
+    if (svgElement) {
+        const bbox = svgElement.getBBox();
+        return JSON.stringify({ X: bbox.x, Y: bbox.y, Width: bbox.width, Height: bbox.height, });
+    }
+    return '{}';
 };
 
 document.set2dContextProperty = function (id, propertyName, propertyValue) {

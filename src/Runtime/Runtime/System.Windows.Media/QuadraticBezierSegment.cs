@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using System.Collections.Generic;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -26,138 +25,69 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Creates a quadratic Bezier curve between two points in a PathFigure.
+    /// Creates a quadratic Bezier curve between two points in a <see cref="PathFigure"/>.
     /// </summary>
-    public sealed partial class QuadraticBezierSegment : PathSegment
+    public sealed class QuadraticBezierSegment : PathSegment
     {
-        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QuadraticBezierSegment"/> class.
+        /// </summary>
+        public QuadraticBezierSegment() { }
 
         /// <summary>
-        /// Initializes a new instance of the QuadraticBezierSegment class.
+        /// Identifies the <see cref="Point1"/> dependency property.
         /// </summary>
-        public QuadraticBezierSegment()
-        {
-
-        }
-
-        #endregion
-
-        #region Dependency Properties
+        public static readonly DependencyProperty Point1Property =
+            DependencyProperty.Register(
+                nameof(Point1),
+                typeof(Point),
+                typeof(QuadraticBezierSegment),
+                new PropertyMetadata(new Point(), PropertyChanged));
 
         /// <summary>
         /// Gets or sets the control point of the curve.
         /// </summary>
+        /// <returns>
+        /// The control point of this <see cref="QuadraticBezierSegment"/>. The default
+        /// value is a <see cref="Point"/> with value 0,0.
+        /// </returns>
         public Point Point1
         {
-            get { return (Point)GetValue(Point1Property); }
-            set { SetValue(Point1Property, value); }
+            get => (Point)GetValue(Point1Property);
+            set => SetValue(Point1Property, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="QuadraticBezierSegment.Point1"/> dependency 
-        /// property.
-        /// </summary>
-        public static readonly DependencyProperty Point1Property =
-            DependencyProperty.Register(
-                nameof(Point1), 
-                typeof(Point), 
-                typeof(QuadraticBezierSegment), 
-                new PropertyMetadata(new Point(), Point1_Changed));
-
-        private static void Point1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            QuadraticBezierSegment segment = (QuadraticBezierSegment)d;
-            if (segment.ParentPath != null)
-            {
-                segment.ParentPath.ScheduleRedraw();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the end Point of this QuadraticBezierSegment.
-        /// </summary>
-        public Point Point2
-        {
-            get { return (Point)GetValue(Point2Property); }
-            set { SetValue(Point2Property, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="QuadraticBezierSegment.Point2"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Point2"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty Point2Property =
             DependencyProperty.Register(
-                nameof(Point2), 
-                typeof(Point), 
-                typeof(QuadraticBezierSegment), 
-                new PropertyMetadata(new Point(), Point2_Changed));
+                nameof(Point2),
+                typeof(Point),
+                typeof(QuadraticBezierSegment),
+                new PropertyMetadata(new Point(), PropertyChanged));
 
-        private static void Point2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the end <see cref="Point"/> of this <see cref="QuadraticBezierSegment"/>.
+        /// </summary>
+        /// <returns>
+        /// The end point of this <see cref="QuadraticBezierSegment"/>. The default
+        /// value is a <see cref="Point"/> with value 0,0.
+        /// </returns>
+        public Point Point2
         {
-            QuadraticBezierSegment segment = (QuadraticBezierSegment)d;
-            if (segment.ParentPath != null)
-            {
-                segment.ParentPath.ScheduleRedraw();
-            }
+            get => (Point)GetValue(Point2Property);
+            set => SetValue(Point2Property, value);
         }
 
-        #endregion
-
-        #region Overriden Methods
-
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
-                                               double yOffsetToApplyBeforeMultiplication, 
-                                               double xOffsetToApplyAfterMultiplication, 
-                                               double yOffsetToApplyAfterMultiplication, 
-                                               double horizontalMultiplicator, 
-                                               double verticalMultiplicator, 
-                                               object canvasDomElement, 
-                                               Point previousLastPoint)
+        internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)
         {
-            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-
-            // tell the context that there should be a quadratic bezier curve from the starting 
-            // point to this point, with the previous point as control point.
-            //context.quadraticCurveTo(
-            //    (Point1.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-            //    (Point1.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-            //    (Point2.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-            //    (Point2.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-            //Note: we replaced the code above with the one below because Bridge.NET has an issue when adding "0" to an Int64 (as of May 1st, 2020), so it is better to first multiply and then add, rather than the contrary:
-            context.quadraticCurveTo(
-                    Point1.X * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
-                    Point1.Y * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                    Point2.X * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
-                    Point2.Y * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-
-            return Point2;
+            // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#quadratic_b%C3%A9zier_curve
+            yield return "Q";
+            yield return Point1.X.ToString(formatProvider);
+            yield return Point1.Y.ToString(formatProvider);
+            yield return Point2.X.ToString(formatProvider);
+            yield return Point2.Y.ToString(formatProvider);
         }
-
-        internal override Point GetMaxXY() //todo: make this give the size of the actual curve, not the control points.
-        {
-            double maxX = Point1.X;
-            double maxY = Point1.Y;
-            if (Point2.X > maxX)
-            {
-                maxX = Point2.X;
-            }
-            if (Point2.Y > maxY)
-            {
-                maxY = Point2.Y;
-            }
-            return new Point(maxX, maxY);
-        }
-
-        internal override Point GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY, Point startingPoint)
-        {
-            minX = Math.Min(minX, Math.Min(Point1.X, Point2.X));
-            maxX = Math.Max(maxX, Math.Max(Point1.X, Point2.X));
-            minY = Math.Min(minY, Math.Min(Point1.Y, Point2.Y));
-            maxY = Math.Max(maxY, Math.Max(Point1.Y, Point2.Y));
-            return Point2;
-        }
-
-        #endregion
     }
 }

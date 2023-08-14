@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using System;
 
@@ -31,10 +29,12 @@ namespace Windows.UI.Xaml.Media
         /// The color values at the ends of the gradient vector fill the remaining space.
         /// </summary>
         Pad = 0,
-        ///// <summary>
-        ///// The gradient is repeated in the reverse direction until the space is filled.
-        ///// </summary>
-        //Reflect = 1,  
+
+        /// <summary>
+        /// The gradient is repeated in the reverse direction until the space is filled.
+        /// </summary>
+        Reflect = 1,
+
         /// <summary>
         /// The gradient is repeated in the original direction until the space is filled.
         /// </summary>

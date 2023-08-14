@@ -14,6 +14,8 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Markup;
+using System.Collections.Specialized;
+using System.Globalization;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -30,53 +32,36 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Represents a complex shape that may be composed of arcs, curves, ellipses,
-    /// lines, and rectangles.
+    /// Represents a complex shape that may be composed of arcs, curves, ellipses, lines,
+    /// and rectangles.
     /// </summary>
     [ContentProperty(nameof(Figures))]
-    public sealed partial class PathGeometry : Geometry
+    public sealed class PathGeometry : Geometry
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PathGeometry"/> class.
         /// </summary>
-        public PathGeometry()
-        {
-
-        }
+        public PathGeometry() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PathGeometry"/> class.
+        /// Initializes a new instance of the <see cref="PathGeometry"/> class with 
+        /// the specified Figures.
         /// </summary>
-        /// <param name="figures">A collection of figures</param>
+        /// <param name="figures">
+        /// The Figures of the <see cref="PathGeometry"/> which describes the contents 
+        /// of the <see cref="Path"/>.
+        /// </param>
         public PathGeometry(IEnumerable<PathFigure> figures)
         {
-            if (figures != null)
+            if (figures is null)
             {
-                foreach (PathFigure item in figures)
-                {
-                    this.Figures.Add(item);
-                }
+                throw new ArgumentNullException(nameof(figures));
             }
-            else
+
+            foreach (PathFigure item in figures)
             {
-                throw new ArgumentNullException("figures");
+                Figures.Add(item);
             }
-        }
-
-        #endregion
-
-        #region Dependency Properties
-
-        /// <summary>
-        /// Gets or sets the collection of PathFigure objects that describe the contents
-        /// of a path.
-        /// </summary>
-        public PathFigureCollection Figures
-        {
-            get { return (PathFigureCollection)GetValue(FiguresProperty); }
-            set { SetValue(FiguresProperty, value); }
         }
 
         /// <summary>
@@ -84,38 +69,52 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public static readonly DependencyProperty FiguresProperty =
             DependencyProperty.Register(
-                nameof(Figures), 
-                typeof(PathFigureCollection), 
-                typeof(PathGeometry), 
+                nameof(Figures),
+                typeof(PathFigureCollection),
+                typeof(PathGeometry),
                 new PropertyMetadata(
                     new PFCDefaultValueFactory<PathFigure>(
                         static () => new PathFigureCollection(),
                         static (d, dp) =>
                         {
-                            Geometry g = (Geometry)d;
-                            var collection = new PathFigureCollection();
-                            collection.SetParentPath(g.ParentPath);
-                            return collection;
+                            PathGeometry pathGeometry = (PathGeometry)d;
+                            var figures = new PathFigureCollection();
+                            figures.SetParentGeometry(pathGeometry);
+                            figures.CollectionChanged += new NotifyCollectionChangedEventHandler(pathGeometry.OnFiguresCollectionChanged);
+                            return figures;
                         }),
                     OnFiguresChanged,
                     CoerceFigures));
 
+        /// <summary>
+        /// Gets or sets the collection of <see cref="PathFigure"/> objects that describe
+        /// the contents of a path.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="PathFigure"/> objects that describe the contents
+        /// of a path. Each individual <see cref="PathFigure"/> describes a shape.
+        /// </returns>
+        public PathFigureCollection Figures
+        {
+            get => (PathFigureCollection)GetValue(FiguresProperty);
+            set => SetValue(FiguresProperty, value);
+        }
+
         private static void OnFiguresChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            PathGeometry geometry = (PathGeometry)d;
-            if (null != e.OldValue)
+            PathGeometry pathGeometry = (PathGeometry)d;
+            if (e.OldValue is PathFigureCollection oldFigures)
             {
-                ((PathFigureCollection)e.OldValue).SetParentPath(null);
+                oldFigures.SetParentGeometry(null);
+                oldFigures.CollectionChanged -= new NotifyCollectionChangedEventHandler(pathGeometry.OnFiguresCollectionChanged);
             }
-            if (geometry.ParentPath != null)
+            if (e.NewValue is PathFigureCollection newFigures)
             {
-                if (null != e.NewValue)
-                {
-                    ((PathFigureCollection)e.NewValue).SetParentPath(geometry.ParentPath);
-                }
+                newFigures.SetParentGeometry(pathGeometry);
+                newFigures.CollectionChanged += new NotifyCollectionChangedEventHandler(pathGeometry.OnFiguresCollectionChanged);
+            }
 
-                geometry.ParentPath.ScheduleRedraw();
-            }
+            OnPathChanged(d, e);
         }
 
         private static object CoerceFigures(DependencyObject d, object baseValue)
@@ -123,100 +122,87 @@ namespace Windows.UI.Xaml.Media
             return baseValue ?? new PathFigureCollection();
         }
 
-        /// <summary>
-        /// Gets or sets a value that determines how the intersecting areas contained
-        /// in the PathGeometry are combined.
-        /// </summary>
-        public FillRule FillRule
-        {
-            get { return (FillRule)GetValue(FillRuleProperty); }
-            set { SetValue(FillRuleProperty, value); }
-        }
+        private void OnFiguresCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaisePathChanged();
 
         /// <summary>
-        /// Identifies the <see cref="PathGeometry.FillRule"/> dependency 
-        /// property.
+        /// Identifies the <see cref="FillRule"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FillRuleProperty =
             DependencyProperty.Register(
-                nameof(FillRule), 
-                typeof(FillRule), 
-                typeof(PathGeometry), 
-                new PropertyMetadata(FillRule.EvenOdd, FillRule_Changed));
+                nameof(FillRule),
+                typeof(FillRule),
+                typeof(PathGeometry),
+                new PropertyMetadata(FillRule.EvenOdd, OnFillRuleChanged));
 
-        private static void FillRule_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets a value that determines how the intersecting areas contained in
+        /// the <see cref="PathGeometry"/> are combined.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="FillRule"/> enumeration value that indicates how the intersecting
+        /// areas of the <see cref="PathGeometry"/> are combined. The default is <see cref="FillRule.EvenOdd"/>.
+        /// </returns>
+        public FillRule FillRule
         {
-            PathGeometry geometry = (PathGeometry)d;
-            if (geometry.ParentPath != null && geometry.ParentPath._isLoaded)
-            {
-                geometry.ParentPath.ScheduleRedraw();
-            }
-        }
-
-        #endregion
-
-        #region Overriden Methods
-
-        internal override void SetParentPath(Path path)
-        {
-            base.SetParentPath(path);
-            Figures.SetParentPath(path);
-        }
-
-        internal override string GetFillRuleAsString()
-        {
-            return (FillRule == FillRule.Nonzero) ? "nonzero" : "evenodd";
-        }
-
-        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
-        {
-            foreach (PathFigure figure in Figures)
-            {
-                figure.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY);
-            }
+            get => (FillRule)GetValue(FillRuleProperty);
+            set => SetValue(FillRuleProperty, value);
         }
 
         /// <summary>
-        /// Applies FillStyle, StrokeStyle + Adds the figures to the canvas' context, then calls the Fill method.
+        /// Returns a string representation of this <see cref="PathGeometry"/>.
         /// </summary>
-        internal protected override void DefineInCanvas(Path path, 
-                                                        object canvasDomElement, 
-                                                        double horizontalMultiplicator, 
-                                                        double verticalMultiplicator, 
-                                                        double xOffsetToApplyBeforeMultiplication, 
-                                                        double yOffsetToApplyBeforeMultiplication, 
-                                                        double xOffsetToApplyAfterMultiplication, 
-                                                        double yOffsetToApplyAfterMultiplication, 
-                                                        Size shapeActualSize)
+        /// <returns>
+        /// A string representation of this <see cref="PathGeometry"/>.
+        /// </returns>
+        public override string ToString()
         {
-            //we define the Fillstyle and StrokeStyle:
-            //StrokeStyle:
-
-            if (shapeActualSize.Width > 0 && shapeActualSize.Height > 0)
+            string figuresString = ToStreamGeometry(Figures, CultureInfo.InvariantCulture);
+            if (FillRule != FillRule.EvenOdd)
             {
-
-                //this will change the context in the canvas to draw itself.
-                foreach (PathFigure figure in Figures)
-                {
-                    //Add the figure to the canvas:
-                    figure.DefineInCanvas(xOffsetToApplyBeforeMultiplication, 
-                                          yOffsetToApplyBeforeMultiplication, 
-                                          xOffsetToApplyAfterMultiplication, 
-                                          yOffsetToApplyAfterMultiplication, 
-                                          horizontalMultiplicator, 
-                                          verticalMultiplicator, 
-                                          canvasDomElement, 
-                                          this.ParentPath != null ? this.ParentPath.StrokeThickness : 0, // Note : this paramater is unused 
-                                          shapeActualSize);
-                }
+                figuresString = $"F1{figuresString}";
             }
+            return figuresString;
         }
 
-        #endregion
+        internal override string ToPathData(IFormatProvider formatProvider) => ToStreamGeometry(Figures, formatProvider);
 
-        internal new static object INTERNAL_ConvertFromString(string pathAsString)
+        internal override FillRule GetFillRule() => FillRule;
+
+        /// <summary>
+		/// Transform the figures collection into a SVG Path according to :
+		/// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
+		/// </summary>
+		private static string ToStreamGeometry(PathFigureCollection figures, IFormatProvider formatProvider)
         {
-            return GeometryParser.ParseGeometry(pathAsString);
+            if (figures is null)
+            {
+                return string.Empty;
+            }
+
+            return string.Join(" ", GenerateDataParts(figures, formatProvider));
+
+            static IEnumerable<string> GenerateDataParts(PathFigureCollection figures, IFormatProvider formatProvider)
+            {
+                foreach (var figure in figures)
+                {
+                    // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#moveto_path_commands
+                    yield return $"M {figure.StartPoint.X.ToString(formatProvider)},{figure.StartPoint.Y.ToString(formatProvider)}";
+
+                    foreach (var segment in figure.Segments)
+                    {
+                        foreach (var p in segment.ToDataStream(formatProvider))
+                        {
+                            yield return p;
+                        }
+                    }
+
+                    if (figure.IsClosed)
+                    {
+                        // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#closepath
+                        yield return "Z";
+                    }
+                }
+            }
         }
     }
 }
