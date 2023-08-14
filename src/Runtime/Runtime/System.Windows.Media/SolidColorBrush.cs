@@ -19,6 +19,12 @@ using System.Windows.Markup;
 using OpenSilver.Internal;
 
 #if MIGRATION
+using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Media
 #else
 namespace Windows.UI.Xaml.Media
@@ -27,76 +33,80 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Paints an area with a solid color.
     /// </summary>
-    [ContentProperty("Color")]
+    [ContentProperty(nameof(Color))]
     public sealed class SolidColorBrush : Brush
     {
         /// <summary>
-        /// Initializes a new instance of the SolidColorBrush class with no color.
+        /// Initializes a new instance of the <see cref="SolidColorBrush"/> class 
+        /// with no color.
         /// </summary>
-        public SolidColorBrush()
-        {
-        }
+        public SolidColorBrush() { }
+
         /// <summary>
-        /// Initializes a new instance of the SolidColorBrush class with the specified
-        /// Color.
+        /// Initializes a new instance of the <see cref="SolidColorBrush"/> class
+        /// with the specified <see cref="Color"/>.
         /// </summary>
-        /// <param name="color">The color to apply to the brush.</param>
+        /// <param name="color">
+        /// The color to apply to the brush.
+        /// </param>
         public SolidColorBrush(Color color)
         {
-            this.Color = color;
+            Color = color;
         }
 
         /// <summary>
-        /// Gets or sets the color of this SolidColorBrush.
+        /// Gets or sets the color of this <see cref="SolidColorBrush"/>.
         /// </summary>
+        /// <returns>
+        /// The brush's color. The default value is <see cref="Colors.Transparent"/>.
+        /// </returns>
         public Color Color
         {
-            get { return (Color)GetValue(ColorProperty); }
-            set { SetValue(ColorProperty, value); }
+            get => (Color)GetValue(ColorProperty);
+            set => SetValue(ColorProperty, value);
         }
+
         /// <summary>
-        /// Identifies the Color dependency property.
+        /// Identifies the <see cref="Color"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ColorProperty =
-            DependencyProperty.Register("Color", typeof(Color), typeof(SolidColorBrush), new PropertyMetadata(Color.FromArgb(0, 0, 0, 0))
-            {
-                GetCSSEquivalents = static (instance) =>
+            DependencyProperty.Register(
+                nameof(Color),
+                typeof(Color),
+                typeof(SolidColorBrush),
+                new PropertyMetadata(Colors.Transparent)
                 {
-                    static ValueToHtmlConverter ConvertValueToHtml(CSSEquivalent cssEquivalent)
+                    GetCSSEquivalents = static (instance) =>
                     {
-                        return (inst, value) =>
+                        static ValueToHtmlConverter ConvertValueToHtml(CSSEquivalent cssEquivalent)
                         {
-                            var valuesDict = new Dictionary<string, object>();
-                            foreach (string name in cssEquivalent.Name)
+                            return (inst, value) =>
                             {
-                                if (!name.EndsWith("Alpha"))
+                                var valuesDict = new Dictionary<string, object>();
+                                foreach (string name in cssEquivalent.Name)
                                 {
-                                    valuesDict.Add(name, ((Color)value).INTERNAL_ToHtmlStringForVelocity());
+                                    if (!name.EndsWith("Alpha"))
+                                    {
+                                        valuesDict.Add(name, ((Color)value).INTERNAL_ToHtmlStringForVelocity());
+                                    }
+                                    else
+                                    {
+                                        valuesDict.Add(name, ((double)((Color)value).A) / 255);
+                                    }
                                 }
-                                else
-                                {
-                                    valuesDict.Add(name, ((double)((Color)value).A) / 255);
-                                }
-                            }
-                            return valuesDict;
-                        };
+                                return valuesDict;
+                            };
+                        }
+
+                        return MergeCSSEquivalentsOfTheParentsProperties((Brush)instance, ConvertValueToHtml);
                     }
+                });
 
-                    return MergeCSSEquivalentsOfTheParentsProperties((Brush)instance, ConvertValueToHtml);
-                }
-            });
-
-        internal string INTERNAL_ToHtmlString()
-        {
-            return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
-        }
+        internal string INTERNAL_ToHtmlString() => Color.INTERNAL_ToHtmlString(Opacity);
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public object ConvertToCSSValue()
-        {
-            return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
-        }
+        public object ConvertToCSSValue() => Color.INTERNAL_ToHtmlString(Opacity);
 
         public object Clone() => new SolidColorBrush(Color);
 
@@ -104,12 +114,25 @@ namespace Windows.UI.Xaml.Media
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsAlreadyAClone() => false;
 
-        public override string ToString()
-        {
-            return this.Color.ToString();
-        }
+        public override string ToString() => Color.ToString();
 
         internal override Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(INTERNAL_ToHtmlString());
+
+        internal override ISvgBrush GetSvgElement() => new SvgSolidColorBrush(this);
+
+        private sealed class SvgSolidColorBrush : ISvgBrush
+        {
+            private readonly SolidColorBrush _brush;
+
+            public SvgSolidColorBrush(SolidColorBrush scb)
+            {
+                _brush = scb ?? throw new ArgumentNullException(nameof(scb));
+            }
+
+            public string GetBrush(Shape shape) => _brush.INTERNAL_ToHtmlString();
+
+            public void DestroyBrush(Shape shape) { }
+        }
     }
 }

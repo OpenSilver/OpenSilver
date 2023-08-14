@@ -26,12 +26,14 @@ using OpenSilver.Internal.Controls;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
+using System.Windows.Shapes;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
@@ -367,7 +369,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         internal static void RemoveAttribute(object domElement, string attributeName)
         {
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.removeAttribute('{attributeName}');");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sElement}.removeAttribute('{attributeName}');");
         }
 
         public static object GetDomElementAttribute(object domElementRef, string attributeName)
@@ -526,58 +528,39 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateShapeOuterDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
+        internal static (INTERNAL_HtmlDomElementReference SvgElement, INTERNAL_HtmlDomElementReference SvgShape, INTERNAL_HtmlDomElementReference SvgDefs)
+            CreateShapeElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, Shape shape)
         {
-#if PERFSTAT
-            Performance.Counter("CreateShapeOuterDomElementAndAppendIt", t0);
-#endif
-            string uniqueIdentifier = NewId();
+            Debug.Assert(parent is not null);
+            Debug.Assert(shape is not null);
 
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeOuterElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
-            }
-            else
-            {
-                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeOuterElement(""{uniqueIdentifier}"", {sParentRef})");
-            }
+            string svgUid = NewId();
+            string shapeUid = NewId();
+            string defsUid = NewId();
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"document.createShapeElement('{svgUid}', '{shapeUid}', '{defsUid}', '{shape.SvgTagName}', '{parent.UniqueIdentifier}');");
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+            AddToGlobalStore(svgUid, shape);
+            AddToGlobalStore(shapeUid, shape);
+
+            var svg = new INTERNAL_HtmlDomElementReference(svgUid, parent);
+            var svgShape = new INTERNAL_HtmlDomElementReference(shapeUid, svg);
+            var svgDefs = new INTERNAL_HtmlDomElementReference(defsUid, svg);
+
+            return (svg, svgShape, svgDefs);
         }
 
-        internal static object CreateShapeInnerDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
+        internal static INTERNAL_HtmlDomElementReference CreateSvgElementAndAppendIt(
+            INTERNAL_HtmlDomElementReference parent,
+            string tagName)
         {
-#if PERFSTAT
-            Performance.Counter("CreateShapeInnerDomElementAndAppendIt", t0);
-#endif
-            string uniqueIdentifier = NewId();
+            string uid = NewId();
 
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeInnerElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
-            }
-            else
-            {
-                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeInnerElement(""{uniqueIdentifier}"", {sParentRef})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"document.createSvgElement('{uid}', '{tagName}', '{parent.UniqueIdentifier}');");
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
-
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
         internal static INTERNAL_HtmlDomElementReference CreateTextBoxViewDomElementAndAppendIt(

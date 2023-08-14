@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using System.Collections.Generic;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -28,143 +27,90 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a cubic Bezier curve drawn between two points.
     /// </summary>
-    public sealed partial class BezierSegment : PathSegment
+    public sealed class BezierSegment : PathSegment
     {
-        ///// <summary>
-        ///// Initializes a new instance of the BezierSegment class.
-        ///// </summary>
-        //public BezierSegment();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BezierSegment"/> class.
+        /// </summary>
+        public BezierSegment() { }
+
+        /// <summary>
+        /// Identifies the <see cref="Point1"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty Point1Property =
+            DependencyProperty.Register(
+                nameof(Point1),
+                typeof(Point),
+                typeof(BezierSegment),
+                new PropertyMetadata(new Point(), PropertyChanged));
 
         /// <summary>
         /// Gets or sets the first control point of the curve.
         /// </summary>
+        /// <returns>
+        /// The first control point of the curve. The default is a <see cref="Point"/> with
+        /// value 0,0.
+        /// </returns>
         public Point Point1
         {
-            get { return (Point)GetValue(Point1Property); }
-            set { SetValue(Point1Property, value); }
+            get => (Point)GetValue(Point1Property);
+            set => SetValue(Point1Property, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="BezierSegment.Point1"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Point2"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty Point1Property =
+        public static readonly DependencyProperty Point2Property =
             DependencyProperty.Register(
-                nameof(Point1), 
-                typeof(Point), 
-                typeof(BezierSegment), 
-                new PropertyMetadata(new Point(), Point1_Changed));
-
-        private static void Point1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            BezierSegment segment = (BezierSegment)d;
-            if (segment.ParentPath != null)
-            {
-                segment.ParentPath.ScheduleRedraw();
-            }
-        }
+                nameof(Point2),
+                typeof(Point),
+                typeof(BezierSegment),
+                new PropertyMetadata(new Point(), PropertyChanged));
 
         /// <summary>
         /// Gets or sets the second control point of the curve.
         /// </summary>
+        /// <returns>
+        /// The second control point of the curve.
+        /// </returns>
         public Point Point2
         {
-            get { return (Point)GetValue(Point2Property); }
-            set { SetValue(Point2Property, value); }
+            get => (Point)GetValue(Point2Property);
+            set => SetValue(Point2Property, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="BezierSegment.Point2"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Point3"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty Point2Property =
+        public static readonly DependencyProperty Point3Property =
             DependencyProperty.Register(
-                nameof(Point2), 
-                typeof(Point), 
-                typeof(BezierSegment), 
-                new PropertyMetadata(new Point(), Point2_Changed));
-
-        private static void Point2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            BezierSegment segment = (BezierSegment)d;
-            if (segment.ParentPath != null)
-            {
-                segment.ParentPath.ScheduleRedraw();
-            }
-        }
+                nameof(Point3),
+                typeof(Point),
+                typeof(BezierSegment),
+                new PropertyMetadata(new Point(), PropertyChanged));
 
         /// <summary>
         /// Gets or sets the end point of the curve.
         /// </summary>
+        /// <returns>
+        /// The end point of the curve.
+        /// </returns>
         public Point Point3
         {
-            get { return (Point)GetValue(Point3Property); }
-            set { SetValue(Point3Property, value); }
+            get => (Point)GetValue(Point3Property);
+            set => SetValue(Point3Property, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="BezierSegment.Point3"/> dependency 
-        /// property.
-        /// </summary>
-        public static readonly DependencyProperty Point3Property =
-            DependencyProperty.Register(
-                nameof(Point3), 
-                typeof(Point), 
-                typeof(BezierSegment), 
-                new PropertyMetadata(new Point(), Point3_Changed));
-
-        private static void Point3_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)
         {
-            BezierSegment segment = (BezierSegment)d;
-            if (segment.ParentPath != null)
-            {
-                segment.ParentPath.ScheduleRedraw();
-            }
+            // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#cubic_b%C3%A9zier_curve
+            yield return "C";
+            yield return Point1.X.ToString(formatProvider);
+            yield return Point1.Y.ToString(formatProvider);
+            yield return Point2.X.ToString(formatProvider);
+            yield return Point2.Y.ToString(formatProvider);
+            yield return Point3.X.ToString(formatProvider);
+            yield return Point3.Y.ToString(formatProvider);
         }
-
-        internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
-                                               double yOffsetToApplyBeforeMultiplication, 
-                                               double xOffsetToApplyAfterMultiplication, 
-                                               double yOffsetToApplyAfterMultiplication, 
-                                               double horizontalMultiplicator, 
-                                               double verticalMultiplicator, 
-                                               object canvasDomElement, 
-                                               Point previousLastPoint)
-        {
-            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-
-            // tell the context that there should be a cubic bezier curve from the 
-            // starting point to this point, with the two previous points as control points.
-            context.bezierCurveTo(
-                (Point1.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-                (Point1.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                (Point2.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-                (Point2.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication,
-                (Point3.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-                (Point3.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-            return Point3;
-        }
-
-        // todo: make this give the size of the actual curve, not the control points.
-        internal override Point GetMaxXY() 
-        {
-            return new Point(Math.Max(Point1.X, Math.Max(Point2.X, Point3.X)),
-                             Math.Max(Point1.Y, Math.Max(Point2.Y, Point3.Y)));
-        }
-
-        internal override Point GetMinMaxXY(ref double minX, 
-                                            ref double maxX, 
-                                            ref double minY, 
-                                            ref double maxY, 
-                                            Point startingPoint)
-        {
-            minX = Math.Min(minX, Math.Min(Point1.X, Math.Min(Point2.X, Point3.X)));
-            maxX = Math.Max(maxX, Math.Max(Point1.X, Math.Max(Point2.X, Point3.X)));
-            minY = Math.Min(minY, Math.Min(Point1.Y, Math.Min(Point2.Y, Point3.Y)));
-            maxY = Math.Max(maxY, Math.Max(Point1.Y, Math.Max(Point2.Y, Point3.Y)));
-
-            return Point3;
-        }
-
     }
 }

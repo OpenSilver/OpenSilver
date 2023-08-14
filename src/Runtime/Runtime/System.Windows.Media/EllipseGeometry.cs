@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -30,132 +29,74 @@ namespace Windows.UI.Xaml.Media
     public sealed class EllipseGeometry : Geometry
     {
         /// <summary>
-        /// Initializes a new instance of the EllipseGeometry class.
+        /// Initializes a new instance of the <see cref="EllipseGeometry"/> class.
         /// </summary>
-        public EllipseGeometry()
-        {
-
-        }
+        public EllipseGeometry() { }
 
         /// <summary>
-        /// Gets or sets the center point of the EllipseGeometry.
-        /// </summary>
-        public Point Center
-        {
-            get { return (Point)GetValue(CenterProperty); }
-            set { SetValue(CenterProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="EllipseGeometry.Center"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Center"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CenterProperty =
             DependencyProperty.Register(
-                nameof(Center), 
-                typeof(Point), 
-                typeof(EllipseGeometry), 
-                new PropertyMetadata(new Point(), Point_Changed));
-
-        private static void Point_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            EllipseGeometry geometry = (EllipseGeometry)d;
-            if (geometry.ParentPath != null && geometry.ParentPath._isLoaded)
-            {
-                geometry.ParentPath.ScheduleRedraw();
-            }
-        }
+                nameof(Center),
+                typeof(Point),
+                typeof(EllipseGeometry),
+                new PropertyMetadata(new Point(), OnPathChanged));
 
         /// <summary>
-        /// Gets or sets the x-radius value of the EllipseGeometry.
+        /// Gets or sets the center point of the <see cref="EllipseGeometry"/>.
         /// </summary>
-        public double RadiusX
+        /// <returns>
+        /// The center point of the <see cref="EllipseGeometry"/>.
+        /// </returns>
+        public Point Center
         {
-            get { return (double)GetValue(RadiusXProperty); }
-            set { SetValue(RadiusXProperty, value); }
+            get => (Point)GetValue(CenterProperty);
+            set => SetValue(CenterProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="EllipseGeometry.RadiusX"/> dependency 
-        /// property.
+        /// Identifies the <see cref="RadiusX"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty RadiusXProperty =
             DependencyProperty.Register(
-                nameof(RadiusX), 
-                typeof(double), 
-                typeof(EllipseGeometry), 
-                new PropertyMetadata(0d, RadiusX_Changed));
-
-        private static void RadiusX_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            EllipseGeometry geometry = (EllipseGeometry)d;
-            if (geometry.ParentPath != null && geometry.ParentPath._isLoaded)
-            {
-                geometry.ParentPath.ScheduleRedraw();
-            }
-        }
+                nameof(RadiusX),
+                typeof(double),
+                typeof(EllipseGeometry),
+                new PropertyMetadata(0.0, OnPathChanged));
 
         /// <summary>
-        /// Gets or sets the y-radius value of the EllipseGeometry.
+        /// Gets or sets the x-radius value of the <see cref="EllipseGeometry"/>.
         /// </summary>
-        public double RadiusY
+        /// <returns>
+        /// The x-radius value of the <see cref="EllipseGeometry"/>.
+        /// </returns>
+        public double RadiusX
         {
-            get { return (double)GetValue(RadiusYProperty); }
-            set { SetValue(RadiusYProperty, value); }
+            get => (double)GetValue(RadiusXProperty);
+            set => SetValue(RadiusXProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="EllipseGeometry.RadiusY"/> dependency 
-        /// property.
+        /// Identifies the <see cref="RadiusY"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty RadiusYProperty =
             DependencyProperty.Register(
-                nameof(RadiusY), 
-                typeof(double), 
-                typeof(EllipseGeometry), 
-                new PropertyMetadata(0d, RadiusY_Changed));
+                nameof(RadiusY),
+                typeof(double),
+                typeof(EllipseGeometry),
+                new PropertyMetadata(0.0, OnPathChanged));
 
-        private static void RadiusY_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the y-radius value of the <see cref="EllipseGeometry"/>.
+        /// </summary>
+        /// <returns>
+        /// The y-radius value of the <see cref="EllipseGeometry"/>.
+        /// </returns>
+        public double RadiusY
         {
-            EllipseGeometry geometry = (EllipseGeometry)d;
-            if (geometry.ParentPath != null && geometry.ParentPath._isLoaded)
-            {
-                geometry.ParentPath.ScheduleRedraw();
-            }
-        }
-
-        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
-        {
-            double maxAbs = Center.X + RadiusX;
-            double minAbs = Center.X - RadiusX;
-            double minOrd = Center.Y - RadiusY;
-            double maxOrd = Center.Y + RadiusY;
-            minX = Math.Min(minX, minAbs);
-            maxX = Math.Max(maxX, maxAbs);
-            minY = Math.Min(minY, minOrd);
-            maxY = Math.Max(maxY, maxOrd);
-        }
-
-        internal protected override void DefineInCanvas(Shapes.Path path, 
-                                                        object canvasDomElement, 
-                                                        double horizontalMultiplicator, 
-                                                        double verticalMultiplicator, 
-                                                        double xOffsetToApplyBeforeMultiplication, 
-                                                        double yOffsetToApplyBeforeMultiplication, 
-                                                        double xOffsetToApplyAfterMultiplication, 
-                                                        double yOffsetToApplyAfterMultiplication, 
-                                                        Size shapeActualSize)
-        {
-            var ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-
-            ctx.ellipse(
-                Center.X + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication,
-                Center.Y + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication,
-                RadiusX,
-                RadiusY,
-                0d,
-                0d,
-                2 * Math.PI);
+            get => (double)GetValue(RadiusYProperty);
+            set => SetValue(RadiusYProperty, value);
         }
 
         internal override Rect BoundsInternal
@@ -179,6 +120,16 @@ namespace Windows.UI.Xaml.Media
 
                 return boundsRect;
             }
+        }
+
+        internal override string ToPathData(IFormatProvider formatProvider)
+        {
+            var cx = Center.X;
+            var cy = Center.Y;
+            var rx = RadiusX;
+            var ry = RadiusY;
+
+            return $"M{cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy + ry).ToString(formatProvider)} A{rx.ToString(formatProvider)},{ry.ToString(formatProvider)} 0 0 0 {cx.ToString(formatProvider)},{(cy - ry).ToString(formatProvider)} Z";
         }
     }
 }

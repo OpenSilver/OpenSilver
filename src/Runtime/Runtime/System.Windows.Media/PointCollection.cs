@@ -16,11 +16,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
+#if !MIGRATION
 using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -29,32 +26,56 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    public sealed partial class PointCollection : PresentationFrameworkCollection<Point>
+    /// <summary>
+    /// Represents a collection of <see cref="Point"/> values that can be individually
+    /// accessed by index.
+    /// </summary>
+    public sealed class PointCollection : PresentationFrameworkCollection<Point>
     {
-        private Shape _parentShape;
-
         /// <summary>
-        /// Initializes a new instance that is empty.
+        /// Initializes a new instance of the <see cref="PointCollection"/> class.
         /// </summary>
-        public PointCollection() : base(false) 
-        { 
+        public PointCollection()
+            : base(true)
+        {
         }
 
         /// <summary>
-        /// Initializes a new instance that is empty and has the specified initial capacity.
+        /// Initializes a new instance of the <see cref="PointCollection"/> class with 
+        /// the specified capacity.
         /// </summary>
-        /// <param name="capacity">int - The number of elements that the new list is initially capable of storing.</param>
-        public PointCollection(int capacity) : base(capacity, false) 
-        { 
+        /// <param name="capacity">
+        /// The number of <see cref="Point"/> values that the collection is initially 
+        /// capable of storing.
+        /// </param>
+        public PointCollection(int capacity)
+            : base(capacity, true)
+        {
         }
 
         /// <summary>
-        /// Creates a PointCollection with all of the same elements as collection
+        /// Initializes a new instance of the <see cref="PointCollection"/> class that contains 
+        /// items copied from the specified collection of <see cref="Point"/> values and has the 
+        /// same initial capacity as the number of items copied.
         /// </summary>
-        public PointCollection(IEnumerable<Point> points) : base(points, false) 
-        { 
+        /// <param name="points">
+        /// The collection whose items are copied to the new <see cref="PointCollection"/>.
+        /// </param>
+        public PointCollection(IEnumerable<Point> points)
+            : base(points, true)
+        {
         }
 
+        /// <summary>
+        /// Converts a String representation of a collection of points into an 
+        /// equivalent <see cref="PointCollection"/>.
+        /// </summary>
+        /// <param name="source">
+        /// The <see cref="string"/> representation of the collection of points.
+        /// </param>
+        /// <returns>
+        /// The equivalent <see cref="PointCollection"/>.
+        /// </returns>
         public static PointCollection Parse(string source)
         {
             var result = new PointCollection();
@@ -85,52 +106,16 @@ namespace Windows.UI.Xaml.Media
             return result;
         }
 
-        internal override void AddOverride(Point point)
-        {
-            this.AddInternal(point);
-            this.NotifyParent();
-        }
+        internal override void AddOverride(Point point) => AddInternal(point);
 
-        internal override void ClearOverride()
-        {
-            this.ClearInternal();
-            this.NotifyParent();
-        }
+        internal override void ClearOverride() => ClearInternal();
 
-        internal override void RemoveAtOverride(int index)
-        {
-            this.RemoveAtInternal(index);
-            this.NotifyParent();
-        }
+        internal override void RemoveAtOverride(int index) => RemoveAtInternal(index);
 
-        internal override void InsertOverride(int index, Point point)
-        {
-            this.InsertInternal(index, point);
-            this.NotifyParent();
-        }
+        internal override void InsertOverride(int index, Point point) => InsertInternal(index, point);
 
-        internal override Point GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override Point GetItemOverride(int index) => GetItemInternal(index);
 
-        internal override void SetItemOverride(int index, Point point)
-        {
-            this.SetItemInternal(index, point);
-            this.NotifyParent();
-        }
-
-        internal void SetParentShape(Shape shape)
-        {
-            this._parentShape = shape;
-        }
-
-        private void NotifyParent()
-        {
-            if (this._parentShape != null)
-            {
-                this._parentShape.ScheduleRedraw();
-            }
-        }
+        internal override void SetItemOverride(int index, Point point) => SetItemInternal(index, point);
     }
 }

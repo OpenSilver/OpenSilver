@@ -12,12 +12,8 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
+#if !MIGRATION
 using Windows.Foundation;
 #endif
 
@@ -27,57 +23,50 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    /// <summary>
+    /// Describes a two-dimensional rectangular geometry.
+    /// </summary>
     public sealed class RectangleGeometry : Geometry
     {
-        internal protected override void DefineInCanvas(Path path, 
-                                                        object canvasDomElement, 
-                                                        double horizontalMultiplicator, 
-                                                        double verticalMultiplicator, 
-                                                        double xOffsetToApplyBeforeMultiplication, 
-                                                        double yOffsetToApplyBeforeMultiplication, 
-                                                        double xOffsetToApplyAfterMultiplication, 
-                                                        double yOffsetToApplyAfterMultiplication, 
-                                                        Size shapeActualSize)
-        {
-            var ctx = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-
-            Rect rect = Rect;
-
-            ctx.rect(
-                rect.X + xOffsetToApplyBeforeMultiplication + xOffsetToApplyAfterMultiplication, 
-                rect.Y + yOffsetToApplyBeforeMultiplication + yOffsetToApplyAfterMultiplication,
-                rect.Width,
-                rect.Height);
-        }
-
-        internal protected override void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
-        {
-            Rect rect = Rect;
-            minX = Math.Min(minX, rect.X);
-            maxX = Math.Max(maxX, rect.X + rect.Width);
-            minY = Math.Min(minY, rect.Y);
-            maxY = Math.Max(maxY, rect.Y + rect.Height);
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RectangleGeometry"/> class,
+        /// and creates a rectangle with zero area.
+        /// </summary>
+        public RectangleGeometry() { }
 
         /// <summary>
-        ///     Rect - Rect.  Default value is Rect.Empty.
+        /// Identifies the <see cref="Rect"/> dependency property.
         /// </summary>
+        public static readonly DependencyProperty RectProperty =
+            DependencyProperty.Register(
+                nameof(Rect),
+                typeof(Rect),
+                typeof(RectangleGeometry),
+                new PropertyMetadata(new Rect(), OnPathChanged));
+
+        /// <summary>
+        /// Gets or sets the dimensions of the rectangle.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Rect"/> structure that describes the position and size of the
+        /// rectangle. The default is null.
+        /// </returns>
         public Rect Rect
         {
-            get { return (Rect)GetValue(RectProperty); }
-            set { SetValue(RectProperty, value); }
+            get => (Rect)GetValue(RectProperty);
+            set => SetValue(RectProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RectangleGeometry.Rect"/> dependency
-        /// property.
+        /// Identifies the <see cref="RadiusX"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty RectProperty = 
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty RadiusXProperty =
             DependencyProperty.Register(
-                nameof(Rect), 
-                typeof(Rect), 
-                typeof(RectangleGeometry), 
-                new PropertyMetadata(Rect.Empty));
+                nameof(RadiusX),
+                typeof(double),
+                typeof(RectangleGeometry),
+                new PropertyMetadata(0.0));
 
         /// <summary>
         /// Gets or sets the x-radius of the ellipse that is used to round the corners of
@@ -90,21 +79,20 @@ namespace Windows.UI.Xaml.Media
         [OpenSilver.NotImplemented]
         public double RadiusX
         {
-            get { return (double)this.GetValue(RadiusXProperty); }
-            set { this.SetValue(RadiusXProperty, value); }
+            get => (double)GetValue(RadiusXProperty);
+            set => SetValue(RadiusXProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RectangleGeometry.RadiusX"/> dependency
-        /// property.
+        /// Identifies the <see cref="RadiusY" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty RadiusXProperty =
+        public static readonly DependencyProperty RadiusYProperty =
             DependencyProperty.Register(
-                nameof(RadiusX),
+                nameof(RadiusY),
                 typeof(double),
                 typeof(RectangleGeometry),
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0.0));
 
         /// <summary>
         /// Gets or sets the y-radius of the ellipse that is used to round the corners of
@@ -117,21 +105,9 @@ namespace Windows.UI.Xaml.Media
         [OpenSilver.NotImplemented]
         public double RadiusY
         {
-            get { return (double)this.GetValue(RadiusYProperty); }
-            set { this.SetValue(RadiusYProperty, value); }
+            get => (double)GetValue(RadiusYProperty);
+            set => SetValue(RadiusYProperty, value);
         }
-
-        /// <summary>
-        /// Identifies the <see cref="RectangleGeometry.RadiusY" /> dependency
-        /// property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty RadiusYProperty =
-            DependencyProperty.Register(
-                nameof(RadiusY),
-                typeof(double),
-                typeof(RectangleGeometry),
-                new PropertyMetadata(0d));
 
         internal override Rect BoundsInternal
         {
@@ -157,6 +133,18 @@ namespace Windows.UI.Xaml.Media
 
                 return boundsRect;
             }
+        }
+
+        internal override string ToPathData(IFormatProvider formatProvider)
+        {
+            var rect = Rect;
+
+            var left = rect.Left.ToString(formatProvider);
+            var top = rect.Top.ToString(formatProvider);
+            var right = rect.Right.ToString(formatProvider);
+            var bottom = rect.Bottom.ToString(formatProvider);
+
+            return $"M{left},{top} L{right},{top} {right},{bottom} {left},{bottom} Z";
         }
     }
 }
