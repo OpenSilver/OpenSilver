@@ -110,6 +110,7 @@
 		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverAssemblyAttribute.cs" />
 		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverResourceExposureAttribute.cs" />
 		<Compile Include="OpenSilver\Utility\FrugalMap.cs" />
+		<Compile Include="OpenSilver\XamlDesignerConstructorStub.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
 		<Compile Include="PagedCollectionView\IPagedCollectionView.cs" />
