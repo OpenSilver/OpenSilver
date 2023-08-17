@@ -526,6 +526,8 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private bool IsClosed => this.InteractionState == WindowInteractionState.Closing || this.InteractionState == WindowInteractionState.NotResponding;
+
         /// <summary>
         /// Gets a value indicating whether the PopUp is open or not.
         /// </summary>
@@ -653,6 +655,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void Close()
         {
+            if (IsClosed)
+            {
+                return;
+            }
             // AutomationPeer returns "Closing" when Close() is called
             // but the window is not closed completely:
             this.InteractionState = WindowInteractionState.Closing;
@@ -1199,6 +1205,10 @@ namespace Windows.UI.Xaml.Controls
         /// </exception>
         public void Show()
         {
+            if (!IsClosed)
+            {
+                return;
+            }
             // AutomationPeer returns "Running" when Show() is called
             // but the ChildWindow is not ready for user interaction:
             this.InteractionState = WindowInteractionState.Running;
