@@ -15,50 +15,68 @@
 
     <dependencies>
       <group targetFramework="net462">
-        <dependency id="DotNetBrowser" version="1.21.5" />
-        <dependency id="MahApps.Metro" version="1.2.4.0" />
-        <dependency id="Microsoft.Web.Administration" version="7.0.0.0" />
+        <dependency id="Microsoft.Web.WebView2" version="1.0.1905-prerelease" />
+        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.824" />
+        <dependency id="MahApps.Metro" version="2.4.9" />
+        <dependency id="Microsoft.Extensions.ObjectPool" version="7.0.4" />
+      </group>
+
+      <group targetFramework="netcoreapp3.1">
+        <dependency id="Microsoft.Web.WebView2" version="1.0.1905-prerelease" />
+        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.824" />
+        <dependency id="MahApps.Metro" version="2.4.9" />
         <dependency id="Microsoft.Extensions.ObjectPool" version="7.0.4" />
       </group>
     </dependencies>
 
+    <frameworkReferences>
+      <group targetFramework="netcoreapp3.1">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+      </group>
+      <group targetFramework="net462" />
+    </frameworkReferences>
+
     <contentFiles>
-        <files include="any/net462/**" buildAction="None" copyToOutput="true"/>
+      <files include="**/*.js" buildAction="None" copyToOutput="true" />
+      <files include="**/*.css" buildAction="None" copyToOutput="true" />
+      <files include="**/*.html" buildAction="None" copyToOutput="true" />
     </contentFiles>
   </metadata>
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.dll" target="lib/net462" />
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.pdb" target="lib/net462" />
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.xml" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/Debug/net462/OpenSilver.Simulator.dll" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/Debug/net462/OpenSilver.Simulator.pdb" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/Debug/net462/OpenSilver.Simulator.xml" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/Debug/netcoreapp3.1/OpenSilver.Simulator.dll" target="lib/netcoreapp3.1" />
+    <file src="../src/Simulator/Simulator/bin/Debug/netcoreapp3.1/OpenSilver.Simulator.pdb" target="lib/netcoreapp3.1" />
+    <file src="../src/Simulator/Simulator/bin/Debug/netcoreapp3.1/OpenSilver.Simulator.xml" target="lib/netcoreapp3.1" />
 
     <!-- OpenSilver targets -->
     <file src="../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
 
     <!-- OpenSilver HTML files -->
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root_opensilver.html" target="contentFiles/any/net462/simulator_root.html" />
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root_opensilver.html" target="contentFiles/any/net462/interop_debug_root.html" />
+    <file src="../src/Simulator/Simulator/simulator_root_opensilver.html" target="contentFiles/any/any/simulator_root.html" />
+    <file src="../src/Simulator/Simulator/interop_debug_root_opensilver.html" target="contentFiles/any/any/interop_debug_root.html" />
 
     <!-- OpenSilver compiler -->
     <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
-
     <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
     <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.pdb" target="tools/OpenSilver.Compiler.Resources.pdb" />
     <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
     <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.pdb" target="tools/OpenSilver.Compiler.Common.pdb" />
 
     <!-- OpenSilver JS and CSS files -->
-    <file src="../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/cshtml5.css" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/cshtml5.js" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/flatpickr.css" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/flatpickr.js" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/velocity.js" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/net462/js_css" />    
-    <file src="../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/net462/js_css" />
-    <file src="../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/cshtml5.css" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/cshtml5.js" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/flatpickr.css" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/flatpickr.js" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/velocity.js" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/any/js_css" />    
+    <file src="../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/any/js_css" />
+    <file src="../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/any/js_css" />
 	
     <!-- OpenSilver icon -->
     <file src="nuspec/OpenSilver_icon.png" target="images\OpenSilver_icon.png" />

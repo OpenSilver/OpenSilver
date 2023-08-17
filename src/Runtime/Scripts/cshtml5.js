@@ -660,10 +660,10 @@ document.eventCallback = function (callbackId, args, sync) {
     }
 }
 
-document.getCallbackFunc = function (callbackId, sync, sliceArguments) {
+document.getCallbackFunc = function (callbackId, sync) {
     return function () {
         return document.eventCallback(callbackId,
-            (sliceArguments) ? Array.prototype.slice.call(arguments) : arguments,
+            Array.prototype.slice.call(arguments),
             sync);
     };
 }

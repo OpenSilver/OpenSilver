@@ -1,17 +1,16 @@
 ﻿<mahapps:MetroWindow x:Class="DotNetForHtml5.EmulatorWithoutJavascript.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:dotnetbrowser="clr-namespace:DotNetBrowser.WPF;assembly=DotNetBrowser"
         xmlns:mahapps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:xamlinspection="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection"
-        xmlns:licensecheckernamespace="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking"
+        xmlns:xamlinspection="clr-namespace:OpenSilver.Simulator.XamlInspection"
         xmlns:console="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.Console"
         SizeToContent="WidthAndHeight"
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="Manual"
         ShowIconOnTitleBar="True"
-        GlowBrush="{DynamicResource AccentColorBrush}"
-        Left="100" Top="5">
+        GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
+        Left="100" Top="5"
+        KeyUp="MetroWindow_KeyUp">
     <mahapps:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -19,15 +18,11 @@
                 <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <!-- MahApps.Metro Accent and AppTheme setting -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Blue.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </mahapps:MetroWindow.Resources>
     <Grid>
-        <Grid x:Name="GridForAudioMediaElements" Width="0" Height="0"/>
         <Border Background="#FF111112" x:Name="Root">
             <Grid Background="#FF444445">
                 <Grid.RowDefinitions>
@@ -42,95 +37,34 @@
                     <ColumnDefinition x:Name="ColumnForXamlInspection" Width="Auto"/>
                     <ColumnDefinition x:Name="ColumnForXamlPropertiesPane" Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Vertical" Grid.Row="0" Grid.ColumnSpan="2">
-                    <Border x:Name="ToolbarDuringJavaScriptCompilation" Background="#FF49BC1C">
-                        <StackPanel Orientation="Horizontal" Margin="10,10,10,10">
-                            <StackPanel Orientation="Vertical" Margin="10,0,10,0">
-                                <TextBlock Text="Generating HTML and JavaScript files..." Foreground="White" FontWeight="Bold"/>
-                                <TextBlock Text="Note: what you see below is an intermediate version that is useful for debugging. However, it is much slower than the final result." Foreground="White" Margin="0,5,0,0" TextWrapping="Wrap"/>
-                                <TextBlock Text="Be sure to test the final result in the browser by waiting for the generation to complete, and then clicking 'Run in browser'." Foreground="White"/>
-                                <StackPanel x:Name="MessageToDisplayDuringFirstTimeCompilation" Margin="0,10,0,0" Orientation="Horizontal">
-                                    <Path Stretch="Uniform" Fill="#FFFFFFFF" Width="26" Height="26" Data="F1M950.458,504.864L940.094,504.864 940.094,503.164 940.925,503.164C941.828,503.164 942.434,503.083 942.748,502.922 943.057,502.758 943.276,502.531 943.404,502.231 943.532,501.935 943.597,501.239 943.597,500.148L943.597,488.226 940.094,488.226 940.094,486.547C941.216,486.414 942.153,486.226 942.917,485.987 943.68,485.747 944.546,485.367 945.518,484.846L946.994,484.846 946.994,501.079C946.994,501.646 947.078,502.071 947.24,502.354 947.401,502.635 947.628,502.843 947.917,502.971 948.206,503.099 948.737,503.164 949.505,503.164L950.458,503.164 M943.576,476.395C944.034,475.944 944.589,475.719 945.234,475.719 945.882,475.719 946.437,475.944 946.896,476.395 947.354,476.848 947.584,477.398 947.584,478.046 947.584,478.692 947.354,479.247 946.896,479.704 946.437,480.164 945.882,480.392 945.234,480.392 944.589,480.392 944.034,480.164 943.576,479.704 943.117,479.247 942.888,478.692 942.888,478.046 942.888,477.398 943.117,476.848 943.576,476.395z M945.276,468.91C933.469,468.91 923.896,478.483 923.896,490.29 923.896,502.099 933.469,511.671 945.276,511.671 957.084,511.671 966.656,502.099 966.656,490.29 966.656,478.483 957.084,468.91 945.276,468.91z"/>
-                                    <TextBlock Text="First-time compilation is slower than subsequent ones. Please be patient..." Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                </StackPanel>
-                                <StackPanel x:Name="MessageToDisplayWhenCompilationIsSlow" Margin="0,10,0,0" Orientation="Horizontal">
-                                    <Path Stretch="Uniform" Fill="#FFFFFFFF" Width="26" Height="26" Data="F1M950.458,504.864L940.094,504.864 940.094,503.164 940.925,503.164C941.828,503.164 942.434,503.083 942.748,502.922 943.057,502.758 943.276,502.531 943.404,502.231 943.532,501.935 943.597,501.239 943.597,500.148L943.597,488.226 940.094,488.226 940.094,486.547C941.216,486.414 942.153,486.226 942.917,485.987 943.68,485.747 944.546,485.367 945.518,484.846L946.994,484.846 946.994,501.079C946.994,501.646 947.078,502.071 947.24,502.354 947.401,502.635 947.628,502.843 947.917,502.971 948.206,503.099 948.737,503.164 949.505,503.164L950.458,503.164 M943.576,476.395C944.034,475.944 944.589,475.719 945.234,475.719 945.882,475.719 946.437,475.944 946.896,476.395 947.354,476.848 947.584,477.398 947.584,478.046 947.584,478.692 947.354,479.247 946.896,479.704 946.437,480.164 945.882,480.392 945.234,480.392 944.589,480.392 944.034,480.164 943.576,479.704 943.117,479.247 942.888,478.692 942.888,478.046 942.888,477.398 943.117,476.848 943.576,476.395z M945.276,468.91C933.469,468.91 923.896,478.483 923.896,490.29 923.896,502.099 933.469,511.671 945.276,511.671 957.084,511.671 966.656,502.099 966.656,490.29 966.656,478.483 957.084,468.91 945.276,468.91z"/>
-                                    <TextBlock Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0">
-                                        <Run Text="Compilation appears to be taking a long time. You can avoid recompiling all the assemblies by unchecking some assemblies"/>
-                                        <LineBreak/>
-                                        <Run Text="from the 'Configuration Manager' of Visual Studio. Just be sure to check them again when you need to recompile them."/>
-                                    </TextBlock>
-                                </StackPanel>
+                <Grid Background="#2F2F2F" Grid.Row="0" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Foreground="#FFDDDDDD" x:Name="WelcomeTextBlock">
+                        <Run Text="he Simulator below lets you debug in C# using Visual Studio."/>
+                        <LineBreak />
+                        <Run Text="To view the final web version instead, run the project that"/>
+                        <LineBreak />
+                        <Run Text="ends with &quot;.Browser&quot; in your solution."/>
+                    </TextBlock>
+                    <StackPanel Grid.Column="1" Margin="10,14,24,16" VerticalAlignment="Top" HorizontalAlignment="Left">
+
+                        <Button x:Name="ButtonViewXamlTree" Click="ButtonViewXamlTree_Click" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Stretch="Uniform" Fill="White" Width="14" Height="14" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Data="M40.110691,17.336001L43.787209,19.603006 47.739838,17.851579 46.722206,22.052104 49.609001,25.26417 45.300961,25.597356 43.13229,29.337 41.485435,25.338367 37.260998,24.432104 40.553104,21.631422z M30.316431,15.311499C30.737907,15.3207,31.141415,15.45716,31.470024,15.730532L33.818306,17.694105C34.694302,18.424594,34.7043,19.856977,33.841408,20.888161L6.1638265,54.03081C5.2956729,55.0699,3.888453,55.316195,3.0118785,54.583106L0.66258836,52.621932C-0.21271044,51.889041,-0.22314736,50.462062,0.64531529,49.424178L28.322847,16.281325C28.861591,15.634333,29.61397,15.296166,30.316431,15.311499z M17.982637,0.28100014L22.582518,3.1118908 27.524708,0.93214035 26.253859,6.1756935 29.865,10.203163 24.47509,10.621074 21.760185,15.288001 19.702805,10.298364 14.42,9.1577039 18.53216,5.6602993z M37.014431,0L40.23534,1.97754 43.692245,0.45019531 42.80167,4.1220703 45.327003,6.9426298 41.552406,7.2316895 39.658558,10.5 38.221096,7.0024395 34.521999,6.2094698 37.39922,3.7629395z"/>
+                                <TextBlock FontSize="11" Text="Inspect Visual Tree" Margin="6,0,0,0"/>
                             </StackPanel>
-                        </StackPanel>
-                    </Border>
-                    <Grid Background="#2F2F2F">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel x:Name="ToolbarWhenCompilationError" Grid.Column="0" Orientation="Horizontal" Margin="16,16,16,10" VerticalAlignment="Top" HorizontalAlignment="Left">
-                            <StackPanel Orientation="Vertical" Margin="14,0,30,0">
-                                <TextBlock Text="Error while compiling to HTML and JavaScript." Foreground="#FFE6B8B8" FontWeight="Bold"/>
-                                <Button x:Name="ButtonViewCompilationLog" Content="View Compilation Log" Margin="0,10,0,0" Click="ButtonViewCompilationLog_Click" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="#FFBD6969"/>
+                        </Button>
+                        <Button x:Name="ButtonOpenDevTools" Click="ButtonOpenDevTools_Click" Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="#888888">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Stretch="Uniform" Fill="White" Width="17" Height="17" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Data="M16.000043,16.185269C15.85004,16.185269 15.698036,16.228265 15.564034,16.318258 15.210026,16.559237 15.116024,17.043197 15.356029,17.398167 15.597034,17.753137 16.083045,17.846129 16.437053,17.606149 16.609056,17.490159 16.726059,17.313174 16.765059,17.110191 16.804061,16.906208 16.76206,16.699226 16.646057,16.52624 16.495054,16.305259 16.249048,16.185269 16.000043,16.185269z M15.996174,14.186017C16.888547,14.18589 17.765832,14.613901 18.302094,15.406334 18.718103,16.020283 18.869106,16.760221 18.729103,17.489159 18.5881,18.217098 18.172091,18.847045 17.558077,19.26301 17.558077,19.26301 17.557077,19.26301 17.557077,19.26301 17.081067,19.584983 16.541055,19.73897 16.005043,19.73897 15.113024,19.73897 14.236004,19.311006 13.699992,18.519073 12.841973,17.250179 13.175981,15.519325 14.444009,14.662397 14.919894,14.340299 15.46075,14.186093 15.996174,14.186017z M15.994363,12.631384C15.159364,12.631384 14.315365,12.872375 13.573366,13.374356 12.614367,14.023331 11.965368,15.006293 11.746368,16.142249 11.526368,17.278205 11.764368,18.43216 12.412367,19.391123 13.751365,21.369047 16.449362,21.891026 18.429359,20.552078 20.407357,19.21313 20.929357,16.514234 19.590358,14.534311 18.753359,13.298359 17.386361,12.631384 15.994363,12.631384z M2,8.999999L2,24.999999 15.54086,24.999999 15.428873,23.268127 15.251416,23.249507C14.496091,23.15886,13.758959,22.933517,13.078991,22.581125L12.981368,22.528639 11.874002,24.042969 10.432005,23.008987 11.55576,21.473918 11.520715,21.439881C11.241899,21.160465 10.985493,20.850879 10.756369,20.51208 10.519119,20.161843 10.319619,19.793733 10.158823,19.412622L10.153788,19.399818 8.315011,19.870972 7.8910122,18.147982 9.7070742,17.683523 9.6997004,17.626332C9.6358862,17.012621 9.6623707,16.386114 9.7823706,15.763263 9.8223705,15.555646 9.8721991,15.351529 9.931509,15.15143L9.9364748,15.136068 8.3170004,14.362005 9.1109991,12.757008 10.688446,13.51064 10.711994,13.472977C11.164369,12.787629,11.751868,12.191401,12.452367,11.71742L12.567836,11.6424 11.881005,10.094005 13.519002,9.3560085 14.20001,10.890481 14.394869,10.835667C14.920068,10.698399 15.456307,10.631044 15.990171,10.630976 16.20467,10.630948 16.418786,10.641782 16.631648,10.663307L16.860208,10.692241 17.338018,9.0629892 19.055012,9.5389891 18.573934,11.179385 18.783318,11.274937C19.460312,11.604913,20.084641,12.058555,20.618998,12.628556L20.703541,12.721636 22.134993,11.753014 23.126991,13.219019 21.693449,14.189055 21.742454,14.288908C22.078852,15.010012,22.268293,15.772905,22.318434,16.538105L22.328342,16.74032 24.027009,16.904005 23.830008,18.673971 22.137917,18.511555 22.11556,18.601069C21.918753,19.337832,21.589605,20.041008,21.135771,20.671115L20.959601,20.903385 22.130013,22.106007 20.836007,23.353015 19.651979,22.136402 19.550358,22.209014C18.872234,22.667747,18.135907,22.977266,17.381171,23.144896L17.217404,23.178121 17.331019,24.925013 16.367516,24.999999 30,24.999999 30,8.999999z M13.499019,2.9999714C14.327018,2.9999714 14.999018,3.6719723 14.999019,4.4999723 14.999018,5.3279724 14.327018,5.9999723 13.499019,5.9999723 12.671019,5.9999723 11.999019,5.3279724 11.999019,4.4999723 11.999019,3.6719723 12.671019,2.9999714 13.499019,2.9999714z M9.4990187,2.9999714C10.327019,2.9999714 10.999019,3.6719723 10.999019,4.4999723 10.999019,5.3279724 10.327019,5.9999723 9.4990187,5.9999723 8.6710186,5.9999723 7.9990187,5.3279724 7.9990187,4.4999723 7.9990187,3.6719723 8.6710186,2.9999714 9.4990187,2.9999714z M5.4990187,2.9999714C6.3270187,2.9999714 6.9990187,3.6719723 6.9990187,4.4999723 6.9990187,5.3279724 6.3270187,5.9999723 5.4990187,5.9999723 4.6710186,5.9999723 3.9990187,5.3279724 3.9990187,4.4999723 3.9990187,3.6719723 4.6710186,2.9999714 5.4990187,2.9999714z M2,2L2,6.999999 30,6.999999 30,2z M0,0L32,0 32,26.999999 0,26.999999z"/>
+                                <TextBlock FontSize="11" Text="Open DevTools" Margin="6,0,0,0"/>
                             </StackPanel>
-                        </StackPanel>
-                        <StackPanel x:Name="ToolbarAfterSuccessfulJavaScriptCompilation" Grid.Column="0" Orientation="Horizontal" Margin="20,14,24,16" VerticalAlignment="Top" HorizontalAlignment="Left">
-                            <TextBlock Foreground="#FFDDDDDD" x:Name="WelcomeTextBlock">
-                                <Run Text="The Simulator below lets you debug in C#"/>
-                                <LineBreak />
-                                <Run Text="using Visual Studio. To view the final web"/>
-                                <LineBreak />
-                                <Run Text="version instead, click &quot;Run in browser...&quot;."/>
-                            </TextBlock>
-                            <StackPanel Margin="34,0,0,0">
-                                <Button x:Name="ButtonRunInBrowser" Click="ButtonRunInBrowser_Click" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="#FF49BC1C" HorizontalAlignment="Left">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Stretch="Uniform" Fill="White" Width="10" Height="10" Margin="0,0,0,0" Data="F1M-224.553,1265L-246.174,1283.52 -267.792,1302.04 -267.792,1265 -267.792,1227.97 -246.174,1246.49 -224.553,1265z" />
-                                        <TextBlock Text="RUN IN BROWSER" Margin="6,0,0,0"/>
-                                    </StackPanel>
-                                </Button>
-                                <CheckBox x:Name="CheckBoxUseHttpLocalhost" Content="Use http://localhost" Foreground="LightGray" Margin="0,5,0,0" HorizontalAlignment="Left"/>
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,14,24,16" VerticalAlignment="Top" HorizontalAlignment="Left">
-                            <StackPanel Margin="10,0,0,0">
-                                <Button x:Name="ButtonSeeOutputFolder" Click="ButtonSeeOutputFolder_Click" Padding="10,3" Margin="0,0,0,0" Cursor="Hand" BorderThickness="0" Focusable="False" Background="Transparent" HorizontalAlignment="Left">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Stretch="Uniform" Fill="White" Width="16" Height="16" Margin="0,0,0,0" Data="M0,21.940001L64,21.940001 58.81641,53.042002 5.4832716,53.042002z M5.4829998,0L26.983213,0 26.983213,6.5154943 58.805,6.5154943 58.805,14.362 5.5063095,14.362 5.5063095,7.1121521 5.4829998,7.1121521z" />
-                                        <TextBlock Text="OPEN OUTPUT FOLDER" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                                <Button x:Name="ButtonTestOnDevice" Click="ButtonTestOnMobileDevices_Click" Padding="10,3" Margin="0,0,0,0" Cursor="Hand" BorderThickness="0" Focusable="False" Background="Transparent" HorizontalAlignment="Left">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Stretch="Uniform" Fill="White" Width="16" Height="16" Margin="0,0,0,0" Data="F1M674.893,306.117L674.893,370.117 708.935,370.117 708.935,306.117 674.893,306.117z M685.832,308.841L698.132,308.841 698.132,310.247 685.832,310.247 685.832,308.841z M691.082,365.992C691.019,365.95 690.391,365.53 689.813,365.478 688.912,365.397 688.277,365.742 688.128,365.832L688.869,363.276C688.869,363.276 689.547,362.807 690.566,362.899 691.086,362.948 691.464,363.173 691.83,363.423L691.082,365.992z M688.989,362.84L689.73,360.282C689.73,360.282 690.406,359.814 691.425,359.906 691.945,359.954 692.324,360.179 692.69,360.429L691.941,362.998C691.878,362.957 691.251,362.536 690.673,362.484 689.772,362.403 689.136,362.748 688.989,362.84z M694.36,366.475C694.165,366.571 693.506,366.856 692.731,366.767 692.217,366.707 691.837,366.501 691.487,366.269L692.231,363.699C692.574,363.928 692.946,364.13 693.447,364.188 694.362,364.297 695.117,363.867 695.117,363.867L694.36,366.475z M695.22,363.481C695.024,363.578 694.365,363.863 693.589,363.773 693.076,363.715 692.697,363.508 692.346,363.276L693.089,360.705C693.433,360.935 693.806,361.136 694.307,361.195 695.222,361.303 695.976,360.873 695.976,360.873L695.22,363.481z M706.212,356.364L677.615,356.364 677.615,312.926 706.212,312.926 706.212,356.364z" />
-                                        <TextBlock Text="TEST ON DEVICE" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                            <StackPanel Margin="10,0,0,0">
-                                <Button x:Name="ButtonDebuggingTips" Click="ButtonDebuggingTips_Click" Padding="10,3" Margin="0,0,0,0" Cursor="Hand" BorderThickness="0" Focusable="False" Background="Transparent" HorizontalAlignment="Left">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Stretch="Uniform" Fill="White" Width="16" Height="16" Margin="0,0,0,0" Data="M14.580002,23.394012L14.580002,26.235001 17.18399,26.235001 17.18399,23.394012z M16.117996,5.7660065C14.539993,5.7660065 13.278992,6.2390137 12.332993,7.1880035 10.991989,8.5250092 10.320999,10.223007 10.320999,12.27301L13.043991,12.27301C13.043991,10.695007 13.437988,9.5130005 14.22699,8.7230072 14.697998,8.25 15.289001,8.0130005 16,8.0130005 16.867996,8.0130005 17.537003,8.25 18.009995,8.7230072 18.561996,9.2750092 18.838989,10.106003 18.838989,11.207001 18.838989,12.077011 18.522995,12.827011 17.89299,13.455002 16.789001,14.561005 16.039001,15.429001 15.644989,16.061005 15.090988,16.92601 14.817001,18.228012 14.817001,19.964005L16.947998,19.964005C16.947998,18.545013 17.302002,17.478012 18.009995,16.767014 18.955994,15.824005 19.705994,15.074005 20.259995,14.522003 21.205002,13.574005 21.679001,12.432007 21.679001,11.090012 21.679001,9.5130005 21.166,8.2109985 20.14299,7.1880035 19.194992,6.2390137 17.853989,5.7660065 16.117996,5.7660065z M16,0C24.819992,0 32,7.178009 32,16.001007 32,24.822006 24.819992,32 16,32 7.1759949,32 0,24.822006 0,16.001007 0,7.178009 7.1759949,0 16,0z" />
-                                        <TextBlock Text="DEBUGGING TIPS" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                                <Button x:Name="ButtonViewXamlTree" Click="ButtonViewXamlTree_Click" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Stretch="Uniform" Fill="White" Width="14" Height="14" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Data="M40.110691,17.336001L43.787209,19.603006 47.739838,17.851579 46.722206,22.052104 49.609001,25.26417 45.300961,25.597356 43.13229,29.337 41.485435,25.338367 37.260998,24.432104 40.553104,21.631422z M30.316431,15.311499C30.737907,15.3207,31.141415,15.45716,31.470024,15.730532L33.818306,17.694105C34.694302,18.424594,34.7043,19.856977,33.841408,20.888161L6.1638265,54.03081C5.2956729,55.0699,3.888453,55.316195,3.0118785,54.583106L0.66258836,52.621932C-0.21271044,51.889041,-0.22314736,50.462062,0.64531529,49.424178L28.322847,16.281325C28.861591,15.634333,29.61397,15.296166,30.316431,15.311499z M17.982637,0.28100014L22.582518,3.1118908 27.524708,0.93214035 26.253859,6.1756935 29.865,10.203163 24.47509,10.621074 21.760185,15.288001 19.702805,10.298364 14.42,9.1577039 18.53216,5.6602993z M37.014431,0L40.23534,1.97754 43.692245,0.45019531 42.80167,4.1220703 45.327003,6.9426298 41.552406,7.2316895 39.658558,10.5 38.221096,7.0024395 34.521999,6.2094698 37.39922,3.7629395z"/>
-                                        <TextBlock FontSize="11" Text="Inspect Visual Tree" Margin="6,0,0,0"/>
-                                    </StackPanel>
-                                </Button>
-                                <Button x:Name="ButtonOpenDevTools" Click="ButtonOpenDevTools_Click" Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="#888888">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Stretch="Uniform" Fill="White" Width="17" Height="17" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Data="M16.000043,16.185269C15.85004,16.185269 15.698036,16.228265 15.564034,16.318258 15.210026,16.559237 15.116024,17.043197 15.356029,17.398167 15.597034,17.753137 16.083045,17.846129 16.437053,17.606149 16.609056,17.490159 16.726059,17.313174 16.765059,17.110191 16.804061,16.906208 16.76206,16.699226 16.646057,16.52624 16.495054,16.305259 16.249048,16.185269 16.000043,16.185269z M15.996174,14.186017C16.888547,14.18589 17.765832,14.613901 18.302094,15.406334 18.718103,16.020283 18.869106,16.760221 18.729103,17.489159 18.5881,18.217098 18.172091,18.847045 17.558077,19.26301 17.558077,19.26301 17.557077,19.26301 17.557077,19.26301 17.081067,19.584983 16.541055,19.73897 16.005043,19.73897 15.113024,19.73897 14.236004,19.311006 13.699992,18.519073 12.841973,17.250179 13.175981,15.519325 14.444009,14.662397 14.919894,14.340299 15.46075,14.186093 15.996174,14.186017z M15.994363,12.631384C15.159364,12.631384 14.315365,12.872375 13.573366,13.374356 12.614367,14.023331 11.965368,15.006293 11.746368,16.142249 11.526368,17.278205 11.764368,18.43216 12.412367,19.391123 13.751365,21.369047 16.449362,21.891026 18.429359,20.552078 20.407357,19.21313 20.929357,16.514234 19.590358,14.534311 18.753359,13.298359 17.386361,12.631384 15.994363,12.631384z M2,8.999999L2,24.999999 15.54086,24.999999 15.428873,23.268127 15.251416,23.249507C14.496091,23.15886,13.758959,22.933517,13.078991,22.581125L12.981368,22.528639 11.874002,24.042969 10.432005,23.008987 11.55576,21.473918 11.520715,21.439881C11.241899,21.160465 10.985493,20.850879 10.756369,20.51208 10.519119,20.161843 10.319619,19.793733 10.158823,19.412622L10.153788,19.399818 8.315011,19.870972 7.8910122,18.147982 9.7070742,17.683523 9.6997004,17.626332C9.6358862,17.012621 9.6623707,16.386114 9.7823706,15.763263 9.8223705,15.555646 9.8721991,15.351529 9.931509,15.15143L9.9364748,15.136068 8.3170004,14.362005 9.1109991,12.757008 10.688446,13.51064 10.711994,13.472977C11.164369,12.787629,11.751868,12.191401,12.452367,11.71742L12.567836,11.6424 11.881005,10.094005 13.519002,9.3560085 14.20001,10.890481 14.394869,10.835667C14.920068,10.698399 15.456307,10.631044 15.990171,10.630976 16.20467,10.630948 16.418786,10.641782 16.631648,10.663307L16.860208,10.692241 17.338018,9.0629892 19.055012,9.5389891 18.573934,11.179385 18.783318,11.274937C19.460312,11.604913,20.084641,12.058555,20.618998,12.628556L20.703541,12.721636 22.134993,11.753014 23.126991,13.219019 21.693449,14.189055 21.742454,14.288908C22.078852,15.010012,22.268293,15.772905,22.318434,16.538105L22.328342,16.74032 24.027009,16.904005 23.830008,18.673971 22.137917,18.511555 22.11556,18.601069C21.918753,19.337832,21.589605,20.041008,21.135771,20.671115L20.959601,20.903385 22.130013,22.106007 20.836007,23.353015 19.651979,22.136402 19.550358,22.209014C18.872234,22.667747,18.135907,22.977266,17.381171,23.144896L17.217404,23.178121 17.331019,24.925013 16.367516,24.999999 30,24.999999 30,8.999999z M13.499019,2.9999714C14.327018,2.9999714 14.999018,3.6719723 14.999019,4.4999723 14.999018,5.3279724 14.327018,5.9999723 13.499019,5.9999723 12.671019,5.9999723 11.999019,5.3279724 11.999019,4.4999723 11.999019,3.6719723 12.671019,2.9999714 13.499019,2.9999714z M9.4990187,2.9999714C10.327019,2.9999714 10.999019,3.6719723 10.999019,4.4999723 10.999019,5.3279724 10.327019,5.9999723 9.4990187,5.9999723 8.6710186,5.9999723 7.9990187,5.3279724 7.9990187,4.4999723 7.9990187,3.6719723 8.6710186,2.9999714 9.4990187,2.9999714z M5.4990187,2.9999714C6.3270187,2.9999714 6.9990187,3.6719723 6.9990187,4.4999723 6.9990187,5.3279724 6.3270187,5.9999723 5.4990187,5.9999723 4.6710186,5.9999723 3.9990187,5.3279724 3.9990187,4.4999723 3.9990187,3.6719723 4.6710186,2.9999714 5.4990187,2.9999714z M2,2L2,6.999999 30,6.999999 30,2z M0,0L32,0 32,26.999999 0,26.999999z"/>
-                                        <TextBlock FontSize="11" Text="Open DevTools" Margin="6,0,0,0"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
                 <Grid Grid.Row="1" Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -179,7 +113,6 @@
                             <Border.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Inspect Visual Tree" Cursor="Hand" Click="ButtonViewXamlTree_Click"/>
-                                    <MenuItem Header="View HTML/JS compilation log..." x:Name="MenuButtonViewCompilationLog" Cursor="Hand" Click="ButtonViewCompilationLog_Click"/>
                                     <MenuItem Header="Execute custom JavaScript code..." Cursor="Hand" Click="ButtonExecuteJS_Click"/>
                                     <MenuItem Header="View all JS code executed by the Simulator so far..." Visibility="Collapsed" Cursor="Hand" Click="ButtonViewJavaScriptLog_Click"/>
                                     <MenuItem Header="Debug JS code executed by the Simulator so far..." Cursor="Hand" Click="ButtonDebugJavaScriptLog_Click"/>
@@ -196,20 +129,12 @@
                     </StackPanel>
 
                     <ScrollViewer x:Name="MainScrollViewer" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="0,10,10,10" BorderThickness="0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                        <!-- Note: setting Focusable to false in the ScrollVewer is required to allow DotNetBrowser to retain the focus (cf. email from DotNetBrowser support on 2017.11.29) -->
                         <Border x:Name="MainBorder" Background="Transparent" CornerRadius="40" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                             <Grid>
                                 <Border x:Name="PhoneDecoration1" Visibility="Collapsed" Background="#FF333333" Height="8" Width="50" CornerRadius="5" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,25,0,0"/>
                                 <Border x:Name="PhoneDecoration2" Visibility="Collapsed" Background="#FF333333" Height="40" Width="40" CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                 <Grid x:Name="ContainerForMainWebBrowserAndHighlightElement" Margin="0,0,0,0">
                                     <Border x:Name="BrowserContainer"/>
-                                    <Canvas x:Name="ContainerForHighlightElement">
-                                        <Rectangle x:Name="HighlightElement" Visibility="Collapsed" Stroke="Red" StrokeDashArray="4 2" StrokeThickness="2"/>
-                                    </Canvas>
-                                    <Canvas x:Name="ContainerForElementPickerHighlight">
-                                        <Rectangle x:Name="ElementPickerHighlight" Visibility="Collapsed" Stroke="Blue" StrokeDashArray="4 2" StrokeThickness="2"/>
-                                    </Canvas>
-                                    <Rectangle x:Name="ElementPickerForInspection" Visibility="Collapsed" Fill="Transparent" MouseMove="ElementPickerForInspection_MouseMove" MouseDown="ElementPickerForInspection_MouseDown"/>
                                 </Grid>
                                 <Border x:Name="ContainerOfLoadingMessage" CornerRadius="5" Background="#88000000" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
                                     <TextBlock Text="Launching the application Please wait..."  Width="200" Foreground="White" FontSize="16" Margin="15,10" TextWrapping="Wrap" TextAlignment="Center"/>
@@ -222,12 +147,6 @@
 
                 <console:ConsoleControl Grid.ColumnSpan="2" Grid.Row="2" x:Name="Console" />
 
-                <!--<StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                    <Button Content="Stats" Click="ButtonStats_Click" Cursor="Hand" BorderThickness="0" />
-                    <Button Content="Execute JS" Click="ButtonExecuteJS_Click" Margin="10,0,0,0" Cursor="Hand" BorderThickness="0"/>
-                    <Button Content="View DOM tree" Click="ButtonSeeHtml_Click" Margin="10,0,0,0" Cursor="Hand" BorderThickness="0"/>
-                    <Button Content="View DOM history" Click="ButtonViewJavaScriptLog_Click" Margin="10,0,0,0" Cursor="Hand" BorderThickness="0"/>
-                </StackPanel>-->
                 <GridSplitter x:Name="MainGridSplitter" Grid.Column="2" Grid.RowSpan="1000" Visibility="Collapsed" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" ShowsPreview="True" Width="8" Cursor="SizeWE" />
                 <Border x:Name="BorderForXamlInspection" Visibility="Collapsed" Grid.Column="3" Grid.RowSpan="1000" Background="#FF252525">
                     <Grid>
@@ -237,14 +156,15 @@
                         </Grid.RowDefinitions>
                         <StackPanel x:Name="ContainerForXamlInspectorToolbar" Visibility="Collapsed" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top">
                             <StackPanel Orientation="Horizontal">
-                                <ToggleButton x:Name="ButtonViewHideElementPickerForInspector" ToolTip="Enable/disable the UI picker" Margin="16,16,0,16" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}" Click="ButtonViewHideElementPickerForInspector_Click">
+                                <ToggleButton x:Name="ButtonViewHideElementPickerForInspector" ToolTip="Enable/disable the UI picker" Margin="16,16,0,16" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}" Click="ButtonViewHideElementPickerForInspector_Click">
                                     <Path Stretch="Uniform" Fill="White" Width="18" Height="18" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Data="M27.534067,15.350001L27.534067,21.65646 31.025,21.65646 31.025,27.641132 27.534067,27.641132 27.534067,31.132001 21.548581,31.132001 21.548581,27.641132 15.298,27.641132C15.2975,25.358821,15.926888,23.238401,17.004468,21.412269L21.078689,21.412269 21.078689,17.227529C22.954853,16.050573,25.163012,15.3578,27.534067,15.350001z M27.578946,14.252979C20.203084,14.252979 14.203034,20.252946 14.203034,27.628605 14.203034,35.004164 20.203084,41.004732 27.578946,41.004732 34.954409,41.004732 40.955257,35.004164 40.955257,27.628605 40.955257,20.252946 34.954409,14.252979 27.578946,14.252979z M27.578946,10.253001C37.160326,10.253001 44.955292,18.047858 44.955292,27.628605 44.955292,32.11298 43.232578,36.192959 40.433754,39.27894L46.081001,46.491001 38.526737,46.491001 35.755215,42.952721C33.315794,44.258614 30.533971,45.004709 27.578946,45.004709 17.997966,45.004709 10.203,37.209852 10.203,27.628605 10.203,18.047858 17.997966,10.253001 27.578946,10.253001z M3.0078211,0L6.4980726,0 6.4980726,3.0078316 21.078974,3.0078316 21.078974,0 24.902387,0 24.902387,3.0078316 28.577,3.0078316 28.577,6.6647167 24.902387,6.6647167 24.902387,9.1940346C23.577482,9.3861761,22.298878,9.7155185,21.078974,10.171372L21.078974,6.6647167 6.4980726,6.6647167 6.4980726,21.412251 10.017635,21.412251C9.6203938,22.531458,9.3301129,23.697467,9.1516423,24.902475L6.4980726,24.902475 6.4980726,28.577001 3.0078211,28.577001 3.0078211,24.902475 0,24.902475 0,21.412251 3.0078211,21.412251 3.0078211,6.6647167 0,6.6647167 0,3.0078316 3.0078211,3.0078316z"/>
                                 </ToggleButton>
-                                <Button x:Name="ButtonRefreshXamlTree" Margin="10,16,0,16"  Content="Refresh" Click="ButtonRefreshXamlTree_Click" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}"/>
-                                <Button x:Name="ButtonXamlInspectorOptions" Margin="10,16,16,16" Content="..." Click="ButtonXamlInspectorOptions_Click" Padding="6,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}">
+                                <Button x:Name="ButtonRefreshXamlTree" Margin="10,16,0,16"  Content="Refresh" Click="ButtonRefreshXamlTree_Click" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}"/>
+                                <Button x:Name="ButtonXamlInspectorOptions" Margin="10,16,16,16" Content="..." Click="ButtonXamlInspectorOptions_Click" Padding="6,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}">
                                     <Button.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Expand All Nodes" Cursor="Hand" Click="ButtonExpandAllNodes_Click"/>
+                                            <MenuItem Header="Collapse All Nodes" Cursor="Hand" Click="ButtonCollapseAllNodes_Click"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                 </Button>
@@ -260,59 +180,5 @@
                 </Border>
             </Grid>
         </Border>
-        <Border x:Name="LicenseCheckerContainer">
-        </Border>
-        <StackPanel Grid.Row="2" Grid.Column="0"  Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0, 0, 32, 24">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Cursor" Value="Hand"/>
-                    <Setter Property="Margin" Value="10, 10, 10, 10"/>
-                </Style>
-            </StackPanel.Resources>
-            <Border>
-                <StackPanel>
-                    <ToggleButton x:Name="ButtonProfil" Background="Transparent" Width="24" Height="24" BorderThickness="0" Visibility="Collapsed">
-                        <ToggleButton.Template>
-                            <ControlTemplate TargetType="ToggleButton">
-                                <Border Background="Transparent">
-                                    <Path Stretch="Uniform" Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M7.07,18.28C7.5,17.38 10.12,16.5 12,16.5C13.88,16.5 16.5,17.38 16.93,18.28C15.57,19.36 13.86,20 12,20C10.14,20 8.43,19.36 7.07,18.28M18.36,16.83C16.93,15.09 13.46,14.5 12,14.5C10.54,14.5 7.07,15.09 5.64,16.83C4.62,15.5 4,13.82 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,13.82 19.38,15.5 18.36,16.83M12,6C10.06,6 8.5,7.56 8.5,9.5C8.5,11.44 10.06,13 12,13C13.94,13 15.5,11.44 15.5,9.5C15.5,7.56 13.94,6 12,6M12,11A1.5,1.5 0 0,1 10.5,9.5A1.5,1.5 0 0,1 12,8A1.5,1.5 0 0,1 13.5,9.5A1.5,1.5 0 0,1 12,11Z" Fill="#FF6D6D6D"></Path>
-                                </Border>
-                            </ControlTemplate>
-                        </ToggleButton.Template>
-                    </ToggleButton>
-                    <Popup x:Name="PopupProfil" PlacementTarget="{Binding ElementName=ButtonProfil}" IsOpen="{Binding IsChecked, ElementName=ButtonProfil}" StaysOpen="False" PopupAnimation="Slide">
-                        <StackPanel Orientation="Vertical" Background="#202020">
-                            <StackPanel.Resources>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Margin" Value="2, 2, 2, 2"/>
-                                    <Setter Property="Cursor" Value="Hand"/>
-                                    <Setter Property="Focusable" Value="False"/>
-                                    <Setter Property="Background" Value="#202020"/>
-                                    <Setter Property="BorderBrush" Value="#101010"/>
-                                </Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Margin" Value="2, 2, 2, 2"/>
-                                    <Setter Property="FontFamily"  Value="SegoeUI"/>
-                                    <Setter Property="FontSize"  Value="14"/>
-                                    <Setter Property="Foreground" Value="#c0c0c0"/>
-                                </Style>
-                            </StackPanel.Resources>
-                            <TextBlock x:Name="ProfilDetailEmail" Text="test@outlook.com"/>
-                            <TextBlock x:Name="ProfilDetailEdition" Text="test editon"/>
-                            <Button Name="ButtonLogOut" Cursor="Hand" Click="ButtonLogout_Click" Background="#202020" HorizontalAlignment="Left">
-                                <TextBlock>Log Out</TextBlock>
-                            </Button>
-                        </StackPanel>
-                    </Popup>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-        <Button Name="LaunchOptimizerButton" HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderThickness="0" Click="LaunchOptimizerButton_Click" Visibility="Collapsed">
-            <TextBlock>
-                Launch optimizer
-            </TextBlock>
-        </Button>
-        <!--<TextBlock Text="POSITION" x:Name="Test" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"/>-->
     </Grid>
 </mahapps:MetroWindow>

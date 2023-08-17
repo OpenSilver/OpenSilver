@@ -15,15 +15,10 @@
 
 
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
+namespace OpenSilver.Simulator.XamlInspection
 {
     public class TreeNode : INotifyPropertyChanged
     {
@@ -102,5 +97,46 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public TreeNode Parent { get; set; }
+
+
+        bool _AreChildrenLoaded = true;
+        public bool AreChildrenLoaded
+        {
+            get { return _AreChildrenLoaded; }
+            set
+            {
+                _AreChildrenLoaded = value;
+                NotifiyPropertyChanged("AreChildrenLoaded");
+            }
+        }
+
+        bool _IsSelectedNodeChild = false;
+        public bool IsSelectedNodeChild
+        {
+            get { return _IsSelectedNodeChild; }
+            set
+            {
+                _IsSelectedNodeChild = value;
+                NotifiyPropertyChanged("IsSelectedNodeChild");
+            }
+        }
+
+        bool _IsActiveNodeAncestor = false;
+        public bool IsActiveNodeAncestor
+        {
+            get { return _IsActiveNodeAncestor; }
+            set
+            {
+                _IsActiveNodeAncestor = value;
+                NotifiyPropertyChanged("IsActiveNodeAncestor");
+            }
+        }
+
+        public override string ToString()
+        {
+            return _title;
+        }
     }
 }

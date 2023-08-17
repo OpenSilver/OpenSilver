@@ -111,7 +111,7 @@ public class CoreDispatcher
     /// </returns>
     public bool CheckAccess()
     {
-        return !OpenSilver.Interop.IsRunningInTheSimulator || INTERNAL_Simulator.WebControlDispatcherCheckAccess();
+        return !OpenSilver.Interop.IsRunningInTheSimulator || INTERNAL_Simulator.OpenSilverDispatcherCheckAccess();
     }
 
     public DispatcherOperation InvokeAsync(Action a, DispatcherPriority priority = DispatcherPriority.Normal)
@@ -145,7 +145,7 @@ public class CoreDispatcher
         }
         else
         {
-            INTERNAL_Simulator.WebControlDispatcherBeginInvoke(() => _ = ProcessQueueAsync());
+            INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(() => _ = ProcessQueueAsync());
         }
     }
 

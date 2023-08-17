@@ -52,7 +52,7 @@ namespace CSHTML5.Internal
         public override string ToString() => ToJavaScriptStringImpl();
 
         private string ToJavaScriptStringImpl()
-            => $"document.getCallbackFunc({_id}, {GetSyncString()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
+            => $"document.getCallbackFunc({_id}, {GetSyncString()})";
 
         string IJavaScriptConvertible.ToJavaScriptString() => ToJavaScriptStringImpl();
 

@@ -2,44 +2,79 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript.Console
 {
     public class ConsoleMessage
     {
-        public enum MessageLevel
-        {
-            Log,
-            Warning,
-            Error
-        }
+        public const string ErrorLevel = "error";
+        public const string WarningLevel = "warning";
+        public const string InfoLevel = "info";
+        public const string DebugLevel = "debug";
+        public const string LogLevel = "log";
 
-        public string Message { get; }
-        public MessageLevel Level { get; }
-        public IMessageSource Source { get; }
+        public const string XmlSource = "xml";
+        public const string JavaScriptSource = "javascript";
+        public const string NetworkSource = "network";
+        public const string ConsoleApiSource = "console-api";
+        public const string StorageSource = "storage";
+        public const string AppCacheSource = "appcache";
+        public const string RenderingSource = "rendering";
+        public const string SecuritySource = "security";
+        public const string WorkerSource = "worker";
+        public const string DeprecationSource = "deprecation";
+        public const string OtherSource = "other";
 
-        public ConsoleMessage(string message, MessageLevel level, IMessageSource source = null)
-        {
-            Message = message;
-            Level = level;
-            Source = source;
-        }
+        [JsonPropertyName("level")]
+        public string Level { get; set; }
+        [JsonPropertyName("source")]
+        public string Source { get; set; }
+        [JsonPropertyName("text")]
+        public string Text { get; set; }
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
 
         public override string ToString()
         {
-            if (Source is FileSource fileSource)
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(Level);
+
+            if (!string.IsNullOrEmpty(Text))
             {
-                return $"{Message}\n\nat: {fileSource.Path}:{fileSource.Line}";
-            }
-            else if (Source is InteropSource interopSource)
-            {
-                return $"{Message}\n\nError in the following code:\n{interopSource.Code}";
+                sb.AppendLine($": {Text}");
             }
             else
             {
-                return Message;
+                sb.AppendLine();
             }
+
+            if (!string.IsNullOrEmpty(Source))
+            {
+                sb.AppendLine($"Source: {Source}");
+            }
+
+            if (!string.IsNullOrEmpty(Url))
+            {
+                sb.AppendLine($"Url: {Url}");
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    public class ConsoleMessageHolder
+    {
+        [JsonPropertyName("message")]
+        public ConsoleMessage Message { get; set; }
+
+        [JsonPropertyName("entry")]
+        public ConsoleMessage Entry
+        {
+            get => Message; set => Message = value;
         }
     }
 }

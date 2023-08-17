@@ -65,7 +65,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.Console
 
                 Console.Items.Add(message);
 
-                if (message.Level == ConsoleMessage.MessageLevel.Error)
+                if (message.Level == ConsoleMessage.ErrorLevel)
                 {
                     ErrorCount++;
                     if (!ConsoleVisible)
@@ -134,7 +134,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.Console
 
             foreach (ConsoleMessage message in Console.Items)
             {
-                if (message.Level != ConsoleMessage.MessageLevel.Error) continue;
+                if (message.Level != ConsoleMessage.ErrorLevel) continue;
 
                 if (!firstIteration)
                 {

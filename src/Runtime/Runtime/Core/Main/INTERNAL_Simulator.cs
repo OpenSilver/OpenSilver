@@ -14,49 +14,35 @@
 
 
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DotNetForHtml5.Core
 {
-#if CSHTML5NETSTANDARD //todo: remove this directive and use the "InternalsVisibleTo" attribute instead.
-    public
-#else
-    internal
-#endif
-        static class INTERNAL_Simulator
+    public static class INTERNAL_Simulator
     {
         // Note: all the properties here are populated by the Simulator, which "injects" stuff here when the application is launched in the Simulator.
 
-        static dynamic htmlDocument;
-        public static dynamic HtmlDocument
-        {
-            set // Intended to be called by the "Emulator" project to inject the HTML document.
-            {
-                htmlDocument = value;
-            }
-            internal get
-            {
-                return htmlDocument;
-            }
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic HtmlDocument { internal get; set; }
 
-        // Here we get the Document from DotNetBrowser
-        static dynamic domDocument;
-        public static dynamic DOMDocument
-        {
-            set // Intended to be called by the "Emulator" project to inject the Document.
-            {
-                domDocument = value;
-            }
-            internal get
-            {
-                return domDocument;
-            }
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic DOMDocument { internal get; set; }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic WpfMediaElementFactory { internal get; set; }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Func<object, object> ConvertBrowserResult { get; set; }
 
         // BeginInvoke of the WebControl's Dispatcher
         public static Action<Action> WebControlDispatcherBeginInvoke
@@ -131,19 +117,6 @@ namespace DotNetForHtml5.Core
             }
         }
 
-        static dynamic wpfMediaElementFactory;
-        public static dynamic WpfMediaElementFactory
-        {
-            set // Intended to be called by the "Emulator" project to inject the WpfMediaElementFactory.
-            {
-                wpfMediaElementFactory = value;
-            }
-            internal get
-            {
-                return wpfMediaElementFactory;
-            }
-        }
-
         static private dynamic webClientFactory;
         public static dynamic WebClientFactory
         {
@@ -194,6 +167,29 @@ namespace DotNetForHtml5.Core
         }
 #endif
 
-        public static Func<object, object> ConvertBrowserResult { get; set; }
+        public static Action<object> SimulatorCallbackSetup
+        {
+            get;
+            set;
+        }
+
+        public static Action<Action> OpenSilverDispatcherBeginInvoke
+        {
+            set;
+            internal get;
+        }
+
+        public static Action<Action, TimeSpan> OpenSilverDispatcherInvoke
+        {
+            set;
+            internal get;
+        }
+
+        public static Func<bool> OpenSilverDispatcherCheckAccess
+        {
+            get;
+            internal set;
+        }
+
     }
 }

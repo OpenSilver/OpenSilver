@@ -9,10 +9,17 @@
 			ResourcesExtractor;
 		</CoreBuildDependsOn>
 	</PropertyGroup>
-	
+
+	<PropertyGroup>
+		<Prefer32Bit>True</Prefer32Bit>
+		<Prefer32Bit Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">False</Prefer32Bit>
+		<_SourceAssemblyFilePath>$(OutputPath)\$(AssemblyName).exe</_SourceAssemblyFilePath>
+		<_SourceAssemblyFilePath Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">$(OutputPath)\$(AssemblyName).dll</_SourceAssemblyFilePath>
+	</PropertyGroup>
+
 	<Target Name="ResourcesExtractor">
 		<ResourcesExtractorAndCopier
-			SourceAssembly="$(OutputPath)\$(AssemblyName).exe"
+			SourceAssembly="$(_SourceAssemblyFilePath)"
 			OutputRootPath="wwwroot\"
 			OutputResourcesPath="resources\"
 			AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp"

@@ -15,9 +15,7 @@
 
 
 
-using DotNetBrowser.WPF;
 using DotNetForHtml5.EmulatorWithoutJavascript.Console;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -29,13 +27,19 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     //Do not remove this class: called via reflection.
     public class SimulatorProxy
     {
-        WPFBrowserView _webControl;
-        ConsoleControl _console;
-
-        public SimulatorProxy(WPFBrowserView webControl, ConsoleControl console)
+        private readonly IInputElement _webControl;
+        private readonly ConsoleControl _console;
+        public SimulatorProxy(IInputElement webControl, ConsoleControl console,
+            Dispatcher simulatorAppDispatcher,
+            Dispatcher openSilverRuntimeDispatcher,
+            JavaScriptExecutionHandler javaScriptExecutionHandler)
         {
             _webControl = webControl;
             _console = console;
+
+            SimulatorAppDispatcher = simulatorAppDispatcher;
+            OpenSilverRuntimeDispatcher = openSilverRuntimeDispatcher;
+            JavaScriptExecutionHandler = javaScriptExecutionHandler;
         }
 
         //Do not remove this method: called via reflection.
@@ -153,10 +157,19 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         public void ReportJavaScriptError(string error, string where)
         {
-            _console.AddMessage(new ConsoleMessage(
-                error,
-                ConsoleMessage.MessageLevel.Error,
-                new InteropSource(where)));
+            _console.AddMessage(new ConsoleMessage
+            {
+                Text = error,
+                Url = where,
+                Source = ConsoleMessage.JavaScriptSource,
+                Level = ConsoleMessage.ErrorLevel,
+            });
         }
+
+        internal static Dispatcher SimulatorAppDispatcher { get; private set; }
+
+        internal static Dispatcher OpenSilverRuntimeDispatcher { get; private set; }
+
+        internal static JavaScriptExecutionHandler JavaScriptExecutionHandler { get; private set; }
     }
 }

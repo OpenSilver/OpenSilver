@@ -1,7 +1,13 @@
-﻿<!DOCTYPE html> 
+﻿<!DOCTYPE html>
 <html style="margin: 0px; width: 100%; height: 100%;">
 <head>
-
+    <style>
+        @keyframes blinker {
+            50% {
+                opacity: 0.3;
+            }
+        }
+    </style>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <link rel="stylesheet" type="text/css" href="[PARENT]/Libraries/cshtml5.css" /> <!-- Path for production (JSIL-based version) -->
@@ -63,10 +69,107 @@
 
 </head>
 
-  <body oncontextmenu="return false;"> 
-
+<body oncontextmenu="return false;">
     <div id="opensilver-root" style="position: relative; width: 100%; height: 100%; overflow-x: hidden; overflow-y: hidden">
+        <div id="XamlInspectorOverlay" style="position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: 10000; display: none; pointer-events: none;">
+        </div>
+        <div id="XamlInspectorElementHighlightBlueOuter" style="position: absolute; width: 100%; height: 100%; z-index: 10010; display: none; pointer-events: none;">
+            <div id="XamlInspectorElementHighlightBlue"
+                 style="position: absolute; width: 0px; height: 0px; border-color: blue; border-style: dashed; border-width: 4px; z-index: 10010; pointer-events: none; " />
+        </div>
+        <div id="XamlInspectorElementHighlightRedOuter" style="position: absolute; width: 100%; height: 100%; z-index: 10011; display: none; pointer-events: none;">
+            <div id="XamlInspectorElementHighlightRed"
+                 style="position: absolute; width: 0px; height: 0px; border-color: red; border-style: dashed; border-width: 4px; z-index: 10011; pointer-events: none; animation: blinker 1.5s linear infinite;" />
+        </div>
         [PARAM_INITPARAMS_GOES_HERE]
     </div>
-  </body>
+
+    <script language="javascript">
+
+        var xamlInspectorOverlay = document.getElementById("XamlInspectorOverlay");
+        var lastHighlightedElementId;
+
+        window.onresize = function () {
+            if (xamlInspectorOverlay.style.display == "") {
+                XamlInspectorHighlightElement(lastHighlightedElementId, 1);
+                XamlInspectorHighlightElement(lastHighlightedElementId, 2);
+            }
+        }
+
+        //why this: despite the XamlInspectorOverlay being on top and capturing events,
+        // OS divs were still getting mouseEnter and mouseLeave, probably could be better solved by a css wizard!
+        var eventCallbackFunctionHolder;
+
+        function startXamlInspection() {
+            xamlInspectorOverlay.style.display = "";
+            xamlInspectorOverlay.style.pointerEvents = "";
+            eventCallbackFunctionHolder = document.eventCallback;
+            document.eventCallback = function (callbackId, callerArgs, sync) { };
+        }
+
+        function stopXamlInspection() {
+            XamlInspectorHighlightElement(null, 1);
+            XamlInspectorHighlightElement(null, 2);
+            xamlInspectorOverlay.style.display = 'none';
+            xamlInspectorOverlay.style.pointerEvents = 'none';
+            document.eventCallback = eventCallbackFunctionHolder;
+            eventCallbackFunctionHolder = null;
+        }
+
+        function onXamlInspectorOverlayEvent(e) {
+            e = e || window.event;
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.type == "mousemove") {
+                chrome.webview.hostObjects.XamlInspectorCallback.OnMouseMove(e.clientX, e.clientY);
+            }
+
+            if (e.type == "mousedown") {
+                chrome.webview.hostObjects.XamlInspectorCallback.OnMouseDown(e.clientX, e.clientY);
+            }
+        }
+
+        xamlInspectorOverlay.addEventListener("mousedown", onXamlInspectorOverlayEvent);
+        xamlInspectorOverlay.addEventListener("mouseup", onXamlInspectorOverlayEvent);
+        xamlInspectorOverlay.addEventListener("mousemove", onXamlInspectorOverlayEvent);
+        xamlInspectorOverlay.addEventListener("mouseover", onXamlInspectorOverlayEvent);
+
+        function XamlInspectorHighlightElement(elementId, highlighClr) {
+            var bounds = null;
+            if (elementId) {
+                var element = document.getElementByIdSafe(elementId);
+                bounds = element.getBoundingClientRect();
+            }
+            XamlInspectorMoveElementHighlightDiv(highlighClr, bounds);
+            lastHighlightedElementId = elementId;
+        }
+
+        function XamlInspectorMoveElementHighlightDiv(highlighClr, bounds) {
+            var highlightDivId;
+            if (highlighClr == 1)   //Blue
+                highlightDivId = "XamlInspectorElementHighlightBlue";
+            else if (highlighClr == 2)    //Red
+                highlightDivId = "XamlInspectorElementHighlightRed";
+
+            var highlightDiv = document.getElementById(highlightDivId);
+            var highlightDivOuter = document.getElementById(highlightDivId + "Outer");
+
+            if (!bounds) {
+                highlightDivOuter.style.display = "none";
+                return;
+            }
+
+            highlightDivOuter.style.display = "";
+            highlightDiv.style.left = bounds.left - parseInt(highlightDiv.style.borderWidth) + "px";
+            highlightDiv.style.top = bounds.top - parseInt(highlightDiv.style.borderWidth) + "px";
+            highlightDiv.style.width = bounds.width + "px";
+            highlightDiv.style.height = bounds.height + "px";
+
+            if (highlighClr == 2) XamlInspectorMoveElementHighlightDiv(1, new DOMRect(0, 0, 0, 0));
+        }
+
+    </script>
+
+</body>
 </html>
