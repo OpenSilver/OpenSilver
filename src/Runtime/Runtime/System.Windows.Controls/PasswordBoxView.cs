@@ -105,7 +105,7 @@ namespace Windows.UI.Xaml.Controls
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
             int pwdLength = Host.Password.Length;
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+            Size TextSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
                 uniqueIdentifier,
                 "pre",
                 string.Empty,

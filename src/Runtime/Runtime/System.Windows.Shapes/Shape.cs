@@ -595,11 +595,7 @@ namespace Windows.UI.Xaml.Shapes
                                                double yOffsetToApplyBeforeMultiplication, 
                                                Size shapeActualSize)
         {
-            // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
-            // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
-            var context = OpenSilver.Interop.ExecuteJavaScriptAsync(
-                $"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
-            string sContext = INTERNAL_InteropImplementation.GetVariableStringForJS(context);
+            string sContext = $"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')";
 
             // we remove the previous drawing:
             // todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
@@ -613,7 +609,6 @@ namespace Windows.UI.Xaml.Shapes
             // FillStyle:
             double opacity = shape.Fill == null ? 1 : shape.Fill.Opacity;
             object fillValue = GetHtmlBrush(shape, 
-                                            context, 
                                             shape.Fill, 
                                             opacity, 
                                             minX, 
@@ -654,7 +649,6 @@ namespace Windows.UI.Xaml.Shapes
             //stroke
             opacity = shape.Stroke == null ? 1 : shape.Stroke.Opacity;
             object strokeValue = GetHtmlBrush(shape, 
-                                              context, 
                                               shape.Stroke, 
                                               opacity, 
                                               minX, 
@@ -695,12 +689,9 @@ namespace Windows.UI.Xaml.Shapes
 
             //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {shape.StrokeThickness.ToInvariantString()}");
-
-            INTERNAL_DispatcherHelpers.QueueAction(() => context.Dispose());
         }
 
-        internal static object GetHtmlBrush(Shape shape, 
-                                            object context, 
+        internal static object GetHtmlBrush(Shape shape,
                                             Brush brush, 
                                             double opacity, 
                                             double minX, 
@@ -746,7 +737,7 @@ namespace Windows.UI.Xaml.Shapes
 
                 if (fillAsLinearGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    return createLinearGradient(context, x0, y0, x1, y1, fillAsLinearGradientBrush, opacity);
+                    return createLinearGradient(shape._canvasDomElement, x0, y0, x1, y1, fillAsLinearGradientBrush, opacity);
                 }
                 else
                 {
@@ -843,12 +834,10 @@ namespace Windows.UI.Xaml.Shapes
 {sCanvas}.style.width = ""{width}"";
 {sCanvas}.style.height = ""{height}""");
 
-                    var ctx = OpenSilver.Interop.ExecuteJavaScriptAsync($"{sCanvas}.getContext('2d')");
-
-                    var gradient = createLinearGradient(ctx, 0d, 0d, distance, 0d, fillAsLinearGradientBrush, opacity);
+                    var gradient = createLinearGradient(canvas, 0d, 0d, distance, 0d, fillAsLinearGradientBrush, opacity);
 
                     string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement);
-                    string sCtx = INTERNAL_InteropImplementation.GetVariableStringForJS(ctx);
+                    string sCtx = $"{sCanvas}.getContext('2d')";
                     string sGradient = INTERNAL_InteropImplementation.GetVariableStringForJS(gradient);
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 {sCtx}.fillStyle = {sGradient};
@@ -858,7 +847,8 @@ var context = {sElement}.getContext('2d');
 context.rotate({angle.ToInvariantString()});
 context.translate({offset.ToInvariantString()}, 0);
 }}");
-                    return OpenSilver.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.createPattern({sCanvas}, 'repeat')");
+                    return OpenSilver.Interop.ExecuteJavaScriptAsync(
+                        $"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d').createPattern({sCanvas}, 'repeat')");
                 }
             }
             else if (brush is RadialGradientBrush)
@@ -897,10 +887,11 @@ context.translate({offset.ToInvariantString()}, 0);
                     r = r * (yOffsetToApplyBeforeMultiplication + maxY - minY) * verticalMultiplicator + minY;
                 }
 
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.scale({radiusScaling.ToInvariantString()},1)");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d').scale({radiusScaling.ToInvariantString()},1)");
                 if (fillAsRadialGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    return createRadialGradient(context, gradientOriginX, gradientOriginY, 0d, centerX, centerY, r,
+                    return createRadialGradient(shape._canvasDomElement, gradientOriginX, gradientOriginY, 0d, centerX, centerY, r,
                         fillAsRadialGradientBrush, opacity);
                 }
                 else
@@ -926,7 +917,7 @@ context.translate({offset.ToInvariantString()}, 0);
                     }
                     int additionalRepetitions = repeatingTimes - 1;
 
-                    var returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d,
+                    var returnValue = createRadialGradient(shape._canvasDomElement, gradientOriginX, gradientOriginY, 0d,
                         centerX - xCorrection * additionalRepetitions * r, 
                         centerY - yCorrection * additionalRepetitions * r,
                         r + additionalRepetitions * r,
@@ -1069,10 +1060,10 @@ context.restore();
             }
         }
 
-        private static object createLinearGradient(object context2d, double x0, double y0, double x1, double y1,
+        private static object createLinearGradient(object canvasElement, double x0, double y0, double x1, double y1,
             LinearGradientBrush lgb, double opacity)
         {
-            string sContext2d = INTERNAL_InteropImplementation.GetVariableStringForJS(context2d);
+            string sContext2d = $"{INTERNAL_InteropImplementation.GetVariableStringForJS(canvasElement)}.getContext('2d')";
             object canvasGradient = OpenSilver.Interop.ExecuteJavaScriptAsync(
                 $"{sContext2d}.createLinearGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()})");
 
@@ -1084,10 +1075,10 @@ context.restore();
             return canvasGradient;
         }
 
-        private static object createRadialGradient(object context2d, double x0, double y0, double r0, double x1, double y1, double r1,
+        private static object createRadialGradient(object canvasElement, double x0, double y0, double r0, double x1, double y1, double r1,
             RadialGradientBrush rgb, double opacity)
         {
-            string sContext2d = INTERNAL_InteropImplementation.GetVariableStringForJS(context2d);
+            string sContext2d = $"{INTERNAL_InteropImplementation.GetVariableStringForJS(canvasElement)}.getContext('2d')";
             object canvasGradient = OpenSilver.Interop.ExecuteJavaScriptAsync(
                 $"{sContext2d}.createRadialGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {r0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()}, {r1.ToInvariantString()})");
 

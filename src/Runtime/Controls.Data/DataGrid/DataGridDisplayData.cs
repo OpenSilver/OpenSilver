@@ -370,7 +370,7 @@ internal class DataGridDisplayData
 
         #endregion Methods
 
-#if DEBUG && MIGRATION
+#if DEBUG
         internal void PrintDisplay()
         {
             foreach (UIElement element in this.GetScrollingElements())

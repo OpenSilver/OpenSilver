@@ -107,7 +107,7 @@ namespace Windows.UI.Xaml.Shapes
 		
 		override internal protected void Redraw()
 		{
-			if (Points.Count < 2)
+			if (Points.Count < 2 || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
 			{
 				// It is fine to have 0 or 1 points but nothing to draw in that case.
 				return;
@@ -144,16 +144,15 @@ namespace Windows.UI.Xaml.Shapes
 				ApplyMarginToFixNegativeCoordinates(_marginOffsets);
 			}
 
-			var context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDomElement);
-			string sContext = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(context);
+			string sContext = $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext('2d')";
 
             //we remove the previous drawing:
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
 				$"{sContext}.clearRect(0,0,{shapeActualSize.Width.ToInvariantString()},{shapeActualSize.Height.ToInvariantString()});");
 
 			double opacity = Stroke == null ? 1 : Stroke.Opacity;
-			object strokeValue = GetHtmlBrush(this, context, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
-			object fillValue = GetHtmlBrush(this, context, Fill, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+			object strokeValue = GetHtmlBrush(this, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+			object fillValue = GetHtmlBrush(this, Fill, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
 
 			if (fillValue != null)
 			{
@@ -179,8 +178,6 @@ namespace Windows.UI.Xaml.Shapes
 			{
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke();");
 			}
-
-			INTERNAL_DispatcherHelpers.QueueAction(() => context.Dispose());
 		}
 	}
 }

@@ -225,7 +225,7 @@ namespace Windows.UI.Xaml.Controls
             var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
-            divStyle.textAlign = "left"; // this is the default value.
+            divStyle.textAlign = "start"; // this is the default value.
             domElementWhereToPlaceChildren = div;
 
             return div;
@@ -246,7 +246,7 @@ namespace Windows.UI.Xaml.Controls
             var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
 
             divStyle.overflow = "hidden"; //keeps the text from overflowing despite the RichTextBlock's size limitations.
-            divStyle.textAlign = "left"; // this is the default value.
+            divStyle.textAlign = "start"; // this is the default value.
             divStyle.width = "100%";
             domElementWhereToPlaceChild = div;
 

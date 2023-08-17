@@ -666,8 +666,9 @@ if(nextSibling != undefined) {
             // Update the DOM structure of the Child (for example, if the child is a Grid, this will render its rows and columns):
             child.INTERNAL_UpdateDomStructureIfNecessary();
 
-            // For debugging purposes (to better read the output html), add a class to the outer DIV that tells us the corresponding type of the element (Border, StackPanel, etc.):
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(outerDomElement, "class", child.GetType().ToString());
+            // For debugging purposes (to better read the output html), add a class to the outer DIV
+            // that tells us the corresponding type of the element (Border, StackPanel, etc.):
+            INTERNAL_HtmlDomManager.AddCSSClass(outerDomElement, child.GetType().ToString());
 
             // Set Visibility hidden when rendering with CustomLayout
             if ((child.IsCustomLayoutRoot || child.KeepHiddenInFirstRender) && child.Visibility == Visibility.Visible)

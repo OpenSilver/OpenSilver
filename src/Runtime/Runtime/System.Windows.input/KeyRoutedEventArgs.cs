@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using CSHTML5;
 
 #if !MIGRATION
@@ -51,7 +52,12 @@ namespace Windows.UI.Xaml.Input
             set => HandledImpl = value;
         }
 
-        internal bool Cancellable { get; set; } = true;
+        /// <summary>
+        /// Gets or sets a value that determines if the routed event will call <i>preventDefault()</i>
+        /// if <see cref="Handled"/> is set to true. The default is true.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public bool Cancellable { get; set; } = true;
 
         internal void PreventDefault()
         {

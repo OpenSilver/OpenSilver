@@ -70,67 +70,67 @@ namespace OpenSilver
             Type t = typeof(T);
             if (t == typeof(string))
             {
-                string s = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToString(value) : Convert.ToString(value);
+                string s = ConvertJSResultToString(value);
                 return Unsafe.As<string, T>(ref s);
             }
             else if (t == typeof(double))
             {
-                double d = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDouble(value) : Convert.ToDouble(value);
+                double d = ConvertJSResultToDouble(value);
                 return Unsafe.As<double, T>(ref d);
             }
             else if (t == typeof(int))
             {
-                int i = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt32(value) : Convert.ToInt32(value);
+                int i = ConvertJSResultToInt32(value);
                 return Unsafe.As<int, T>(ref i);
             }
             else if (t == typeof(bool))
             {
-                bool b = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToBoolean(value) : Convert.ToBoolean(value);
+                bool b = ConvertJSResultToBoolean(value);
                 return Unsafe.As<bool, T>(ref b);
             }
             else if (t == typeof(char))
             {
-                char c = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToChar(value) : Convert.ToChar(value);
+                char c = ConvertJSResultToChar(value);
                 return Unsafe.As<char, T>(ref c);
             }
             else if (t == typeof(float))
             {
-                float f = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToSingle(value) : Convert.ToSingle(value);
+                float f = ConvertJSResultToSingle(value);
                 return Unsafe.As<float, T>(ref f);
             }
             else if (t == typeof(byte))
             {
-                byte b = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToByte(value) : Convert.ToByte(value);
+                byte b = ConvertJSResultToByte(value);
                 return Unsafe.As<byte, T>(ref b);
             }
             else if (t == typeof(uint))
             {
-                uint i = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToUInt32(value) : Convert.ToUInt32(value);
+                uint i = ConvertJSResultToUInt32(value);
                 return Unsafe.As<uint, T>(ref i);
             }
             else if (t == typeof(long))
             {
-                long l = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt64(value) : Convert.ToInt64(value);
+                long l = ConvertJSResultToInt64(value);
                 return Unsafe.As<long, T>(ref l);
             }
             else if (t == typeof(ulong))
             {
-                ulong l = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToUInt64(value) : Convert.ToUInt64(value);
+                ulong l = ConvertJSResultToUInt64(value);
                 return Unsafe.As<ulong, T>(ref l);
             }
             else if (t == typeof(short))
             {
-                short s = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt16(value) : Convert.ToInt16(value);
+                short s = ConvertJSResultToInt16(value);
                 return Unsafe.As<short, T>(ref s);
             }
             else if (t == typeof(decimal))
             {
-                decimal d = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDecimal(value) : Convert.ToDecimal(value);
+                decimal d = ConvertJSResultToDecimal(value);
                 return Unsafe.As<decimal, T>(ref d);
             }
             else if (t == typeof(DateTime))
             {
-                DateTime d = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDateTime(value) : Convert.ToDateTime(value);
+                DateTime d = ConvertJSResultToDateTime(value);
                 return Unsafe.As<DateTime, T>(ref d);
             }
             else
@@ -139,9 +139,61 @@ namespace OpenSilver
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string ConvertJSResultToString(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToString(value) : Convert.ToString(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static double ConvertJSResultToDouble(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDouble(value) : Convert.ToDouble(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int ConvertJSResultToInt32(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt32(value) : Convert.ToInt32(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool ConvertJSResultToBoolean(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToBoolean(value) : Convert.ToBoolean(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static char ConvertJSResultToChar(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToChar(value) : Convert.ToChar(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float ConvertJSResultToSingle(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToSingle(value) : Convert.ToSingle(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static byte ConvertJSResultToByte(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToByte(value) : Convert.ToByte(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static uint ConvertJSResultToUInt32(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToUInt32(value) : Convert.ToUInt32(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static long ConvertJSResultToInt64(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt64(value) : Convert.ToInt64(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ulong ConvertJSResultToUInt64(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToUInt64(value) : Convert.ToUInt64(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static short ConvertJSResultToInt16(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt16(value) : Convert.ToInt16(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static decimal ConvertJSResultToDecimal(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDecimal(value) : Convert.ToDecimal(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static DateTime ConvertJSResultToDateTime(object value) =>
+            IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDateTime(value) : Convert.ToDateTime(value);
+
         public static T1 ExecuteJavaScriptGetResult<T1>(string javascript)
         {
-            var result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: true);
+            var result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: -1, wantsResult: true, flush: true);
             T1 t1 = ConvertJavascriptResult<T1>(result);
             return t1;
         }
@@ -151,7 +203,7 @@ namespace OpenSilver
         /// </summary>
         internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue)
         {
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: false, flush: flushQueue);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: -1, wantsResult: false, flush: flushQueue);
         }
 
         internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue, params object[] variables)
@@ -171,7 +223,7 @@ namespace OpenSilver
 
         public static void ExecuteJavaScriptVoid(string javascript)
         {
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: false, flush: true);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: -1, wantsResult: false, flush: true);
         }
 
         public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables)
@@ -215,9 +267,8 @@ namespace OpenSilver
         /// </summary> 
         internal static double ExecuteJavaScriptDouble(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
-            var result = ConvertJavascriptResult<double>(value);
-            return result;
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: -1, wantsResult: true, flush: flushQueue);
+            return ConvertJSResultToDouble(value);
         }
 
         /// <summary>
@@ -225,9 +276,8 @@ namespace OpenSilver
         /// </summary>
         internal static int ExecuteJavaScriptInt32(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
-            var result = ConvertJavascriptResult<int>(value);
-            return result;
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: -1, wantsResult: true, flush: flushQueue);
+            return ConvertJSResultToInt32(value);
         }
 
         /// <summary>
@@ -235,9 +285,8 @@ namespace OpenSilver
         /// </summary>
         internal static string ExecuteJavaScriptString(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
-            var result = ConvertJavascriptResult<string>(value);
-            return result;
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: -1, wantsResult: true, flush: flushQueue);
+            return ConvertJSResultToString(value);
         }
 
         /// <summary>
@@ -245,9 +294,8 @@ namespace OpenSilver
         /// </summary>
         internal static bool ExecuteJavaScriptBoolean(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
-            var result = ConvertJavascriptResult<bool>(value);
-            return result;
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: -1, wantsResult: true, flush: flushQueue);
+            return ConvertJSResultToBoolean(value);
         }
 
         /// <summary>

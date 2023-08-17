@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -19,76 +20,73 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    public sealed partial class TransformCollection : PresentationFrameworkCollection<Transform>
+    public sealed class TransformCollection : PresentationFrameworkCollection<Transform>
     {
-        private TransformGroup _parentTransform;
+        private WeakReference<TransformGroup> _ownerWeakRef;
 
-        public TransformCollection() : base(false)
+        public TransformCollection()
+            : base(true)
         {
         }
 
         internal override void AddOverride(Transform value)
         {
-            this.SubscribeToChangedEvent(value);
-
-            this.AddDependencyObjectInternal(value);
+            SubscribeToChangedEvent(value);
+            AddDependencyObjectInternal(value);
         }
 
         internal override void ClearOverride()
         {
             foreach (Transform t in this)
             {
-                this.UnsubscribeToChangedEvent(t);
+                UnsubscribeToChangedEvent(t);
             }
 
-            this.ClearDependencyObjectInternal();
+            ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, Transform value)
         {
-            this.SubscribeToChangedEvent(value);
-
-            this.InsertDependencyObjectInternal(index, value);
+            SubscribeToChangedEvent(value);
+            InsertDependencyObjectInternal(index, value);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.UnsubscribeToChangedEvent(this[index]);
-
-            this.RemoveAtDependencyObjectInternal(index);
+            UnsubscribeToChangedEvent(this[index]);
+            RemoveAtDependencyObjectInternal(index);
         }
 
-        internal override Transform GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override Transform GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, Transform value)
         {
-            this.UnsubscribeToChangedEvent(this[index]);
-            this.SubscribeToChangedEvent(value);
-
-            this.SetItemDependencyObjectInternal(index, value);
+            UnsubscribeToChangedEvent(this[index]);
+            SubscribeToChangedEvent(value);
+            SetItemDependencyObjectInternal(index, value);
         }
 
-        internal void SetParentTransform(TransformGroup transform)
-        {
-            this._parentTransform = transform;
-        }
+        internal void SetOwner(TransformGroup owner) =>
+            _ownerWeakRef = owner is null ? null : new WeakReference<TransformGroup>(owner);
 
         private void SubscribeToChangedEvent(Transform transform)
         {
-            transform.Changed += new EventHandler(this.TransformChanged);
+            Debug.Assert(transform is not null);
+            transform.Changed += new EventHandler(TransformChanged);
         }
 
         private void UnsubscribeToChangedEvent(Transform transform)
         {
-            transform.Changed -= new EventHandler(this.TransformChanged);
+            Debug.Assert(transform is not null);
+            transform.Changed -= new EventHandler(TransformChanged);
         }
 
         private void TransformChanged(object sender, EventArgs e)
         {
-            this._parentTransform?.RaiseTransformChanged();
+            if (_ownerWeakRef.TryGetTarget(out TransformGroup owner))
+            {
+                owner.RaiseTransformChanged();
+            }
         }
     }
 }

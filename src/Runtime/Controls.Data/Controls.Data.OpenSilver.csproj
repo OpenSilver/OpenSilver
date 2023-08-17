@@ -14,13 +14,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
+    <DefineTrace>true</DefineTrace>
+    <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
+    <DefineConstants Condition="'$(Configuration)' == 'SL'">$(DefineConstants);MIGRATION</DefineConstants>
+    <DefineConstants Condition="'$(Optimize)' != 'true'">$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

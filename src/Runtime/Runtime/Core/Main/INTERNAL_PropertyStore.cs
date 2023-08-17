@@ -572,16 +572,6 @@ namespace CSHTML5.Internal
                 storage.INTERNAL_IsVisualValueDirty = false;
             }
 
-            // Update the source of the Binding, in case the previous value
-            // of a property was a Binding and the Mode was "TwoWay":
-            // Note: we know that oldBindingExpression.IsUpdating is false
-            // because oldBindingExpression is only set in that case (otherwise,
-            // it is null).
-            if (currentExpr != null) 
-            {
-                currentExpr.SetValue(depObj, dp, computedValue);
-            }
-
             return valueChanged;
         }
 

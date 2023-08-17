@@ -861,7 +861,7 @@ namespace Windows.UI.Xaml.Controls
         }
         #endregion
 
-#if DEBUG && MIGRATION
+#if DEBUG
 
         public void PrintIndexes()
         {

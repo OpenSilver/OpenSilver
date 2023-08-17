@@ -3268,7 +3268,7 @@ namespace Windows.UI.Xaml.Controls
 
 #endregion Private Methods
 
-#if DEBUG && MIGRATION
+#if DEBUG
         internal void PrintRowGroupInfo()
         {
             Debug.WriteLine("-----------------------------------------------RowGroupHeaders");

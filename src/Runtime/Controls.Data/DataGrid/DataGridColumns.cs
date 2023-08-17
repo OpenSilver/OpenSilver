@@ -1262,7 +1262,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
 
-#if DEBUG && MIGRATION
+#if DEBUG
                 Debug.Assert(this.ColumnsInternal.Debug_VerifyColumnDisplayIndexes());
 #endif
                 // Now raise all the OnColumnDisplayIndexChanged events
@@ -1308,7 +1308,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 this.ColumnsInternal.DisplayIndexMap.Insert(insertedColumn.DisplayIndexWithFiller, insertedColumn.Index);
 
-#if DEBUG && MIGRATION
+#if DEBUG
                 Debug.Assert(this.ColumnsInternal.Debug_VerifyColumnDisplayIndexes());
 #endif
                 // Now raise all the OnColumnDisplayIndexChanged events

@@ -631,7 +631,7 @@ namespace Windows.UI.Xaml.Controls
 
         #region Debugging Methods
 
-#if DEBUG && MIGRATION
+#if DEBUG
         internal bool Debug_VerifyColumnDisplayIndexes()
         {
             for (int columnDisplayIndex = 0; columnDisplayIndex < this.ItemsInternal.Count; columnDisplayIndex++)

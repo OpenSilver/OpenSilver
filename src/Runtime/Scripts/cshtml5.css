@@ -42,6 +42,11 @@ body {
     -webkit-user-select: text; /* 'none' prevents copy paste. 'text' allows it. */
 }
 
+.opensilver-hyperlink:hover {
+    color: var(--mouse-over-color, rgb(237, 110, 0)) !important;
+    text-decoration: var(--mouse-over-decoration, underline) !important;
+}
+
 .ie_set_p_margins_to_zero p {
     margin-top: 0px; /* This prevents weird additional spaces between lines in multiline TextBoxes in IE. */
     margin-bottom: 0px; /* This prevents weird additional spaces between lines in multiline TextBoxes in IE. */

@@ -47,20 +47,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store = new Dictionary<string, WeakReference<UIElement>>(2048);
         }
 
-        private static object _rootDomElement;
-
-        public static object GetApplicationRootDomElement()
-        {
-            _rootDomElement ??= OpenSilver.Interop.ExecuteJavaScriptAsync("document.getXamlRoot()");
-
-            if (_rootDomElement == null)
-            {
-                const string ROOT_NAME = "opensilver-root";
-                throw new Exception("The application root DOM element was not found. To fix this issue, please add a DIV with the ID '" + ROOT_NAME + "' to the HTML page.");
-            }
-
-            return _rootDomElement;
-        }
+        public static object GetApplicationRootDomElement() => Application.Current?.GetRootDiv();
 
         internal static UIElement GetElementById(string id)
         {
@@ -291,6 +278,22 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             string uid = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                 $"document.setDomAttribute(\"{uid}\",\"{attributeName}\",{value})");
+        }
+
+        internal static void AddCSSClass(object domElementRef, string className)
+        {
+            Debug.Assert(domElementRef is not null);
+
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.classList.add('{className}');");
+        }
+
+        internal static void RemoveCSSClass(object domElementRef, string className)
+        {
+            Debug.Assert(domElementRef is not null);
+
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.classList.remove('{className}');");
         }
 
         internal static void SetCSSStyleProperty(object domElementRef, string propertyName, string value)
@@ -888,39 +891,6 @@ parentElement.appendChild(child);";
             using (var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript(js))
             {
                 return GetUIElementFromDomElement(domElementAtCoordinates);
-            }
-        }
-
-        internal static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
-        {
-            string[] elements;
-            if (subtree != null)
-            {
-                string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(OpenSilver.Interop.GetDiv(subtree));
-                elements = JsonSerializer.Deserialize<string[]>(
-                    OpenSilver.Interop.ExecuteJavaScriptString(
-                        $"window.elementsFromPointOpensilver({intersectingPoint.X.ToInvariantString()},{intersectingPoint.Y.ToInvariantString()},{sDiv})"));
-            }
-            else
-            {
-                elements = JsonSerializer.Deserialize<string[]>(
-                    OpenSilver.Interop.ExecuteJavaScriptString(
-                        $"window.elementsFromPointOpensilver({intersectingPoint.X.ToInvariantString()},{intersectingPoint.Y.ToInvariantString()},null)"));
-            }
-
-            for (int i = elements.Length - 1; i >= 0; i--)
-            {
-                if (_store.TryGetValue(elements[i], out var elemWeakRef))
-                {
-                    if (elemWeakRef.TryGetTarget(out var uie))
-                    {
-                        yield return uie;
-                    }
-                    else
-                    {
-                        _store.Remove(elements[i]);
-                    }
-                }
             }
         }
 

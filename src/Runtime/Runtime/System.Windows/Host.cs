@@ -25,20 +25,18 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 {
     public partial class Host
     {
-        private readonly bool _hookupEvents;
+        private readonly Application _app;
         private readonly JavaScriptCallback _hashChangeCallback;
         private Content _content;
         private Settings _settings;
         private string _navigationState;
         private Dictionary<string, string> _initParams;
 
-        public Host() : this(false) { }
+        public Host() : this(null) { }
 
-        internal Host(bool hookupEvents)
+        internal Host(Application app)
         {
-            _hookupEvents = hookupEvents;
-            _content = new Content(_hookupEvents);
-
+            _app = app;
             _navigationState = GetBrowserNavigationState();
             _hashChangeCallback = JavaScriptCallback.Create(OnNavigationChanged, true);
             OpenSilver.Interop.ExecuteJavaScriptVoid(
@@ -48,7 +46,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         /// <summary>
         /// Gets the "Content" sub-object of this Host.
         /// </summary>
-        public Content Content => _content ??= new Content(_hookupEvents);
+        public Content Content => _content ??= new Content(_app);
 
         /// <summary>
         /// Gets the "Settings" sub-object of this tHost.
@@ -124,7 +122,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         /// The set of initialization parameters, as a dictionary with key strings and value
         /// strings.
         /// </returns>
-        public IDictionary<string, string> InitParams => _initParams ?? (_initParams = ParseInitParams());
+        public IDictionary<string, string> InitParams => _initParams ??= ParseInitParams();
 
         private Dictionary<string, string> ParseInitParams()
         {
@@ -132,7 +130,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 
             var initParams = new Dictionary<string, string>();
 
-            Application app = Application.Current;
+            Application app = _app ?? Application.Current;
             if (app != null && app.AppParams.TryGetValue(InitParamsName, out string initParamsString))
             {
                 foreach (string p in initParamsString.Split(','))

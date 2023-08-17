@@ -71,13 +71,9 @@ namespace System.Windows.Browser
             {
                 if (_plugin is null)
                 {
-                    object root = INTERNAL_HtmlDomManager.GetApplicationRootDomElement();
-                    if (root is not null)
+                    if (Application.Current?.GetRootDiv() is INTERNAL_HtmlDomElementReference root)
                     {
-                        string id = OpenSilver.Interop.ExecuteJavaScriptString(
-                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(root)}.id");
-
-                        _plugin = Document.GetElementById(id);
+                        _plugin = Document.GetElementById(root.UniqueIdentifier);
                     }
                 }
 

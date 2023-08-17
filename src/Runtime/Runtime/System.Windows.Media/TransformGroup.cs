@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Specialized;
 using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
@@ -29,6 +30,8 @@ namespace Windows.UI.Xaml.Media
     [ContentProperty(nameof(Children))]
     public sealed class TransformGroup : Transform
     {
+        private WeakEventListener<TransformGroup, TransformCollection, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TransformGroup"/> class.
         /// </summary>
@@ -65,7 +68,7 @@ namespace Windows.UI.Xaml.Media
                         {
                             TransformGroup tg = (TransformGroup)d;
                             var collection = new TransformCollection();
-                            collection.SetParentTransform(tg);
+                            tg.OnChildrenChanged(null, collection);
                             return collection;
                         }),
                     OnChildrenChanged,
@@ -73,12 +76,32 @@ namespace Windows.UI.Xaml.Media
 
         private static void OnChildrenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TransformGroup transformGroup = (TransformGroup)d;
-            TransformCollection oldValue = (TransformCollection)e.OldValue;
-            TransformCollection newValue = (TransformCollection)e.NewValue;
-            
-            oldValue?.SetParentTransform(null);
-            newValue?.SetParentTransform(transformGroup);
+            ((TransformGroup)d).OnChildrenChanged((TransformCollection)e.OldValue, (TransformCollection)e.NewValue);
+        }
+
+        private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaiseTransformChanged();
+
+        private void OnChildrenChanged(TransformCollection oldChildren, TransformCollection newChildren)
+        {
+            oldChildren?.SetOwner(null);
+
+            if (_collectionChangedListener != null)
+            {
+                _collectionChangedListener.Detach();
+                _collectionChangedListener = null;
+            }
+
+            if (newChildren is not null)
+            {
+                newChildren.SetOwner(this);
+
+                _collectionChangedListener = new(this, newChildren)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnChildrenCollectionChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                };
+                newChildren.CollectionChanged += _collectionChangedListener.OnEvent;
+            }
         }
 
         private static object CoerceChildren(DependencyObject d, object baseValue)
@@ -152,15 +175,15 @@ namespace Windows.UI.Xaml.Media
 
         internal override void INTERNAL_ApplyTransform()
         {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            if (INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(INTERNAL_parent))
             {
-                ApplyCSSChanges(this.ValueInternal);
+                ApplyCSSChanges(ValueInternal);
             }
         }
 
         internal override void INTERNAL_UnapplyTransform()
         {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
+            if (INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(INTERNAL_parent))
             {
                 ApplyCSSChanges(Matrix.Identity);
             }

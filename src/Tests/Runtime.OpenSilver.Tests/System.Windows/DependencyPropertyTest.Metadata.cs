@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Runtime.CompilerServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #if MIGRATION
@@ -22,6 +23,12 @@ namespace Windows.UI.Xaml.Tests;
 
 public partial class DependencyPropertyTest
 {
+    static DependencyPropertyTest()
+    {
+        RuntimeHelpers.RunClassConstructor(typeof(MyDependencyObject1).TypeHandle);
+        RuntimeHelpers.RunClassConstructor(typeof(MyDependencyObject2).TypeHandle);
+    }
+
     [TestMethod]
     public void OverrideMetadata_Should_Throw_When_ForType_Is_Null()
     {
