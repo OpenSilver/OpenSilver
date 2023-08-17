@@ -1597,6 +1597,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 _lastCalendarButton = b;
             }
         }
+      
+        /// <summary>
+        /// Resets mouse states.
+        /// </summary>
+        internal void ResetStates()
+        {
+            _isMouseLeftButtonDown = false;
+        }
 
 #if SILVERLIGHT
         /// <summary>
@@ -1627,6 +1635,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 #endif
-#endregion Mouse Events
+        #endregion Mouse Events
     }
 }

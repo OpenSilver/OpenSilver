@@ -1540,6 +1540,7 @@ namespace Windows.UI.Xaml.Controls
             int count = RowsPerMonth * ColumnsPerMonth;
             if (monthControl != null)
             {
+                monthControl.ResetStates();
                 if (monthControl.MonthView != null)
                 {
                     for (int childIndex = ColumnsPerMonth; childIndex < count; childIndex++)
@@ -2004,6 +2005,15 @@ namespace Windows.UI.Xaml.Controls
                 startIndex = HoverEndIndex.Value;
                 endIndex = HoverStartIndex.Value;
             }
+        }
+       
+        /// <summary>
+        /// Triggering on lost mouse capture
+        /// </summary>
+        protected override void OnLostMouseCapture(MouseEventArgs e)
+        {
+            ResetStates();
+            base.OnLostMouseCapture(e);
         }
         #endregion Selection
 
