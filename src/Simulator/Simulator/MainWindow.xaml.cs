@@ -382,7 +382,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             // Initialize the WebBrowser control:
             await InitializeWebViewAsync();
 
-            if (await InitializeApplication())
+            if (InitializeApplication())
             {
                 MainWebBrowser.CoreWebView2.DOMContentLoaded += (s1, e1) =>
                 {
@@ -932,8 +932,7 @@ Click OK to continue.";
             }
         }
 
-#if OPENSILVER
-        async Task<bool> InitializeApplication()
+        bool InitializeApplication()
         {
             // In OpenSilver we already have the user application type passed to the constructor, so we do not need to retrieve it here
             try
@@ -941,9 +940,6 @@ Click OK to continue.";
                 // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
 
                 _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser, _openSilverRuntimeDispatcher);
-
-                // Create the HTML DOM MANAGER proxy and pass it to the "Core" project:
-                string htmlDocument = await MainWebBrowser.ExecuteScriptAsync("document");
 
                 InteropHelpers.InjectWebControlDispatcher(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
@@ -998,99 +994,6 @@ Click OK to continue.";
 
                 MainWebBrowser.CoreWebView2.AddHostObjectToScript("XamlInspectorCallback", new XamlInspectorCallback());
             });
-        }
-
-#elif BRIDGE
-        bool InitializeApplication()
-        {
-            // Read the path of the assembly that contains the entry point:
-            if (ReflectionInUserAssembliesHelper.TryGetPathOfAssemblyThatContainsEntryPoint(out _pathOfAssemblyThatContainsEntryPoint))
-            {
-                // Load the assembly (other assemblies get or got loaded thanks to the "AssemblyResolve" event):
-                try
-                {
-                    _entryPointAssembly = Assembly.LoadFile(_pathOfAssemblyThatContainsEntryPoint);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Unable to load: " + _pathOfAssemblyThatContainsEntryPoint + "\r\n\r\n(" + ex.Message + ")\r\n\r\n---------------\r\nHow to fix this issue:\r\n---------------\r\n\r\nYou can attempt to fix this issue by forcing a Rebuild of the project.\r\n\r\nIf it still does not work, please go to the Project Properties, navigate to the Start Options (under the 'Debug' tab), and make sure that the 'Command line arguments' contains the exact name of the assembly (eg. \"MyAssemblyName.dll\"). You can verify that the assembly name is correct by going to the 'Application' tab of the 'Project Properties' and reading the field 'Assembly name'.\r\n\r\nIf you need any assistance, please contact support at support@cshtml5.com");
-                    HideLoadingMessage();
-                    return false;
-                }
-
-                try
-                {
-                    // Determine Entry point:
-                    Type applicationType;
-                    if (ReflectionInUserAssembliesHelper.TryDetermineTypeThatInheritsFromApplication(_entryPointAssembly, out applicationType, out _coreAssembly))
-                    {
-                        _appCreationDelegate = () => Activator.CreateInstance(applicationType);
-                        // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
-                        _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
-
-                        // Create the HTML DOM MANAGER proxy and pass it to the "Core" project:
-                        JSValue htmlDocument = (JSObject)MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document");
-
-                        InteropHelpers.InjectWebControlDispatcher(MainWebBrowser, _coreAssembly);
-                        InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
-                        InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
-                        InteropHelpers.InjectWebClientFactory(_coreAssembly);
-                        InteropHelpers.InjectClipboardHandler(_coreAssembly);
-                        InteropHelpers.InjectSimulatorProxy(new SimulatorProxy(MainWebBrowser, Console), _coreAssembly);
-
-                        // Inject the code to display the message box in the simulator:
-                        InteropHelpers.InjectCodeToDisplayTheMessageBox(
-                            (message, title, showCancelButton) => { return MessageBox.Show(message, title, showCancelButton ? MessageBoxButton.OKCancel : MessageBoxButton.OK) == MessageBoxResult.OK; },
-                            _coreAssembly);
-
-                        // Ensure the static constructor of all common types is called so that the type converters are initialized:
-                        StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(_coreAssembly);
-                        return true;
-
-                    }
-                    else
-                    {
-                        // Error is already displayed by the method above.
-                        HideLoadingMessage();
-                        return false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error while loading the application: " + Environment.NewLine + Environment.NewLine + ex.Message);
-                    HideLoadingMessage();
-                    return false;
-                }
-            }
-            else
-            {
-                MessageBox.Show("To launch the app in the simulator, call the simulator EXE and pass the path to the application DLL as a command line argument.\r\n\r\nThe easiest way to do so is to launch Visual Studio, click File -> New -> Project, create a project of type \"C#/XAML for HTML5\" application, and then run that project.\r\n\r\nYou can see how it works by going to the Properties of that project, clicking the \"Debug\" tab, and reading what is under \"Start external program\".");
-                HideLoadingMessage();
-                return false;
-            }
-        }
-#endif
-
-        void ReloadAppAfterRedirect(string urlFragment)
-        {
-            // Create the HTML DOM MANAGER proxy and pass it to the "Core" project:
-
-            // Ensure the static constructor of all common types is called so that the type converters are initialized:
-            //StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(_coreAssembly);
-
-            // We will need to wait for the page to finish loading before executing the app:
-            MainWebBrowser.Loaded += (s1, e1) =>
-            {
-                Dispatcher.BeginInvoke((Action)(async () =>
-                {
-                    InteropHelpers.RaiseReloadedEvent(_coreAssembly); // to reset some static fields
-                    await Task.Delay(3000); //Note: this is to ensure all the js and css files of simulator_root.html have been loaded (client_fb).
-                    StartApplication();
-                }));
-            };
-
-            // Load the page:
-            LoadIndexFile(urlFragment);
         }
 
         bool StartApplication()

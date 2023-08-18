@@ -21,12 +21,14 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Collections;
 using DotNetForHtml5.EmulatorWithoutJavascript;
+using System.Globalization;
 
 namespace OpenSilver.Simulator.XamlInspection
 {
     internal static class XamlInspectionHelper
     {
-        private static MethodInfo _FindElementInHostInfo;
+        private static MethodInfo _GetUIElementFromDomElement;
+        private static MethodInfo _OpenSilverExecuteJavaScript;
         private static MethodInfo _GetVisualParent;
         private static Dictionary<object, TreeNode> _XamlSourcePathNodes;
 
@@ -353,36 +355,54 @@ namespace OpenSilver.Simulator.XamlInspection
 
         public static object GetVisualElementAtPoint(Point coordinates)
         {
-            if (_FindElementInHostInfo == null)
+            if (_OpenSilverExecuteJavaScript == null)
             {
-                // Find the "Core" assembly among the loaded assemblies:
-                //Assembly coreAssembly =
-                //    (from a in AppDomain.CurrentDomain.GetAssemblies()
-                //     where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR
-                //     select a).FirstOrDefault();
                 if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
                 {
-                    Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "CSHTML5.Internal" && type.Name == "INTERNAL_HtmlDomManager") select type).FirstOrDefault();
-                    _FindElementInHostInfo = manager.GetMethod("FindElementInHostCoordinates_UsedBySimulatorToo", BindingFlags.Public | BindingFlags.Static);
+                    Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "OpenSilver" && type.Name == "Interop") select type).FirstOrDefault();
+                    _OpenSilverExecuteJavaScript = manager.GetMethod(
+                        "ExecuteJavaScript",
+                        new Type[] { typeof(string) });
                 }
             }
 
-            if (_FindElementInHostInfo != null)
+            if (_GetUIElementFromDomElement == null)
             {
-                //With WebView2 we get a dpi aware values so commenting these:
-                //double dpiAwareX = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(coordinates.X, invert: true);
-                //double dpiAwareY = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(coordinates.Y, invert: true);
+                if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
+                {
+                    Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "CSHTML5.Internal" && type.Name == "INTERNAL_HtmlDomManager") select type).FirstOrDefault();
+                    _GetUIElementFromDomElement = manager.GetMethod("GetUIElementFromDomElement_UsedBySimulatorToo", BindingFlags.NonPublic | BindingFlags.Static);
+                }
+            }
 
-                var element = _FindElementInHostInfo.Invoke(null, new object[] { coordinates.X, coordinates.Y });
+            if (_OpenSilverExecuteJavaScript != null && _GetUIElementFromDomElement != null)
+            {
+                string js = $@"
+(function(){{
+    var domElementsAtCoordinates = document.elementsFromPoint({coordinates.X.ToString(CultureInfo.InvariantCulture)}, {coordinates.Y.ToString(CultureInfo.InvariantCulture)});
+    if (!domElementsAtCoordinates || domElementsAtCoordinates.length == 0)
+    {{
+        return null;
+    }}
+    var firstItem = domElementsAtCoordinates[0];
+    if (firstItem === document.documentElement)
+    {{
+        return null;
+    }}
+    if (firstItem.id && firstItem.id === 'XamlInspectorOverlay')
+    {{
+        return domElementsAtCoordinates.length > 1 ? domElementsAtCoordinates[1] : null;
+    }}
+    return firstItem;
+}}())
+                ";
+                var domRef = _OpenSilverExecuteJavaScript.Invoke(null, new string[] { js }); 
+                var element = _GetUIElementFromDomElement.Invoke(null, new object[] { domRef });
+                if (domRef is IDisposable disposable) disposable.Dispose();
                 return element;
             }
-            else
-                return null;
+
+            return null;
         }
 
         public static void HighlightElementUsingJS(object uiElement, int highlightClr)
@@ -419,7 +439,7 @@ namespace OpenSilver.Simulator.XamlInspection
         {
             var element = await SimulatorProxy.OpenSilverRuntimeDispatcher.InvokeAsync(() =>
             {
-                return XamlInspectionHelper.GetVisualElementAtPoint(new Point(x, y));
+                return GetVisualElementAtPoint(new Point(x, y));
             });
 
             return element;

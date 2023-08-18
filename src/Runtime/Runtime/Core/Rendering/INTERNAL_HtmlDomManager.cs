@@ -861,6 +861,11 @@ parentElement.appendChild(child);";
 
         public static UIElement GetUIElementFromDomElement(object domElementRef)
         {
+            return GetUIElementFromDomElement_UsedBySimulatorToo(domElementRef);
+        }
+
+        internal static UIElement GetUIElementFromDomElement_UsedBySimulatorToo(object domElementRef)
+        {
             UIElement result = null;
 
             while (!IsNullOrUndefined(domElementRef))
