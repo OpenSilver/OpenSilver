@@ -47,11 +47,11 @@ namespace Windows.UI.Xaml.Data
             UpdatingValue = 1 << 0,
             UpdatingSource = 1 << 1,
             Attaching = 1 << 2,
-            NeedsUpdate = 1 << 3,
         }
 
         private BindingStatus _status = BindingStatus.None;
         private bool _isUpdateOnLostFocus;
+        private bool _needsUpdate; // True if this binding expression has a pending source update
         private DynamicValueConverter _dynamicConverter;
         private object _bindingSource;
         private IInternalFrameworkElement _mentor;
@@ -84,13 +84,6 @@ namespace Windows.UI.Xaml.Data
         {
             get => ReadFlag(BindingStatus.Attaching);
             set => WriteFlag(BindingStatus.Attaching, value);
-        }
-
-        // True if this binding expression has a pending source update
-        private bool NeedsUpdate
-        {
-            get => ReadFlag(BindingStatus.NeedsUpdate);
-            set => WriteFlag(BindingStatus.NeedsUpdate, value);
         }
 
         private void WriteFlag(BindingStatus flag, bool value)
@@ -240,15 +233,20 @@ namespace Windows.UI.Xaml.Data
 
             Target = d;
 
-            _isUpdateOnLostFocus = ParentBinding.UpdateSourceTrigger == UpdateSourceTrigger.Default &&
-                (d is TextBox && dp == TextBox.TextProperty ||
-                 d is PasswordBox && dp == PasswordBox.PasswordProperty);
-            if (_isUpdateOnLostFocus)
-            {
-                ((IInternalFrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
-            }
-
             AttachToContext(false);
+
+            // Listen to changes on the Target if the Binding is TwoWay:
+            if (ParentBinding.Mode == BindingMode.TwoWay && ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.Explicit)
+            {
+                _isUpdateOnLostFocus = ParentBinding.UpdateSourceTrigger == UpdateSourceTrigger.Default &&
+                    ((d is TextBox && dp == TextBox.TextProperty) || (d is PasswordBox && dp == PasswordBox.PasswordProperty));
+                if (_isUpdateOnLostFocus)
+                {
+                    ((IInternalFrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
+                }
+
+                _targetPropertyListener = new DependencyPropertyChangedListener(Target, TargetProperty, UpdateSourceCallback);
+            }
 
             if (BindingSource is IInternalFrameworkElement fe)
             {
@@ -263,12 +261,6 @@ namespace Windows.UI.Xaml.Data
             // shoud do the work (their properties will change when the source will
             // become available)
             _propertyPathWalker.Update(BindingSource);
-
-            //Listen to changes on the Target if the Binding is TwoWay:
-            if (ParentBinding.Mode == BindingMode.TwoWay)
-            {
-                _targetPropertyListener = new DependencyPropertyChangedListener(Target, TargetProperty, UpdateSourceCallback);
-            }
 
             IsAttaching = false;
         }
@@ -681,29 +673,16 @@ namespace Windows.UI.Xaml.Data
             //--------------
         }
 
-        internal void TryUpdateSourceObject(object value)
-        {
-            if (_status != BindingStatus.None || ParentBinding.UpdateSourceTrigger == UpdateSourceTrigger.Explicit)
-            {
-                return;
-            }
-
-            if (_isUpdateOnLostFocus && ReferenceEquals(FocusManager.GetFocusedElement(), Target))
-            {
-                NeedsUpdate = true;
-                return;
-            }
-
-            UpdateSourceObject(value);
-        }
-
         internal void UpdateSourceObject(object value)
         {
             if (_propertyPathWalker.IsPathBroken)
+            {
                 return;
+            }
+
+            IsUpdatingSource = true;
 
             IPropertyPathNode node = _propertyPathWalker.FinalNode;
-            bool oldIsUpdating = IsUpdatingSource;
 
             object convertedValue = value;
             Type expectedType = node.Type;
@@ -721,13 +700,13 @@ namespace Windows.UI.Xaml.Data
 #endif
 
                     if (convertedValue == DependencyProperty.UnsetValue)
+                    {
                         return;
+                    }
                 }
 
                 if (!DependencyProperty.IsValidType(convertedValue, expectedType))
                 {
-                    IsUpdatingSource = true;
-
 #if MIGRATION
                     convertedValue = DynamicConverter.Convert(convertedValue, expectedType, null, ParentBinding.ConverterCulture);
 #else
@@ -735,7 +714,9 @@ namespace Windows.UI.Xaml.Data
 #endif
 
                     if (convertedValue == DependencyProperty.UnsetValue)
+                    {
                         return;
+                    }
                 }
 
                 node.SetValue(convertedValue);
@@ -759,7 +740,7 @@ namespace Windows.UI.Xaml.Data
             }
             finally
             {
-                IsUpdatingSource = oldIsUpdating;
+                IsUpdatingSource = false;
             }
 
             vError ??= GetBaseValidationError();
@@ -801,9 +782,9 @@ namespace Windows.UI.Xaml.Data
 
         private void OnTargetLostFocus(object sender, RoutedEventArgs e)
         {
-            if (NeedsUpdate)
+            if (_needsUpdate)
             {
-                NeedsUpdate = false;
+                _needsUpdate = false;
                 UpdateSourceObject(Target.GetValue(TargetProperty));
             }
         }
@@ -1170,13 +1151,24 @@ namespace Windows.UI.Xaml.Data
 
         private void UpdateSourceCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
+            if (_status != BindingStatus.None)
+            {
+                return;
+            }
+
+            if (_isUpdateOnLostFocus && ReferenceEquals(FocusManager.GetFocusedElement(), Target))
+            {
+                _needsUpdate = true;
+                return;
+            }
+            
             try
             {
-                TryUpdateSourceObject(args.NewValue);
+                UpdateSourceObject(args.NewValue);
             }
-            catch (Exception err)
+            catch (Exception ex)
             {
-                Console.WriteLine($"[BINDING] UpdateSource: {err}");
+                Console.WriteLine($"[BINDING] UpdateSource: {ex}");
             }
         }
 
