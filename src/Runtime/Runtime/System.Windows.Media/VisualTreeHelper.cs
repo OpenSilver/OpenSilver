@@ -144,7 +144,7 @@ namespace Windows.UI.Xaml.Media
         /// The object to search within.
         /// </param>
         /// <returns>
-        /// An enumerable set of System.Windows.UIElement objects that are determined to
+        /// An enumerable set of <see cref="UIElement"/> objects that are determined to
         /// be located in the visual tree composition at the specified point and within the
         /// specified subtee.
         /// </returns>
@@ -153,9 +153,14 @@ namespace Windows.UI.Xaml.Media
             var list = new List<UIElement>();
             foreach (string id in FindElementsInHostCoordinatesNative(intersectingPoint, subtree))
             {
-                if (INTERNAL_HtmlDomManager.GetElementById(id) is UIElement uie)
+                switch (INTERNAL_HtmlDomManager.GetElementById(id))
                 {
-                    list.Add(uie);
+                    case PopupRoot or null:
+                        continue;
+
+                    case UIElement uie:
+                        list.Add(uie);
+                        break;
                 }
             }
             return list;
