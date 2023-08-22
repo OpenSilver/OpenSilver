@@ -13,18 +13,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using DotNetForHtml5.Core;
-using CSHTML5;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 #if MIGRATION
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 #else
 using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Documents;
 #endif
 
 #if MIGRATION
@@ -151,28 +155,112 @@ namespace Windows.UI.Xaml.Media
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
         {
             var list = new List<UIElement>();
-            foreach (string id in FindElementsInHostCoordinatesNative(intersectingPoint, subtree))
-            {
-                switch (INTERNAL_HtmlDomManager.GetElementById(id))
-                {
-                    case PopupRoot or null:
-                        continue;
 
-                    case UIElement uie:
-                        list.Add(uie);
-                        break;
+            Window window = subtree switch
+            {
+                Window w => w,
+                null => Window.Current,
+                _ => null,
+            };
+
+            var hitTestResults = HitTestNative(intersectingPoint);
+
+            if (window is not null)
+            {
+                foreach (Popup popup in ((IEnumerable<Popup>)GetOpenPopups(window)).Reverse())
+                {
+                    if (popup.Child is not UIElement popupRoot)
+                    {
+                        continue;
+                    }
+
+                    list.AddRange(FindElementsInHostCoordinatesImpl(intersectingPoint, popupRoot, hitTestResults));
+                }
+
+                subtree = window;
+            }
+
+            if (subtree is not null)
+            {
+                list.AddRange(FindElementsInHostCoordinatesImpl(intersectingPoint, subtree, hitTestResults));
+            }
+
+            return list;
+
+            static IEnumerable<UIElement> FindElementsInHostCoordinatesImpl(Point intersectingPoint, UIElement element, HashSet<UIElement> hitTestResults)
+            {
+                Debug.Assert(element is not null);
+
+                bool includeAllElements = false;
+
+                foreach (UIElement child in GetChildren(element).OrderByDescending(Canvas.GetZIndex))
+                {
+                    foreach (UIElement uie in FindElementsInHostCoordinatesImpl(intersectingPoint, child, hitTestResults))
+                    {
+                        includeAllElements = true;
+                        yield return uie;
+                    }
+                }
+
+                if (includeAllElements || hitTestResults.Contains(element))
+                {
+                    yield return element;
                 }
             }
-            return list;
+
+            static IEnumerable<UIElement> GetChildren(UIElement element)
+            {
+                int childrenCount = element.VisualChildrenCount;
+                for (int i = childrenCount - 1; i >= 0; i--)
+                {
+                    UIElement child = element.GetVisualChild(i);
+                    if (child is null or Inline)
+                    {
+                        continue;
+                    }
+
+                    yield return child;
+                }
+            }
+
+            static HashSet<UIElement> HitTestNative(Point intersectingPoint)
+            {
+                string[] ids = JsonSerializer.Deserialize<string[]>(
+                    OpenSilver.Interop.ExecuteJavaScriptString(
+                        $"document.elementsFromPointOpenSilver({intersectingPoint.X.ToInvariantString()}, {intersectingPoint.Y.ToInvariantString()});"));
+
+                var hashset = new HashSet<UIElement>();
+                foreach (string id in ids)
+                {
+                    if (INTERNAL_HtmlDomManager.GetElementById(id) is UIElement uie)
+                    {
+                        hashset.Add(uie);
+                    }
+                }
+
+                return hashset;
+            }
         }
 
-        private static string[] FindElementsInHostCoordinatesNative(Point intersectingPoint, UIElement subtree)
+        /// <summary>
+        /// Retrieves a set of objects that are located within a specified <see cref="Rect"/>
+        /// of an object's coordinate space.
+        /// </summary>
+        /// <param name="intersectingRect">
+        /// The <see cref="Rect"/> to use as the determination area.
+        /// </param>
+        /// <param name="subtree">
+        /// The object to search within.
+        /// </param>
+        /// <returns>
+        /// An enumerable set of <see cref="UIElement"/> objects that are determined to
+        /// be located in the visual tree composition at the specified point and within the
+        /// specified subtee.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
         {
-            string x = intersectingPoint.X.ToInvariantString();
-            string y = intersectingPoint.Y.ToInvariantString();
-            string div = subtree is null ? "null" : INTERNAL_InteropImplementation.GetVariableStringForJS(OpenSilver.Interop.GetDiv(subtree));
-            return JsonSerializer.Deserialize<string[]>(
-                OpenSilver.Interop.ExecuteJavaScriptString($"window.elementsFromPointOpensilver({x}, {y}, {div});"));
+            return new List<UIElement>();
         }
 
         /// <summary>
@@ -193,14 +281,16 @@ namespace Windows.UI.Xaml.Media
         {
             var result = new List<Popup>();
 
-            var popupRoots = INTERNAL_PopupsManager.GetAllRootUIElements().OfType<PopupRoot>();
-
-            foreach (var root in popupRoots)
+            if (window is not null)
             {
-                if (root.INTERNAL_ParentWindow == window && root.INTERNAL_LinkedPopup.IsOpen
-                                                         && root.INTERNAL_LinkedPopup.Child != null)
+                foreach (PopupRoot root in INTERNAL_PopupsManager.GetActivePopupRoots())
                 {
-                    result.Add(root.INTERNAL_LinkedPopup);
+                    if (root.INTERNAL_ParentWindow == window &&
+                        root.INTERNAL_LinkedPopup.IsOpen &&
+                        root.INTERNAL_LinkedPopup.Child != null)
+                    {
+                        result.Add(root.INTERNAL_LinkedPopup);
+                    }
                 }
             }
 
@@ -212,18 +302,17 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         /// <param name="element">The element.</param>
         /// <returns>The visual tree children of an element.</returns>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="element"/> is null.
         /// </exception>
         public static IEnumerable<DependencyObject> GetVisualChildren(DependencyObject element)
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
 
             return GetVisualChildrenAndSelfIterator(element).Skip(1);
-            return null;
         }
 
         /// <summary>
@@ -242,12 +331,6 @@ namespace Windows.UI.Xaml.Media
             {
                 yield return GetChild(element, i);
             }
-        }
-
-        [OpenSilver.NotImplemented]
-        public static IEnumerable<UIElement> FindElementsInHostCoordinates(Rect intersectingRect, UIElement subtree)
-        {
-            return null;
         }
     }
 }

@@ -106,6 +106,8 @@ if (popupRoot) {sWindow}.removeChild(popupRoot);");
             }
         }
 
+        internal static IEnumerable<PopupRoot> GetActivePopupRoots() => PopupRootIdentifierToInstance;
+        
         public static Point CalculatePopupAbsolutePositionBasedOnElementPosition(UIElement parentElement, double horizontalOffset, double verticalOffset)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(parentElement))

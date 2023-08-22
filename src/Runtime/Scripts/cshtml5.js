@@ -1412,25 +1412,17 @@ var jsilConfig = {
     ]
 };
 
-window.elementsFromPointOpensilver = function (x, y, element) {
-    if (!element) element = document.body;
-    const elements = [];
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, null, false);
-    let currentNode = walker.currentNode;
-    while (currentNode) {
-        const xamlid = currentNode.xamlid;
-        if (xamlid && PerformHitTest(x, y, currentNode)) {
-            elements.push(xamlid);
+document.elementsFromPointOpenSilver = function (x, y) {
+    const ids = [];
+    const hitTestResults = document.elementsFromPoint(x, y);
+    for (const el of hitTestResults) {
+        const xamlid = el.xamlid;
+        if (xamlid) {
+            ids.push(xamlid);
         }
-        currentNode = walker.nextNode();
     }
-    return JSON.stringify(elements.reverse());
+    return JSON.stringify(ids);
 };
-
-function PerformHitTest(x, y, element) {
-    const rect = element.getBoundingClientRect();
-    return rect.x <= x && x <= rect.x + rect.width && rect.y <= y && y <= rect.y + rect.height;
-}
 
 //------------------------------
 // Just to check if client browser support touch
