@@ -148,7 +148,10 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
     const newElement = document.createElement(tagName);
 
     newElement.setAttribute('id', id);
-    newElement.setAttribute('xamlid', id);
+    Object.defineProperty(newElement, 'xamlid', {
+        value: id,
+        writable: false,
+    });
 
     if (typeof parentElement == 'string') {
         parentElement = document.getElementById(parentElement);
@@ -202,7 +205,10 @@ document.createPopupRootElement = function (id, rootElement, pointerEvents) {
 
     const popupRoot = document.createElement('div');
     popupRoot.setAttribute('id', id);
-    popupRoot.setAttribute('xamlid', id);
+    Object.defineProperty(popupRoot, 'xamlid', {
+        value: id,
+        writable: false,
+    });
     popupRoot.style.position = 'absolute';
     popupRoot.style.width = '100%';
     popupRoot.style.height = '100%';
@@ -432,8 +438,9 @@ document.createInputManager = function (callback) {
 
     function getClosestElementId(element) {
         while (element) {
-            if (element.hasAttribute('xamlid')) {
-                return element.getAttribute('xamlid');
+            const xamlid = element.xamlid;
+            if (xamlid) {
+                return xamlid;
             }
 
             element = element.parentElement;
@@ -1411,7 +1418,7 @@ window.elementsFromPointOpensilver = function (x, y, element) {
     const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, null, false);
     let currentNode = walker.currentNode;
     while (currentNode) {
-        const xamlid = currentNode.getAttribute('xamlid');
+        const xamlid = currentNode.xamlid;
         if (xamlid && PerformHitTest(x, y, currentNode)) {
             elements.push(xamlid);
         }
