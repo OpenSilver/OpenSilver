@@ -490,8 +490,6 @@ document.createInputManager = function (callback) {
             }
         });
 
-        document.addEventListener('selectstart', function (e) { if (_mouseCapture !== null) e.preventDefault(); });
-
         document.addEventListener('contextmenu', function (e) {
             if (_suppressContextMenu ||
                 (_mouseCapture !== null && this !== _mouseCapture)) {

@@ -640,6 +640,12 @@ namespace Windows.UI.Xaml.Controls
 
             e.Handled = true;
             Focus();
+
+#if MIGRATION
+            CaptureMouse();
+#else
+            CapturePointer();
+#endif
         }
 
         /// <summary>
@@ -665,6 +671,12 @@ namespace Windows.UI.Xaml.Controls
 #endif
 
             e.Handled = true;
+
+#if MIGRATION
+            ReleaseMouseCapture();
+#else
+            ReleasePointerCapture();
+#endif
         }
 
 #if MIGRATION
