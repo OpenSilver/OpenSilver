@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Text.RegularExpressions;
 
 namespace OpenSilver.Compiler
 {
@@ -135,7 +136,7 @@ namespace OpenSilver.Compiler
         /// </summary>
         private static string GetQuotedVerbatimString(string s)
         {
-            return "\"" + s.Replace("\"", "\"\"") + "\"";
+            return "\"" + Regex.Unescape(s.Replace("\"", "\"\"")) + "\"";
         }
 
         //Types to add to the switch (probably):
