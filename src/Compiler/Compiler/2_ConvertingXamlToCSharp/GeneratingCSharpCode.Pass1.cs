@@ -101,7 +101,8 @@ namespace OpenSilver.Compiler
                         new List<string>());
 
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(initializeComponentMethod,
+                    string partialClass = GeneratePartialClass("",
+                                                               initializeComponentMethod,
                                                                new ComponentConnectorBuilder().ToString(),
                                                                resultingFieldsForNamedElements,
                                                                className,

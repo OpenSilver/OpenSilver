@@ -263,8 +263,13 @@ namespace OpenSilver.Compiler
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
+                    string additionalConstructors = IsClassTheApplicationClass(baseType)
+                        ? $"private {className}(global::OpenSilver.XamlDesignerConstructorStub stub) {{ InitializeComponent(); }}"
+                        : string.Empty;
+
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(initializeComponentMethod,
+                    string partialClass = GeneratePartialClass(additionalConstructors,
+                                                               initializeComponentMethod,
                                                                connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
