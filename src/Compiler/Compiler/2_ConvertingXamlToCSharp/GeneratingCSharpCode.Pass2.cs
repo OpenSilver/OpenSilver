@@ -263,8 +263,9 @@ namespace OpenSilver.Compiler
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
-                    var additionalConstructors = IsClassTheApplicationClass(baseType) ?
-                        "private App(global::OpenSilver.XamlDesignerConstructorStub stub) { InitializeComponent(); }" : "";
+                    string additionalConstructors = IsClassTheApplicationClass(baseType)
+                        ? $"private {className}(global::OpenSilver.XamlDesignerConstructorStub stub) {{ InitializeComponent(); }}"
+                        : string.Empty;
 
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass(additionalConstructors,
