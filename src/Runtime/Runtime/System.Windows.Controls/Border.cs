@@ -186,7 +186,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Background),
                 typeof(Brush),
                 typeof(Border),
-                new PropertyMetadata((object)null)
+                new PropertyMetadata(null, OnBackgroundChanged)
                 {
                     MethodToUpdateDom2 = (d, oldValue, newValue) =>
                     {
@@ -195,6 +195,22 @@ namespace Windows.UI.Xaml.Controls
                         SetPointerEvents(border);
                     },
                 });
+
+        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Border border = (Border)d;
+            border.SizeChanged -= OnSizeChanged;
+            if (e.NewValue is LinearGradientBrush)
+            {
+                border.SizeChanged += OnSizeChanged;
+            }
+        }
+
+        private static void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Border b = (Border)sender;
+            _ = Panel.RenderBackgroundAsync(b, b.Background);
+        }
 
         /// <summary>
         /// Gets or sets a brush that describes the border background of a control.
