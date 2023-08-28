@@ -1311,13 +1311,7 @@ namespace System.ServiceModel
                     }
                 }
 
-#if OPENSILVER
-                request = string.Format(requestFormat,
-                                        methodNameElement.ToString(SaveOptions.DisableFormatting));
-#else
-                request = string.Format(requestFormat, 
-                                        methodNameElement.ToString(false));
-#endif
+                request = string.Format(requestFormat, DataContractSerializerCustom.XElementToString(methodNameElement));
             }
 
             private void ReadAndPrepareResponseGeneric_JSVersion<T>(
@@ -1399,7 +1393,7 @@ namespace System.ServiceModel
                 const string ns = "http://schemas.xmlsoap.org/soap/envelope/";
 
                 VerifyThatResponseIsNotNullOrEmpty(response);
-                var faultElement = XDocument.Parse(response).Root
+                var faultElement = DataContractSerializerCustom.ParseToXDocument(response).Root
                                                  .Element(XName.Get("Body", ns))
                                                  .Element(XName.Get("Fault", ns));
 
@@ -1533,7 +1527,7 @@ namespace System.ServiceModel
                     NS = "http://www.w3.org/2003/05/soap-envelope";
                 }
 
-                XElement envelopeElement = XDocument.Parse(responseAsString).Root;
+                XElement envelopeElement = DataContractSerializerCustom.ParseToXDocument(responseAsString).Root;
                 XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
                 XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
 
