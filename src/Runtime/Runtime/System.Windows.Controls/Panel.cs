@@ -267,22 +267,38 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Panel.Background"/> dependency property.
+        /// Identifies the <see cref="Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
             DependencyProperty.Register(
                 nameof(Background),
                 typeof(Brush),
                 typeof(Panel),
-                new PropertyMetadata((object)null)
+                new PropertyMetadata(null, OnBackgroundChanged)
                 {
-                    MethodToUpdateDom = (d, e) =>
+                    MethodToUpdateDom2 = (d, oldValue, newValue) =>
                     {
                         var panel = (Panel)d;
-                        _ = RenderBackgroundAsync(panel, (Brush)e);
+                        _ = RenderBackgroundAsync(panel, (Brush)newValue);
                         SetPointerEvents(panel);
                     },
                 });
+
+        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Panel panel = (Panel)d;
+            panel.SizeChanged -= OnSizeChanged;
+            if (e.NewValue is LinearGradientBrush)
+            {
+                panel.SizeChanged += OnSizeChanged;
+            }
+        }
+
+        private static void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Panel p = (Panel)sender;
+            _ = RenderBackgroundAsync(p, p.Background);
+        }
 
         internal static async Task RenderBackgroundAsync(UIElement uie, Brush brush)
         {
