@@ -1241,7 +1241,7 @@ namespace System.ServiceModel
 
                             DataContractSerializerCustom dataContractSerializer =
                                 new DataContractSerializerCustom(
-                                    requestBody.GetType(),
+                                    parameterInfos[i].ParameterType,
                                     types,
                                     isXmlSerializer);
 
