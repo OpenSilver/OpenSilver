@@ -470,15 +470,13 @@ document.createInputManager = function (callback) {
         document.addEventListener('mouseup', function (e) {
             if (!e.isHandled) {
                 const target = _mouseCapture;
-                if (target !== null) {
-                    switch (e.button) {
-                        case 0:
-                            callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
-                            break;
-                        case 2:
-                            callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
-                            break;
-                    }
+                switch (e.button) {
+                    case 0:
+                        callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
+                        break;
+                    case 2:
+                        callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
+                        break;
                 }
             }
         });
@@ -531,7 +529,8 @@ document.createInputManager = function (callback) {
 
             root.addEventListener('wheel', function (e) {
                 e.isHandled = true;
-                callback(getClosestElementId(e.target), EVENTS.WHEEL, e);
+                const target = _mouseCapture || e.target;
+                callback(getClosestElementId(target), EVENTS.WHEEL, e);
             });
 
             root.addEventListener('mousedown', function (e) {
