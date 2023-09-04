@@ -29,24 +29,18 @@ namespace Windows.UI.Xaml.Media
     [ContentProperty(nameof(GradientStops))]
     public partial class GradientBrush : Brush
     {
-        //// Returns:
-        ////     Specifies how the colors in a gradient are interpolated. The default is SRgbLinearInterpolation.
-        ///// <summary>
-        ///// Gets or sets a ColorInterpolationMode enumeration value that specifies how
-        ///// the gradient's colors are interpolated.
-        ///// </summary>
-        //public ColorInterpolationMode ColorInterpolationMode
-        //{
-        //    get { return (ColorInterpolationMode)GetValue(ColorInterpolationModeProperty); }
-        //    set { SetValue(ColorInterpolationModeProperty, value); }
-        //}
-        ///// <summary>
-        ///// Identifies the ColorInterpolationMode dependency property.
-        ///// </summary>
-        //public static readonly DependencyProperty ColorInterpolationModeProperty =
-        //    DependencyProperty.Register("ColorInterpolationMode", typeof(ColorInterpolationMode), typeof(GradientBrush), new PropertyMetadata(null));
+        protected GradientBrush() { }
 
-
+        private protected GradientBrush(GradientBrush original)
+            : base(original)
+        {
+            MappingMode = original.MappingMode;
+            SpreadMethod = original.SpreadMethod;
+            foreach (GradientStop stop in original.GradientStops)
+            {
+                GradientStops.Add(new GradientStop { Offset = stop.Offset, Color = stop.Color });
+            }
+        }
 
         /// <summary>
         /// Gets or sets the brush's gradient stops, which is a collection of the GradientStop

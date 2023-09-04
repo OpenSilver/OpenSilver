@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+using CSHTML5.Internal;
+using OpenSilver.Internal.Data;
+using OpenSilver.Internal.Media.Animation;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,13 +24,11 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public abstract partial class AnimationTimeline : Timeline
+    public abstract class AnimationTimeline : Timeline
     {
         private List<JavaScriptCallback> _velocityCallbacks;
-        internal string _targetName;
         internal PropertyPath _targetProperty;
         internal DependencyObject _propertyContainer;
-        internal DependencyObject _target;
         internal DependencyProperty _propDp;
         internal bool _isInitialized = false;
         internal bool _cancelledAnimation = false;
@@ -53,9 +48,7 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
             Initialize(parameters);
-            
-            // This is a workaround to tell the property the effective value should be the animated value.
-            SetInitialAnimationValue();
+
             base.IterateOnce(parameters, isLastLoop);
 
             Apply(parameters, isLastLoop);
@@ -75,22 +68,82 @@ namespace Windows.UI.Xaml.Media.Animation
             // Needs to be overriden
         }
 
-        internal void Initialize(IterationParameters parameters)
+        private void Initialize(IterationParameters parameters)
         {
             GetTargetInformation(parameters);
             InitializeCore();
+            // This is a workaround to tell the property the effective value should be the animated value.
+            SetInitialAnimationValue();
             _isInitialized = true;
         }
 
-        internal virtual void GetTargetInformation(IterationParameters parameters)
+        private void GetTargetInformation(IterationParameters parameters)
         {
+            _parameters = parameters;
 
+            _propertyContainer = null;
+            _targetProperty = null;
+            _propDp = null;
+
+            if (parameters != null && parameters.TimelineMappings.TryGetValue(this, out (DependencyObject, PropertyPath) info))
+            {
+                DependencyObject finalTarget = info.Item1;
+                PropertyPath path = info.Item2;
+
+                if (path.DependencyProperty is null && path.SVI.Length == 0)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                for (int i = 0; i < path.SVI.Length - 1; i++)
+                {
+                    SourceValueInfo svi = path.SVI[i];
+                    switch (svi.type)
+                    {
+                        case PropertyNodeType.Property:
+                            DependencyProperty dp = DPFromName(svi.propertyName, finalTarget.GetType());
+                            var value = AsDependencyObject(finalTarget.GetValue(dp));
+                            if (i == 0 && value is ICloneOnAnimation<DependencyObject> cloneable && !cloneable.IsClone)
+                            {
+                                value = cloneable.Clone();
+                                finalTarget.SetValue(dp, value);
+                            }
+                            finalTarget = value;
+                            break;
+
+                        case PropertyNodeType.Indexed:
+                            if (finalTarget is not IList list)
+                            {
+                                throw new InvalidOperationException($"'{finalTarget}' must implement IList.");
+                            }
+                            if (!int.TryParse(svi.param, out int index))
+                            {
+                                throw new InvalidOperationException($"'{svi.param}' can't be converted to an integer value.");
+                            }
+
+                            finalTarget = AsDependencyObject(list[index]);
+                            break;
+
+                        default:
+                            throw new InvalidOperationException();
+                    }
+                }
+
+                _propertyContainer = finalTarget;
+                _targetProperty = path;
+                _propDp = path.GetFinalProperty(finalTarget);
+            }
+
+            static DependencyObject AsDependencyObject(object o) =>
+                o as DependencyObject ??
+                throw new InvalidOperationException($"'{o}' must be a DependencyObject.");
+
+            static DependencyProperty DPFromName(string name, Type ownerType) =>
+                DependencyProperty.FromName(name, ownerType) ??
+                throw new InvalidOperationException($"No DependencyProperty named '{name}' could be found in '{ownerType}'.");
         }
 
-        internal virtual void InitializeCore()
-        {
-
-        }
+        internal virtual void InitializeCore() { }
 
         internal override void Stop(IterationParameters parameters, bool revertToFormerValue = false)
         {

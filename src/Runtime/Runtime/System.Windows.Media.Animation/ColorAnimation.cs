@@ -80,17 +80,6 @@ namespace Windows.UI.Xaml.Media.Animation
         public static readonly DependencyProperty ToProperty =
             DependencyProperty.Register("To", typeof(Color?), typeof(ColorAnimation), new PropertyMetadata(null));
 
-        internal override void GetTargetInformation(IterationParameters parameters)
-        {
-            _parameters = parameters;
-            GetTargetElementAndPropertyInfo(parameters, out DependencyObject target, out PropertyPath propertyPath);
-            _propertyContainer = target;
-            _targetProperty = propertyPath;
-            _propDp = GetProperty(_propertyContainer, _targetProperty);
-            _target = Storyboard.GetTarget(this);
-            _targetName = Storyboard.GetTargetName(this);
-        }
-
         // This guid is used to specifically target a particular call to the animation. It prevents the callback which should be called when velocity's animation end 
         // to be called when the callback is called from a previous call to the animation. This could happen when the animation was started quickly multiples times in a row. 
         private Guid _animationID;

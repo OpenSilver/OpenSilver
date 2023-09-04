@@ -51,6 +51,13 @@ namespace Windows.UI.Xaml.Media
             _id = _holder.Add(this);
         }
 
+        private protected Brush(Brush original)
+        {
+            Opacity = original.Opacity;
+            RelativeTransform = original.RelativeTransform;
+            Transform = original.Transform;
+        }
+
         ~Brush()
         {
             _holder.Remove(_id);

@@ -382,17 +382,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal override void GetTargetInformation(IterationParameters parameters)
-        {
-            _parameters = parameters;
-            GetTargetElementAndPropertyInfo(parameters, out DependencyObject target, out PropertyPath propertyPath);
-            _propertyContainer = target;
-            _targetProperty = propertyPath;
-            _propDp = GetProperty(_propertyContainer, _targetProperty);
-            _target = Storyboard.GetTarget(this);
-            _targetName = Storyboard.GetTargetName(this);
-        }
-        
         protected override Duration GetNaturalDurationCore()
         {
             return new Duration(LargestTimeSpanKeyTime);

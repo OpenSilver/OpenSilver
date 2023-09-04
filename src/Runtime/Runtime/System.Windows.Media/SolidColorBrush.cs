@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media.Animation;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -28,8 +29,10 @@ namespace Windows.UI.Xaml.Media
     /// Paints an area with a solid color.
     /// </summary>
     [ContentProperty("Color")]
-    public sealed class SolidColorBrush : Brush
+    public sealed class SolidColorBrush : Brush, ICloneOnAnimation<SolidColorBrush>
     {
+        private readonly bool _isClone;
+
         /// <summary>
         /// Initializes a new instance of the SolidColorBrush class with no color.
         /// </summary>
@@ -44,6 +47,14 @@ namespace Windows.UI.Xaml.Media
         public SolidColorBrush(Color color)
         {
             this.Color = color;
+        }
+
+        private SolidColorBrush(SolidColorBrush original)
+            : base(original)
+        {
+            _isClone = true;
+
+            Color = original.Color;
         }
 
         /// <summary>
@@ -91,6 +102,10 @@ namespace Windows.UI.Xaml.Media
             return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
         }
 
+        SolidColorBrush ICloneOnAnimation<SolidColorBrush>.Clone() => new SolidColorBrush(this);
+
+        bool ICloneOnAnimation<SolidColorBrush>.IsClone => _isClone;
+
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object ConvertToCSSValue()
@@ -98,7 +113,8 @@ namespace Windows.UI.Xaml.Media
             return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
         }
 
-        public object Clone() => new SolidColorBrush(Color);
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object Clone() => new SolidColorBrush(this);
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]

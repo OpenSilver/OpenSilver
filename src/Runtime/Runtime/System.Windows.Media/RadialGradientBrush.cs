@@ -18,6 +18,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media.Animation;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -33,13 +34,15 @@ namespace Windows.UI.Xaml.Media
     /// Paints an area with a radial gradient. A focal point defines the beginning
     /// of the gradient, and a circle defines the end point of the gradient.
     /// </summary>
-    public sealed class RadialGradientBrush : GradientBrush
+    public sealed class RadialGradientBrush : GradientBrush, ICloneOnAnimation<RadialGradientBrush>
     {
+        private readonly bool _isClone;
+
         /// <summary>
         /// Initializes a new instance of the System.Windows.Media.RadialGradientBrush
         /// class.
         /// </summary>
-        public RadialGradientBrush() {}
+        public RadialGradientBrush() { }
        
         /// <summary>
         /// Initializes a new instance of the System.Windows.Media.RadialGradientBrush
@@ -66,6 +69,17 @@ namespace Windows.UI.Xaml.Media
             gradientStops.Add(new GradientStop() { Color = startColor, Offset = 0 });
             gradientStops.Add(new GradientStop() { Color = endColor, Offset = 1 });
             GradientStops = gradientStops;
+        }
+
+        private RadialGradientBrush(RadialGradientBrush original)
+            : base(original)
+        {
+            _isClone = true;
+
+            Center = original.Center;
+            GradientOrigin = original.GradientOrigin;
+            RadiusX = original.RadiusX;
+            RadiusY = original.RadiusY;
         }
 
         /// <summary>
@@ -150,6 +164,10 @@ namespace Windows.UI.Xaml.Media
                 typeof(double), 
                 typeof(RadialGradientBrush), 
                 new PropertyMetadata(0.5));
+
+        bool ICloneOnAnimation<RadialGradientBrush>.IsClone => _isClone;
+
+        RadialGradientBrush ICloneOnAnimation<RadialGradientBrush>.Clone() => new RadialGradientBrush(this);
 
         internal override Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(INTERNAL_ToHtmlString(parent));

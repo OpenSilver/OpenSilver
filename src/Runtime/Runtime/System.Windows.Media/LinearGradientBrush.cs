@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media.Animation;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -31,8 +32,10 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Paints an area with a linear gradient.
     /// </summary>
-    public sealed class LinearGradientBrush : GradientBrush
+    public sealed class LinearGradientBrush : GradientBrush, ICloneOnAnimation<LinearGradientBrush>
     {
+        private readonly bool _isClone;
+
         public LinearGradientBrush() { }
 
         /// <summary>
@@ -51,6 +54,15 @@ namespace Windows.UI.Xaml.Media
             GradientStops = gradientStopCollection;
 
             _angle = -angle;
+        }
+
+        private LinearGradientBrush(LinearGradientBrush original)
+            : base(original)
+        {
+            _isClone = true;
+
+            StartPoint = original.StartPoint;
+            EndPoint = original.EndPoint;
         }
 
         private double _angle; //degrees
@@ -102,6 +114,10 @@ namespace Windows.UI.Xaml.Media
         {
             ((LinearGradientBrush)d).RecalculateAngle();
         }
+
+        bool ICloneOnAnimation<LinearGradientBrush>.IsClone => _isClone;
+
+        LinearGradientBrush ICloneOnAnimation<LinearGradientBrush>.Clone() => new LinearGradientBrush(this);
 
         internal override Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(INTERNAL_ToHtmlString(parent));

@@ -172,7 +172,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 {
                     InitializeIteration();
 
-                    var timelineMappings = new Dictionary<Timeline, Tuple<DependencyObject, PropertyPath>>();
+                    var timelineMappings = new Dictionary<Timeline, (DependencyObject, PropertyPath)>();
                     TimelineTreeWalkRecursive(this,
                         containingObject,
                         null,
@@ -320,7 +320,7 @@ namespace Windows.UI.Xaml.Media.Animation
             DependencyObject parentObject,
             string parentObjectName,
             PropertyPath parentPropertyPath,
-            Dictionary<Timeline, Tuple<DependencyObject, PropertyPath>> timelineMappings)
+            Dictionary<Timeline, (DependencyObject, PropertyPath)> timelineMappings)
         {
             DependencyObject targetObject = parentObject;
             string currentObjectName = parentObjectName;
@@ -380,7 +380,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     throw new InvalidOperationException(string.Format("Must specify TargetProperty for '{0}'.", currentTimeline.GetType().ToString()));
                 }
 
-                timelineMappings.Add(currentTimeline, Tuple.Create(targetObject, currentPropertyPath));
+                timelineMappings.Add(currentTimeline, (targetObject, currentPropertyPath));
             }
             else
             {
@@ -506,13 +506,13 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     internal sealed class IterationParameters
     {
-        public IterationParameters(IReadOnlyDictionary<Timeline, Tuple<DependencyObject, PropertyPath>> mappings)
+        public IterationParameters(IReadOnlyDictionary<Timeline, (DependencyObject, PropertyPath)> mappings)
         {
             TimelineMappings = mappings;
             Guid = Guid.NewGuid();
         }
 
-        internal readonly IReadOnlyDictionary<Timeline, Tuple<DependencyObject, PropertyPath>> TimelineMappings;
+        internal readonly IReadOnlyDictionary<Timeline, (DependencyObject, PropertyPath)> TimelineMappings;
         internal readonly Guid Guid;
     }
 }
