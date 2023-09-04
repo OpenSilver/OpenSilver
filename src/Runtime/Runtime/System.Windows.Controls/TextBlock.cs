@@ -410,7 +410,17 @@ namespace Windows.UI.Xaml.Controls
 
             if (TextWrapping == TextWrapping.NoWrap || (_noWrapSize.Width + paddingWidth) <= availableSize.Width)
             {
-                return new Size(_noWrapSize.Width + paddingWidth, _noWrapSize.Height + paddingHeight);
+                var desiredSize = new Size(_noWrapSize.Width + paddingWidth, _noWrapSize.Height + paddingHeight);
+
+                if (TextTrimming != TextTrimming.None)
+                {
+                    // Note: Silverlight does not clip here, however we need to do it for the
+                    // css 'text-overflow' property to work.
+                    desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
+                    desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
+                }
+
+                return desiredSize;
             }
 
             Size textSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
