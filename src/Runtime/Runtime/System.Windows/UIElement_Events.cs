@@ -60,6 +60,7 @@ namespace Windows.UI.Xaml
             RoutedEvent.RegisterClassHandler(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk));
             RoutedEvent.RegisterClassHandler(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk));
             RoutedEvent.RegisterClassHandler(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk));
+            RoutedEvent.RegisterClassHandler(LostMouseCaptureEvent, new MouseEventHandler(OnLostMouseCaptureThunk));
         }
 
         private static void OnMouseMoveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseMove(e);
@@ -89,6 +90,8 @@ namespace Windows.UI.Xaml
         private static void OnGotFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnGotFocus(e);
 
         private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
+
+        private static void OnLostMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnLostMouseCapture(e);
 #else
         private static void RegisterEvents(Type type)
         {
@@ -105,6 +108,7 @@ namespace Windows.UI.Xaml
             RoutedEvent.RegisterClassHandler(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk));
             RoutedEvent.RegisterClassHandler(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk));
             RoutedEvent.RegisterClassHandler(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk));
+            RoutedEvent.RegisterClassHandler(LostMouseCaptureEvent, new PointerEventHandler(OnLostMouseCaptureThunk));
         }
 
         private static void OnMouseMoveThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerMoved(e);
@@ -132,6 +136,8 @@ namespace Windows.UI.Xaml
         private static void OnGotFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnGotFocus(e);
 
         private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
+
+        private static void OnLostMouseCaptureThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerCaptureLost(e);
 #endif
 
         /// <summary>
@@ -983,11 +989,45 @@ namespace Windows.UI.Xaml
 
         #endregion
 
-        #region Allow or Prevent Focus events for IsTabStop
+        #region LostMouseCapture event
 
-        internal virtual object GetFocusTarget() => INTERNAL_OuterDomElement;
+        internal static readonly RoutedEvent LostMouseCaptureEvent;
+
+#if MIGRATION
+        public event MouseEventHandler LostMouseCapture
+        {
+            add
+            {
+                AddHandler(LostMouseCaptureEvent, value, false);
+            }
+            remove
+            {
+                RemoveHandler(LostMouseCaptureEvent, value);
+            }
+        }
+#else
+        public event PointerEventHandler PointerCaptureLost
+        {
+            add
+            {
+                AddHandler(LostMouseCaptureEvent, value, false);
+            }
+            remove
+            {
+                RemoveHandler(LostMouseCaptureEvent, value);
+            }
+        }
+#endif
+
+#if MIGRATION
+        protected virtual void OnLostMouseCapture(MouseEventArgs e) { }
+#else
+        protected virtual void OnPointerCaptureLost(PointerRoutedEventArgs e) { }
+#endif
 
         #endregion
+
+        internal virtual object GetFocusTarget() => INTERNAL_OuterDomElement;
 
         public virtual void INTERNAL_AttachToDomEvents()
         {

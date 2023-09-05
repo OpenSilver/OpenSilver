@@ -59,6 +59,7 @@ namespace Windows.UI.Xaml
             KeyUpEvent = new RoutedEvent(nameof(KeyUp), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
             GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
             LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
+            LostMouseCaptureEvent = new RoutedEvent(nameof(LostMouseCapture), RoutingStrategy.Bubble, typeof(MouseEventHandler), typeof(UIElement));
 #else
             PointerMovedEvent = new RoutedEvent(nameof(PointerMoved), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
             PointerPressedEvent = new RoutedEvent(nameof(PointerPressed), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
@@ -75,6 +76,7 @@ namespace Windows.UI.Xaml
             KeyUpEvent = new RoutedEvent(nameof(KeyUp), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
             GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
             LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
+            LostMouseCaptureEvent = new RoutedEvent(nameof(PointerCaptureLost), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
 #endif
 
             RegisterEvents(typeof(UIElement));
@@ -1011,40 +1013,6 @@ namespace Windows.UI.Xaml
         {
             InputManager.Current.ReleaseMouseCapture(this);
         }
-
-#if MIGRATION
-        internal void OnLostMouseCapturedInternal(MouseEventArgs e)
-#else
-        internal void OnLostMouseCapturedInternal(PointerRoutedEventArgs e)
-#endif
-        {
-#if MIGRATION
-            OnLostMouseCapture(e);
-#else
-            OnPointerCaptureLost(e);
-#endif
-        }
-
-#if MIGRATION
-        protected virtual void OnLostMouseCapture(MouseEventArgs e)
-#else
-        protected virtual void OnPointerCaptureLost(PointerRoutedEventArgs e)
-#endif
-        {
-#if MIGRATION
-            if (LostMouseCapture != null)
-                LostMouseCapture(this, e);
-#else
-            if (PointerCaptureLost != null)
-                PointerCaptureLost(this, e);
-#endif
-        }
-
-#if MIGRATION
-        public event MouseEventHandler LostMouseCapture;
-#else
-        public event PointerEventHandler PointerCaptureLost;
-#endif
 
 #endregion
 

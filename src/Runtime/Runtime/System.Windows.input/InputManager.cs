@@ -138,7 +138,12 @@ internal sealed class InputManager
         {
             Pointer.INTERNAL_captured = null;
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.releaseMouseCapture();");
-            uie.OnLostMouseCapturedInternal(new MouseEventArgs());
+
+            uie.RaiseEvent(new MouseEventArgs
+            {
+                RoutedEvent = UIElement.LostMouseCaptureEvent,
+                OriginalSource = uie,
+            });
         }
     }
 
