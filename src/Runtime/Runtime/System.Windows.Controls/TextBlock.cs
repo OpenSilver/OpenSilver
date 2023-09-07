@@ -357,6 +357,11 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (String.IsNullOrEmpty(this.Text))
+            {
+                return new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
+            }
+
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
 
             if (noWrapSize == Size.Empty)
