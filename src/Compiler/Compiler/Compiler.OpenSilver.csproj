@@ -36,6 +36,8 @@
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssembliesInspectorImpl.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeDefinitionExtensions.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeReferenceExtensions.cs" />
+    <Compile Include="EntryPoints\Updates.cs" />
+    <Compile Include="OtherHelpersAndHandlers\OpenSilverSettings.cs" />
     <Compile Include="OtherHelpersAndHandlers\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />

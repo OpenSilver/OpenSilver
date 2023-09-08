@@ -36,5 +36,7 @@ namespace OpenSilver
         public const string COMMERCIAL_EDITION_L_FRIENDLY_NAME = "Commercial Edition (L)";
         public const string PREMIUM_SUPPORT_EDITION_FRIENDLY_NAME = "Premium Support Edition";
         public const string COMMUNITY_EDITION_FRIENDLY_NAME = "Community Edition";
+
+        public const string UPDATES_IDENTIFIER_KEY = "Identifier";
     }
 }
