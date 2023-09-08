@@ -1540,7 +1540,6 @@ namespace Windows.UI.Xaml.Controls
             int count = RowsPerMonth * ColumnsPerMonth;
             if (monthControl != null)
             {
-                monthControl.ResetStates();
                 if (monthControl.MonthView != null)
                 {
                     for (int childIndex = ColumnsPerMonth; childIndex < count; childIndex++)
@@ -2254,7 +2253,6 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnPointerCaptureLost(PointerRoutedEventArgs e)
 #endif
         {
-            ResetStates();
 #if MIGRATION
             base.OnLostMouseCapture(e);
 #else

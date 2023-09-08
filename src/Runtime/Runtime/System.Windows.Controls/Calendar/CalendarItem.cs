@@ -1607,14 +1607,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Resets mouse states.
-        /// </summary>
-        internal void ResetStates()
-        {
-            _isMouseLeftButtonDown = false;
-        }
-
-        /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
