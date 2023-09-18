@@ -19,12 +19,12 @@ using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
 {
-    internal static partial class GeneratingVBCode
+    internal partial class GeneratingVBCode
     {
-        private class GeneratorPass1 : IVBCodeGenerator
+        private class GeneratorPass1 : ICodeGenerator
         {
-            private readonly XamlReaderVB _reader;
-            private readonly ConversionSettingsVB _settings;
+            private readonly XamlReader _reader;
+            private readonly ConversionSettings _settings;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
@@ -33,9 +33,9 @@ namespace OpenSilver.Compiler
                 string assemblyNameWithoutExtension,
                 string fileNameWithPathRelativeToProjectRoot,
                 AssembliesInspector reflectionOnSeparateAppDomain,
-                ConversionSettingsVB settings)
+                ConversionSettings settings)
             {
-                _reader = new XamlReaderVB(doc);
+                _reader = new XamlReader(doc);
                 _settings = settings;
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
@@ -55,7 +55,7 @@ namespace OpenSilver.Compiler
 
                 while (_reader.Read())
                 {
-                    if (_reader.NodeType != XamlNodeTypeVB.StartObject)
+                    if (_reader.NodeType != XamlNodeType.StartObject)
                         continue;
 
                     if (!hasCodeBehind)
@@ -96,8 +96,9 @@ namespace OpenSilver.Compiler
                         new List<string>());
 
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(initializeComponentMethod,
-                                                               new ComponentConnectorBuilder().ToString(),
+                    string partialClass = GeneratePartialClass("",
+                                                                initializeComponentMethod,
+                                                               new ComponentConnectorBuilderVB().ToString(),
                                                                resultingFieldsForNamedElements,
                                                                className,
                                                                namespaceStringIfAny,
@@ -161,7 +162,7 @@ namespace OpenSilver.Compiler
                 out string typeName,
                 out string assemblyName)
             {
-                GettingInformationAboutXamlTypesVB.GetClrNamespaceAndLocalName(
+                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     xName,
                     _settings.EnableImplicitAssemblyRedirection,
                     out namespaceName,

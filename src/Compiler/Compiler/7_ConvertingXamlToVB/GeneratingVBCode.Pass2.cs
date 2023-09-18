@@ -26,9 +26,9 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal static partial class GeneratingVBCode
+    internal partial class GeneratingVBCode
     {
-        private class GeneratorPass2 : IVBCodeGenerator
+        private class GeneratorPass2 : ICodeGenerator
         {
             private abstract class GeneratorScope
             {
@@ -98,9 +98,9 @@ namespace OpenSilver.Compiler
 
             private class FrameworkTemplateScope : GeneratorScope
             {
-                private readonly IMetadataVB _metadata;
+                private readonly IMetadata _metadata;
 
-                public FrameworkTemplateScope(string templateName, string templateRoot, IMetadataVB metadata)
+                public FrameworkTemplateScope(string templateName, string templateRoot, IMetadata metadata)
                     : base(templateRoot)
                 {
                     _metadata = metadata;
@@ -140,7 +140,7 @@ namespace OpenSilver.Compiler
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
-                public readonly ComponentConnectorBuilder ComponentConnector = new ComponentConnectorBuilder();
+                public readonly ComponentConnectorBuilderVB ComponentConnector = new ComponentConnectorBuilderVB();
 
                 public bool GenerateFieldsForNamedElements { get; set; }
 
@@ -165,10 +165,12 @@ namespace OpenSilver.Compiler
                 public string CurrentXamlContext => CurrentScope.XamlContext;
             }
 
+            private ConvertingStringToValue ConvertingStringToValue = new ConvertingStringToValueVB();
+
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
 
-            private readonly XamlReaderVB _reader;
-            private readonly ConversionSettingsVB _settings;
+            private readonly XamlReader _reader;
+            private readonly ConversionSettings _settings;
 
             private readonly string _sourceFile;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
@@ -176,17 +178,18 @@ namespace OpenSilver.Compiler
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
+            private SystemTypesHelperVB _systemTypesHelper = new SystemTypesHelperVB();
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
                 string fileNameWithPathRelativeToProjectRoot,
                 string assemblyNameWithoutExtension,
                 AssembliesInspector reflectionOnSeparateAppDomain,
-                ConversionSettingsVB settings,
+                ConversionSettings settings,
                 string codeToPutInTheInitializeComponentOfTheApplicationClass,
                 ILogger logger)
             {
-                _reader = new XamlReaderVB(doc);
+                _reader = new XamlReader(doc);
                 _settings = settings;
                 _sourceFile = sourceFile;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
@@ -222,19 +225,19 @@ namespace OpenSilver.Compiler
                 {
                     switch (_reader.NodeType)
                     {
-                        case XamlNodeTypeVB.StartObject:
+                        case XamlNodeType.StartObject:
                             TryCatch(OnWriteStartObject, parameters);
                             break;
 
-                        case XamlNodeTypeVB.EndObject:
+                        case XamlNodeType.EndObject:
                             TryCatch(OnWriteEndObject, parameters);
                             break;
 
-                        case XamlNodeTypeVB.StartMember:
+                        case XamlNodeType.StartMember:
                             TryCatch(OnWriteStartMember, parameters);
                             break;
 
-                        case XamlNodeTypeVB.EndMember:
+                        case XamlNodeType.EndMember:
                             if (_reader.MemberData.Member != null)
                             {
                                 TryCatch(OnWriteEndMember, parameters);
@@ -262,8 +265,15 @@ namespace OpenSilver.Compiler
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
+                    string additionalConstructors = IsClassTheApplicationClass(baseType)
+                        ? $@"Private Sub {className}(stub as Global.OpenSilver.XamlDesignerConstructorStub)
+    InitializeComponent()
+End Sub
+" : string.Empty;
+
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(initializeComponentMethod,
+                    string partialClass = GeneratePartialClass(additionalConstructors,
+                                                               initializeComponentMethod,
                                                                connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
@@ -325,11 +335,11 @@ namespace OpenSilver.Compiler
                     out string assemblyNameIfAny);
 
                 bool isRootElement = IsElementTheRootElement(element);
-                bool isKnownSystemType = SystemTypesHelperVB.IsSupportedSystemType(
+                bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
                     elementTypeInCSharp.Substring("Global.".Length), assemblyNameIfAny
                 );
                 bool isInitializeTypeFromString =
-                    element.Attribute(InsertingImplicitNodesVB.InitializedFromStringAttribute) != null;
+                    element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
 
                 // Add the constructor (in case of object) or a direct initialization (in case
                 // of system type or "isInitializeFromString" or referenced ResourceDictionary)
@@ -354,7 +364,7 @@ namespace OpenSilver.Compiler
                         {
                             // If the direct content is not specified, we use the type's
                             // default value (ex: <sys:String></sys:String>)
-                            directContent = SystemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
+                            directContent = _systemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
                         parameters.StringBuilder.AppendLine(
@@ -362,7 +372,7 @@ namespace OpenSilver.Compiler
                                 "Dim {0} As {1} = {3}.XamlContext_WriteStartObject({4}, {2})",
                                 elementUniqueNameOrThisKeyword,
                                 elementTypeInCSharp,
-                                SystemTypesHelperVB.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("Global.".Length)),
+                                _systemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("Global.".Length)),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
                             )
@@ -374,7 +384,7 @@ namespace OpenSilver.Compiler
                         // Add the type initialization from string:
                         //------------------------------------------------
 
-                        string stringValue = element.Attribute(InsertingImplicitNodesVB.InitializedFromStringAttribute).Value;
+                        string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
 
                         bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
                             elementTypeInCSharp.Substring("Global.".Length), assemblyNameIfAny
@@ -536,7 +546,7 @@ namespace OpenSilver.Compiler
 
                                 // Verify that there are no markups (they are supposed to have been replaced by XML nodes before entering this method - cf. InsertingMarkupNodesInXaml.InsertMarkupNodes(..)):
                                 //if (!attributeValue.StartsWith("{"))
-                                if (!InsertingMarkupNodesInXamlVB.IsMarkupExtension(attribute))
+                                if (!InsertingMarkupNodesInXaml.IsMarkupExtension(attribute))
                                 {
                                     // Check if the attribute corresponds to a Property, an Event, etc.:
                                     string memberName = attribute.Name.LocalName;
@@ -614,7 +624,7 @@ namespace OpenSilver.Compiler
                                                     parameters.StringBuilder.AppendLine(
                                                         string.Format("{0}.XamlPath = {1}",
                                                             elementUniqueNameOrThisKeyword,
-                                                            SystemTypesHelperVB.ConvertFromInvariantString(resolvedPath, "System.String")
+                                                            _systemTypesHelper.ConvertFromInvariantString(resolvedPath, "System.String")
                                                         )
                                                     );
                                                 }
@@ -638,7 +648,7 @@ namespace OpenSilver.Compiler
                                                 parameters.StringBuilder.AppendLine(
                                                     string.Format("{0}.DependencyPropertyName = {1}",
                                                         elementUniqueNameOrThisKeyword,
-                                                        SystemTypesHelperVB.ConvertFromInvariantString(propertyName, "System.String")));
+                                                        _systemTypesHelper.ConvertFromInvariantString(propertyName, "System.String")));
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
@@ -1471,7 +1481,7 @@ End If",
                     //----------------------------
                     // PROPERTY IS OF TYPE STRING
                     //----------------------------
-                    return ConvertingStringToValueVB.PrepareStringForString(value);
+                    return ConvertingStringToValue.PrepareStringForString(value);
                 }
                 else if (isValueEnum)
                 {
@@ -1529,7 +1539,7 @@ End If",
                         propertyName,
                         xName);
 
-                    bool isKnownSystemType = SystemTypesHelperVB.IsSupportedSystemType(
+                    bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
                         valueTypeFullName.Substring("Global.".Length), valueAssemblyName
                     );
 
@@ -1773,13 +1783,13 @@ End If",
                 }
                 else if (isKnownSystemType)
                 {
-                    preparedValue = SystemTypesHelperVB.ConvertFromInvariantString(
+                    preparedValue = _systemTypesHelper.ConvertFromInvariantString(
                         value, type.Substring("Global.".Length)
                     );
                 }
                 else
                 {
-                    preparedValue = ConvertingStringToValueVB.ConvertFromInvariantString(type, value);
+                    preparedValue = ConvertingStringToValue.ConvertFromInvariantString(type, value);
                 }
 
                 return preparedValue;
@@ -1927,7 +1937,7 @@ End If",
             }
 
             private void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
-                => GettingInformationAboutXamlTypesVB.GetClrNamespaceAndLocalName(
+                => GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     xName,
                     _settings.EnableImplicitAssemblyRedirection,
                     out namespaceName,
@@ -1941,7 +1951,7 @@ End If",
                 out string typeName,
                 out string assemblyName)
             {
-                GettingInformationAboutXamlTypesVB.GetClrNamespaceAndLocalName(
+                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     xName,
                     _settings.EnableImplicitAssemblyRedirection,
                     out namespaceName,

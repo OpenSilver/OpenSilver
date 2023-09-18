@@ -54,9 +54,25 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             set => _compilerType = value;
         }
 
-        public MonoCecilAssembliesInspectorImpl(bool isSlMigration)
+        private SystemTypesHelper _systemTypesHelper;
+        public MonoCecilAssembliesInspectorImpl(bool isSlMigration, CompilerTypesEnum compilerType)
         {
-            _metadata = isSlMigration ? Metadatas.Silverlight : Metadatas.UWP;
+            CompilerType = compilerType;
+            if (CompilerType == CompilerTypesEnum.CSharp)
+            {
+                _metadata = isSlMigration ? MetadatasCS.Silverlight : MetadatasCS.UWP;
+                _systemTypesHelper = new SystemTypesHelperCS();
+            }
+            else if (CompilerType == CompilerTypesEnum.VBNet)
+            {
+                _metadata = isSlMigration ? MetadatasVB.Silverlight : MetadatasVB.UWP;
+                _systemTypesHelper = new SystemTypesHelperVB();
+            }
+            else
+            {
+                throw new InvalidCompilerTypeException();
+            }
+            
         }
 
         public void Dispose()
@@ -353,20 +369,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
         {
             // Distinguish between system types (String, Double...) and other types
-            if (CompilerType == CompilerTypesEnum.CSharp)
-            {
-                if (SystemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
-                    return SystemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
-            }
-            else if (CompilerType == CompilerTypesEnum.VBNet)
-            {
-                if (SystemTypesHelperVB.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
-                    return SystemTypesHelperVB.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
-            }
-            else
-            {
-                throw new InvalidCompilerTypeException();
-            }
+            if (_systemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
+                return _systemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
 
             // Find the type:
             var type = FindType(

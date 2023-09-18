@@ -26,7 +26,7 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal static partial class GeneratingCSharpCode
+    internal partial class GeneratingCSCode
     {
         private class GeneratorPass2 : ICodeGenerator
         {
@@ -141,7 +141,7 @@ namespace OpenSilver.Compiler
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
-                public readonly ComponentConnectorBuilder ComponentConnector = new ComponentConnectorBuilder();
+                public readonly ComponentConnectorBuilderCS ComponentConnector = new ComponentConnectorBuilderCS();
 
                 public bool GenerateFieldsForNamedElements { get; set; }
 
@@ -166,6 +166,8 @@ namespace OpenSilver.Compiler
                 public string CurrentXamlContext => CurrentScope.XamlContext;
             }
 
+            private ConvertingStringToValue ConvertingStringToValue = new ConvertingStringToValueCS();
+
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
 
             private readonly XamlReader _reader;
@@ -177,6 +179,7 @@ namespace OpenSilver.Compiler
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
+            private SystemTypesHelperCS _systemTypesHelper = new SystemTypesHelperCS();
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -287,7 +290,8 @@ namespace OpenSilver.Compiler
                         parameters.ResultingMethods,
                         $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot);
+                        _fileNameWithPathRelativeToProjectRoot,
+                        "");
 
                     string finalCode = $@"
 {factoryClass}
@@ -307,7 +311,8 @@ namespace OpenSilver.Compiler
                         parameters.ResultingMethods,
                         $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot);
+                        _fileNameWithPathRelativeToProjectRoot,
+                        "");
 
                     return finalCode;
                 }
@@ -329,7 +334,7 @@ namespace OpenSilver.Compiler
                     out string assemblyNameIfAny);
 
                 bool isRootElement = IsElementTheRootElement(element);
-                bool isKnownSystemType = SystemTypesHelper.IsSupportedSystemType(
+                bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
                     elementTypeInCSharp.Substring("global::".Length), assemblyNameIfAny
                 );
                 bool isInitializeTypeFromString =
@@ -358,7 +363,7 @@ namespace OpenSilver.Compiler
                         {
                             // If the direct content is not specified, we use the type's
                             // default value (ex: <sys:String></sys:String>)
-                            directContent = SystemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
+                            directContent = _systemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
                         parameters.StringBuilder.AppendLine(
@@ -366,7 +371,7 @@ namespace OpenSilver.Compiler
                                 "{1} {0} = {3}.XamlContext_WriteStartObject({4}, {2});",
                                 elementUniqueNameOrThisKeyword,
                                 elementTypeInCSharp,
-                                SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
+                                _systemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
                             )
@@ -612,7 +617,7 @@ namespace OpenSilver.Compiler
                                                     parameters.StringBuilder.AppendLine(
                                                         string.Format("{0}.XamlPath = {1};",
                                                             elementUniqueNameOrThisKeyword,
-                                                            SystemTypesHelper.ConvertFromInvariantString(resolvedPath, "System.String")
+                                                            _systemTypesHelper.ConvertFromInvariantString(resolvedPath, "System.String")
                                                         )
                                                     );
                                                 }
@@ -636,7 +641,7 @@ namespace OpenSilver.Compiler
                                                 parameters.StringBuilder.AppendLine(
                                                     string.Format("{0}.DependencyPropertyName = {1};",
                                                         elementUniqueNameOrThisKeyword,
-                                                        SystemTypesHelper.ConvertFromInvariantString(propertyName, "System.String")));
+                                                        _systemTypesHelper.ConvertFromInvariantString(propertyName, "System.String")));
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
@@ -1534,7 +1539,7 @@ else
                         propertyName,
                         xName);
 
-                    bool isKnownSystemType = SystemTypesHelper.IsSupportedSystemType(
+                    bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
                         valueTypeFullName.Substring("global::".Length), valueAssemblyName
                     );
 
@@ -1778,7 +1783,7 @@ else
                 }
                 else if (isKnownSystemType)
                 {
-                    preparedValue = SystemTypesHelper.ConvertFromInvariantString(
+                    preparedValue = _systemTypesHelper.ConvertFromInvariantString(
                         value, type.Substring("global::".Length)
                     );
                 }

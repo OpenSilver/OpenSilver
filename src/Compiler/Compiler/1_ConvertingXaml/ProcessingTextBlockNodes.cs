@@ -25,7 +25,7 @@ using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
 {
-    internal static class ProcessingTextBlockNodesVB
+    internal static class ProcessingTextBlockNodes
     {
         //------------------------------------------------------------
         // This class will process the "TextBlock" and "Span" nodes
@@ -46,16 +46,16 @@ namespace OpenSilver.Compiler
         {
             if (currentNode is XText)
             {
-                if ((GeneratingVBCode.IsTextBlock(parentElement) && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
-                    || GeneratingVBCode.IsSpan(parentElement)
-                    || GeneratingVBCode.IsItalic(parentElement)
-                    || GeneratingVBCode.IsUnderline(parentElement)
-                    || GeneratingVBCode.IsBold(parentElement)
-                    || GeneratingVBCode.IsHyperlink(parentElement)
-                    || GeneratingVBCode.IsParagraph(parentElement))
+                if ((GeneratingCode.IsTextBlock(parentElement) && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
+                    || GeneratingCode.IsSpan(parentElement)
+                    || GeneratingCode.IsItalic(parentElement)
+                    || GeneratingCode.IsUnderline(parentElement)
+                    || GeneratingCode.IsBold(parentElement)
+                    || GeneratingCode.IsHyperlink(parentElement)
+                    || GeneratingCode.IsParagraph(parentElement))
                 {
                     // Surround with a <Run>:
-                    XElement contentWrapper = new XElement(XName.Get("Run", GeneratingVBCode.DefaultXamlNamespace)); //todo: read the "ContentWrapperAttribute" of the collection (cf. InlineCollection.cs) instead of hard-coding this.
+                    XElement contentWrapper = new XElement(XName.Get("Run", GeneratingCode.DefaultXamlNamespace)); //todo: read the "ContentWrapperAttribute" of the collection (cf. InlineCollection.cs) instead of hard-coding this.
                     XNode content = currentNode;
                     currentNode.ReplaceWith(contentWrapper);
                     contentWrapper.Add(content);

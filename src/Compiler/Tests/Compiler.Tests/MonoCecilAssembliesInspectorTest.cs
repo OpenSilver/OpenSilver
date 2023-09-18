@@ -43,6 +43,7 @@ namespace Compiler.Tests
 #else
             false
 #endif
+            , OpenSilver.Compiler.CompilerTypesEnum.CSharp
         );
 
         [ClassInitialize]

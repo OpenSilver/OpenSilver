@@ -17,9 +17,9 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal static class ConvertingXamlToCSharp
+    internal class ConvertingXamlToCSharp : ConvertingXamlToCode
     {
-        public static string Convert(
+        public override string Convert(
             string xaml,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
@@ -33,7 +33,7 @@ namespace OpenSilver.Compiler
             string outputResourcesPath,
             ILogger logger)
         {
-            ConversionSettings settings = isSLMigration ? ConversionSettings.Silverlight : ConversionSettings.UWP;
+            ConversionSettings settings = isSLMigration ? ConversionSettingsCS.Silverlight : ConversionSettingsCS.UWP;
 
             // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it could be badly formatted and not be parsable using XDocument.Parse.
             xaml = ProcessingHtmlPresenterNodes.Process(xaml);
@@ -47,7 +47,7 @@ namespace OpenSilver.Compiler
             // Insert implicit nodes in XAML:
             if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
             {
-                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings);
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global::", new SystemTypesHelperCS());
 
                 FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
 
@@ -73,7 +73,7 @@ global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
 ", outputRootPath, outputAppFilesPath, outputLibrariesPath, outputResourcesPath);
 
             // Generate C# code from the tree:
-            return GeneratingCSharpCode.GenerateCSharpCode(
+            return GeneratingCSCode.GenerateCode(
                 doc,
                 sourceFile,
                 fileNameWithPathRelativeToProjectRoot,
@@ -87,28 +87,22 @@ global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
         }
     }
 
-    internal sealed class ConversionSettings
+    internal sealed class ConversionSettingsCS : ConversionSettings
     {
         public static ConversionSettings Silverlight { get; } =
-            new ConversionSettings
+            new ConversionSettingsCS
             {
-                Metadata = Metadatas.Silverlight,
-                CoreTypesConverter = CoreTypesConverters.Silverlight,
+                Metadata = MetadatasCS.Silverlight,
+                CoreTypesConverter = CoreTypesConvertersCS.Silverlight,
                 EnableImplicitAssemblyRedirection = true,
             };
 
         public static ConversionSettings UWP { get; } =
-            new ConversionSettings
+            new ConversionSettingsCS
             {
-                Metadata = Metadatas.UWP,
-                CoreTypesConverter = CoreTypesConverters.UWP,
+                Metadata = MetadatasCS.UWP,
+                CoreTypesConverter = CoreTypesConvertersCS.UWP,
                 EnableImplicitAssemblyRedirection = false,
             };
-
-        public IMetadata Metadata { get; private set; }
-
-        public ICoreTypesConverter CoreTypesConverter { get; private set; }
-
-        public bool EnableImplicitAssemblyRedirection { get; private set; }
     }
 }

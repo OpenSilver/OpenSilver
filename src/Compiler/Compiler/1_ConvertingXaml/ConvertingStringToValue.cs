@@ -13,74 +13,16 @@
 \*====================================================================================*/
 
 using System;
-using System.Text.RegularExpressions;
 
 namespace OpenSilver.Compiler
 {
-    internal static class ConvertingStringToValueVB
+    internal abstract class ConvertingStringToValue
     {
-        public static string ConvertFromInvariantString(string type, string source)
-        {
-            string value = source.Trim();
+        public abstract string ConvertFromInvariantString(string type, string source);
 
-            if (IsNullableType(type, out string underlyingType))
-            {
-                if (value == "null")
-                {
-                    return "Nothing";
-                }
-            }
+        internal abstract string PrepareStringForChar(string source);
 
-            string result;
-
-            switch (underlyingType)
-            {
-                case "Global.System.SByte":
-                case "Global.System.UInt16":
-                case "Global.System.UInt32":
-                case "Global.System.UInt64":
-                    // Note: for numeric types, removing the quotation marks is sufficient
-                    // (+ potential additional letter to tell the actual type because casts
-                    // from int to double for example causes an exception).
-                    result = value;
-                    break;
-
-                case "Global.System.Decimal":
-                    result = PrepareStringForDecimal(value);
-                    break;
-
-                case "Global.System.Char":
-                    result = PrepareStringForChar(value);
-                    break;
-
-                case "Global.System.Object":
-                    result = PrepareStringForString(source);
-                    break;
-
-                default:
-                    // return after escaping (note: we use value and not stringValue
-                    // because it can be a string that starts or ends with spaces)
-                    result = CoreTypesHelperVB.ConvertFromInvariantStringHelper(
-                        source,
-                        underlyingType
-                    );
-                    break;
-            }
-
-            return result;
-        }
-
-        private static string PrepareStringForChar(string source)
-        {
-            if (source != null && source.Length == 1)
-            {
-                return $"\"{source}\"c";
-            }
-
-            return "Chr(0)";
-        }
-
-        private static string PrepareStringForDecimal(string source)
+        internal virtual string PrepareStringForDecimal(string source)
         {
             string value = source.ToLower();
 
@@ -102,7 +44,7 @@ namespace OpenSilver.Compiler
             return $"{value}M";
         }
 
-        internal static string PrepareStringForString(string source)
+        internal virtual string PrepareStringForString(string source)
         {
             // "{}" is used to escape '{' (when used at the beginning of the string)
             string value = source.StartsWith("{}") ? source.Substring(2) : source;
@@ -113,19 +55,7 @@ namespace OpenSilver.Compiler
             return GetQuotedVerbatimString(value);
         }
 
-        private static bool IsNullableType(string type, out string underlyingType)
-        {
-            if (type.StartsWith("Global.System.Nullable<"))
-            {
-                // skips "Global.System.Nullable<" and then remove 
-                // the trailing '>' at the end
-                underlyingType = type.Substring(23, type.Length - 24);
-                return true;
-            }
-
-            underlyingType = type;
-            return false;
-        }
+        internal abstract bool IsNullableType(string type, out string underlyingType);
 
         /// <summary>
         /// Adds @" at the beginning of the string and a " at the end, and escapes the 
@@ -134,10 +64,7 @@ namespace OpenSilver.Compiler
         /// Transforming strings from: "stringContent with a \" in it." into: 
         /// "@\"stringContent with a \"\" in it.\""
         /// </summary>
-        private static string GetQuotedVerbatimString(string s)
-        {
-            return "\"" + Regex.Unescape(s.Replace("\"", "\"\"")) + "\"";
-        }
+        internal abstract string GetQuotedVerbatimString(string s);
 
         //Types to add to the switch (probably):
         //
@@ -151,7 +78,7 @@ namespace OpenSilver.Compiler
         //  - Alignments seem to already be dealt with (maybe it's enums in general).
     }
 
-    internal enum ColorsEnumVB : int
+    internal enum ColorsEnum : int
     {
         AliceBlue = unchecked((int)0xFFF0F8FF),
         AntiqueWhite = unchecked((int)0xFFFAEBD7),
@@ -300,7 +227,7 @@ namespace OpenSilver.Compiler
     // IMPORTANT: if you add or remove entries in this Enum, you must update
     // accordingly the file "FontWeights.cs" in the Runtime project.
     //
-    internal enum FontWeightsCodeVB : int
+    internal enum FontWeightsCode : int
     {
         Thin = 100,
         ExtraLight = 200,

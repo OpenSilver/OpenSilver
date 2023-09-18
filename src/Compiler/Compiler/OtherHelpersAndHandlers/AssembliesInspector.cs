@@ -30,9 +30,9 @@ namespace OpenSilver.Compiler
 
         private readonly MonoCecilAssembliesInspectorImpl _monoCecilVersion;
 
-        public AssembliesInspector(bool isSlMigration)
+        public AssembliesInspector(bool isSlMigration, CompilerTypesEnum compilerType)
         {
-            _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(isSlMigration);
+            _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(isSlMigration, compilerType);
         }
 
         public void Dispose()
@@ -47,14 +47,6 @@ namespace OpenSilver.Compiler
         public void LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo, bool skipReadingAttributesFromAssemblies)
         {
             _monoCecilVersion.LoadAssembly(assemblyPath, loadReferencedAssembliesToo, skipReadingAttributesFromAssemblies);
-        }
-
-        public void SetCompilerType(CompilerTypesEnum compierType)
-        {
-            if (_monoCecilVersion == null)
-                throw new Exception("MarshalledObject is null. It should not be null to set Compiler Type.");
-
-            _monoCecilVersion.CompilerType = compierType;
         }
 
         public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)

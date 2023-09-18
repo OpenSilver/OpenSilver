@@ -23,6 +23,7 @@ using System.Linq;
 using System.Threading;
 using OpenSilver.Compiler.Common;
 using ILogger = OpenSilver.Compiler.Common.ILogger;
+using System.CodeDom.Compiler;
 
 namespace OpenSilver.Compiler
 {
@@ -37,6 +38,9 @@ namespace OpenSilver.Compiler
         [Required]
         public string Flags { get; set; }
 
+        [Required]
+        public int CompilerTypeInt { get; set; }
+
         public string SourceAssemblyForPass2 { get; set; }
 
         public bool IsProcessingCSHTML5Itself { get; set; }
@@ -46,10 +50,26 @@ namespace OpenSilver.Compiler
 
         public override bool Execute()
         {
+            CompilerTypesEnum compilerType = CompilerTypesEnum.None;
+
+            switch(CompilerTypeInt)
+            {
+                case 1:
+                    compilerType = CompilerTypesEnum.CSharp;
+                    break;
+                case 2:
+                    compilerType = CompilerTypesEnum.VBNet;
+                    break;
+                default:
+                    break;
+
+            }
+
             return ExecuteImpl(
                 IsSecondPass,
                 IsSLMigration,
                 Flags,
+                compilerType,
                 ResolvedReferences,
                 SourceAssemblyForPass2,
                 IsProcessingCSHTML5Itself,
@@ -60,6 +80,7 @@ namespace OpenSilver.Compiler
             bool isSecondPass,
             bool isSLMigration,
             string flagsString,
+            CompilerTypesEnum compilerType,
             ITaskItem[] resolvedReferences,
             string sourceAssemblyForPass2,
             bool isProcessingCSHTML5Itself,
@@ -86,7 +107,7 @@ namespace OpenSilver.Compiler
                         throw new Exception(operationName + " failed because the SourceAssembly parameter was not specified during the second pass.");
 
                     // Create a new static instance of the "ReflectionOnSeparateAppDomainHandler":
-                    AssembliesInspector.Current = new AssembliesInspector(isSLMigration);
+                    AssembliesInspector.Current = new AssembliesInspector(isSLMigration, compilerType);
                     AssembliesInspector reflectionOnSeparateAppDomain = AssembliesInspector.Current;
 
                     // we load the source assembly early in case we are processing the CSHTML5.
