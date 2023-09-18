@@ -296,21 +296,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="FontFamily"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
-            DependencyProperty.Register(
-                nameof(FontFamily), 
-                typeof(FontFamily), 
-                typeof(Control),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var c = (Control)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(c.INTERNAL_OuterDomElement);
-                        style.fontFamily = newValue is FontFamily ff ?
-                            INTERNAL_FontsHelper.LoadFont(ff.Source, c) :
-                            string.Empty;
-                    },
-                });
+            TextElementProperties.FontFamilyProperty.AddOwner(typeof(Control));
 
         //-----------------------
         // FONTSIZE

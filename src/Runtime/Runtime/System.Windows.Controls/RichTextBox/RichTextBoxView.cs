@@ -20,7 +20,7 @@ using System.Windows.Input;
 using System.Xml;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
-using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 #if MIGRATION
 using System.Windows.Documents;
@@ -392,7 +392,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                     //if (!string.IsNullOrEmpty(delta.Attributes.FontName))
                     //    run.SetAttribute("FontFamily", GetFontName(delta.Attributes.FontName));
 
-                    run.SetAttribute("FontFamily", !string.IsNullOrEmpty(delta.Attributes.FontName) ? GetFontName(delta.Attributes.FontName) : INTERNAL_FontsHelper.DefaultCssFontFamily);
+                    run.SetAttribute("FontFamily", !string.IsNullOrEmpty(delta.Attributes.FontName) ? GetFontName(delta.Attributes.FontName) : FontFace.DefaultCssFontFamily);
                     if (!string.IsNullOrEmpty(delta.Attributes.FontSize))
                         run.SetAttribute("FontSize", delta.Attributes.FontSize.Replace("px", ""));
                     if (delta.Attributes.Color != null)
@@ -402,7 +402,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 }
                 else
                 {
-                    run.SetAttribute("FontFamily", INTERNAL_FontsHelper.DefaultCssFontFamily);
+                    run.SetAttribute("FontFamily", FontFace.DefaultCssFontFamily);
                 }
 
                 paragraph.AppendChild(run);

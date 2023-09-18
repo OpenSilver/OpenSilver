@@ -189,17 +189,15 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="FontFamily"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
-            DependencyProperty.Register(
-                nameof(FontFamily),
-                typeof(FontFamily),
+            TextElementProperties.FontFamilyProperty.AddOwner(
                 typeof(RichTextBlock),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
+                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var rtb = (RichTextBlock)d;
                         var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.fontFamily = newValue is FontFamily ff ? INTERNAL_FontsHelper.LoadFont(ff.Source, rtb) : string.Empty;
+                        style.fontFamily = ((FontFamily)newValue).GetFontFace(rtb).CssFontName;
                     },
                 });
 
@@ -211,6 +209,11 @@ namespace Windows.UI.Xaml.Controls
         {
             get => (FontFamily)GetValue(FontFamilyProperty);
             set => SetValue(FontFamilyProperty, value);
+        }
+
+        private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TextElementProperties.InvalidateMeasureOnFontFamilyChanged((RichTextBlock)d, (FontFamily)e.NewValue);
         }
 
         /// <summary>

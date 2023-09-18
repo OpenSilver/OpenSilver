@@ -1179,7 +1179,18 @@ const isTouchDevice = () => {
     return (('ontouchstart' in window) ||
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0));
-}
+};
+
+document.loadFont = async function (family, source, loadedCallback) {
+    try {
+        const font = new FontFace(family, source);
+        await font.load();
+        document.fonts.add(font);
+        loadedCallback(true);
+    } catch (error) {
+        loadedCallback(false);
+    }
+};
 
 document.textboxHelpers = (function () {
     function getSelectionLength(view) {

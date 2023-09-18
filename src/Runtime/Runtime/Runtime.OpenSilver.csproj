@@ -288,6 +288,7 @@
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Wasm.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Simulator.cs" />
 		<Compile Include="System.Windows.Media\ColorInterpolationMode.cs" />
+		<Compile Include="OpenSilver\Internal\Media\FontFace.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
@@ -647,7 +648,6 @@
 		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
 		<Compile Include="Core\Other\HashSet2_1.cs" />
 		<Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
-		<Compile Include="Core\Other\INTERNAL_FontsHelper.cs" />
 		<Compile Include="Core\Other\INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.cs" />
 		<Compile Include="Core\Other\INTERNAL_XamlResourcesHandler.cs" />
 		<Compile Include="Core\Other\ISet2_1.cs" />

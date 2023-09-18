@@ -121,10 +121,6 @@ namespace Windows.UI.Xaml
             OpenSilver.Interop.ExecuteJavaScriptVoid(@"document.isSLMigration = false", false);
 #endif
 
-            // Get default font-family from css
-            INTERNAL_FontsHelper.DefaultCssFontFamily = OpenSilver.Interop.ExecuteJavaScriptString(
-                "window.getComputedStyle(document.getElementsByTagName('body')[0]).getPropertyValue(\"font-family\")");
-
             Window.Current = _mainWindow = new Window(true);
             _mainWindow.AttachToDomElement(_rootDiv);
 

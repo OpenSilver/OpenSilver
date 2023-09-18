@@ -12,6 +12,9 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using OpenSilver.Internal.Media;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -22,34 +25,90 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a family of related fonts.
     /// </summary>
-    public partial class FontFamily
+    public class FontFamily
     {
-        // Parameters:
-        //   familyName:
-        //     The family name of the font to represent. This can include a hashed suffix.
         /// <summary>
-        /// Initializes a new instance of the FontFamily class from the specified font
-        /// family string.
+        /// Initializes a new instance of the <see cref="FontFamily"/> class from
+        /// the specified font family string.
         /// </summary>
-        /// <param name="familyName">The family name of the font to represent. This can include a hashed suffix.</param>
-        public FontFamily(string familyName) 
-        { 
-            Source = familyName; 
+        /// <param name="familyName">
+        /// The family name or names that comprise the new <see cref="FontFamily"/>.
+        /// </param>
+        public FontFamily(string familyName)
+        {
+            Source = familyName;
+        }
+
+        internal static FontFamily Default { get; } = new FontFamily("Portable User Interface");
+
+        /// <summary>
+        /// Gets the font family name that is used to construct the <see cref="FontFamily"/> object.
+        /// </summary>
+        public string Source { get; }
+
+        /// <summary>
+        /// Gets a value that indicates whether the current font family object and the specified
+        /// font family object are the same.
+        /// </summary>
+        /// <param name="o">
+        /// The object to compare.
+        /// </param>
+        /// <returns>
+        /// true if o is equal to the current <see cref="FontFamily"/> object; otherwise,
+        /// false. If o is not a <see cref="FontFamily"/> object, false is returned.
+        /// </returns>
+        public override bool Equals(object o)
+        {
+            if (o is FontFamily ff)
+            {
+                return ReferenceEquals(this, ff) ||
+                    (Source is not null && ff.Source is not null &&
+                     string.Equals(Source, ff.Source, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return false;
         }
 
         /// <summary>
-        /// Gets the font family name that is used to construct the FontFamily object.
+        /// Serves as a hash function for <see cref="FontFamily"/>.
         /// </summary>
-        public string Source { get; private set; }
+        /// <returns>
+        /// An integer hash value.
+        /// </returns>
+        public override int GetHashCode() => Source?.ToLower().GetHashCode() ?? base.GetHashCode();
 
-        internal string INTERNAL_ToHtmlString()
+        /// <summary>
+        /// Returns a string representation of this <see cref="FontFamily"/>.
+        /// </summary>
+        /// <returns>
+        /// The input font family string.
+        /// </returns>
+        public override string ToString() => Source ?? string.Empty;
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Task<bool> LoadFontAsync(FontFamily font)
         {
-            return Source;
+            if (font is null)
+            {
+                throw new ArgumentNullException(nameof(font));
+            }
+
+            return LoadFontAsync(font.Source);
         }
 
-        public override string ToString()
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static Task<bool> LoadFontAsync(string fontSource)
         {
-            return Source;
+            if (string.IsNullOrEmpty(fontSource))
+            {
+                return Task.FromResult(true);
+            }
+
+            return FontFace.GetFontFace(fontSource, null).LoadAsync();
         }
+
+        internal FontFace GetFontFace(UIElement relativeTo) => _face ??= FontFace.GetFontFace(Source, relativeTo);
+
+        private FontFace _face;
     }
 }
