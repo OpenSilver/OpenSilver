@@ -13,8 +13,13 @@
 
 using System.Diagnostics;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Controls;
+using System.Windows.Media;
+#else
 using Windows.UI.Text;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -45,6 +50,37 @@ internal static class TextElementProperties
             typeof(int),
             typeof(TextElementProperties),
             new PropertyMetadata(0) { Inherits = true, });
+
+    public static readonly DependencyProperty FontFamilyProperty =
+        DependencyProperty.RegisterAttached(
+            "FontFamily",
+            typeof(FontFamily),
+            typeof(TextElementProperties),
+            new PropertyMetadata(FontFamily.Default) { Inherits = true, },
+            IsValidFontFamily);
+
+    private static bool IsValidFontFamily(object o) => o is FontFamily;
+
+    internal static void InvalidateMeasureOnFontFamilyChanged(UIElement uie, FontFamily font)
+    {
+        var face = font.GetFontFace(uie);
+        if (face.IsLoaded)
+        {
+            if (uie is TextBlock tb)
+            {
+                tb.InvalidateCacheAndMeasure();
+            }
+            else
+            {
+                uie.InvalidateMeasure();
+            }
+        }
+        else
+        {
+            face.RegisterForMeasure(uie);
+            _ = face.LoadAsync();
+        }
+    }
 
     internal static double GetBaseLineOffsetNative(UIElement uie)
     {

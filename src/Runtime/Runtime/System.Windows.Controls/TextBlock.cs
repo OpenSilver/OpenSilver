@@ -21,11 +21,13 @@ using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -46,7 +48,7 @@ namespace Windows.UI.Xaml.Controls
     /// </code>
     /// </example>
     [ContentProperty(nameof(Inlines))]
-    public partial class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
+    public class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
     {
         private bool _isTextChanging;
         private Size _noWrapSize = Size.Empty;
@@ -77,8 +79,25 @@ namespace Windows.UI.Xaml.Controls
                         style.letterSpacing = $"{value.ToInvariantString()}em";
                     },
                 });
+
+            FontFamilyProperty.OverrideMetadata(
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.fontFamily = ((FontFamily)newValue).GetFontFace(tb).CssFontName;
+                    },
+                });
         }
-        
+
+        private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TextElementProperties.InvalidateMeasureOnFontFamilyChanged((TextBlock)d, (FontFamily)e.NewValue);
+        }
+
         public TextBlock()
         {
             IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.

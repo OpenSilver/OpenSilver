@@ -34,6 +34,27 @@ namespace Windows.UI.Xaml.Documents
     /// </summary>
     public abstract class TextElement : Control
     {
+        static TextElement()
+        {
+            FontFamilyProperty.OverrideMetadata(
+                typeof(TextElement),
+                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var textElement = (TextElement)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textElement.INTERNAL_OuterDomElement);
+                        style.fontFamily = ((FontFamily)newValue).GetFontFace(textElement).CssFontName;
+                    },
+                });
+        }
+
+        private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var face = ((FontFamily)e.NewValue).GetFontFace((TextElement)d);
+            _ = face.LoadAsync();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TextElement"/> class.
         /// </summary>
