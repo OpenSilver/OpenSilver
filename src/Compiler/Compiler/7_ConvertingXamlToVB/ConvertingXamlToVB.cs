@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -18,9 +17,9 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal static class ConvertingXamlToVB
+    internal class ConvertingXamlToVB : ConvertingXamlToCode
     {
-        public static string Convert(
+        public override string Convert(
             string xaml,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
@@ -34,36 +33,36 @@ namespace OpenSilver.Compiler
             string outputResourcesPath,
             ILogger logger)
         {
-            ConversionSettingsVB settings = isSLMigration ? ConversionSettingsVB.Silverlight : ConversionSettingsVB.UWP;
+            ConversionSettings settings = isSLMigration ? ConversionSettingsVB.Silverlight : ConversionSettingsVB.UWP;
 
             // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it could be badly formatted and not be parsable using XDocument.Parse.
-            xaml = ProcessingHtmlPresenterNodesVB.Process(xaml);
+            xaml = ProcessingHtmlPresenterNodes.Process(xaml);
 
             // Parse the XML:
             XDocument doc = XDocument.Parse(xaml, LoadOptions.SetLineInfo);
 
             // Process the "TextBlock" and "Span" nodes in order to surround direct text content with "<Run>" tags:
-            ProcessingTextBlockNodesVB.Process(doc, reflectionOnSeparateAppDomain);
+            ProcessingTextBlockNodes.Process(doc, reflectionOnSeparateAppDomain);
 
             // Insert implicit nodes in XAML:
             if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
             {
-                InsertingImplicitNodesVB.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings);
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "Global.", new SystemTypesHelperVB());
 
-                FixingPropertiesOrderVB.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
+                FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
 
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
-                ProcessingContentPresenterNodesVB.Process(doc, reflectionOnSeparateAppDomain);
+                ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain);
 
                 // Process the "ColorAnimation" nodes in order to transform "Storyboard.TargetProperty="XXX"" into "Storyboard.TargetProperty="XXX.Color"" if XXX doesn't end on ".Color" or ".Color)"
-                ProcessingColorAnimationNodesVB.Process(doc, reflectionOnSeparateAppDomain);
+                ProcessingColorAnimationNodes.Process(doc, reflectionOnSeparateAppDomain);
 
                 // Convert markup extensions into XDocument nodes:
-                InsertingMarkupNodesInXamlVB.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain, settings);
+                InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain, settings);
             }
 
             // Generate unique names for XAML elements:
-            GeneratingUniqueNamesVB.ProcessDocument(doc);
+            GeneratingUniqueNames.ProcessDocument(doc);
 
             // Prepare the code that will be put in the "InitializeComponent" of the Application class, which means that it will be executed when the application is launched:
             string codeToPutInTheInitializeComponentOfTheApplicationClass = string.Format(@"
@@ -74,7 +73,7 @@ Global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = ""{3}""
 ", outputRootPath, outputAppFilesPath, outputLibrariesPath, outputResourcesPath);
 
             // Generate Vb code from the tree:
-            return GeneratingVBCode.GenerateVBCode(
+            return GeneratingVBCode.GenerateCode(
                 doc,
                 sourceFile,
                 fileNameWithPathRelativeToProjectRoot,
@@ -88,9 +87,9 @@ Global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = ""{3}""
         }
     }
 
-    internal sealed class ConversionSettingsVB
+    internal sealed class ConversionSettingsVB : ConversionSettings
     {
-        public static ConversionSettingsVB Silverlight { get; } =
+        public static ConversionSettings Silverlight { get; } =
             new ConversionSettingsVB
             {
                 Metadata = MetadatasVB.Silverlight,
@@ -98,18 +97,12 @@ Global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = ""{3}""
                 EnableImplicitAssemblyRedirection = true,
             };
 
-        public static ConversionSettingsVB UWP { get; } =
+        public static ConversionSettings UWP { get; } =
             new ConversionSettingsVB
             {
                 Metadata = MetadatasVB.UWP,
                 CoreTypesConverter = CoreTypesConvertersVB.UWP,
                 EnableImplicitAssemblyRedirection = false,
             };
-
-        public IMetadataVB Metadata { get; private set; }
-
-        public ICoreTypesConverterVB CoreTypesConverter { get; private set; }
-
-        public bool EnableImplicitAssemblyRedirection { get; private set; }
     }
 }

@@ -19,7 +19,7 @@ using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
 {
-    internal static partial class GeneratingCSharpCode
+    internal partial class GeneratingCSCode
     {
         private class GeneratorPass1 : ICodeGenerator
         {
@@ -103,7 +103,7 @@ namespace OpenSilver.Compiler
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass("",
                                                                initializeComponentMethod,
-                                                               new ComponentConnectorBuilder().ToString(),
+                                                               new ComponentConnectorBuilderCS().ToString(),
                                                                resultingFieldsForNamedElements,
                                                                className,
                                                                namespaceStringIfAny,
@@ -120,7 +120,8 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot);
+                        _fileNameWithPathRelativeToProjectRoot,
+                        "");
 
                     string finalCode = $@"
 {factoryClass}
@@ -138,7 +139,8 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot);
+                        _fileNameWithPathRelativeToProjectRoot,
+                        "");
 
                     return finalCode;
                 }

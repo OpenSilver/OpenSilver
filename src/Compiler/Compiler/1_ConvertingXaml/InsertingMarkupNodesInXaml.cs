@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -23,13 +22,13 @@ using OpenSilver.Compiler.Common;
 
 namespace OpenSilver.Compiler
 {
-    internal static class InsertingMarkupNodesInXamlVB
+    internal static class InsertingMarkupNodesInXaml
     {
         //todo: support strings that contain commas, like in: {Binding Value, ConverterParameter = 'One, two, three, four, five, six', Mode = OneWay}
 
         internal static void InsertMarkupNodes(XDocument doc,
             AssembliesInspector reflectionOnSeparateAppDomain,
-            ConversionSettingsVB settings)
+            ConversionSettings settings)
         {
             TraverseNextElement(doc.Root, doc.Root.GetDefaultNamespace(), reflectionOnSeparateAppDomain, settings);
         }
@@ -37,7 +36,7 @@ namespace OpenSilver.Compiler
         private static void TraverseNextElement(XElement currentElement,
             XNamespace lastDefaultNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
-            ConversionSettingsVB settings)
+            ConversionSettings settings)
         {
             XNamespace currentDefaultNamespace = currentElement.GetDefaultNamespace();
             if (currentDefaultNamespace == XNamespace.None)
@@ -55,7 +54,7 @@ namespace OpenSilver.Compiler
             {
                 if (IsMarkupExtension(currentAttribute))
                 {
-                    // Skip if the attribute has a namespace but no "dot", such as d:DataContext="{...}", so that it is in line with what we do in "GeneratingVBCode.cs". This is actually needed to be able to compile because something like d:DataContext="{d:ClassThatDoesNotExist ...}" where "d" is in the list of "mc:Ignorable". //todo: a better approach would be to remove all attributes that have a prefix in the list of "mc:Ignorable".
+                    // Skip if the attribute has a namespace but no "dot", such as d:DataContext="{...}", so that it is in line with what we do in "GeneratingCSharpCode.cs". This is actually needed to be able to compile because something like d:DataContext="{d:ClassThatDoesNotExist ...}" where "d" is in the list of "mc:Ignorable". //todo: a better approach would be to remove all attributes that have a prefix in the list of "mc:Ignorable".
                     if (string.IsNullOrEmpty(currentAttribute.Name.NamespaceName) || currentAttribute.Name.LocalName.Contains("."))
                     {
                         string currentElementTypeName = currentElement.Name.LocalName.Split('.')[0];
@@ -122,7 +121,7 @@ namespace OpenSilver.Compiler
                     int indexOfClosingBracket = value.IndexOf('}');
                     if (indexOfClosingBracket < 0)
                     {
-                        throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use \"{{}}\" to escape '{{'.", attribute.Name), GeneratingVBCode.GetLineNumber(attribute.Parent), -1);
+                        throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use \"{{}}\" to escape '{{'.", attribute.Name), GeneratingCode.GetLineNumber(attribute.Parent), -1);
                     }
                     string contentBetweenBrackets = value.Substring(1, indexOfClosingBracket - 1);
                     if (string.IsNullOrEmpty(contentBetweenBrackets)) //handle special case where '{' is escaped with "{}"
@@ -139,7 +138,7 @@ namespace OpenSilver.Compiler
                         }
                         else
                         {
-                            throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use {} to escape '{'.", attribute.Name), GeneratingVBCode.GetLineNumber(attribute.Parent), -1);
+                            throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use {} to escape '{'.", attribute.Name), GeneratingCode.GetLineNumber(attribute.Parent), -1);
                         }
                     }
                 }
@@ -160,7 +159,7 @@ namespace OpenSilver.Compiler
             XNamespace lastDefaultNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
             Func<string, XNamespace> getNamespaceOfPrefix,
-            ConversionSettingsVB settings)
+            ConversionSettings settings)
         {
             Dictionary<string, string> listOfSubAttributes = GenerateListOfAttributesFromString(attributeValue);
             List<XElement> elementsToAdd = new List<XElement>();
@@ -251,7 +250,7 @@ namespace OpenSilver.Compiler
                     string keyStringAfterPlaceHolderReplacement = keyString;
                     if (keyString == "_placeHolderForDefaultValue") //this test is to replace the name of the attribute (which is in keyString) if it was a placeholder
                     {
-                        GettingInformationAboutXamlTypesVB.GetClrNamespaceAndLocalName(
+                        GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                             nodeName,
                             settings.EnableImplicitAssemblyRedirection,
                             out string namespaceName,

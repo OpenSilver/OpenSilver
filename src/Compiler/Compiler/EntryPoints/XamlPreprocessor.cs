@@ -152,8 +152,8 @@ namespace OpenSilver.Compiler
                             if (outputFile.EndsWith(".cs"))
                             {
                                 // Convert XAML to CS:
-                                reflectionOnSeparateAppDomain.SetCompilerType(CompilerTypesEnum.CSharp);
-                                generatedCode = ConvertingXamlToCSharp.Convert(xaml, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass: !isSecondPass, isSLMigration: isSLMigration, outputRootPath: outputRootPath, outputAppFilesPath: outputAppFilesPath, outputLibrariesPath: outputLibrariesPath, outputResourcesPath: outputResourcesPath, logger: logger);
+                                ConvertingXamlToCode convertingXAML = new ConvertingXamlToCSharp();
+                                generatedCode = convertingXAML.Convert(xaml, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass: !isSecondPass, isSLMigration: isSLMigration, outputRootPath: outputRootPath, outputAppFilesPath: outputAppFilesPath, outputLibrariesPath: outputLibrariesPath, outputResourcesPath: outputResourcesPath, logger: logger);
 
                                 // Add the header that contains the file hash so as to avoid re-processing the file if not needed:
                                 generatedCode = CreateHeaderContainingHash(generatedCode, xaml, isSecondPass)
@@ -164,8 +164,8 @@ namespace OpenSilver.Compiler
                             else if (outputFile.EndsWith(".vb"))
                             {
                                 // Convert XAML to VB:
-                                reflectionOnSeparateAppDomain.SetCompilerType(CompilerTypesEnum.VBNet);
-                                generatedCode = ConvertingXamlToVB.Convert(xaml, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass: !isSecondPass, isSLMigration: isSLMigration, outputRootPath: outputRootPath, outputAppFilesPath: outputAppFilesPath, outputLibrariesPath: outputLibrariesPath, outputResourcesPath: outputResourcesPath, logger: logger);
+                                ConvertingXamlToCode convertingXAML = new ConvertingXamlToVB();
+                                generatedCode = convertingXAML.Convert(xaml, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass: !isSecondPass, isSLMigration: isSLMigration, outputRootPath: outputRootPath, outputAppFilesPath: outputAppFilesPath, outputLibrariesPath: outputLibrariesPath, outputResourcesPath: outputResourcesPath, logger: logger);
 
                                 // Add the header that contains the file hash so as to avoid re-processing the file if not needed:
                                 generatedCode = CreateVBHeaderContainingHash(generatedCode, xaml, isSecondPass)
