@@ -20,6 +20,12 @@ namespace CSHTML5.Internal
         public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback(Action action, bool sync = false)
             => new SelfDisposedJavaScriptCallback(action, sync).JSCallback;
 
+        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback<T>(Action<T> action, bool sync = false)
+            => new SelfDisposedJavaScriptCallback<T>(action, sync).JSCallback;
+
+        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback<T1, T2>(Action<T1, T2> action, bool sync = false)
+           => new SelfDisposedJavaScriptCallback<T1, T2>(action, sync).JSCallback;
+
         private sealed class SelfDisposedJavaScriptCallback
         {
             private readonly Action _action;
@@ -36,6 +42,44 @@ namespace CSHTML5.Internal
             {
                 JSCallback.Dispose();
                 _action();
+            }
+        }
+
+        private sealed class SelfDisposedJavaScriptCallback<T>
+        {
+            private readonly Action<T> _action;
+            public readonly JavaScriptCallback JSCallback;
+
+            public SelfDisposedJavaScriptCallback(Action<T> action, bool sync)
+            {
+                _action = action ?? throw new ArgumentNullException(nameof(action));
+
+                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose, sync);
+            }
+
+            private void RunCallbackAndDispose(T arg0)
+            {
+                JSCallback.Dispose();
+                _action(arg0);
+            }
+        }
+
+        private sealed class SelfDisposedJavaScriptCallback<T1, T2>
+        {
+            private readonly Action<T1, T2> _action;
+            public readonly JavaScriptCallback JSCallback;
+
+            public SelfDisposedJavaScriptCallback(Action<T1, T2> action, bool sync)
+            {
+                _action = action ?? throw new ArgumentNullException(nameof(action));
+
+                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose, sync);
+            }
+
+            private void RunCallbackAndDispose(T1 arg1, T2 arg2)
+            {
+                JSCallback.Dispose();
+                _action(arg1, arg2);
             }
         }
     }
