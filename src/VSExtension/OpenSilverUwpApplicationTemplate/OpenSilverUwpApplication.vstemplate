@@ -3,8 +3,13 @@
         <Name>UWP-Compatible Variation of OpenSilver Application</Name>
         <Description>A blank project for creating an app using UWP-Compatible variation of OpenSilver (ie. it uses the UWP dialect of XAML instead of the Silverlight dialect).</Description>
         <Icon>Icon.ico</Icon>
-        <ProjectType>CSharp</ProjectType>
-        <LanguageTag>C#</LanguageTag>
+        <ProjectType>csharp</ProjectType>
+        <LanguageTag>csharp</LanguageTag>
+        <LanguageTag>xaml</LanguageTag>
+        <ProjectTypeTag>web</ProjectTypeTag>
+        <ProjectTypeTag>blazor</ProjectTypeTag>
+        <ProjectTypeTag>OpenSilver</ProjectTypeTag>
+        <ProjectTypeTag>uwp</ProjectTypeTag>
         <SortOrder>30</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>OpenSilverApplication</DefaultName>
