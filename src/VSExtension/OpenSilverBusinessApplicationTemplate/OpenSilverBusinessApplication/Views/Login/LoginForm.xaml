@@ -1,0 +1,42 @@
+﻿<StackPanel xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:local="clr-namespace:$ext_safeprojectname$.Controls"
+            x:Class="$ext_safeprojectname$.LoginUI.LoginForm"
+            KeyDown="LoginForm_KeyDown"
+            mc:Ignorable="d"
+            d:DataContext="{d:DesignInstance Type=login:LoginInfo}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <local:BusyIndicator x:Name="busyIndicator" BusyContent="Logging in..."
+                             IsBusy="{Binding IsLoggingIn}">
+            <StackPanel Orientation="Vertical">
+                <toolkit:DataForm x:Name="loginForm"
+                                  Padding="10,0,10,0"
+                                  CurrentItem="{Binding}"
+                                  CustomLayout="True"
+                                  IsAutoHeightOnCustomLayout="True"
+                                  AutoEdit="True" CommandButtonsVisibility="None" HeaderVisibility="Collapsed"
+                                  AutoGeneratingField="LoginForm_AutoGeneratingField"
+                                  IsEnabled="{Binding IsLoggingIn, Converter={StaticResource NotOperatorValueConverter}}"
+                                  Style="{StaticResource LoginDataFormStyle}" />
+            </StackPanel>
+        </local:BusyIndicator>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
+            <Button x:Name="loginButton" Content="Ok" Click="LoginButton_Click" Style="{StaticResource RegisterLoginButtonStyle}" IsEnabled="{Binding Path=CanLogIn}" />
+            <Button x:Name="loginCancel" Content="Cancel" Click="CancelButton_Click" Style="{StaticResource RegisterLoginButtonStyle}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Style="{StaticResource RegisterLoginLinkPanelStyle}">
+            <TextBlock Text="Not registered yet?" Style="{StaticResource CommentStyle}" />
+            <HyperlinkButton x:Name="registerNow" Content="Register now" Click="RegisterNow_Click" IsEnabled="{Binding IsLoggingIn, Converter={StaticResource NotOperatorValueConverter}}" />
+        </StackPanel>
+    </Grid>
+</StackPanel>

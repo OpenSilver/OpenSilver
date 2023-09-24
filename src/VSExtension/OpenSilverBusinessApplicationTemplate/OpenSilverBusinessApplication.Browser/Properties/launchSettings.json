@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "$ext_safeprojectname$.Browser": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:57248;http://localhost:57249"
+    }
+  }
+}

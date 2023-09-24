@@ -1,0 +1,53 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Hidden>true</Hidden>
+    <CreateInPlace>true</CreateInPlace>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="$ext_safeprojectname$.csproj" File="OpenSilverBusinessApplication.csproj" ReplaceParameters="true">
+      <Folder Name="Assets" TargetFolderName="Assets">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Styles.xaml">Styles.xaml</ProjectItem>
+      </Folder>
+      <Folder Name="Contexts" TargetFolderName="Contexts">
+        <ProjectItem ReplaceParameters="true" TargetFileName="WebContext.cs">WebContext.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Controls" TargetFolderName="Controls">
+        <ProjectItem ReplaceParameters="true" TargetFileName="BusyIndicator.cs">BusyIndicator.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="BusyIndicator.xaml">BusyIndicator.xaml</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="VisualStates.cs">VisualStates.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Helpers" TargetFolderName="Helpers">
+        <ProjectItem ReplaceParameters="true" TargetFileName="DataFieldExtensions.cs">DataFieldExtensions.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="NotOperatorValueConverter.cs">NotOperatorValueConverter.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="TargetNullValueConverter.cs">TargetNullValueConverter.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Models" TargetFolderName="Models">
+        <ProjectItem ReplaceParameters="true" TargetFileName="LoginInfo.cs">LoginInfo.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="RegistrationData.partial.cs">RegistrationData.partial.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="User.partial.cs">User.partial.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Views" TargetFolderName="Views">
+        <Folder Name="Login" TargetFolderName="Login">
+          <ProjectItem ReplaceParameters="true" TargetFileName="LoginForm.xaml">LoginForm.xaml</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="LoginForm.xaml.cs">LoginForm.xaml.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="LoginRegistrationWindow.xaml">LoginRegistrationWindow.xaml</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="LoginRegistrationWindow.xaml.cs">LoginRegistrationWindow.xaml.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="LoginStatus.xaml">LoginStatus.xaml</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="LoginStatus.xaml.cs">LoginStatus.xaml.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="RegistrationForm.xaml">RegistrationForm.xaml</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="RegistrationForm.xaml.cs">RegistrationForm.xaml.cs</ProjectItem>
+        </Folder>
+        <ProjectItem ReplaceParameters="true" TargetFileName="About.xaml">About.xaml</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="About.xaml.cs">About.xaml.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="ErrorWindow.xaml">ErrorWindow.xaml</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="ErrorWindow.xaml.cs">ErrorWindow.xaml.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Home.xaml">Home.xaml</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Home.xaml.cs">Home.xaml.cs</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml">App.xaml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml.cs">App.xaml.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="MainPage.xaml">MainPage.xaml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="MainPage.xaml.cs">MainPage.xaml.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

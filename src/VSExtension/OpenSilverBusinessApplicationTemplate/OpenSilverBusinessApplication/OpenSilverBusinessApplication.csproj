@@ -1,0 +1,100 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <Configurations>Debug;Release;</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RazorLangVersion>3.0</RazorLangVersion>
+    <LinkedOpenRiaServerProject>..\$ext_safeprojectname$.Web\$ext_safeprojectname$.Web.csproj</LinkedOpenRiaServerProject>
+    <RootNamespace>$ext_safeprojectname$.Web</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;OPENSILVER;OPENRIA;SILVERLIGHT</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>OPENSILVER</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Assets\Styles.xaml" />
+    <None Remove="Controls\BusyIndicator.xaml" />
+    <None Remove="EmptyOpenSilverMigrationApplication.csproj.vspscc" />
+    <None Remove="MyTemplate_rename_me_after_export.vstemplate" />
+    <None Remove="Views\About.xaml" />
+    <None Remove="Views\ErrorWindow.xaml" />
+    <None Remove="Views\Home.xaml" />
+    <None Remove="Views\Login\LoginForm.xaml" />
+    <None Remove="Views\Login\LoginRegistrationWindow.xaml" />
+    <None Remove="Views\Login\LoginStatus.xaml" />
+    <None Remove="Views\Login\RegistrationForm.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Controls\BusyIndicator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Views\ErrorWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Views\About.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Views\Home.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Views\Login\LoginForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Views\Login\LoginRegistrationWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Views\Login\LoginStatus.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Views\Login\RegistrationForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <PackageReference Include="OpenSilver" Version="1.2.2" />
+    <PackageReference Include="OpenSilver.OpenRiaServices.Client.4.6" Version="1.2.0" />
+    <PackageReference Include="OpenSilver.OpenRiaServices.Client.Core.4.6" Version="1.2.0" />
+    <PackageReference Include="OpenSilver.OpenRiaServices.CodeGen.4.6" Version="1.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <Page Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Generated_Code\" />
+    <Folder Include="Models\" />
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
+</Project>

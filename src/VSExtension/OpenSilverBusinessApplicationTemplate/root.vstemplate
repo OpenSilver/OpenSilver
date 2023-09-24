@@ -1,0 +1,25 @@
+<VSTemplate xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Version="3.0.0" Type="ProjectGroup">
+   <TemplateData>
+      <Name>OpenSilver Business Application (RIA Services)</Name>
+      <Description>OpenSilver line-of-business application using Open RIA Services (client/server)</Description>
+      <Icon>__TemplateIcon.ico</Icon>
+      <DefaultName>OpenSilverBusinessApplication</DefaultName>
+      <ProvideDefaultName>true</ProvideDefaultName>
+      <CreateInPlace>true</CreateInPlace>
+      <ProjectType>csharp</ProjectType>
+      <ProjectSubType>web</ProjectSubType>
+      <LanguageTag>csharp</LanguageTag>
+      <LanguageTag>xaml</LanguageTag>
+      <ProjectTypeTag>web</ProjectTypeTag>
+      <ProjectTypeTag>blazor</ProjectTypeTag>
+      <ProjectTypeTag>OpenSilver</ProjectTypeTag>
+   </TemplateData>
+   <TemplateContent>
+      <ProjectCollection>
+         <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">OpenSilverBusinessApplication\OpenSilverBusinessApplication.vstemplate</ProjectTemplateLink>
+         <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Browser">OpenSilverBusinessApplication.Browser\OpenSilverBusinessApplication.Browser.vstemplate</ProjectTemplateLink>
+         <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Simulator">OpenSilverBusinessApplication.Simulator\OpenSilverBusinessApplication.Simulator.vstemplate</ProjectTemplateLink>
+         <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Web">OpenSilverBusinessApplication.Web\OpenSilverBusinessApplication.Web.vstemplate</ProjectTemplateLink>
+      </ProjectCollection>
+   </TemplateContent>
+</VSTemplate>

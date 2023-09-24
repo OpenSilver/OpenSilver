@@ -9,6 +9,7 @@
         <ProjectTypeTag>web</ProjectTypeTag>
         <ProjectTypeTag>blazor</ProjectTypeTag>
         <ProjectTypeTag>OpenSilver</ProjectTypeTag>
+        <ProjectTypeTag>library</ProjectTypeTag>
         <SortOrder>20</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>OpenSilverClassLibrary</DefaultName>

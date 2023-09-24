@@ -1,0 +1,12 @@
+﻿<navigation:Page x:Class="$ext_safeprojectname$.Views.About"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=OpenSilver.Controls.Navigation"
+                 mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="480"
+                 Style="{StaticResource PageStyle}">
+    <StackPanel>
+        <TextBlock Text="About" Style="{StaticResource HeaderTextStyle}" />
+    </StackPanel>
+</navigation:Page>
