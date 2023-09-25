@@ -13,7 +13,6 @@
 
 using System;
 using System.Diagnostics;
-using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -73,34 +72,17 @@ namespace Windows.UI.Xaml.Input
             scope.SetValue(FocusedElementProperty, newFocus);
         }
 
-        private static void OnFocusedElementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnFocusedElementChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.OldValue is UIElement oldFocus)
+            if (e.OldValue is UIElement uie)
             {
-                ClearTabIndex(oldFocus);
-                oldFocus.RaiseEvent(new RoutedEventArgs
-                {
-                    RoutedEvent = UIElement.LostFocusEvent,
-                    OriginalSource = oldFocus,
-                });
+                InputManager.ClearTabIndex(uie);
             }
+        }
 
-            static void ClearTabIndex(UIElement uie)
-            {
-                if (uie.GetFocusTarget() is { } domElement)
-                {
-                    switch (uie)
-                    {
-                        case TextBox or PasswordBox:
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(domElement, "tabindex", "-1");
-                            break;
-
-                        default:
-                            INTERNAL_HtmlDomManager.RemoveAttribute(domElement, "tabindex");
-                            break;
-                    }
-                }
-            }
+        internal static DependencyObject GetFocusScope(UIElement uie)
+        {
+            return uie?.INTERNAL_ParentWindow ?? Window.Current;
         }
 
         internal static bool HasFocus(UIElement uie, bool useLogicalTree = false)

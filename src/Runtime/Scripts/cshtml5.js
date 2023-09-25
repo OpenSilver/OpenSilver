@@ -401,14 +401,15 @@ document.createInputManager = function (callback) {
         WHEEL: 7,
         KEYDOWN: 8,
         KEYUP: 9,
-        FOCUS: 10,
-        BLUR: 11,
-        KEYPRESS: 12,
-        INPUT: 13,
-        TOUCH_START: 14,
-        TOUCH_END: 15,
-        TOUCH_MOVE: 16,
-        WINDOW_BLUR: 17,
+        KEYPRESS: 10,
+        INPUT: 11,
+        TOUCH_START: 12,
+        TOUCH_END: 13,
+        TOUCH_MOVE: 14,
+        FOCUS_MANAGED: 15,
+        FOCUS_UNMANAGED: 16,
+        WINDOW_FOCUS: 17,
+        WINDOW_BLUR: 18,
     };
 
     const MODIFIERKEYS = {
@@ -418,6 +419,42 @@ document.createInputManager = function (callback) {
         SHIFT: 4,
         WINDOWS: 8,
     };
+
+    const FocusManager = (function () {
+        let _timeoutID = null;
+        let _isManagedFocusUpdate = false;
+
+        function startTimer() {
+            if (_timeoutID === null) {
+                _timeoutID = setTimeout(function () {
+                    _timeoutID = null;
+                    callback('', EVENTS.FOCUS_MANAGED, null);
+                });
+            }
+        };
+
+        return {
+            get isManagingFocus() {
+                return _isManagedFocusUpdate;
+            },
+            focus: function (element) {
+                if (!element) return false;
+
+                element.setAttribute('tabindex', 0);
+
+                _isManagedFocusUpdate = true;
+                element.focus({ preventScroll: true });
+                _isManagedFocusUpdate = false;
+
+                if (document.activeElement === element) {
+                    startTimer();
+                    return true;
+                }
+
+                return false;
+            },
+        };
+    })();
 
     let _modifiers = MODIFIERKEYS.NONE;
     let _mouseCapture = null;
@@ -504,6 +541,8 @@ document.createInputManager = function (callback) {
 
         document.addEventListener('keyup', function (e) { setModifiers(e); });        
 
+        window.addEventListener('focus', function (e) { callback('', EVENTS.WINDOW_FOCUS, e); });
+
         window.addEventListener('blur', function (e) {
             callback('', EVENTS.WINDOW_BLUR, e);
             _modifiers = MODIFIERKEYS.NONE;
@@ -517,7 +556,32 @@ document.createInputManager = function (callback) {
             // Make sure the root div is keyboard focusable, so that we can tab into the app.
             root.tabIndex = Math.max(root.tabIndex, 0);
 
-            root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
+            root.addEventListener('focusin', function (e) {
+                if (FocusManager.isManagingFocus) return;
+
+                // Unrequested focus update, either from user interaction or call to focus()
+                // method via interop or external javascript component.
+                if (root._ignoreFocus) return;
+
+                // Try to reconnect focused element to a known opensilver element
+                const xamlid = getClosestElementId(e.target);
+                if (xamlid) {
+                    callback(xamlid, EVENTS.FOCUS_UNMANAGED, e);
+                } else {
+                    // Root element received focus. Check if previous focused element belongs to
+                    // the app. If yes, then move focus here again silently.
+                    if (getClosestElementId(e.relatedTarget)) {
+                        root._ignoreFocus = true;
+                        e.relatedTarget.focus({ preventScroll: true });
+                        root._ignoreFocus = false;
+
+                        // Make sure that re-focus was successful.
+                        if (document.activeElement === e.relatedTarget) return;
+                    }
+
+                    callback('', EVENTS.FOCUS_UNMANAGED, e);
+                }
+            });
 
             root.addEventListener('mousemove', function (e) {
                 if (shouldIgnoreMouseEvent(e)) return;
@@ -646,6 +710,9 @@ document.createInputManager = function (callback) {
         },
         suppressContextMenu: function (value) {
             _suppressContextMenu = value;
+        },
+        focus: function (element) {
+            return FocusManager.focus(element);
         },
     };
 };

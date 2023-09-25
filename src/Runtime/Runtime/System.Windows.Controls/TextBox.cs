@@ -77,7 +77,7 @@ namespace Windows.UI.Xaml.Controls
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
-        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv ?? base.GetFocusTarget();
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays

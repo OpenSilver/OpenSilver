@@ -90,7 +90,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (FocusManager.GetFocusedElement() == Host)
             {
-                INTERNAL_HtmlDomManager.SetFocusNative(_contentEditableDiv);
+                InputManager.SetFocusNative(InputDiv);
             }
         }
 

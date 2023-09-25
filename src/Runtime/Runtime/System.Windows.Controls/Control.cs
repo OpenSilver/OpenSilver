@@ -675,17 +675,9 @@ namespace Windows.UI.Xaml.Controls
         /// true if focus was set to the control, or focus was already on the control.
         /// false if the control is not focusable.
         /// </returns>
-        public bool Focus()
-        {
-            if (KeyboardNavigation.Current.Focus(this) is UIElement uie)
-            {
-                INTERNAL_HtmlDomManager.SetFocus(uie);
-                KeyboardNavigation.UpdateFocusedElement(uie);
-                return true;
-            }
-
-            return false;
-        }
+        public bool Focus() =>
+            KeyboardNavigation.Current.Focus(this) is UIElement uie &&
+            InputManager.Current.SetFocus(uie);
 
         private bool _useSystemFocusVisuals;
 

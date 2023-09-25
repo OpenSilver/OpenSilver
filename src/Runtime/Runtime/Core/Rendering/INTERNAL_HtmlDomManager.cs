@@ -133,17 +133,10 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 object domElement = element.GetFocusTarget();
                 if (domElement != null)
                 {
-                    SetFocusNative(domElement);
+                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.setFocus({sElement});");
                 }
             }
-        }
-
-        internal static void SetFocusNative(object domElementRef)
-        {
-            Debug.Assert(domElementRef != null);
-
-            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.setFocus({sElement});");
         }
 
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
