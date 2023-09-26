@@ -83,7 +83,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return res;
         }
 
-        public static string ConvertToString(this TypeReference typeRef, CompilerTypesEnum compilerType)
+        public static string ConvertToString(this TypeReference typeRef, SupportedLanguage compilerType)
         {
             var fullNamespace = typeRef.BuildFullPath();
             var typeName = typeRef.GetTypeNameIncludingGenericArguments(false, compilerType);
@@ -110,16 +110,16 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return fullPath;
         }
 
-        public static string GetTypeNameIncludingGenericArguments(this TypeReference type, bool appendNamespace, CompilerTypesEnum compilerType)
+        public static string GetTypeNameIncludingGenericArguments(this TypeReference type, bool appendNamespace, SupportedLanguage compilerType)
         {
             var result = new StringBuilder();
 
             string prefix= "";
-            if (compilerType == CompilerTypesEnum.CSharp)
+            if (compilerType == SupportedLanguage.CSharp)
             {
                 prefix = "global::";
             }
-            else if (compilerType == CompilerTypesEnum.VBNet)
+            else if (compilerType == SupportedLanguage.VBNet)
             {
                 prefix = "Global.";
             }
@@ -142,12 +142,12 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
             result = new StringBuilder(result.ToString().Split('`')[0]);
-            if (compilerType == CompilerTypesEnum.CSharp)
+            if (compilerType == SupportedLanguage.CSharp)
             {
                 result.Append(
                     $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))}>");
             }
-            else if (compilerType == CompilerTypesEnum.VBNet)
+            else if (compilerType == SupportedLanguage.VBNet)
             {
                 result.Append(
                     $"(Of {string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))})");

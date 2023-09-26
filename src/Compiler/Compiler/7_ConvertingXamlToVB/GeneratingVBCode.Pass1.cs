@@ -19,7 +19,7 @@ using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
 {
-    internal partial class GeneratingVBCode
+    internal static partial class GeneratingVBCode
     {
         private class GeneratorPass1 : ICodeGenerator
         {
@@ -65,14 +65,16 @@ namespace OpenSilver.Compiler
                     }
 
                     XElement element = _reader.ObjectData.Element;
-                    XAttribute xNameAttr = element.Attributes().FirstOrDefault(attr => IsXNameAttribute(attr) || IsNameAttribute(attr));
+                    XAttribute xNameAttr = element.Attributes()
+                        .FirstOrDefault(attr => GeneratingCode.IsXNameAttribute(attr) || GeneratingCode.IsNameAttribute(attr));
+
                     if (xNameAttr != null && GetRootOfCurrentNamescopeForCompilation(element).Parent == null)
                     {
                         string name = xNameAttr.Value;
                         if (!string.IsNullOrWhiteSpace(name))
                         {
                             string fieldModifier = _settings.Metadata.FieldModifier;
-                            XAttribute fieldModifierAttr = element.Attribute(xNamespace + "FieldModifier");
+                            XAttribute fieldModifierAttr = element.Attribute(GeneratingCode.xNamespace + "FieldModifier");
                             if (fieldModifierAttr != null)
                             {
                                 fieldModifier = fieldModifierAttr.Value?.ToLower() ?? "private";
@@ -109,7 +111,7 @@ namespace OpenSilver.Compiler
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
-                        GetUniqueName(_reader.Document.Root),
+                        GeneratingCode.GetUniqueName(_reader.Document.Root),
                         "Throw New Global.System.NotImplementedException()",
                         "Throw New Global.System.NotImplementedException()",
                         Enumerable.Empty<string>(),
@@ -128,7 +130,7 @@ namespace OpenSilver.Compiler
                 {
                     string finalCode = GenerateFactoryClass(
                         baseType,
-                        GetUniqueName(_reader.Document.Root),
+                        GeneratingCode.GetUniqueName(_reader.Document.Root),
                         "Throw New Global.System.NotImplementedException()",
                         "Throw New Global.System.NotImplementedException()",
                         Enumerable.Empty<string>(),
@@ -146,7 +148,7 @@ namespace OpenSilver.Compiler
                 while (element.Parent != null)
                 {
                     XElement parent = element.Parent;
-                    if (IsDataTemplate(parent) || IsItemsPanelTemplate(parent) || IsControlTemplate(parent))
+                    if (GeneratingCode.IsDataTemplate(parent) || GeneratingCode.IsItemsPanelTemplate(parent) || GeneratingCode.IsControlTemplate(parent))
                     {
                         return parent;
                     }

@@ -17,13 +17,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using System.Xml;
 using OpenSilver.Internal;
 using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal partial class GeneratingVBCode : GeneratingCode
+    internal static partial class GeneratingVBCode
     {
         private class ComponentConnectorBuilderVB
         {
@@ -199,7 +198,7 @@ End Class
             out bool hasCodeBehind)
         {
             // Read the "{x:Class}" attribute:
-            XAttribute classAttributeIfAny = doc.Root.Attribute(xNamespace + "Class");
+            XAttribute classAttributeIfAny = doc.Root.Attribute(GeneratingCode.xNamespace + "Class");
             if (classAttributeIfAny != null)
             {
                 //-----------------

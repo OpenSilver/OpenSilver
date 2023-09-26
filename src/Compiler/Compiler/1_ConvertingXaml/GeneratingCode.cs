@@ -13,14 +13,8 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 using System.Xml;
-using OpenSilver.Internal;
-using ILogger = OpenSilver.Compiler.Common.ILogger;
-using System.Windows.Forms;
 
 namespace OpenSilver.Compiler
 {
@@ -29,27 +23,13 @@ namespace OpenSilver.Compiler
         string Generate();
     }
 
-    internal partial class GeneratingCode
+    internal static class GeneratingCode
     {
         internal const string DefaultXamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
         private const string LegacyXamlNamespace = "http://schemas.microsoft.com/client/2007"; // XAML namespace used for Silverlight 1.0 application
 
         internal static readonly XNamespace[] DefaultXamlNamespaces = new XNamespace[2] { DefaultXamlNamespace, LegacyXamlNamespace };
         internal static readonly XNamespace xNamespace = @"http://schemas.microsoft.com/winfx/2006/xaml"; // Used for example for "x:Name" attributes and {x:Null} markup extensions.
-
-        public virtual string GenerateCode(XDocument doc,
-            string sourceFile,
-            string fileNameWithPathRelativeToProjectRoot,
-            string assemblyNameWithoutExtension,
-            AssembliesInspector reflectionOnSeparateAppDomain,
-            bool isFirstPass,
-            ConversionSettings settings,
-            string codeToPutInTheInitializeComponentOfTheApplicationClass,
-            ILogger logger)
-        {
-            return "";
-        }
-        
 
         internal static int GetLineNumber(XNode element)
         {
@@ -83,13 +63,6 @@ namespace OpenSilver.Compiler
 
         internal static bool IsNameAttribute(XAttribute attr)
             => attr.Name.LocalName == "Name" && string.IsNullOrEmpty(attr.Name.NamespaceName);
-
-        internal virtual string CreateInitializeComponentMethod(
-            string applicationTypeFullName,
-            string additionalCodeForApplication,
-            string assemblyNameWithoutExtension,
-            string fileNameWithPathRelativeToProjectRoot,
-            List<string> findNameCalls) => "";
 
         internal static string GetUniqueName(XElement element)
         {

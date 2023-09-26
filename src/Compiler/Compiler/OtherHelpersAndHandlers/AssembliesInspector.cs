@@ -30,7 +30,7 @@ namespace OpenSilver.Compiler
 
         private readonly MonoCecilAssembliesInspectorImpl _monoCecilVersion;
 
-        public AssembliesInspector(bool isSlMigration, CompilerTypesEnum compilerType)
+        public AssembliesInspector(bool isSlMigration, SupportedLanguage compilerType)
         {
             _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(isSlMigration, compilerType);
         }
@@ -122,12 +122,5 @@ namespace OpenSilver.Compiler
 
         public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
             => _monoCecilVersion.GetField(fieldName, namespaceName, typeName, assemblyName);
-    }
-
-    public enum CompilerTypesEnum
-    {
-        None,
-        CSharp,
-        VBNet,
     }
 }

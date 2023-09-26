@@ -23,7 +23,7 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal partial class GeneratingCSCode : GeneratingCode
+    internal static partial class GeneratingCSCode
     {
         private class ComponentConnectorBuilderCS
         {
@@ -216,7 +216,7 @@ namespace {namespaceStringIfAny}
             out bool hasCodeBehind)
         {
             // Read the "{x:Class}" attribute:
-            XAttribute classAttributeIfAny = doc.Root.Attribute(xNamespace + "Class");
+            XAttribute classAttributeIfAny = doc.Root.Attribute(GeneratingCode.xNamespace + "Class");
             if (classAttributeIfAny != null)
             {
                 //-----------------
