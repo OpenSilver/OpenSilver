@@ -31,7 +31,7 @@ namespace OpenSilver.Compiler
             return true;
         }
 
-        private void Update(string productId)
+        private async void Update(string productId)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace OpenSilver.Compiler
                 string date = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss");
 
                 using var client = new HttpClient();
-                client.GetAsync(
+                await client.GetAsync(
                     new UriBuilder("https://opensilver-service.azurewebsites.net/api/Updates")
                     {
                         Query = $"id={identifier}&productId={productId}&version={productVersion}&date={date}"
