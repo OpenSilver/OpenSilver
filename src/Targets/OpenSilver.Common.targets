@@ -29,6 +29,7 @@
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="OpenSilver.Compiler.AfterXamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="OpenSilver.Compiler.TypeScriptDefToCSharp" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.Resources.dll" TaskName="OpenSilver.Compiler.Resources.ResourcesExtractorAndCopier" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="OpenSilver.Compiler.Updates" />
 
   <ItemGroup>
     <AvailableItemName Include="ApplicationDefinition" />
@@ -96,7 +97,7 @@
   Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
   ============================================================-->
   <PropertyGroup Condition="'$(CompilerBuildNumber)'==''">
-    <CompilerBuildNumber>15</CompilerBuildNumber>
+    <CompilerBuildNumber>16</CompilerBuildNumber>
   </PropertyGroup>
   <PropertyGroup Condition="'$(IsSecondPass)'==''">
     <IsSecondPass>False</IsSecondPass>
@@ -366,10 +367,18 @@
   BEFORE COMPILE
   ============================================================-->
   <Target Name="CSharpXamlForHtml5BeforeCompile_NotDesignTime">
-    <Message
-          Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
-          Importance="normal"/>
+    
+    <Message Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
+             Importance="normal"/>
 
+    <PropertyGroup>
+      <_OpenSilverPkgPath Condition="'$(IsSLMigration)' == 'True'">$(PkgOpenSilver)</_OpenSilverPkgPath>
+      <_OpenSilverPkgPath Condition="'$(IsSLMigration)' != 'True'">$(PkgOpenSilver_UWPCompatible)</_OpenSilverPkgPath>
+    </PropertyGroup>
+	  
+	  <Updates Condition="'$(IsBrowserProject)'=='True' AND '$(SkipOpenSilverUpdates)'==''"
+			       PackagePath="$(_OpenSilverPkgPath)"/>
+	  
     <!--============================================================
       XamlPreprocessor (during Pass 1 and Pass 2)
       ============================================================-->

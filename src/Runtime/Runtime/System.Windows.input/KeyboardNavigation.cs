@@ -56,7 +56,7 @@ internal sealed class KeyboardNavigation
         // When nothing has focus - we should start from the root of the visual tree
         if (sourceElement == null)
         {
-            sourceElement = Application.Current?.RootVisual;
+            sourceElement = Window.Current?.Content;
             if (sourceElement == null)
                 return;
         }

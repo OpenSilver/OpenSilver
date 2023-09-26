@@ -65,6 +65,8 @@ namespace Windows.UI.Xaml
                     ProcessOnWindowSizeChanged)
                 .AttachToDomEvents();
             }
+
+            GotFocus += new RoutedEventHandler(OnGotFocus);
         }
 
         internal ITextMeasurementService TextMeasurementService { get; private set; }
@@ -174,6 +176,8 @@ namespace Windows.UI.Xaml
             InvalidateMeasure();
             InvalidateArrange();
         }
+
+        private void OnGotFocus(object sender, RoutedEventArgs e) => Current = this;
 
         #region Bounds and SizeChanged event
 
@@ -347,18 +351,32 @@ namespace Windows.UI.Xaml
         [OpenSilver.NotImplemented]
         public WindowStyle WindowStyle { get; set; }
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets the window that contains the specified <see cref="DependencyObject"/>.
+        /// </summary>
+        /// <param name="dependencyObject">
+        /// The object contained by the <see cref="Window"/> to get.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Window"/> to get.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// dependencyObject is not a valid <see cref="DependencyObject"/>.
+        /// </exception>
         public static Window GetWindow(DependencyObject dependencyObject)
         {
-            //TODO: this should in theory throw an InvaliOperationException if the dependencyObject is not valid but I didn't check what made it not valid (it looks like Windows themselves are not valid).
-            //      In Silverlight, doing: Window.GetWindow(new Border()); returns the main window if it was made from the main window, null if from another window.
-
-            UIElement dependencyObjectAsUIElement = dependencyObject as UIElement;
-            if (dependencyObjectAsUIElement != null)
+            if (dependencyObject is not UIElement uie)
             {
-                return dependencyObjectAsUIElement.INTERNAL_ParentWindow;
+                throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
             }
-            return null;
+
+            return GetWindow(uie);
+        }
+
+        internal static Window GetWindow(UIElement uie)
+        {
+            Debug.Assert(uie is not null);
+            return uie.INTERNAL_ParentWindow;
         }
 
         [OpenSilver.NotImplemented]

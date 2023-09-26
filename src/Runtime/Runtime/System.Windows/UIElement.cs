@@ -1092,11 +1092,7 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                UIElement rootVisual = Application.Current?.RootVisual;
-                if (rootVisual == null)
-                {
-                    throw new InvalidOperationException();
-                }
+                UIElement rootVisual = Window.GetWindow(this)?.Content ?? throw new InvalidOperationException();
 
                 outerDivOfReferenceVisual = rootVisual.INTERNAL_OuterDomElement;
             }
