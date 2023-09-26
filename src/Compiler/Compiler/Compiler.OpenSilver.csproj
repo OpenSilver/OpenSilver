@@ -29,7 +29,7 @@
       <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
     </Compile>
     <Compile Include="1_ConvertingXaml\ConvertingStringToValue.cs" />
-    <Compile Include="1_ConvertingXaml\ConvertingXamlToCode.cs" />
+    <Compile Include="1_ConvertingXaml\ConverstionSettings.cs" />
     <Compile Include="1_ConvertingXaml\CoreTypesHelper.cs" />
     <Compile Include="1_ConvertingXaml\FixingPropertiesOrder.cs" />
     <Compile Include="1_ConvertingXaml\GeneratingCode.cs" />
@@ -38,6 +38,7 @@
     <Compile Include="1_ConvertingXaml\IMetadata.cs" />
     <Compile Include="1_ConvertingXaml\InsertingImplicitNodes.cs" />
     <Compile Include="1_ConvertingXaml\InsertingMarkupNodesInXaml.cs" />
+    <Compile Include="1_ConvertingXaml\SupportedLanguage.cs" />
     <Compile Include="1_ConvertingXaml\ProcessingColorAnimationNodes.cs" />
     <Compile Include="1_ConvertingXaml\ProcessingContentPresenterNodes.cs" />
     <Compile Include="1_ConvertingXaml\ProcessingHtmlPresenterNodes.cs" />

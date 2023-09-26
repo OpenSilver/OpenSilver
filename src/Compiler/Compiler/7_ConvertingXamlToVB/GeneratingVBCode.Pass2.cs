@@ -26,7 +26,7 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal partial class GeneratingVBCode
+    internal static partial class GeneratingVBCode
     {
         private class GeneratorPass2 : ICodeGenerator
         {
@@ -213,7 +213,7 @@ namespace OpenSilver.Compiler
                         _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName);
 
                 parameters.PushScope(
-                    new RootScope(GetUniqueName(_reader.Document.Root),
+                    new RootScope(GeneratingCode.GetUniqueName(_reader.Document.Root),
                         _reflectionOnSeparateAppDomain.IsAssignableFrom(
                             _settings.Metadata.SystemWindowsNS, "FrameworkElement",
                             _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
@@ -285,7 +285,7 @@ End Sub
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
-                        GetUniqueName(_reader.Document.Root),
+                        GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
                         $"Return CType(Global.CSHTML5.Internal.TypeInstantiationHelper.Instantiate(GetType({componentTypeFullName})), {componentTypeFullName})",
                         parameters.ResultingMethods,
@@ -302,7 +302,7 @@ End Sub
                 }
                 else
                 {
-                    string rootElementName = GetUniqueName(_reader.Document.Root);
+                    string rootElementName = GeneratingCode.GetUniqueName(_reader.Document.Root);
 
                     string finalCode = GenerateFactoryClass(
                         baseType,
@@ -344,7 +344,7 @@ End Sub
                 // Add the constructor (in case of object) or a direct initialization (in case
                 // of system type or "isInitializeFromString" or referenced ResourceDictionary)
                 // (unless this is the root element)
-                string elementUniqueNameOrThisKeyword = GetUniqueName(element);
+                string elementUniqueNameOrThisKeyword = GeneratingCode.GetUniqueName(element);
 
                 bool flag = false;
                 if (!isRootElement)
@@ -486,8 +486,8 @@ End Sub
                         bool isAttachedProperty = attributeLocalName.Contains(".");
                         if (!isAttachedProperty)
                         {
-                            bool isXNameAttr = IsXNameAttribute(attribute);
-                            if (isXNameAttr || IsNameAttribute(attribute))
+                            bool isXNameAttr = GeneratingCode.IsXNameAttribute(attribute);
+                            if (isXNameAttr || GeneratingCode.IsNameAttribute(attribute))
                             {
                                 //-------------
                                 // x:Name (or "Name")
@@ -499,7 +499,7 @@ End Sub
                                 if (isElementInRootNamescope && parameters.GenerateFieldsForNamedElements)
                                 {
                                     string fieldModifier = _settings.Metadata.FieldModifier;
-                                    XAttribute attr = element.Attribute(xNamespace + "FieldModifier");
+                                    XAttribute attr = element.Attribute(GeneratingCode.xNamespace + "FieldModifier");
                                     if (attr != null)
                                     {
                                         fieldModifier = (attr.Value ?? "").ToLower();
@@ -744,11 +744,11 @@ End Sub
                         throw new XamlParseException("A FrameworkTemplate cannot have more than one child.", element);
                     }
 
-                    string frameworkTemplateName = GetUniqueName(element);
+                    string frameworkTemplateName = GeneratingCode.GetUniqueName(element);
 
                     FrameworkTemplateScope scope = new FrameworkTemplateScope(
                         frameworkTemplateName,
-                        GetUniqueName(member.Elements().First()),
+                        GeneratingCode.GetUniqueName(member.Elements().First()),
                         _settings.Metadata);
 
                     parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, AddressOf {scope.MethodName})");
@@ -766,7 +766,7 @@ End Sub
 
                 // Get information about the parent element (to which the property applies) and the element itself:
                 var parentElement = element.Parent;
-                string parentElementUniqueNameOrThisKeyword = GetUniqueName(parentElement);
+                string parentElementUniqueNameOrThisKeyword = GeneratingCode.GetUniqueName(parentElement);
                 string typeName = element.Name.LocalName.Split('.')[0];
                 string propertyName = element.Name.LocalName.Split('.')[1];
                 XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
@@ -789,7 +789,7 @@ End Sub
                     if (IsPropertyOrFieldACollection(element, isAttachedProperty)
                         && (element.Elements().Count() != 1
                         || (!IsTypeAssignableFrom(element.Elements().First().Name, element.Name, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
-                        && !IsBinding(element.Elements().First())
+                        && !GeneratingCode.IsBinding(element.Elements().First())
                         && element.Elements().First().Name.LocalName != "StaticResourceExtension"
                         && element.Elements().First().Name.LocalName != "StaticResource"
                         && element.Elements().First().Name.LocalName != "TemplateBinding"
@@ -823,22 +823,22 @@ End Sub
                             string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                             if (isImplicitStyle)
                             {
-                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {GetUniqueName(child)})");
+                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {GeneratingCode.GetUniqueName(child)})");
                             }
                             else if (isImplicitDataTemplate)
                             {
                                 string key = $"New Global.{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(GetType({childKey}))";
 
-                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add({key}, {GetUniqueName(child)})");
+                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add({key}, {GeneratingCode.GetUniqueName(child)})");
                             }
                             else
                             {
-                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {GetUniqueName(child)})");
+                                parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {GeneratingCode.GetUniqueName(child)})");
                             }
                         }
                         else
                         {
-                            parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IList).Add({GetUniqueName(child)})");
+                            parameters.StringBuilder.AppendLine($"CType({codeToAccessTheEnumerable}, Global.System.Collections.IList).Add({GeneratingCode.GetUniqueName(child)})");
                         }
                     }
                     else
@@ -847,7 +847,7 @@ End Sub
                         // PROPERTY TYPE IS NOT A COLLECTION
                         //------------------------
 
-                        string childUniqueName = GetUniqueName(child);
+                        string childUniqueName = GeneratingCode.GetUniqueName(child);
                         // Note about "RelativeSource": even though it inherits from "MarkupExtension", we do not was
                         // to consider "RelativeSource" as a markup extension for the compilation because it is only
                         // meant to be used WITHIN another markup extension (sort of a "nested" markup extension),
@@ -906,7 +906,7 @@ End Sub
                                             "{0}.Set{1}({2}, CType({4}.CallProvideValue({5}, {6}), {3}))",
                                             elementTypeInCSharp,
                                             propertyName,
-                                            GetUniqueName(parent),
+                                            GeneratingCode.GetUniqueName(parent),
                                             "Global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
                                             parameters.CurrentXamlContext,
@@ -932,7 +932,7 @@ End Sub
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
                                             "{0}.{1} = CType({3}.CallProvideValue({4}, {5}), {2})",
-                                            GetUniqueName(parent),
+                                            GeneratingCode.GetUniqueName(parent),
                                             propertyName,
                                             "Global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
@@ -994,12 +994,12 @@ End Sub
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2}", parentElementUniqueNameOrThisKeyword, propertyName, GetUniqueName(child)));
+                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2}", parentElementUniqueNameOrThisKeyword, propertyName, GeneratingCode.GetUniqueName(child)));
                                 }
                                 else
                                 {
                                     parameters.StringBuilder.AppendLine(string.Format("Global.{3}.BindingOperations.SetBinding({0}, {1}, {2})",
-                                        parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
+                                        parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GeneratingCode.GetUniqueName(child), _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
@@ -1015,10 +1015,10 @@ End Sub
                                     "{0}.SetValue({1}, {2}.ProvideValue(New Global.System.ServiceProvider({3}, Nothing)))",
                                     parentElementUniqueNameOrThisKeyword,
                                     dependencyPropertyName,
-                                    GetUniqueName(child),
+                                    GeneratingCode.GetUniqueName(child),
                                     parameters.CurrentScope is FrameworkTemplateScope scope ? scope.TemplateOwner : TemplateOwnerValuePlaceHolder));
                             }
-                            else if (child.Name == xNamespace + "NullExtension")
+                            else if (child.Name == GeneratingCode.xNamespace + "NullExtension")
                             {
                                 //------------------------------
                                 // {x:Null}
@@ -1076,7 +1076,7 @@ End Sub
 
                                     string markupExtension = string.Format(
                                         "CType({1},{0}).ProvideValue(New Global.System.ServiceProvider({2}, {3}))",
-                                        IMarkupExtensionClass, childUniqueName, GetUniqueName(parent), propertyKeyString
+                                        IMarkupExtensionClass, childUniqueName, GeneratingCode.GetUniqueName(parent), propertyKeyString
                                     );
 
                                     parameters.StringBuilder.AppendLine(
@@ -1143,7 +1143,7 @@ Else
 End If",
                                                           customMarkupValueName, //0
                                                           childUniqueName,//1
-                                                          GetUniqueName(parent),//2
+                                                          GeneratingCode.GetUniqueName(parent),//2
                                                           propertyKeyString,//3
                                                           bindingBaseTypeString,//4
                                                           propertyName,//5
@@ -1158,7 +1158,7 @@ End If",
                                         parameters.StringBuilder.AppendLine(
                                             string.Format(
                                                 "{0}.{1} = CType((CType({4},{3}).ProvideValue(New Global.System.ServiceProvider({0}, {5})),{2})",
-                                                GetUniqueName(parent),
+                                                GeneratingCode.GetUniqueName(parent),
                                                 propertyName,
                                                 "Global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                                 IMarkupExtensionClass,
@@ -1178,29 +1178,29 @@ End If",
                 XElement target = _reader.MemberData.Target;
                 XElement child = _reader.MemberData.Value;
 
-                string targetUniqueName = GetUniqueName(target);
+                string targetUniqueName = GeneratingCode.GetUniqueName(target);
 
                 if (IsElementADictionary(target))
                 {
                     string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                     if (isImplicitStyle)
                     {
-                        parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {GetUniqueName(child)})");
+                        parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IDictionary).Add(GetType({childKey}), {GeneratingCode.GetUniqueName(child)})");
                     }
                     else if (isImplicitDataTemplate)
                     {
                         string key = $"New Global.{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(GetType({childKey}))";
 
-                        parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IDictionary).Add({key}, {GetUniqueName(child)})");
+                        parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IDictionary).Add({key}, {GeneratingCode.GetUniqueName(child)})");
                     }
                     else
                     {
-                        parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {GetUniqueName(child)})");
+                        parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IDictionary).Add(\"{childKey}\", {GeneratingCode.GetUniqueName(child)})");
                     }
                 }
                 else
                 {
-                    parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IList).Add({GetUniqueName(child)})");
+                    parameters.StringBuilder.AppendLine($"CType({targetUniqueName}, Global.System.Collections.IList).Add({GeneratingCode.GetUniqueName(child)})");
                 }
             }
 
@@ -1401,20 +1401,20 @@ End If",
                 isImplicitStyle = false;
                 isImplicitDataTemplate = false;
 
-                if (element.Attribute(xNamespace + "Key") != null)
+                if (element.Attribute(GeneratingCode.xNamespace + "Key") != null)
                 {
-                    return element.Attribute(xNamespace + "Key").Value;
+                    return element.Attribute(GeneratingCode.xNamespace + "Key").Value;
                 }
-                else if (element.Attribute(xNamespace + "Name") != null)
+                else if (element.Attribute(GeneratingCode.xNamespace + "Name") != null)
                 {
-                    return element.Attribute(xNamespace + "Name").Value;
+                    return element.Attribute(GeneratingCode.xNamespace + "Name").Value;
                 }
-                else if (IsStyle(element))
+                else if (GeneratingCode.IsStyle(element))
                 {
                     isImplicitStyle = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element);
                 }
-                else if (IsDataTemplate(element) && element.Attribute("DataType") != null)
+                else if (GeneratingCode.IsDataTemplate(element) && element.Attribute("DataType") != null)
                 {
                     isImplicitDataTemplate = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true);

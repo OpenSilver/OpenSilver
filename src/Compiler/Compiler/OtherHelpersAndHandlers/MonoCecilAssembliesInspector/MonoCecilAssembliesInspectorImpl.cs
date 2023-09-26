@@ -47,23 +47,23 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private readonly MonoCecilAssemblyStorage _storage = new();
 
-        private CompilerTypesEnum _compilerType;
-        public CompilerTypesEnum CompilerType  // read-write instance property
+        private SupportedLanguage _compilerType;
+        public SupportedLanguage CompilerType  // read-write instance property
         {
             get => _compilerType;
             set => _compilerType = value;
         }
 
         private SystemTypesHelper _systemTypesHelper;
-        public MonoCecilAssembliesInspectorImpl(bool isSlMigration, CompilerTypesEnum compilerType)
+        public MonoCecilAssembliesInspectorImpl(bool isSlMigration, SupportedLanguage compilerType)
         {
             CompilerType = compilerType;
-            if (CompilerType == CompilerTypesEnum.CSharp)
+            if (CompilerType == SupportedLanguage.CSharp)
             {
                 _metadata = isSlMigration ? MetadatasCS.Silverlight : MetadatasCS.UWP;
                 _systemTypesHelper = new SystemTypesHelperCS();
             }
-            else if (CompilerType == CompilerTypesEnum.VBNet)
+            else if (CompilerType == SupportedLanguage.VBNet)
             {
                 _metadata = isSlMigration ? MetadatasVB.Silverlight : MetadatasVB.UWP;
                 _systemTypesHelper = new SystemTypesHelperVB();
@@ -82,11 +82,11 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private string GetGlobalPrefixFromCompilerType()
         {
-            if (CompilerType == CompilerTypesEnum.CSharp)
+            if (CompilerType == SupportedLanguage.CSharp)
             {
                 return GlobalPrefix_CS;
             }
-            else if (CompilerType == CompilerTypesEnum.VBNet)
+            else if (CompilerType == SupportedLanguage.VBNet)
             {
                 return GlobalPrefix_VB;
             }
@@ -754,7 +754,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string prefix = GetGlobalPrefixFromCompilerType();
             var field = FindFieldDeep(type, name, out _, ignoreCase, true, true);
 
-            if (CompilerType == CompilerTypesEnum.CSharp)
+            if (CompilerType == SupportedLanguage.CSharp)
             {
                 if (field is not null)
                 {
@@ -772,7 +772,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     }
                 }
             }
-            else if (CompilerType == CompilerTypesEnum.VBNet)
+            else if (CompilerType == SupportedLanguage.VBNet)
             {
                 if (field is not null)
                 {

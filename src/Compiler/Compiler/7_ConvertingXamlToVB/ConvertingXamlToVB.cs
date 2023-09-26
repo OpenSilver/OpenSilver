@@ -17,9 +17,9 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal class ConvertingXamlToVB : ConvertingXamlToCode
+    internal static class ConvertingXamlToVB
     {
-        public override string Convert(
+        public static string Convert(
             string xaml,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
@@ -85,24 +85,5 @@ Global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = ""{3}""
                 logger);
 
         }
-    }
-
-    internal sealed class ConversionSettingsVB : ConversionSettings
-    {
-        public static ConversionSettings Silverlight { get; } =
-            new ConversionSettingsVB
-            {
-                Metadata = MetadatasVB.Silverlight,
-                CoreTypesConverter = CoreTypesConvertersVB.Silverlight,
-                EnableImplicitAssemblyRedirection = true,
-            };
-
-        public static ConversionSettings UWP { get; } =
-            new ConversionSettingsVB
-            {
-                Metadata = MetadatasVB.UWP,
-                CoreTypesConverter = CoreTypesConvertersVB.UWP,
-                EnableImplicitAssemblyRedirection = false,
-            };
     }
 }
