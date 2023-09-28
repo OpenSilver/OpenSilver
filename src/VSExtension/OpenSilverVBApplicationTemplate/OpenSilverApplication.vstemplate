@@ -1,6 +1,6 @@
 <VSTemplate Version="3.0.0" Type="ProjectGroup" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
     <TemplateData>
-        <Name>VB-Compatible Variation of OpenSilver Application</Name>
+        <Name>OpenSilver Application (Visual Basic)</Name>
         <Description>A blank project for creating a rich internet application using OpenSilver. OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</Description>
         <Icon>Icon.ico</Icon>
         <ProjectType>VisualBasic</ProjectType>
@@ -14,13 +14,13 @@
     <TemplateContent>
         <ProjectCollection>
             <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Browser">
-                OpenSilverVBApplication.Browser\OpenSilverVBApplication.Browser.vstemplate
+                OpenSilverVBApplication.Browser\OpenSilverApplication.Browser.vstemplate
             </ProjectTemplateLink>
             <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">
-                OpenSilverVBApplication\OpenSilverVBApplication.vstemplate
+                OpenSilverVBApplication\OpenSilverApplication.vstemplate
             </ProjectTemplateLink>
             <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Simulator">
-                OpenSilverVBApplication.Simulator\OpenSilverVBApplication.Simulator.vstemplate
+                OpenSilverVBApplication.Simulator\OpenSilverApplication.Simulator.vstemplate
             </ProjectTemplateLink>
         </ProjectCollection>
     </TemplateContent>

@@ -4,7 +4,7 @@
         <CreateInPlace>true</CreateInPlace>
     </TemplateData>
     <TemplateContent>
-        <Project File="OpenSilverVBApplication.Browser.csproj" ReplaceParameters="true">
+        <Project File="OpenSilverApplication.Browser.csproj" ReplaceParameters="true">
             <Folder Name="Properties" TargetFolderName="Properties">
                 <ProjectItem ReplaceParameters="true" TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
             </Folder>
