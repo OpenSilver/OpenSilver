@@ -4,7 +4,7 @@
         <CreateInPlace>true</CreateInPlace>
     </TemplateData>
     <TemplateContent>
-        <Project File="OpenSilverVBApplication.vbproj" ReplaceParameters="true">
+        <Project File="OpenSilverApplication.vbproj" ReplaceParameters="true">
             <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml">App.xaml</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml.vb">App.xaml.vb</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="MainPage.xaml">MainPage.xaml</ProjectItem>

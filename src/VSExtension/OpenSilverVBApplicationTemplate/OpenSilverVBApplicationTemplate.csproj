@@ -59,7 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Icon.ico" />
-    <VSTemplate Include="OpenSilverVBApplication.vstemplate" />
+    <VSTemplate Include="OpenSilverApplication.vstemplate" />
     <None Include="OpenSilverVBApplication/**" />
     <None Include="OpenSilverVBApplication.Browser/**" />
     <None Include="OpenSilverVBApplication.Simulator/**" />

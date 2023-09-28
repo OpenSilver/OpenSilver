@@ -4,7 +4,7 @@
         <CreateInPlace>true</CreateInPlace>
     </TemplateData>
     <TemplateContent>
-        <Project File="OpenSilverVBApplication.Simulator.csproj" ReplaceParameters="true">
+        <Project File="OpenSilverApplication.Simulator.csproj" ReplaceParameters="true">
             <ProjectItem ReplaceParameters="true" TargetFileName="Startup.cs">Startup.cs</ProjectItem>
         </Project>
     </TemplateContent>
