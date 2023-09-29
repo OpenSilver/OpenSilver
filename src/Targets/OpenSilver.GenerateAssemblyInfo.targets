@@ -86,4 +86,26 @@
     </WriteCodeFragment>
   </Target>
 
+  <Target Name="GenerateXamlDesignerAttributes"
+          BeforeTargets="BeforeCompile;CoreCompile">
+    <ItemGroup>
+      <OpenSilver_XamlDesigner Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+          <_Parameter1>XamlDesignerBackground</_Parameter1>
+      </OpenSilver_XamlDesigner>
+    </ItemGroup>
+
+    <PropertyGroup>
+      <GeneratedXamlDesignerAttributesFile Condition="'$(GeneratedXamlDesignerAttributesFile)' ==''">$(MSBuildProjectName).AssemblyInfo.OpenSilver.XamlDesigner$(DefaultLanguageSourceExtension)</GeneratedXamlDesignerAttributesFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <!-- Ensure the generated file is not already part of the Compile sources -->
+      <Compile Remove="$(GeneratedXamlDesignerAttributesFile)" />
+    </ItemGroup>
+
+    <WriteCodeFragment AssemblyAttributes="@(OpenSilver_XamlDesigner)" Language="$(Language)" OutputDirectory="$(IntermediateOutputPath)" OutputFile="$(GeneratedXamlDesignerAttributesFile)">
+      <Output TaskParameter="OutputFile" ItemName="Compile" />
+      <Output TaskParameter="OutputFile" ItemName="FileWrites" />
+    </WriteCodeFragment>
+  </Target>
 </Project>
