@@ -175,6 +175,7 @@ namespace OpenSilver.Compiler
             private readonly string _sourceFile;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
+            private readonly string _rootNamespace;
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
@@ -184,6 +185,7 @@ namespace OpenSilver.Compiler
                 string sourceFile,
                 string fileNameWithPathRelativeToProjectRoot,
                 string assemblyNameWithoutExtension,
+                string rootNamespace,
                 AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings,
                 string codeToPutInTheInitializeComponentOfTheApplicationClass,
@@ -194,6 +196,7 @@ namespace OpenSilver.Compiler
                 _sourceFile = sourceFile;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
+                _rootNamespace = rootNamespace;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
                 _codeToPutInTheInitializeComponentOfTheApplicationClass = codeToPutInTheInitializeComponentOfTheApplicationClass;
                 _logger = logger;
@@ -215,7 +218,7 @@ namespace OpenSilver.Compiler
                 parameters.PushScope(
                     new RootScope(GeneratingCode.GetUniqueName(_reader.Document.Root),
                         _reflectionOnSeparateAppDomain.IsAssignableFrom(
-                            _settings.Metadata.SystemWindowsNS, "FrameworkElement",
+                            _settings.Metadata.SystemWindowsNS, "IFrameworkElement",
                             _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
                     )
                 );
@@ -253,6 +256,9 @@ namespace OpenSilver.Compiler
                 // Get general information about the class:
                 GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
+
+                (string namespaceDeclaration, string namespaceName) = GetNamespace(namespaceStringIfAny, _rootNamespace);
+
                 string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
 
                 if (hasCodeBehind)
@@ -277,11 +283,11 @@ End Sub
                                                                connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
-                                                               namespaceStringIfAny,
+                                                               namespaceDeclaration,
                                                                baseType,
                                                                addApplicationEntryPoint: false);
 
-                    string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
+                    string componentTypeFullName = GetFullTypeName(namespaceName, className);
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
@@ -291,8 +297,7 @@ End Sub
                         parameters.ResultingMethods,
                         $"Global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        baseType);
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     string finalCode = $@"
 {factoryClass}
@@ -312,8 +317,7 @@ End Sub
                         parameters.ResultingMethods,
                         $"Global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        baseType);
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     return finalCode;
                 }
@@ -456,7 +460,7 @@ End Sub
                 // Set templated parent if any
                 if (parameters.CurrentScope is FrameworkTemplateScope scope)
                 {
-                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
+                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                     {
                         parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {scope.TemplateOwner})");
                     }
@@ -505,7 +509,9 @@ End Sub
                                         fieldModifier = (attr.Value ?? "").ToLower();
                                     }
 
-                                    string fieldName = name;
+                                    // add '[]' to handle cases where x:Name is a forbidden word (for instance 'Me'
+                                    // or any other VB keyword)
+                                    string fieldName = $"[{name}]";
                                     parameters.ResultingFieldsForNamedElements.Add(    string.Format("{0} WithEvents {1} As {2}", fieldModifier, fieldName, elementTypeInCSharp));
                                     parameters.ResultingFindNameCalls.Add($"Me.{fieldName} = (CType(Me.FindName(\"{name}\"), {elementTypeInCSharp}))");
                                 }
@@ -998,8 +1004,13 @@ End Sub
                                 }
                                 else
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("Global.{3}.BindingOperations.SetBinding({0}, {1}, {2})",
-                                        parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GeneratingCode.GetUniqueName(child), _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
+                                    parameters.StringBuilder.AppendLine(
+                                        string.Format(
+                                            "Global.{3}.BindingOperations.SetBinding({0}, {1}, {2})",
+                                            parentElementUniqueNameOrThisKeyword,
+                                            propertyDeclaringTypeName + "." + propertyName + "Property",
+                                            GeneratingCode.GetUniqueName(child),
+                                            _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
@@ -1131,7 +1142,7 @@ End Sub
 
                                     if (isDependencyProperty)
                                     {
-                                        string bindingBaseTypeString = $"{_settings.Metadata.SystemWindowsDataNS}.Binding";
+                                        string bindingBaseTypeString = $"Global.{_settings.Metadata.SystemWindowsDataNS}.Binding";
 
                                         //todo: make this more readable by cutting it into parts ?
                                         parameters.StringBuilder.AppendLine(

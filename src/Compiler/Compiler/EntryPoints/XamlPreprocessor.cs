@@ -75,6 +75,8 @@ namespace OpenSilver.Compiler
         [Required]
         public string Language { get; set; }
 
+        public string RootNamespace { get; set; }
+
         public override bool Execute()
         {
             return ExecuteImpl(
@@ -91,7 +93,8 @@ namespace OpenSilver.Compiler
                 OutputLibrariesPath,
                 OutputResourcesPath,
                 Flags,
-                LanguageHelpers.GetLanguage(Language));
+                LanguageHelpers.GetLanguage(Language),
+                RootNamespace);
         }
 
         private static bool ExecuteImpl(
@@ -108,7 +111,8 @@ namespace OpenSilver.Compiler
             string outputLibrariesPath,
             string outputResourcesPath,
             string flagsString,
-            SupportedLanguage language)
+            SupportedLanguage language,
+            string rootNamespace)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -184,6 +188,7 @@ namespace OpenSilver.Compiler
                                     sourceFile,
                                     fileNameWithPathRelativeToProjectRoot,
                                     assemblyNameWithoutExtension,
+                                    rootNamespace,
                                     reflectionOnSeparateAppDomain,
                                     isFirstPass: !isSecondPass,
                                     isSLMigration: isSLMigration,

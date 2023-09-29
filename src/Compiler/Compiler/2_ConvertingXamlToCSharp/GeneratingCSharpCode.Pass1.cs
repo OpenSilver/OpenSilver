@@ -122,8 +122,7 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        "");
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     string finalCode = $@"
 {factoryClass}
@@ -141,8 +140,7 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        "");
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     return finalCode;
                 }

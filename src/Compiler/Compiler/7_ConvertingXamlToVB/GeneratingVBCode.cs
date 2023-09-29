@@ -84,6 +84,7 @@ namespace OpenSilver.Compiler
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
             string assemblyNameWithoutExtension,
+            string rootNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
             ConversionSettings settings,
@@ -96,6 +97,7 @@ namespace OpenSilver.Compiler
                 generator = new GeneratorPass1(doc,
                     assemblyNameWithoutExtension,
                     fileNameWithPathRelativeToProjectRoot,
+                    rootNamespace,
                     reflectionOnSeparateAppDomain,
                     settings);
             }
@@ -105,6 +107,7 @@ namespace OpenSilver.Compiler
                     sourceFile,
                     fileNameWithPathRelativeToProjectRoot,
                     assemblyNameWithoutExtension,
+                    rootNamespace,
                     reflectionOnSeparateAppDomain,
                     settings,
                     codeToPutInTheInitializeComponentOfTheApplicationClass,
@@ -188,7 +191,21 @@ Partial Public Class {className}
 End Class
 ";
 
-            return classCodeFilled;
+            string finalCode;
+            if (!string.IsNullOrEmpty(namespaceStringIfAny))
+            {
+                finalCode = $@"
+Namespace {namespaceStringIfAny}
+{classCodeFilled}
+End Namespace
+";
+            }
+            else
+            {
+                finalCode = classCodeFilled;
+            }
+
+            return finalCode;
         }
 
         private static void GetClassInformationFromXaml(XDocument doc,
@@ -232,6 +249,33 @@ End Class
             }
         }
 
+        private static (string NamespaceDeclaration, string NamespaceName) GetNamespace(string ns, string rootNamespace)
+        {
+            if (string.IsNullOrEmpty(ns))
+            {
+                return (string.Empty, rootNamespace);
+            }
+
+            if (string.IsNullOrEmpty(rootNamespace))
+            {
+                return (ns, ns);
+            }
+
+            if (ns.StartsWith(rootNamespace))
+            {
+                if (ns.Length == rootNamespace.Length)
+                {
+                    return (string.Empty, ns);
+                }
+                else if (ns[rootNamespace.Length] == '.')
+                {
+                    return (ns.Substring(rootNamespace.Length + 1), ns);
+                }
+            }
+
+            return (ns, $"{rootNamespace}.{ns}");
+        }
+
         private static string GetFullTypeName(string namespaceName, string typeName)
         {
             if (string.IsNullOrEmpty(namespaceName))
@@ -250,8 +294,7 @@ End Class
             IEnumerable<string> additionalMethods,
             string uiElementFullyQualifiedTypeName,
             string assemblyName,
-            string fileNameWithPathRelativeToProjectRoot,
-            string baseType)
+            string fileNameWithPathRelativeToProjectRoot)
         {
             string absoluteSourceUri =
                     fileNameWithPathRelativeToProjectRoot.Contains(';') ?
@@ -259,16 +302,6 @@ End Class
                     "/" + assemblyName + ";component/" + fileNameWithPathRelativeToProjectRoot;
 
             string factoryName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
-
-            string xamlSourcePath = "";
-
-            if (baseType != "Global.System.Windows.Application" && baseType != "Global.System.Windows.ResourceDictionary")
-            {
-                xamlSourcePath = $@"If TypeOf {componentParamName} Is {uiElementFullyQualifiedTypeName} Then
-            CType(CObj({componentParamName}), {uiElementFullyQualifiedTypeName}).XamlSourcePath = ""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}""
-        End If
-";
-            }
 
             string finalCode = $@"
 '------------------------------------------------------------------------------
@@ -301,11 +334,13 @@ Public NotInheritable Class {factoryName}
     End Sub
 
     Private Sub IXamlComponentLoader_LoadComponent1(component As Object) Implements {IXamlComponentLoaderClass}.LoadComponent
-        LoadComponentImpl(CType(CObj(component), {componentTypeFullName}))
+        LoadComponentImpl(CType(component, {componentTypeFullName}))
     End Sub
 
     Private Shared Sub LoadComponentImpl(ByVal {componentParamName} As {componentTypeFullName})
-        {xamlSourcePath}
+        If TypeOf CObj({componentParamName}) Is {uiElementFullyQualifiedTypeName} Then
+            CType(CObj({componentParamName}), {uiElementFullyQualifiedTypeName}).XamlSourcePath = ""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}""
+        End If
 
         {loadComponentImpl}
     End Sub

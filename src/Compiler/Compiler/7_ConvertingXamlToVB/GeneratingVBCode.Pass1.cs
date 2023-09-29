@@ -27,11 +27,13 @@ namespace OpenSilver.Compiler
             private readonly ConversionSettings _settings;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
+            private readonly string _rootNamespace;
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             
             public GeneratorPass1(XDocument doc,
                 string assemblyNameWithoutExtension,
                 string fileNameWithPathRelativeToProjectRoot,
+                string rootNamespace,
                 AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings)
             {
@@ -39,6 +41,7 @@ namespace OpenSilver.Compiler
                 _settings = settings;
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
+                _rootNamespace = rootNamespace;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
             }
 
@@ -48,6 +51,9 @@ namespace OpenSilver.Compiler
             {
                 GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
+
+                (string namespaceDeclaration, string namespaceName) = GetNamespace(namespaceStringIfAny, _rootNamespace);
+
                 string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
 
                 List<string> resultingFieldsForNamedElements = new List<string>();
@@ -80,9 +86,15 @@ namespace OpenSilver.Compiler
                                 fieldModifier = fieldModifierAttr.Value?.ToLower() ?? "private";
                             }
 
-                            string fieldName = name;
-                            string elementTypeInCSharp = GetCSharpEquivalentOfXamlTypeAsString(element.Name, true);
-                            resultingFieldsForNamedElements.Add(string.Format("    {0} WithEvents {1} As {2}", fieldModifier, fieldName, elementTypeInCSharp));
+                            // add '[]' to handle cases where x:Name is a forbidden word (for instance 'Me'
+                            // or any other VB keyword)
+                            string fieldName = $"[{name}]";
+                            resultingFieldsForNamedElements.Add(
+                                string.Format(
+                                    "    {0} WithEvents {1} As {2}",
+                                    fieldModifier,
+                                    fieldName,
+                                    GetCSharpEquivalentOfXamlTypeAsString(element.Name, true)));
                         }
                     }
                 }
@@ -99,15 +111,15 @@ namespace OpenSilver.Compiler
 
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass("",
-                                                                initializeComponentMethod,
+                                                               initializeComponentMethod,
                                                                new ComponentConnectorBuilderVB().ToString(),
                                                                resultingFieldsForNamedElements,
                                                                className,
-                                                               namespaceStringIfAny,
+                                                               namespaceDeclaration,
                                                                baseType,
                                                                addApplicationEntryPoint: false);
 
-                    string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
+                    string componentTypeFullName = GetFullTypeName(namespaceName, className);
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
@@ -117,8 +129,7 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"Global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        baseType);
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     string finalCode = $@"
 {factoryClass}
@@ -136,8 +147,7 @@ namespace OpenSilver.Compiler
                         Enumerable.Empty<string>(),
                         $"Global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot,
-                        baseType);
+                        _fileNameWithPathRelativeToProjectRoot);
 
                     return finalCode;
                 }

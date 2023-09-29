@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using System.Xml;
 using OpenSilver.Internal;
 using ILogger = OpenSilver.Compiler.Common.ILogger;
 
@@ -268,8 +267,7 @@ namespace {namespaceStringIfAny}
             IEnumerable<string> additionalMethods,
             string uiElementFullyQualifiedTypeName,
             string assemblyName,
-            string fileNameWithPathRelativeToProjectRoot,
-            string baseType)
+            string fileNameWithPathRelativeToProjectRoot)
         {
             string absoluteSourceUri =
                     fileNameWithPathRelativeToProjectRoot.Contains(';') ?
@@ -319,12 +317,10 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
 
     private static void LoadComponentImpl({componentTypeFullName} {componentParamName})
     {{
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-        if ({componentParamName} is {uiElementFullyQualifiedTypeName})
+        if ((object){componentParamName} is {uiElementFullyQualifiedTypeName})
         {{
             (({uiElementFullyQualifiedTypeName})(object){componentParamName}).XamlSourcePath = @""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}"";
         }}
-#pragma warning restore 0184
 
         {loadComponentImpl}
     }}
