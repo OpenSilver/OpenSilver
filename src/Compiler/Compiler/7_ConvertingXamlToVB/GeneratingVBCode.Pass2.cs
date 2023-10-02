@@ -272,7 +272,7 @@ namespace OpenSilver.Compiler
                         parameters.ResultingFindNameCalls);
 
                     string additionalConstructors = IsClassTheApplicationClass(baseType)
-                        ? $@"Private Sub {className}(stub as Global.OpenSilver.XamlDesignerConstructorStub)
+                        ? @"Private Sub New(stub as Global.OpenSilver.XamlDesignerConstructorStub)
     InitializeComponent()
 End Sub
 " : string.Empty;
