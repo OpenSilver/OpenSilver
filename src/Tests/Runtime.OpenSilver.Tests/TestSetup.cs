@@ -73,6 +73,11 @@ namespace Runtime.OpenSilver.Tests
             {
                 return JsonDocument.Parse(@"""0|0""").RootElement;
             }
+            var pattern = @"document\.inputManager\.focus\(document\.getElementByIdSafe\(""([^""]*)""\)\);";
+            if (Regex.IsMatch(param, pattern))
+            {
+                return true;
+            }
             return new JsonElement();
         }
 
@@ -91,6 +96,9 @@ namespace Runtime.OpenSilver.Tests
             javaScriptExecutionHandlerMock
                 .Setup(x => x.InvokeUnmarshalled<byte[], int, object>(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<int>()))
                 .Returns<string, byte[], int>((name, bytes, length) => ExecuteJsMock(Encoding.Unicode.GetString(bytes, 0, length)));
+            javaScriptExecutionHandlerMock
+                .Setup(x => x.InvokeUnmarshalled<string, int, bool, object>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns<string, string, int, bool>((name, js, refId, wantsResult) => ExecuteJsMock(js));
 
             var javaScriptExecutionHandler2 = javaScriptExecutionHandlerMock.Object;
             INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;
