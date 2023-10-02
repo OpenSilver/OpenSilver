@@ -648,17 +648,12 @@ namespace Windows.UI.Xaml.Controls
 
             e.Handled = true;
             Focus();
+#if MIGRATION
+            _textViewHost?.View.CaptureMouse();
+#else
+            _textViewHost?.View.CapturePointer(e.Pointer);
+#endif
         }
-
-        /// <summary>
-        /// Returns a <see cref="TextBoxAutomationPeer"/> for use by the Silverlight automation 
-        /// infrastructure.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="TextBoxAutomationPeer"/> for the <see cref="TextBox"/> object.
-        /// </returns>
-        protected override AutomationPeer OnCreateAutomationPeer()
-            => new TextBoxAutomationPeer(this);
 
 #if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -672,8 +667,28 @@ namespace Windows.UI.Xaml.Controls
             base.OnPointerReleased(e);
 #endif
 
+            if (e.Handled)
+            {
+                return;
+            }
+
             e.Handled = true;
+#if MIGRATION
+            _textViewHost?.View.ReleaseMouseCapture();
+#else
+            _textViewHost?.View.ReleasePointerCapture(e.Pointer);
+#endif
         }
+
+        /// <summary>
+        /// Returns a <see cref="TextBoxAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TextBoxAutomationPeer"/> for the <see cref="TextBox"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new TextBoxAutomationPeer(this);
 
 #if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
