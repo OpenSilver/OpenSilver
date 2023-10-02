@@ -313,44 +313,46 @@ End Namespace
 ' </auto-generated>
 '------------------------------------------------------------------------------
 
-<Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>
-<Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)>
-Public NotInheritable Class {factoryName}
-    Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}), {IXamlComponentLoaderClass}(Of {componentTypeFullName})
-    Public Shared Function Instantiate() As Object
-        Return CreateComponentImpl()
-    End Function
-
-    Private Function IXamlComponentFactory_CreateComponent() As {componentTypeFullName} Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}).CreateComponent
-        Return CreateComponentImpl()
-    End Function
-
-    Private Function IXamlComponentFactory_CreateComponent1() As Object Implements {IXamlComponentFactoryClass}.CreateComponent
-        Return CreateComponentImpl()
-    End Function
-
-    Private Sub IXamlComponentLoader_LoadComponent(component As {componentTypeFullName}) Implements {IXamlComponentLoaderClass}(Of {componentTypeFullName}).LoadComponent
-        LoadComponentImpl(component)
-    End Sub
-
-    Private Sub IXamlComponentLoader_LoadComponent1(component As Object) Implements {IXamlComponentLoaderClass}.LoadComponent
-        LoadComponentImpl(CType(component, {componentTypeFullName}))
-    End Sub
-
-    Private Shared Sub LoadComponentImpl(ByVal {componentParamName} As {componentTypeFullName})
-        If TypeOf CObj({componentParamName}) Is {uiElementFullyQualifiedTypeName} Then
-            CType(CObj({componentParamName}), {uiElementFullyQualifiedTypeName}).XamlSourcePath = ""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}""
-        End If
-
-        {loadComponentImpl}
-    End Sub
-
-    Private Shared Function CreateComponentImpl() As {componentTypeFullName}
-        {createComponentImpl}
-    End Function
-
-    {string.Join(Environment.NewLine + Environment.NewLine, additionalMethods)}
-End Class
+Namespace Global
+    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>
+    <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)>
+    Public NotInheritable Class {factoryName}
+        Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}), {IXamlComponentLoaderClass}(Of {componentTypeFullName})
+        Public Shared Function Instantiate() As Object
+            Return CreateComponentImpl()
+        End Function
+    
+        Private Function IXamlComponentFactory_CreateComponent() As {componentTypeFullName} Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}).CreateComponent
+            Return CreateComponentImpl()
+        End Function
+    
+        Private Function IXamlComponentFactory_CreateComponent1() As Object Implements {IXamlComponentFactoryClass}.CreateComponent
+            Return CreateComponentImpl()
+        End Function
+    
+        Private Sub IXamlComponentLoader_LoadComponent(component As {componentTypeFullName}) Implements {IXamlComponentLoaderClass}(Of {componentTypeFullName}).LoadComponent
+            LoadComponentImpl(component)
+        End Sub
+    
+        Private Sub IXamlComponentLoader_LoadComponent1(component As Object) Implements {IXamlComponentLoaderClass}.LoadComponent
+            LoadComponentImpl(CType(component, {componentTypeFullName}))
+        End Sub
+    
+        Private Shared Sub LoadComponentImpl(ByVal {componentParamName} As {componentTypeFullName})
+            If TypeOf CObj({componentParamName}) Is {uiElementFullyQualifiedTypeName} Then
+                CType(CObj({componentParamName}), {uiElementFullyQualifiedTypeName}).XamlSourcePath = ""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}""
+            End If
+    
+            {loadComponentImpl}
+        End Sub
+    
+        Private Shared Function CreateComponentImpl() As {componentTypeFullName}
+            {createComponentImpl}
+        End Function
+    
+        {string.Join(Environment.NewLine + Environment.NewLine, additionalMethods)}
+    End Class
+End Namespace
 ";
 
             return finalCode;
