@@ -124,7 +124,7 @@ namespace OpenSilver.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"Public Shared Function {MethodName}({TemplateOwner} As Global.{_metadata.SystemWindowsNS}.IFrameworkElement, {XamlContext} As {XamlContextClass}) As Global.{_metadata.SystemWindowsNS}.IFrameworkElement")
+                    builder.AppendLine($"Private Shared Function {MethodName}({TemplateOwner} As Global.{_metadata.SystemWindowsNS}.IFrameworkElement, {XamlContext} As {XamlContextClass}) As Global.{_metadata.SystemWindowsNS}.IFrameworkElement")
                         .Append(StringBuilder.ToString());
                     builder.AppendLine($"Return {Root}")
                         .AppendLine("End Function");
