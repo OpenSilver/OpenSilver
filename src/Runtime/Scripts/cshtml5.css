@@ -42,6 +42,13 @@ body {
     -webkit-user-select: text; /* 'none' prevents copy paste. 'text' allows it. */
 }
 
+.opensilver-mouse-captured {
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Chrome, Safari, and Opera */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
 .opensilver-hyperlink:hover {
     color: var(--mouse-over-color, rgb(237, 110, 0)) !important;
     text-decoration: var(--mouse-over-decoration, underline) !important;
