@@ -124,7 +124,7 @@ namespace OpenSilver.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"Public Shared Function {MethodName}({TemplateOwner} As Global.{_metadata.SystemWindowsNS}.IFrameworkElement, {XamlContext} As {XamlContextClass}) As Global.{_metadata.SystemWindowsNS}.IFrameworkElement")
+                    builder.AppendLine($"Private Shared Function {MethodName}({TemplateOwner} As Global.{_metadata.SystemWindowsNS}.IFrameworkElement, {XamlContext} As {XamlContextClass}) As Global.{_metadata.SystemWindowsNS}.IFrameworkElement")
                         .Append(StringBuilder.ToString());
                     builder.AppendLine($"Return {Root}")
                         .AppendLine("End Function");
@@ -272,7 +272,7 @@ namespace OpenSilver.Compiler
                         parameters.ResultingFindNameCalls);
 
                     string additionalConstructors = IsClassTheApplicationClass(baseType)
-                        ? $@"Private Sub {className}(stub as Global.OpenSilver.XamlDesignerConstructorStub)
+                        ? @"Private Sub New(stub as Global.OpenSilver.XamlDesignerConstructorStub)
     InitializeComponent()
 End Sub
 " : string.Empty;
@@ -420,20 +420,12 @@ End Sub
                             _fileNameWithPathRelativeToProjectRoot,
                             _assemblyNameWithoutExtension);
 
-                        // VB.Net doesn't allow to define class with empty namespace.
-                        string sourceAssembly = "";
-                        int idx = absoluteSourceUri.IndexOf(";");
-                        if (idx > 1)
-                        {
-                            sourceAssembly = absoluteSourceUri.Substring(1, idx - 1) + ".";
-                        }
-
                         parameters.StringBuilder.AppendLine(
                             string.Format(
                                 "Dim {0} = {3}.XamlContext_WriteStartObject({4}, CType(New {2}(), {1}).CreateComponent())",
                                 elementUniqueNameOrThisKeyword,
                                 $"{IXamlComponentFactoryClass}(Of {elementTypeInCSharp})",
-                                sourceAssembly + XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
+                                XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
                             )
