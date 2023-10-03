@@ -15,6 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Markup;
+using CSHTML5;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
@@ -70,6 +71,34 @@ namespace Windows.UI.Xaml.Controls
         private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
         private ITextBoxViewHost<TextBoxView> _textViewHost;
+
+        static TextBox()
+        {
+            JavaScriptCallback javaScriptCallback = JavaScriptCallback.Create((Action<string>)(activeElement =>
+            {
+                IDisposable jsObjectReference = OpenSilver.Interop.ExecuteJavaScript(
+                    $"document.getElementById('{activeElement}')");
+                UIElement uiElement = INTERNAL_HtmlDomManager.GetUIElementFromDomElement(jsObjectReference);
+
+                if (uiElement is TextBoxView textBoxView)
+                {
+                    textBoxView.Host.RaiseSelectionChanged();
+                }
+            }), true);
+            string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(javaScriptCallback);
+
+            // The selectionchange event listener is added to the whole document
+            // and will be triggered every time the page Selection changes (anywhere)
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+                $@"document.addEventListener('selectionchange', () => {{
+                    const activeElement = document.activeElement;
+
+                    if (activeElement) {{
+                        {sAction}(activeElement.id);
+                    }}
+                }});"
+            );
+        }
 
         public TextBox()
         {
@@ -918,8 +947,12 @@ namespace Windows.UI.Xaml.Controls
             return false;
         }
 
-        [OpenSilver.NotImplemented]
         public event RoutedEventHandler SelectionChanged;
+
+        internal void RaiseSelectionChanged()
+        {
+            SelectionChanged?.Invoke(this, new RoutedEventArgs());
+        }
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionForegroundProperty =
