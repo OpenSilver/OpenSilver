@@ -17,6 +17,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Experimental;
 using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
+using OpenSilver.Compiler;
 
 #if MIGRATION
 using System.Windows;
@@ -43,6 +44,7 @@ namespace Compiler.Tests
 #else
             false
 #endif
+            , SupportedLanguage.CSharp
         );
 
         [ClassInitialize]

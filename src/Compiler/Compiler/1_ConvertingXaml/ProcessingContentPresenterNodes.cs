@@ -39,7 +39,7 @@ namespace OpenSilver.Compiler
 
         static void TraverseNextElement(XElement currentElement, bool isInsideControlTemplate, AssembliesInspector reflectionOnSeparateAppDomain)
         {
-            if (GeneratingCSharpCode.IsControlTemplate(currentElement))
+            if (GeneratingCode.IsControlTemplate(currentElement))
             {
                 isInsideControlTemplate = true;
             }
@@ -47,7 +47,7 @@ namespace OpenSilver.Compiler
             if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains("."))
             {
                 bool isContentPresenter = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                    GeneratingCSharpCode.DefaultXamlNamespace,
+                    GeneratingCode.DefaultXamlNamespace,
                     "ContentPresenter",
                     currentElement.Name.NamespaceName,
                     currentElement.Name.LocalName);
@@ -89,7 +89,7 @@ namespace OpenSilver.Compiler
                         {
                             // Then make sure this is not an attached property.
                             bool isProperty = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                                GeneratingCSharpCode.DefaultXamlNamespace,
+                                GeneratingCode.DefaultXamlNamespace,
                                 "ContentPresenter",
                                 namespaceName,
                                 typeAndProperty[0]);

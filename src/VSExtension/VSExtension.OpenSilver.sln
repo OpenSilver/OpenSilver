@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilverUwpClassLibraryTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.TemplateWizards", "OpenSilver.TemplateWizards\OpenSilver.TemplateWizards.csproj", "{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilverVBApplicationTemplate", "OpenSilverVBApplicationTemplate\OpenSilverVBApplicationTemplate.csproj", "{229629AC-C4E0-4848-9CFA-31064C9D83A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilverVBClassLibraryTemplate", "OpenSilverVBClassLibraryTemplate\OpenSilverVBClassLibraryTemplate.csproj", "{77155280-90DB-41B5-A285-760DA09F0A4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BCC3CB3-6BB0-4382-8FBA-62D8D5071C23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{229629AC-C4E0-4848-9CFA-31064C9D83A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{229629AC-C4E0-4848-9CFA-31064C9D83A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{229629AC-C4E0-4848-9CFA-31064C9D83A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{229629AC-C4E0-4848-9CFA-31064C9D83A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77155280-90DB-41B5-A285-760DA09F0A4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77155280-90DB-41B5-A285-760DA09F0A4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77155280-90DB-41B5-A285-760DA09F0A4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77155280-90DB-41B5-A285-760DA09F0A4C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

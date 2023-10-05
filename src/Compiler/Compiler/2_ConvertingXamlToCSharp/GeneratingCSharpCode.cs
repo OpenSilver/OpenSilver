@@ -17,20 +17,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using System.Xml;
 using OpenSilver.Internal;
 using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal interface ICodeGenerator
+    internal static partial class GeneratingCSCode
     {
-        string Generate();
-    }
-
-    internal static partial class GeneratingCSharpCode
-    {
-        private class ComponentConnectorBuilder
+        private class ComponentConnectorBuilderCS
         {
             private const string targetParam = "target";
             private const string componentIdParam = "componentId";
@@ -88,13 +82,7 @@ namespace OpenSilver.Compiler
             }
         }
 
-        internal const string DefaultXamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
-        private const string LegacyXamlNamespace = "http://schemas.microsoft.com/client/2007"; // XAML namespace used for Silverlight 1.0 application
-
-        private static readonly XNamespace[] DefaultXamlNamespaces = new XNamespace[2] { DefaultXamlNamespace, LegacyXamlNamespace };
-        internal static readonly XNamespace xNamespace = @"http://schemas.microsoft.com/winfx/2006/xaml"; // Used for example for "x:Name" attributes and {x:Null} markup extensions.
-
-        public static string GenerateCSharpCode(XDocument doc,
+        public static string GenerateCode(XDocument doc,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
             string assemblyNameWithoutExtension,
@@ -128,39 +116,6 @@ namespace OpenSilver.Compiler
             return generator.Generate();
         }
 
-        internal static int GetLineNumber(XNode element)
-        {
-            // Get the line number in the original XAML file by walking up the tree until we find a node that contains line number information:
-
-            while (element != null)
-            {
-                // See if the current element has line information:
-                if (((IXmlLineInfo)element).HasLineInfo())
-                {
-                    return ((IXmlLineInfo)element).LineNumber;
-                }
-
-                // If not, go to the previous sibling node if any:
-                var previousNode = element.PreviousNode;
-                if (previousNode != null)
-                {
-                    element = previousNode;
-                }
-                else
-                {
-                    // Alternatively, walk up the tree to go to the parent node:
-                    element = element.Parent;
-                }
-            }
-            return -1;
-        }
-
-        private static bool IsXNameAttribute(XAttribute attr)
-            => attr.Name.LocalName == "Name" && attr.Name.NamespaceName == xNamespace;
-
-        private static bool IsNameAttribute(XAttribute attr)
-            => attr.Name.LocalName == "Name" && string.IsNullOrEmpty(attr.Name.NamespaceName);
-
         private static string CreateInitializeComponentMethod(
             string applicationTypeFullName,
             string additionalCodeForApplication,
@@ -192,11 +147,6 @@ namespace OpenSilver.Compiler
             {string.Join(Environment.NewLine + "            ", findNameCalls)}
         }}
 ";
-        }
-
-        private static string GetUniqueName(XElement element)
-        {
-            return element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
         }
 
         private static string GeneratePartialClass(
@@ -265,7 +215,7 @@ namespace {namespaceStringIfAny}
             out bool hasCodeBehind)
         {
             // Read the "{x:Class}" attribute:
-            XAttribute classAttributeIfAny = doc.Root.Attribute(xNamespace + "Class");
+            XAttribute classAttributeIfAny = doc.Root.Attribute(GeneratingCode.xNamespace + "Class");
             if (classAttributeIfAny != null)
             {
                 //-----------------
@@ -367,12 +317,10 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
 
     private static void LoadComponentImpl({componentTypeFullName} {componentParamName})
     {{
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-        if ({componentParamName} is {uiElementFullyQualifiedTypeName})
+        if ((object){componentParamName} is {uiElementFullyQualifiedTypeName})
         {{
             (({uiElementFullyQualifiedTypeName})(object){componentParamName}).XamlSourcePath = @""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}"";
         }}
-#pragma warning restore 0184
 
         {loadComponentImpl}
     }}
@@ -395,50 +343,5 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
         private const string IComponentConnectorClass = "global::OpenSilver.Internal.Xaml.IComponentConnector";
         private const string XamlContextClass = "global::OpenSilver.Internal.Xaml.Context.XamlContext";
         private const string IMarkupExtensionClass = "global::System.Xaml.IMarkupExtension<object>";
-
-        public static bool IsDataTemplate(XElement element) => IsXElementOfType(element, "DataTemplate");
-
-        public static bool IsItemsPanelTemplate(XElement element) => IsXElementOfType(element, "ItemsPanelTemplate");
-
-        public static bool IsControlTemplate(XElement element) => IsXElementOfType(element, "ControlTemplate");
-
-        public static bool IsBinding(XElement element) => IsXElementOfType(element, "Binding");
-
-        public static bool IsStyle(XElement element) => IsXElementOfType(element, "Style");
-
-        public static bool IsTextBlock(XElement element) => IsXElementOfType(element, "TextBlock");
-
-        public static bool IsRun(XElement element) => IsXElementOfType(element, "Run");
-
-        public static bool IsSpan(XElement element) => IsXElementOfType(element, "Span");
-
-        public static bool IsItalic(XElement element) => IsXElementOfType(element, "Italic");
-
-        public static bool IsUnderline(XElement element) => IsXElementOfType(element, "Underline");
-
-        public static bool IsBold(XElement element) => IsXElementOfType(element, "Bold");
-
-        public static bool IsHyperlink(XElement element) => IsXElementOfType(element, "Hyperlink");
-
-        public static bool IsParagraph(XElement element) => IsXElementOfType(element, "Paragraph");
-
-        public static bool IsColorAnimation(XElement element) => IsXElementOfType(element, "ColorAnimation");
-
-        private static bool IsXElementOfType(XElement element, string typeName)
-        {
-            XName name = element.Name;
-            if (name.LocalName == typeName)
-            {
-                for (int i = 0; i < DefaultXamlNamespaces.Length; i++)
-                {
-                    if (name.Namespace == DefaultXamlNamespaces[i])
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
     }
 }

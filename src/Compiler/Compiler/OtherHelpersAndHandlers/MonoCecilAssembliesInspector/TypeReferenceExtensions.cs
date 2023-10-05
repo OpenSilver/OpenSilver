@@ -21,7 +21,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 {
     internal static class TypeReferenceExtensions
     {
-        private const string GlobalPrefix = "global::";
 
         public static bool IsString(this TypeReference typeRef) => typeRef == typeRef.Module.TypeSystem.String;
 
@@ -84,10 +83,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return res;
         }
 
-        public static string ConvertToString(this TypeReference typeRef)
+        public static string ConvertToString(this TypeReference typeRef, SupportedLanguage compilerType)
         {
             var fullNamespace = typeRef.BuildFullPath();
-            var typeName = typeRef.GetTypeNameIncludingGenericArguments(false);
+            var typeName = typeRef.GetTypeNameIncludingGenericArguments(false, compilerType);
 
             return string.IsNullOrEmpty(fullNamespace) ? typeName : $"{fullNamespace}.{typeName}";
         }
@@ -111,12 +110,27 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return fullPath;
         }
 
-        public static string GetTypeNameIncludingGenericArguments(this TypeReference type, bool appendNamespace)
+        public static string GetTypeNameIncludingGenericArguments(this TypeReference type, bool appendNamespace, SupportedLanguage compilerType)
         {
             var result = new StringBuilder();
+
+            string prefix= "";
+            if (compilerType == SupportedLanguage.CSharp)
+            {
+                prefix = "global::";
+            }
+            else if (compilerType == SupportedLanguage.VBNet)
+            {
+                prefix = "Global.";
+            }
+            else
+            {
+                throw new InvalidCompilerTypeException();
+            }
+
             if (appendNamespace)
             {
-                result.Append(GlobalPrefix);
+                result.Append(prefix);
                 if (!string.IsNullOrEmpty(type.Namespace)) result.Append(type.Namespace + ".");
             }
 
@@ -128,8 +142,20 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
             result = new StringBuilder(result.ToString().Split('`')[0]);
-            result.Append(
-                $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true)))}>");
+            if (compilerType == SupportedLanguage.CSharp)
+            {
+                result.Append(
+                    $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))}>");
+            }
+            else if (compilerType == SupportedLanguage.VBNet)
+            {
+                result.Append(
+                    $"(Of {string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))})");
+            }
+            else
+            {
+                throw new InvalidCompilerTypeException();
+            }
 
             return result.ToString();
         }

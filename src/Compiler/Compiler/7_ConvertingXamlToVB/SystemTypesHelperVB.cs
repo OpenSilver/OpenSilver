@@ -19,23 +19,25 @@ using System.Globalization;
 
 namespace OpenSilver.Compiler
 {
-    internal static class SystemTypesHelper
+    internal class SystemTypesHelperVB : SystemTypesHelper
     {
-        private const string InvariantCulture = "global::System.Globalization.CultureInfo.InvariantCulture";
+        private const string InvariantCulture = "Global.System.Globalization.CultureInfo.InvariantCulture";
         private const string mscorlib = "mscorlib";
+
+        private static SystemTypesHelperVB systemTypesHelper = new SystemTypesHelperVB();
 
         private static Dictionary<string, Func<string, string>> SupportedIntrinsicTypes { get; } =
             new Dictionary<string, Func<string, string>>(9)
             {
-                ["system.double"] = (s => ConvertToDouble(s)),
-                ["system.single"] = (s => ConvertToSingle(s)),
-                ["system.timespan"] = (s => ConvertToTimeSpan(s)),
-                ["system.string"] = (s => ConvertToString(s)),
-                ["system.boolean"] = (s => ConvertToBoolean(s)),
-                ["system.byte"] = (s => ConvertToByte(s)),
-                ["system.int16"] = (s => ConvertToInt16(s)),
-                ["system.int32"] = (s => ConvertToInt32(s)),
-                ["system.int64"] = (s => ConvertToInt64(s)),
+                ["system.double"] = (s => systemTypesHelper.ConvertToDouble(s)),
+                ["system.single"] = (s => systemTypesHelper.ConvertToSingle(s)),
+                ["system.timespan"] = (s => systemTypesHelper.ConvertToTimeSpan(s)),
+                ["system.string"] = (s => systemTypesHelper.ConvertToString(s)),
+                ["system.boolean"] = (s => systemTypesHelper.ConvertToBoolean(s)),
+                ["system.byte"] = (s => systemTypesHelper.ConvertToByte(s)),
+                ["system.int16"] = (s => systemTypesHelper.ConvertToInt16(s)),
+                ["system.int32"] = (s => systemTypesHelper.ConvertToInt32(s)),
+                ["system.int64"] = (s => systemTypesHelper.ConvertToInt64(s)),
             };
 
         private static Dictionary<string, string> SupportIntrinsicTypesDefaultValues { get; } =
@@ -43,16 +45,16 @@ namespace OpenSilver.Compiler
             {
                 ["system.double"] = "0D",
                 ["system.single"] = "0F",
-                ["system.timespan"] = "new global::System.TimeSpan()",
+                ["system.timespan"] = "New Global.System.TimeSpan()",
                 ["system.string"] = "",
                 ["system.boolean"] = "false",
-                ["system.byte"] = "(global::System.Byte)0",
-                ["system.int16"] = "(global::System.Int16)0",
+                ["system.byte"] = "CByte(0)",
+                ["system.int16"] = "CShort(0)",
                 ["system.int32"] = "0",
                 ["system.int64"] = "0L",
             };
 
-        public static bool IsSupportedSystemType(string typeFullName, string assemblyIfAny)
+        public override bool IsSupportedSystemType(string typeFullName, string assemblyIfAny)
         {
             if (IsMscorlibOrNull(assemblyIfAny))
             {
@@ -62,15 +64,15 @@ namespace OpenSilver.Compiler
             return false;
         }
 
-        public static string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny)
+        public override string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny)
         {
             Debug.Assert(IsMscorlibOrNull(assemblyIfAny));
             Debug.Assert(namespaceName == "System");
 
-            return $"global::{namespaceName}.{typeName}";
+            return $"Global.{namespaceName}.{typeName}";
         }
 
-        public static string ConvertFromInvariantString(string source, string typeFullName)
+        public override string ConvertFromInvariantString(string source, string typeFullName)
         {
             if (SupportedIntrinsicTypes.TryGetValue(typeFullName.ToLower(), out var converter))
             {
@@ -83,7 +85,7 @@ namespace OpenSilver.Compiler
             );
         }
 
-        public static string GetDefaultValue(string namespaceName, string typeName, string assemblyIfAny)
+        public override string GetDefaultValue(string namespaceName, string typeName, string assemblyIfAny)
         {
             if (IsMscorlibOrNull(assemblyIfAny))
             {
@@ -98,7 +100,7 @@ namespace OpenSilver.Compiler
             return null;
         }
 
-        private static string ConvertToDouble(string source)
+        internal override string ConvertToDouble(string source)
         {
             string value = source.Trim().ToLower();
 
@@ -107,13 +109,13 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "global::System.Double.NaN";
+                    return "Global.System.Double.NaN";
 
                 case "infinity":
-                    return "global::System.Double.PositiveInfinity";
+                    return "Global.System.Double.PositiveInfinity";
 
                 case "-infinity":
-                    return "global::System.Double.NegativeInfinity";
+                    return "Global.System.Double.NegativeInfinity";
             }
 
             if (value.EndsWith("d"))
@@ -134,7 +136,7 @@ namespace OpenSilver.Compiler
             return $"{value}D";
         }
 
-        private static string ConvertToSingle(string source)
+        internal override string ConvertToSingle(string source)
         {
             string value = source.Trim().ToLower();
 
@@ -143,13 +145,13 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "global::System.Single.NaN";
+                    return "Global.System.Single.NaN";
 
                 case "infinity":
-                    return "global::System.Single.PositiveInfinity";
+                    return "Global.System.Single.PositiveInfinity";
 
                 case "-infinity":
-                    return "global::System.Single.NegativeInfinity";                    
+                    return "Global.System.Single.NegativeInfinity";                    
             }
 
             if (value.EndsWith("f"))
@@ -170,7 +172,7 @@ namespace OpenSilver.Compiler
             return $"{value}F";
         }
 
-        private static string ConvertToTimeSpan(string source)
+        internal override string ConvertToTimeSpan(string source)
         {
             string value = source.Trim();
 
@@ -182,18 +184,18 @@ namespace OpenSilver.Compiler
             // Optimization to avoid parsing at runtime
             if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out TimeSpan timeSpan))
             {
-                return $"new global::System.TimeSpan({timeSpan.Ticks}L)";
+                return $"New Global.System.TimeSpan({timeSpan.Ticks}L)";
             }
 
-            return $"global::System.TimeSpan.Parse({Escape(value)}, {InvariantCulture})";
+            return $"Global.System.TimeSpan.Parse({Escape(value)}, {InvariantCulture})";
         }
 
-        private static string ConvertToString(string source)
+        internal override string ConvertToString(string source)
         {
             return Escape(source);
         }
 
-        private static string ConvertToBoolean(string source)
+        internal override string ConvertToBoolean(string source)
         {
             string value = source.Trim();
             
@@ -205,7 +207,7 @@ namespace OpenSilver.Compiler
             return value.ToLower();
         }
 
-        private static string ConvertToByte(string source)
+        internal override string ConvertToByte(string source)
         {
             string value = source.Trim();
         
@@ -214,10 +216,10 @@ namespace OpenSilver.Compiler
                 return SupportIntrinsicTypesDefaultValues["system.byte"];
             }
 
-            return $"(global::System.Byte){value}";
+            return $"CByte({value})";
         }
 
-        private static string ConvertToInt16(string source)
+        internal override string ConvertToInt16(string source)
         {
             string value = source.Trim();
 
@@ -226,10 +228,10 @@ namespace OpenSilver.Compiler
                 return SupportIntrinsicTypesDefaultValues["system.int16"];
             }
 
-            return $"(global::System.Int16){value}";
+            return $"CShort({value})";
         }
 
-        private static string ConvertToInt32(string source)
+        internal override string ConvertToInt32(string source)
         {
             string value = source.Trim();
 
@@ -241,7 +243,7 @@ namespace OpenSilver.Compiler
             return value;
         }
 
-        private static string ConvertToInt64(string source)
+        internal override string ConvertToInt64(string source)
         {
             string value = source.Trim();
         
@@ -253,7 +255,7 @@ namespace OpenSilver.Compiler
             return $"{value}L";
         }
 
-        private static bool IsMscorlibOrNull(string assemblyName)
+        internal override bool IsMscorlibOrNull(string assemblyName)
         {
             if (assemblyName == null || 
                 assemblyName.Equals(mscorlib, StringComparison.OrdinalIgnoreCase))
@@ -264,14 +266,14 @@ namespace OpenSilver.Compiler
             return false;
         }
 
-        private static string GetKey(string namespaceName, string typeName)
+        internal override string GetKey(string namespaceName, string typeName)
         {
             return $"{namespaceName}.{typeName}".ToLower();
         }
 
-        private static string Escape(string s)
+        internal override string Escape(string s)
         {
-            return string.Concat("@\"", s.Replace("\"", "\"\""), "\"");
+            return string.Concat("\"", s.Replace("\"", "\"\""), "\"");
         }
     }
 }

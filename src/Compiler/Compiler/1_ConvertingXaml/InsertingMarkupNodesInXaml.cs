@@ -121,7 +121,7 @@ namespace OpenSilver.Compiler
                     int indexOfClosingBracket = value.IndexOf('}');
                     if (indexOfClosingBracket < 0)
                     {
-                        throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use \"{{}}\" to escape '{{'.", attribute.Name), GeneratingCSharpCode.GetLineNumber(attribute.Parent), -1);
+                        throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use \"{{}}\" to escape '{{'.", attribute.Name), GeneratingCode.GetLineNumber(attribute.Parent), -1);
                     }
                     string contentBetweenBrackets = value.Substring(1, indexOfClosingBracket - 1);
                     if (string.IsNullOrEmpty(contentBetweenBrackets)) //handle special case where '{' is escaped with "{}"
@@ -138,7 +138,7 @@ namespace OpenSilver.Compiler
                         }
                         else
                         {
-                            throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use {} to escape '{'.", attribute.Name), GeneratingCSharpCode.GetLineNumber(attribute.Parent), -1);
+                            throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use {} to escape '{'.", attribute.Name), GeneratingCode.GetLineNumber(attribute.Parent), -1);
                         }
                     }
                 }

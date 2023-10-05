@@ -25,7 +25,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 {
     internal class MonoCecilAssembliesInspectorImpl : IDisposable
     {
-        private const string GlobalPrefix = "global::";
+        private const string GlobalPrefix_CS = "global::";
+        private const string GlobalPrefix_VB = "Global.";
         private const string SystemXamlNamespace = "System.Xaml";
         private const string GenericMarkupExtension = "IMarkupExtension`1";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";
@@ -46,14 +47,53 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private readonly MonoCecilAssemblyStorage _storage = new();
 
-        public MonoCecilAssembliesInspectorImpl(bool isSlMigration)
+        private SupportedLanguage _compilerType;
+        public SupportedLanguage CompilerType  // read-write instance property
         {
-            _metadata = isSlMigration ? Metadatas.Silverlight : Metadatas.UWP;
+            get => _compilerType;
+            set => _compilerType = value;
+        }
+
+        private SystemTypesHelper _systemTypesHelper;
+        public MonoCecilAssembliesInspectorImpl(bool isSlMigration, SupportedLanguage compilerType)
+        {
+            CompilerType = compilerType;
+            if (CompilerType == SupportedLanguage.CSharp)
+            {
+                _metadata = isSlMigration ? MetadatasCS.Silverlight : MetadatasCS.UWP;
+                _systemTypesHelper = new SystemTypesHelperCS();
+            }
+            else if (CompilerType == SupportedLanguage.VBNet)
+            {
+                _metadata = isSlMigration ? MetadatasVB.Silverlight : MetadatasVB.UWP;
+                _systemTypesHelper = new SystemTypesHelperVB();
+            }
+            else
+            {
+                throw new InvalidCompilerTypeException();
+            }
+            
         }
 
         public void Dispose()
         {
             _storage.Dispose();
+        }
+
+        private string GetGlobalPrefixFromCompilerType()
+        {
+            if (CompilerType == SupportedLanguage.CSharp)
+            {
+                return GlobalPrefix_CS;
+            }
+            else if (CompilerType == SupportedLanguage.VBNet)
+            {
+                return GlobalPrefix_VB;
+            }
+            else
+            {
+                throw new InvalidCompilerTypeException();
+            }
         }
 
         private TypeDefinition FindType(string namespaceName, string localTypeName,
@@ -73,10 +113,15 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 GettingInformationAboutXamlTypes.FixNamespaceForCompatibility(ref assemblyNameIfAny, ref namespaceName);
             }
 
-            if (namespaceName.StartsWith(GlobalPrefix,
+            if (namespaceName.StartsWith(GlobalPrefix_CS,
                     StringComparison
                         .CurrentCultureIgnoreCase)) // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style namespace (cf. section that handles Binding in "GeneratingCSharpCode.cs")
-                namespaceName = namespaceName.Substring(GlobalPrefix.Length);
+                namespaceName = namespaceName.Substring(GlobalPrefix_CS.Length);
+
+            if (namespaceName.StartsWith(GlobalPrefix_VB,
+                    StringComparison
+                        .CurrentCultureIgnoreCase)) // Note: normally in XAML there is no "Global.", but we may enter this method passing a VB.Net-style namespace
+                namespaceName = namespaceName.Substring(GlobalPrefix_VB.Length);
 
             // Handle special cases:
             if (localTypeName == StaticRes) localTypeName = StaticResExtension;
@@ -324,17 +369,21 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
         {
             // Distinguish between system types (String, Double...) and other types
-            if (SystemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
-                return SystemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
+            if (_systemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
+                return _systemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
 
             // Find the type:
             var type = FindType(
                 namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing
             );
 
+            string prefix = GetGlobalPrefixFromCompilerType();
+
             if (type != null)
+            {
                 // Use information from the type
-                return $"{GlobalPrefix}{type}";
+                return $"{prefix}{type}";
+            }
 
             if (ifTypeNotFoundTryGuessing)
             {
@@ -343,8 +392,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     // Attempt to find the type in the current namespace
                     return localTypeName;
 
-                return
-                    $"{GlobalPrefix}{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
+                return $"{prefix}{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
             }
 
             throw new XamlParseException(
@@ -361,7 +409,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (type != null)
             {
-                return type.ConvertToString() + ", " + type.Module.Assembly.Name.Name;
+                return type.ConvertToString(CompilerType) + ", " + type.Module.Assembly.Name.Name;
             }
 
             return null;
@@ -402,7 +450,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName,
                 assemblyNameIfAny, isAttached);
             propertyNamespaceName = typeRef.BuildFullPath();
-            propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false);
+            propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false, CompilerType);
             propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeString = typeRef.IsString();
             isTypeEnum = typeRef.ResolveOrThrow().IsEnum;
@@ -415,7 +463,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             var typeDef = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
             returnValueNamespaceName = typeDef.BuildFullPath();
-            returnValueLocalTypeName = typeDef.GetTypeNameIncludingGenericArguments(false);
+            returnValueLocalTypeName = typeDef.GetTypeNameIncludingGenericArguments(false, CompilerType);
             returnValueAssemblyName = typeDef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeString = typeDef.IsString();
             isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
@@ -605,7 +653,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var field = FindFieldDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
             if (field != null &&
                 (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
-                return $"{type.GetTypeNameIncludingGenericArguments(true)}.{field.Name}";
+                return $"{type.GetTypeNameIncludingGenericArguments(true, CompilerType)}.{field.Name}";
 
             return null;
         }
@@ -621,7 +669,11 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             // Look for the static dependency property field in the type and its ancestors:
             var fieldName = propertyName + PropertySuffix;
             var field = FindFieldDeep(type, fieldName, out _, true, true, true);
-            if (field != null) return GlobalPrefix + type + "." + fieldName;
+            if (field != null)
+            {
+                string prefix = GetGlobalPrefixFromCompilerType();
+                return prefix + type + "." + fieldName;
+            }
 
             return null;
         }
@@ -652,9 +704,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
 
-            memberDeclaringTypeName = propertyOrFieldDeclaringType.GetTypeNameIncludingGenericArguments(true);
+            memberDeclaringTypeName = propertyOrFieldDeclaringType.GetTypeNameIncludingGenericArguments(true, CompilerType);
             memberTypeNamespace = propertyOrFieldType.BuildFullPath();
-            memberTypeName = propertyOrFieldType.GetTypeNameIncludingGenericArguments(false);
+            memberTypeName = propertyOrFieldType.GetTypeNameIncludingGenericArguments(false, CompilerType);
             isTypeString = propertyOrFieldType.IsString();
             isTypeEnum = propertyOrFieldType.ResolveOrThrow().IsEnum;
         }
@@ -673,10 +725,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     dependencyObjectType.IsAssignableFrom(m.Parameters[0].ParameterType.ResolveOrThrow()));
                 if (method != null)
                 {
-                    declaringTypeName = currentType.GetTypeNameIncludingGenericArguments(true);
+                    declaringTypeName = currentType.GetTypeNameIncludingGenericArguments(true, CompilerType);
                     var returnType = method.ReturnType.PopulateGeneric(elementType, currentType);
                     returnValueNamespaceName = returnType.BuildFullPath();
-                    returnValueLocalTypeName = returnType.GetTypeNameIncludingGenericArguments(false);
+                    returnValueLocalTypeName = returnType.GetTypeNameIncludingGenericArguments(false, CompilerType);
                     isTypeString = returnType.IsString();
                     isTypeEnum = returnType.ResolveOrThrow().IsEnum;
                     return;
@@ -699,25 +751,58 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var type = FindType(namespaceName, enumName, assembly)
                         ?? throw new XamlParseException($"Type '{enumName}' not found in namespace '{namespaceName}'.");
 
+            string prefix = GetGlobalPrefixFromCompilerType();
             var field = FindFieldDeep(type, name, out _, ignoreCase, true, true);
-            if (field is not null)
-            {
-                return $"{GlobalPrefix}{type.ConvertToString()}.{field.Name}";
-            }
 
-            if (allowIntegerValue)
+            if (CompilerType == SupportedLanguage.CSharp)
             {
-                if (long.TryParse(name, out var l))
+                if (field is not null)
                 {
-                    return $"({GlobalPrefix}{type.ConvertToString()}){l}";
+                    return $"{prefix}{type.ConvertToString(CompilerType)}.{field.Name}";
                 }
-                if (ulong.TryParse(name, out var ul))
+                if (allowIntegerValue)
                 {
-                    return $"({GlobalPrefix}{type.ConvertToString()}){ul}";
+                    if (long.TryParse(name, out var l))
+                    {
+                        return $"({prefix}{type.ConvertToString(CompilerType)}){l}";
+                    }
+                    if (ulong.TryParse(name, out var ul))
+                    {
+                        return $"({prefix}{type.ConvertToString(CompilerType)}){ul}";
+                    }
                 }
+            }
+            else if (CompilerType == SupportedLanguage.VBNet)
+            {
+                if (field is not null)
+                {
+                    return $"{prefix}{type.ConvertToString(CompilerType)}.{field.Name}";
+                }
+                if (allowIntegerValue)
+                {
+                    if (long.TryParse(name, out var l))
+                    {
+                        return $"CType({l}, {prefix}{type.ConvertToString(CompilerType)})";
+                    }
+                    if (ulong.TryParse(name, out var ul))
+                    {
+                        return $"CType({ul}, {prefix}{type.ConvertToString(CompilerType)})";
+                    }
+                }
+            }
+            else
+            {
+                throw new InvalidCompilerTypeException();
             }
 
             return null;
+        }
+    }
+    public class InvalidCompilerTypeException : Exception
+    {
+        public InvalidCompilerTypeException() : base("Invalid Compiler Type")
+        {
+
         }
     }
 }

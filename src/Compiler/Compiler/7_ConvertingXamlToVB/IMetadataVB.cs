@@ -16,28 +16,17 @@ using System;
 
 namespace OpenSilver.Compiler
 {
-    internal interface IMetadata
+    internal static class MetadatasVB
     {
-        string FieldModifier { get; }
+        public static IMetadata Silverlight { get; } = new SLMetadataVB();
 
-        string SystemWindowsDLL { get; }
+        public static IMetadata UWP { get; } = new UWPMetadataVB();
 
-        string SystemWindowsNS { get; }
-        string SystemWindowsDataNS { get; }
-        string SystemWindowsControlsNS { get; }
-        string SystemWindowsMediaNS { get; }
-        string SystemWindowsMediaAnimationNS { get; }
     }
 
-    internal static class Metadatas
+    internal class SLMetadataVB : IMetadata
     {
-        public static IMetadata Silverlight { get; } = new SLMetadata();
-        public static IMetadata UWP { get; } = new UWPMetadata();
-    }
-
-    internal class SLMetadata : IMetadata
-    {
-        public string FieldModifier { get; } = "internal";
+        public string FieldModifier { get; } = "Friend";
 
         public string SystemWindowsDLL { get; } = "System.Windows";
 
@@ -48,11 +37,11 @@ namespace OpenSilver.Compiler
         public string SystemWindowsMediaAnimationNS { get; } = "System.Windows.Media.Animation";
     }
 
-    internal class UWPMetadata : IMetadata
+    internal class UWPMetadataVB : IMetadata
     {
-        public string FieldModifier { get; } = "protected";
+        public string FieldModifier { get; } = "Protected";
 
-        public string SystemWindowsDLL { get; } = string.Empty;
+        public string SystemWindowsDLL => throw new NotSupportedException();
 
         public string SystemWindowsNS { get; } = "Windows.UI.Xaml";
         public string SystemWindowsDataNS { get; } = "Windows.UI.Xaml.Data";

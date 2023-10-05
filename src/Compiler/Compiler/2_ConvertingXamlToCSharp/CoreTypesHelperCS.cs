@@ -21,60 +21,13 @@ using OpenSilver.Compiler.Common;
 
 namespace OpenSilver.Compiler
 {
-    internal interface ICoreTypesConverter
+    internal static class CoreTypesConvertersCS
     {
-        bool IsSupportedCoreType(string typeFullName, string assemblyName);
+        public static ICoreTypesConverter Silverlight { get; } = new SLCoreTypesConverterCS();
 
-        string ConvertFromInvariantString(string source, string typeFullName);
+        public static ICoreTypesConverter UWP { get; } = new UWPCoreTypesConverterCS();
     }
-
-    internal static class CoreTypesConverters
-    {
-        public static ICoreTypesConverter Silverlight { get; } = new SLCoreTypesConverter();
-
-        public static ICoreTypesConverter UWP { get; } = new UWPCoreTypesConverter();
-    }
-
-    internal abstract class CoreTypesConverterBase : ICoreTypesConverter
-    {
-        protected abstract Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }
-
-        public bool IsSupportedCoreType(string typeFullName, string assemblyName)
-        {
-            if (IsCoreAssemblyOrNull(assemblyName))
-            {
-                return SupportedCoreTypes.ContainsKey(typeFullName.ToLower());
-            }
-
-            return false;
-        }
-
-        public string ConvertFromInvariantString(string source, string typeFullName)
-        {
-            if (SupportedCoreTypes.TryGetValue(typeFullName.ToLower(), out var converter))
-            {
-                Debug.Assert(converter != null);
-                return converter(source);
-            }
-
-            throw new InvalidOperationException(
-                $"Cannot find a converter for type '{typeFullName}'"
-            );
-        }
-
-        private static bool IsCoreAssemblyOrNull(string assemblyName)
-        {
-            if (assemblyName == null ||
-                assemblyName.Equals(Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    internal sealed class SLCoreTypesConverter : CoreTypesConverterBase
+    internal sealed class SLCoreTypesConverterCS : CoreTypesConverterBase
     {
         protected override Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }
             = GetSupportedCoreTypes();
@@ -130,7 +83,7 @@ namespace OpenSilver.Compiler
         }
     }
 
-    internal sealed class UWPCoreTypesConverter : CoreTypesConverterBase
+    internal sealed class UWPCoreTypesConverterCS : CoreTypesConverterBase
     {
         protected override Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }
             = GetSupportedCoreTypes();
@@ -188,6 +141,8 @@ namespace OpenSilver.Compiler
     {
         public const string TypeFromStringConvertersFullName = "global::DotNetForHtml5.Core.TypeFromStringConverters";
 
+        private static SystemTypesHelper SystemTypesHelperCS = new SystemTypesHelperCS();
+
         public static string ConvertFromInvariantStringHelper(string source, string destinationType)
         {
             return string.Format(
@@ -220,7 +175,7 @@ namespace OpenSilver.Compiler
             }
             else
             {
-                return SystemTypesHelper.ConvertFromInvariantString(stringValue, "system.timespan");
+                return SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan");
             }
         }
 
@@ -242,7 +197,7 @@ namespace OpenSilver.Compiler
                 return $"new {destinationType}({stringDoubleValue.TrimEnd()})";
             }
 
-            return SystemTypesHelper.ConvertFromInvariantString(stringValue, "system.timespan");
+            return SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan");
         }
 
         internal static string ConvertToBrush(string source, string destinationType, string colorTypeName)
@@ -560,7 +515,7 @@ namespace OpenSilver.Compiler
             }
             else
             {
-                return SystemTypesHelper.ConvertFromInvariantString(stringValue, "system.timespan");
+                return SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan");
             }
         }
 

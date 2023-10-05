@@ -41,7 +41,7 @@ namespace OpenSilver.Compiler
         static void TraverseNextElement(XElement currentElement, AssembliesInspector reflectionOnSeparateAppDomain)
         {
            
-            if (GeneratingCSharpCode.IsColorAnimation(currentElement))
+            if (GeneratingCode.IsColorAnimation(currentElement))
             {
                 //Storyboard.TargetProperty="Background.Color"
                 XAttribute targetPropertyAttr = currentElement.Attribute("Storyboard.TargetProperty");

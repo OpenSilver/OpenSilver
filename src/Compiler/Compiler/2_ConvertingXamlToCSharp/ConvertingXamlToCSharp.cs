@@ -33,7 +33,7 @@ namespace OpenSilver.Compiler
             string outputResourcesPath,
             ILogger logger)
         {
-            ConversionSettings settings = isSLMigration ? ConversionSettings.Silverlight : ConversionSettings.UWP;
+            ConversionSettings settings = isSLMigration ? ConversionSettingsCS.Silverlight : ConversionSettingsCS.UWP;
 
             // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it could be badly formatted and not be parsable using XDocument.Parse.
             xaml = ProcessingHtmlPresenterNodes.Process(xaml);
@@ -47,7 +47,7 @@ namespace OpenSilver.Compiler
             // Insert implicit nodes in XAML:
             if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
             {
-                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings);
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global::", new SystemTypesHelperCS());
 
                 FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
 
@@ -73,7 +73,7 @@ global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
 ", outputRootPath, outputAppFilesPath, outputLibrariesPath, outputResourcesPath);
 
             // Generate C# code from the tree:
-            return GeneratingCSharpCode.GenerateCSharpCode(
+            return GeneratingCSCode.GenerateCode(
                 doc,
                 sourceFile,
                 fileNameWithPathRelativeToProjectRoot,
@@ -85,30 +85,5 @@ global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
                 logger);
 
         }
-    }
-
-    internal sealed class ConversionSettings
-    {
-        public static ConversionSettings Silverlight { get; } =
-            new ConversionSettings
-            {
-                Metadata = Metadatas.Silverlight,
-                CoreTypesConverter = CoreTypesConverters.Silverlight,
-                EnableImplicitAssemblyRedirection = true,
-            };
-
-        public static ConversionSettings UWP { get; } =
-            new ConversionSettings
-            {
-                Metadata = Metadatas.UWP,
-                CoreTypesConverter = CoreTypesConverters.UWP,
-                EnableImplicitAssemblyRedirection = false,
-            };
-
-        public IMetadata Metadata { get; private set; }
-
-        public ICoreTypesConverter CoreTypesConverter { get; private set; }
-
-        public bool EnableImplicitAssemblyRedirection { get; private set; }
     }
 }
