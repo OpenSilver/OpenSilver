@@ -62,6 +62,7 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Telerik.Windows.Controls.GridView")]
 
+[assembly: OpenSilver.XamlDesigner(1)]
 
 #if MIGRATION
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows")]
