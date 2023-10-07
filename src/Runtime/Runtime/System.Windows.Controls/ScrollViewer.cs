@@ -12,12 +12,15 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 using System.Windows.Input;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
@@ -48,6 +51,19 @@ namespace Windows.UI.Xaml.Controls
         private const string ElementHorizontalScrollBarName = "HorizontalScrollBar";
         private const string ElementVerticalScrollBarName = "VerticalScrollBar";
 
+        // Property caching
+        private Visibility _scrollVisibilityX;
+        private Visibility _scrollVisibilityY;
+
+        // Scroll property values - cache of what was computed by ISI
+        private double _xPositionISI;
+        private double _yPositionISI;
+        private double _xExtent;
+        private double _yExtent;
+        private double _xSize;
+        private double _ySize;
+
+        private bool _invalidatedMeasureFromArrange;
         private IScrollInfo _scrollInfo;
 
         /// <summary>
@@ -83,7 +99,6 @@ namespace Windows.UI.Xaml.Controls
                 {
                     _scrollInfo.CanHorizontallyScroll = HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled;
                     _scrollInfo.CanVerticallyScroll = VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
-                    InvalidateScrollInfo();
                 }
             }
         }
@@ -96,7 +111,7 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public double HorizontalOffset
         {
-            get => (double)GetValue(HorizontalOffsetProperty);
+            get => _xPositionISI;
             private set => SetValue(HorizontalOffsetPropertyKey, value);
         }
 
@@ -147,7 +162,6 @@ namespace Windows.UI.Xaml.Controls
                     scrollViewer.ScrollInfo.CanHorizontallyScroll = scrollViewer.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled;
                     scrollViewer.ScrollInfo.CanVerticallyScroll = scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
                 }
-                scrollViewer.UpdateScrollbarVisibility();
             }
         }
 
@@ -159,7 +173,7 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public double VerticalOffset
         {
-            get => (double)GetValue(VerticalOffsetProperty);
+            get => _yPositionISI;
             private set => SetValue(VerticalOffsetPropertyKey, value);
         }
 
@@ -330,8 +344,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 ElementVerticalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Vertical, e); };
             }
-
-            UpdateScrollbarVisibility();
         }
 
         private void SetScrollOffset(Orientation orientation, double value)
@@ -348,8 +360,6 @@ namespace Windows.UI.Xaml.Controls
                     ScrollInfo.SetHorizontalOffset(clamped);
                 else
                     ScrollInfo.SetVerticalOffset(clamped);
-
-                UpdateScrollBar(orientation, clamped);
             }
         }
         /// <summary> 
@@ -450,11 +460,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The vertical size of the area that can be scrolled. This property has no default value.
         /// </returns>
-        public double ScrollableHeight
-        {
-            get => (double)GetValue(ScrollableHeightProperty);
-            private set => SetValue(ScrollableHeightPropertyKey, value);
-        }
+        public double ScrollableHeight => Math.Max(0.0, ExtentHeight - ViewportHeight);
 
         private static readonly DependencyPropertyKey ScrollableWidthPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -475,11 +481,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The horizontal size of the area that can be scrolled. This property has no default value.
         /// </returns>
-        public double ScrollableWidth
-        {
-            get => (double)GetValue(ScrollableWidthProperty);
-            private set => SetValue(ScrollableWidthPropertyKey, value);
-        }
+        public double ScrollableWidth => Math.Max(0.0, ExtentWidth - ViewportWidth);
 
         private static readonly DependencyPropertyKey ViewportHeightPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -499,11 +501,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The vertical size of the viewable content. This property has no default value.
         /// </returns>
-        public double ViewportHeight
-        {
-            get => (double)GetValue(ViewportHeightProperty);
-            private set => SetValue(ViewportHeightPropertyKey, value);
-        }
+        public double ViewportHeight => _ySize;
 
         private static readonly DependencyPropertyKey ViewportWidthPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -523,11 +521,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The horizontal size of the viewable content. The default value is 0.0.
         /// </returns>
-        public double ViewportWidth
-        {
-            get => (double)GetValue(ViewportWidthProperty);
-            private set => SetValue(ViewportWidthPropertyKey, value);
-        }
+        public double ViewportWidth => _xSize;
 
         private static readonly DependencyPropertyKey ComputedHorizontalScrollBarVisibilityPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -549,11 +543,7 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="Visibility"/> that indicates whether the horizontal scroll bar is visible.
         /// The default value is <see cref="Visibility.Visible"/>.
         /// </returns>
-        public Visibility ComputedHorizontalScrollBarVisibility
-        {
-            get => (Visibility)GetValue(ComputedHorizontalScrollBarVisibilityProperty);
-            private set => SetValue(ComputedHorizontalScrollBarVisibilityPropertyKey, value);
-        }
+        public Visibility ComputedHorizontalScrollBarVisibility => _scrollVisibilityX;
 
         private static readonly DependencyPropertyKey ComputedVerticalScrollBarVisibilityPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -575,11 +565,7 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="Visibility"/> that indicates whether the vertical scroll bar is visible.
         /// The default value is <see cref="Visibility.Visible"/>.
         /// </returns>
-        public Visibility ComputedVerticalScrollBarVisibility
-        {
-            get => (Visibility)GetValue(ComputedVerticalScrollBarVisibilityProperty);
-            private set => SetValue(ComputedVerticalScrollBarVisibilityPropertyKey, value);
-        }
+        public Visibility ComputedVerticalScrollBarVisibility => _scrollVisibilityY;
 
         private static readonly DependencyPropertyKey ExtentHeightPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -599,11 +585,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The vertical size of all the content for display in the <see cref="ScrollViewer"/>.
         /// </returns>
-        public double ExtentHeight
-        {
-            get => (double)GetValue(ExtentHeightProperty);
-            private set => SetValue(ExtentHeightPropertyKey, value);
-        }
+        public double ExtentHeight => _yExtent;
 
         private static readonly DependencyPropertyKey ExtentWidthPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -623,91 +605,160 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The horizontal size of all the content for display in the <see cref="ScrollViewer"/>.
         /// </returns>
-        public double ExtentWidth
-        {
-            get => (double)GetValue(ExtentWidthProperty);
-            private set => SetValue(ExtentWidthPropertyKey, value);
-        }
+        public double ExtentWidth => _xExtent;
 
         /// <summary>
         /// Called when the value of properties that describe the size and location of the scroll area change.
         /// </summary>
         public void InvalidateScrollInfo()
         {
-            if (ScrollInfo is not null)
-            {
-                // ScrollBar visibility has to be updated before ViewportHeight/Width, because
-                // that will trigger ScrollBar control sizing which depends on ScrollBar ActualWidth/Height
-                UpdateScrollbarVisibility();
+            IScrollInfo isi = ScrollInfo;
 
-                ExtentHeight = ScrollInfo.ExtentHeight;
-                ExtentWidth = ScrollInfo.ExtentWidth;
-                ViewportHeight = ScrollInfo.ViewportHeight;
-                ViewportWidth = ScrollInfo.ViewportWidth;
-                UpdateScrollBar(Orientation.Horizontal, ScrollInfo.HorizontalOffset);
-                UpdateScrollBar(Orientation.Vertical, ScrollInfo.VerticalOffset);
+            // anybody can call this method even if we don't have ISI...
+            if (isi == null)
+            {
+                return;
             }
 
-            if (Math.Max(0, ExtentHeight - ViewportHeight) != ScrollableHeight)
+            // This is a public API, and is expected to be called by the
+            // IScrollInfo implementation when any of the scrolling properties
+            // change.  Sometimes this is done independently (not as a result
+            // of laying out this ScrollViewer) and that means we should re-run
+            // the logic of determining visibility of autoscrollbars, if any.
+            //
+            // However, invalidating measure during arrange is dangerous
+            // because it could lead to layout never settling down.  This has
+            // been observed with the layout rounding feature and non-standard
+            // DPIs causing ScrollViewer to never settle on the visibility of
+            // autoscrollbars.
+            //
+            // To guard against this condition, we only allow measure to be
+            // invalidated from arrange once.
+            //
+            // We also don't invalidate measure if we are in the middle of the
+            // measure pass, as the ScrollViewer will already be updating the
+            // visibility of the autoscrollbars.
+            if (!MeasureInProgress && (!ArrangeInProgress || !_invalidatedMeasureFromArrange))
             {
-                ScrollableHeight = Math.Max(0, ExtentHeight - ViewportHeight);
-                InvalidateMeasure();
-            }
-            if (Math.Max(0, ExtentWidth - ViewportWidth) != ScrollableWidth)
-            {
-                ScrollableWidth = Math.Max(0, ExtentWidth - ViewportWidth);
-                InvalidateMeasure();
-            }
-        }
+                //
+                // Check if we should remove/add scrollbars.
+                //
+                double extent = isi.ExtentWidth;
+                double viewport = isi.ViewportWidth;
 
-        private void UpdateScrollbarVisibility()
-        {
-            // Update horizontal ScrollBar 
-            Visibility horizontalVisibility = HorizontalScrollBarVisibility switch
-            {
-                ScrollBarVisibility.Visible => Visibility.Visible,
-                ScrollBarVisibility.Disabled or ScrollBarVisibility.Hidden => Visibility.Collapsed,
-                _ => (ScrollInfo is null || ScrollInfo.ExtentWidth <= ScrollInfo.ViewportWidth) ? Visibility.Collapsed : Visibility.Visible,
-            };
-
-            if (horizontalVisibility != ComputedHorizontalScrollBarVisibility)
-            {
-                ComputedHorizontalScrollBarVisibility = horizontalVisibility;
-                InvalidateMeasure();
-            }
-
-            // Update vertical ScrollBar
-            Visibility verticalVisibility = VerticalScrollBarVisibility switch
-            {
-                ScrollBarVisibility.Visible => Visibility.Visible,
-                ScrollBarVisibility.Disabled or ScrollBarVisibility.Hidden => Visibility.Collapsed,
-                _ => (ScrollInfo is null || ScrollInfo.ExtentHeight <= ScrollInfo.ViewportHeight) ? Visibility.Collapsed : Visibility.Visible,
-            };
-
-            if (verticalVisibility != ComputedVerticalScrollBarVisibility)
-            {
-                ComputedVerticalScrollBarVisibility = verticalVisibility;
-                InvalidateMeasure();
-            }
-        }
-
-        private void UpdateScrollBar(Orientation orientation, double value)
-        {
-            // Update relevant ScrollBar
-            if (orientation == Orientation.Horizontal)
-            {
-                HorizontalOffset = value;
-                if (ElementHorizontalScrollBar is not null)
+                if (HorizontalScrollBarVisibility == ScrollBarVisibility.Auto &&
+                    ((_scrollVisibilityX == Visibility.Collapsed && DoubleUtil.GreaterThan(extent, viewport)) ||
+                     (_scrollVisibilityX == Visibility.Visible && DoubleUtil.LessThanOrClose(extent, viewport))))
                 {
-                    ElementHorizontalScrollBar.Value = value;
+                    InvalidateMeasure();
+                }
+                else
+                {
+                    extent = isi.ExtentHeight;
+                    viewport = isi.ViewportHeight;
+
+                    if (VerticalScrollBarVisibility == ScrollBarVisibility.Auto &&
+                        ((_scrollVisibilityY == Visibility.Collapsed && DoubleUtil.GreaterThan(extent, viewport)) ||
+                         (_scrollVisibilityY == Visibility.Visible && DoubleUtil.LessThanOrClose(extent, viewport))))
+                    {
+                        InvalidateMeasure();
+                    }
                 }
             }
-            else
+
+            // If any scrolling properties have actually changed, fire public events post-layout
+            if (!DoubleUtil.AreClose(HorizontalOffset, isi.HorizontalOffset) ||
+                !DoubleUtil.AreClose(VerticalOffset, isi.VerticalOffset) ||
+                !DoubleUtil.AreClose(ViewportWidth, isi.ViewportWidth) ||
+                !DoubleUtil.AreClose(ViewportHeight, isi.ViewportHeight) ||
+                !DoubleUtil.AreClose(ExtentWidth, isi.ExtentWidth) ||
+                !DoubleUtil.AreClose(ExtentHeight, isi.ExtentHeight))
             {
-                VerticalOffset = value;
-                if (ElementVerticalScrollBar is not null)
+                double oldActualHorizontalOffset = HorizontalOffset;
+                double oldActualVerticalOffset = VerticalOffset;
+
+                double oldViewportWidth = ViewportWidth;
+                double oldViewportHeight = ViewportHeight;
+
+                double oldExtentWidth = ExtentWidth;
+                double oldExtentHeight = ExtentHeight;
+
+                double oldScrollableWidth = ScrollableWidth;
+                double oldScrollableHeight = ScrollableHeight;
+
+                bool changed = false;
+
+                //
+                // Go through scrolling properties updating values.
+                //
+                if (!DoubleUtil.AreClose(oldActualHorizontalOffset, isi.HorizontalOffset))
                 {
-                    ElementVerticalScrollBar.Value = value;
+                    _xPositionISI = isi.HorizontalOffset;
+                    HorizontalOffset = _xPositionISI;
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldActualVerticalOffset, isi.VerticalOffset))
+                {
+                    _yPositionISI = isi.VerticalOffset;
+                    VerticalOffset = _yPositionISI;
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldViewportWidth, isi.ViewportWidth))
+                {
+                    _xSize = isi.ViewportWidth;
+                    SetValue(ViewportWidthPropertyKey, _xSize);
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldViewportHeight, isi.ViewportHeight))
+                {
+                    _ySize = isi.ViewportHeight;
+                    SetValue(ViewportHeightPropertyKey, _ySize);
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldExtentWidth, isi.ExtentWidth))
+                {
+                    _xExtent = isi.ExtentWidth;
+                    SetValue(ExtentWidthPropertyKey, _xExtent);
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldExtentHeight, isi.ExtentHeight))
+                {
+                    _yExtent = isi.ExtentHeight;
+                    SetValue(ExtentHeightPropertyKey, _yExtent);
+                    changed = true;
+                }
+
+                // ScrollableWidth/Height are dependant on Viewport and Extent set above.  This check must be done after those.
+                double scrollableWidth = ScrollableWidth;
+                if (!DoubleUtil.AreClose(oldScrollableWidth, ScrollableWidth))
+                {
+                    SetValue(ScrollableWidthPropertyKey, scrollableWidth);
+                    changed = true;
+                }
+
+                double scrollableHeight = ScrollableHeight;
+                if (!DoubleUtil.AreClose(oldScrollableHeight, ScrollableHeight))
+                {
+                    SetValue(ScrollableHeightPropertyKey, scrollableHeight);
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    if (ElementHorizontalScrollBar != null && !DoubleUtil.AreClose(oldActualHorizontalOffset, HorizontalOffset))
+                    {
+                        ElementHorizontalScrollBar.Value = HorizontalOffset;
+                    }
+
+                    if (ElementVerticalScrollBar != null && !DoubleUtil.AreClose(oldActualVerticalOffset, VerticalOffset))
+                    {
+                        ElementVerticalScrollBar.Value = VerticalOffset;
+                    }
                 }
             }
         }
@@ -825,5 +876,149 @@ namespace Windows.UI.Xaml.Controls
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ScrollViewerAutomationPeer(this);
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            IScrollInfo isi = ScrollInfo;
+
+            UIElement child = VisualChildrenCount > 0 ? GetVisualChild(0) : null;
+            ScrollBarVisibility vsbv = VerticalScrollBarVisibility;
+            ScrollBarVisibility hsbv = HorizontalScrollBarVisibility;
+            Size desiredSize = new Size();
+
+            if (child != null)
+            {
+                bool vsbAuto = vsbv == ScrollBarVisibility.Auto;
+                bool hsbAuto = hsbv == ScrollBarVisibility.Auto;
+                bool vDisableScroll = vsbv == ScrollBarVisibility.Disabled;
+                bool hDisableScroll = hsbv == ScrollBarVisibility.Disabled;
+                Visibility vv = vsbv == ScrollBarVisibility.Visible ? Visibility.Visible : Visibility.Collapsed;
+                Visibility hv = hsbv == ScrollBarVisibility.Visible ? Visibility.Visible : Visibility.Collapsed;
+
+                if (_scrollVisibilityY != vv)
+                {
+                    _scrollVisibilityY = vv;
+                    SetValue(ComputedVerticalScrollBarVisibilityPropertyKey, _scrollVisibilityY);
+                }
+                if (_scrollVisibilityX != hv)
+                {
+                    _scrollVisibilityX = hv;
+                    SetValue(ComputedHorizontalScrollBarVisibilityPropertyKey, _scrollVisibilityX);
+                }
+
+                if (isi != null)
+                {
+                    isi.CanHorizontallyScroll = !hDisableScroll;
+                    isi.CanVerticallyScroll = !vDisableScroll;
+                }
+
+                child.Measure(constraint);
+
+                // it could now be here as a result of visual template expansion that happens during Measure
+                isi = ScrollInfo;
+
+                if (isi != null && (hsbAuto || vsbAuto))
+                {
+                    bool makeHorizontalBarVisible = hsbAuto && DoubleUtil.GreaterThan(isi.ExtentWidth, isi.ViewportWidth);
+                    bool makeVerticalBarVisible = vsbAuto && DoubleUtil.GreaterThan(isi.ExtentHeight, isi.ViewportHeight);
+
+                    if (makeHorizontalBarVisible)
+                    {
+                        if (_scrollVisibilityX != Visibility.Visible)
+                        {
+                            _scrollVisibilityX = Visibility.Visible;
+                            SetValue(ComputedHorizontalScrollBarVisibilityPropertyKey, _scrollVisibilityX);
+                        }
+                    }
+
+                    if (makeVerticalBarVisible)
+                    {
+                        if (_scrollVisibilityY != Visibility.Visible)
+                        {
+                            _scrollVisibilityY = Visibility.Visible;
+                            SetValue(ComputedVerticalScrollBarVisibilityPropertyKey, _scrollVisibilityY);
+                        }
+                    }
+
+                    if (makeHorizontalBarVisible || makeVerticalBarVisible)
+                    {
+                        // Remeasure our visual tree.
+                        // Requires this extra invalidation because we need to remeasure Grid which is not neccessarily dirty now
+                        // since we only invlaidated scrollbars but we don't have LayoutUpdate loop at our disposal here
+                        child.InvalidateMeasure();
+                        child.Measure(constraint);
+                    }
+
+                    //if both are Auto, then appearance of one scrollbar may causes appearance of another.
+                    //If we don't re-check here, we get some part of content covered by auto scrollbar and can never reach to it since
+                    //another scrollbar may not appear (in cases when viewport==extent) - bug 1199443
+                    if (hsbAuto && vsbAuto && makeHorizontalBarVisible != makeVerticalBarVisible)
+                    {
+                        bool makeHorizontalBarVisible2 = !makeHorizontalBarVisible && DoubleUtil.GreaterThan(isi.ExtentWidth, isi.ViewportWidth);
+                        bool makeVerticalBarVisible2 = !makeVerticalBarVisible && DoubleUtil.GreaterThan(isi.ExtentHeight, isi.ViewportHeight);
+
+                        if (makeHorizontalBarVisible2)
+                        {
+                            if (_scrollVisibilityX != Visibility.Visible)
+                            {
+                                _scrollVisibilityX = Visibility.Visible;
+                                SetValue(ComputedHorizontalScrollBarVisibilityPropertyKey, _scrollVisibilityX);
+                            }
+                        }
+                        else if (makeVerticalBarVisible2) //only one can be true
+                        {
+                            if (_scrollVisibilityY != Visibility.Visible)
+                            {
+                                _scrollVisibilityY = Visibility.Visible;
+                                SetValue(ComputedVerticalScrollBarVisibilityPropertyKey, _scrollVisibilityY);
+                            }
+                        }
+
+                        if (makeHorizontalBarVisible2 || makeVerticalBarVisible2)
+                        {
+                            // Remeasure our visual tree.
+                            // Requires this extra invalidation because we need to remeasure Grid which is not neccessarily dirty now
+                            // since we only invlaidated scrollbars but we don't have LayoutUpdate loop at our disposal here
+                            child.InvalidateMeasure();
+                            child.Measure(constraint);
+                        }
+                    }
+                }
+
+                desiredSize = child.DesiredSize;
+            }
+
+            if (!ArrangeDirty && _invalidatedMeasureFromArrange)
+            {
+                // If we invalidated measure from a previous arrange pass, but
+                // if after the following measure pass we are not dirty for
+                // arrange, then ArrangeOverride will not get called, and we
+                // need to clean up our state here.
+                _invalidatedMeasureFromArrange = false;
+            }
+
+            return desiredSize;
+        }
+
+        protected override Size ArrangeOverride(Size arrangeSize)
+        {
+            bool previouslyInvalidatedMeasureFromArrange = _invalidatedMeasureFromArrange;
+
+            Size size = base.ArrangeOverride(arrangeSize);
+
+            if (previouslyInvalidatedMeasureFromArrange)
+            {
+                // If we invalidated measure from a previous arrange pass,
+                // then we are not supposed to invalidate measure this time.
+                Debug.Assert(!MeasureDirty);
+                _invalidatedMeasureFromArrange = false;
+            }
+            else
+            {
+                _invalidatedMeasureFromArrange = MeasureDirty;
+            }
+
+            return size;
+        }
     }
 }
