@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml
     public class Content
     {
         private readonly JavaScriptCallback _fullscreenchangeCallback;
-        private readonly IResizeObserverAdapter _resizeObserver;
+        private readonly ResizeObserverAdapter _resizeObserver;
 
         public Content() : this(null)
         {
@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml
                 OpenSilver.Interop.ExecuteJavaScriptVoid(
                     $"document.addEventListener('fullscreenchange', {INTERNAL_InteropImplementation.GetVariableStringForJS(_fullscreenchangeCallback)})");
 
-                _resizeObserver = ResizeObserverFactory.Create();
+                _resizeObserver = new ResizeObserverAdapter();
                 _resizeObserver.Observe(app.GetRootDiv(), OnContentSizeChanged);
 
                 // WORKINPROGRESS

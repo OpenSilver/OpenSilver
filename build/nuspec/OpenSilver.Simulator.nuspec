@@ -73,7 +73,6 @@
     <file src="../src/Runtime/Scripts/flatpickr.css" target="contentFiles/any/any/js_css" />
     <file src="../src/Runtime/Scripts/flatpickr.js" target="contentFiles/any/any/js_css" />
     <file src="../src/Runtime/Scripts/velocity.js" target="contentFiles/any/any/js_css" />
-    <file src="../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/any/js_css" />
     <file src="../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/any/js_css" />    
     <file src="../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/any/js_css" />
     <file src="../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/any/js_css" />

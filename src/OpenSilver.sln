@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{BDA9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulator", "Simulator", "{F3405D9A-9228-4579-97B7-6BFB11D2D582}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulator.OpenSilver", "Simulator\Simulator\Simulator.OpenSilver.csproj", "{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulator.OpenSilver", "Simulator\Simulator\Simulator.OpenSilver.csproj", "{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Targets", "Targets", "{AA67D4B5-3E71-4A76-8FC6-49ED51F0D599}"
 	ProjectSection(SolutionItems) = preProject
@@ -60,7 +60,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99A3
 		Runtime\Scripts\quill.core.css = Runtime\Scripts\quill.core.css
 		Runtime\Scripts\quill.min.js = Runtime\Scripts\quill.min.js
 		Runtime\Scripts\ResizeObserver.js = Runtime\Scripts\ResizeObserver.js
-		Runtime\Scripts\ResizeSensor.js = Runtime\Scripts\ResizeSensor.js
 		Runtime\Scripts\velocity.js = Runtime\Scripts\velocity.js
 	EndProjectSection
 EndProject

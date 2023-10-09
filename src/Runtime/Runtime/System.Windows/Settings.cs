@@ -85,15 +85,6 @@ namespace System
 
         public bool EnableWebRequestsLogging { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value determining whether or not to use the resizeSensor.js library
-        /// instead of the ResizeObserver API to listen for size change event in Html.
-        /// </summary>
-        /// <remarks>Should probably be removed once we get the ResizeObserver fully working.</remarks>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool UseResizeSensor { get; set; }
-
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool SyncRenderingWithLayout
         {

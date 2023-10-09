@@ -53,8 +53,7 @@ promises = [];
     'libs/cshtml5.js',
     'libs/velocity.js',
     'libs/flatpickr.js',
-    'libs/ResizeSensor.js',
-    'libs/ResizeObserver.js',    
+    'libs/ResizeObserver.js',
     'libs/quill.min.js',
     'libs/html2canvas.js']));
 

@@ -29,7 +29,7 @@ namespace CSHTML5.Native.Html.Controls
     {
         private object _jsDiv;
         private string _htmlContent;
-        private IResizeObserverAdapter _resizeObserver;
+        private ResizeObserverAdapter _resizeObserver;
 
         internal sealed override bool EnablePointerEventsCore => true;
 
@@ -44,7 +44,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            _resizeObserver = ResizeObserverFactory.Create();
+            _resizeObserver = new ResizeObserverAdapter();
             _resizeObserver.Observe(_jsDiv, OnHtmlContentResized);
 
             ApplyHtmlContent();
