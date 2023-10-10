@@ -73,11 +73,38 @@ namespace Runtime.OpenSilver.Tests
             {
                 return JsonDocument.Parse(@"""0|0""").RootElement;
             }
-            var pattern = @"document\.inputManager\.focus\(document\.getElementByIdSafe\(""([^""]*)""\)\);";
-            if (Regex.IsMatch(param, pattern))
+            var patternFocus = @"document\.inputManager\.focus\(document\.getElementByIdSafe\(""([^""]*)""\)\);";
+            if (Regex.IsMatch(param, patternFocus))
             {
                 return true;
             }
+
+            var patternCreateMeasurement = @"document\.createMeasurementService\(document\.getElementByIdSafe\(""([^""]*)""\)\);";
+            var matchesCreateMeasurement = Regex.Matches(param, patternCreateMeasurement);
+            if (matchesCreateMeasurement.Count > 0)
+            {
+                var parentId = matchesCreateMeasurement[0].Groups[1].Value;
+                return parentId + "-msr";
+            }
+
+            var patternOffsetWidth = @"document\.getElementByIdSafe\(""([^""]*)""\)\.offsetWidth";
+            if (Regex.IsMatch(param, patternOffsetWidth))
+            {
+                return 0;
+            }
+
+            var patternOffsetHeight = @"document\.getElementByIdSafe\(""([^""]*)""\)\.offsetHeight";
+            if (Regex.IsMatch(param, patternOffsetHeight))
+            {
+                return 0;
+            }
+
+            var patternGetBox = @"document\.getBBox\(document\.getElementByIdSafe\(""([^""]*)""\)\);";
+            if (Regex.IsMatch(param, patternGetBox))
+            {
+                return JsonDocument.Parse("{\"x\":0,\"y\":0,\"width\":0,\"height\":0}").RootElement;
+            }
+
             return new JsonElement();
         }
 
