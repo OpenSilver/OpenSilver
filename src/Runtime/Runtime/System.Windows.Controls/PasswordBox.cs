@@ -12,8 +12,9 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -50,9 +51,26 @@ namespace Windows.UI.Xaml.Controls
         private const string ContentElementName = "ContentElement"; // Sl & UWP
         private const string ContentElementName_WPF = "PART_ContentHost"; // WPF
 
+        private bool _isProcessingInput;
         private bool _isFocused;
         private FrameworkElement _contentElement;
-        private ITextBoxViewHost<PasswordBoxView> _textViewHost;
+        private ITextViewHost<PasswordBoxView> _textViewHost;
+
+        static PasswordBox()
+        {
+            CharacterSpacingProperty.OverrideMetadata(
+                typeof(PasswordBox),
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var pwb = (PasswordBox)d;
+                        double value = (int)newValue / 1000.0;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(pwb.INTERNAL_OuterDomElement);
+                        style.letterSpacing = $"{value.ToInvariantString()}em";
+                    },
+                });
+        }
 
         public PasswordBox()
         {
@@ -60,21 +78,20 @@ namespace Windows.UI.Xaml.Controls
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
-        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv ?? base.GetFocusTarget();
 
         /// <summary>
-        /// The DependencyID for the PasswordChar property.
-        /// Default Value: '•'
+        /// Identifies the <see cref="PasswordChar"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PasswordCharProperty =
             DependencyProperty.Register(
-                nameof(PasswordChar), 
-                typeof(char), 
-                typeof(PasswordBox), 
+                nameof(PasswordChar),
+                typeof(char),
+                typeof(PasswordBox),
                 new PropertyMetadata('•'));
 
         /// <summary>
-        /// Character to display instead of the actual password.
+        /// Character to display instead of the actual password. The default value is '•'.
         /// </summary>
         public char PasswordChar
         {
@@ -92,12 +109,12 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public int MaxLength
         {
-            get { return (int)GetValue(MaxLengthProperty); }
-            set { SetValue(MaxLengthProperty, value); }
+            get => (int)GetValue(MaxLengthProperty);
+            set => SetValue(MaxLengthProperty, value);
         }
 
         /// <summary>
-        /// Identifies the MaxLength dependency property.
+        /// Identifies the <see cref="MaxLength"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxLengthProperty =
             DependencyProperty.Register(
@@ -110,16 +127,10 @@ namespace Windows.UI.Xaml.Controls
         private static void OnMaxLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var pwb = (PasswordBox)d;
-            if (pwb._textViewHost != null)
-            {
-                pwb._textViewHost.View.OnMaxLengthChanged((int)e.NewValue);
-            }
+            pwb._textViewHost?.View.OnMaxLengthChanged((int)e.NewValue);
         }
 
-        private static bool MaxLengthValidateValue(object value)
-        {
-            return ((int)value) >= 0;
-        }
+        private static bool MaxLengthValidateValue(object value) => (int)value >= 0;
 
         /// <summary>
         /// Gets or sets the password currently held by the <see cref="PasswordBox"/>.
@@ -133,20 +144,20 @@ namespace Windows.UI.Xaml.Controls
         /// </exception>
         public string Password
         {
-            get { return (string)GetValue(PasswordProperty); }
+            get => (string)GetValue(PasswordProperty);
             set
             {
-                if (value == null)
+                if (value is null)
                 {
                     throw new ArgumentNullException(nameof(value));
                 }
 
-                SetValue(PasswordProperty, value); 
+                SetValue(PasswordProperty, value);
             }
         }
-        
+
         /// <summary>
-        /// Identifies the Password dependency property.
+        /// Identifies the <see cref="Password"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PasswordProperty =
             DependencyProperty.Register(
@@ -158,23 +169,35 @@ namespace Windows.UI.Xaml.Controls
         private static void OnPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var pwb = (PasswordBox)d;
-            if (pwb._textViewHost != null)
+            if (pwb._isProcessingInput)
             {
-                pwb._textViewHost.View.OnPasswordChanged((string)e.NewValue);
+                // Clear the flag to allow changing the Text during TextChanged
+                pwb._isProcessingInput = false;
+            }
+            else
+            {
+                pwb._textViewHost?.View.SetPasswordNative((string)e.NewValue);
             }
 
-            pwb.OnPasswordChanged(new RoutedEventArgs
-            {
-                OriginalSource = pwb
-            });
+            pwb.OnPasswordChanged(new RoutedEventArgs { OriginalSource = pwb });
         }
 
-        private static object CoercePassword(DependencyObject d, object baseValue)
+        private static object CoercePassword(DependencyObject d, object baseValue) => baseValue ?? string.Empty;
+
+        internal void UpdatePasswordProperty(string text)
         {
-            return baseValue ?? string.Empty;
+            _isProcessingInput = true;
+            try
+            {
+                SetCurrentValue(PasswordProperty, text);
+            }
+            finally
+            {
+                _isProcessingInput = false;
+            }
         }
 
-#region password changed event
+        #region password changed event
 
         /// <summary>
         /// Occurs when the value of the Password property changes.
@@ -186,10 +209,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected void OnPasswordChanged(RoutedEventArgs eventArgs)
         {
-            if (PasswordChanged != null)
-            {
-                PasswordChanged(this, eventArgs);
-            }
+            PasswordChanged?.Invoke(this, eventArgs);
         }
 
         #endregion
@@ -273,8 +293,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Builds the visual tree for the <see cref="PasswordBox" /> 
-        /// control when a new template is applied.
+        /// Builds the visual tree for the <see cref="PasswordBox" /> control when 
+        /// a new template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -302,19 +322,15 @@ namespace Windows.UI.Xaml.Controls
             UpdateVisualStates();
         }
 
-        private PasswordBoxView CreateView()
-        {
-            return new PasswordBoxView(this);
-        }
+        private PasswordBoxView CreateView() => new PasswordBoxView(this);
 
         private void InitializeContentElement()
         {
-            _textViewHost = TextBox.GetContentHost<PasswordBoxView>(_contentElement);
+            _textViewHost = TextViewHostProvider.From<PasswordBoxView>(_contentElement);
 
             if (_textViewHost != null)
             {
                 PasswordBoxView view = CreateView();
-
                 _textViewHost.AttachView(view);
             }
         }
@@ -334,17 +350,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Selects all the character in the PasswordBox.
         /// </summary>
-        public void SelectAll()
-        {
-            if (INTERNAL_InnerDomElement is null)
-            {
-                return;
-            }
-
-            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_InnerDomElement);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"{sDiv}.setSelectionRange(0, {sDiv}.value.length)");
-        }
+        public void SelectAll() => _textViewHost?.View.SelectNative();
 
         internal override void UpdateVisualStates()
         {
@@ -374,7 +380,12 @@ namespace Windows.UI.Xaml.Controls
         #region Not supported yet
 
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CaretBrushProperty = DependencyProperty.Register("CaretBrush", typeof(Brush), typeof(PasswordBox), null);
+        public static readonly DependencyProperty CaretBrushProperty =
+            DependencyProperty.Register(
+                nameof(CaretBrush),
+                typeof(Brush),
+                typeof(PasswordBox),
+                null);
 
         /// <summary>
         /// Gets or sets the brush that is used to render the vertical bar that indicates the insertion point.
@@ -382,12 +393,17 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public Brush CaretBrush
         {
-            get { return (Brush)this.GetValue(PasswordBox.CaretBrushProperty); }
-            set { this.SetValue(PasswordBox.CaretBrushProperty, value); }
+            get => (Brush)GetValue(CaretBrushProperty);
+            set => SetValue(CaretBrushProperty, value);
         }
 
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(PasswordBox), null);
+        public static readonly DependencyProperty SelectionBackgroundProperty =
+            DependencyProperty.Register(
+                nameof(SelectionBackground),
+                typeof(Brush),
+                typeof(PasswordBox),
+                null);
 
         /// <summary>
         /// Gets or sets the brush used to render the background for the selected text.
@@ -395,8 +411,8 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public Brush SelectionBackground
         {
-            get { return (Brush)this.GetValue(PasswordBox.SelectionBackgroundProperty); }
-            set { this.SetValue(PasswordBox.SelectionBackgroundProperty, value); }
+            get => (Brush)GetValue(SelectionBackgroundProperty);
+            set => SetValue(SelectionBackgroundProperty, value);
         }
 
         /// <summary>
@@ -417,10 +433,10 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public Brush SelectionForeground
         {
-            get { return (Brush)this.GetValue(SelectionForegroundProperty); }
-            set { this.SetValue(SelectionForegroundProperty, value); }
+            get => (Brush)GetValue(SelectionForegroundProperty);
+            set => SetValue(SelectionForegroundProperty, value);
         }
 
-#endregion
+        #endregion
     }
 }

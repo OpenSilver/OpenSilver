@@ -11,8 +11,15 @@
 *  
 \*====================================================================================*/
 
-#if !MIGRATION
+using System.Diagnostics;
+
+#if MIGRATION
+using System.Windows.Controls;
+using System.Windows.Media;
+#else
 using Windows.UI.Text;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -36,4 +43,54 @@ internal static class TextElementProperties
             typeof(FontWeight),
             typeof(TextElementProperties),
             new PropertyMetadata(FontWeights.Normal) { Inherits = true, });
+
+    public static readonly DependencyProperty CharacterSpacingProperty =
+        DependencyProperty.RegisterAttached(
+            "CharacterSpacing",
+            typeof(int),
+            typeof(TextElementProperties),
+            new PropertyMetadata(0) { Inherits = true, });
+
+    public static readonly DependencyProperty FontFamilyProperty =
+        DependencyProperty.RegisterAttached(
+            "FontFamily",
+            typeof(FontFamily),
+            typeof(TextElementProperties),
+            new PropertyMetadata(FontFamily.Default) { Inherits = true, },
+            IsValidFontFamily);
+
+    private static bool IsValidFontFamily(object o) => o is FontFamily;
+
+    internal static void InvalidateMeasureOnFontFamilyChanged(UIElement uie, FontFamily font)
+    {
+        var face = font.GetFontFace(uie);
+        if (face.IsLoaded)
+        {
+            if (uie is TextBlock tb)
+            {
+                tb.InvalidateCacheAndMeasure();
+            }
+            else
+            {
+                uie.InvalidateMeasure();
+            }
+        }
+        else
+        {
+            face.RegisterForMeasure(uie);
+            _ = face.LoadAsync();
+        }
+    }
+
+    internal static double GetBaseLineOffsetNative(UIElement uie)
+    {
+        Debug.Assert(uie is not null);
+        if (uie.INTERNAL_OuterDomElement is not null)
+        {
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(uie.INTERNAL_OuterDomElement);
+            return OpenSilver.Interop.ExecuteJavaScriptDouble($"document.getBaseLineOffset({sDiv});");
+        }
+
+        return 0.0;
+    }
 }

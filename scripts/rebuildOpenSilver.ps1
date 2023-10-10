@@ -1,10 +1,10 @@
 param (
-    $OS_VERSION = $(if ($null -eq $env:OS_VERSION) { "1.1.0" } else { $env:OS_VERSION }),
+    $OS_VERSION = $(if ($null -eq $env:OS_VERSION) { "1.2.0" } else { $env:OS_VERSION }),
     $OS_CONFIGURATION = $(if ($null -eq $env:OS_CONFIGURATION) { "SL" } else { $env:OS_CONFIGURATION }),
     $OS_NAME = $(if ($null -eq $env:OS_NAME) { "OpenSilver" } else { $env:OS_NAME }),
     $OS_SIMULATOR_NAME = $(if ($null -eq $env:OS_SIMULATOR_NAME) { "OpenSilver.Simulator" } else { $env:OS_SIMULATOR_NAME }),
-    $OS_SIMULATOR_VERSION = $(if ($null -eq $env:OS_SIMULATOR_VERSION) { "1.1.0" } else { $env:OS_SIMULATOR_VERSION }),
-    $OS_BUILD_VERSION=$(if ($null -eq $env:OS_BUILD_VERSION) { "1.1.0" } else { $env:OS_BUILD_VERSION }),
+    $OS_SIMULATOR_VERSION = $(if ($null -eq $env:OS_SIMULATOR_VERSION) { "1.2.0" } else { $env:OS_SIMULATOR_VERSION }),
+    $OS_BUILD_VERSION=$(if ($null -eq $env:OS_BUILD_VERSION) { "1.2.0" } else { $env:OS_BUILD_VERSION }),
     $MSBUILD = "msbuild.exe",
     $NUGET_CACHE = "$env:USERPROFILE\.nuget\packages",
     $COPY_PDB = $false,
@@ -27,15 +27,17 @@ Push-Location ".."
 try {
 
     # Recompile opensilver.compiler and copy into local cache
-    echo "a" | .\restore-packages-opensilver.bat
+    Write-Output "a" | .\restore-packages-opensilver.bat
     get-childitem -Include bin -Recurse -force | Remove-Item -Force -Recurse
     get-childitem -Include obj -Recurse -force | Remove-Item -Force -Recurse
 
     Invoke-Expression "&'$MSBUILD' .\build\slnf\OpenSilver.slnf /t:""Restore;Clean"" /p:Configuration=$OS_CONFIGURATION /consoleloggerparameters:ErrorsOnly"
 
     .\build\nuget.exe install Mono.Cecil -Version 0.9.5.0 -OutputDirectory src\packages
-    .\build\nuget.exe install MahApps.Metro -Version 1.2.4 -OutputDirectory src\packages
-    .\build\nuget.exe install DotNetBrowser -Version 1.21.5 -OutputDirectory src\packages
+    .\build\nuget.exe install MahApps.Metro -Version 2.4.9 -OutputDirectory src\packages
+    .\build\nuget.exe install Microsoft.Web.WebView2 -Version 1.0.1905-prerelease -OutputDirectory src\packages
+    .\build\nuget.exe install Microsoft.Web.WebView2.DevToolsProtocolExtension -Version 1.0.824 -OutputDirectory src\packages
+    .\build\nuget.exe install Microsoft.Extensions.ObjectPool -Version 7.0.4 -OutputDirectory src\packages
     .\build\nuget.exe install NuGet.Build.Tasks.Pack -Version 5.9.1 -OutputDirectory src\packages
 
     taskkill /fi "imagename eq msbuild.exe" /f
@@ -51,7 +53,6 @@ try {
     xcopy /y "src\Targets\$OS_NAME.targets" "src\packages\$OS_NAME.$OS_BUILD_VERSION\build\"
     xcopy /y "src\Targets\OpenSilver.Common.targets" "src\packages\$OS_NAME.$OS_BUILD_VERSION\build\"
 
-
     # Build
     Invoke-Expression "&'$MSBUILD' .\build\slnf\OpenSilver.slnf /p:Configuration=$OS_CONFIGURATION /consoleloggerparameters:ErrorsOnly /t:""clean;build"" $BUILD_PARAMS"
 
@@ -62,15 +63,15 @@ try {
         $date = (get-date -Format "MM/dd/yyy HH:mm:ss").toString()
 
         If(!(test-path temp)) {
-            md temp
+            mkdir temp
         }
-        echo "Opensilver $OS_VERSION ($date)" > temp/Version.txt
+        Write-Output "Opensilver $OS_VERSION ($date)" > temp/Version.txt
         .\nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=$OS_NAME;PackageVersion=$OS_VERSION;Configuration=$OS_CONFIGURATION;Target=$OS_NAME"
 
         if ($true -eq $BUILD_SIMULATOR) {
             Invoke-Expression "&'$MSBUILD' .\slnf\OpenSilver.Simulator.slnf /p:Configuration=$OS_CONFIGURATION /consoleloggerparameters:ErrorsOnly /t:""clean;restore;build"""
 
-            echo "Opensilver.Simulator $OS_VERSION ($date)" > temp/Version.txt
+            Write-Output "Opensilver.Simulator $OS_VERSION ($date)" > temp/Version.txt
             Invoke-Expression "&'$MSBUILD' -t:pack .\slnf\OpenSilver.Simulator.slnf -p:Configuration=SL -p:PackageOutputPath=""$pwd/output/OpenSilver"" -p:NuspecFile=""$pwd/nuspec/OpenSilver.Simulator.nuspec"" -p:NuspecBasePath=""$pwd"" -p:NuspecProperties=PackageVersion=$OS_SIMULATOR_VERSION /consoleloggerparameters:ErrorsOnly"
         }
     }
@@ -82,7 +83,7 @@ try {
 
         # Force Cache restore
         If(!(test-path cache-temp)) {
-            md cache-temp
+            mkdir cache-temp
         }
 
         Push-Location cache-temp

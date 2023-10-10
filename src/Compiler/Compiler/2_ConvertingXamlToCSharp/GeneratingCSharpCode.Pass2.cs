@@ -26,7 +26,7 @@ using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
-    internal static partial class GeneratingCSharpCode
+    internal static partial class GeneratingCSCode
     {
         private class GeneratorPass2 : ICodeGenerator
         {
@@ -141,7 +141,7 @@ namespace OpenSilver.Compiler
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
-                public readonly ComponentConnectorBuilder ComponentConnector = new ComponentConnectorBuilder();
+                public readonly ComponentConnectorBuilderCS ComponentConnector = new ComponentConnectorBuilderCS();
 
                 public bool GenerateFieldsForNamedElements { get; set; }
 
@@ -166,6 +166,8 @@ namespace OpenSilver.Compiler
                 public string CurrentXamlContext => CurrentScope.XamlContext;
             }
 
+            private ConvertingStringToValue ConvertingStringToValue = new ConvertingStringToValueCS();
+
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
 
             private readonly XamlReader _reader;
@@ -177,6 +179,7 @@ namespace OpenSilver.Compiler
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
+            private SystemTypesHelperCS _systemTypesHelper = new SystemTypesHelperCS();
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -211,7 +214,7 @@ namespace OpenSilver.Compiler
                         _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName);
 
                 parameters.PushScope(
-                    new RootScope(GetUniqueName(_reader.Document.Root),
+                    new RootScope(GeneratingCode.GetUniqueName(_reader.Document.Root),
                         _reflectionOnSeparateAppDomain.IsAssignableFrom(
                             _settings.Metadata.SystemWindowsNS, "IFrameworkElement",
                             _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
@@ -263,8 +266,13 @@ namespace OpenSilver.Compiler
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
+                    string additionalConstructors = IsClassTheApplicationClass(baseType)
+                        ? $"private {className}(global::OpenSilver.XamlDesignerConstructorStub stub) {{ InitializeComponent(); }}"
+                        : string.Empty;
+
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(initializeComponentMethod,
+                    string partialClass = GeneratePartialClass(additionalConstructors,
+                                                               initializeComponentMethod,
                                                                connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
@@ -276,7 +284,7 @@ namespace OpenSilver.Compiler
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
-                        GetUniqueName(_reader.Document.Root),
+                        GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
                         $"return ({componentTypeFullName})global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof({componentTypeFullName}));",
                         parameters.ResultingMethods,
@@ -292,7 +300,7 @@ namespace OpenSilver.Compiler
                 }
                 else
                 {
-                    string rootElementName = GetUniqueName(_reader.Document.Root);
+                    string rootElementName = GeneratingCode.GetUniqueName(_reader.Document.Root);
 
                     string finalCode = GenerateFactoryClass(
                         baseType,
@@ -324,7 +332,7 @@ namespace OpenSilver.Compiler
                     out string assemblyNameIfAny);
 
                 bool isRootElement = IsElementTheRootElement(element);
-                bool isKnownSystemType = SystemTypesHelper.IsSupportedSystemType(
+                bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
                     elementTypeInCSharp.Substring("global::".Length), assemblyNameIfAny
                 );
                 bool isInitializeTypeFromString =
@@ -333,7 +341,7 @@ namespace OpenSilver.Compiler
                 // Add the constructor (in case of object) or a direct initialization (in case
                 // of system type or "isInitializeFromString" or referenced ResourceDictionary)
                 // (unless this is the root element)
-                string elementUniqueNameOrThisKeyword = GetUniqueName(element);
+                string elementUniqueNameOrThisKeyword = GeneratingCode.GetUniqueName(element);
 
                 bool flag = false;
                 if (!isRootElement)
@@ -353,7 +361,7 @@ namespace OpenSilver.Compiler
                         {
                             // If the direct content is not specified, we use the type's
                             // default value (ex: <sys:String></sys:String>)
-                            directContent = SystemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
+                            directContent = _systemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
                         parameters.StringBuilder.AppendLine(
@@ -361,7 +369,7 @@ namespace OpenSilver.Compiler
                                 "{1} {0} = {3}.XamlContext_WriteStartObject({4}, {2});",
                                 elementUniqueNameOrThisKeyword,
                                 elementTypeInCSharp,
-                                SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
+                                _systemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
                             )
@@ -467,8 +475,8 @@ namespace OpenSilver.Compiler
                         bool isAttachedProperty = attributeLocalName.Contains(".");
                         if (!isAttachedProperty)
                         {
-                            bool isXNameAttr = IsXNameAttribute(attribute);
-                            if (isXNameAttr || IsNameAttribute(attribute))
+                            bool isXNameAttr = GeneratingCode.IsXNameAttribute(attribute);
+                            if (isXNameAttr || GeneratingCode.IsNameAttribute(attribute))
                             {
                                 //-------------
                                 // x:Name (or "Name")
@@ -480,7 +488,7 @@ namespace OpenSilver.Compiler
                                 if (isElementInRootNamescope && parameters.GenerateFieldsForNamedElements)
                                 {
                                     string fieldModifier = _settings.Metadata.FieldModifier;
-                                    XAttribute attr = element.Attribute(xNamespace + "FieldModifier");
+                                    XAttribute attr = element.Attribute(GeneratingCode.xNamespace + "FieldModifier");
                                     if (attr != null)
                                     {
                                         fieldModifier = (attr.Value ?? "").ToLower();
@@ -607,7 +615,7 @@ namespace OpenSilver.Compiler
                                                     parameters.StringBuilder.AppendLine(
                                                         string.Format("{0}.XamlPath = {1};",
                                                             elementUniqueNameOrThisKeyword,
-                                                            SystemTypesHelper.ConvertFromInvariantString(resolvedPath, "System.String")
+                                                            _systemTypesHelper.ConvertFromInvariantString(resolvedPath, "System.String")
                                                         )
                                                     );
                                                 }
@@ -631,7 +639,7 @@ namespace OpenSilver.Compiler
                                                 parameters.StringBuilder.AppendLine(
                                                     string.Format("{0}.DependencyPropertyName = {1};",
                                                         elementUniqueNameOrThisKeyword,
-                                                        SystemTypesHelper.ConvertFromInvariantString(propertyName, "System.String")));
+                                                        _systemTypesHelper.ConvertFromInvariantString(propertyName, "System.String")));
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
@@ -727,11 +735,11 @@ namespace OpenSilver.Compiler
                         throw new XamlParseException("A FrameworkTemplate cannot have more than one child.", element);
                     }
 
-                    string frameworkTemplateName = GetUniqueName(element);
+                    string frameworkTemplateName = GeneratingCode.GetUniqueName(element);
 
                     FrameworkTemplateScope scope = new FrameworkTemplateScope(
                         frameworkTemplateName,
-                        GetUniqueName(member.Elements().First()),
+                        GeneratingCode.GetUniqueName(member.Elements().First()),
                         _settings.Metadata);
 
                     parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, {scope.MethodName});");
@@ -749,7 +757,7 @@ namespace OpenSilver.Compiler
 
                 // Get information about the parent element (to which the property applies) and the element itself:
                 var parentElement = element.Parent;
-                string parentElementUniqueNameOrThisKeyword = GetUniqueName(parentElement);
+                string parentElementUniqueNameOrThisKeyword = GeneratingCode.GetUniqueName(parentElement);
                 string typeName = element.Name.LocalName.Split('.')[0];
                 string propertyName = element.Name.LocalName.Split('.')[1];
                 XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
@@ -772,7 +780,7 @@ namespace OpenSilver.Compiler
                     if (IsPropertyOrFieldACollection(element, isAttachedProperty)
                         && (element.Elements().Count() != 1
                         || (!IsTypeAssignableFrom(element.Elements().First().Name, element.Name, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
-                        && !IsBinding(element.Elements().First())
+                        && !GeneratingCode.IsBinding(element.Elements().First())
                         && element.Elements().First().Name.LocalName != "StaticResourceExtension"
                         && element.Elements().First().Name.LocalName != "StaticResource"
                         && element.Elements().First().Name.LocalName != "TemplateBinding"
@@ -806,22 +814,22 @@ namespace OpenSilver.Compiler
                             string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                             if (isImplicitStyle)
                             {
-                                parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add(typeof({childKey}), {GetUniqueName(child)});");
+                                parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add(typeof({childKey}), {GeneratingCode.GetUniqueName(child)});");
                             }
                             else if (isImplicitDataTemplate)
                             {
                                 string key = $"new global::{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof({childKey}))";
 
-                                parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add({key}, {GetUniqueName(child)});");
+                                parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add({key}, {GeneratingCode.GetUniqueName(child)});");
                             }
                             else
                             {
-                                parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add(\"{childKey}\", {GetUniqueName(child)});");
+                                parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add(\"{childKey}\", {GeneratingCode.GetUniqueName(child)});");
                             }
                         }
                         else
                         {
-                            parameters.StringBuilder.AppendLine($"((global::System.Collections.IList){codeToAccessTheEnumerable}).Add({GetUniqueName(child)});");
+                            parameters.StringBuilder.AppendLine($"((global::System.Collections.IList){codeToAccessTheEnumerable}).Add({GeneratingCode.GetUniqueName(child)});");
                         }
                     }
                     else
@@ -830,7 +838,7 @@ namespace OpenSilver.Compiler
                         // PROPERTY TYPE IS NOT A COLLECTION
                         //------------------------
 
-                        string childUniqueName = GetUniqueName(child);
+                        string childUniqueName = GeneratingCode.GetUniqueName(child);
                         // Note about "RelativeSource": even though it inherits from "MarkupExtension", we do not was
                         // to consider "RelativeSource" as a markup extension for the compilation because it is only
                         // meant to be used WITHIN another markup extension (sort of a "nested" markup extension),
@@ -889,7 +897,7 @@ namespace OpenSilver.Compiler
                                             "{0}.Set{1}({2}, ({3})({4}.CallProvideValue({5}, {6})));",
                                             elementTypeInCSharp,
                                             propertyName,
-                                            GetUniqueName(parent),
+                                            GeneratingCode.GetUniqueName(parent),
                                             "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
                                             parameters.CurrentXamlContext,
@@ -915,7 +923,7 @@ namespace OpenSilver.Compiler
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
                                             "{0}.{1} = ({2}){3}.CallProvideValue({4}, {5});",
-                                            GetUniqueName(parent),
+                                            GeneratingCode.GetUniqueName(parent),
                                             propertyName,
                                             "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
@@ -977,7 +985,7 @@ namespace OpenSilver.Compiler
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2};", parentElementUniqueNameOrThisKeyword, propertyName, GetUniqueName(child)));
+                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2};", parentElementUniqueNameOrThisKeyword, propertyName, GeneratingCode.GetUniqueName(child)));
                                 }
                                 else
                                 {
@@ -986,7 +994,7 @@ namespace OpenSilver.Compiler
                                             "global::{3}.BindingOperations.SetBinding({0}, {1}, {2});",
                                             parentElementUniqueNameOrThisKeyword,
                                             propertyDeclaringTypeName + "." + propertyName + "Property",
-                                            GetUniqueName(child),
+                                            GeneratingCode.GetUniqueName(child),
                                             _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
                                 }
                             }
@@ -1003,10 +1011,10 @@ namespace OpenSilver.Compiler
                                     "{0}.SetValue({1}, {2}.ProvideValue(new global::System.ServiceProvider({3}, null)));",
                                     parentElementUniqueNameOrThisKeyword,
                                     dependencyPropertyName,
-                                    GetUniqueName(child),
+                                    GeneratingCode.GetUniqueName(child),
                                     parameters.CurrentScope is FrameworkTemplateScope scope ? scope.TemplateOwner : TemplateOwnerValuePlaceHolder));
                             }
-                            else if (child.Name == xNamespace + "NullExtension")
+                            else if (child.Name == GeneratingCode.xNamespace + "NullExtension")
                             {
                                 //------------------------------
                                 // {x:Null}
@@ -1064,7 +1072,7 @@ namespace OpenSilver.Compiler
 
                                     string markupExtension = string.Format(
                                         "(({0}){1}).ProvideValue(new global::System.ServiceProvider({2}, {3}))",
-                                        IMarkupExtensionClass, childUniqueName, GetUniqueName(parent), propertyKeyString
+                                        IMarkupExtensionClass, childUniqueName, GeneratingCode.GetUniqueName(parent), propertyKeyString
                                     );
 
                                     parameters.StringBuilder.AppendLine(
@@ -1134,7 +1142,7 @@ else
 }}",
                                                           customMarkupValueName, //0
                                                           childUniqueName,//1
-                                                          GetUniqueName(parent),//2
+                                                          GeneratingCode.GetUniqueName(parent),//2
                                                           propertyKeyString,//3
                                                           bindingBaseTypeString,//4
                                                           propertyName,//5
@@ -1149,7 +1157,7 @@ else
                                         parameters.StringBuilder.AppendLine(
                                             string.Format(
                                                 "{0}.{1} = ({2})(({3}){4}).ProvideValue(new global::System.ServiceProvider({0}, {5}));",
-                                                GetUniqueName(parent),
+                                                GeneratingCode.GetUniqueName(parent),
                                                 propertyName,
                                                 "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                                 IMarkupExtensionClass,
@@ -1168,29 +1176,29 @@ else
                 XElement target = _reader.MemberData.Target;
                 XElement child = _reader.MemberData.Value;
 
-                string targetUniqueName = GetUniqueName(target);
+                string targetUniqueName = GeneratingCode.GetUniqueName(target);
 
                 if (IsElementADictionary(target))
                 {
                     string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                     if (isImplicitStyle)
                     {
-                        parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add(typeof({childKey}), {GetUniqueName(child)});");
+                        parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add(typeof({childKey}), {GeneratingCode.GetUniqueName(child)});");
                     }
                     else if (isImplicitDataTemplate)
                     {
                         string key = $"new global::{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof({childKey}))";
 
-                        parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add({key}, {GetUniqueName(child)});");
+                        parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add({key}, {GeneratingCode.GetUniqueName(child)});");
                     }
                     else
                     {
-                        parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add(\"{childKey}\", {GetUniqueName(child)});");
+                        parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add(\"{childKey}\", {GeneratingCode.GetUniqueName(child)});");
                     }
                 }
                 else
                 {
-                    parameters.StringBuilder.AppendLine($"((global::System.Collections.IList){targetUniqueName}).Add({GetUniqueName(child)});");
+                    parameters.StringBuilder.AppendLine($"((global::System.Collections.IList){targetUniqueName}).Add({GeneratingCode.GetUniqueName(child)});");
                 }
             }
 
@@ -1391,20 +1399,20 @@ else
                 isImplicitStyle = false;
                 isImplicitDataTemplate = false;
 
-                if (element.Attribute(xNamespace + "Key") != null)
+                if (element.Attribute(GeneratingCode.xNamespace + "Key") != null)
                 {
-                    return element.Attribute(xNamespace + "Key").Value;
+                    return element.Attribute(GeneratingCode.xNamespace + "Key").Value;
                 }
-                else if (element.Attribute(xNamespace + "Name") != null)
+                else if (element.Attribute(GeneratingCode.xNamespace + "Name") != null)
                 {
-                    return element.Attribute(xNamespace + "Name").Value;
+                    return element.Attribute(GeneratingCode.xNamespace + "Name").Value;
                 }
-                else if (IsStyle(element))
+                else if (GeneratingCode.IsStyle(element))
                 {
                     isImplicitStyle = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element);
                 }
-                else if (IsDataTemplate(element) && element.Attribute("DataType") != null)
+                else if (GeneratingCode.IsDataTemplate(element) && element.Attribute("DataType") != null)
                 {
                     isImplicitDataTemplate = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true);
@@ -1529,7 +1537,7 @@ else
                         propertyName,
                         xName);
 
-                    bool isKnownSystemType = SystemTypesHelper.IsSupportedSystemType(
+                    bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
                         valueTypeFullName.Substring("global::".Length), valueAssemblyName
                     );
 
@@ -1773,7 +1781,7 @@ else
                 }
                 else if (isKnownSystemType)
                 {
-                    preparedValue = SystemTypesHelper.ConvertFromInvariantString(
+                    preparedValue = _systemTypesHelper.ConvertFromInvariantString(
                         value, type.Substring("global::".Length)
                     );
                 }

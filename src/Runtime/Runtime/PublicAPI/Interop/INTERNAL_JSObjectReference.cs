@@ -165,17 +165,13 @@ namespace CSHTML5.Types
             if (IsArray)
             {
                 var fullName = Value.GetType().FullName;
-                if (Value != null && fullName == "DotNetBrowser.JSArray")
+                if (Value is string s)
                 {
-                    result = ((dynamic)Value)[ArrayIndex];
+                    result = s;
                 }
                 else if (Value is object[] array)
                 {
                     result = array[ArrayIndex];
-                }
-                else if (Value != null && (fullName == "DotNetBrowser.JSObject"))
-                {
-                    result = ((dynamic)Value).GetProperty(ArrayIndex.ToString());
                 }
                 else
                 {
@@ -191,33 +187,14 @@ namespace CSHTML5.Types
             {
                 return null;
             }
-            else if (result.GetType().FullName == "DotNetBrowser.JSNumber")
-            {
-                return ((dynamic)result).GetNumber();
-            }
-            else if (result.GetType().FullName == "DotNetBrowser.JSBoolean")
-            {
-                return ((dynamic)result).GetBool();
-            }
-            else if (result.GetType().FullName == "DotNetBrowser.JSString")
-            {
-                return ((dynamic)result).GetString();
-            }
 
-            return DotNetForHtml5.Core.INTERNAL_Simulator.ConvertBrowserResult(result);
+            return result;
         }
 
         public bool IsUndefined()
         {
             var actualValue = GetActualValue();
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                return actualValue == null || actualValue.GetType().FullName == "DotNetBrowser.JSUndefined";
-            }
-            else
-            {
-                return actualValue == null || actualValue.ToString() == "[UNDEFINED]";
-            }
+            return actualValue == null || actualValue.ToString() == "[UNDEFINED]";
         }
 
         public bool IsNull() => GetActualValue() == null;

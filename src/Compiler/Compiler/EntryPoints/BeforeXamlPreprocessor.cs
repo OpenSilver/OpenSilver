@@ -37,6 +37,9 @@ namespace OpenSilver.Compiler
         [Required]
         public string Flags { get; set; }
 
+        [Required]
+        public string Language { get; set; }
+
         public string SourceAssemblyForPass2 { get; set; }
 
         public bool IsProcessingCSHTML5Itself { get; set; }
@@ -50,6 +53,7 @@ namespace OpenSilver.Compiler
                 IsSecondPass,
                 IsSLMigration,
                 Flags,
+                LanguageHelpers.GetLanguage(Language),
                 ResolvedReferences,
                 SourceAssemblyForPass2,
                 IsProcessingCSHTML5Itself,
@@ -60,6 +64,7 @@ namespace OpenSilver.Compiler
             bool isSecondPass,
             bool isSLMigration,
             string flagsString,
+            SupportedLanguage language,
             ITaskItem[] resolvedReferences,
             string sourceAssemblyForPass2,
             bool isProcessingCSHTML5Itself,
@@ -86,7 +91,7 @@ namespace OpenSilver.Compiler
                         throw new Exception(operationName + " failed because the SourceAssembly parameter was not specified during the second pass.");
 
                     // Create a new static instance of the "ReflectionOnSeparateAppDomainHandler":
-                    AssembliesInspector.Current = new AssembliesInspector(isSLMigration);
+                    AssembliesInspector.Current = new AssembliesInspector(isSLMigration, language);
                     AssembliesInspector reflectionOnSeparateAppDomain = AssembliesInspector.Current;
 
                     // we load the source assembly early in case we are processing the CSHTML5.

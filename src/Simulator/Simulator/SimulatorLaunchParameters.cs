@@ -1,7 +1,5 @@
-﻿using DotNetBrowser.WPF;
-using DotNetForHtml5.EmulatorWithoutJavascript;
-using System;
-using System.Collections.Generic;
+﻿using DotNetForHtml5.EmulatorWithoutJavascript;
+using Microsoft.Web.WebView2.Wpf;
 
 #if OPENSILVER
 namespace OpenSilver.Simulator
@@ -17,7 +15,7 @@ namespace CSHTML5.Simulator
         // note: this can grow very very fast, so if you don't need it, I suggest you turn it off
         public bool LogExecutedJavaScriptCode { get; set; } = true;
 
-        public Action<WPFBrowserView> BrowserCreatedCallback { get; set; }
+        public Action<WebView2> BrowserCreatedCallback { get; set; }
 
         /// <summary>
         /// Action to call when the provided app class is created successfully.

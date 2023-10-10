@@ -1730,13 +1730,6 @@ namespace Windows.UI.Xaml.Controls
             return GenerateRow(rowIndex, slot, this.DataConnection.GetDataItem(rowIndex));
         }
 
-        private static DataGridRow NewDataGridRow(bool keepHiddenOnFirstRender)
-        {
-            var row = new DataGridRow();
-            RuntimeHelpers.UIElement_SetKeepHiddenInFirstRender(row, keepHiddenOnFirstRender);
-            return row;
-        }
-
         /// <summary>
         /// Returns a row for the provided index. The row gets first loaded through the LoadingRow event.
         /// </summary>
@@ -1746,7 +1739,7 @@ namespace Windows.UI.Xaml.Controls
             DataGridRow dataGridRow = GetGeneratedRow(dataContext);
             if (dataGridRow == null)
             {
-                dataGridRow = this.DisplayData.GetUsedRow() ?? NewDataGridRow(true);
+                dataGridRow = this.DisplayData.GetUsedRow() ?? new DataGridRow();
                 dataGridRow.Index = rowIndex;
                 dataGridRow.Slot = slot;
                 dataGridRow.OwningGrid = this;

@@ -1,0 +1,37 @@
+<VSTemplate Version="3.0.0" Type="ProjectGroup" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+    <TemplateData>
+        <Name>OpenSilver Application (Visual Basic)</Name>
+        <Description>A blank project for creating a rich internet application using OpenSilver. OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</Description>
+        <Icon>Icon.ico</Icon>
+        <ProjectType>VisualBasic</ProjectType>
+        <LanguageTag>Visual Basic</LanguageTag>
+        <SortOrder>50</SortOrder>
+        <CreateNewFolder>true</CreateNewFolder>
+        <DefaultName>OpenSilverApplication</DefaultName>
+        <ProvideDefaultName>true</ProvideDefaultName>
+        <CreateInPlace>true</CreateInPlace>
+    </TemplateData>
+    <TemplateContent>
+        <ProjectCollection>
+            <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Browser">
+                OpenSilverVBApplication.Browser\OpenSilverApplication.Browser.vstemplate
+            </ProjectTemplateLink>
+            <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">
+                OpenSilverVBApplication\OpenSilverApplication.vstemplate
+            </ProjectTemplateLink>
+            <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Simulator">
+                OpenSilverVBApplication.Simulator\OpenSilverApplication.Simulator.vstemplate
+            </ProjectTemplateLink>
+        </ProjectCollection>
+    </TemplateContent>
+    <WizardExtension>
+        <Assembly>OpenSilver.TemplateWizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</Assembly>
+        <FullClassName>OpenSilver.TemplateWizards.AppCustomizationWizard</FullClassName>
+    </WizardExtension>
+    <WizardData>
+        <OpenSilverInfo>
+            <Api>Silverlight</Api>
+            <Type>Application</Type>
+        </OpenSilverInfo>
+    </WizardData>
+</VSTemplate>

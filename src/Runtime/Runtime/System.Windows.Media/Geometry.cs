@@ -27,12 +27,14 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Provides a base class for objects that define geometric shapes. Geometry
-    /// objects can be used for clipping regions and as geometry definitions for
-    /// rendering two-dimensional graphical data as a Path.
+    /// Provides a base class for objects that define geometric shapes. <see cref="Geometry"/>
+    /// objects can be used for clipping regions and as geometry definitions for rendering
+    /// two-dimensional graphic data as a <see cref="Path"/>.
     /// </summary>
     public abstract class Geometry : DependencyObject
     {
+        internal Geometry() { }
+
         /// <summary>
         /// Gets an empty geometry object.
         /// </summary>
@@ -41,62 +43,38 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public static Geometry Empty => new PathGeometry();
 
-        internal Geometry() { }
-
-        internal Path ParentPath { get; private set; }
-
-        internal virtual void SetParentPath(Path path)
-        {
-            ParentPath = path;
-        }
-
         /// <summary>
-        /// Draws the Geometry on the canvas.
+        /// Identifies the <see cref="Transform"/> dependency property.
         /// </summary>
-        internal protected abstract void DefineInCanvas(Path path, 
-                                                        object canvasDomElement, 
-                                                        double horizontalMultiplicator, 
-                                                        double verticalMultiplicator, 
-                                                        double xOffsetToApplyBeforeMultiplication, 
-                                                        double yOffsetToApplyBeforeMultiplication, 
-                                                        double xOffsetToApplyAfterMultiplication, 
-                                                        double yOffsetToApplyAfterMultiplication, 
-                                                        Size shapeActualSize);
-
-        internal protected abstract void GetMinMaxXY(ref double minX, 
-                                                     ref double maxX, 
-                                                     ref double minY, 
-                                                     ref double maxY);
-
-        internal virtual string GetFillRuleAsString()
-        {
-            return "evenodd";
-        }
-
         public static readonly DependencyProperty TransformProperty = 
             DependencyProperty.Register(
                 nameof(Transform), 
                 typeof(Transform), 
                 typeof(Geometry), 
-                new PropertyMetadata(null, OnTransformPropertyChanged));
-        
+                new PropertyMetadata((object)null));
+
+        /// <summary>
+        /// Gets or sets the <see cref="Media.Transform"/> object applied to a <see cref="Geometry"/>.
+        /// </summary>
+        /// <returns>
+        /// The transformation applied to the <see cref="Geometry"/>. Note that this
+        /// value may be a single <see cref="Media.Transform"/> or a <see cref="TransformCollection"/>
+        /// cast as a <see cref="Media.Transform"/>.
+        /// </returns>
         public Transform Transform
         {
             get => (Transform)GetValue(TransformProperty);
             set => SetValue(TransformProperty, value);
         }
 
-        private static void OnTransformPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            // note: currently we can't detect when the transform's property are changing
-            // (for instance changing the X property of a TranslateTransform won't refresh
-            // the shape)
-            Geometry geometry = (Geometry)d;
-            if (geometry.ParentPath != null)
-            {
-                geometry.ParentPath.ScheduleRedraw();
-            }
-        }
+        /// <summary>
+        /// Gets the standard tolerance used for polygonal approximation.
+        /// </summary>
+        /// <returns>
+        /// The standard tolerance. The default value is 0.25.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public static double StandardFlatteningTolerance { get; } = 0.25;
 
         /// <summary>
         /// Gets a <see cref="Rect"/> that specifies the axis-aligned bounding box of the
@@ -108,6 +86,41 @@ namespace Windows.UI.Xaml.Media
         [OpenSilver.NotImplemented]
         public Rect Bounds => BoundsInternal;
 
-        internal virtual Rect BoundsInternal => Rect.Empty;
+        internal virtual Rect BoundsInternal => new Rect();
+
+        internal event EventHandler<GeometryInvalidatedEventsArgs> Invalidated;
+
+        internal static void OnPathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Geometry geometry = (Geometry)d;
+            geometry.RaisePathChanged();
+        }
+
+        internal void RaisePathChanged() => Invalidated?.Invoke(this, new GeometryInvalidatedEventsArgs(true, false));
+
+        internal static void OnFillRuleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Geometry geometry = (Geometry)d;
+            geometry.RaiseFillRuleChanged();
+        }
+
+        private void RaiseFillRuleChanged() => Invalidated?.Invoke(this, new GeometryInvalidatedEventsArgs(false, true));
+
+        internal abstract string ToPathData(IFormatProvider formatProvider);
+
+        internal virtual FillRule GetFillRule() => FillRule.EvenOdd;
+    }
+
+    internal class GeometryInvalidatedEventsArgs : EventArgs
+    {
+        public GeometryInvalidatedEventsArgs(bool affectsMeasure, bool affectsFillRule)
+        {
+            AffectsMeasure = affectsMeasure;
+            AffectsFillRule = affectsFillRule;
+        }
+
+        public bool AffectsMeasure { get; }
+
+        public bool AffectsFillRule { get; }
     }
 }

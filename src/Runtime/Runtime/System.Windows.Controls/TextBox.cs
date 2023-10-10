@@ -13,19 +13,20 @@
 
 using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Windows.Markup;
-using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Input;
 #else
 using Windows.Foundation;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
 using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
@@ -66,10 +67,42 @@ namespace Windows.UI.Xaml.Controls
 
         private bool _isProcessingInput;
         private bool _isFocused;
-        private int? _selectionIdxCache;
         private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
-        private ITextBoxViewHost<TextBoxView> _textViewHost;
+        private ITextViewHost<TextBoxView> _textViewHost;
+
+        static TextBox()
+        {
+            CharacterSpacingProperty.OverrideMetadata(
+                typeof(TextBox),
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBox)d;
+                        double value = (int)newValue / 1000.0;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.letterSpacing = $"{value.ToInvariantString()}em";
+                    },
+                });
+
+            FontFamilyProperty.OverrideMetadata(
+                typeof(TextBox),
+                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBox)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.fontFamily = ((FontFamily)newValue).GetFontFace(tb).CssFontName;
+                    },
+                });
+        }
+
+        private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TextElementProperties.InvalidateMeasureOnFontFamilyChanged((TextBox)d, (FontFamily)e.NewValue);
+        }
 
         public TextBox()
         {
@@ -77,7 +110,7 @@ namespace Windows.UI.Xaml.Controls
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
-        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv ?? base.GetFocusTarget();
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -94,9 +127,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty AcceptsReturnProperty =
             DependencyProperty.Register(
-                nameof(AcceptsReturn), 
-                typeof(bool), 
-                typeof(TextBox), 
+                nameof(AcceptsReturn),
+                typeof(bool),
+                typeof(TextBox),
                 new PropertyMetadata(false, OnAcceptsReturnChanged));
 
         private static void OnAcceptsReturnChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -123,9 +156,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty AcceptsTabProperty =
             DependencyProperty.Register(
-                nameof(AcceptsTab), 
-                typeof(bool), 
-                typeof(TextBox), 
+                nameof(AcceptsTab),
+                typeof(bool),
+                typeof(TextBox),
                 new PropertyMetadata(false));
 
         /// <summary>
@@ -142,9 +175,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty PlaceholderTextProperty =
             DependencyProperty.Register(
-                nameof(PlaceholderText), 
-                typeof(string), 
-                typeof(TextBox), 
+                nameof(PlaceholderText),
+                typeof(string),
+                typeof(TextBox),
                 new PropertyMetadata(string.Empty));
 
         /// <summary>
@@ -161,10 +194,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(
-                nameof(Text), 
-                typeof(string), 
+                nameof(Text),
+                typeof(string),
                 typeof(TextBox),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextChanged, CoerceText));
+                new PropertyMetadata(string.Empty, OnTextChanged, CoerceText));
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -174,15 +207,9 @@ namespace Windows.UI.Xaml.Controls
                 // Clear the flag to allow changing the Text during TextChanged
                 tb._isProcessingInput = false;
             }
-            else if (tb._textViewHost != null)
+            else
             {
-                tb._textViewHost.View.OnTextChanged((string)e.NewValue);
-            }
-
-            if (tb._selectionIdxCache.HasValue)
-            {
-                tb._textViewHost.View.NEW_SET_SELECTION(tb._selectionIdxCache.Value, tb._selectionIdxCache.Value);
-                tb._selectionIdxCache = null;
+                tb._textViewHost?.View.SetTextNative((string)e.NewValue);
             }
 
             tb.OnTextChanged(new TextChangedEventArgs() { OriginalSource = tb });
@@ -207,9 +234,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty TextAlignmentProperty =
             DependencyProperty.Register(
-                nameof(TextAlignment), 
-                typeof(TextAlignment), 
-                typeof(TextBox), 
+                nameof(TextAlignment),
+                typeof(TextAlignment),
+                typeof(TextBox),
                 new PropertyMetadata(TextAlignment.Left, OnTextAlignmentChanged));
 
         private static void OnTextAlignmentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -236,9 +263,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty CaretBrushProperty =
             DependencyProperty.Register(
-                nameof(CaretBrush), 
-                typeof(Brush), 
-                typeof(TextBox), 
+                nameof(CaretBrush),
+                typeof(Brush),
+                typeof(TextBox),
                 new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
         /// <summary>
@@ -489,45 +516,48 @@ namespace Windows.UI.Xaml.Controls
                 tb._textViewHost.View.OnIsSpellCheckEnabledChanged((bool)e.NewValue);
             }
         }
-        
+
+        /// <summary>
+        /// Gets a value by which each line of text is offset from a baseline.
+        /// </summary>
+        /// <returns>
+        /// The amount by which each line of text is offset from the baseline, in device
+        /// independent pixels. <see cref="double.NaN"/> indicates that an optimal baseline offset
+        /// is automatically calculated from the current font characteristics. The default
+        /// is <see cref="double.NaN"/>.
+        /// </returns>
+        public double BaselineOffset => GetBaseLineOffset(this);
+
+        private static double GetBaseLineOffset(TextBox textbox)
+        {
+            if (textbox._textViewHost?.View is TextBoxView view)
+            {
+                return TextElementProperties.GetBaseLineOffsetNative(view);
+            }
+
+            return 0.0;
+        }
+
         public string SelectedText
         {
-            get
-            {
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out _);
-                    return Text.Substring(selectionStartIndex, selectionLength);
-                }
-
-                return string.Empty;
-            }
+            get => _textViewHost?.View.SelectedText ?? string.Empty;
             set
             {
-                if (_textViewHost != null)
+                if (value is null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out _);
-                    string text = Text.Substring(0, selectionStartIndex) + value + Text.Substring(selectionStartIndex + selectionLength);
-                    _selectionIdxCache = selectionStartIndex + value.Length;
-                    Text = text;
-                    _selectionIdxCache = null;
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                if (_textViewHost is not null)
+                {
+                    _textViewHost.View.SelectedText = value;
                 }
             }
         }
 
-
         public int SelectionStart
         {
-            get
-            {
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out _, out _);
-                    return selectionStartIndex;
-                }
-
-                return 0;
-            }
+            get => _textViewHost?.View.SelectionStart ?? 0;
             set
             {
                 if (value < 0)
@@ -535,22 +565,16 @@ namespace Windows.UI.Xaml.Controls
                     throw new ArgumentOutOfRangeException("SelectionStart cannot be lower than 0");
                 }
 
-                _textViewHost?.View.NEW_SET_SELECTION(value, value + SelectionLength);
+                if (_textViewHost is not null)
+                {
+                    _textViewHost.View.SelectionStart = value;
+                }
             }
         }
 
         public int SelectionLength
         {
-            get
-            {
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_GET_SELECTION(out _, out int selectionLength, out _);
-                    return selectionLength;
-                }
-
-                return 0;
-            }
+            get => _textViewHost?.View.SelectionLength ?? 0;
             set
             {
                 if (value < 0)
@@ -558,22 +582,10 @@ namespace Windows.UI.Xaml.Controls
                     throw new ArgumentOutOfRangeException("SelectionLength cannot be lower than 0");
                 }
 
-                _textViewHost?.View.NEW_SET_SELECTION(SelectionStart, SelectionStart + value);
-            }
-        }
-
-        // It needs to get caret position for selection with Shift key
-        internal int CaretPosition
-        {
-            get
-            {
-                if (_textViewHost != null)
+                if (_textViewHost is not null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out _, out _, out int caretIndex);
-                    return caretIndex;
+                    _textViewHost.View.SelectionLength = value;
                 }
-
-                return 0;
             }
         }
 
@@ -588,10 +600,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnTextChanged(TextChangedEventArgs eventArgs)
         {
-            if (TextChanged != null)
-            {
-                TextChanged(this, eventArgs);
-            }
+            TextChanged?.Invoke(this, eventArgs);
         }
 
         /// <summary>
@@ -648,17 +657,12 @@ namespace Windows.UI.Xaml.Controls
 
             e.Handled = true;
             Focus();
+#if MIGRATION
+            _textViewHost?.View.CaptureMouse();
+#else
+            _textViewHost?.View.CapturePointer(e.Pointer);
+#endif
         }
-
-        /// <summary>
-        /// Returns a <see cref="TextBoxAutomationPeer"/> for use by the Silverlight automation 
-        /// infrastructure.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="TextBoxAutomationPeer"/> for the <see cref="TextBox"/> object.
-        /// </returns>
-        protected override AutomationPeer OnCreateAutomationPeer()
-            => new TextBoxAutomationPeer(this);
 
 #if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -672,8 +676,28 @@ namespace Windows.UI.Xaml.Controls
             base.OnPointerReleased(e);
 #endif
 
+            if (e.Handled)
+            {
+                return;
+            }
+
             e.Handled = true;
+#if MIGRATION
+            _textViewHost?.View.ReleaseMouseCapture();
+#else
+            _textViewHost?.View.ReleasePointerCapture(e.Pointer);
+#endif
         }
+
+        /// <summary>
+        /// Returns a <see cref="TextBoxAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TextBoxAutomationPeer"/> for the <see cref="TextBox"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new TextBoxAutomationPeer(this);
 
 #if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
@@ -706,11 +730,13 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Handled)
+            {
                 return;
+            }
 
             base.OnKeyDown(e);
 
-            HandleKeyDown(e);
+            _textViewHost?.View.ProcessKeyDown(e);
         }
 
         protected override void OnTextInput(TextCompositionEventArgs e)
@@ -734,20 +760,16 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
         }
 
-        internal sealed override void OnTextInputInternal()
+        internal void UpdateTextProperty(string text)
         {
-            if (_textViewHost != null)
+            _isProcessingInput = true;
+            try
             {
-                _isProcessingInput = true;
-                try
-                {
-                    _textViewHost.View.InvalidateMeasure();
-                    SetCurrentValue(TextProperty, _textViewHost.View.GetText());
-                }
-                finally
-                {
-                    _isProcessingInput = false;
-                }
+                SetCurrentValue(TextProperty, text);
+            }
+            finally
+            {
+                _isProcessingInput = false;
             }
         }
 
@@ -768,25 +790,23 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Selects all text in the text box.
         /// </summary>
-        public void SelectAll()
-        {
-            Select(0, this.Text.Length);
-        }
+        public void SelectAll() => Select(0, int.MaxValue);
 
         public void Select(int start, int length)
         {
             if (start < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(start));
-            if (start + length < 0)
+            }
+
+            if (length < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(length));
-            _textViewHost?.View.NEW_SET_SELECTION(start, start + length);
+            }
+
+            _textViewHost?.View.SetSelectionRange(start, start + length);
         }
 
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            return base.MeasureOverride(availableSize);
-        }
-    
         internal override void UpdateVisualStates()
         {
             if (!IsEnabled)
@@ -833,7 +853,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void InitializeContentElement()
         {
-            _textViewHost = GetContentHost<TextBoxView>(_contentElement);
+            _textViewHost = TextViewHostProvider.From<TextBoxView>(_contentElement);
 
             if (_textViewHost != null)
             {
@@ -850,57 +870,6 @@ namespace Windows.UI.Xaml.Controls
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
-        }
-
-        internal static ITextBoxViewHost<T> GetContentHost<T>(FrameworkElement contentElement) where T : FrameworkElement, ITextBoxView
-        {
-            if (contentElement is ContentControl cc)
-            {
-                return new TextBoxViewHost_ContentControl<T>(cc);
-            }
-            else if (contentElement is ContentPresenter cp)
-            {
-                return new TextBoxViewHost_ContentPresenter<T>(cp);
-            }
-            else if (contentElement is Border border)
-            {
-                return new TextBoxViewHost_Border<T>(border);
-            }
-            else if (contentElement is UserControl uc)
-            {
-                return new TextBoxViewHost_UserControl<T>(uc);
-            }
-            else if (contentElement is Panel panel)
-            {
-                return new TextBoxViewHost_Panel<T>(panel);
-            }
-            else if (contentElement is ItemsControl ic)
-            {
-                return new TextBoxViewHost_ItemsControl<T>(ic);
-            }
-            else if (IsContentPropertyHost(contentElement, out string contentPropertyName))
-            {
-                return new TextBoxViewHost_ContentProperty<T>(contentElement, contentPropertyName);
-            }
-
-            return null;
-        }
-
-        private static bool IsContentPropertyHost(FrameworkElement host, out string contentPropertyName)
-        {
-            ContentPropertyAttribute contentProp = (ContentPropertyAttribute)host
-                .GetType()
-                .GetCustomAttributes(typeof(ContentPropertyAttribute), true)
-                .FirstOrDefault();
-
-            if (contentProp != null)
-            {
-                contentPropertyName = contentProp.Name;
-                return true;
-            }
-
-            contentPropertyName = null;
-            return false;
         }
 
         [OpenSilver.NotImplemented]

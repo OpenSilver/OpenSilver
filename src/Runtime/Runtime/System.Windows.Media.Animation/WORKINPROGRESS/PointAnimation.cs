@@ -114,21 +114,6 @@ namespace Windows.UI.Xaml.Media.Animation
             set { this.SetValue(ToProperty, value); }
         }
 
-        internal override void GetTargetInformation(IterationParameters parameters)
-        {
-            _parameters = parameters;
-            DependencyObject target;
-            PropertyPath propertyPath;
-
-            GetTargetElementAndPropertyInfo(parameters, out target, out propertyPath);
-
-            _propertyContainer = target;
-            _targetProperty = propertyPath;
-            _propDp = GetProperty(_propertyContainer, _targetProperty);
-            _target = Storyboard.GetTarget(this);
-            _targetName = Storyboard.GetTargetName(this);
-        }
-
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
             if (To != null)

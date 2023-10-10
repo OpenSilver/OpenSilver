@@ -39,6 +39,10 @@ namespace Windows.UI.Xaml.Controls
         private DataGrid _owner;
         private bool _scrollForCurrentChanged;
         private DataGridSelectionAction _selectionActionForCurrentChanged;
+        private WeakEventListener<DataGridDataConnection, object, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+        private WeakEventListener<DataGridDataConnection, object, NotifyCollectionChangedEventArgs> _sortDescriptionsCollectionChangedListener;
+        private WeakEventListener<DataGridDataConnection, object, EventArgs> _currentChangedListener;
+        private WeakEventListener<DataGridDataConnection, object, CurrentChangingEventArgs> _currentChangingListener;
 
         #endregion Data
 
@@ -543,21 +547,28 @@ namespace Windows.UI.Xaml.Controls
 
         internal void UnWireEvents(IEnumerable value)
         {
-            INotifyCollectionChanged notifyingDataSource = value as INotifyCollectionChanged;
-            if (notifyingDataSource != null)
+            if (this._collectionChangedListener != null)
             {
-                notifyingDataSource.CollectionChanged -= new NotifyCollectionChangedEventHandler(NotifyingDataSource_CollectionChanged);
+                this._collectionChangedListener.Detach();
+                this._collectionChangedListener = null;
             }
 
-            if (this.SortDescriptions != null)
+            if (this._sortDescriptionsCollectionChangedListener != null)
             {
-                ((INotifyCollectionChanged)this.SortDescriptions).CollectionChanged -= new NotifyCollectionChangedEventHandler(CollectionView_SortDescriptions_CollectionChanged);
+                this._sortDescriptionsCollectionChangedListener.Detach();
+                this._sortDescriptionsCollectionChangedListener = null;
             }
 
-            if (this.CollectionView != null)
+            if (this._currentChangedListener != null)
             {
-                this.CollectionView.CurrentChanged -= new EventHandler(CollectionView_CurrentChanged);
-                this.CollectionView.CurrentChanging -= new CurrentChangingEventHandler(CollectionView_CurrentChanging);
+                this._currentChangedListener.Detach();
+                this._currentChangedListener = null;
+            }
+
+            if (this._currentChangingListener != null)
+            {
+                this._currentChangingListener.Detach();
+                this._currentChangingListener = null;
             }
 
             this.EventsWired = false;
@@ -568,18 +579,41 @@ namespace Windows.UI.Xaml.Controls
             INotifyCollectionChanged notifyingDataSource = value as INotifyCollectionChanged;
             if (notifyingDataSource != null)
             {
-                notifyingDataSource.CollectionChanged += new NotifyCollectionChangedEventHandler(NotifyingDataSource_CollectionChanged);
+                this._collectionChangedListener = new(this)
+                {
+                    OnEventAction = static (instance, source, args) => instance.NotifyingDataSource_CollectionChanged(source, args),
+                    OnDetachAction = listener => notifyingDataSource.CollectionChanged -= listener.OnEvent,
+                };
+                notifyingDataSource.CollectionChanged += this._collectionChangedListener.OnEvent;
             }
 
-            if (this.SortDescriptions != null)
+            INotifyCollectionChanged sortDescriptions = this.SortDescriptions;
+            if (sortDescriptions != null)
             {
-                ((INotifyCollectionChanged)this.SortDescriptions).CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionView_SortDescriptions_CollectionChanged);
+                this._sortDescriptionsCollectionChangedListener = new(this)
+                {
+                    OnEventAction = static (instance, source, args) => instance.CollectionView_SortDescriptions_CollectionChanged(source, args),
+                    OnDetachAction = listener => sortDescriptions.CollectionChanged -= listener.OnEvent,
+                };
+                sortDescriptions.CollectionChanged += this._sortDescriptionsCollectionChangedListener.OnEvent;
             }
 
-            if (this.CollectionView != null)
+            ICollectionView collectionView = this.CollectionView;
+            if (collectionView != null)
             {
-                this.CollectionView.CurrentChanged += new EventHandler(CollectionView_CurrentChanged);
-                this.CollectionView.CurrentChanging += new CurrentChangingEventHandler(CollectionView_CurrentChanging);
+                this._currentChangedListener = new(this)
+                {
+                    OnEventAction = static (instance, source, args) => instance.CollectionView_CurrentChanged(source, args),
+                    OnDetachAction = listener => collectionView.CurrentChanged -= listener.OnEvent,
+                };
+                collectionView.CurrentChanged += this._currentChangedListener.OnEvent;
+
+                this._currentChangingListener = new(this)
+                {
+                    OnEventAction = static (instance, source, args) => instance.CollectionView_CurrentChanging(source, args),
+                    OnDetachAction = listener => collectionView.CurrentChanging -= listener.OnEvent,
+                };
+                collectionView.CurrentChanging += this._currentChangingListener.OnEvent;
             }
 
             this.EventsWired = true;

@@ -135,7 +135,7 @@ namespace OpenSilver.TemplateWizards
                 CopyNugetConfig(replacementsDictionary);
             }
 
-            replacementsDictionary.Add("$opensilverpackageversion$", "1.2.2");
+            replacementsDictionary.Add("$opensilverpackageversion$", "1.2.3");
         }
 
         public bool ShouldAddProjectItem(string filePath)

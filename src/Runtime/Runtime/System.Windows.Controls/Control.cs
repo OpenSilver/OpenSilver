@@ -72,10 +72,11 @@ namespace Windows.UI.Xaml.Controls
         {
             // Initialize the _templateCache to the default value for TemplateProperty.
             // If the default value is non-null then wire it to the current instance.
-            ControlTemplate defaultValue = (ControlTemplate)TemplateProperty.GetDefaultValue(this);
+            PropertyMetadata metadata = TemplateProperty.GetMetadata(DependencyObjectType);
+            ControlTemplate defaultValue = (ControlTemplate)metadata.GetDefaultValue(this, TemplateProperty);
             if (defaultValue != null)
             {
-                OnTemplateChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, TemplateProperty));
+                OnTemplateChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, TemplateProperty, metadata));
             }
         }
 
@@ -115,25 +116,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.Background"/> dependency property.
+        /// Identifies the <see cref="Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
             DependencyProperty.Register(
-                nameof(Background), typeof(Brush), 
+                nameof(Background),
+                typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata((object)null)
-                {
-                    MethodToUpdateDom2 = UpdateDomOnBackgroundChanged,
-                });
-
-        private static void UpdateDomOnBackgroundChanged(DependencyObject d, object oldValue, object newValue)
-        {
-            var control = (Control)d;
-            if (!control.HasTemplate)
-            {
-                _ = Panel.RenderBackgroundAsync(control, (Brush)newValue);
-            }
-        }
+                new PropertyMetadata((object)null));
 
         //-----------------------
         // BORDERBRUSH
@@ -306,21 +296,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="FontFamily"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
-            DependencyProperty.Register(
-                nameof(FontFamily), 
-                typeof(FontFamily), 
-                typeof(Control),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var c = (Control)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(c.INTERNAL_OuterDomElement);
-                        style.fontFamily = newValue is FontFamily ff ?
-                            INTERNAL_FontsHelper.LoadFont(ff.Source, c) :
-                            string.Empty;
-                    },
-                });
+            TextElementProperties.FontFamilyProperty.AddOwner(typeof(Control));
 
         //-----------------------
         // FONTSIZE
@@ -449,28 +425,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Padding),
                 typeof(Thickness),
                 typeof(Control),
-                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom = static (d, newValue) =>
-                    {
-                        var control = (Control)d;
-                        // if the parent is a canvas, we ignore this property and we want to ignore this
-                        // property if there is a ControlTemplate on this control.
-                        // textblock under custom layout can support padding property now
-                        if (control.INTERNAL_InnerDomElement != null && 
-                            !control.HasTemplate && 
-                            control.INTERNAL_VisualParent is not Canvas && 
-                            (!control.IsUnderCustomLayout || control is TextBlock))
-                        {
-                            var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(control.INTERNAL_InnerDomElement);
-                            Thickness padding = (Thickness)newValue;
-
-                            // todo: if the container has a padding, add it to the margin
-                            domStyle.boxSizing = "border-box";
-                            domStyle.padding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
-                        }
-                    },
-                });
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         //-----------------------
         // HORIZONTALCONTENTALIGNMENT
@@ -631,12 +586,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Control control = (Control)d;
-            FrameworkElement.UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+            UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(control))
-            {
-                control.InvalidateMeasureInternal();
-            }
+            control.InvalidateMeasure();
         }
 
         /// <summary>
@@ -675,17 +627,9 @@ namespace Windows.UI.Xaml.Controls
         /// true if focus was set to the control, or focus was already on the control.
         /// false if the control is not focusable.
         /// </returns>
-        public bool Focus()
-        {
-            if (KeyboardNavigation.Current.Focus(this) is UIElement uie)
-            {
-                INTERNAL_HtmlDomManager.SetFocus(uie);
-                KeyboardNavigation.UpdateFocusedElement(uie);
-                return true;
-            }
-
-            return false;
-        }
+        public bool Focus() =>
+            KeyboardNavigation.Current.Focus(this) is UIElement uie &&
+            InputManager.Current.SetFocus(uie);
 
         private bool _useSystemFocusVisuals;
 
@@ -777,15 +721,6 @@ namespace Windows.UI.Xaml.Controls
                 UpdateValidationState();
             }
         }
-        
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-#if !BRIDGE
-            return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-#else
-            return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
-#endif
-        }
 
         /// <summary>
         /// This method is here to avoid creating the dom for a control which has a Template.
@@ -796,12 +731,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>The "root" dom element of the FrameworkElement.</returns>
         internal object CreateDomElementForControlTemplate(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            // I think this method should in most (all?) case return two divs, as if it was a frameworkElement.
-#if !BRIDGE
-            return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-#else
-            return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
-#endif
+            return CreateDomElementInternal(parentRef, out domElementWhereToPlaceChildren);
         }
 
         /// <summary>
@@ -815,27 +745,26 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Identifies the <see cref="CharacterSpacing"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty CharacterSpacingProperty =
-            DependencyProperty.Register(
-                nameof(CharacterSpacing),
-                typeof(int),
+            TextElementProperties.CharacterSpacingProperty.AddOwner(
                 typeof(Control),
-                new PropertyMetadata(0));
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits));
 
-        //
-        // Summary:
-        //     Gets or sets the distance between characters of text in the control measured
-        //     in 1000ths of the font size.
-        //
-        // Returns:
-        //     The distance between characters of text in the control measured in 1000ths of
-        //     the font size. The default is 0.
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets or sets the distance between characters of text in the control measured
+        /// in 1000ths of the font size.
+        /// </summary>
+        /// <returns>
+        /// The distance between characters of text in the control measured in 1000ths of
+        /// the font size. The default is 0.
+        /// </returns>
         public int CharacterSpacing
         {
-            get { return (int)GetValue(CharacterSpacingProperty); }
-            set { SetValue(CharacterSpacingProperty, value); }
+            get => (int)GetValue(CharacterSpacingProperty);
+            set => SetValue(CharacterSpacingProperty, value);
         }
 
         [OpenSilver.NotImplemented]
@@ -857,18 +786,6 @@ namespace Windows.UI.Xaml.Controls
             get { return (FontStretch)GetValue(FontStretchProperty); }
             set { SetValue(FontStretchProperty, value); }
         }
-
-        ////
-        //// Summary:
-        ////     Called before the System.Windows.UIElement.TextInput event occurs.
-        ////
-        //// Parameters:
-        ////   e:
-        ////     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
-        //protected virtual void OnTextInput(TextCompositionEventArgs e)
-        //{
-
-        //}
 
         [OpenSilver.NotImplemented]
         protected virtual void OnDrop(DragEventArgs e)

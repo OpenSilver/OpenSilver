@@ -32,7 +32,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 
 namespace System
 {
-    public partial class Settings
+    public class Settings
     {
         private readonly Lazy<bool> _windowless = new Lazy<bool>(() =>
         {
@@ -85,12 +85,12 @@ namespace System
 
         public bool EnableWebRequestsLogging { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value determining whether or not to use the resizeSensor.js library
-        /// instead of the ResizeObserver API to listen for size change event in Html.
-        /// </summary>
-        /// <remarks>Should probably be removed once we get the ResizeObserver fully working.</remarks>
-        public bool UseResizeSensor { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool SyncRenderingWithLayout
+        {
+            get { return INTERNAL_HtmlDomManager.SyncRenderingWithLayout; }
+            set { INTERNAL_HtmlDomManager.SyncRenderingWithLayout = value; }
+        }
 
         public bool EnableInteropLogging
         {
@@ -120,22 +120,18 @@ namespace System
         /// The DOM elements are created later, when the control becomes visible.
         /// Enabling this option results in significantly improved performance if there are many hidden elements.
         /// </summary>
-        public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded
-        {
-            get { return INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded; }
-            set { INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreNotLoaded = value; }
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded { get; set; }
 
         /// <summary>
         /// Wait a few moments before creating the DOM elements for the UI elements that are not visible.
         /// The goal is to give the time to the browser engine to draw the visible ones, in order to improve the perceived performance.
         /// The DOM elements are created immediately after the browser engine has finished drawing (when the UI thread is available).
         /// </summary>
-        public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast
-        {
-            get { return INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast; }
-            set { INTERNAL_VisualTreeManager.EnableOptimizationWhereCollapsedControlsAreLoadedLast = value; }
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast { get; set; }
 
         /// <summary>
         /// Gets or sets the number of children in a Panel to render progressively in a batch.

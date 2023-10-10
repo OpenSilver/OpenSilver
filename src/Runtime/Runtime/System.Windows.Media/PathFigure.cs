@@ -12,15 +12,12 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Specialized;
 using System.Windows.Markup;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
+#if !MIGRATION
 using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -34,97 +31,61 @@ namespace Windows.UI.Xaml.Media
     /// geometric segments.
     /// </summary>
     [ContentProperty(nameof(Segments))]
-    public sealed partial class PathFigure : DependencyObject
+    public sealed class PathFigure : DependencyObject
     {
-        #region Data
-
-        private Path _parentPath = null;
-
-        #endregion
-
-        #region Constructor
+        private Geometry _parentGeometry;
 
         /// <summary>
-        /// Initializes a new instance of the PathFigure class.
+        /// Initializes a new instance of the <see cref="PathFigure"/> class.
         /// </summary>
-        public PathFigure()
-        {
-
-        }
-
-        #endregion
-
-        #region Dependency Properties
+        public PathFigure() { }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether this figure's first and last
-        /// segments are connected.
-        /// </summary>
-        public bool IsClosed
-        {
-            get { return (bool)GetValue(IsClosedProperty); }
-            set { SetValue(IsClosedProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="PathFigure.IsClosed"/> dependency 
-        /// property.
+        /// Identifies the <see cref="IsClosed"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsClosedProperty =
             DependencyProperty.Register(
-                nameof(IsClosed), 
-                typeof(bool), 
-                typeof(PathFigure), 
-                new PropertyMetadata(false, IsClosed_Changed));
-
-        private static void IsClosed_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            PathFigure figure = (PathFigure)d;
-            if (figure._parentPath != null)
-            {
-                figure._parentPath.ScheduleRedraw();
-            }
-        }
+                nameof(IsClosed),
+                typeof(bool),
+                typeof(PathFigure),
+                new PropertyMetadata(false, PropertyChanged));
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the contained area of this PathFigure
-        /// is to be used for hit-testing, rendering, and clipping.
+        /// Gets or sets a value that indicates whether this figure's first and last segments
+        /// are connected.
         /// </summary>
-        public bool IsFilled
+        /// <returns>
+        /// true if the first and last segments of the figure are connected; otherwise, false.
+        /// The default is false.
+        /// </returns>
+        public bool IsClosed
         {
-            get { return (bool)GetValue(IsFilledProperty); }
-            set { SetValue(IsFilledProperty, value); }
+            get => (bool)GetValue(IsClosedProperty);
+            set => SetValue(IsClosedProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="PathFigure.IsFilled"/> dependency 
-        /// property.
+        /// Identifies the <see cref="IsFilled"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsFilledProperty =
             DependencyProperty.Register(
-                nameof(IsFilled), 
-                typeof(bool), 
-                typeof(PathFigure), 
-                new PropertyMetadata(false, IsFilled_Changed));
-
-        private static void IsFilled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            //note: this doesn't currently work, we need extra work to make it work (see DefineInCanvas in this class).
-            PathFigure figure = (PathFigure)d;
-            if (figure._parentPath != null)
-            {
-                figure._parentPath.ScheduleRedraw();
-            }
-        }
+                nameof(IsFilled),
+                typeof(bool),
+                typeof(PathFigure),
+                new PropertyMetadata(false, PropertyChanged));
 
         /// <summary>
-        /// Gets or sets the collection of segments that define the shape of this PathFigure
-        /// object.
+        /// Gets or sets a value that indicates whether the contained area of this <see cref="PathFigure"/>
+        /// is to be used for hit-testing, rendering, and clipping.
         /// </summary>
-        public PathSegmentCollection Segments
+        /// <returns>
+        /// true if the contained area of this <see cref="PathFigure"/> is to be used
+        /// for hit-testing, rendering, and clipping; otherwise, false. The default is true.
+        /// </returns>
+        public bool IsFilled
         {
-            get { return (PathSegmentCollection)GetValue(SegmentsProperty); }
-            set { SetValue(SegmentsProperty, value); }
+            get => (bool)GetValue(IsFilledProperty);
+            set => SetValue(IsFilledProperty, value);
         }
 
         /// <summary>
@@ -132,38 +93,52 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public static readonly DependencyProperty SegmentsProperty =
             DependencyProperty.Register(
-                nameof(Segments), 
-                typeof(PathSegmentCollection), 
-                typeof(PathFigure), 
+                nameof(Segments),
+                typeof(PathSegmentCollection),
+                typeof(PathFigure),
                 new PropertyMetadata(
                     new PFCDefaultValueFactory<PathSegment>(
                         static () => new PathSegmentCollection(),
                         static (d, dp) =>
                         {
-                            PathFigure pf = (PathFigure)d;
-                            var collection = new PathSegmentCollection();
-                            collection.SetParentPath(pf._parentPath);
-                            return collection;
+                            PathFigure figure = (PathFigure)d;
+                            var segments = new PathSegmentCollection();
+                            segments.SetParentGeometry(figure._parentGeometry);
+                            segments.CollectionChanged += new NotifyCollectionChangedEventHandler(figure.OnSegmentsCollectionChanged);
+                            return segments;
                         }),
                     OnSegmentsChanged,
                     CoerceSegments));
 
+        /// <summary>
+        /// Gets or sets the collection of segments that define the shape of this <see cref="PathFigure"/>
+        /// object.
+        /// </summary>
+        /// <returns>
+        /// The collection of segments that define the shape of this <see cref="PathFigure"/>
+        /// object. The default is an empty collection.
+        /// </returns>
+        public PathSegmentCollection Segments
+        {
+            get => (PathSegmentCollection)GetValue(SegmentsProperty);
+            set => SetValue(SegmentsProperty, value);
+        }
+
         private static void OnSegmentsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PathFigure figure = (PathFigure)d;
-            if (null != e.OldValue)
+            if (e.OldValue is PathSegmentCollection oldSegments)
             {
-                ((PathSegmentCollection)e.OldValue).SetParentPath(null);
+                oldSegments.SetParentGeometry(null);
+                oldSegments.CollectionChanged -= new NotifyCollectionChangedEventHandler(figure.OnSegmentsCollectionChanged);
             }
-            if (figure._parentPath != null)
+            if (e.NewValue is PathSegmentCollection newSegments)
             {
-                if (null != e.NewValue)
-                {
-                    ((PathSegmentCollection)e.NewValue).SetParentPath(figure._parentPath);
-                }
-
-                figure._parentPath.ScheduleRedraw();
+                newSegments.SetParentGeometry(figure._parentGeometry);
+                newSegments.CollectionChanged += new NotifyCollectionChangedEventHandler(figure.OnSegmentsCollectionChanged);
             }
+            
+            PropertyChanged(d, e);
         }
 
         private static object CoerceSegments(DependencyObject d, object baseValue)
@@ -171,123 +146,45 @@ namespace Windows.UI.Xaml.Media
             return baseValue ?? new PathSegmentCollection();
         }
 
-        /// <summary>
-        /// Gets or sets the Point where the PathFigure begins.
-        /// </summary>
-        public Point StartPoint
-        {
-            get { return (Point)GetValue(StartPointProperty); }
-            set { SetValue(StartPointProperty, value); }
-        }
+        private void OnSegmentsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateParentGeometry();
 
         /// <summary>
-        /// Identifies the <see cref="PathFigure.StartPoint"/> dependency 
-        /// property.
+        /// Identifies the <see cref="StartPoint"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
             DependencyProperty.Register(
-                nameof(StartPoint), 
-                typeof(Point), 
-                typeof(PathFigure), 
-                new PropertyMetadata(new Point(), StartPoint_Changed));
+                nameof(StartPoint),
+                typeof(Point),
+                typeof(PathFigure),
+                new PropertyMetadata(new Point(), PropertyChanged));
 
-        private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the <see cref="Point"/> where the <see cref="PathFigure"/> begins.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Point"/> where the <see cref="PathFigure"/> begins. The
+        /// default is a <see cref="Point"/> with value 0,0.
+        /// </returns>
+        public Point StartPoint
         {
-            PathFigure figure = (PathFigure)d;
-            if (figure._parentPath != null)
+            get => (Point)GetValue(StartPointProperty);
+            set => SetValue(StartPointProperty, value);
+        }
+
+        internal void SetParentGeometry(Geometry geometry)
+        {
+            _parentGeometry = geometry;
+            foreach (var segment in Segments)
             {
-                figure._parentPath.ScheduleRedraw();
+                segment.SetParentGeometry(geometry);
             }
         }
 
-        #endregion
-
-        #region Internal Methods
-
-        internal void SetParentPath(Path path)
+        private static void PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (_parentPath != path)
-            {
-                _parentPath = path;
-                Segments.SetParentPath(path);
-            }
+            ((PathFigure)d).InvalidateParentGeometry();
         }
 
-        internal void DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
-                                     double yOffsetToApplyBeforeMultiplication, 
-                                     double xOffsetToApplyAfterMultiplication, 
-                                     double yOffsetToApplyAfterMultiplication, 
-                                     double horizontalMultiplicator, 
-                                     double verticalMultiplicator, 
-                                     object canvasDomElement, 
-                                     double strokeThickness, 
-                                     Size shapeActualSize)
-        {
-            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-
-            // todo: In order to support IsFilled, add a call to context.beginPath() here 
-            // (instead the call to beginPath() that is located in "Path.cs") and handle 
-            // the filling here (in the PathFigure) instead of in the Redraw of the Path.
-
-            Point segmentStartingPosition = new Point(StartPoint.X, StartPoint.Y);
-
-            // tell the context that there should be a line from the starting point to this point
-            //context.moveTo((StartPoint.X + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication, 
-            //               (StartPoint.Y + yOffsetToApplyBeforeMultiplication) * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-            //Note: we replaced the code above with the one below because Bridge.NET has an issue when adding "0" to an Int64 (as of May 1st, 2020), so it is better to first multiply and then add, rather than the contrary:
-            context.moveTo(StartPoint.X * horizontalMultiplicator + xOffsetToApplyBeforeMultiplication * horizontalMultiplicator + xOffsetToApplyAfterMultiplication,
-                           StartPoint.Y * verticalMultiplicator + yOffsetToApplyBeforeMultiplication * verticalMultiplicator + yOffsetToApplyAfterMultiplication);
-
-            foreach (PathSegment segment in Segments)
-            {
-                segmentStartingPosition = segment.DefineInCanvas(xOffsetToApplyBeforeMultiplication, 
-                                                                 yOffsetToApplyBeforeMultiplication, 
-                                                                 xOffsetToApplyAfterMultiplication, 
-                                                                 yOffsetToApplyAfterMultiplication, 
-                                                                 horizontalMultiplicator, 
-                                                                 verticalMultiplicator, 
-                                                                 canvasDomElement, 
-                                                                 segmentStartingPosition);
-            }
-            if (IsClosed) // we close the figure:
-            {
-                // tell the context that there should be a line from the starting point to this point
-                context.closePath();
-            }
-        }
-
-        internal void GetMinMaxXY(ref double minX, ref double maxX, ref double minY, ref double maxY)
-        {
-            minX = Math.Min(minX, StartPoint.X);
-            maxX = Math.Max(maxX, StartPoint.X);
-            minY = Math.Min(minY, StartPoint.Y);
-            maxY = Math.Max(maxY, StartPoint.Y);
-
-            Point segmentStartingPosition = new Point(StartPoint.X, StartPoint.Y);
-            foreach (PathSegment segment in Segments)
-            {
-                segmentStartingPosition = segment.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY, segmentStartingPosition);
-            }
-        }
-
-        internal Point GetMaxXY()
-        {
-            Point globalMax = new Point();
-            foreach (PathSegment segment in Segments)
-            {
-                Point segmentMaxXY = segment.GetMaxXY();
-                if (segmentMaxXY.X > globalMax.X)
-                {
-                    globalMax.X = segmentMaxXY.X;
-                }
-                if (segmentMaxXY.Y > globalMax.Y)
-                {
-                    globalMax.Y = segmentMaxXY.Y;
-                }
-            }
-            return globalMax;
-        }
-
-        #endregion
+        private void InvalidateParentGeometry() => _parentGeometry?.RaisePathChanged();
     }
 }

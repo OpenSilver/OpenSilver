@@ -110,15 +110,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal override void GetTargetInformation(IterationParameters parameters)
-        {
-            _parameters = parameters;
-            GetTargetElementAndPropertyInfo(parameters, out DependencyObject target, out PropertyPath propertyPath);
-            _propertyContainer = target;
-            _targetProperty = propertyPath;
-            _propDp = GetProperty(_propertyContainer, _targetProperty);
-        }
-
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
             StartKeyFrame(GetNextKeyFrame());

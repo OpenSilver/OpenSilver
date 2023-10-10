@@ -23,6 +23,7 @@ using OpenSilver.Internal;
 
 #if OPENSILVER
 using System.Text.Json;
+using DotNetForHtml5.Core;
 #endif
 
 #if MIGRATION
@@ -55,9 +56,7 @@ namespace CSHTML5
 
             if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                // Adding a property to the JavaScript "window" object:
-                dynamic jsWindow = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptWithResult("window");
-                jsWindow.SetProperty("onCallBack", new OnCallbackSimulator());
+                INTERNAL_Simulator.SimulatorCallbackSetup(new OnCallbackSimulator());
             }
 
             _isInitialized = true;

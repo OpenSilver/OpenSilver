@@ -179,6 +179,8 @@ namespace Windows.UI.Xaml.Input
 
         internal Point GetPosition(UIElement relativeTo)
             => GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
+
+        internal int Delta => GetCurrentPoint(null).Properties.MouseWheelDelta;
 #endif
 
         internal static Point GetPosition(Point origin, UIElement relativeTo)
@@ -201,7 +203,7 @@ namespace Windows.UI.Xaml.Input
                 // Returns the pointer coordinates relative to the "relativeTo" element:
                 //-----------------------------------
 
-                UIElement rootVisual = Application.Current?.RootVisual;
+                UIElement rootVisual = Window.GetWindow(relativeTo)?.Content;
                 if (rootVisual != null)
                 {
                     return rootVisual.TransformToVisual(relativeTo).Transform(origin);

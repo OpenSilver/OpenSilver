@@ -15,11 +15,9 @@
 
 
 
-using DotNetBrowser;
-using DotNetBrowser.WPF;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 using OpenSilver;
-using System;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
@@ -28,39 +26,49 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     {
         const string MICROSOFT_COOKIES_URL = "https://login.microsoftonline.com";
 
-        public static void LoadMicrosoftCookies(WPFBrowserView wpfBrowserView, string registryName)
+        public static void LoadMicrosoftCookies(WebView2 wpfWebView, string registryName)
         {
-            LoadCookies(wpfBrowserView, MICROSOFT_COOKIES_URL, registryName);
+            LoadCookies(wpfWebView, MICROSOFT_COOKIES_URL, registryName);
         }
 
-        public static void LoadCookies(WPFBrowserView wpfBrowserView, string url, string registryName)
+        public static void LoadCookies(WebView2 wpfWebView, string url, string registryName)
         {
             // we search for cookies with a specific url into registries
             string cookiesAsString = RegistryHelpers.GetSetting(registryName + "_" + url, null);
             if (cookiesAsString != null)
             {
-                List<CookieData> cookiesList = Serializer.Load<List<CookieData>>(cookiesAsString);
-                foreach (var cookie in cookiesList)
+                var cookieManager = wpfWebView.CoreWebView2.CookieManager;
+                if (cookieManager != null)
                 {
-                    if (cookie.session)
-                        wpfBrowserView.Browser.CookieStorage.SetSessionCookie(cookie.url, cookie.name, cookie.value, cookie.domain, cookie.path, cookie.secure, cookie.httpOnly);
-                    else
-                        wpfBrowserView.Browser.CookieStorage.SetCookie(cookie.url, cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expirationTime, cookie.secure, cookie.httpOnly);
+                    List<CookieData> cookiesList = Serializer.Load<List<CookieData>>(cookiesAsString);
+                    foreach (var cookie in cookiesList)
+                    {
+                        CoreWebView2Cookie coreCookie = cookieManager.CreateCookie(cookie.name, cookie.value, cookie.domain, cookie.path);
+                        coreCookie.IsSecure = cookie.secure;
+                        coreCookie.IsHttpOnly = cookie.httpOnly;
+
+                        if (!cookie.session)
+                        {
+                            coreCookie.Expires = cookie.expirationTime;
+                        }
+
+                        cookieManager.AddOrUpdateCookie(coreCookie);
+                    }
                 }
             }
         }
 
-        public static void SaveMicrosoftCookies(WPFBrowserView wpfBrowserView, string registryName)
+        public static void SaveMicrosoftCookies(WebView2 wpfWebView, string registryName)
         {
-            SaveCookies(wpfBrowserView, MICROSOFT_COOKIES_URL, registryName);
+            SaveCookies(wpfWebView, MICROSOFT_COOKIES_URL, registryName);
         }
 
-        public static void SaveCookies(WPFBrowserView wpfBrowserView, string url, string registryName)
+        public static void SaveCookies(WebView2 wpfWebView, string url, string registryName)
         {
             // we register cookies with a specific url into registries
-            if (url != null && wpfBrowserView.Browser != null && wpfBrowserView.Browser.CookieStorage != null)
+            if (url != null && wpfWebView.CoreWebView2?.CookieManager != null)
             {
-                List<DotNetBrowser.Cookie> cookiesList = wpfBrowserView.Browser.CookieStorage.GetAllCookies(url);
+                List<CoreWebView2Cookie> cookiesList = wpfWebView.CoreWebView2?.CookieManager.GetCookiesAsync(url).GetAwaiter().GetResult();
                 List<CookieData> cookiesDataList = new List<CookieData>();
                 foreach (var cookie in cookiesList)
                     cookiesDataList.Add(new CookieData(cookie, url));
@@ -69,37 +77,44 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             }
         }
 
-        public static void ClearCookies(WPFBrowserView wpfBrowserView, string registryName = null)
+        public static void ClearCookies(WebView2 wpfWebView, string registryName = null)
         {
             if (!string.IsNullOrEmpty(registryName))
             {
                 RegistryHelpers.DeleteSetting(registryName + "_" + MICROSOFT_COOKIES_URL);
             }
-            if (wpfBrowserView.Browser != null && wpfBrowserView.Browser.CookieStorage != null)
+            if (wpfWebView.CoreWebView2?.CookieManager != null)
             {
-                int numberOfDeletedCookies = wpfBrowserView.Browser.CookieStorage.DeleteAll();
-                wpfBrowserView.Browser.CookieStorage.Save();
-                MessageBox.Show(numberOfDeletedCookies.ToString() + " cookies have been deleted.");
+                wpfWebView.CoreWebView2.CookieManager.DeleteAllCookies();
+                MessageBox.Show("All cookies have been deleted.");
             }
         }
 
-        public static void SetCustomCookies(WPFBrowserView wpfBrowserView, IList<CookieData> cookies)
+        public static void SetCustomCookies(WebView2 wpfWebView, IList<CookieData> cookies)
         {
             if (cookies == null)
-                return;
-
-            foreach (CookieData data in cookies)
             {
-                if (data.session)
+                return;
+            }
+
+            var cookieManager = wpfWebView.CoreWebView2?.CookieManager;
+            if (cookieManager == null)
+            {
+                return;
+            }
+
+            foreach (CookieData cookie in cookies)
+            {
+                CoreWebView2Cookie coreCookie = cookieManager.CreateCookie(cookie.name, cookie.value, cookie.domain, cookie.path);
+                coreCookie.IsSecure = cookie.secure;
+                coreCookie.IsHttpOnly = cookie.httpOnly;
+                if (!cookie.session)
                 {
-                    wpfBrowserView.Browser.CookieStorage.SetSessionCookie(data.url, data.name, data.value, data.domain, data.path, data.secure, data.httpOnly);
+                    coreCookie.Expires = cookie.expirationTime;
                 }
-                else
-                {
-                    wpfBrowserView.Browser.CookieStorage.SetCookie(data.url, data.name, data.value, data.domain, data.path, data.expirationTime, data.secure, data.httpOnly);
-                }
+
+                cookieManager.AddOrUpdateCookie(coreCookie);
             }
         }
-
     }
 }

@@ -98,17 +98,6 @@ namespace Windows.UI.Xaml.Media.Animation
             _appliedKeyFramesCount = 0;
         }
 
-        internal override void GetTargetInformation(IterationParameters parameters)
-        {
-            _parameters = parameters;
-            GetTargetElementAndPropertyInfo(parameters, out DependencyObject target, out PropertyPath propertyPath);
-            _propertyContainer = target;
-            _targetProperty = propertyPath;
-            _propDp = GetProperty(_propertyContainer, _targetProperty);
-            _target = Storyboard.GetTarget(this);
-            _targetName = Storyboard.GetTargetName(this);
-        }
-
         private PropertyMetadata _propertyMetadata;
 
         // This guid is used to specifically target a particular call to the animation. It prevents the callback which should be called when velocity's animation end 

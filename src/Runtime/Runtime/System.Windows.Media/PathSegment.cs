@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
-#else
-using System.Windows.Shapes;
-#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -32,57 +21,26 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Represents a segment of a PathFigure object.
+    /// Represents a segment of a <see cref="PathFigure"/> object.
     /// </summary>
-    public abstract partial class PathSegment : DependencyObject
+    public abstract class PathSegment : DependencyObject
     {
-        #region Constructor
+        private Geometry _parentGeometry;
 
-        internal PathSegment()
+        internal PathSegment() { }
+
+        internal void SetParentGeometry(Geometry geometry) => _parentGeometry = geometry;
+
+        internal static void PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-
+            ((PathSegment)d).InvalidateParentGeometry();
         }
 
-        #endregion
+        internal void InvalidateParentGeometry() => _parentGeometry?.RaisePathChanged();
 
-        #region Internal API
-
-        internal Path ParentPath { get; private set; }
-
-        /// <summary>
-        /// Defines the segment in the canvas, then returns the position of the last point of the segment.
-        /// </summary>
-        /// <param name="xOffsetToApplyBeforeMultiplication"></param>
-        /// <param name="yOffsetToApplyBeforeMultiplication"></param>
-        /// <param name="xOffsetToApplyAfterMultiplication"></param>
-        /// <param name="yOffsetToApplyAfterMultiplication"></param>
-        /// <param name="horizontalMultiplicator"></param>
-        /// <param name="verticalMultiplicator"></param>
-        /// <param name="canvasDomElement"></param>
-        /// <param name="previousLastPOint"></param>
-        /// <returns>The position of the last point of the segment (that will be the starting position for the next segment).</returns>
-        internal abstract Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication, 
-                                               double yOffsetToApplyBeforeMultiplication, 
-                                               double xOffsetToApplyAfterMultiplication, 
-                                               double yOffsetToApplyAfterMultiplication, 
-                                               double horizontalMultiplicator, 
-                                               double verticalMultiplicator, 
-                                               object canvasDomElement, 
-                                               Point previousLastPOint);
-
-        internal abstract Point GetMinMaxXY(ref double minX,
-                                            ref double maxX,
-                                            ref double minY,
-                                            ref double maxY,
-                                            Point startingPoint);
-
-        internal abstract Point GetMaxXY();
-
-        internal virtual void SetParentPath(Path path)
+        internal virtual IEnumerable<string> ToDataStream(IFormatProvider formatProvider)
         {
-            ParentPath = path;
+            throw new NotSupportedException($"ToDataStream() not supported on {GetType().Name}");
         }
-
-        #endregion
     }
 }

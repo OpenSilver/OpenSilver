@@ -1,0 +1,228 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:System.Windows.Controls"
+  xmlns:controlsPrimitives="clr-namespace:System.Windows.Controls.Primitives;assembly=System.Windows.Controls"
+  xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows">
+
+    <Style TargetType="controlsPrimitives:CalendarDayButton">
+        <Setter Property="Background" Value="#FFBADDE9" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="MinWidth" Value="5" />
+        <Setter Property="MinHeight" Value="5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controlsPrimitives:CalendarDayButton">
+                    <Grid>
+                        <vsm:VisualStateManager.VisualStateGroups>
+                            <vsm:VisualStateGroup x:Name="CommonStates">
+                                <vsm:VisualStateGroup.Transitions>
+                                    <vsm:VisualTransition GeneratedDuration="0:0:0.1" />
+                                </vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualState x:Name="Normal" />
+                                <vsm:VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="Background"
+                                          Storyboard.TargetProperty="Opacity"
+                                          To=".5"
+                                          Duration="0" />
+                                    </Storyboard>
+                                </vsm:VisualState>
+                                <vsm:VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="Background"
+                                          Storyboard.TargetProperty="Opacity"
+                                          To=".5"
+                                          Duration="0" />
+                                    </Storyboard>
+                                </vsm:VisualState>
+                                <vsm:VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="Background"
+                                          Storyboard.TargetProperty="Opacity"
+                                          To="0"
+                                          Duration="0" />
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="Content"
+                                          Storyboard.TargetProperty="Opacity"
+                                          To=".35"
+                                          Duration="0" />
+                                    </Storyboard>
+                                </vsm:VisualState>
+                            </vsm:VisualStateGroup>
+                            <vsm:VisualStateGroup x:Name="SelectionStates">
+                                <vsm:VisualStateGroup.Transitions>
+                                    <vsm:VisualTransition GeneratedDuration="0" />
+                                </vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualState x:Name="Unselected" />
+                                <vsm:VisualState x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="SelectedBackground"
+                                          Storyboard.TargetProperty="Opacity"
+                                          To=".75"
+                                          Duration="0" />
+                                    </Storyboard>
+                                </vsm:VisualState>
+                            </vsm:VisualStateGroup>
+                            <vsm:VisualStateGroup x:Name="CalendarButtonFocusStates">
+                                <vsm:VisualStateGroup.Transitions>
+                                    <vsm:VisualTransition GeneratedDuration="0" />
+                                </vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualState x:Name="CalendarButtonFocused">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames
+                                          Storyboard.TargetName="FocusVisual"
+                                          Storyboard.TargetProperty="Visibility"
+                                          Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </vsm:VisualState>
+                                <vsm:VisualState x:Name="CalendarButtonUnfocused">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames
+                                          Storyboard.TargetName="FocusVisual"
+                                          Storyboard.TargetProperty="Visibility"
+                                          Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </vsm:VisualState>
+                            </vsm:VisualStateGroup>
+                            <vsm:VisualStateGroup x:Name="ActiveStates">
+                                <vsm:VisualStateGroup.Transitions>
+                                    <vsm:VisualTransition GeneratedDuration="0" />
+                                </vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualState x:Name="Active" />
+                                <vsm:VisualState x:Name="Inactive">
+                                    <Storyboard>
+                                        <ColorAnimation
+                                          Storyboard.TargetName="Content"
+                                          Storyboard.TargetProperty="(ContentControl.Foreground).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                          To="#FF777777"
+                                          Duration="0" />
+                                        <ColorAnimation
+                                          Storyboard.TargetName="Content"
+                                          Storyboard.TargetProperty="(ContentControl.Foreground).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
+                                          To="#FF777777"
+                                          Duration="0" />
+                                    </Storyboard>
+                                </vsm:VisualState>
+                            </vsm:VisualStateGroup>
+                            <vsm:VisualStateGroup x:Name="DayStates">
+                                <vsm:VisualStateGroup.Transitions>
+                                    <vsm:VisualTransition GeneratedDuration="0" />
+                                </vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualState x:Name="RegularDay" />
+                                <vsm:VisualState x:Name="Today">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="TodayBackground"
+                                          Storyboard.TargetProperty="Opacity"
+                                          To="1"
+                                          Duration="0" />
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="Content"
+                                          Storyboard.TargetProperty="(ContentControl.Foreground).(GradientBrush.GradientStops)[1].(GradientStop.Offset)"
+                                          To="1"
+                                          Duration="0" />
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="Content"
+                                          Storyboard.TargetProperty="(ContentControl.Foreground).(GradientBrush.GradientStops)[2].(GradientStop.Offset)"
+                                          To="1"
+                                          Duration="0" />
+                                    </Storyboard>
+                                </vsm:VisualState>
+                            </vsm:VisualStateGroup>
+                            <vsm:VisualStateGroup x:Name="BlackoutDayStates">
+                                <vsm:VisualStateGroup.Transitions>
+                                    <vsm:VisualTransition GeneratedDuration="0" />
+                                </vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualState x:Name="NormalDay" />
+                                <vsm:VisualState x:Name="BlackoutDay">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                          Storyboard.TargetName="BlackoutVisual"
+                                          Storyboard.TargetProperty="Opacity"
+                                          To=".2"
+                                          Duration="0" />
+                                    </Storyboard>
+                                </vsm:VisualState>
+                            </vsm:VisualStateGroup>
+                        </vsm:VisualStateManager.VisualStateGroups>
+                        
+                        <Rectangle
+                          x:Name="TodayBackground"
+                          RadiusX="1"
+                          RadiusY="1"
+                          Opacity="0"
+                          Fill="#FFAAAAAA" />
+                        <Rectangle
+                          x:Name="SelectedBackground"
+                          RadiusX="1"
+                          RadiusY="1"
+                          Opacity="0"
+                          Fill="{TemplateBinding Background}" />
+                        <Rectangle
+                          x:Name="Background"
+                          RadiusX="1"
+                          RadiusY="1"
+                          Opacity="0"
+                          Fill="{TemplateBinding Background}" />
+                        
+                        <ContentControl
+                          x:Name="Content"
+                          IsTabStop="False"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                          FontSize="{TemplateBinding FontSize}"
+                          Margin="5,1,5,1">
+                            <ContentControl.Foreground>
+                                <LinearGradientBrush>
+                                    <GradientStop Offset="0" Color="#FFFFFFFF" />
+                                    <GradientStop Offset="0" Color="#FFFFFFFF" />
+                                    <GradientStop Offset="0" Color="#FF333333" />
+                                    <GradientStop Offset="1" Color="#FF333333" />
+                                </LinearGradientBrush>
+                            </ContentControl.Foreground>
+                        </ContentControl>
+                        
+                        <Path
+                          x:Name="BlackoutVisual"
+                          Opacity="0"
+                          Margin="3"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          RenderTransformOrigin="0.5,0.5"
+                          Fill="#FF000000"
+                          Stretch="Fill"
+                          Data="M8.1772461,11.029181 L10.433105,11.029181 L11.700684,12.801641 L12.973633,11.029181 L15.191895,11.029181 L12.844727,13.999395 L15.21875,17.060919 L12.962891,17.060919 L11.673828,15.256231 L10.352539,17.060919 L8.1396484,17.060919 L10.519043,14.042364 z" />
+                        <Rectangle
+                          x:Name="FocusVisual"
+                          Visibility="Collapsed"
+                          IsHitTestVisible="false"
+                          RadiusX="1"
+                          RadiusY="1"
+                          Stroke="#FF6DBDD1" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

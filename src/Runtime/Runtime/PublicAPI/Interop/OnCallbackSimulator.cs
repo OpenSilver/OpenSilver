@@ -12,11 +12,14 @@
 \*====================================================================================*/
 
 using System;
+using System.Runtime.InteropServices;
 using DotNetForHtml5.Core;
 
 namespace CSHTML5.Internal
 {
-    internal sealed class OnCallbackSimulator
+    [ClassInterface(ClassInterfaceType.AutoDispatch)]
+    [ComVisible(true)]
+    public sealed class OnCallbackSimulator
     {
         public OnCallbackSimulator()
         {
@@ -26,16 +29,6 @@ namespace CSHTML5.Internal
         public void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
         {
             OnCallBackImpl.Instance.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
-        }
-
-        // This method can be removed later. Now it is used for easier migration from old cshtml5.js to new one
-        public object OnCallbackFromJavaScript(
-            int callbackId,
-            string idWhereCallbackArgsAreStored,
-            object callbackArgsObject)
-        {
-            return OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                false);
         }
 
         public object OnCallbackFromJavaScript(
@@ -71,7 +64,7 @@ namespace CSHTML5.Internal
             if (returnValue)
             {
                 var timeout = TimeSpan.FromSeconds(30);
-                INTERNAL_Simulator.WebControlDispatcherInvoke(InvokeCallback, timeout);
+                INTERNAL_Simulator.OpenSilverDispatcherInvoke(InvokeCallback, timeout);
                 if (!actionExecuted)
                 {
                     throw GenerateDeadlockException(timeout);
@@ -79,7 +72,7 @@ namespace CSHTML5.Internal
             }
             else
             {
-                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(InvokeCallback);
+                INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(InvokeCallback);
             }
 
             return returnValue ? result : null;

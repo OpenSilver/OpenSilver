@@ -14,13 +14,10 @@
 \*====================================================================================*/
 
 
-
-using DotNetBrowser;
-using DotNetBrowser.DOM;
-using System;
+using Microsoft.Web.WebView2.Wpf;
 using System.Reflection;
 using System.Windows;
-using DotNetBrowser.WPF;
+using System.Windows.Threading;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -33,34 +30,16 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         }
 #endif
 
-        internal static void InjectDOMDocument(DOMDocument document, Assembly coreAssembly)
+        internal static void InjectWebControlDispatcher(WebView2 webControl, Assembly coreAssembly)
         {
-            InjectPropertyValue("DOMDocument", document, coreAssembly);
-        }
+            InjectPropertyValue("WebControlDispatcherBeginInvoke",
+                new Action<Action>((method) => webControl.Dispatcher.BeginInvoke(method)), coreAssembly);
 
-        internal static void InjectHtmlDocument(JSValue htmlDocument, Assembly coreAssembly)
-        {
-            InjectPropertyValue("HtmlDocument", htmlDocument, coreAssembly);
-        }
+            InjectPropertyValue("WebControlDispatcherInvoke",
+                new Action<Action, TimeSpan>((method, timeout) => webControl.Dispatcher.Invoke(method, timeout)), coreAssembly);
 
-        internal static void InjectWebControlDispatcherBeginInvoke(WPFBrowserView webControl, Assembly coreAssembly)
-        {
-            InjectPropertyValue("WebControlDispatcherBeginInvoke", new Action<Action>((method) => webControl.Dispatcher.BeginInvoke(method)), coreAssembly);
-        }
-
-        internal static void InjectWebControlDispatcherInvoke(WPFBrowserView webControl, Assembly coreAssembly)
-        {
-            InjectPropertyValue("WebControlDispatcherInvoke", new Action<Action, TimeSpan>((method, timeout) => webControl.Dispatcher.Invoke(method, timeout)), coreAssembly);
-        }
-
-        internal static void InjectWebControlDispatcherCheckAccess(WPFBrowserView webControl, Assembly coreAssembly)
-        {
-            InjectPropertyValue("WebControlDispatcherCheckAccess", new Func<bool>(() => webControl.Dispatcher.CheckAccess()), coreAssembly);
-        }
-
-        internal static void InjectConvertBrowserResult(Func<object, object> func, Assembly coreAssembly)
-        {
-            InjectPropertyValue("ConvertBrowserResult", func, coreAssembly);
+            InjectPropertyValue("WebControlDispatcherCheckAccess",
+                new Func<bool>(() => webControl.Dispatcher.CheckAccess()), coreAssembly);
         }
 
         internal static void InjectJavaScriptExecutionHandler(dynamic javaScriptExecutionHandler, Assembly coreAssembly)
@@ -70,11 +49,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 #else
             InjectPropertyValue("JavaScriptExecutionHandler", javaScriptExecutionHandler, coreAssembly);
 #endif
-        }
-
-        internal static void InjectWpfMediaElementFactory(Assembly coreAssembly)
-        {
-            InjectPropertyValue("WpfMediaElementFactory", new WpfMediaElementFactory(), coreAssembly);
         }
 
         internal static void InjectWebClientFactory(Assembly coreAssembly)
@@ -90,6 +64,23 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         internal static void InjectSimulatorProxy(SimulatorProxy simulatorProxy, Assembly coreAssembly)
         {
             InjectPropertyValue("SimulatorProxy", simulatorProxy, coreAssembly);
+        }
+
+        internal static void InjectSimulatorCallbackSetup(Action<object> callbackSetup, Assembly coreAssembly)
+        {
+            InjectPropertyValue("SimulatorCallbackSetup", callbackSetup, coreAssembly);
+        }
+
+        internal static void InjectOpenSilverRuntimeDispatcher(Dispatcher dispatcher, Assembly coreAssembly)
+        {
+            InjectPropertyValue("OpenSilverDispatcherBeginInvoke",
+                new Action<Action>((method) => dispatcher.BeginInvoke(method)), coreAssembly);
+
+            InjectPropertyValue("OpenSilverDispatcherInvoke",
+                new Action<Action, TimeSpan>((method, timeout) => dispatcher.Invoke(method, timeout)), coreAssembly);
+
+            InjectPropertyValue("OpenSilverDispatcherCheckAccess",
+                new Func<bool>(() => dispatcher.CheckAccess()), coreAssembly);
         }
 
         internal static dynamic GetPropertyValue(string propertyName, Assembly coreAssembly)

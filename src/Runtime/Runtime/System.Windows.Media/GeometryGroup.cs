@@ -12,13 +12,12 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Specialized;
+using System.Text;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
+#if !MIGRATION
 using Windows.Foundation;
 #endif
 
@@ -32,58 +31,35 @@ namespace Windows.UI.Xaml.Media
     /// Represents a composite geometry, composed of other <see cref="Geometry"/> objects.
     /// </summary>
     [ContentProperty(nameof(Children))]
-    [OpenSilver.NotImplemented]
     public sealed class GeometryGroup : Geometry
     {
-        internal protected override void DefineInCanvas(
-            Path path, 
-            object canvasDomElement, 
-            double horizontalMultiplicator, 
-            double verticalMultiplicator, 
-            double xOffsetToApplyBeforeMultiplication, 
-            double yOffsetToApplyBeforeMultiplication, 
-            double xOffsetToApplyAfterMultiplication, 
-            double yOffsetToApplyAfterMultiplication, 
-            Size shapeActualSize)
-        {
-            GeometryCollection children = (GeometryCollection)GetValue(ChildrenProperty);
-            if (children != null)
-            {
-                foreach (Geometry child in children)
-                {
-                    child.DefineInCanvas(
-                        path, 
-                        canvasDomElement, 
-                        horizontalMultiplicator, 
-                        verticalMultiplicator, 
-                        xOffsetToApplyBeforeMultiplication, 
-                        yOffsetToApplyBeforeMultiplication, 
-                        xOffsetToApplyAfterMultiplication, 
-                        yOffsetToApplyAfterMultiplication, 
-                        shapeActualSize);
-                }
-            }
-        }
+        private WeakEventListener<GeometryGroup, GeometryCollection, NotifyCollectionChangedEventArgs> _collectionChangedListener;
 
-        internal protected override void GetMinMaxXY(
-            ref double minX, 
-            ref double maxX, 
-            ref double minY, 
-            ref double maxY)
-        {
-            GeometryCollection children = (GeometryCollection)GetValue(ChildrenProperty);
-            if (children != null)
-            {
-                foreach (Geometry child in children)
-                {
-                    child.GetMinMaxXY(
-                        ref minX, 
-                        ref maxX, 
-                        ref minY, 
-                        ref maxY);
-                }
-            }
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeometryGroup"/> class.
+        /// </summary>
+        public GeometryGroup() { }
+
+        /// <summary>
+        /// Identifies the <see cref="Children"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ChildrenProperty =
+            DependencyProperty.Register(
+                nameof(Children),
+                typeof(GeometryCollection),
+                typeof(GeometryGroup),
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<Geometry>(
+                        static () => new GeometryCollection(),
+                        static (d, dp) =>
+                        {
+                            GeometryGroup geometry = (GeometryGroup)d;
+                            var collection = new GeometryCollection();
+                            geometry.OnChildrenChanged(null, collection);
+                            return collection;
+                        }),
+                    OnChildrenChanged,
+                    CoerceChildren));
 
         /// <summary>
         /// Gets or sets the <see cref="GeometryCollection"/> that contains the objects
@@ -94,32 +70,58 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public GeometryCollection Children
         {
-            get { return (GeometryCollection)GetValue(ChildrenProperty); }
-            set { SetValue(ChildrenProperty, value); }
+            get => (GeometryCollection)GetValue(ChildrenProperty);
+            set => SetValue(ChildrenProperty, value);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="Children"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ChildrenProperty = 
-            DependencyProperty.Register(
-                nameof(Children), 
-                typeof(GeometryCollection), 
-                typeof(GeometryGroup), 
-                new PropertyMetadata(
-                    new PFCDefaultValueFactory<Geometry>(
-                        static () => new GeometryCollection(),
-                        static (d, dp) => new GeometryCollection()),
-                    null,
-                    CoerceChildren));
+        private static void OnChildrenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((GeometryGroup)d).OnChildrenChanged((GeometryCollection)e.OldValue, (GeometryCollection)e.NewValue);
+            OnPathChanged(d, e);
+        }
 
         private static object CoerceChildren(DependencyObject d, object baseValue)
         {
             return baseValue ?? new GeometryCollection();
         }
 
+        private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaisePathChanged();
+
+        private void OnChildrenChanged(GeometryCollection oldChildren, GeometryCollection newChildren)
+        {
+            oldChildren?.SetOwner(null);
+
+            if (_collectionChangedListener != null)
+            {
+                _collectionChangedListener.Detach();
+                _collectionChangedListener = null;
+            }
+
+            if (newChildren is not null)
+            {
+                newChildren.SetOwner(this);
+
+                _collectionChangedListener = new(this, newChildren)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnChildrenCollectionChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                };
+                newChildren.CollectionChanged += _collectionChangedListener.OnEvent;
+            }
+        }
+
         /// <summary>
-        /// Gets or sets how the intersecting areas of the objects contained in this <see cref="GeometryGroup"/> 
+        /// Identifies the <see cref="FillRule"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FillRuleProperty =
+            DependencyProperty.Register(
+                nameof(FillRule),
+                typeof(FillRule),
+                typeof(GeometryGroup),
+                new PropertyMetadata(FillRule.EvenOdd, OnFillRuleChanged));
+
+        /// <summary>
+        /// Gets or sets how the intersecting areas of the objects contained in this <see cref="GeometryGroup"/>
         /// are combined.
         /// </summary>
         /// <returns>
@@ -128,25 +130,9 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public FillRule FillRule
         {
-            get
-            {
-                return (FillRule)GetValue(FillRuleProperty);
-            }
-            set
-            {
-                SetValue(FillRuleProperty, value);
-            }
+            get => (FillRule)GetValue(FillRuleProperty);
+            set => SetValue(FillRuleProperty, value);
         }
-
-        /// <summary>
-        /// Identifies the <see cref="FillRule"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty FillRuleProperty = 
-            DependencyProperty.Register(
-                nameof(FillRule), 
-                typeof(FillRule), 
-                typeof(GeometryGroup), 
-                new PropertyMetadata(FillRule.EvenOdd));
 
         internal override Rect BoundsInternal
         {
@@ -166,5 +152,20 @@ namespace Windows.UI.Xaml.Media
                 return boundsRect;
             }
         }
+
+        internal override string ToPathData(IFormatProvider formatProvider)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var child in Children)
+            {
+                var childData = child.ToPathData(formatProvider);
+                sb.Append(childData);
+            }
+
+            return sb.ToString();
+        }
+
+        internal override FillRule GetFillRule() => FillRule;
     }
 }

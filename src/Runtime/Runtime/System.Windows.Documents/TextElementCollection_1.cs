@@ -16,9 +16,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenSilver.Internal.Documents;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -26,11 +24,11 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    public partial class TextElementCollection<T> : IList, ICollection<T> where T : TextElement
+    public class TextElementCollection<T> : IList, ICollection<T> where T : TextElement
     {
         #region Data
         private readonly DependencyObject _owner;
-        private readonly INTERNAL_ITextContainer _textContainer;
+        private readonly ITextContainer _textContainer;
         private readonly List<T> _collection;
         #endregion
 
@@ -39,7 +37,7 @@ namespace Windows.UI.Xaml.Documents
         {
             this._owner = owner;
             this._collection = new List<T>();
-            this._textContainer = INTERNAL_TextContainerHelper.FromOwner(owner);
+            this._textContainer = TextContainersHelper.FromOwner(owner);
         }
         #endregion
 
@@ -190,7 +188,7 @@ namespace Windows.UI.Xaml.Documents
         #endregion
 
         #region Internal Properties
-        internal INTERNAL_ITextContainer TextContainer
+        internal ITextContainer TextContainer
         {
             get
             {

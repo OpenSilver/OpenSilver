@@ -12,7 +12,9 @@
 \*====================================================================================*/
 
 using System;
+using System.Security;
 using System.Threading.Tasks;
+using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 
 namespace OpenSilver.Internal
@@ -90,19 +92,24 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<object>();
 
-                Interop.ExecuteJavaScriptVoid("navigator.clipboard.writeText($0).then($1());",flushQueue:false, 
-                    text,
-                    new Action(() =>
+                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                    JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<bool>(success =>
                     {
-                        try
+                        if (success)
                         {
                             tcs.SetResult(null);
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            tcs.SetException(ex);
+                            tcs.SetException(ClipboardAccessNotAllowException());
                         }
                     }));
+
+                string sText = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(text);
+
+                Interop.ExecuteJavaScriptVoid(
+                    $"navigator.clipboard.writeText({sText}).then(() => {sCallback}(true), () => {sCallback}(false));",
+                    false);
 
                 return tcs.Task;
             }
@@ -114,18 +121,22 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<string>();
 
-                Interop.ExecuteJavaScriptVoid("navigator.clipboard.readText().then(text => $0(text));",flushQueue:false, 
-                    new Action<string>(content =>
+                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                    JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<string, bool>((content, success) =>
                     {
-                        try
+                        if (success)
                         {
                             tcs.SetResult(content);
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            tcs.SetException(ex);
+                            tcs.SetException(ClipboardAccessNotAllowException());
                         }
                     }));
+
+                Interop.ExecuteJavaScriptVoid(
+                    $"navigator.clipboard.readText().then(text => {sCallback}(text, true), () => {sCallback}('', false));",
+                    false);
 
                 return tcs.Task;
             }
@@ -137,21 +148,18 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<bool>();
 
-                Interop.ExecuteJavaScriptVoid("navigator.clipboard.readText().then(text => $0(!!text))",flushQueue:false, 
-                    new Action<bool>(b =>
-                    {
-                        try
-                        {
-                            tcs.SetResult(b);
-                        }
-                        catch (Exception ex)
-                        {
-                            tcs.SetException(ex);
-                        }
-                    }));
+                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                    JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<bool>(b => tcs.SetResult(b)));
+
+                Interop.ExecuteJavaScriptVoid(
+                    $"navigator.clipboard.readText().then(text => {sCallback}(!!text), () => {sCallback}(false));",
+                    false);
 
                 return tcs.Task;
             }
+
+            private static SecurityException ClipboardAccessNotAllowException()
+                => new SecurityException("Clipboard access is not allowed");
         }
 
         private class ExecCommandClipboard : IAsyncClipboard

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <DefineSilverlight>true</DefineSilverlight>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="$opensilverpackagename$" Version="$opensilverpackageversion$" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Class1.vb" />
+  </ItemGroup>
+
+</Project>

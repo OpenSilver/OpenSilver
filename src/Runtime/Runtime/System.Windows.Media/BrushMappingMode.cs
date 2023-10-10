@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 #if MIGRATION
 namespace System.Windows.Media
 #else
@@ -26,7 +18,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
-    /// Specifies the coordinate system used by a System.Windows.Media.Brush.
+    /// Specifies the coordinate system used by a <see cref="Brush"/>.
     /// </summary>
     public enum BrushMappingMode
     {
@@ -35,12 +27,12 @@ namespace Windows.UI.Xaml.Media
         /// directly in local space.
         /// </summary>
         Absolute = 0,
-       
+
         /// <summary>
-        /// The coordinate system is relative to a bounding box: 0 indicates 0 percent
-        /// of the bounding box, and 1 indicates 100 percent of the bounding box. For
-        /// example, (0.5, 0.5) describes a point in the middle of the bounding box,
-        /// and (1, 1) describes a point at the bottom right of the bounding box.
+        /// The coordinate system is relative to a bounding box: 0 indicates 0 percent of
+        /// the bounding box, and 1 indicates 100 percent of the bounding box. For example,
+        /// (0.5, 0.5) describes a point in the middle of the bounding box, and (1, 1) describes
+        /// a point at the bottom right of the bounding box.
         /// </summary>
         RelativeToBoundingBox = 1,
     }

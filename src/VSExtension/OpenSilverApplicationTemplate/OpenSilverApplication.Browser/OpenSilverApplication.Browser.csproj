@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-     <DisableImplicitNamespaceImports>True</DisableImplicitNamespaceImports>
+    <DisableImplicitNamespaceImports>True</DisableImplicitNamespaceImports>
   </PropertyGroup>
 
   <ItemGroup>

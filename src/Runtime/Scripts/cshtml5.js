@@ -144,35 +144,36 @@ document.getActualWidthAndHeight = function (element) {
     return (typeof element === 'undefined' || element === null) ? '0|0' : element['offsetWidth'].toFixed(3) + '|' + element['offsetHeight'].toFixed(3);
 }
 
-document.createElementSafe = function (tagName, id, parentElement, index) {
-    const newElement = document.createElement(tagName);
+document.createElementSafe = function (tagName, id, parent, index) {
+    if (typeof parent === 'string') parent = document.getElementById(parent);
+    if (parent == null) return null;
 
-    newElement.setAttribute('id', id);
-    newElement.setAttribute('xamlid', id);
+    const element = document.createElement(tagName);
 
-    if (typeof parentElement == 'string') {
-        parentElement = document.getElementById(parentElement);
+    element.setAttribute('id', id);
+    Object.defineProperty(element, 'xamlid', {
+        value: id,
+        writable: false,
+    });
+
+    if (index < 0 || index >= parent.children.length) {
+        parent.appendChild(element);
+    } else {
+        parent.insertBefore(element, parent.children[index]);
     }
 
-    if (parentElement == null) {
-        console.log('createElement is failed becaused of the removed parent.');
-        return null;
-    }
-
-    if (index < 0 || index >= parentElement.children.length) {
-        parentElement.appendChild(newElement);
-    }
-    else {
-        var nextSibling = parentElement.children[index];
-        parentElement.insertBefore(newElement, nextSibling);
-    }
-
-    Object.defineProperty(newElement, 'dump', {
+    Object.defineProperty(element, 'dump', {
         get() { return document.dumpProperties(id); }
     });
 
-    return newElement;
-}
+    return element;
+};
+
+document.createLayoutElement = function (tagName, id, parent, index) {
+    const element = document.createElementSafe(tagName, id, parent, index);
+    if (element) element.classList.add('uielement-unarranged');
+    return element;
+};
 
 document.dumpProperties = function (id, ...names) {
     if (DotNet && DotNet.invokeMethod) {
@@ -181,45 +182,37 @@ document.dumpProperties = function (id, ...names) {
     return null;
 };
 
-document.createTextBlockElement = function (id, parentElement, wrap) {
-    const newElement = document.createElementSafe('div', id, parentElement, -1);
-
-    if (newElement) {
-        newElement.style['overflow'] = 'hidden';
-        newElement.style['textAlign'] = 'start';
-        newElement.style['boxSizing'] = 'border-box';
+document.createTextBlockElement = function (id, parent, wrap) {
+    const element = document.createLayoutElement('div', id, parent, -1);
+    if (element) {
+        element.style.overflow = 'hidden';
+        element.style.textAlign = 'start';
+        element.style.boxSizing = 'border-box';
         if (wrap) {
-            newElement.style['overflowWrap'] = 'break-word';
-            newElement.style['whiteSpace'] = 'pre-wrap';
+            element.style.overflowWrap = 'break-word';
+            element.style.whiteSpace = 'pre-wrap';
         } else {
-            newElement.style['whiteSpace'] = 'pre';
+            element.style.whiteSpace = 'pre';
         }
     }
-}
+};
 
 document.createPopupRootElement = function (id, rootElement, pointerEvents) {
     if (!rootElement) return;
 
     const popupRoot = document.createElement('div');
     popupRoot.setAttribute('id', id);
-    popupRoot.setAttribute('xamlid', id);
+    Object.defineProperty(popupRoot, 'xamlid', {
+        value: id,
+        writable: false,
+    });
     popupRoot.style.position = 'absolute';
     popupRoot.style.width = '100%';
     popupRoot.style.height = '100%';
-    popupRoot.style.overflowX = 'hidden';
-    popupRoot.style.overflowY = 'hidden';
+    popupRoot.style.overflow = 'clip';
     popupRoot.style.pointerEvents = pointerEvents;
     rootElement.appendChild(popupRoot);
-}
-
-document.createCanvasElement = function (id, parentElement) {
-    const newElement = document.createElementSafe('div', id, parentElement, -1);
-
-    if (newElement) {
-        newElement.style['overflow'] = 'display';
-        newElement.style['position'] = 'relative';
-    }
-}
+};
 
 document.createImageElement = function (id, parentElement) {
     const img = document.createElementSafe('img', id, parentElement, -1);
@@ -239,20 +232,7 @@ document.createImageElement = function (id, parentElement) {
             this.style.display = 'none';
         });
     }
-}
-
-document.createFrameworkElement = function (id, parentElement, enablePointerEvents) {
-    const newElement = document.createElementSafe('div', id, parentElement, -1);
-
-    if (newElement) {
-        newElement.style['width'] = '100%';
-        newElement.style['height'] = '100%';
-
-        if (enablePointerEvents) {
-            newElement.style['pointerEvents'] = 'all';
-        }
-    }
-}
+};
 
 document.createTextElement = function (id, tagName, parent) {
     if (typeof parent === 'string') parent = document.getElementById(parent);
@@ -261,30 +241,55 @@ document.createTextElement = function (id, tagName, parent) {
     const textElement = document.createElement(tagName);
     textElement.setAttribute('id', id);
 
-    if (index < 0 || index >= parent.children.length) {
-        parent.appendChild(textElement);
-    } else {
-        parent.insertBefore(textElement, parent.children[index]);
-    }
+    parent.appendChild(textElement);
 };
 
-document.createShapeOuterElement = function (id, parentElement) {
-    const newElement = document.createElementSafe('div', id, parentElement, -1);
+document.createShapeElement = function (svgId, shapeId, defsId, svgTagName, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
 
-    if (newElement) {
-        newElement.style['lineHeight'] = '0';     // Line height is not needed in shapes because it causes layout issues.
-        newElement.style['fontSize'] = '0';       //this allows this div to be as small as we want (for some reason in Firefox, what contains a canvas has a height of at least about (1 + 1/3) * fontSize)
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('uielement-shape');
+    svg.classList.add('uielement-unarranged');
+    svg.setAttribute('id', svgId);
+    Object.defineProperty(svg, 'xamlid', {
+        value: svgId,
+        writable: false,
+    });
+    Object.defineProperty(svg, 'dump', {
+        get() { return document.dumpProperties(svgId); }
+    });
+    const shape = document.createElementNS('http://www.w3.org/2000/svg', svgTagName);
+    shape.setAttribute('id', shapeId);
+    shape.setAttribute('vector-effect', 'non-scaling-stroke');
+    Object.defineProperty(shape, 'xamlid', {
+        value: shapeId,
+        writable: false,
+    });
+    svg.appendChild(shape);
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.setAttribute('id', defsId);
+    svg.appendChild(defs);
+    parent.appendChild(svg);
+};
+
+document.createSvgElement = function (id, tagName, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+    svg.setAttribute('id', id);
+
+    parent.appendChild(svg);
+};
+
+document.getBBox = function (svgElement) {
+    if (svgElement) {
+        const bbox = svgElement.getBBox();
+        return JSON.stringify({ X: bbox.x, Y: bbox.y, Width: bbox.width, Height: bbox.height, });
     }
-}
-
-document.createShapeInnerElement = function (id, parentElement) {
-    const newElement = document.createElementSafe('canvas', id, parentElement, -1);
-
-    if (newElement) {
-        newElement.style['width'] = '0';
-        newElement.style['height'] = '0';
-    }
-}
+    return '{}';
+};
 
 document.set2dContextProperty = function (id, propertyName, propertyValue) {
     const element = document.getElementById(id);
@@ -311,6 +316,13 @@ document.setDomStyle = function (id, propertyName, value) {
 
     element.style[propertyName] = value;
 }
+
+document.setStyleProperty = function (id, propertyName, value, priority) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.style.setProperty(propertyName, value, priority);
+    }
+};
 
 document.setDomTransform = function (id, value) {
     const element = document.getElementById(id);
@@ -388,13 +400,13 @@ document.createInputManager = function (callback) {
         WHEEL: 7,
         KEYDOWN: 8,
         KEYUP: 9,
-        FOCUS: 10,
-        BLUR: 11,
-        KEYPRESS: 12,
-        INPUT: 13,
-        TOUCH_START: 14,
-        TOUCH_END: 15,
-        TOUCH_MOVE: 16,
+        KEYPRESS: 10,
+        TOUCH_START: 11,
+        TOUCH_END: 12,
+        TOUCH_MOVE: 13,
+        FOCUS_MANAGED: 14,
+        FOCUS_UNMANAGED: 15,
+        WINDOW_FOCUS: 16,
         WINDOW_BLUR: 17,
     };
 
@@ -405,6 +417,42 @@ document.createInputManager = function (callback) {
         SHIFT: 4,
         WINDOWS: 8,
     };
+
+    const FocusManager = (function () {
+        let _timeoutID = null;
+        let _isManagedFocusUpdate = false;
+
+        function startTimer() {
+            if (_timeoutID === null) {
+                _timeoutID = setTimeout(function () {
+                    _timeoutID = null;
+                    callback('', EVENTS.FOCUS_MANAGED, null);
+                });
+            }
+        };
+
+        return {
+            get isManagingFocus() {
+                return _isManagedFocusUpdate;
+            },
+            focus: function (element) {
+                if (!element) return false;
+
+                element.setAttribute('tabindex', 0);
+
+                _isManagedFocusUpdate = true;
+                element.focus({ preventScroll: true });
+                _isManagedFocusUpdate = false;
+
+                if (document.activeElement === element) {
+                    startTimer();
+                    return true;
+                }
+
+                return false;
+            },
+        };
+    })();
 
     let _modifiers = MODIFIERKEYS.NONE;
     let _mouseCapture = null;
@@ -425,8 +473,9 @@ document.createInputManager = function (callback) {
 
     function getClosestElementId(element) {
         while (element) {
-            if (element.hasAttribute('xamlid')) {
-                return element.getAttribute('xamlid');
+            const xamlid = element.xamlid;
+            if (xamlid) {
+                return xamlid;
             }
 
             element = element.parentElement;
@@ -456,15 +505,13 @@ document.createInputManager = function (callback) {
         document.addEventListener('mouseup', function (e) {
             if (!e.isHandled) {
                 const target = _mouseCapture;
-                if (target !== null) {
-                    switch (e.button) {
-                        case 0:
-                            callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
-                            break;
-                        case 2:
-                            callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
-                            break;
-                    }
+                switch (e.button) {
+                    case 0:
+                        callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
+                        break;
+                    case 2:
+                        callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
+                        break;
                 }
             }
         });
@@ -478,8 +525,6 @@ document.createInputManager = function (callback) {
             }
         });
 
-        document.addEventListener('selectstart', function (e) { if (_mouseCapture !== null) e.preventDefault(); });
-
         document.addEventListener('contextmenu', function (e) {
             if (_suppressContextMenu ||
                 (_mouseCapture !== null && this !== _mouseCapture)) {
@@ -491,6 +536,8 @@ document.createInputManager = function (callback) {
         document.addEventListener('keydown', function (e) { setModifiers(e); });
 
         document.addEventListener('keyup', function (e) { setModifiers(e); });        
+
+        window.addEventListener('focus', function (e) { callback('', EVENTS.WINDOW_FOCUS, e); });
 
         window.addEventListener('blur', function (e) {
             callback('', EVENTS.WINDOW_BLUR, e);
@@ -505,7 +552,32 @@ document.createInputManager = function (callback) {
             // Make sure the root div is keyboard focusable, so that we can tab into the app.
             root.tabIndex = Math.max(root.tabIndex, 0);
 
-            root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
+            root.addEventListener('focusin', function (e) {
+                if (FocusManager.isManagingFocus) return;
+
+                // Unrequested focus update, either from user interaction or call to focus()
+                // method via interop or external javascript component.
+                if (root._ignoreFocus) return;
+
+                // Try to reconnect focused element to a known opensilver element
+                const xamlid = getClosestElementId(e.target);
+                if (xamlid) {
+                    callback(xamlid, EVENTS.FOCUS_UNMANAGED, e);
+                } else {
+                    // Root element received focus. Check if previous focused element belongs to
+                    // the app. If yes, then move focus here again silently.
+                    if (getClosestElementId(e.relatedTarget)) {
+                        root._ignoreFocus = true;
+                        e.relatedTarget.focus({ preventScroll: true });
+                        root._ignoreFocus = false;
+
+                        // Make sure that re-focus was successful.
+                        if (document.activeElement === e.relatedTarget) return;
+                    }
+
+                    callback('', EVENTS.FOCUS_UNMANAGED, e);
+                }
+            });
 
             root.addEventListener('mousemove', function (e) {
                 if (shouldIgnoreMouseEvent(e)) return;
@@ -517,7 +589,8 @@ document.createInputManager = function (callback) {
 
             root.addEventListener('wheel', function (e) {
                 e.isHandled = true;
-                callback(getClosestElementId(e.target), EVENTS.WHEEL, e);
+                const target = _mouseCapture || e.target;
+                callback(getClosestElementId(target), EVENTS.WHEEL, e);
             });
 
             root.addEventListener('mousedown', function (e) {
@@ -598,13 +671,6 @@ document.createInputManager = function (callback) {
                     }
                 });
 
-                view.addEventListener('input', function (e) {
-                    if (!e.isHandled) {
-                        e.isHandled = true;
-                        callback(getClosestElementId(this), EVENTS.INPUT, e);
-                    }
-                });
-
                 view.addEventListener('keydown', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
@@ -627,12 +693,17 @@ document.createInputManager = function (callback) {
         },
         captureMouse: function (element) {
             _mouseCapture = element;
+            document.body.classList.add('opensilver-mouse-captured');
         },
         releaseMouseCapture: function () {
             _mouseCapture = null;
+            document.body.classList.remove('opensilver-mouse-captured');
         },
         suppressContextMenu: function (value) {
             _suppressContextMenu = value;
+        },
+        focus: function (element) {
+            return FocusManager.focus(element);
         },
     };
 };
@@ -653,10 +724,10 @@ document.eventCallback = function (callbackId, args, sync) {
     }
 }
 
-document.getCallbackFunc = function (callbackId, sync, sliceArguments) {
+document.getCallbackFunc = function (callbackId, sync) {
     return function () {
         return document.eventCallback(callbackId,
-            (sliceArguments) ? Array.prototype.slice.call(arguments) : arguments,
+            Array.prototype.slice.call(arguments),
             sync);
     };
 }
@@ -679,68 +750,68 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
     window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
 }
 
-document.setVisualBounds = function (id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
-    var element = document.getElementById(id);
+document.setVisualBounds = function (id, left, top, width, height, clip, clipLeft, clipTop, clipWidth, clipHeight) {
+    const element = document.getElementById(id);
     if (element) {
-        element.style.left = left + "px";
-        element.style.top = top + "px";
-        element.style.width = width + "px";
-        element.style.height = height + "px";
-
-        if (bSetAbsolutePosition) {
-            element.style.position = "absolute";
+        element.style.left = left + 'px';
+        element.style.top = top + 'px';
+        element.style.width = width + 'px';
+        element.style.height = height + 'px';
+        element.style.position = 'absolute';
+        if (clip) {
+            element.style.clipPath = `polygon(${clipLeft}px ${clipTop}px, ${clipWidth}px ${clipTop}px, ${clipWidth}px ${clipHeight}px, ${clipLeft}px ${clipHeight}px)`;
+        } else {
+            element.style.clipPath = '';
         }
-        if (bSetZeroMargin) {
-            element.style.margin = "0";
-        }
-        if (bSetZeroPadding) {
-            element.style.padding = "0";
-        }
+        element.classList.remove('uielement-unarranged');
     }
 }
 
-document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
-    var element = document.getElementById(id);
-    if (element) {
-        element.style.left = left + "px";
-        element.style.top = top + "px";
+document.createMeasurementService = function (parent) {
+    if (!parent) return null;
+    const measurer = document.createElement('div');
+    measurer.id = `${parent.id}-msr`; 
+    measurer.style.position = 'absolute';
+    measurer.style.visibility = 'hidden';
+    measurer.style.height = '';
+    measurer.style.width = '';
+    measurer.style.boxSizing = 'border-box';
+    measurer.style.whiteSpace = 'pre';
+    measurer.style.left = '-100000px';
+    measurer.style.top = '-100000px';
+    measurer.style.textAlign = 'left';
+    parent.appendChild(measurer);
+    return measurer.id;
+};
 
-        if (bSetAbsolutePosition) {
-            element.style.position = "absolute";
-        }
-        if (bSetZeroMargin) {
-            element.style.margin = "0";
-        }
-        if (bSetZeroPadding) {
-            element.style.padding = "0";
-        }
-    }
-}
-
-document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflowWrap, padding, maxWidth, emptyVal) {
-    var element = document.getElementById(measureElementId);
-    var elToMeasure = document.getElementById(uid);
+document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflowWrap, maxWidth, emptyVal) {
+    const element = document.getElementById(measureElementId);
+    const elToMeasure = document.getElementById(uid);
     if (element && elToMeasure) {
-        var computedStyle = getComputedStyle(elToMeasure);
+        if (elToMeasure instanceof HTMLTextAreaElement) {
+            let text = elToMeasure.value.length == 0 ? emptyVal : elToMeasure.value;
+            // if the text ends with a new line, we need to add one more or it will not be measured
+            if (text.endsWith('\n')) text += '\n';
+            element.innerHTML = text;
+        } else {
+            element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
+        }
 
-        element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
+        const computedStyle = getComputedStyle(elToMeasure);
 
         element.style.fontSize = computedStyle.fontSize;
         element.style.fontWeight = computedStyle.fontWeight;
         element.style.fontFamily = computedStyle.fontFamily;
         element.style.fontStyle = computedStyle.fontStyle;
+        element.style.lineHeight = computedStyle.lineHeight;
+        element.style.letterSpacing = computedStyle.letterSpacing;
 
-        if (whiteSpace.length > 0)
-            element.style.whiteSpace = whiteSpace;
+        element.style.whiteSpace = whiteSpace;
         element.style.overflowWrap = overflowWrap;
-        if (padding.length > 0) {
-            element.style.boxSizing = "border-box";
-            element.style.padding = padding;
-        }
-
         element.style.maxWidth = maxWidth;
 
-        const size = element.offsetWidth + "|" + element.offsetHeight;
+        const rect = element.getBoundingClientRect();
+        const size = Math.ceil(rect.width) + "|" + Math.ceil(rect.height);
 
         element.innerHTML = '';
 
@@ -749,6 +820,15 @@ document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflo
 
     return "0|0";
 }
+
+document.getBaseLineOffset = (function () {
+    const ctx = document.createElement('canvas').getContext('2d');
+    return function (element) {
+        if (!element) return 0.0;
+        ctx.font = getComputedStyle(element).font;
+        return ctx.measureText('').fontBoundingBoxAscent;
+    };
+})();
 
 document.setContentString = function (id, text, removeTextWrapping) {
     var el = document.getElementById(id);
@@ -807,300 +887,6 @@ var defineStringEndsWith = function () {
 }
 defineStringEndsWith();
 
-//gets the text inside a textArea as it actually is (domElement.innerText returns an incorrect result).
-getTextAreaInnerText = function (domElement, forceNewLineFirst) {
-    //logic here:   - br prepares a new line and we only add it to the text if there is more to add afterwards.
-    //              - text means text
-    //              - div want their own line so new line before if none, new line after.
-    //                  no new line before if first element, no new line after if last element.
-    var resultString = "";
-    var currentNode = domElement.childNodes[0];
-    while (currentNode != undefined) {
-        if (currentNode.nodeType == Node.TEXT_NODE) {
-            if (currentNode.textContent != "") { //Note: we added this test because IE sometimes adds an empty text node which should not count for anything as far as I know.
-                if (forceNewLineFirst) {
-                    resultString += "\n";
-                }
-                var textToAdd = currentNode.textContent;
-                if (textToAdd.endsWith("\n")) {
-                    //We need this because Edge sometimes decides to add the newline '\n' in the Text instead of adding a dom element (when pressing enter at the end of a line?) and
-                    //  when it does this, it adds an additional '\n' because why not... So we remove that additional one.
-                    //Note: It adds a total of one '\n' so if you go to the end of the TextArea and press enter five times, there will be six '\n' in the TextNode.
-                    if (currentNode.nextSibling == undefined) {
-                        //Only if currentNode.nextSibling is undefined, because apparently, it only adds one '\n' too much when it is the last node.
-                        textToAdd = textToAdd.substring(0, textToAdd.length - 1);
-                    }
-                    //We also replace the '\n' with "\r\n":
-                    textToAdd = textToAdd.replace(new RegExp("\n", 'g'), "\n");
-                }
-                resultString += textToAdd;
-                forceNewLineFirst = false;
-            }
-        }
-        else {
-            var nodeName = currentNode.nodeName;
-            if (nodeName == "BR") {
-                if (forceNewLineFirst) {
-                    resultString += "\n";
-                }
-                forceNewLineFirst = true;
-            }
-            else //we consider it's a <div> or a <p>:
-            {
-                if (forceNewLineFirst) {
-                    resultString += "\n";
-                    forceNewLineFirst = false;
-                }
-                if (currentNode.previousSibling != undefined && !resultString.endsWith("\n")) {
-                    //The element is not the first in its parent and there is no new line to put it, so we add one:
-                    resultString += "\n";
-                }
-
-                resultString += getTextAreaInnerText(currentNode, forceNewLineFirst);
-                if (currentNode.nextSibling != undefined) {
-                    //the element is not the last in its parent and there is no new line to put the following so we add one:
-                    forceNewLineFirst = true;
-                    //resultString += "\r\n";
-                }
-            }
-        }
-        currentNode = currentNode.nextSibling;
-    }
-    return resultString;
-}
-
-document.getTextBoxSelection = (function () {
-    //this counts the amount of characters before the ones (start and end) defined by the range object.
-    // it does so by defining:
-    //      -globalIndexes.startIndex and globalIndexes.endIndex: the indexes as in c# of the positions defined by the range
-    //      -globalIndexes.isStartFound and globalIndexes.isEndFound: a boolean stating whether the index has been found yet ot not (used within this method to know when to stop changing the indexes).
-    function getRangeGlobalStartAndEndIndexes(currentParent, isFirstChild, charactersWentThrough, selection, range, globalIndexes) {
-        //we go down the tree until we find multiple children or until there is no children left:
-        while (currentParent.hasChildNodes()) {
-            //a div/p/br tag means a new line if it is not the first child of its parent:
-            if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-                charactersWentThrough += 1; //corresponds to counting the characters for the new line (that are not otherwise included in the count)
-                isFirstChild = true;
-            }
-            //we stop as soon as we find an element that has more than one childNode, so we can go through all the children afterwards.
-            if (currentParent.childNodes.length > 1) {
-                break;
-            }
-            currentParent = currentParent.childNodes[0];
-        }
-        if (currentParent.hasChildNodes()) { //this being true means that we stopped in the previous loop because it had multiple children. We need to go through them for the count of characters:
-            var i = 0;
-            var amountOfChildren = currentParent.childNodes.length;
-            //recursively go through the children:
-            for (i = 0; i < amountOfChildren; ++i) {
-                var temp = currentParent.childNodes[i];
-                charactersWentThrough = getRangeGlobalStartAndEndIndexes(temp, i == 0, charactersWentThrough, selection, range, globalIndexes);
-                if (globalIndexes.isCaretFound && globalIndexes.isStartFound && globalIndexes.isEndFound) {
-                    break;
-                }
-            }
-        } else {
-            //we stopped because we are at the end of a branch in the tree view --> count the characters in the line:
-            //if the end of the branch is a new line, count it:
-            if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-                charactersWentThrough += 1;
-            }
-            else {
-                if (currentParent.length) {
-                    //we get the basic informations about the text:
-                    var textContent = currentParent.textContent;
-                    var wholeLength = textContent.length;
-                    if (currentParent === selection.focusNode) {
-                        globalIndexes.caretIndex = charactersWentThrough + selection.focusOffset;
-                        globalIndexes.isCaretFound = true;
-                    }
-                    if (currentParent === range.startContainer) {
-                        globalIndexes.startIndex = charactersWentThrough + range.startOffset;
-                        globalIndexes.isStartFound = true;
-                    }
-                    if (currentParent === range.endContainer) {
-                        globalIndexes.endIndex = charactersWentThrough + range.endOffset;
-                        globalIndexes.isEndFound = true;
-                    }
-                    charactersWentThrough += wholeLength; //move forward in the count of characters.
-                } else {
-                    if (currentParent.tagName === 'BR') {
-                        if (currentParent.parentElement === selection.focusNode) {
-                            globalIndexes.caretIndex = charactersWentThrough;
-                            globalIndexes.isCaretFound = true;
-                        }
-                        if (currentParent.parentElement === range.startContainer) {
-                            globalIndexes.startIndex = charactersWentThrough;
-                            globalIndexes.isStartFound = true;
-                        }
-                        if (currentParent.parentElement === range.endContainer) {
-                            globalIndexes.endIndex = charactersWentThrough;
-                            globalIndexes.isEndFound = true;
-                        }
-                    }
-                }
-            }
-            return charactersWentThrough;
-        }
-    }
-
-    return function (element) {
-        const sel = window.getSelection();
-        const gi = {};
-        if (sel.rangeCount === 0) {
-            gi.caretIndex = 0;
-            gi.startIndex = 0;
-            gi.endIndex = 0;
-        } else {
-            getRangeGlobalStartAndEndIndexes(element, true, 0, sel, sel.getRangeAt(0), gi);
-        }
-        return JSON.stringify(gi);
-    }
-})();
-
-//this method goes through every branch of the visual tree starting from the given element and counts the characters until the given indexes are met.
-//It then fills nodesAndOffsets with the nodes and offsets to apply on the range defined in the calling method.
-document.getRangeStartAndEnd = function getRangeStartAndEnd(currentParent, isFirstChild, charactersWentThrough, startLimitIndex, endLimitIndex, nodesAndOffsets, isStartFound, isEndFound) {
-    //we go down the tree until we find multiple children or until there is no children left:
-    while (currentParent.hasChildNodes()) {
-        //a div/p/br tag means a new line if it is not the first child of its parent:
-        if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-            charactersWentThrough += 2;
-            isFirstChild = true;
-        }
-        if (currentParent.childNodes.length > 1) {
-            break;
-        }
-        currentParent = currentParent.childNodes[0];
-    }
-    if (currentParent.hasChildNodes()) {
-        //this being true means that the currentParent has multiple children through which we need to go to count the characters.
-        //We therefore recursively call this same method on them and update the count of characters went through:
-        var i = 0;
-        var amountOfChildren = currentParent.childNodes.length;
-
-        for (i = 0; i < amountOfChildren; ++i) {
-            var temp = currentParent.childNodes[i];
-            charactersWentThrough = getRangeStartAndEnd(temp, i == 0, charactersWentThrough, startLimitIndex, endLimitIndex, nodesAndOffsets, isStartFound, isEndFound);
-            if ((!(temp.tagName == 'BR')) && charactersWentThrough >= startLimitIndex) {
-                isStartFound = true;
-            }
-            if ((!(temp.tagName == 'BR')) && charactersWentThrough >= endLimitIndex) {
-                isEndFound = true;
-            }
-            if (isStartFound && isEndFound) {
-                break;
-            }
-        }
-    }
-    else {
-        //handle new lines at the end of the branches:
-        if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-            charactersWentThrough += 2;
-        }
-        else {
-            if (currentParent.length) {
-                var textContent = currentParent.textContent;
-                var splittedText = textContent.split("\n");
-                var wholeLength = currentParent.length; //this will be the length of the whole text in this dom element, including possible compensation for the amount of characters used for a new line.
-                var newLineCompensation = 0;
-                if (splittedText.length > 1) {
-                    var firstText = splittedText[0];
-                    if (firstText[firstText.length - 1] != "\r") {
-                        wholeLength += splittedText.length - 1; //for n lines, n-1 new lines
-                        newLineCompensation = 1; //if newLine can be different than 0 or 1, change the places where commented to do so.
-                    }
-                }
-                if (!isStartFound) {
-                    if (charactersWentThrough + wholeLength > startLimitIndex) { //read this as "if we reach the given index in the text of this dom element"
-                        //here, we need the offset in the text, while compensating the possible new lines (basically, if the new line in the text is represented as only '\n', consider -1 on the offset to put in the range for each new line met before reaching the offset).
-                        var startOffset;
-                        if (newLineCompensation != 0) {
-                            var i = 0;
-                            var remainingOffset = startLimitIndex - charactersWentThrough; //this is the offset considering each new line as 2 characters.
-                            var charactersWentThroughInThisLine = 0;
-                            //the following loop's only purpose is to get the amount of new lines before the remaining offset.
-                            for (i = 0; i < splittedText.length; ++i) {
-                                if (charactersWentThroughInThisLine + splittedText[i].length >= remainingOffset) {
-                                    break;
-                                }
-                                //advance through the text while including 2 characters for each new line to keep things constant with the definition of remainingOffset:
-                                charactersWentThroughInThisLine += splittedText[i].length + 1 + newLineCompensation; //note: it's OK to not include the newLineCompensation in the "if" above since we would want to go to the next line anyway.
-                            }
-                            startOffset = remainingOffset - i; //line to change if newLineCompensation can be different than 1 (i * newLineCompensation).
-                            if (charactersWentThroughInThisLine - remainingOffset == 1) {
-                                ++startOffset; //this means we were between '\r' and '\n'
-                            }
-                        }
-                        else {
-                            //no need for compensation on the offset to put in the range since new lines are already 2 characters.
-                            startOffset = startLimitIndex - charactersWentThrough;
-                        }
-                        if (startOffset < 0) {
-                            startOffset = 0; //case where the index lead to a position between '\r' and '\n' in a new line
-                        }
-                        nodesAndOffsets['startOffset'] = startOffset;
-                    }
-                    else {
-                        nodesAndOffsets['startOffset'] = currentParent.length; //case where the index given is bigger than the length of the text.
-                    }
-                    nodesAndOffsets['startParent'] = currentParent;
-                }
-                if (!isEndFound) {
-                    if (charactersWentThrough + wholeLength > endLimitIndex) {
-                        var endOffset;
-                        if (newLineCompensation != 0) {
-                            var i = 0;
-                            var remainingOffset = endLimitIndex - charactersWentThrough; //this is the offset considering each new line as 2 characters.
-                            var charactersWentThroughInThisLine = 0;
-                            for (i = 0; i < splittedText.length; ++i) {
-                                if (charactersWentThroughInThisLine + splittedText[i].length >= remainingOffset) {
-                                    break;
-                                }
-                                charactersWentThroughInThisLine += splittedText[i].length + 1 + newLineCompensation; //note: it's OK to not include the newLineCompensation in the "if" above since we would want to go to the next line anyway.
-                            }
-                            endOffset = remainingOffset - i; //line to change if newLineCompensation can be different than 1 (i * newLineCompensation).
-                            if (charactersWentThroughInThisLine - remainingOffset == 1) {
-                                ++endOffset; //this means we were between '\r' and '\n'
-                            }
-                        }
-                        else {
-                            endOffset = endLimitIndex - charactersWentThrough;
-                        }
-                        if (endOffset < 0) {
-                            endOffset = 0;
-                        }
-                        nodesAndOffsets['endOffset'] = endOffset;
-                    }
-                    else {
-                        nodesAndOffsets['endOffset'] = currentParent.length; //case where the index given is bigger than the length of the text.
-                    }
-                    nodesAndOffsets['endParent'] = currentParent;
-                }
-                return charactersWentThrough + wholeLength;
-            }
-            else {
-                //case where the element is basically empty
-                nodesAndOffsets['startParent'] = currentParent;
-                nodesAndOffsets['startOffset'] = 0;
-                nodesAndOffsets['endParent'] = currentParent;
-                nodesAndOffsets['endOffset'] = 0;
-            }
-        }
-    }
-    return charactersWentThrough;
-}
-
-document.doesElementInheritDisplayNone = function getRangeStartAndEnd(domElement) {
-    // This method will check if the element or one of its ancestors has "display:none".
-    while (domElement && domElement.style) {
-        if (domElement.style.display == 'none')
-            return true;
-        domElement = domElement.parentNode;
-    }
-    return false;
-}
-
 document.checkForDivsThatAbsorbEvents = function checkForDivsThatAbsorbEvents(jsEventArgs) {
     var currentElement = jsEventArgs.target;
     var endElement = jsEventArgs.currentTarget;
@@ -1110,30 +896,6 @@ document.checkForDivsThatAbsorbEvents = function checkForDivsThatAbsorbEvents(js
         currentElement = currentElement.parentNode;
     }
     return false;
-}
-
-document.getTextLengthIncludingNewLineCompensation = function (instance) {
-    var cshtml5Asm;
-    if (document.isSLMigration)
-        cshtml5Asm = JSIL.GetAssembly('SLMigration.CSharpXamlForHtml5');
-    else
-        cshtml5Asm = JSIL.GetAssembly('CSharpXamlForHtml5');
-    var htmlDomManager = function () {
-        return (htmlDomManager = JSIL.Memoize(cshtml5Asm.CSHTML5.Internal.INTERNAL_HtmlDomManager))();
-    };
-    var text = htmlDomManager()['GetTextBoxText'](instance);
-    if (!instance['get_AcceptsReturn']()) {
-        text = (System.String.Replace(System.String.Replace(text, "\n", ""), "\r", ""));
-    }
-    var correctionDueToNewLines = text.split("\n").length;
-    --correctionDueToNewLines; //for n lines, we have n-1 ""\r\n""
-    if (window.chrome && correctionDueToNewLines != 0) {
-        --correctionDueToNewLines; //on chrome, we have a \n right at the end for some reason.
-    }
-    else if (window.IE_VERSION) {
-        correctionDueToNewLines *= 2; //IE already has 2 characters for new lines but they are doubled: we have ""\r\n\r\n"" instead of ""\r\n"".
-    }
-    return text.length + correctionDueToNewLines;
 }
 
 document.functionToCompareWordForFilter = function (wordToCompare) {
@@ -1398,25 +1160,17 @@ var jsilConfig = {
     ]
 };
 
-window.elementsFromPointOpensilver = function (x, y, element) {
-    if (!element) element = document.body;
-    const elements = [];
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, null, false);
-    let currentNode = walker.currentNode;
-    while (currentNode) {
-        const xamlid = currentNode.getAttribute('xamlid');
-        if (xamlid && PerformHitTest(x, y, currentNode)) {
-            elements.push(xamlid);
+document.elementsFromPointOpenSilver = function (x, y) {
+    const ids = [];
+    const hitTestResults = document.elementsFromPoint(x, y);
+    for (const el of hitTestResults) {
+        const xamlid = el.xamlid;
+        if (xamlid) {
+            ids.push(xamlid);
         }
-        currentNode = walker.nextNode();
     }
-    return JSON.stringify(elements.reverse());
+    return JSON.stringify(ids);
 };
-
-function PerformHitTest(x, y, element) {
-    const rect = element.getBoundingClientRect();
-    return rect.x <= x && x <= rect.x + rect.width && rect.y <= y && y <= rect.y + rect.height;
-}
 
 //------------------------------
 // Just to check if client browser support touch
@@ -1425,7 +1179,178 @@ const isTouchDevice = () => {
     return (('ontouchstart' in window) ||
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0));
-}
+};
+
+document.loadFont = async function (family, source, loadedCallback) {
+    try {
+        const font = new FontFace(family, source);
+        await font.load();
+        document.fonts.add(font);
+        loadedCallback(true);
+    } catch (error) {
+        loadedCallback(false);
+    }
+};
+
+document.textboxHelpers = (function () {
+    function getSelectionLength(view) {
+        return view.selectionEnd - view.selectionStart;
+    };
+
+    function getCaretPosition(view) {
+        return view.selectionDirection === 'forward' ? view.selectionEnd : view.selectionStart;
+    };
+
+    function isNewLineChar(c) {
+        return c === '\n' || c === '\r';
+    };
+
+    function navigateInDirection(view, e) {
+        if (!e.shiftKey && !e.ctrlKey && getSelectionLength(view) > 0) {
+            return true;
+        }
+
+        switch (e.key) {
+            case 'ArrowUp':
+                return getCaretPosition(view) > 0;
+            case 'ArrowDown':
+                return getCaretPosition(view) < view.value.length;
+            case 'ArrowLeft':
+                return window.getComputedStyle(view).direction === 'ltr' ?
+                    (getCaretPosition(view) > 0) :
+                    (getCaretPosition(view) < view.value.length);
+            case 'ArrowRight':
+                return window.getComputedStyle(view).direction === 'ltr' ?
+                    (getCaretPosition(view) < view.value.length) :
+                    (getCaretPosition(view) > 0);
+            default:
+                return false;
+        }
+    };
+
+    function navigateByPage(view, e) {
+        // In Chrome, navigation with PageUp and PageDown does not work when overflow is set to 'hidden',
+        // so we manually update the cursor position here.
+
+        if (e.ctrlKey) {
+            return false;
+        }
+
+        if (e.key === 'PageDown') {
+            if (getCaretPosition(view) < view.value.length || (!e.shiftKey && getSelectionLength(view) > 0)) {
+                const start = e.shiftKey ? (view.selectionDirection === 'forward' ? view.selectionStart : view.selectionEnd) : view.value.length;
+                const end = view.value.length;
+                view.setSelectionRange(start, end, 'forward');
+                view.scrollTo(view.scrollWidth, view.scrollHeight);
+                return true;
+            }
+        } else {
+            if (getCaretPosition(view) > 0 || (!e.shiftKey && getSelectionLength(view) > 0)) {
+                const start = 0;
+                const end = e.shiftKey ? (view.selectionDirection === 'forward' ? view.selectionStart : view.selectionEnd) : 0;
+                view.setSelectionRange(start, end, 'backward');
+                view.scrollTo(0, 0);
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    function navigateToStart(view, e) {
+        if (!e.shiftKey && getSelectionLength(view) > 0) {
+            return true;
+        }
+
+        const caretIndex = getCaretPosition(view); 
+        return caretIndex > 0 && (e.ctrlKey || !isNewLineChar(view.value[caretIndex - 1]));
+    };
+
+    function navigateToEnd(view, e) {
+        if (!e.shiftKey && getSelectionLength(view) > 0) {
+            return true;
+        }
+
+        const caretIndex = getCaretPosition(view); 
+        return caretIndex < view.value.length && (e.ctrlKey || !isNewLineChar(view.value[caretIndex]));
+    };
+
+    function handleTab(view, e) {
+        if (view.getAttribute('data-acceptstab') === 'true' &&
+            (getSelectionLength(view) > 0 || view.maxLength < 0 || view.value.length < view.maxLength)) {
+            e.preventDefault();
+            view.setRangeText('\t', view.selectionStart, view.selectionEnd, 'end');
+            return true;
+        }
+
+        return false;
+    };
+
+    return {
+        createView: function (id, parentId) {
+            const view = document.createLayoutElement('textarea', id, parentId, -1);
+            view.style.fontSize = 'inherit';
+            view.style.fontFamily = 'inherit';
+            view.style.color = 'inherit';
+            view.style.letterSpacing = 'inherit';
+            view.style.resize = 'none';
+            view.style.outline = 'none';
+            view.style.border = 'none';
+            view.style.boxSizing = 'border-box';
+            view.style.background = 'transparent';
+            view.style.cursor = 'text';
+            view.style.overflow = 'hidden';
+            view.style.tabSize = '4';
+            view.style.padding = '0px';
+
+            view.setAttribute('tabindex', -1);
+
+            view.addEventListener('paste', function (e) {
+                if (this.getAttribute('data-acceptsreturn') === 'false') {
+                    e.preventDefault();
+                    let content = (e.originalEvent || e).clipboardData.getData('text/plain');
+                    if (content !== undefined) {
+                        content = content.replace(/\n/g, '').replace(/\r/g, '');
+                    }
+                    document.execCommand('insertText', false, content);
+                }
+            }, false);
+        },
+        onKeyDownNative: function (view, e) {
+            switch (e.key.toLowerCase()) {
+                case 'arrowleft':
+                case 'arrowright':
+                case 'arrowdown':
+                case 'arrowup':
+                    return navigateInDirection(view, e);
+                case 'pagedown':
+                case 'pageup':
+                    return navigateByPage(view, e);
+                case 'home':
+                    return navigateToStart(view, e);
+                case 'end':
+                    return navigateToEnd(view, e);
+                case 'delete':
+                    return getCaretPosition(view) < view.value.length || getSelectionLength(view) > 0;
+                case 'backspace':
+                    return getCaretPosition(view) > 0 || getSelectionLength(view) > 0;
+                case 'c':
+                case 'x':
+                    return e.ctrlKey && getSelectionLength(view) > 0;
+                case 'a':
+                    return e.ctrlKey && getSelectionLength(view) < view.value.length;
+                case 'v':
+                case 'y':
+                case 'z':
+                    return e.ctrlKey;
+                case 'tab':
+                    return handleTab(view, e);
+                default:
+                    return false;
+            }
+        },
+    };
+})();
 
 document.velocityHelpers = (function () {
     const cache = {};

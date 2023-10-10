@@ -376,10 +376,16 @@ namespace Windows.UI.Xaml
         {
             // Initialize the _styleCache to the default value for StyleProperty.
             // If the default value is non-null then wire it to the current instance.
-            Style defaultValue = (Style)StyleProperty.GetDefaultValue(this);
+            PropertyMetadata metadata = StyleProperty.GetMetadata(DependencyObjectType);
+            Style defaultValue = (Style)metadata.GetDefaultValue(this, StyleProperty);
             if (defaultValue != null)
             {
-                OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty));
+                OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty, metadata));
+            }
+
+            if (((FlowDirection)FlowDirectionProperty.GetDefaultValue(this)) == FlowDirection.RightToLeft)
+            {
+                IsRightToLeft = true;
             }
 
             Application app = Application.Current;
@@ -488,46 +494,14 @@ namespace Windows.UI.Xaml
         /// <returns>The "root" dom element of the FrameworkElement.</returns>
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            //------------------
-            // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
-            //------------------
-
-            object div1;
-            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            if (!this.IsUnderCustomLayout)
-            {
-                object div2 = INTERNAL_HtmlDomManager.CreateFrameworkDomElementAndAppendIt(div1, this, false);
-                domElementWhereToPlaceChildren = div2;
-
-                if (this.IsCustomLayoutRoot)
-                {
-                    div1style.position = "relative";
-                }
-            }
-            else
-            {
-                domElementWhereToPlaceChildren = div1;
-            }
-            return div1;
+            return CreateDomElementInternal(parentRef, out domElementWhereToPlaceChildren);
         }
 
-        //BRIDGETODO
-        // Bridge bug : when we use virtual, override & out/base in a function, bridge doesn't compile
-        // so delete this class when the bug is resolved
-        public object CreateDomElement_WorkaroundBridgeInheritanceBug(object parentRef, out object domElementWhereToPlaceChildren)
+        internal object CreateDomElementInternal(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            //------------------
-            // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
-            //------------------
-
-            object div1;
-            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            object div2;
-            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
-            div2style.width = "100%";
-            div2style.height = "100%";
-            domElementWhereToPlaceChildren = div2;
-            return div1;
+            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
+            domElementWhereToPlaceChildren = div;
+            return div;
         }
 
         // Internal helper so the FrameworkElement could see the
@@ -598,19 +572,6 @@ namespace Windows.UI.Xaml
 #endif
         {
             
-        }
-
-        // Note: the returned Size is unused for now.
-        internal override sealed Size MeasureCore()
-        {
-            if (!this.ApplyTemplate())
-            {
-                if (this.TemplateChild != null)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
-                }
-            }
-            return new Size();
         }
 
         //
@@ -1038,7 +999,7 @@ namespace Windows.UI.Xaml
                 new FrameworkPropertyMetadata(
                     FlowDirection.LeftToRight,
                     FrameworkPropertyMetadataOptions.Inherits,
-                    null,
+                    OnFlowDirectionChanged,
                     CoerceFlowDirection)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
@@ -1075,8 +1036,15 @@ namespace Windows.UI.Xaml
         /// </returns>
         public FlowDirection FlowDirection
         {
-            get => (FlowDirection)GetValue(FlowDirectionProperty);
+            get => IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
             set => SetValue(FlowDirectionProperty, value);
+        }
+
+        private static void OnFlowDirectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var fe = (FrameworkElement)d;
+            // Cache the new value as a bit to optimize accessing the FlowDirection property's CLR accessor
+            fe.IsRightToLeft = ((FlowDirection)e.NewValue) == FlowDirection.RightToLeft;
         }
 
         private static object CoerceFlowDirection(DependencyObject d, object baseValue)
@@ -1084,7 +1052,13 @@ namespace Windows.UI.Xaml
             FlowDirection direction = (FlowDirection)baseValue;
             return (direction != FlowDirection.RightToLeft) ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
         }
-        
+
+        internal bool IsRightToLeft
+        {
+            get { return ReadInternalFlag(InternalFlags.IsRightToLeft); }
+            set { WriteInternalFlag(InternalFlags.IsRightToLeft, value); }
+        }
+
         #endregion
 
         #region Work in progress
@@ -1117,15 +1091,9 @@ namespace Windows.UI.Xaml
 
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            // Skip when loading or changed on TextMeasurement Div.
-            if (INTERNAL_OuterDomElement == null)
-            {
-                return;
-            }
+            base.OnPropertyChanged(e);
 
-            var metadata = e.Property.GetMetadata(DependencyObjectType) as FrameworkPropertyMetadata;
-            
-            if (metadata != null)
+            if (e.Metadata is FrameworkPropertyMetadata metadata)
             {
                 if (metadata.AffectsMeasure)
                 {
@@ -1135,11 +1103,6 @@ namespace Windows.UI.Xaml
                 if (metadata.AffectsArrange)
                 {
                     InvalidateArrange();
-                }
-
-                if (metadata.AffectsRender)
-                {
-                    //InvalidateVisual();
                 }
 
                 if (metadata.AffectsParentMeasure)
@@ -1276,8 +1239,6 @@ namespace Windows.UI.Xaml
             {
                 UpdateThemeStyleProperty();
             }
-
-            InvalidateMeasureInternal();
         }
 
         // Extracts the required flag and returns
@@ -1325,8 +1286,8 @@ namespace Windows.UI.Xaml
         // free bit = 0x00000200,
         NeedsClipBounds = 0x00000400,
 
-        //HasWidthEverChanged = 0x00000800,
-        //HasHeightEverChanged = 0x00001000,
+        HasWidthEverChanged = 0x00000800,
+        HasHeightEverChanged = 0x00001000,
         // free bit = 0x00002000,
         // free bit = 0x00004000,
 
@@ -1372,7 +1333,7 @@ namespace Windows.UI.Xaml
 
         // FlowDirection is set to RightToLeft (0 == LeftToRight, 1 == RightToLeft)
         // This is an optimization to speed reading the FlowDirection property
-        //IsRightToLeft = 0x20000000,
+        IsRightToLeft = 0x20000000,
 
         ShouldLookupImplicitStyles = 0x40000000,
 

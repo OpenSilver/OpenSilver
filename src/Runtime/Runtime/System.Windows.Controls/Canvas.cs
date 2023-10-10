@@ -75,7 +75,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 Value = (inst, value) => value.ToInvariantString() + "px",
                                 Name = new List<string> { "left" },
-                                DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                                DomElement = uielement.INTERNAL_OuterDomElement,
                                 ApplyAlsoWhenThereIsAControlTemplate = true
                             };
                         }
@@ -102,7 +102,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 Value = (inst, value) => value.ToInvariantString() + "px",
                                 Name = new List<string> { "top" },
-                                DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                                DomElement = uielement.INTERNAL_OuterDomElement,
                                 ApplyAlsoWhenThereIsAControlTemplate = true
                             };
                         }
@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml.Controls
                     {
                         Value = (inst, value) => value.ToInvariantString(),
                         Name = new List<string> { "zIndex" },
-                        DomElement = ((UIElement)instance).INTERNAL_AdditionalOutsideDivForMargins,
+                        DomElement = ((UIElement)instance).INTERNAL_OuterDomElement,
                         ApplyAlsoWhenThereIsAControlTemplate = true
                     }
                 });
@@ -206,36 +206,6 @@ namespace Windows.UI.Xaml.Controls
             return (int)element.GetValue(ZIndexProperty);
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            var div = INTERNAL_HtmlDomManager.CreateCanvasDomElementAndAppendIt(parentRef, this);
-            domElementWhereToPlaceChildren = div;
-            return div;
-
-            //domElementWhereToPlaceChildren = div;
-
-            //var div1 = INTERNAL_HtmlDomManager.CreateDomElement("div");
-            //var div2 = INTERNAL_HtmlDomManager.CreateDomElement("div");
-            //div2.style.position = "absolute";
-            //INTERNAL_HtmlDomManager.AppendChild(div1, div2);
-            //domElementWhereToPlaceChildren = div2;
-
-            //return div;
-
-            /* -------------------------------
-             * A canvas should look like this:
-             * -------------------------------
-             * <div style="width: 50px; height: 50px;">
-             *     <div style="position:relative"> width & height are the size of the canvas itself
-             *         ... children (with position: absolute), below are two example of children
-             *         <div style="background-color: rgb(200,0,200);width:20px;height:20px;  position: absolute"></div>
-             *         <div style="background-color: rgb(100,0,200);width:20px;height:20px;margin-left:20px;margin-right:auto;  position: absolute"></div>
-             *     </div>
-             * </div>
-            */
-
-        }
-
         protected override Size MeasureOverride(Size availableSize)
         {
             var childConstraint = new Size(double.PositiveInfinity, double.PositiveInfinity);
@@ -247,16 +217,6 @@ namespace Windows.UI.Xaml.Controls
             }
 
             return new Size();
-        }
-
-        internal override bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            return double.IsNaN(child.Width);
-        }
-
-        internal override bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            return double.IsNaN(child.Height);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -271,6 +231,18 @@ namespace Windows.UI.Xaml.Controls
             }
 
             return finalSize;
+        }
+
+        internal override Rect? GetLayoutClip(Size layoutSlotSize)
+        {
+            if (ClipToBounds)
+            {
+                return new Rect(RenderSize);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

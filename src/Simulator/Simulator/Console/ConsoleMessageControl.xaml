@@ -9,16 +9,12 @@
     
     <StackPanel Orientation="Vertical">
         <Grid ClipToBounds="True" Background="{Binding MessageBackground, ElementName=Root}">
-
-            <TextBox x:Name="SimpleContent" Visibility="Collapsed" BorderThickness="0" Margin="0,-2,0,-2" IsReadOnly="True" Background="Transparent" Foreground="{Binding MessageForeground, ElementName=Root}"/>
-
-            <Expander x:Name="Expander" Visibility="Collapsed" BorderThickness="0" Margin="0,-3,0,-3" Background="{Binding MessageBackground, ElementName=Root}">
+            <Expander x:Name="Expander" BorderThickness="0" Margin="0,-3,0,-3" Background="{Binding MessageBackground, ElementName=Root}">
                 <Expander.Header>
                     <TextBox x:Name="ExpanderHeader" BorderThickness="0" IsReadOnly="True" Margin="0,-3,0,-3" Background="Transparent" Foreground="{Binding MessageForeground, ElementName=Root}"/>
                 </Expander.Header>
                 <TextBox x:Name="ExpanderContent" BorderThickness="0" IsReadOnly="True" Background="Transparent" Foreground="{Binding MessageForeground, ElementName=Root}"/>
             </Expander>
-
         </Grid>
         <Separator Margin="0" Background="#3A3A3A" />
     </StackPanel>

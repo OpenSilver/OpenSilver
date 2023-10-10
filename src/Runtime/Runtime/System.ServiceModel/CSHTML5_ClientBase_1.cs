@@ -289,8 +289,7 @@ namespace System.ServiceModel
             // Attempt to read the WCF endpoint address by first looking into the 
             // "ServiceReferences.ClientConfig" file, and then the "App.Config" file
             string endpointAddress;
-            using (var serviceReferencesClientConfig = OpenSilver.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig"))
-            {
+            using (var serviceReferencesClientConfig = OpenSilver.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig")) {
                 if (TryReadEndpoint(serviceReferencesClientConfig,
                         "ServiceReferences.ClientConfig",
                         contractConfigurationName,
@@ -301,8 +300,7 @@ namespace System.ServiceModel
                 }
                 else
                 {
-                    using (var appConfig = OpenSilver.Interop.ExecuteJavaScript("window.AppConfig"))
-                    {
+                    using (var appConfig = OpenSilver.Interop.ExecuteJavaScript("window.AppConfig")) {
                         if (TryReadEndpoint(appConfig,
                                 "App.Config",
                                 contractConfigurationName,
@@ -329,7 +327,8 @@ namespace System.ServiceModel
             bool throwIfFileNotFound,
             out string endpointAddress)
         {
-            bool isNullOrUndefined = OpenSilver.Interop.IsNull(configFileContent);
+            bool isNullOrUndefined = OpenSilver.Interop.ExecuteJavaScriptBoolean(
+                $"!{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(configFileContent)}");
             if (!isNullOrUndefined)
             {
                 string fileContentAsString = Convert.ToString(configFileContent);
@@ -1121,10 +1120,10 @@ namespace System.ServiceModel
             }
 #endif
 
-            private void ProcessNode(XmlElement node, Action<XmlElement> action)
+            private void ProcessNode(XElement node, Action<XElement> action)
             {
                 action(node);
-                foreach (XmlElement child in node.ChildNodes)
+                foreach (XElement child in node.Elements())
                 {
                     ProcessNode(child, action);
                 }
@@ -1242,11 +1241,11 @@ namespace System.ServiceModel
 
                             DataContractSerializerCustom dataContractSerializer =
                                 new DataContractSerializerCustom(
-                                    requestBody.GetType(),
+                                    parameterInfos[i].ParameterType.IsByRef ? parameterInfos[i].ParameterType.GetElementType(): parameterInfos[i].ParameterType,
                                     types,
                                     isXmlSerializer);
 
-                            XmlDocument xdoc = dataContractSerializer.SerializeToXmlDocument(requestBody);
+                            XDocument xdoc = dataContractSerializer.SerializeToXDocument(requestBody);
 
                             XElement paramNameElement =
                                 new XElement(XNamespace.Get(interfaceTypeNamespace)
@@ -1257,23 +1256,15 @@ namespace System.ServiceModel
                                 // because it would be <request> which is not what we want. 
                                 // The correct parameter name is alread in the Request body.
                                 methodNameElement.Add(paramNameElement);
-                                foreach (XmlNode currentNode in xdoc.DocumentElement.ChildNodes)
+                                foreach (XNode currentNode in xdoc.Root.Nodes())
                                 {
-                                    switch (currentNode.NodeType)
-                                    {
-                                        case XmlNodeType.Element:
-                                            paramNameElement.Add(XElement.Parse(currentNode.OuterXml));
-                                            break;
-                                        default:
-                                            paramNameElement.Add(new XText(currentNode.OuterXml));
-                                            break;
-                                    }
+                                    paramNameElement.Add(currentNode);
                                 }
-                                foreach (XmlAttribute currentAttribute in xdoc.DocumentElement.Attributes)
+                                foreach (XAttribute currentAttribute in xdoc.Root.Attributes())
                                 {
                                     // we don't want to keep the "xmlns="http://schemas.microsoft.com/2003/10/Serialization/" 
                                     // because it breaks the request.
-                                    if (currentAttribute.LocalName != "xmlns")
+                                    if (currentAttribute.Name.LocalName != "xmlns")
                                     {
                                         paramNameElement.Add(currentAttribute);
                                     }
@@ -1287,17 +1278,18 @@ namespace System.ServiceModel
                                 //      <Body>
                                 //         <toDoItem
                                 // so we want to go to xdoc.Root.Nodes()[0].Nodes()
-                                foreach (XmlNode currentNode in xdoc.DocumentElement.ChildNodes)
+                                foreach (XNode currentNode in xdoc.Root.Nodes())
                                 {
-                                    XmlElement xElement = currentNode as XmlElement;
+                                    XElement xElement = currentNode as XElement;
                                     if (xElement != null)
                                     {
-                                        foreach (XmlElement node in xElement.ChildNodes)
+                                        foreach (XElement node in xElement.Elements())
                                         {
-                                            ProcessNode(node, x => x.Prefix = string.IsNullOrEmpty(x.Prefix) ?
+                                            ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ?
                                                                                            interfaceTypeNamespace :
-                                                                                           x.Prefix);
-                                            methodNameElement.Add(XElement.Parse(node.OuterXml));
+                                                                                           x.Name.NamespaceName)
+                                                                                      .GetName(x.Name.LocalName));
+                                            methodNameElement.Add(node);
                                         }
                                     }
                                 }
@@ -1319,13 +1311,7 @@ namespace System.ServiceModel
                     }
                 }
 
-#if OPENSILVER
-                request = string.Format(requestFormat,
-                                        methodNameElement.ToString(SaveOptions.DisableFormatting));
-#else
-                request = string.Format(requestFormat, 
-                                        methodNameElement.ToString(false));
-#endif
+                request = string.Format(requestFormat, DataContractSerializerCustom.XElementToString(methodNameElement));
             }
 
             private void ReadAndPrepareResponseGeneric_JSVersion<T>(
@@ -1407,43 +1393,38 @@ namespace System.ServiceModel
                 const string ns = "http://schemas.xmlsoap.org/soap/envelope/";
 
                 VerifyThatResponseIsNotNullOrEmpty(response);
-                XmlDocument document = new XmlDocument();
-                document.LoadXml(response);
-
-                XmlNamespaceManager xmlnsManager = new XmlNamespaceManager(document.NameTable);
-                xmlnsManager.AddNamespace("ns", ns);
-
-                XmlNode bodyElement = document.DocumentElement.SelectSingleNode("ns:Body", xmlnsManager);
-                XmlNode faultElement = bodyElement.SelectSingleNode("ns:Fault", xmlnsManager);
+                var faultElement = DataContractSerializerCustom.ParseToXDocument(response).Root
+                                                 .Element(XName.Get("Body", ns))
+                                                 .Element(XName.Get("Fault", ns));
 
                 if (faultElement == null)
                 {
                     return new FaultException();
                 }
 
-                var faultStringElement = faultElement.SelectSingleNode("faultstring");
-                var faultReasonValue = faultStringElement?.InnerText;
-                var lang = faultStringElement?.Attributes.GetNamedItem("lang", XNamespace.Xml.NamespaceName)?.Value;
+                var faultStringElement = faultElement.Element(XName.Get("faultstring"));
+                var faultReasonValue = faultStringElement?.Value;
+                var lang = faultStringElement?.Attribute(XName.Get("lang", XNamespace.Xml.NamespaceName))?.Value;
                 var faultReasonText = string.IsNullOrEmpty(lang)
                     ? new FaultReasonText(faultReasonValue)
                     : new FaultReasonText(faultReasonValue, lang);
                 var reason = new FaultReason(faultReasonText);
 
-                var faultCodeElement = faultElement.SelectSingleNode("faultcode");
-                var code = new FaultCode(faultCodeElement?.InnerText);
+                var faultCodeElement = faultElement.Element(XName.Get("faultcode"));
+                var code = new FaultCode(faultCodeElement?.Value);
 
-                var detailElement = faultElement.SelectSingleNode("detail");
+                var detailElement = faultElement.Element(XName.Get("detail"));
                 if (detailElement == null)
                 {
                     return new FaultException(reason, code, null);
                 }
 
-                detailElement = detailElement.FirstChild;
+                detailElement = detailElement.Elements().First();
                 var detailType = ResolveType(detailElement.Name, useXmlSerializerFormat);
 
                 var serializer = new DataContractSerializerCustom(detailType);
 
-                var detail = serializer.DeserializeFromXmlNode(detailElement);
+                var detail = serializer.DeserializeFromXElement(detailElement);
 
                 var type = typeof(FaultException<>).MakeGenericType(detailType);
 
@@ -1470,7 +1451,7 @@ namespace System.ServiceModel
                                          attr.Name == name.LocalName :
                                          type.Name == name.LocalName;
 
-                            if (nameMatch)
+                            if(nameMatch)
                             {
                                 bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
                                     attr.Namespace == name.NamespaceName :
@@ -1546,41 +1527,34 @@ namespace System.ServiceModel
                     NS = "http://www.w3.org/2003/05/soap-envelope";
                 }
 
-
-                XmlDocument document = new XmlDocument();
-                document.LoadXml(responseAsString);
-
-                XmlNamespaceManager xmlnsManager = new XmlNamespaceManager(document.NameTable);
-                xmlnsManager.AddNamespace("ns", NS);
-
-                XmlNode envelopeElement = document.DocumentElement;
-                XmlNode headerElement = envelopeElement.SelectSingleNode("ns:Header", xmlnsManager);
-                XmlNode bodyElement = envelopeElement.SelectSingleNode("ns:Body", xmlnsManager);
+                XElement envelopeElement = DataContractSerializerCustom.ParseToXDocument(responseAsString).Root;
+                XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
+                XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
 
 
 #if OPENSILVER
                 // Error parsing, if applicable
                 if (soapVersion == "1.2")
                 {
-                    XmlNode faultElement = bodyElement.SelectSingleNode("ns:Fault", xmlnsManager);
+                    XElement faultElement = bodyElement.Element(XName.Get("Fault", NS));
 
                     if (faultElement != null)
                     {
-                        XmlNode codeElement = faultElement.SelectSingleNode("ns:Code", xmlnsManager);
-                        XmlNode reasonElement = faultElement.SelectSingleNode("ns:Reason", xmlnsManager);
-                        XmlNode detailElement = faultElement.SelectSingleNode("ns:Detail", xmlnsManager);
+                        XElement codeElement = faultElement.Element(XName.Get("Code", NS));
+                        XElement reasonElement = faultElement.Element(XName.Get("Reason", NS));
+                        XElement detailElement = faultElement.Element(XName.Get("Detail", NS));
 
-                        FaultCode faultCode = new FaultCode(codeElement.FirstChild.InnerText);
-                        FaultReason faultReason = new FaultReason(reasonElement.FirstChild.InnerText);
-                        string action = headerElement.SelectSingleNode(headerElement.GetPrefixOfNamespace("http://www.w3.org/2005/08/addressing") + ":Action").Value;
+                        FaultCode faultCode = new FaultCode(codeElement.Elements().First().Value);
+                        FaultReason faultReason = new FaultReason(reasonElement.Elements().First().Value);
+                        string action = headerElement.Element(XName.Get("Action", "http://www.w3.org/2005/08/addressing")).Value;
 
                         FaultException faultException;
 
                         if (detailElement != null)
                         {
-                            XmlNode innerExceptionElement = detailElement.FirstChild;
+                            XElement innerExceptionElement = detailElement.Elements().First();
 
-                            object innerException = ParseException(innerExceptionElement, innerExceptionElement.LocalName);
+                            object innerException = ParseException(innerExceptionElement, innerExceptionElement.Name.LocalName);
 
                             Type faultExceptionType = typeof(FaultException<>).MakeGenericType(innerException.GetType());
 
@@ -1595,17 +1569,17 @@ namespace System.ServiceModel
                         return null;
                     }
 
-                    object ParseException(XmlNode exceptionElement, string exceptionTypeName)
+                    object ParseException(XElement exceptionElement, string exceptionTypeName)
                     {
                         Type exceptionType = ResolveType(exceptionTypeName);
 
                         object exception = Activator.CreateInstance(exceptionType);
 
-                        foreach (XmlNode element in exceptionElement.ChildNodes)
+                        foreach (XElement element in exceptionElement.Elements())
                         {
-                            PropertyInfo property = exceptionType.GetProperty(element.LocalName);
+                            PropertyInfo property = exceptionType.GetProperty(element.Name.LocalName);
 
-                            XmlAttribute isNullAttribute = element.Attributes["nil"];
+                            XAttribute isNullAttribute = element.Attributes().FirstOrDefault(a => a.Name.LocalName == "nil");
                             if (isNullAttribute != null && isNullAttribute.Value == "true")
                             {
                                 property.SetValue(exception, null);
@@ -1692,7 +1666,7 @@ namespace System.ServiceModel
                     // to allow passing it as Generic type argument when calling CallWebMethod.
                     if (requestResponseType == typeof(object))
                     {
-                        if (bodyElement != null && bodyElement.ChildNodes.Count == 0)
+                        if (bodyElement != null && bodyElement.Nodes().Count() == 0)
                         {
                             // Note: there might be a more efficient way of checking if the method has a return 
                             // type (possibly through a smart use of responseAsString.IndexOf but it seems 
@@ -1722,7 +1696,7 @@ namespace System.ServiceModel
                     }
 
                     DataContractSerializerCustom deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
-                    XmlNode xElement = envelopeElement;
+                    XElement xElement = envelopeElement;
 
                     //exclude the parts that are <Enveloppe><Body>... since they are useless 
                     // and would keep the deserialization from working properly
@@ -1741,12 +1715,14 @@ namespace System.ServiceModel
                     // The reason is that the response uses one less XElement in the 
                     // case where we use XmlSerializer and the method has the return 
                     // Type object.
-                    bool isTypeSpecified = xElement.Attributes.GetNamedItem("type", "http://www.w3.org/2001/XMLSchema-instance") != null;
+                    bool isTypeSpecified =
+                        xElement.Attributes(XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance").GetName("type"))
+                                .Any();
                     if (!isXmlSerializer || !isTypeSpecified)
                     {
                         // we are either not in the XmlSerializer version or we have 
                         // the "extra" XElement so we move in once.
-                        xElement = xElement.FirstChild ?? xElement; //move inside of the <Body> tag
+                        xElement = xElement.Elements().FirstOrDefault() ?? xElement; //move inside of the <Body> tag
                     }
 
                     if (!isXmlSerializer)
@@ -1754,24 +1730,24 @@ namespace System.ServiceModel
                         if (typeToDeserialize.GetCustomAttribute<MessageContractAttribute>() != null)
                         {
                             // DataContractSerializer needs correct namespace instead of http://tempuri.org/
-                            string ns = DataContractSerializer_Helpers.GetDefaultNamespace(typeToDeserialize.Namespace, false);
-                            xElement.Prefix = ns;
-                            xElement.Attributes.RemoveNamedItem("xmlns");
-                            foreach (XmlNode childElement in xElement.ChildNodes)
+                            XNamespace ns = DataContractSerializer_Helpers.GetDefaultNamespace(typeToDeserialize.Namespace, false);
+                            xElement.Name = ns + xElement.Name.LocalName;
+                            xElement.Attributes("xmlns").Remove();
+                            foreach (var childElement in xElement.Elements())
                             {
-                                childElement.Prefix = ns;
+                                childElement.Name = ns + childElement.Name.LocalName;
                             }
                         }
                         else
                         {
-                            xElement = xElement.FirstChild ?? xElement;
+                            xElement = xElement.Elements().FirstOrDefault() ?? xElement;
                         }
-                        requestResponse = deSerializer.DeserializeFromXmlNode(xElement);
+                        requestResponse = deSerializer.DeserializeFromXElement(xElement);
                     }
                     else
                     {
                         requestResponse = Activator.CreateInstance(requestResponseType);
-                        object requestResponseBody = deSerializer.DeserializeFromXmlNode(xElement);
+                        object requestResponseBody = deSerializer.DeserializeFromXElement(xElement);
                         bodyFieldInfo.SetValue(requestResponse, requestResponseBody);
                     }
                 }
@@ -1884,7 +1860,7 @@ namespace System.ServiceModel
         /// <summary>
         /// Gets the underlying System.ServiceModel.IClientChannel implementation.
         /// </summary>
-        [OpenSilver.NotImplemented]
+		[OpenSilver.NotImplemented]
         public IClientChannel InnerChannel
         {
             get { return null; }
@@ -1937,7 +1913,7 @@ namespace System.ServiceModel
             /// class from an existing instance of the class.
             /// </summary>
             /// <param name="client">The object used to initialize the new instance of the class.</param>
-            [OpenSilver.NotImplemented]
+		    [OpenSilver.NotImplemented]
             protected ChannelBase(CSHTML5_ClientBase<T> client)
             {
 

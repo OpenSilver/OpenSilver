@@ -37,18 +37,6 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         internal INameResolver NameResolver { get; set; }
 
-        internal DependencyProperty GetProperty(DependencyObject target, PropertyPath propertyPath)
-        {
-            if (propertyPath.DependencyProperty != null)
-            {
-                return propertyPath.DependencyProperty;
-            }
-
-            return DependencyProperty.FromName(
-                propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName,
-                target.GetType());
-        }
-
         // Returns:
         //     The timeline's simple duration: the amount of time this timeline takes to
         //     complete a single forward iteration. The default value is a Duration that
@@ -175,22 +163,11 @@ namespace Windows.UI.Xaml.Media.Animation
             propertyPath = null;
             target = null;
 
-            if (parameters != null && parameters.TimelineMappings.TryGetValue(this, out Tuple<DependencyObject, PropertyPath> info))
+            if (parameters != null && parameters.TimelineMappings.TryGetValue(this, out (DependencyObject, PropertyPath) info))
             {
                 propertyPath = info.Item2;
                 target = propertyPath.GetFinalItem(info.Item1);
             }
-        }
-
-        internal void GetPropertyPathAndTargetBeforePath(
-            IterationParameters parameters,
-            out DependencyObject targetBeforePath,
-            out PropertyPath propertyPath)
-        {
-            Tuple<DependencyObject, PropertyPath> info = parameters.TimelineMappings[this];
-
-            targetBeforePath = info.Item1;
-            propertyPath = info.Item2;
         }
 
         //Stuff added for loops purposes:

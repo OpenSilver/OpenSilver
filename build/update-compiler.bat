@@ -57,12 +57,8 @@ CALL :copyDll Compiler Mono.Cecil.Rocks
 
 EXIT /B 0
 :copyDll
-echo about to delete
 del "%destDirSL%\tools\%~2.dll" 1>NUL 2>NUL
-echo about to copy
-copy "%sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll" "%destDirSL%\tools" >NUL
-echo about to delete2
+copy "%sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll" "%destDirSL%\tools"
 del "%destDirUWP%\tools\%~2.dll" 1>NUL 2>NUL
-echo about to copy2
-copy "%sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll" "%destDirUWP%\tools" >NUL
+copy "%sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll" "%destDirUWP%\tools"
 EXIT /B 0

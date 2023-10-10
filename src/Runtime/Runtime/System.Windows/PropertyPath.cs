@@ -174,6 +174,11 @@ namespace Windows.UI.Xaml
 
         internal DependencyProperty GetFinalProperty(DependencyObject d)
         {
+            if (DependencyProperty != null)
+            {
+                return DependencyProperty;
+            }
+
             if (SVI.Length == 0)
             {
                 throw new InvalidOperationException();

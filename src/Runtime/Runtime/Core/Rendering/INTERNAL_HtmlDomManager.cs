@@ -16,20 +16,24 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Text;
-using OpenSilver.Internal;
 using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
+using System.Windows.Shapes;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
@@ -46,6 +50,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         {
             _store = new Dictionary<string, WeakReference<UIElement>>(2048);
         }
+
+        internal static bool SyncRenderingWithLayout { get; set; } = false;
 
         public static object GetApplicationRootDomElement() => Application.Current?.GetRootDiv();
 
@@ -75,19 +81,31 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store.Remove(htmlDomElRef.UniqueIdentifier);
         }
 
-        public static void RemoveFromDom(object domNode, string commentForDebugging = null)
+        public static void RemoveFromDom(object domNode)
         {
             var htmlDomElRef = (INTERNAL_HtmlDomElementReference)domNode;
-            var javaScriptCodeToExecute = $@"
-                var element = document.getElementById(""{htmlDomElRef.UniqueIdentifier}"");
-                if (element) element.parentNode.removeChild(element);";
-            ExecuteJavaScript(javaScriptCodeToExecute, commentForDebugging); // IMPORTANT: This cannot be replaced by "INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode" because the element may no longer be in the tree when we try to remove it (cf. issues we had with the Grid on 2015.08.26)
+
+            if (SyncRenderingWithLayout)
+            {
+                LayoutManager.Current.UIRenderer.RemoveRootComponent(htmlDomElRef);
+            }
+            else
+            {
+                RemoveNodeNative(htmlDomElRef);
+            }
+
             if (htmlDomElRef.Parent != null)
             {
                 htmlDomElRef.Parent.FirstChild = null;
             }
 
             RemoveFromGlobalStore(htmlDomElRef);
+        }
+
+        internal static void RemoveNodeNative(INTERNAL_HtmlDomElementReference domNode)
+        {
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(domNode);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.remove();");
         }
 
         public static INTERNAL_HtmlDomElementReference GetParentDomElement(object domElementRef)
@@ -133,22 +151,15 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 object domElement = element.GetFocusTarget();
                 if (domElement != null)
                 {
-                    SetFocusNative(domElement);
+                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"document.setFocus({sElement});");
                 }
             }
         }
 
-        internal static void SetFocusNative(object domElementRef)
-        {
-            Debug.Assert(domElementRef != null);
-
-            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.setFocus({sElement});");
-        }
-
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
         {
-            object domElement = element.GetDomElementToSetContentString();
+            object domElement = element.INTERNAL_InnerDomElement;
 
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElement).UniqueIdentifier;
             string javaScriptCodeToExecute = $@"document.setContentString(""{ uniqueIdentifier}"",""{EscapeStringForUseInJavaScript(content)}"",{removeTextWrapping.ToString().ToLower()})";
@@ -157,25 +168,11 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
         }
 
-        internal static void SetUIElementContentString(UIElement uiElement, string newText)
-        {
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_OuterDomElement).UniqueIdentifier;
-            string javaScriptCodeToExecute = $@"
-var element = document.getElementById(""{uniqueIdentifier}"");
-if (element)
-{{
-element.value = ""{EscapeStringForUseInJavaScript(newText)}"";
-element.style.visibility=""collapse"";
-setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifier}""); if (element2) {{ element2.style.visibility=""visible""; }} }}, 0);
-}}";
-
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
-        }
-
         public static string GetTextBoxText(object domElementRef)
         {
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            return OpenSilver.Interop.ExecuteJavaScriptString($"getTextAreaInnerText({sElement})");
+            return OpenSilver.Interop.ExecuteJavaScriptString(
+                $"if ({sElement} instanceof HTMLTextAreaElement) {sElement}.value; else {sElement}.innerText;");
         }
 
         public static object AddOptionToNativeComboBox(
@@ -226,29 +223,30 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
         }
 
-        internal static INTERNAL_HtmlDomStyleReference GetFrameworkElementBoxSizingStyleForModification(UIElement element)
-        {
-            return GetDomElementStyleForModification(element.INTERNAL_AdditionalOutsideDivForMargins);
-        }
-
         public static INTERNAL_HtmlDomStyleReference GetDomElementStyleForModification(object domElementRef)
             => ((INTERNAL_HtmlDomElementReference)domElementRef).Style;
 
         public static INTERNAL_Html2dContextReference Get2dCanvasContext(object domElementRef)
             => ((INTERNAL_HtmlDomElementReference)domElementRef).Context2d;
 
-        public static INTERNAL_HtmlDomStyleReference CreateDomElementAppendItAndGetStyle(string domElementTag, object parentRef, UIElement associatedUIElement, out object newElementRef)
+        public static INTERNAL_HtmlDomStyleReference CreateDomElementAppendItAndGetStyle(
+            string domElementTag,
+            object parentRef,
+            UIElement associatedUIElement,
+            out object newElementRef)
         {
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
             newElementRef = CreateDomElementAndAppendIt(domElementTag, parentRef, associatedUIElement);
-
             return GetDomElementStyleForModification(newElementRef);
+        }
 
-#if PERFSTAT
-            Performance.Counter("CreateDomElementAppendItAndGetStyle", t0);
-#endif
+        internal static INTERNAL_HtmlDomStyleReference CreateDomLayoutElementAppendItAndGetStyle(
+            string tagName,
+            object parentRef,
+            UIElement uie,
+            out object newElementRef)
+        {
+            newElementRef = CreateDomLayoutElementAndAppendIt(tagName, parentRef, uie);
+            return GetDomElementStyleForModification(newElementRef);
         }
 
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
@@ -364,7 +362,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
         internal static void RemoveAttribute(object domElement, string attributeName)
         {
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.removeAttribute('{attributeName}');");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sElement}.removeAttribute('{attributeName}');");
         }
 
         public static object GetDomElementAttribute(object domElementRef, string attributeName)
@@ -394,13 +392,40 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
         }
 
-        public static object CreateDomElementAndAppendIt(string domElementTag, object parentRef, UIElement associatedUIElement, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        public static object CreateDomElementAndAppendIt(
+            string domElementTag,
+            object parentRef,
+            UIElement associatedUIElement,
+            int index = -1)
         {
-#if PERFSTAT
-            var t0 = Performance.now();
-            Performance.Counter("CreateDomElementAndAppendIt", t0);
-#endif
             return CreateDomElementAndAppendIt_ForUseByTheSimulator(domElementTag, parentRef, associatedUIElement, index);
+        }
+
+        internal static object CreateDomLayoutElementAndAppendIt(
+            string tagName,
+            object parentRef,
+            UIElement uie,
+            int index = -1)
+        {
+            string uid = NewId();
+
+            INTERNAL_HtmlDomElementReference parent = null;
+            if (parentRef is INTERNAL_HtmlDomElementReference domRef)
+            {
+                parent = domRef;
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"document.createLayoutElement('{tagName}', '{uid}', '{parent.UniqueIdentifier}', {index.ToInvariantString()})");
+            }
+            else
+            {
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"document.createLayoutElement('{tagName}', '{uid}', {sParentRef}, {index.ToInvariantString()})");
+            }
+
+            AddToGlobalStore(uid, uie);
+
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
         internal static object CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
@@ -447,33 +472,6 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateCanvasDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
-        {
-#if PERFSTAT
-            Performance.Counter("CreateCanvasDomElementAndAppendIt", t0);
-#endif
-            string uniqueIdentifier = NewId();
-
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createCanvasElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
-            }
-            else
-            {
-                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createCanvasElement(""{uniqueIdentifier}"", {sParentRef})");
-            }
-
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
-
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
-        }
-
         internal static object CreateImageDomElementAndAppendIt(
             object parentRef,
             UIElement associatedUIElement)
@@ -494,34 +492,6 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                 string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                     $@"document.createImageElement(""{uniqueIdentifier}"", {sParentRef})");
-            }
-
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
-
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
-        }
-
-        internal static object CreateFrameworkDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement,
-            bool enablePointerEvents)
-        {
-#if PERFSTAT
-            Performance.Counter("CreateFrameworkDomElementAndAppendIt", t0);
-#endif
-            string uniqueIdentifier = NewId();
-
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createFrameworkElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {(enablePointerEvents ? "true" : "false")})");
-            }
-            else
-            {
-                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createFrameworkElement(""{uniqueIdentifier}"", {sParentRef}, {(enablePointerEvents ? "true" : "false")}))");
             }
 
             AddToGlobalStore(uniqueIdentifier, associatedUIElement);
@@ -551,58 +521,66 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateShapeOuterDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
+        internal static (INTERNAL_HtmlDomElementReference SvgElement, INTERNAL_HtmlDomElementReference SvgShape, INTERNAL_HtmlDomElementReference SvgDefs)
+            CreateShapeElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, Shape shape)
         {
-#if PERFSTAT
-            Performance.Counter("CreateShapeOuterDomElementAndAppendIt", t0);
-#endif
-            string uniqueIdentifier = NewId();
+            Debug.Assert(parent is not null);
+            Debug.Assert(shape is not null);
 
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeOuterElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
-            }
-            else
-            {
-                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeOuterElement(""{uniqueIdentifier}"", {sParentRef})");
-            }
+            string svgUid = NewId();
+            string shapeUid = NewId();
+            string defsUid = NewId();
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"document.createShapeElement('{svgUid}', '{shapeUid}', '{defsUid}', '{shape.SvgTagName}', '{parent.UniqueIdentifier}');");
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+            AddToGlobalStore(svgUid, shape);
+            AddToGlobalStore(shapeUid, shape);
+
+            var svg = new INTERNAL_HtmlDomElementReference(svgUid, parent);
+            var svgShape = new INTERNAL_HtmlDomElementReference(shapeUid, svg);
+            var svgDefs = new INTERNAL_HtmlDomElementReference(defsUid, svg);
+
+            return (svg, svgShape, svgDefs);
         }
 
-        internal static object CreateShapeInnerDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
+        internal static INTERNAL_HtmlDomElementReference CreateSvgElementAndAppendIt(
+            INTERNAL_HtmlDomElementReference parent,
+            string tagName)
         {
-#if PERFSTAT
-            Performance.Counter("CreateShapeInnerDomElementAndAppendIt", t0);
-#endif
-            string uniqueIdentifier = NewId();
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"document.createSvgElement('{uid}', '{tagName}', '{parent.UniqueIdentifier}');");
+
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
+        }
+
+        internal static INTERNAL_HtmlDomElementReference CreateTextBoxViewDomElementAndAppendIt(
+            object parentRef,
+            TextBoxView textBoxView)
+        {
+            Debug.Assert(parentRef is not null);
+            Debug.Assert(textBoxView is not null);
+
+            string uid = NewId();
 
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
+            if (parent is not null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeInnerElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
+                    $"document.textboxHelpers.createView('{uid}', '{parent.UniqueIdentifier}');");
             }
             else
             {
                 string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createShapeInnerElement(""{uniqueIdentifier}"", {sParentRef})");
+                    $@"document.textboxHelpers.createView('{uid}', {sParentRef})");
             }
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            AddToGlobalStore(uid, textBoxView);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
         public static object CreateDomElementAndInsertIt(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition) //associatedUIElement is the UIElement of which the current dom element is a part.
@@ -616,7 +594,11 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
 
         private static string NewId() => "id" + _idGenerator.NewId().ToString();
 
-        static object CreateDomElementAndAppendIt_ForUseByTheSimulator(string domElementTag, object parentRef, UIElement associatedUIElement, int index)
+        private static object CreateDomElementAndAppendIt_ForUseByTheSimulator(
+            string tagName,
+            object parentRef,
+            UIElement uie,
+            int index)
         {
             //------------------
             // This is the WPF version of the DOM element creation, intented to be used only by the Simulator (not by
@@ -625,24 +607,25 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             // document.getElementByIdSafe().
             //------------------
 
-            string uniqueIdentifier = NewId();
+            string uid = NewId();
 
             INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            if (parentRef is INTERNAL_HtmlDomElementReference domRef)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                string javaScriptToExecute = $@"document.createElementSafe(""{domElementTag}"", ""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {index.ToInvariantString()})";
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(javaScriptToExecute);
+                parent = domRef;
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"document.createElementSafe('{tagName}', '{uid}', '{parent.UniqueIdentifier}', {index.ToInvariantString()})");
             }
             else
             {
                 string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.createElementSafe(""{domElementTag}"", ""{uniqueIdentifier}"", {sParentRef}, {index.ToInvariantString()})");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"document.createElementSafe('{tagName}', '{uid}', {sParentRef}, {index.ToInvariantString()})");
             }
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            AddToGlobalStore(uid, uie);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
         static object CreateDomElementAndInsertIt_ForUseByTheSimulator(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition)
@@ -861,6 +844,11 @@ parentElement.appendChild(child);";
 
         public static UIElement GetUIElementFromDomElement(object domElementRef)
         {
+            return GetUIElementFromDomElement_UsedBySimulatorToo(domElementRef);
+        }
+
+        internal static UIElement GetUIElementFromDomElement_UsedBySimulatorToo(object domElementRef)
+        {
             UIElement result = null;
 
             while (!IsNullOrUndefined(domElementRef))
@@ -906,24 +894,31 @@ parentElement.appendChild(child);";
             return OpenSilver.Interop.IsNull(jsObject) || OpenSilver.Interop.IsUndefined(jsObject);
         }
 
-        internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Point offset, Size size, Rect? clip)
         {
-            string left = $"{visualBounds.Left.ToInvariantString("0.##")}";
-            string top = $"{visualBounds.Top.ToInvariantString("0.##")}";
-            string width = $"{visualBounds.Width.ToInvariantString("0.##")}";
-            string height = $"{visualBounds.Height.ToInvariantString("0.##")}";
+            string left = Math.Round(offset.X, 2).ToInvariantString();
+            string top = Math.Round(offset.Y, 2).ToInvariantString();
+            string width = Math.Round(size.Width, 2).ToInvariantString();
+            string height = Math.Round(size.Height, 2).ToInvariantString();
+            
+            string javaScriptCodeToExecute;
+            
+            if (clip.HasValue)
+            {
+                Rect clipRect = clip.Value;
+                string clipLeft = Math.Round(clipRect.Left, 2).ToInvariantString();
+                string clipTop = Math.Round(clipRect.Top, 2).ToInvariantString();
+                string clipWidth = Math.Round(clipRect.Width, 2).ToInvariantString();
+                string clipHeight = Math.Round(clipRect.Height, 2).ToInvariantString();
 
-            string javaScriptCodeToExecute = $@"document.setVisualBounds(""{style.Uid}"",{left},{top},{width},{height},{(bSetPositionAbsolute ? "1": "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
-
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
-        }
-
-        internal static void SetPosition(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
-        {
-            string left = $"{visualBounds.Left.ToInvariantString("0.##")}";
-            string top = $"{visualBounds.Top.ToInvariantString("0.##")}";
-
-            string javaScriptCodeToExecute = $@"document.setPosition(""{style.Uid}"",{left},{top},{(bSetPositionAbsolute ? "1" : "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
+                javaScriptCodeToExecute =
+                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipWidth},{clipHeight});";
+            }
+            else
+            {
+                javaScriptCodeToExecute =
+                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},false);";
+            }
 
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }

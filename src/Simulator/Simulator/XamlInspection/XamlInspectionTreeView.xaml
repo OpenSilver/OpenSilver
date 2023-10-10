@@ -1,11 +1,16 @@
-﻿<UserControl x:Class="DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection.XamlInspectionTreeView"
+﻿<UserControl x:Class="OpenSilver.Simulator.XamlInspection.XamlInspectionTreeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:xamlinspection="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection"
+             xmlns:xamlinspection="clr-namespace:OpenSilver.Simulator.XamlInspection"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <xamlinspection:InvertBooleanToVisibilityConverter x:Key="InvertBoolToVis"/>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,14 +18,23 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Note: you need to manually refresh when the Visual Tree changes." TextWrapping="Wrap" Margin="10,0,10,13" Width="200" Foreground="LightGray" TextAlignment="Center" HorizontalAlignment="Center"/>
-        <TreeView Grid.Row="1" x:Name="TreeViewForXamlInspection" SelectedItemChanged="TreeView_SelectedItemChanged">
+        <TreeView Grid.Row="1" x:Name="XamlTree" SelectedItemChanged="TreeView_SelectedItemChanged" VirtualizingPanel.IsVirtualizing="False" >
             <TreeView.ItemTemplateSelector>
                 <xamlinspection:TreeNodeDataTemplateSelector>
                     <xamlinspection:TreeNodeDataTemplateSelector.NormalTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type xamlinspection:TreeNode}" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal" Margin="0,0,30,0">
+                                <Grid Margin="2,0,5,0" VerticalAlignment="Center" Visibility="{Binding IsActiveNodeAncestor, Converter={StaticResource BoolToVis}}">
+                                    <Ellipse Fill="White" Width="8" Height="8" />
+                                    <Ellipse Fill="LightGreen" Width="7" Height="7" />
+                                </Grid>
+                                <Grid Margin="2,0,5,0" VerticalAlignment="Center" Visibility="{Binding IsSelectedNodeChild, Converter={StaticResource BoolToVis}}" >
+                                    <Ellipse Fill="White" Width="8" Height="8" />
+                                    <Ellipse Fill="#1FBAFF" Width="6" Height="6" />
+                                </Grid>
                                 <TextBlock Text="{Binding Title}" />
                                 <TextBlock Text="{Binding Name}" Foreground="LightBlue" Margin="10,0,0,0" />
+                                <Image Source="/OpenSilver.Simulator;component/Expand-Icon-5.png" Margin="20,3,0,0" Width="35" Height="12" VerticalAlignment="Center" MouseDown="SubtreeLoader_MouseDown" Visibility="{Binding AreChildrenLoaded, Mode=TwoWay, Converter={StaticResource InvertBoolToVis}}" />
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </xamlinspection:TreeNodeDataTemplateSelector.NormalTemplate>
@@ -35,6 +49,6 @@
                 </xamlinspection:TreeNodeDataTemplateSelector>
             </TreeView.ItemTemplateSelector>
         </TreeView>
-        <TextBlock x:Name="NumberTreeViewElement" Grid.Row="2" TextWrapping="Wrap" Margin="10,5,10,5" Width="200" Foreground="LightGray" TextAlignment="Center" HorizontalAlignment="Center" Opacity="0.4">text</TextBlock>
+        <!--<TextBlock x:Name="NumberTreeViewElement" Grid.Row="2" TextWrapping="Wrap" Margin="10,5,10,5" Width="200" Foreground="LightGray" TextAlignment="Center" HorizontalAlignment="Center" Opacity="0.4">text</TextBlock>-->
     </Grid>
 </UserControl>

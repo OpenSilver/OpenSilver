@@ -12,7 +12,8 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
+using System.Linq;
+using System.Collections.Specialized;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -33,9 +34,13 @@ namespace Windows.UI.Xaml.Shapes
     /// </summary>
     public sealed class Polyline : Shape
     {
+        private WeakEventListener<Polyline, PointCollection, NotifyCollectionChangedEventArgs> _pointsCollectionChanged;
+
         static Polyline()
         {
-            StretchProperty.OverrideMetadata(typeof(Polyline), new FrameworkPropertyMetadata(Stretch.Fill));
+            StretchProperty.OverrideMetadata(
+                typeof(Polyline),
+                new FrameworkPropertyMetadata(Stretch.Fill, FrameworkPropertyMetadataOptions.AffectsMeasure));
         }
 
         /// <summary>
@@ -51,7 +56,10 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(FillRule),
                 typeof(FillRule),
                 typeof(Polyline),
-                new FrameworkPropertyMetadata(FillRule.EvenOdd, FrameworkPropertyMetadataOptions.AffectsRender));
+                new PropertyMetadata(FillRule.EvenOdd)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Polyline)d).SetFillRuleAttribute((FillRule)newValue),
+                });
 
         /// <summary>
         /// Gets or sets a value that specifies how the interior fill of the shape is determined.
@@ -78,14 +86,30 @@ namespace Windows.UI.Xaml.Shapes
                         static () => new PointCollection(),
                         static (d, dp) =>
                         {
-                            Polyline p = (Polyline)d;
-                            var collection = new PointCollection();
-                            collection.SetParentShape(p);
-                            return collection;
+                            Polyline polyline = (Polyline)d;
+                            var points = new PointCollection();
+                            polyline.OnPointsChanged(null, points);
+                            return points;
                         }),
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender,
+                    FrameworkPropertyMetadataOptions.AffectsMeasure,
                     OnPointsChanged,
-                    CoercePoints));
+                    CoercePoints)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        Polyline polyline = (Polyline)d;
+                        if (newValue is PointCollection points)
+                        {
+                            polyline.SetSvgAttribute(
+                                "points",
+                                string.Join(" ", points.Select(static p => $"{p.X.ToInvariantString()},{p.Y.ToInvariantString()}")));
+                        }
+                        else
+                        {
+                            polyline.RemoveSvgAttribute("points");
+                        }
+                    },
+                });
 
         /// <summary>
         /// Gets or sets a collection that contains the vertex points of the <see cref="Polyline"/>.
@@ -102,23 +126,7 @@ namespace Windows.UI.Xaml.Shapes
 
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var line = (Polyline)d;
-
-            if (e.OldValue is PointCollection oldCollection)
-            {
-                oldCollection.SetParentShape(null);
-            }
-
-            if (e.NewValue is PointCollection newCollection)
-            {
-                newCollection.SetParentShape(line);
-            }
-            
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(line))
-            {
-                line.InvalidateMeasure();
-                line.ScheduleRedraw();
-            }
+            ((Polyline)d).OnPointsChanged((PointCollection)e.OldValue, (PointCollection)e.NewValue);
         }
 
         private static object CoercePoints(DependencyObject d, object baseValue)
@@ -126,99 +134,81 @@ namespace Windows.UI.Xaml.Shapes
             return baseValue ?? new PointCollection();
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-            => INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(
-                this,
-                parentRef,
-                out _canvasDomElement,
-                out domElementWhereToPlaceChildren);
+        private void OnPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateMeasure();
 
-
-        private void GetMinMaxXY(out double minX, out double maxX, out double minY, out double maxY)
+        private void OnPointsChanged(PointCollection oldPoints, PointCollection newPoints)
         {
-            minX = double.MaxValue;
-            minY = double.MaxValue;
-            maxX = double.MinValue;
-            maxY = double.MinValue;
-
-            foreach (var point in Points)
+            if (_pointsCollectionChanged is not null)
             {
-                minX = Math.Min(minX, point.X);
-                minY = Math.Min(minY, point.Y);
-                maxX = Math.Max(maxX, point.X);
-                maxY = Math.Max(maxY, point.Y);
+                _pointsCollectionChanged.Detach();
+                _pointsCollectionChanged = null;
+            }
+
+            if (newPoints is not null)
+            {
+                _pointsCollectionChanged = new(this, newPoints)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnPointsCollectionChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                };
+                newPoints.CollectionChanged += _pointsCollectionChanged.OnEvent;
             }
         }
 
-        protected internal override void Redraw()
+        internal sealed override string SvgTagName => "polyline";
+
+        /// <summary>
+        /// Get the natural size of the geometry that defines this shape
+        /// </summary>
+        internal sealed override Size GetNaturalSize()
         {
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                return;
-            }
-
-            var points = (PointCollection)GetValue(PointsProperty);
-
-            if (points == null || points.Count < 2)
-            {
-                return;
-            }
-
-            GetMinMaxXY(out double minX, out double maxX, out double minY, out double maxY);
-
-            INTERNAL_ShapesDrawHelpers.PrepareStretch(this, _canvasDomElement, 0, maxX, 0, maxY, Stretch, out Size shapeActualSize);
-
-            INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(
-                this,
-                StrokeThickness,
-                0,
-                maxX,
-                0,
-                maxY,
-                Stretch,
-                shapeActualSize,
-                out double horizontalMultiplicator,
-                out double verticalMultiplicator,
-                out double xOffsetToApplyBeforeMultiplication,
-                out double yOffsetToApplyBeforeMultiplication,
-                out double xOffsetToApplyAfterMultiplication,
-                out double yOffsetToApplyAfterMultiplication,
-                out _marginOffsets);
-
-            ApplyMarginToFixNegativeCoordinates(new Point());
-
-            if (Stretch == Stretch.None)
-            {
-                ApplyMarginToFixNegativeCoordinates(_marginOffsets);
-            }
-
-            INTERNAL_ShapesDrawHelpers.PrepareLines(_canvasDomElement, Points, StrokeThickness, false);
-            //todo: make sure the parameters below are correct.
-            DrawFillAndStroke(
-                this,
-                FillRule == FillRule.Nonzero ? "nonzero" : "evenodd",
-                xOffsetToApplyAfterMultiplication,
-                yOffsetToApplyAfterMultiplication,
-                xOffsetToApplyAfterMultiplication + maxX,
-                yOffsetToApplyAfterMultiplication + maxY,
-                horizontalMultiplicator,
-                verticalMultiplicator,
-                xOffsetToApplyBeforeMultiplication,
-                yOffsetToApplyBeforeMultiplication,
-                shapeActualSize);
+            Rect bounds = GetDefiningGeometryBounds();
+            double margin = Math.Ceiling(GetStrokeThickness() / 2);
+            return new Size(Math.Max(bounds.Right + margin, 0), Math.Max(bounds.Bottom + margin, 0));
         }
 
-        protected override Size MeasureOverride(Size availableSize)
+        /// <summary>
+        /// Get the bonds of the geometry that defines this shape
+        /// </summary>
+        internal sealed override Rect GetDefiningGeometryBounds()
         {
-            var points = (PointCollection)GetValue(PointsProperty);
-            if (points == null || points.Count < 2)
+            PointCollection points = Points;
+            if (points is null || points.Count == 0)
             {
-                return base.MeasureOverride(availableSize);
+                return new Rect();
             }
 
-            GetMinMaxXY(out double minX, out double maxX, out double minY, out double maxY);
+            Point startPoint = points[0];
 
-            return new Size(availableSize.Width.Min(maxX + StrokeThickness), availableSize.Height.Min(maxY + StrokeThickness));
+            double minX = startPoint.X;
+            double minY = startPoint.Y;
+            double maxX = startPoint.X;
+            double maxY = startPoint.Y;
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                Point p = points[i];
+
+                if (p.X < minX)
+                {
+                    minX = p.X;
+                }
+                else if (p.X > maxX)
+                {
+                    maxX = p.X;
+                }
+
+                if (p.Y < minY)
+                {
+                    minY = p.Y;
+                }
+                else if (p.Y > maxY)
+                {
+                    maxY = p.Y;
+                }
+            }
+
+            return new Rect(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }

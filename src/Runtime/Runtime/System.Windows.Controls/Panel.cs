@@ -203,7 +203,7 @@ namespace Windows.UI.Xaml.Controls
 
         #region Children Management
 
-        internal virtual void OnChildrenReset()
+        internal void OnChildrenReset()
         {
             if (this.INTERNAL_VisualChildrenInformation != null)
             {
@@ -233,17 +233,17 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal virtual void OnChildrenAdded(UIElement newChild, int index)
+        internal void OnChildrenAdded(UIElement newChild, int index)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
         }
 
-        internal virtual void OnChildrenRemoved(UIElement oldChild, int index)
+        internal void OnChildrenRemoved(UIElement oldChild, int index)
         {
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
         }
 
-        internal virtual void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
+        internal void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
         {
             if (oldChild == newChild)
             {
@@ -267,22 +267,38 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Panel.Background"/> dependency property.
+        /// Identifies the <see cref="Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
             DependencyProperty.Register(
                 nameof(Background),
                 typeof(Brush),
                 typeof(Panel),
-                new PropertyMetadata((object)null)
+                new PropertyMetadata(null, OnBackgroundChanged)
                 {
-                    MethodToUpdateDom = (d, e) =>
+                    MethodToUpdateDom2 = (d, oldValue, newValue) =>
                     {
                         var panel = (Panel)d;
-                        _ = RenderBackgroundAsync(panel, (Brush)e);
+                        _ = RenderBackgroundAsync(panel, (Brush)newValue);
                         SetPointerEvents(panel);
                     },
                 });
+
+        private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Panel panel = (Panel)d;
+            panel.SizeChanged -= OnSizeChanged;
+            if (e.NewValue is LinearGradientBrush)
+            {
+                panel.SizeChanged += OnSizeChanged;
+            }
+        }
+
+        private static void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Panel p = (Panel)sender;
+            _ = RenderBackgroundAsync(p, p.Background);
+        }
 
         internal static async Task RenderBackgroundAsync(UIElement uie, Brush brush)
         {
@@ -477,7 +493,6 @@ namespace Windows.UI.Xaml.Controls
 
                 if (affectsLayout)
                 {
-                    // todo
                     InvalidateMeasure();
                 }
             }
@@ -647,7 +662,14 @@ namespace Windows.UI.Xaml.Controls
                     {
                         return; // in some cases Children collection can be changed during attach process
                     }
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this, i);
+
+                    UIElement child = newChildren[i];
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this, i);
+
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                    child.InvalidateMeasure();
+                    child.InvalidateArrange();
                 }
 
                 int remaining = newChildren.Count - to;

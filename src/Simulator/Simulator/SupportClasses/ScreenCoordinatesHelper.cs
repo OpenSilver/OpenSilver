@@ -17,10 +17,24 @@
 
 using System.Reflection;
 using System.Windows;
-namespace DotNetForHtml5.EmulatorWithoutJavascript
+using System.Windows.Media;
+
+namespace OpenSilver.Simulator
 {
     static class ScreenCoordinatesHelper
     {
+        private static double _dbiX, _dbiY;
+        public static double ScreenWidth { get; }
+        public static double ScreenHeight { get; }
+        static ScreenCoordinatesHelper()
+        {
+            PresentationSource _presentationSource = PresentationSource.FromVisual(Application.Current.MainWindow);
+            Matrix matrix = _presentationSource.CompositionTarget.TransformToDevice;
+            _dbiX = matrix.M22;
+            _dbiY = matrix.M11;
+            ScreenWidth = SystemParameters.PrimaryScreenWidth * _dbiX;
+            ScreenHeight = SystemParameters.PrimaryScreenHeight * _dbiY;
+        }
         public static double ConvertWidthOrNaNToDpiAwareWidthOrNaN(double widthOrNaN, bool invert = false)
         {
 #if BROWSER_IS_NOT_DPI_AWARE
@@ -36,7 +50,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             else
                 return double.NaN;
 #else
-            return widthOrNaN;
+            return widthOrNaN * _dbiX;
 #endif
         }
 
@@ -55,7 +69,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             else
                 return double.NaN;
 #else
-            return heightOrNaN;
+            return heightOrNaN * _dbiY;
 #endif
         }
     }

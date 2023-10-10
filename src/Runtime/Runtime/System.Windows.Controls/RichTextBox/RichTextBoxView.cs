@@ -20,7 +20,7 @@ using System.Windows.Input;
 using System.Xml;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
-using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 #if MIGRATION
 using System.Windows.Documents;
@@ -39,7 +39,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal sealed class RichTextBoxView : FrameworkElement, ITextBoxView
+    internal sealed class RichTextBoxView : FrameworkElement
     {
         private static bool _quillJSInitialized;
 
@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
 
             domElementWhereToPlaceChildren = null;
 
-            object div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
             object quillContainer = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", div, this);
 
             string script = "let options = {"
@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
-        protected override Size MeasureOverride(Size availableSize) => INTERNAL_GetActualWidthAndHeight();
+        protected override Size MeasureOverride(Size availableSize) => GetBoundingClientSize();
 
         internal sealed override void AddEventListeners()
         {
@@ -392,7 +392,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                     //if (!string.IsNullOrEmpty(delta.Attributes.FontName))
                     //    run.SetAttribute("FontFamily", GetFontName(delta.Attributes.FontName));
 
-                    run.SetAttribute("FontFamily", !string.IsNullOrEmpty(delta.Attributes.FontName) ? GetFontName(delta.Attributes.FontName) : INTERNAL_FontsHelper.DefaultCssFontFamily);
+                    run.SetAttribute("FontFamily", !string.IsNullOrEmpty(delta.Attributes.FontName) ? GetFontName(delta.Attributes.FontName) : FontFace.DefaultCssFontFamily);
                     if (!string.IsNullOrEmpty(delta.Attributes.FontSize))
                         run.SetAttribute("FontSize", delta.Attributes.FontSize.Replace("px", ""));
                     if (delta.Attributes.Color != null)
@@ -402,7 +402,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 }
                 else
                 {
-                    run.SetAttribute("FontFamily", INTERNAL_FontsHelper.DefaultCssFontFamily);
+                    run.SetAttribute("FontFamily", FontFace.DefaultCssFontFamily);
                 }
 
                 paragraph.AppendChild(run);

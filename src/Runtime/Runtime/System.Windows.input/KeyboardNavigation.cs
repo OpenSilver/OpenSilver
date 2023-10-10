@@ -56,7 +56,7 @@ internal sealed class KeyboardNavigation
         // When nothing has focus - we should start from the root of the visual tree
         if (sourceElement == null)
         {
-            sourceElement = Application.Current?.RootVisual;
+            sourceElement = Window.Current?.Content;
             if (sourceElement == null)
                 return;
         }
@@ -114,9 +114,8 @@ internal sealed class KeyboardNavigation
         return rootVisual;
     }
 
-    internal static void UpdateFocusedElement(UIElement focusTarget)
+    internal static void UpdateFocusedElement(UIElement focusTarget, DependencyObject focusScope)
     {
-        DependencyObject focusScope = focusTarget?.INTERNAL_ParentWindow ?? Window.Current;
         if (focusScope != null && focusScope != focusTarget)
         {
             FocusManager.SetFocusedElement(focusScope, focusTarget);
@@ -515,7 +514,7 @@ internal sealed class KeyboardNavigation
         return result;
     }
 
-    private bool IsTabStop(DependencyObject e)
+    internal bool IsTabStop(DependencyObject e)
     {
         return e is Control control && IsTabStop(control);
     }

@@ -15,16 +15,19 @@ using System;
 using System.Windows.Markup;
 using System.Diagnostics;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -44,13 +47,13 @@ namespace Windows.UI.Xaml.Controls
     /// TextBlockName.Text = "Some text.";
     /// </code>
     /// </example>
-    [ContentProperty("Inlines")]
-    public partial class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
+    [ContentProperty(nameof(Inlines))]
+    public class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
     {
-        internal override int VisualChildrenCount
-        {
-            get { return this.Inlines.Count; }
-        }
+        private bool _isTextChanging;
+        private Size _noWrapSize = Size.Empty;
+
+        internal override int VisualChildrenCount => Inlines.Count;
 
         internal override UIElement GetVisualChild(int index)
         {
@@ -59,17 +62,46 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            return (Inline)this.Inlines[index];
+            return (Inline)Inlines[index];
         }
 
-        private bool _isTextChanging;
+        static TextBlock()
+        {
+            CharacterSpacingProperty.OverrideMetadata(
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        double value = (int)newValue / 1000.0;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.letterSpacing = $"{value.ToInvariantString()}em";
+                    },
+                });
 
-        private Size _measuredSize;
+            FontFamilyProperty.OverrideMetadata(
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.fontFamily = ((FontFamily)newValue).GetFontFace(tb).CssFontName;
+                    },
+                });
+        }
+
+        private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TextElementProperties.InvalidateMeasureOnFontFamilyChanged((TextBlock)d, (FontFamily)e.NewValue);
+        }
 
         public TextBlock()
         {
-            this.IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
-            this.Inlines = new InlineCollection(this);
+            IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
+            Inlines = new InlineCollection(this);
         }
 
         protected override AutomationPeer OnCreateAutomationPeer()
@@ -82,36 +114,27 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
-        internal sealed override void AddEventListeners()
-        {
-            InputManager.Current.AddEventListeners(this, false);
-        }
+        internal sealed override void AddEventListeners() => InputManager.Current.AddEventListeners(this, false);
 
         internal override string GetPlainText() => Text;
 
-        internal override bool EnablePointerEventsCore
-        {
-            get
-            {
-                return true;
-            }
-        }
+        internal override bool EnablePointerEventsCore => true;
 
         /// <summary>
         /// Get or Set the Text property
         /// </summary>
         public string Text
         {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
         /// <summary>
-        /// Identifies the Text dependency property.
+        /// Identifies the <see cref="Text"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(
-                "Text",
+                nameof(Text),
                 typeof(string),
                 typeof(TextBlock),
                 new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged));
@@ -137,71 +160,88 @@ namespace Windows.UI.Xaml.Controls
 
         internal void SetTextPropertyNoCallBack(string text)
         {
-            if (!this._isTextChanging)
+            if (!_isTextChanging)
             {
-                this._isTextChanging = true;
-                this.SetCurrentValue(TextProperty, text);
-                this._isTextChanging = false;
+                _isTextChanging = true;
+                SetCurrentValue(TextProperty, text);
+                _isTextChanging = false;
             }
         }
 
-        #region Properties for formatting (TextAlignment, TextWrapping)
+        /// <summary>
+        /// Identifies the <see cref="Padding"/> dependency property.
+        /// </summary>
+        public static readonly new DependencyProperty PaddingProperty =
+            DependencyProperty.Register(
+                nameof(Padding),
+                typeof(Thickness),
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        var padding = (Thickness)newValue;
+                        domStyle.padding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
+                    }
+                },
+                IsPaddingValid);
+
+        /// <summary>
+        /// Gets or sets a value that indicates the thickness of padding space between the
+        /// boundaries of the content area and the content displayed by a <see cref="TextBlock"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Thickness"/> structure that specifies the amount of padding to apply.
+        /// </returns>
+        public new Thickness Padding
+        {
+            get => (Thickness)GetValue(PaddingProperty);
+            set => SetValue(PaddingProperty, value);
+        }
+
+        private static bool IsPaddingValid(object value)
+        {
+            Thickness t = (Thickness)value;
+            return Thickness.IsValid(t, false, false, false, false);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TextAlignment"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TextAlignmentProperty =
+            DependencyProperty.Register(
+                nameof(TextAlignment),
+                typeof(TextAlignment),
+                typeof(TextBlock),
+                new PropertyMetadata(TextAlignment.Left)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.textAlign = (TextAlignment)newValue switch
+                        {
+                            TextAlignment.Center => "center",
+                            TextAlignment.Right => "end",
+                            TextAlignment.Justify => "justify",
+                            _ => "start",
+                        };
+                    },
+                });
 
         /// <summary>
         /// Gets or sets how the text should be aligned in the TextBlock.
         /// </summary>
         public TextAlignment TextAlignment
         {
-            get { return (TextAlignment)GetValue(TextAlignmentProperty); }
-            set { SetValue(TextAlignmentProperty, value); }
+            get => (TextAlignment)GetValue(TextAlignmentProperty);
+            set => SetValue(TextAlignmentProperty, value);
         }
 
         /// <summary>
-        /// Identifies the TextAlignment dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TextAlignmentProperty =
-            DependencyProperty.Register(
-                "TextAlignment",
-                typeof(TextAlignment),
-                typeof(TextBlock),
-                new PropertyMetadata(TextAlignment.Left)
-                {
-                    MethodToUpdateDom = TextAlignment_MethodToUpdateDom
-                });
-
-        static void TextAlignment_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var textBlock = (TextBlock)d;
-            switch ((TextAlignment)newValue)
-            {
-                case TextAlignment.Center:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(textBlock).textAlign = "center";
-                    break;
-                case TextAlignment.Left:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(textBlock).textAlign = "start";
-                    break;
-                case TextAlignment.Right:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(textBlock).textAlign = "end";
-                    break;
-                case TextAlignment.Justify:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(textBlock).textAlign = "justify";
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets how the TextBlock wraps text.
-        /// </summary>
-        public TextWrapping TextWrapping
-        {
-            get { return (TextWrapping)GetValue(TextWrappingProperty); }
-            set { SetValue(TextWrappingProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the TextWrapping dependency property.
+        /// Identifies the <see cref="TextWrapping"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register(
@@ -214,6 +254,15 @@ namespace Windows.UI.Xaml.Controls
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((TextBlock)d).INTERNAL_OuterDomElement),
                         (TextWrapping)newValue),
                 });
+
+        /// <summary>
+        /// Gets or sets how the TextBlock wraps text.
+        /// </summary>
+        public TextWrapping TextWrapping
+        {
+            get => (TextWrapping)GetValue(TextWrappingProperty);
+            set => SetValue(TextWrappingProperty, value);
+        }
 
         internal static void ApplyTextWrapping(INTERNAL_HtmlDomStyleReference cssStyle, TextWrapping textWrapping)
         {
@@ -233,167 +282,211 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
-
         public InlineCollection Inlines { get; }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            foreach (Inline child in this.Inlines)
+            foreach (Inline child in Inlines)
             {
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
             }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="TextTrimming"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty TextTrimmingProperty =
             DependencyProperty.Register(
-                "TextTrimming",
+                nameof(TextTrimming),
                 typeof(TextTrimming),
                 typeof(TextBlock),
                 new FrameworkPropertyMetadata(TextTrimming.None, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    MethodToUpdateDom = OnTextTrimmedChangedUpdateDOM
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        style.textOverflow = (TextTrimming)newValue switch
+                        {
+                            TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "ellipsis",
+                            _ => "clip",
+                        };
+                    },
                 });
-
-        private static void OnTextTrimmedChangedUpdateDOM(DependencyObject d, object newValue)
-        {
-            var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification((TextBlock)d);
-            switch ((TextTrimming)newValue)
-            {
-                case TextTrimming.CharacterEllipsis:
-                case TextTrimming.WordEllipsis:
-                    style.textOverflow = "ellipsis";
-                    break;
-                default:
-                    style.textOverflow = "clip";
-                    break;
-            }
-        }
 
         /// <summary>
         /// Gets or sets how the TextBlock trims text.
         /// </summary>
         public TextTrimming TextTrimming
         {
-            get { return (TextTrimming)GetValue(TextTrimmingProperty); }
-            set { SetValue(TextTrimmingProperty, value); }
+            get => (TextTrimming)GetValue(TextTrimmingProperty);
+            set => SetValue(TextTrimmingProperty, value);
         }
 
+        /// <summary>
+        /// Identifies the <see cref="LineHeight"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LineHeightProperty =
+            DependencyProperty.Register(
+                nameof(LineHeight),
+                typeof(double),
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var tb = (TextBlock)d;
+                        double v = (double)newValue;
+                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement).lineHeight =
+                            v switch
+                            {
+                                0.0 => "normal",
+                                _ => $"{v.ToInvariantString()}px",
+                            };
+                    },
+                },
+                IsValidLineHeight);
 
-        // Note on LineHeight: We could make use of the browser's capabilities (see https://developer.mozilla.org/en-US/docs/Web/CSS/line-height) to improve this property.
-        //      For that, we would need a class with an implicit cast from/to double (so the original way of using it would still work), and that would be able to parse strings such as 125% (in that case, getting its value as a double would return the FontSize * 1.25)
-
-        // Returns:
-        //     The height of each line in pixels. A value of 0 indicates that the line height
-        //     is determined automatically from the current font characteristics. The default
-        //     is 0.
-        //
-        // Exceptions:
-        //   T:System.ArgumentException:
-        //     System.Windows.Controls.TextBlock.LineHeight is set to a non-positive value.
-        //[OpenSilver.NotImplemented]
         /// <summary>
         /// Gets or sets the height of each line of content.
         /// </summary>
         public double LineHeight
         {
-            get { return (double)GetValue(LineHeightProperty); }
-            set { SetValue(LineHeightProperty, value); }
+            get => (double)GetValue(LineHeightProperty);
+            set => SetValue(LineHeightProperty, value); 
         }
-        /// <summary>
-        /// Identifies the LineHeight dependency property.
-        /// </summary>
-        public static readonly DependencyProperty LineHeightProperty =
-            DependencyProperty.Register("LineHeight", typeof(double), typeof(TextBlock), new PropertyMetadata(0d)
-            {
-                MethodToUpdateDom = (instance, value) =>
-                {
-                    double valueAsDouble = (double)value;
-                    if (valueAsDouble < 0)
-                    {
-                        throw new ArgumentException("TextBlock.LineHeight is set to a non-positive value.");
-                    }
-                    if (valueAsDouble > 0)
-                    {
-                        ((TextBlock)instance).UpdateCSSLineHeight(value.ToString() + "px");
-                    }
-                    else
-                    {
-                        ((TextBlock)instance).UpdateCSSLineHeight("normal"); //todo: adapt this to what the value would exactly be in Silverlight (probably something like "125%" but I'm not sure of the exact value)
-                    }
-                }
-            });
 
-        private void UpdateCSSLineHeight(string value)
+        private static bool IsValidLineHeight(object o)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
-                domStyle.lineHeight = value ?? "";
-            }
+            double d = (double)o;
+            return !double.IsNaN(d) && d >= 0;
         }
 
-        private Size noWrapSize = Size.Empty;
+        /// <summary>
+        /// Returns a value by which each line of text is offset from a baseline.
+        /// </summary>
+        /// <returns>
+        /// The amount by which each line of text is offset from the baseline, in device
+        /// independent pixels. <see cref="double.NaN"/> indicates that an optimal baseline offset
+        /// is automatically calculated from the current font characteristics. The default
+        /// is 0.0.
+        /// </returns>
+        public double BaselineOffset => GetBaseLineOffset(this);
+
+        private static double GetBaseLineOffset(TextBlock tb)
+        {
+            if (!string.IsNullOrEmpty(tb.Text))
+            {
+                return TextElementProperties.GetBaseLineOffsetNative(tb);
+            }
+
+            return 0.0;
+        }
 
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            // Skip when loading
-            if (INTERNAL_OuterDomElement == null)
-                return;
+            base.OnPropertyChanged(e);
 
-            FrameworkPropertyMetadata metadata = e.Property.GetMetadata(DependencyObjectType) as FrameworkPropertyMetadata;
-
-            if (metadata != null)
+            if (e.Metadata is FrameworkPropertyMetadata metadata)
             {
                 if (metadata.AffectsMeasure)
                 {
-                    noWrapSize = Size.Empty;
+                    _noWrapSize = Size.Empty;
                 }
             }
-            base.OnPropertyChanged(e);
+        }
+
+        internal void InvalidateCacheAndMeasure()
+        {
+            _noWrapSize = Size.Empty;
+            InvalidateMeasure();
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
+            Thickness padding = Padding;
+            double paddingWidth = padding.Left + padding.Right;
+            double paddingHeight = padding.Top + padding.Bottom;
 
-            if (noWrapSize == Size.Empty)
+            if (string.IsNullOrEmpty(Text))
             {
-                noWrapSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
+                return new Size(paddingWidth, paddingHeight);
+            }
+
+            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
+
+            if (_noWrapSize == Size.Empty)
+            {
+                _noWrapSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
                     uniqueIdentifier,
                     "pre",
                     string.Empty,
-                    Padding,
                     double.PositiveInfinity,
                     string.Empty);
             }
 
-            if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
+            if (TextWrapping == TextWrapping.NoWrap || (_noWrapSize.Width + paddingWidth) <= availableSize.Width)
             {
-                _measuredSize = noWrapSize;
-                return noWrapSize;
+                var desiredSize = new Size(_noWrapSize.Width + paddingWidth, _noWrapSize.Height + paddingHeight);
+
+                if (TextTrimming != TextTrimming.None)
+                {
+                    // Note: Silverlight does not clip here, however we need to do it for the
+                    // css 'text-overflow' property to work.
+                    desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
+                    desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
+                }
+
+                return desiredSize;
             }
 
-            Size TextSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
+            Size textSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
                 uniqueIdentifier,
-                TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
-                TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
-                Padding,
-                availableSize.Width,
+                "pre-wrap",
+                "break-word",
+                Math.Max(0, availableSize.Width - paddingWidth),
                 string.Empty);
 
-            _measuredSize = TextSize;
-            return TextSize;
+            return new Size(textSize.Width + paddingWidth, textSize.Height + paddingHeight);
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
+        protected override Size ArrangeOverride(Size finalSize) => finalSize;
+
+        /// <summary>
+        /// Identifies the <see cref="LineStackingStrategy"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty LineStackingStrategyProperty =
+            DependencyProperty.Register(
+                nameof(LineStackingStrategy),
+                typeof(LineStackingStrategy),
+                typeof(TextBlock),
+                new PropertyMetadata(LineStackingStrategy.MaxHeight));
+
+        /// <summary>
+        /// Gets or sets a value that indicates how a line box is determined for each line
+        /// of text in the <see cref="TextBlock"/>.
+        /// </summary>
+        /// <returns>
+        /// A value that indicates how a line box is determined for each line of text in
+        /// the <see cref="TextBlock"/>. The default is <see cref="LineStackingStrategy.MaxHeight"/>.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public LineStackingStrategy LineStackingStrategy
         {
-            double w = Math.Max(_measuredSize.Width, finalSize.Width);
-            double h = Math.Max(_measuredSize.Height, finalSize.Height);
-
-            return new Size(w, h);
+            get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
+            set => SetValue(LineStackingStrategyProperty, value);
         }
+
+        /// <summary>
+        /// Gets or sets the font source that is applied to the text for rendering content.
+        /// </summary>
+        /// <returns>
+        /// The font source that is used to render content in the text box. The default is null.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public FontSource FontSource { get; set; }
     }
 }
