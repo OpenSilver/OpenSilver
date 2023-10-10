@@ -1,4 +1,5 @@
-﻿/*===================================================================================
+﻿
+/*===================================================================================
 *
 *   Copyright (c) Userware/OpenSilver.net
 *
@@ -10,7 +11,6 @@
 *
 \*====================================================================================*/
 
-
 using System;
 using System.ComponentModel;
 
@@ -18,7 +18,7 @@ namespace OpenSilver
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class XamlDesignerAttribute : Attribute
+    public sealed class XamlDesignerAttribute : Attribute
     {
         public XamlDesignerAttribute(int version)
         {
