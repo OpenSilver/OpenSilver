@@ -285,6 +285,7 @@ namespace Windows.UI.Xaml
         private void SetLayoutSize()
         {
             Rect bounds = Bounds;
+            InvalidateMeasure();
             Measure(bounds.Size);
             Arrange(bounds);
             UpdateLayout();
