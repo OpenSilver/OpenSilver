@@ -352,60 +352,86 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
-#region Clip
+        #region Clip
 
+        /// <summary>
+        /// Identifies the <see cref="Clip"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ClipProperty =
+            DependencyProperty.Register(
+                nameof(Clip),
+                typeof(Geometry),
+                typeof(UIElement),
+                new PropertyMetadata(null, OnClipChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetClipGeometry((UIElement)d, (Geometry)newValue),
+                });
+
+        /// <summary>
+        /// Gets or sets the <see cref="Geometry"/> used to define the outline of 
+        /// the contents of a <see cref="UIElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The geometry to be used for clipping area sizing. The default value is null.
+        /// </returns>
         public Geometry Clip
         {
-            get { return (Geometry)GetValue(ClipProperty); }
-            set { SetValue(ClipProperty, value); }
+            get => (Geometry)GetValue(ClipProperty);
+            set => SetValue(ClipProperty, value);
         }
 
-        public static readonly DependencyProperty ClipProperty =
-            DependencyProperty.Register("Clip",
-                                        typeof(Geometry),
-                                        typeof(UIElement),
-                                        new PropertyMetadata(null)
-                                        {
-                                            MethodToUpdateDom = Clip_MethodToUpdateDom,
-                                        });
-
-        private static void Clip_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void OnClipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (newValue == null)
+            UIElement uie = (UIElement)d;
+
+            if (uie._clipGeometryListener is not null)
             {
-                UIElement uiElement = (UIElement)d;
-                var outerDomElement = uiElement.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-                style.clip = "";
-                return;
+                uie._clipGeometryListener.Detach();
+                uie._clipGeometryListener = null;
             }
 
-            // Only RectangleGeometry is supported for now
-            if (newValue is RectangleGeometry)
+            if (e.NewValue is Geometry clipGeo)
             {
-                UIElement uiElement = (UIElement)d;
-                var outerDomElement = uiElement.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-                RectangleGeometry val = (RectangleGeometry)newValue;
-
-                // CSS rect property has the following format - rect(<top>, <right>, <bottom>, <left>)
-                double top = val.Rect.Y;
-                double right = val.Rect.Width + val.Rect.X;
-                double bottom = val.Rect.Height + val.Rect.Y;
-                double left = val.Rect.X;
-
-                string rect = "rect(" + top.ToInvariantString() + "px, " + right.ToInvariantString() + "px" + ", " + bottom.ToInvariantString() + "px, " + left.ToInvariantString() + "px)";
-                style.clip = rect;
-            }
-            else
-            {
-                Debug.WriteLine("Only RectangleGeometry is supported for now.");
+                uie._clipGeometryListener = new(uie, clipGeo)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnClipGeometryChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Invalidated -= listener.OnEvent,
+                };
+                clipGeo.Invalidated += uie._clipGeometryListener.OnEvent;
             }
         }
 
-#endregion
+        private void OnClipGeometryChanged(object sender, GeometryInvalidatedEventsArgs e)
+        {
+            if (e.AffectsMeasure)
+            {
+                SetClipGeometry(this, Clip);
+            }
+        }
+
+        private static void SetClipGeometry(UIElement uie, Geometry geometry)
+        {
+            Debug.Assert(uie is not null);
+
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+            switch (geometry)
+            {
+                case RectangleGeometry rectGeometry:
+                    Rect rect = rectGeometry.Rect;
+                    style.clip = $"rect({rect.Top.ToInvariantString()}px, {rect.Right.ToInvariantString()}px, {rect.Bottom.ToInvariantString()}px, {rect.Left.ToInvariantString()}px)";
+                    break;
+
+                default:
+                    style.clip = string.Empty;
+                    break;
+            }
+        }
+
+        private WeakEventListener<UIElement, Geometry, GeometryInvalidatedEventsArgs> _clipGeometryListener;
+
+        #endregion
 
         /// <summary>
         /// When overriden, creates the dom elements designed to represent an instance of an UIElement and defines the place where its child(ren) will be added.
