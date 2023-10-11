@@ -366,29 +366,51 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (Child == null)
+            // Compute the chrome size added by the various elements
+            Size border = HelperCollapseThickness(BorderThickness);
+            Size padding = HelperCollapseThickness(Padding);
+
+            if (Child is UIElement child)
             {
-                return new Size();
+                // Combine into total decorating size
+                Size combined = new Size(border.Width + padding.Width, border.Height + padding.Height);
+
+                // Remove size of border only from child's reference size.
+                Size childConstraint = new Size(
+                    Math.Max(0.0, availableSize.Width - combined.Width),
+                    Math.Max(0.0, availableSize.Height - combined.Height));
+
+                child.Measure(childConstraint);
+                
+                return new Size(child.DesiredSize.Width + combined.Width, child.DesiredSize.Height + combined.Height);
             }
 
-            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
-            Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
-            Child.Measure(availableSize.Subtract(BorderThicknessSize).Subtract(PaddingSize).Max(new Size()));
-            return Child.DesiredSize.Add(BorderThicknessSize).Add(PaddingSize);
+            return new Size(border.Width + padding.Width, border.Height + padding.Height);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            if (Child != null)
+            Rect boundRect = new Rect(finalSize);
+            Rect innerRect = HelperDeflateRect(boundRect, BorderThickness);
+
+            //  arrange child
+            if (Child is UIElement child)
             {
-                Point PaddingLocation = new Point(Padding.Left, Padding.Top);
-                Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
-                Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
-                Child.Arrange(new Rect(PaddingLocation, finalSize.Subtract(BorderThicknessSize).Subtract(PaddingSize).Max(new Size())));
+                Rect childRect = HelperDeflateRect(innerRect, Padding);
+                child.Arrange(childRect);
             }
 
             return finalSize;
         }
+
+        private static Size HelperCollapseThickness(Thickness th) => new Size(th.Left + th.Right, th.Top + th.Bottom);
+
+        /// Helper to deflate rectangle by thickness
+        private static Rect HelperDeflateRect(Rect rt, Thickness thick) =>
+            new Rect(rt.Left + thick.Left,
+                     rt.Top + thick.Top,
+                     Math.Max(0.0, rt.Width - thick.Left - thick.Right),
+                     Math.Max(0.0, rt.Height - thick.Top - thick.Bottom));
 
         private static bool IsThicknessValid(object value)
         {
