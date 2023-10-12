@@ -42,8 +42,8 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Foreground="#FFDDDDDD" x:Name="WelcomeTextBlock">
-                        <Run Text="he Simulator below lets you debug in C# using Visual Studio."/>
+                    <TextBlock Margin="10,14,24,16" Foreground="#FFDDDDDD" x:Name="WelcomeTextBlock">
+                        <Run Text="The Simulator below lets you debug in C# using Visual Studio."/>
                         <LineBreak />
                         <Run Text="To view the final web version instead, run the project that"/>
                         <LineBreak />
