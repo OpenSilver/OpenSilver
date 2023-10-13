@@ -10,7 +10,7 @@
 		<Configurations>SL;UWP</Configurations>
 		<Platforms>AnyCPU</Platforms>
 		<AssemblyName>OpenSilver</AssemblyName>
-    <AssemblyVersion>1.2.2</AssemblyVersion>
+    <AssemblyVersion>2.0.1</AssemblyVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
