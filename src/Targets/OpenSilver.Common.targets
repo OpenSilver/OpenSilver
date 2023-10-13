@@ -241,7 +241,13 @@
     <Error
       Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
       Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx"/>
-
+	<Exec
+      Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;5"
+      Command="explorer.exe https://opensilver.net/permalinks/update/2.0.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+	<Error
+      Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;5"
+      Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/2.0.aspx"/>
+	  
     <!--============================================================
       Change the Build Action of XAML and TypeScript files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition", "TypeScriptCompile"] to "Content" in case the developer has not already done so.
       ============================================================-->
