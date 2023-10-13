@@ -516,9 +516,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 bool isJs = uriString.EndsWith(".js", StringComparison.InvariantCultureIgnoreCase);
                 if ((isCss || isJs) && Uri.TryCreate(uriString, UriKind.RelativeOrAbsolute, out Uri uri))
                 {
-                    if (uri.Scheme == Uri.UriSchemeFile && File.Exists(uri.AbsolutePath))
+                    string filePath = Uri.UnescapeDataString(uri.AbsolutePath);
+                    if (uri.Scheme == Uri.UriSchemeFile && File.Exists(filePath))
                     {
-                        string content = File.ReadAllText(uri.AbsolutePath);
+                        string content = File.ReadAllText(filePath);
                         
                         string contentType = "Encoding:utf8\n";
                         if (isCss)
