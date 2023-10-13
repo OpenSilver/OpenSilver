@@ -803,7 +803,7 @@ namespace Windows.UI.Xaml.Controls
             base.OnPointerMoved(e);
 #endif           
 
-            if (e.Handled || !e._isTouchEvent || Pointer.INTERNAL_captured is Thumb || ScrollInfo is null)
+            if (e.Handled || !e._isTouchEvent || Pointer.INTERNAL_captured != null || ScrollInfo is null)
             {
                 return;
             }
