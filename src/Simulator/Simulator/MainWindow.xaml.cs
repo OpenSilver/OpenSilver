@@ -1,5 +1,6 @@
 ﻿using MahApps.Metro.Controls;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Core.DevToolsProtocolExtension;
 using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Win32;
 using OpenSilver;
@@ -363,6 +364,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
             MainWebBrowser.CoreWebView2InitializationCompleted += (_s, _e) => { Debug.WriteLine("Initialization completed"); };
             await MainWebBrowser.EnsureCoreWebView2Async(environment);
+
+            var devToolsHelper = MainWebBrowser.CoreWebView2.GetDevToolsProtocolHelper();
+            await devToolsHelper.Emulation.SetTouchEmulationEnabledAsync(true);
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -1200,7 +1204,7 @@ Click OK to continue.";
             UpdateWebBrowserAndWebPageSizeBasedOnCurrentState();
         }
 
-        void UpdateWebBrowserAndWebPageSizeBasedOnCurrentState()
+        async void UpdateWebBrowserAndWebPageSizeBasedOnCurrentState()
         {
             if (DisplaySize_Phone.IsChecked == true)
             {
@@ -1227,6 +1231,8 @@ Click OK to continue.";
                     SetWebBrowserSize(320, 480);
                     ContainerForMainWebBrowserAndHighlightElement.Margin = new Thickness(10, 60, 10, 60);
                 }
+
+                await SetTouchEmulation(true);
             }
             else if (DisplaySize_Tablet.IsChecked == true)
             {
@@ -1253,6 +1259,8 @@ Click OK to continue.";
                     SetWebBrowserSize(768, 1024);
                     ContainerForMainWebBrowserAndHighlightElement.Margin = new Thickness(10, 60, 10, 60);
                 }
+
+                await SetTouchEmulation(true);
             }
             else if (DisplaySize_Desktop.IsChecked == true)
             {
@@ -1276,11 +1284,19 @@ Click OK to continue.";
                     this.Width = 1024;
                     this.Height = 768;
                 }));
+
+                await SetTouchEmulation(false);
             }
             else
             {
                 MessageBox.Show("Error: no display size selected. Please report this error to the authors.");
             }
+        }
+
+        private async Task SetTouchEmulation(bool enable)
+        {
+            var devToolsHelper = MainWebBrowser.CoreWebView2.GetDevToolsProtocolHelper();
+            await devToolsHelper.Emulation.SetEmitTouchEventsForMouseAsync(enable);
         }
 
         private void ButtonViewXamlTree_Click(object sender, RoutedEventArgs e)
