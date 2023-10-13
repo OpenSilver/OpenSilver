@@ -243,7 +243,7 @@
       Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx"/>
 	<Exec
       Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;5"
-      Command="explorer.exe https://opensilver.net/permalinks/update/alpha20.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+      Command="explorer.exe https://opensilver.net/permalinks/update/2.0.aspx" Timeout="2000" ContinueOnError="True"></Exec>
 	<Error
       Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;5"
       Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/2.0.aspx"/>
