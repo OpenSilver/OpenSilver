@@ -63,6 +63,10 @@ namespace Windows.UI.Xaml.Controls
         private double _xSize;
         private double _ySize;
 
+        private double _touchX;
+        private double _touchY;
+        private const int TouchScrollMultiplier = 2; // scrolling is very slow if do not increase the delta
+
         private bool _invalidatedMeasureFromArrange;
         private IScrollInfo _scrollInfo;
 
@@ -779,6 +783,47 @@ namespace Windows.UI.Xaml.Controls
             {
                 e.Handled = true;
             }
+
+            if (e._isTouchEvent)
+            {
+                _touchX = e._pointerAbsoluteX;
+                _touchY = e._pointerAbsoluteY;
+            }
+        }
+
+#if MIGRATION
+        protected override void OnMouseMove(MouseEventArgs e)
+#else
+        protected override void OnPointerMoved(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseMove(e);
+#else
+            base.OnPointerMoved(e);
+#endif           
+
+            if (e.Handled || !e._isTouchEvent || Pointer.INTERNAL_captured is Thumb || ScrollInfo is null)
+            {
+                return;
+            }
+
+            if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
+            {
+                double deltaX = _touchX - e._pointerAbsoluteX;
+                ScrollToHorizontalOffset(ScrollInfo.HorizontalOffset + deltaX * TouchScrollMultiplier);
+            }
+
+            if (ComputedVerticalScrollBarVisibility == Visibility.Visible)
+            {
+                double deltaY = _touchY - e._pointerAbsoluteY;
+                ScrollToVerticalOffset(ScrollInfo.VerticalOffset + deltaY * TouchScrollMultiplier);
+            }
+
+            _touchX = e._pointerAbsoluteX;
+            _touchY = e._pointerAbsoluteY;
+
+            e.Handled = true;
         }
 
 #if MIGRATION
