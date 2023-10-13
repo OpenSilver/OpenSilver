@@ -390,13 +390,15 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            Rect boundRect = new Rect(finalSize);
-            Rect innerRect = HelperDeflateRect(boundRect, BorderThickness);
-
             //  arrange child
             if (Child is UIElement child)
             {
+                Thickness borders = BorderThickness;
+                Rect innerRect = new Rect(0, 0,
+                    Math.Max(0.0, finalSize.Width - borders.Left - borders.Right),
+                    Math.Max(0.0, finalSize.Height - borders.Top - borders.Bottom));
                 Rect childRect = HelperDeflateRect(innerRect, Padding);
+
                 child.Arrange(childRect);
             }
 
