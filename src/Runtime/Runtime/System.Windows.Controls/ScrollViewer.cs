@@ -66,6 +66,8 @@ namespace Windows.UI.Xaml.Controls
         private bool _invalidatedMeasureFromArrange;
         private IScrollInfo _scrollInfo;
 
+        private TouchInfo _touchInfo;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollViewer"/> class.
         /// </summary>
@@ -779,6 +781,66 @@ namespace Windows.UI.Xaml.Controls
             {
                 e.Handled = true;
             }
+
+            if (e.IsTouchEvent)
+            {
+                Point position = e.GetPosition(null);
+                _touchInfo = new TouchInfo
+                {
+                    X = position.X,
+                    Y = position.Y,
+                };
+            }
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+
+            _touchInfo = null;
+        }
+
+#if MIGRATION
+        protected override void OnMouseMove(MouseEventArgs e)
+#else
+        protected override void OnPointerMoved(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseMove(e);
+#else
+            base.OnPointerMoved(e);
+#endif
+
+            if (!e.IsTouchEvent || Pointer.INTERNAL_captured is not null || ScrollInfo is null || _touchInfo is null)
+            {
+                return;
+            }
+
+            Point position = e.GetPosition(null);
+
+            if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
+            {
+                double deltaX = _touchInfo.X - position.X;
+                ScrollToHorizontalOffset(ScrollInfo.HorizontalOffset + deltaX * TouchInfo.ScrollMultiplier);
+            }
+
+            if (ComputedVerticalScrollBarVisibility == Visibility.Visible)
+            {
+                double deltaY = _touchInfo.Y - position.Y;
+                ScrollToVerticalOffset(ScrollInfo.VerticalOffset + deltaY * TouchInfo.ScrollMultiplier);
+            }
+
+            _touchInfo.X = position.X;
+            _touchInfo.Y = position.Y;
         }
 
 #if MIGRATION
@@ -1019,6 +1081,13 @@ namespace Windows.UI.Xaml.Controls
             }
 
             return size;
+        }
+
+        private sealed class TouchInfo
+        {
+            public const int ScrollMultiplier = 5; // scrolling is very slow if do not increase the delta
+            public double X;
+            public double Y;
         }
     }
 }

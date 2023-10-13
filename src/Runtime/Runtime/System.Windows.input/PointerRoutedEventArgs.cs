@@ -54,6 +54,8 @@ namespace Windows.UI.Xaml.Input
         internal double _pointerAbsoluteX = 0d; // Note: they are actually "relative" to the XAML Window root.
         internal double _pointerAbsoluteY = 0d; // Note: they are actually "relative" to the XAML Window root.
 
+        internal bool IsTouchEvent { get; private set; }
+
         /// <summary>
         /// Gets or sets a value that marks the routed event as handled, and prevents
         /// most handlers along the event route from handling the same event again.
@@ -95,8 +97,9 @@ namespace Windows.UI.Xaml.Input
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
                 string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
                 string type = OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.type");
-                string concatenated = type.StartsWith("touch") ? OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.changedTouches[0].pageX + '|' + {sEvent}.changedTouches[0].pageY")
-                                                               : OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.pageX + '|' + {sEvent}.pageY");
+                IsTouchEvent = type.StartsWith("touch");
+                string concatenated = IsTouchEvent ? OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.changedTouches[0].pageX + '|' + {sEvent}.changedTouches[0].pageY")
+                                                   : OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.pageX + '|' + {sEvent}.pageY");
                 int sepIndex = concatenated.IndexOf('|');
                 string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
                 string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
