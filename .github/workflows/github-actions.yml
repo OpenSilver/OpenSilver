@@ -1,7 +1,7 @@
 name: OpenSilver Build
 env:
-  next-release-version: '1.2.0'
-  current-release-version: '1.1.0'
+  next-release-version: '2.1.0'
+  current-release-version: '2.0.0'
 on:
   push:
     branches:

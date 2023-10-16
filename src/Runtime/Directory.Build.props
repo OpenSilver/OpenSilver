@@ -2,7 +2,7 @@
   <Import Project="..\Directory.Build.props" />
 
   <PropertyGroup>
-    <OpenSilverDependencyVersion>1.1.0</OpenSilverDependencyVersion>
+    <OpenSilverDependencyVersion>2.0.0</OpenSilverDependencyVersion>
     <OpenSilverTargetsDirectory>$(MSBuildThisFileDirectory)..\packages\OpenSilver.$(OpenSilverDependencyVersion)\build</OpenSilverTargetsDirectory>
     <OpenSilverTargetsDirectory Condition="'$(Configuration)' == 'UWP'">$(MSBuildThisFileDirectory)..\packages\OpenSilver.UWPCompatible.$(OpenSilverDependencyVersion)\build</OpenSilverTargetsDirectory>
     <OpenSilverTargets>$(OpenSilverTargetsDirectory)\OpenSilver.targets</OpenSilverTargets>
