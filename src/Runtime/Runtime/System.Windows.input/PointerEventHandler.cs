@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
-#if MIGRATION
-
     /// <summary>
     /// Represents the method that handles the System.Windows.UIElement.MouseLeftButtonDown
     /// and System.Windows.UIElement.MouseLeftButtonUp events.
@@ -42,15 +28,4 @@ namespace Windows.UI.Xaml.Input
     /// <param name="sender">The object where the event handler is attached.</param>
     /// <param name="e">The event data.</param>
     public delegate void MouseEventHandler(object sender, MouseEventArgs e);
-
-#else
-
-    /// <summary>
-    /// Represents the method that will handle pointer message events such as PointerPressed.
-    /// </summary>
-    /// <param name="sender">The object that fired the event</param>
-    /// <param name="e">The infos on the event</param>
-    public delegate void PointerEventHandler(object sender, PointerRoutedEventArgs e);
-
-#endif
 }

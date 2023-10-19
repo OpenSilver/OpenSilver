@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     internal partial class INTERNAL_Operations
     {

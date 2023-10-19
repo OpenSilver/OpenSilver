@@ -17,11 +17,7 @@ using System.Globalization;
 using System.Text;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// CornerRadiusConverter - Converter class for converting instances of other types to and from CornerRadius instances.

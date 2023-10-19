@@ -3,18 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 
 #if DEBUG
 using System.Diagnostics;
 #endif
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// A pool of objects that can be reused.

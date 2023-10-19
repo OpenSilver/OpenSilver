@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines constants that specify the different orientations that a control or layout can have.

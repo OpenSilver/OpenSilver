@@ -7,19 +7,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Event arguments used by the <see cref="Frame.NavigationFailed"/> and <see cref="NavigationService.NavigationFailed"/> events.

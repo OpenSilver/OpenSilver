@@ -12,15 +12,9 @@
 \*====================================================================================*/
 
 using System.Windows.Markup;
+using System.Windows;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-#endif
 
 namespace CSHTML5.Native.Html.Controls
 {

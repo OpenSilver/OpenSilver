@@ -7,22 +7,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Windows.Browser;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// A journal history entry.

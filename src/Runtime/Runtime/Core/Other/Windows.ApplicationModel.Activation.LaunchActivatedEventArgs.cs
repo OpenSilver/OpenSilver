@@ -19,11 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.ApplicationModel.Activation
-#else
-namespace Windows.ApplicationModel.Activation
-#endif
 {
     /// <summary>
     /// Provides event information when an app is launched

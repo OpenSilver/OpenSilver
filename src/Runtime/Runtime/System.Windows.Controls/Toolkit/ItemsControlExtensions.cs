@@ -11,30 +11,19 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides useful extensions to ItemsControl instances.
     /// </summary>
     /// <QualityBand>Experimental</QualityBand>
-    public static partial class ItemsControlExtensions
+    public static class ItemsControlExtensions
     {
         /// <summary>
         /// Gets the Panel that contains the containers of an ItemsControl.

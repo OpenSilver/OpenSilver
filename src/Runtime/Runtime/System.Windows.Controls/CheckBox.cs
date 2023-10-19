@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,10 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
-using Bridge;
-#endif
-
-using CSHTML5.Internal;
-using System;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that a user can select (check) or clear (uncheck). A

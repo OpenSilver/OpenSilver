@@ -1,44 +1,17 @@
-using System;
-
-#if MIGRATION
 namespace System.Windows.Interop
-#else
-namespace Windows.UI.Xaml.Interop
-#endif
 {
     [OpenSilver.NotImplemented]
-	public sealed partial class Settings
-	{
-		private bool _windowless;
-		private bool _enableAutoZoom;
+    public sealed class Settings
+    {
         [OpenSilver.NotImplemented]
-		public bool Windowless
-		{
-			get
-			{
-				return _windowless;
-			}
-		}
+        public bool Windowless { get; }
 
         [OpenSilver.NotImplemented]
-		public bool EnableAutoZoom
-		{
-			get
-			{
-				return _enableAutoZoom;
-			}
-
-			set
-			{
-				_enableAutoZoom = value;
-			}
-		}
+        public bool EnableAutoZoom { get; set; }
 
         [OpenSilver.NotImplemented]
-		public Settings()
-		{
-			_windowless = false;
-			_enableAutoZoom = false;
-		}
-	}
+        public Settings()
+        {
+        }
+    }
 }

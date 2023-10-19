@@ -13,14 +13,9 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 using OpenSilver.Internal;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace CSHTML5.Internal
 {

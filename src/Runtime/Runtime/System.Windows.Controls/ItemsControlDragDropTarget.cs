@@ -17,18 +17,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-
-using System.Diagnostics.CodeAnalysis;
-#if MIGRATION
-#else
-using System;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// A control that enabled drag and drop operations on an TItemsControl.
@@ -37,7 +26,6 @@ namespace Windows.UI.Xaml.Controls
     /// <typeparam name="TItemsControl">The type of the control that contains 
     /// the items that can be dragged.</typeparam>
     /// <typeparam name="TItemContainerType">The type of the item container.</typeparam>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Use of Rx makes code appear more complex than it is to static analyzer.")]
     public abstract class ItemsControlDragDropTarget<TItemsControl, TItemContainerType> : DragDropTarget<TItemsControl, TItemContainerType>
         where TItemsControl : ItemsControl
         where TItemContainerType : FrameworkElement
@@ -55,7 +43,6 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the ScrollItemIntoViewAnimationDuration dependency property.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "Member is needed for dependency property.")]
         public static readonly DependencyProperty ScrollItemAnimationDurationProperty =
             DependencyProperty.Register(
                 "ScrollItemAnimationDuration",

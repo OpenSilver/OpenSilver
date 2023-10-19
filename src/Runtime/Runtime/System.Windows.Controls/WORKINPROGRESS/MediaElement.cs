@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,19 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.IO;
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents an object that contains audio, video, or both.

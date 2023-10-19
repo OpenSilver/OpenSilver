@@ -12,14 +12,8 @@
 \*====================================================================================*/
 
 using System;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Documents;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Documents;
-#endif
 
 namespace OpenSilver.Internal.Documents;
 

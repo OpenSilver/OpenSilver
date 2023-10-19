@@ -3,20 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-
-#if MIGRATION
-using System.Windows;
 using System.Windows.Media.Animation;
+
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media.Animation;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Represents a control that can animate the transitions between its specified
@@ -115,7 +106,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization
         /// <param name="easingFunction">The easing function to use to
         /// transition the data points.</param>
         /// <returns>The story board that animates the property.</returns>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "easingFunction", Justification = "This parameter is used in Silverlight.")]
         private static Storyboard CreateStoryboard(
             FrameworkElement target,
             DependencyProperty animatingDependencyProperty,

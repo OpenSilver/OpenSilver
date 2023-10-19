@@ -3,26 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Specialized;
 using System.Windows.Input;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a selectable item inside a Menu or ContextMenu.
@@ -164,11 +149,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Called when the template's tree is generated.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             ChangeVisualState(false);
@@ -200,17 +181,9 @@ namespace Windows.UI.Xaml.Controls
         /// Called whenever the mouse enters a MenuItem.
         /// </summary>
         /// <param name="e">The event data for the MouseEnter event.</param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(MouseEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
             Focus();
             ChangeVisualState(true);
         }
@@ -219,17 +192,9 @@ namespace Windows.UI.Xaml.Controls
         /// Called whenever the mouse leaves a MenuItem.
         /// </summary>
         /// <param name="e">The event data for the MouseLeave event.</param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(MouseEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
             if (null != ParentMenuBase)
             {
                 ParentMenuBase.Focus();
@@ -241,44 +206,28 @@ namespace Windows.UI.Xaml.Controls
         /// Called when the left mouse button is pressed.
         /// </summary>
         /// <param name="e">The event data for the MouseLeftButtonDown event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(MouseButtonEventArgs e)
-#endif
         {
             if (!e.Handled)
             {
                 OnClick();
                 e.Handled = true;
             }
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
         }
 
         /// <summary>
         /// Called when the right mouse button is pressed.
         /// </summary>
         /// <param name="e">The event data for the MouseRightButtonDown event.</param>
-#if MIGRATION
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnRightTapped(RightTappedRoutedEventArgs e)
-#endif
         {
             if (!e.Handled)
             {
                 OnClick();
                 e.Handled = true;
             }
-#if MIGRATION
             base.OnMouseRightButtonDown(e);
-#else
-            base.OnRightTapped(e);
-#endif
         }
 
         /// <summary>

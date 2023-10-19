@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents the method that handles the <see cref="VirtualizingStackPanel.CleanUpVirtualizedItemEvent"/>

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,11 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using OpenSilver.Internal.Documents;
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     public class TextElementCollection<T> : IList, ICollection<T> where T : TextElement
     {

@@ -15,11 +15,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// PagedCollectionView classes use this class as the manager 

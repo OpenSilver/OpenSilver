@@ -7,13 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Maps a URI into a new URI based on mapping rules defined in a concrete implementation.

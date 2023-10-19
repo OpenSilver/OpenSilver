@@ -15,17 +15,10 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xaml;
-using OpenSilver.Internal.Xaml.Context;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Markup;
-using Windows.UI.Xaml.Media.Animation;
-#endif
+using OpenSilver.Internal.Xaml.Context;
 
 namespace OpenSilver.Internal.Xaml
 {

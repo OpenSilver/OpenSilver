@@ -11,19 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Exposes <see cref="ListBox" /> types to UI automation.

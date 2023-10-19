@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,14 @@
 *  
 \*====================================================================================*/
 
-
 //credits : https://github.com/dotnet/wpf/blob/master/src/Microsoft.DotNet.Wpf/src/PresentationCore/System/Windows/Media/ParsersCommon.cs
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
-    internal partial class GeometryParser
+    internal static class GeometryParser
     {
         internal static Geometry ParseGeometry(string pathString/*, IFormatProvider formatProvider*/)
         {

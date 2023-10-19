@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// This class is used as part of a ByteKeyFrameCollection in
@@ -30,7 +22,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// the previous key frame and its own Value to produce its output value.
     /// </summary>
     [OpenSilver.NotImplemented]
-    public sealed partial class SplineDoubleKeyFrame : DoubleKeyFrame
+    public sealed class SplineDoubleKeyFrame : DoubleKeyFrame
     {
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty KeySplineProperty = DependencyProperty.Register("KeySpline", typeof(KeySpline), typeof(SplineDoubleKeyFrame), new PropertyMetadata(new KeySpline()));

@@ -7,19 +7,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Enumeration denoting which of the command buttons should be visible.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames", Justification = "Plural comes before last word.")]
     [Flags]
     public enum DataFormCommandButtonsVisibility
     {

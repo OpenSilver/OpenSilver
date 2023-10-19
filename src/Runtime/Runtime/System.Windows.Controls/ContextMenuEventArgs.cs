@@ -11,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides data for the context menu event.
@@ -26,31 +20,18 @@ namespace Windows.UI.Xaml.Controls
     {
         public ContextMenuEventArgs(double pointerLeft, double pointerTop)
         {
-#if MIGRATION
             CursorLeft = pointerLeft;
             CursorTop = pointerTop;
-#else
-            PointerLeft = pointerLeft;
-            PointerTop = pointerTop;
-#endif
         }
 
         /// <summary>
         /// Gets the horizontal position of the mouse.
         /// </summary>
-#if MIGRATION
         public double CursorLeft { get; }
-#else
-        public double PointerLeft { get; }
-#endif
 
         /// <summary>
         /// Gets the vertical position of the mouse.
         /// </summary>
-#if MIGRATION
         public double CursorTop { get; }
-#else
-        public double PointerTop { get; }
-#endif
     }
 }

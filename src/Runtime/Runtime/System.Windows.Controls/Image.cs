@@ -15,25 +15,13 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Globalization;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.Foundation;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that displays an image. The image is specified as an image file in several possible formats, see Remarks.

@@ -1,23 +1,15 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Windows.Interactivity;
+using System.Windows;
+using System.Windows.Data;
+
 namespace Microsoft.Expression.Interactivity
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Windows.Interactivity;
-    using Interactivity = System.Windows.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Data;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Data;
-#endif
-
     /// <summary>
     /// Helper class for managing binding expressions on dependency objects.
     /// </summary>
@@ -82,7 +74,7 @@ namespace Microsoft.Expression.Interactivity
         public static void EnsureDataBindingOnActionsUpToDate(TriggerBase<DependencyObject> trigger)
         {
             // Update the bindings on the actions. 
-            foreach (Interactivity.TriggerAction action in trigger.Actions)
+            foreach (System.Windows.Interactivity.TriggerAction action in trigger.Actions)
             {
                 DataBindingHelper.EnsureDataBindingUpToDateOnMembers(action);
             }

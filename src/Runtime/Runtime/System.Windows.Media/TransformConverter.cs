@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// TransformConverter - Converter class for converting instances of other types to and from Transform instances

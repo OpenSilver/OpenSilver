@@ -11,17 +11,9 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Automation.Provider;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Text
-#else
-namespace Windows.UI.Xaml.Automation.Text
-#endif
 {
     /// <summary>
     /// Identifies text range endpoints for methods of  <see cref="ITextRangeProvider" />.

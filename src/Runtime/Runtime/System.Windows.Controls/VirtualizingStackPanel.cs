@@ -11,23 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Specialized;
+using System.Windows.Controls.Primitives;
 using CSHTML5.Internals.Controls;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls.Primitives;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Arranges and virtualizes content on a single line that is oriented either horizontally

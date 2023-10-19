@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.IO;
 
-#if MIGRATION
 namespace System.Windows.Media.Imaging
-#else
-namespace Windows.UI.Xaml.Media.Imaging
-#endif
 {
     internal static class PngEncoder
     {

@@ -15,17 +15,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Media;
 

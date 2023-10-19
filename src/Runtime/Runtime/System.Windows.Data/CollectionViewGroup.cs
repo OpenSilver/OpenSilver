@@ -1,17 +1,12 @@
-using System;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// A CollectionViewGroup, as created by a CollectionView according to a GroupDescription.
     /// </summary>
-    abstract public class CollectionViewGroup : INotifyPropertyChanged
+    public abstract class CollectionViewGroup : INotifyPropertyChanged
     {
         #region Constructors
 

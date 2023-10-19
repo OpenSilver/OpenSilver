@@ -3,19 +3,9 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that allows the user to select a date.

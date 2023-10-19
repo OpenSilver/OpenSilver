@@ -11,27 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays the content of a ItemsPresenter.
     /// </summary>
-    public partial class ItemsPresenter : FrameworkElement
+    public class ItemsPresenter : FrameworkElement
     {
         private ItemsPanelTemplate _templateCache;
         private ItemsControl _owner; // templated parent.
@@ -178,11 +163,7 @@ namespace Windows.UI.Xaml.Controls
             this.AttachToOwner();
         }
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             // verify that the template produced a panel with no children
             Panel panel = this.TemplateChild as Panel;

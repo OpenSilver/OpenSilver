@@ -12,12 +12,7 @@
 \*====================================================================================*/
 
 using System;
-
-#if MIGRATION
 using System.Windows.Threading;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace OpenSilver.Internal
 {

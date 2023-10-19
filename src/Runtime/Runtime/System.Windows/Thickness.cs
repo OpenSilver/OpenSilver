@@ -14,11 +14,7 @@
 using System;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Describes the thickness of a frame around a rectangle. Four <see cref="double"/> values

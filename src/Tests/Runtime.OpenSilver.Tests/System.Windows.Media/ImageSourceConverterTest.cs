@@ -11,23 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using OpenSilver.Tests;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.ComponentModel;
-
-#if MIGRATION
 using System.Windows.Media.Imaging;
-#else
-using Windows.UI.Xaml.Media.Imaging;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media.Tests
-#else
-namespace Windows.UI.Xaml.Media.Tests
-#endif
 {
     [TestClass]
     public class ImageSourceConverterTest : TypeConverterTestBase

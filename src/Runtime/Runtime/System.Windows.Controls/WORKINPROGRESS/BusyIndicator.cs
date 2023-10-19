@@ -3,22 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// A control to provide a visual indicator when an application is busy.
@@ -51,19 +40,11 @@ namespace Windows.UI.Xaml.Controls
             _displayAfterTimer = new DispatcherTimer();
             Loaded += delegate
             {
-#if MIGRATION
                 _displayAfterTimer.Tick += new EventHandler(DisplayAfterTimerElapsed);
-#else
-                _displayAfterTimer.Tick += new EventHandler<object>(DisplayAfterTimerElapsed);
-#endif
             };
             Unloaded += delegate
             {
-#if MIGRATION
                 _displayAfterTimer.Tick -= new EventHandler(DisplayAfterTimerElapsed);
-#else
-                _displayAfterTimer.Tick -= new EventHandler<object>(DisplayAfterTimerElapsed);
-#endif
                 _displayAfterTimer.Stop();
             };
         }
@@ -71,11 +52,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Overrides the OnApplyTemplate method.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             ChangeVisualState(false);
@@ -86,11 +63,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">Event sender.</param>
         /// <param name="e">Event arguments.</param>
-#if MIGRATION
         private void DisplayAfterTimerElapsed(object sender, EventArgs e)
-#else
-        private void DisplayAfterTimerElapsed(object sender, object e)
-#endif
         {
             _displayAfterTimer.Stop();
             IsContentVisible = true;

@@ -15,11 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// GridLengthConverter - Converter class for converting 

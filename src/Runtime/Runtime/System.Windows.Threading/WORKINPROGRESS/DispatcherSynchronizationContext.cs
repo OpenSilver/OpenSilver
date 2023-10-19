@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
-
-#if !MIGRATION
-using Windows.UI.Core;
-#endif
 
 namespace System.Windows.Threading
 {
@@ -19,11 +12,7 @@ namespace System.Windows.Threading
         }
 
 		[OpenSilver.NotImplemented]
-#if MIGRATION
         public DispatcherSynchronizationContext(Dispatcher dispatcher)
-#else
-        public DispatcherSynchronizationContext(CoreDispatcher dispatcher)
-#endif
         {
 
         }

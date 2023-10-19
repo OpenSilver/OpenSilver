@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Input;
-#else
-namespace Windows.UI.Xaml.Input;
-#endif
 
 /// <summary>
 /// Specifies the tabbing behavior across tab stops for a Silverlight tabbing sequence

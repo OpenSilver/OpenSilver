@@ -13,11 +13,7 @@
 
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Controls;
-#else
-namespace Windows.UI.Xaml.Controls;
-#endif
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 internal interface IUserControl

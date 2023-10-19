@@ -1,22 +1,13 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Globalization;
+using System.Windows.Controls.Primitives;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Globalization;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media.Animation;
-    using System.Windows.Controls.Primitives;
-#else
-    using global::Windows.UI.Xaml;
-    using global::Windows.UI.Xaml.Media.Animation;
-    using global::Windows.UI.Xaml.Controls.Primitives;
-#endif
-
     /// <summary>
     /// Represents an attachable object that encapsulates a unit of functionality.
     /// </summary>

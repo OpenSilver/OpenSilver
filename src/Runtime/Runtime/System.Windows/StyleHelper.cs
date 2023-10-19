@@ -13,18 +13,9 @@
 
 using System;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     internal static class StyleHelper
     {

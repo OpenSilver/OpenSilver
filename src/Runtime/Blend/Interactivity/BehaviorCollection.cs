@@ -1,10 +1,9 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
 namespace System.Windows.Interactivity
 {
-    using System.ComponentModel;
-
     /// <summary>
     /// Represents a collection of behaviors with a shared AssociatedObject and provides change notifications to its contents when that AssociatedObject changes.
     /// </summary>

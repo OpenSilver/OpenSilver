@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,25 +11,15 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines the element tree that is applied as the control template for a control.
     /// </summary>
-    [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
-    public sealed partial class ControlTemplate : FrameworkTemplate
+    [ContentProperty(nameof(ContentPropertyUsefulOnlyDuringTheCompilation))]
+    public sealed class ControlTemplate : FrameworkTemplate
     {
         /// <summary>
         /// Initializes a new instance of the ControlTemplate class.

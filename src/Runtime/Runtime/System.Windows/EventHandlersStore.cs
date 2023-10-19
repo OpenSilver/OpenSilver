@@ -15,11 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     ///     Container for the event handlers

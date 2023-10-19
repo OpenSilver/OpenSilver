@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
-
 namespace System.Windows.Markup
 {
     /// <summary>
     /// Class used to access elements inside the XAML code
     /// </summary>
-    [System.Windows.Markup.ContentProperty("ResourceKey")]
-    public partial class ThemeResourceExtension : MarkupExtension
+    [ContentProperty(nameof(ResourceKey))]
+    public class ThemeResourceExtension : MarkupExtension
     {
         /// <summary>
         /// The key of the StaticResource.

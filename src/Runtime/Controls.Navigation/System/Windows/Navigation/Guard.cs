@@ -7,13 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     internal static class Guard
     {

@@ -11,17 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
 	/// <summary>
 	/// Represents a composition related to text input which includes the composition

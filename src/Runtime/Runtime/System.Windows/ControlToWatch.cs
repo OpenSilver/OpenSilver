@@ -15,15 +15,7 @@ using System;
 using System.Diagnostics;
 using DotNetForHtml5.Core;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     internal sealed class ControlToWatch
     {

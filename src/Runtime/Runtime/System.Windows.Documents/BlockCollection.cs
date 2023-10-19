@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
 	/// <summary>
 	/// Represents a collection of <see cref="Block"/> elements.

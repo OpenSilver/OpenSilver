@@ -4,17 +4,9 @@
 // All other rights reserved.
 
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
-using System;
-
-#if MIGRATION
 using System.Windows.Data;
+
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Data;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Represents a control that displays a list of items and has a title.
@@ -40,15 +32,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization
         /// </summary>
         public Legend()
         {
-#if !MIGRATION
-            DefaultStyleKey = typeof(Legend);
-#endif
             // By default, the Visibility property should follow ContentVisibility - but users can override it
             SetBinding(VisibilityProperty, new Binding("ContentVisibility") { Source = this });
 
-#if MIGRATION
             DefaultStyleKey = typeof(Legend);
-#endif
         }
 
         /// <summary>

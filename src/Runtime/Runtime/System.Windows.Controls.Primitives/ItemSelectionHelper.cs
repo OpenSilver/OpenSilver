@@ -7,11 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Exposes an ObservableCollection of T and 

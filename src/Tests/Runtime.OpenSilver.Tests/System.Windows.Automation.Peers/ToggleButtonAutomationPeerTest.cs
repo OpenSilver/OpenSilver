@@ -13,24 +13,10 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
-using OpenSilver.Internal;
-using OpenSilver;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers.Tests
-#else
-namespace Windows.UI.Xaml.Automation.Peers.Tests
-#endif
 {
     [TestClass]
     public class ToggleButtonAutomationPeerTest

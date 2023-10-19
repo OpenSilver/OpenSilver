@@ -45,12 +45,12 @@
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../src/Simulator/Simulator/bin/Debug/net462/OpenSilver.Simulator.dll" target="lib/net462" />
-    <file src="../src/Simulator/Simulator/bin/Debug/net462/OpenSilver.Simulator.pdb" target="lib/net462" />
-    <file src="../src/Simulator/Simulator/bin/Debug/net462/OpenSilver.Simulator.xml" target="lib/net462" />
-    <file src="../src/Simulator/Simulator/bin/Debug/netcoreapp3.1/OpenSilver.Simulator.dll" target="lib/netcoreapp3.1" />
-    <file src="../src/Simulator/Simulator/bin/Debug/netcoreapp3.1/OpenSilver.Simulator.pdb" target="lib/netcoreapp3.1" />
-    <file src="../src/Simulator/Simulator/bin/Debug/netcoreapp3.1/OpenSilver.Simulator.xml" target="lib/netcoreapp3.1" />
+    <file src="../src/Simulator/Simulator/bin/$Configuration$/net462/OpenSilver.Simulator.dll" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/$Configuration$/net462/OpenSilver.Simulator.pdb" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/$Configuration$/net462/OpenSilver.Simulator.xml" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.dll" target="lib/netcoreapp3.1" />
+    <file src="../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.pdb" target="lib/netcoreapp3.1" />
+    <file src="../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.xml" target="lib/netcoreapp3.1" />
 
     <!-- OpenSilver targets -->
     <file src="../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
@@ -60,11 +60,11 @@
     <file src="../src/Simulator/Simulator/interop_debug_root_opensilver.html" target="contentFiles/any/any/interop_debug_root.html" />
 
     <!-- OpenSilver compiler -->
-    <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
-    <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
-    <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.pdb" target="tools/OpenSilver.Compiler.Resources.pdb" />
-    <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
-    <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.pdb" target="tools/OpenSilver.Compiler.Common.pdb" />
+    <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/$Configuration$/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
+    <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
+    <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.Resources.pdb" target="tools/OpenSilver.Compiler.Resources.pdb" />
+    <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
+    <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.Common.pdb" target="tools/OpenSilver.Compiler.Common.pdb" />
 
     <!-- OpenSilver JS and CSS files -->
     <file src="../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/any/js_css" />

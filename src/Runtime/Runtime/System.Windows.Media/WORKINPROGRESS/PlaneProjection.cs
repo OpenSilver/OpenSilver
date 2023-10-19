@@ -11,25 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Media.Media3D;
-#else
-using Windows.UI.Xaml.Media.Media3D;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a perspective transform (a 3-D-like effect) on an object.
     /// </summary>
     [OpenSilver.NotImplemented]
-    public sealed partial class PlaneProjection : Projection
+    public sealed class PlaneProjection : Projection
     {
         #region Constructor
 

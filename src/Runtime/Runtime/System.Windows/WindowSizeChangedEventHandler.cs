@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-#if !MIGRATION
-using Windows.UI.Core;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents the method that will handle the Window.SizeChanged event.

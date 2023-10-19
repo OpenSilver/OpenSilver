@@ -1,12 +1,4 @@
-#if !MIGRATION
-using System;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.Foundation
-#endif
 {
 	internal static class PointExtensions
     {

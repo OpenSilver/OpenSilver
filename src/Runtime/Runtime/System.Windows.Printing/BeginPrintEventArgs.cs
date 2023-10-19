@@ -1,20 +1,13 @@
-using System;
-
-#if MIGRATION
 namespace System.Windows.Printing
-#else
-namespace Windows.UI.Xaml.Printing
-#endif
 {
-    //
-    // Summary:
-    //     Provides data for the System.Windows.Printing.PrintDocument.BeginPrint event.
+    /// <summary>
+    /// Provides data for the <see cref="PrintDocument.BeginPrint"/> event.
+    /// </summary>
     public sealed partial class BeginPrintEventArgs : EventArgs
     {
-        //
-        // Summary:
-        //     Initializes a new instance of the System.Windows.Printing.BeginPrintEventArgs
-        //     class.
+        /// <summary>
+        /// Initializes a new instance of <see cref="BeginPrintEventArgs"/> class.
+        /// </summary>
         public BeginPrintEventArgs()
         {
         }

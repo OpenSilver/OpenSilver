@@ -11,18 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if !MIGRATION
-using Windows.Foundation;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     /// <summary>
     /// Reports stylus device information, such as the collection of stylus points associated

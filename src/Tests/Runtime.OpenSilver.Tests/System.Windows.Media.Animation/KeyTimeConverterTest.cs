@@ -11,17 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using OpenSilver.Tests;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation.Tests
-#else
-namespace Windows.UI.Xaml.Media.Animation.Tests
-#endif
 {
     [TestClass]
     public class KeyTimeConverterTest : TypeConverterTestBase

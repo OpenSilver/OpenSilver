@@ -1,24 +1,18 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Interactivity;
+using System.Windows;
+using OpenSilver.Internal.Expression.Interactivity;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.Windows.Interactivity;
-    using OpenSilver.Internal.Expression.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Controls.Primitives;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Controls.Primitives;
-#endif
-
     /// <summary>
     /// Calls a method on a specified object when invoked.
     /// </summary>

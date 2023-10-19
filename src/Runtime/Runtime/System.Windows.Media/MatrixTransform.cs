@@ -11,20 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Creates an arbitrary affine matrix transformation that is used to manipulate objects or coordinate systems in a two-dimensional plane.

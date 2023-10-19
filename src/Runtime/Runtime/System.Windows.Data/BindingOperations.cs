@@ -11,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// Provides the static <see cref="SetBinding(DependencyObject, DependencyProperty, Binding)" />

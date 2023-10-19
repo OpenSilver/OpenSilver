@@ -3,22 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Input;
-using System.Windows.Markup;
-#else
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents the text input of a <see cref="DatePicker" />.
@@ -47,13 +36,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DefaultStyleKey = typeof(DatePickerTextBox);
             SetDefaults();
 
-#if MIGRATION
             this.MouseEnter += OnMouseEnter;
             this.MouseLeave += OnMouseLeave;
-#else
-            this.PointerEntered += OnMouseEnter;
-            this.PointerExited += OnMouseLeave;
-#endif
             this.Loaded += OnLoaded;
             this.LostFocus += OnLostFocus;
             this.GotFocus += OnGotFocus;
@@ -143,11 +127,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Builds the visual tree for the <see cref="DatePickerTextBox" /> when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

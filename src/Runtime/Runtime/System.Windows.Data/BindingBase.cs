@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Markup;
 
-#if MIGRATION 
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// Provides an abstract base class for the Binding class.

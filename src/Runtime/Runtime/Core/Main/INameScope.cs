@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Windows.Markup
-#else
-namespace Windows.UI.Xaml.Markup
-#endif
 {
     /// <summary>
     /// Defines a contract for how names of elements should be accessed within a

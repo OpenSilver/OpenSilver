@@ -11,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Determines how the colors in a gradient are interpolated.

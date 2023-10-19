@@ -3,24 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Exposes <see cref="Calendar" /> types to UI automation.

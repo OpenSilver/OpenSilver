@@ -16,10 +16,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Xaml;
 
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
-
 namespace System.Windows.Markup
 {
     /// <summary>

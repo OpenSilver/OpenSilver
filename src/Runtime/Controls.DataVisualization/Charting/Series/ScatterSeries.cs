@@ -4,16 +4,10 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System;
 
 #if !DEFINITION_SERIES_COMPATIBILITY_MODE
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that contains a data series to be rendered in X/Y scatter format.

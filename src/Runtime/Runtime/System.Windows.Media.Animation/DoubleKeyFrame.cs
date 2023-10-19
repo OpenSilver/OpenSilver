@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,25 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// An abstract class that defines an animation segment with its own target value
     /// and interpolation method for a DoubleAnimationUsingKeyFrames.
     /// </summary>
-    public abstract partial class DoubleKeyFrame : DependencyObject, IKeyFrame
+    public abstract class DoubleKeyFrame : DependencyObject, IKeyFrame
     {
         public static readonly DependencyProperty KeyTimeProperty = DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(DoubleKeyFrame), new PropertyMetadata(new KeyTime()));
         /// <summary>Gets or sets the time at which the key frame's target <see cref="P:System.Windows.Media.Animation.DoubleKeyFrame.Value" /> should be reached.</summary>

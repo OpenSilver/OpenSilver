@@ -14,11 +14,7 @@
 using System;
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Describes the degree to which a font has been stretched, compared to the normal

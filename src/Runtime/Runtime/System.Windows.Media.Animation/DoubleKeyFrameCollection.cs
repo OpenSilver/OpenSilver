@@ -11,16 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
-    public sealed partial class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
+    public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
     {
         public DoubleKeyFrameCollection()
             : base(false)

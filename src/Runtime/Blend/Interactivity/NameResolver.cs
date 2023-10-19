@@ -1,21 +1,13 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Diagnostics;
+using System.Globalization;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media;
-#else
-    using global::Windows.UI.Xaml;
-    using global::Windows.UI.Xaml.Media;
-#endif
-
     /// <summary>
     /// Provides data about which objects were affected when resolving a name change.
     /// </summary>

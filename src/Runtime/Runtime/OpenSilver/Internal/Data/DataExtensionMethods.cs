@@ -4,12 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
 namespace OpenSilver.Internal.Data
 {

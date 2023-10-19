@@ -7,21 +7,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Browser;
 using System.Windows.Interop;
 using OpenSilver.Internal.Navigation;
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Journal used to manage a history list of JournalEntry items.

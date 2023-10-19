@@ -11,17 +11,9 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Contains values used as automation property identifiers by UI automation providers

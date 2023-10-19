@@ -9,16 +9,10 @@
 //   LeftLeaningRedBlackTree.AssertInvariants
 // #define DEBUGGING
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Collections
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
-#endif
 {
     /// <summary>
     /// Implements a left-leaning red-black tree.
@@ -233,7 +227,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
         /// </summary>
         /// <param name="key">Specified key.</param>
         /// <returns>Value associated with the specified key.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "GetValueForKey", Justification = "Method name.")]
         public TValue GetValueForKey(TKey key)
         {
             if (IsMultiDictionary)

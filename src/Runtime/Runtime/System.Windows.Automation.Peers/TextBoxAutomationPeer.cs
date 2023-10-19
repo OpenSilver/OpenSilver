@@ -11,21 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Exposes <see cref="TextBox"/> types to UI automation.

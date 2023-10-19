@@ -18,23 +18,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media.Animation;
-#endif
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Manages states and the logic for transitioning between states for controls.

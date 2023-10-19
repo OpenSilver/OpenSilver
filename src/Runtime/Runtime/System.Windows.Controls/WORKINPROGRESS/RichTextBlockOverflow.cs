@@ -1,8 +1,4 @@
-﻿#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+﻿namespace System.Windows.Controls
 {
     /// <summary>
     /// Displays the content that does not fit in a <see cref="RichTextBlock"/>

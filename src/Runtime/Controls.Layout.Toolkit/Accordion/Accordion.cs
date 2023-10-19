@@ -3,7 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,29 +10,13 @@ using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-#endif
-
-#if OPENSILVER
 using Properties = OpenSilver.Controls.Properties;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a collection of collapsed and expanded AccordionItem controls.
@@ -766,11 +749,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the Accordion control when a 
         /// new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             ItemsControlHelper.OnApplyTemplate();
             base.OnApplyTemplate();
@@ -1936,20 +1915,12 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseEnter event.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseEnter(e))
             {
                 Interaction.OnMouseEnterBase();
-#if MIGRATION
                 base.OnMouseEnter(e);
-#else
-                base.OnPointerEntered(e);
-#endif
             }
         }
 
@@ -1957,20 +1928,12 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseLeave event.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeave(e))
             {
                 Interaction.OnMouseLeaveBase();
-#if MIGRATION
                 base.OnMouseLeave(e);
-#else
-                base.OnPointerExited(e);
-#endif
             }
         }
 
@@ -1978,20 +1941,12 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseLeftButtonDown event.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeftButtonDown(e))
             {
                 Interaction.OnMouseLeftButtonDownBase();
-#if MIGRATION
                 base.OnMouseLeftButtonDown(e);
-#else
-                base.OnPointerPressed(e);
-#endif
             }
         }
 
@@ -1999,20 +1954,12 @@ namespace Windows.UI.Xaml.Controls
         /// Called before the MouseLeftButtonUp event occurs.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeftButtonUp(e))
             {
                 Interaction.OnMouseLeftButtonUpBase();
-#if MIGRATION
                 base.OnMouseLeftButtonUp(e);
-#else
-                base.OnPointerReleased(e);
-#endif
             }
         }
 

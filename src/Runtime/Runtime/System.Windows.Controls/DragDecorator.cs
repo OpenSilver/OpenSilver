@@ -3,18 +3,9 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-#if MIGRATION
 using SW = Microsoft.Windows;
-#else
-using Windows.Foundation;
-using SW = System.Windows;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// A content control that visually indicates what actions are available

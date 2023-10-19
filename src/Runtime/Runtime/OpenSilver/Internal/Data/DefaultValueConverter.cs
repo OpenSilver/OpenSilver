@@ -13,14 +13,8 @@ using System.Globalization;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Data;
-#endif
 
 namespace OpenSilver.Internal.Data
 {
@@ -293,7 +287,6 @@ namespace OpenSilver.Internal.Data
         //
         //------------------------------------------------------
 
-#if MIGRATION
         public object Convert(object o, Type type, object parameter, CultureInfo culture)
         {
             return ConvertTo(o, _targetType, parameter as DependencyObject, culture);
@@ -303,17 +296,6 @@ namespace OpenSilver.Internal.Data
         {
             return ConvertFrom(o, _sourceType, parameter as DependencyObject, culture);
         }
-#else
-        public object Convert(object o, Type type, object parameter, string culture)
-        {
-            return ConvertTo(o, _targetType, parameter as DependencyObject, CultureInfo.GetCultureInfo(culture));
-        }
-
-        public object ConvertBack(object o, Type type, object parameter, string culture)
-        {
-            return ConvertFrom(o, _sourceType, parameter as DependencyObject, CultureInfo.GetCultureInfo(culture));
-        }
-#endif
     }
 
     internal sealed class TargetDefaultValueConverter : DefaultValueConverter, IValueConverter
@@ -336,7 +318,6 @@ namespace OpenSilver.Internal.Data
         //
         //------------------------------------------------------
 
-#if MIGRATION
         public object Convert(object o, Type type, object parameter, CultureInfo culture)
         {
             return ConvertFrom(o, _targetType, parameter as DependencyObject, culture);
@@ -346,17 +327,6 @@ namespace OpenSilver.Internal.Data
         {
             return ConvertTo(o, _sourceType, parameter as DependencyObject, culture);
         }
-#else
-        public object Convert(object o, Type type, object parameter, string culture)
-        {
-            return ConvertFrom(o, _targetType, parameter as DependencyObject, CultureInfo.GetCultureInfo(culture));
-        }
-
-        public object ConvertBack(object o, Type type, object parameter, string culture)
-        {
-            return ConvertTo(o, _sourceType, parameter as DependencyObject, CultureInfo.GetCultureInfo(culture));
-        }
-#endif
     }
 
     internal sealed class SystemConvertConverter : IValueConverter
@@ -367,7 +337,6 @@ namespace OpenSilver.Internal.Data
             _targetType = targetType;
         }
 
-#if MIGRATION
         public object Convert(object o, Type type, object parameter, CultureInfo culture)
         {
             return System.Convert.ChangeType(o, _targetType, culture);
@@ -377,17 +346,6 @@ namespace OpenSilver.Internal.Data
         {
             return System.Convert.ChangeType(o, _sourceType, culture);
         }
-#else
-        public object Convert(object o, Type type, object parameter, string culture)
-        {
-            return System.Convert.ChangeType(o, _targetType, CultureInfo.GetCultureInfo(culture));
-        }
-
-        public object ConvertBack(object o, Type type, object parameter, string culture)
-        {
-            return System.Convert.ChangeType(o, _sourceType, CultureInfo.GetCultureInfo(culture));
-        }
-#endif
 
         // ASSUMPTION: sourceType != targetType
         public static bool CanConvert(Type sourceType, Type targetType)
@@ -486,21 +444,13 @@ namespace OpenSilver.Internal.Data
         //
         //------------------------------------------------------
 
-#if MIGRATION
         public object Convert(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object Convert(object o, Type type, object parameter, string culture)
-#endif
         {
             // conversion from any type to object is easy
             return o;
         }
 
-#if MIGRATION
         public object ConvertBack(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object ConvertBack(object o, Type type, object parameter, string culture)
-#endif
         {
             // if types are compatible, just pass the value through
             if (o == null && !_sourceType.IsValueType)
@@ -516,11 +466,7 @@ namespace OpenSilver.Internal.Data
 
             // otherwise, use system converter
             EnsureConverter(_sourceType);
-#if MIGRATION
             return ConvertFrom(o, _sourceType, parameter as DependencyObject, culture);
-#else
-            return ConvertFrom(o, _sourceType, parameter as DependencyObject, CultureInfo.GetCultureInfo(culture));
-#endif
         }
     }
 
@@ -545,11 +491,7 @@ namespace OpenSilver.Internal.Data
         //
         //------------------------------------------------------
 
-#if MIGRATION
         public object Convert(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object Convert(object o, Type type, object parameter, string culture)
-#endif
         {
             // if types are compatible, just pass the value through
             if ((o != null && _targetType.IsAssignableFrom(o.GetType())) ||
@@ -563,18 +505,10 @@ namespace OpenSilver.Internal.Data
 
             // otherwise, use system converter
             EnsureConverter(_targetType);
-#if MIGRATION
             return ConvertFrom(o, _targetType, parameter as DependencyObject, culture);
-#else
-            return ConvertFrom(o, _targetType, parameter as DependencyObject, CultureInfo.GetCultureInfo(culture));
-#endif
         }
 
-#if MIGRATION
         public object ConvertBack(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object ConvertBack(object o, Type type, object parameter, string culture)
-#endif
         {
             // conversion from any type to object is easy
             return o;
@@ -598,11 +532,7 @@ namespace OpenSilver.Internal.Data
         //
         //------------------------------------------------------
 
-#if MIGRATION
         public object Convert(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object Convert(object o, Type type, object parameter, string culture)
-#endif
         {
             IList il = null;
             IListSource ils = o as IListSource;
@@ -615,11 +545,7 @@ namespace OpenSilver.Internal.Data
             return il;
         }
 
-#if MIGRATION
         public object ConvertBack(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object ConvertBack(object o, Type type, object parameter, string culture)
-#endif
         {
             return null;
         }
@@ -647,20 +573,12 @@ namespace OpenSilver.Internal.Data
         //
         //------------------------------------------------------
 
-#if MIGRATION
         public object Convert(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object Convert(object o, Type type, object parameter, string culture)
-#endif
         {
             return ConvertTo(o, _targetType);
         }
 
-#if MIGRATION
         public object ConvertBack(object o, Type type, object parameter, CultureInfo culture)
-#else
-        public object ConvertBack(object o, Type type, object parameter, string culture)
-#endif
         {
             return ConvertTo(o, _sourceType);
         }

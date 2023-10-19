@@ -11,28 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections;
 using System.Collections.ObjectModel;
-using OpenSilver;
-
-#if MIGRATION
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Tests
-#else
-namespace Windows.UI.Xaml.Tests
-#endif
 {
     [TestClass]
     public partial class FrameworkElementTest

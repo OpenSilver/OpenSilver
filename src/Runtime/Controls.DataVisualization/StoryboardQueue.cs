@@ -3,16 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows.Media.Animation;
+
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.UI.Xaml.Media.Animation;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
 /// <summary>
 /// Represents a storyboard queue that plays storyboards in sequence.

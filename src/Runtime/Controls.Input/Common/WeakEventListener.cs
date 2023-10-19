@@ -3,14 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Implements a weak event listener that allows the owner to be garbage
@@ -19,7 +12,6 @@ namespace Windows.UI.Xaml.Controls
     /// <typeparam name="TInstance">Type of instance listening for the event.</typeparam>
     /// <typeparam name="TSource">Type of source for the event.</typeparam>
     /// <typeparam name="TEventArgs">Type of event arguments for the event.</typeparam>
-    [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used as link target in several projects.")]
     internal class WeakEventListener<TInstance, TSource, TEventArgs> where TInstance : class
     {
         /// <summary>

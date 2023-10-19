@@ -5,11 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides the base implementation for controls that contain a single
@@ -21,8 +17,7 @@ namespace Windows.UI.Xaml.Controls
     /// lack of support and consistency with other Silverlight controls.
     /// </remarks>
     /// <QualityBand>Stable</QualityBand>
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Headered", Justification = "Consistency with WPF")]
-    public partial class HeaderedContentControl : ContentControl
+    public class HeaderedContentControl : ContentControl
     {
 #region public object Header
         /// <summary>

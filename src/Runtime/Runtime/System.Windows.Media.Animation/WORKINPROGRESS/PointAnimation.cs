@@ -11,21 +11,13 @@
 *  
 \*====================================================================================*/
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Animates the value of a <see cref="Point"/> property between two target values
     /// using linear interpolation over a specified <see cref="Timeline.Duration"/>.
     /// </summary>
-    public sealed partial class PointAnimation : AnimationTimeline
+    public sealed class PointAnimation : AnimationTimeline
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PointAnimation"/>

@@ -3,28 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Windows.Input;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
 /// <summary>
 /// Represents a control that redistributes space between the rows of
@@ -162,22 +147,13 @@ namespace Windows.UI.Xaml.Controls
             _dragValidator.DragStartedEvent += new EventHandler<DragStartedEventArgs>(DragValidator_DragStartedEvent);
             _dragValidator.DragDeltaEvent += new EventHandler<DragDeltaEventArgs>(DragValidator_DragDeltaEvent);
             _dragValidator.DragCompletedEvent += new EventHandler<DragCompletedEventArgs>(DragValidator_DragCompletedEvent);
-
-#if MIGRATION
             this.MouseEnter += delegate(object sender, MouseEventArgs e)
-#else
-            this.PointerEntered += delegate(object sender, MouseEventArgs e)
-#endif
             {
                 _isMouseOver = true;
                 ChangeVisualState();
             };
 
-#if MIGRATION
             this.MouseLeave += delegate(object sender, MouseEventArgs e)
-#else
-            this.PointerExited += delegate(object sender, MouseEventArgs e)
-#endif
             {
                 _isMouseOver = false;
 
@@ -208,11 +184,7 @@ namespace Windows.UI.Xaml.Controls
         /// <see cref="T:System.Windows.Controls.GridSplitter" />
         /// control when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

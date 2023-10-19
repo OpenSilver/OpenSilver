@@ -11,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents methods that handle various routed events that track property

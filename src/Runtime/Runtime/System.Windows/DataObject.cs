@@ -18,11 +18,7 @@ using System.Collections.Generic;
 using System.Security;
 using System.Linq;
 
-#if MIGRATION
 namespace Microsoft.Windows
-#else
-namespace System.Windows
-#endif
 {
     /// <summary>
     /// Provides a basic implementation of the IDataObject interface,

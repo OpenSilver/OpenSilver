@@ -14,19 +14,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Provider;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Provides a base class that exposes an automation peer for an associated class 

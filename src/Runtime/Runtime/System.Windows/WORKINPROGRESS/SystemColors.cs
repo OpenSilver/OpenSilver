@@ -1,10 +1,6 @@
 using System.Windows.Media;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
 	//
 	// Summary:

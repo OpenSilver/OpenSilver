@@ -5,30 +5,13 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
-using System;
 using System.Windows.Input;
 using System.Linq;
-
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-using Windows.UI.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
-
 {
     /// <summary>
     /// Represents an individual <see cref="T:System.Windows.Controls.DataGrid" /> column header.
@@ -77,7 +60,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public DataGridColumnHeader()
         {
-#if MIGRATION
             this.LostMouseCapture += new MouseEventHandler(DataGridColumnHeader_LostMouseCapture);
             this.MouseLeftButtonDown += new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonDown);
             this.MouseLeftButtonUp += new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonUp);
@@ -86,9 +68,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.MouseLeave += new MouseEventHandler(DataGridColumnHeader_MouseLeave);
 
             DefaultStyleKey = typeof(DataGridColumnHeader);
-#else
-
-#endif
         }
 
         #region Dependency Properties
@@ -232,13 +211,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Builds the visual tree for the column header when a new template is applied. 
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
         {
-#else
-        protected override void OnApplyTemplate()
-        {
-#endif
             base.OnApplyTemplate();
 
             ApplyState(false);
@@ -358,10 +332,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 this.Dispatcher.BeginInvoke(new Action(ProcessSort));
             }
         }
-#if MIGRATION
+
         internal void OnMouseLeftButtonDown(ref bool handled, Point mousePosition)
         {
-
             this.IsPressed = true;
 
             if (this.OwningGrid != null && this.OwningGrid.ColumnHeaders != null)
@@ -442,92 +415,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 handled = true;
             }
         }
-#else
-        internal void OnMouseLeftButtonDown(ref bool handled, PointerPoint mousePosition)
-        {
 
-            this.IsPressed = true;
-
-            if (this.OwningGrid != null && this.OwningGrid.ColumnHeaders != null)
-            {
-                this.CapturePointer();
-
-                _dragMode = DragMode.MouseDown;
-                _frozenColumnsWidth = this.OwningGrid.ColumnsInternal.GetVisibleFrozenEdgedColumnsWidth();
-                _lastMousePositionHeaders = this.Translate(this.OwningGrid.ColumnHeaders, mousePosition.Position);
-
-                double distanceFromLeft = mousePosition.Position.X;
-                double distanceFromRight = this.ActualWidth - distanceFromLeft;
-                DataGridColumn currentColumn = this.OwningColumn;
-                DataGridColumn previousColumn = null;
-                if (!(this.OwningColumn is DataGridFillerColumn))
-                {
-                    previousColumn = this.OwningGrid.ColumnsInternal.GetPreviousVisibleNonFillerColumn(currentColumn);
-                }
-
-                if (_dragMode == DragMode.MouseDown && _dragColumn == null && (distanceFromRight <= DATAGRIDCOLUMNHEADER_resizeRegionWidth))
-                {
-                    handled = TrySetResizeColumn(currentColumn);
-                }
-                else if (_dragMode == DragMode.MouseDown && _dragColumn == null && distanceFromLeft <= DATAGRIDCOLUMNHEADER_resizeRegionWidth && previousColumn != null)
-                {
-                    handled = TrySetResizeColumn(previousColumn);
-                }
-
-                if (_dragMode == DragMode.Resize && _dragColumn != null)
-                {
-                    _dragStart = _lastMousePositionHeaders;
-                    _originalWidth = _dragColumn.ActualWidth;
-                    _originalHorizontalOffset = this.OwningGrid.HorizontalOffset;
-
-                    handled = true;
-                }
-            }
-        }
-
-        internal void OnMouseLeftButtonUp(ref bool handled, Point mousePosition, Point mousePositionHeaders)
-        {
-            this.IsPressed = false;
-
-            if (this.OwningGrid != null && this.OwningGrid.ColumnHeaders != null)
-            {
-                if (_dragMode == DragMode.MouseDown)
-                {
-                    OnMouseLeftButtonUp_Click(ref handled);
-                }
-                else if (_dragMode == DragMode.Reorder)
-                {
-                    // Find header we're hovering over
-                    int targetIndex = this.GetReorderingTargetDisplayIndex(mousePositionHeaders);
-
-                    if (((!this.OwningColumn.IsFrozen && targetIndex >= this.OwningGrid.FrozenColumnCount)
-                          || (this.OwningColumn.IsFrozen && targetIndex < this.OwningGrid.FrozenColumnCount)))
-                    {
-                        this.OwningColumn.DisplayIndex = targetIndex;
-
-                        DataGridColumnEventArgs ea = new DataGridColumnEventArgs(this.OwningColumn);
-                        this.OwningGrid.OnColumnReordered(ea);
-                    }
-
-                    DragCompletedEventArgs dragCompletedEventArgs = new DragCompletedEventArgs(mousePosition.X - _dragStart.Value.X, mousePosition.Y - _dragStart.Value.Y, false);
-                    this.OwningGrid.OnColumnHeaderDragCompleted(dragCompletedEventArgs);
-                }
-                else if (_dragMode == DragMode.Drag)
-                {
-                    DragCompletedEventArgs dragCompletedEventArgs = new DragCompletedEventArgs(0, 0, false);
-                    this.OwningGrid.OnColumnHeaderDragCompleted(dragCompletedEventArgs);
-                }
-
-                SetDragCursor(mousePosition);
-
-                // Variables that track drag mode states get reset in DataGridColumnHeader_LostMouseCapture
-
-                ReleasePointerCapture();
-                DataGridColumnHeader._dragMode = DragMode.None;
-                handled = true;
-            }
-        }
-#endif
         internal void OnMouseLeftButtonUp_Click(ref bool handled)
         {
             // completed a click without dragging, so we're sorting
@@ -739,7 +627,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
             return column.ActualCanUserResize;
         }
-#if MIGRATION
+
         private void DataGridColumnHeader_LostMouseCapture(object sender, MouseEventArgs e)
         {
             this.OnLostMouseCapture();
@@ -767,56 +655,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.OnMouseLeave();
             ApplyState(true);
         }
-#else
-        private void DataGridColumnHeader_LostMouseCapture(object sender, PointerRoutedEventArgs e)
-        {
-            this.OnLostMouseCapture();
-        }
 
-        private void DataGridColumnHeader_MouseEnter(object sender, PointerRoutedEventArgs e)
-        {
-            if (!this.IsEnabled)
-            {
-                return;
-            }
-            this.OnPointerEntered(e);
-            ApplyState(true);
-        }
-
-        private void DataGridColumnHeader_MouseLeave(object sender, PointerRoutedEventArgs e)
-        {
-            if (!this.IsEnabled)
-            {
-                return;
-            }
-
-            this.OnMouseLeave();
-            ApplyState(true);
-        }
-#endif
-#if MIGRATION
         private void DataGridColumnHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-#else
-        private void DataGridColumnHeader_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
-        {
-#endif
             if (this.OwningColumn == null || e.Handled || !this.IsEnabled)
             {
                 return;
             }
-#if MIGRATION
             Point mousePosition = e.GetPosition(this);
-#else
-            PointerPoint mousePosition = e.GetCurrentPoint(this);
-#endif
             bool handled = e.Handled;
             OnMouseLeftButtonDown(ref handled, mousePosition);
             e.Handled = handled;
 
             ApplyState(true);
         }
-#if MIGRATION
+
         private void DataGridColumnHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
 
@@ -847,39 +700,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             bool handled = false;
             OnMouseMove(ref handled, mousePosition, mousePositionHeaders);
         }
-#else
-        private void DataGridColumnHeader_MouseLeftButtonUp(object sender, PointerRoutedEventArgs e)
-        {
 
-            if (this.OwningColumn == null || e.Handled || !this.IsEnabled)
-            {
-                return;
-            }
-
-            Point mousePosition = e.GetCurrentPoint(this).Position;
-            Point mousePositionHeaders = e.GetCurrentPoint(this.OwningGrid.ColumnHeaders).Position;
-            bool handled = e.Handled;
-
-            OnMouseLeftButtonUp(ref handled, mousePosition, mousePositionHeaders);
-            e.Handled = handled;
-
-            ApplyState(true);
-        }
-
-        private void DataGridColumnHeader_MouseMove(object sender, PointerRoutedEventArgs e)
-        {
-            if (this.OwningGrid == null || !this.IsEnabled)
-            {
-                return;
-            }
-
-            Point mousePosition = e.GetCurrentPoint(this).Position;
-            Point mousePositionHeaders = e.GetCurrentPoint(this.OwningGrid.ColumnHeaders).Position;
-
-            bool handled = false;
-            OnMouseMove(ref handled, mousePosition, mousePositionHeaders);
-        }
-#endif
         /// <summary>
         /// Returns the column against whose top-left the reordering caret should be positioned
         /// </summary>
@@ -1181,7 +1002,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 previousColumn = this.OwningGrid.ColumnsInternal.GetPreviousVisibleNonFillerColumn(currentColumn);
             }
-#if MIGRATION
             if ((distanceFromRight <= DATAGRIDCOLUMNHEADER_resizeRegionWidth && currentColumn != null && CanResizeColumn(currentColumn)) ||
                 (distanceFromLeft <= DATAGRIDCOLUMNHEADER_resizeRegionWidth && previousColumn != null && CanResizeColumn(previousColumn)))
             {
@@ -1195,9 +1015,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 this.Cursor = DataGridColumnHeader._originalCursor;
             }
-#else
-
-#endif
         }
 
         private static bool TrySetResizeColumn(DataGridColumn column)

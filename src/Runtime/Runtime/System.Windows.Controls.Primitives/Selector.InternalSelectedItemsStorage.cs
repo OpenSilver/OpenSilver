@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     public partial class Selector
     {

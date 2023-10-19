@@ -5,15 +5,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System;
-
-#if MIGRATION
 using System.Windows.Data;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.UI.Xaml.Data;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that contains a data series to be rendered in X/Y 

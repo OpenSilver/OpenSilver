@@ -11,22 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     /// <summary>
     /// Provides utility methods related to element focus, without the need to handle focus-related events.

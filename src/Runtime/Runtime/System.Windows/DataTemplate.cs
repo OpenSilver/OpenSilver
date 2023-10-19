@@ -14,11 +14,7 @@
 using System;
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Describes the visual structure of a data object.
@@ -50,11 +46,8 @@ namespace Windows.UI.Xaml
             }
             set
             {
-#if MIGRATION
                 Exception ex = System.Windows.DataTemplateKey.ValidateDataType(value, nameof(value));
-#else
-                Exception ex = Windows.UI.Xaml.DataTemplateKey.ValidateDataType(value, nameof(value));
-#endif
+                
                 if (ex != null)
                 {
                     throw ex;

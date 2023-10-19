@@ -19,13 +19,8 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Windows.Browser.Internal;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows.Threading;
-#else
-using Dispatcher = Windows.UI.Core.CoreDispatcher;
-#endif
+using CSHTML5.Internal;
 
 namespace System.Windows.Browser
 {

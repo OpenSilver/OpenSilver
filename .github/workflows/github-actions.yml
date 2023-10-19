@@ -47,7 +47,7 @@ jobs:
           cp src/Targets/OpenSilver.GenerateAssemblyInfo.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
       - name: Build OpenSilver
         working-directory: build
-        run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+        run: msbuild slnf/OpenSilver.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Format Version Suffix
         id: format-suffix
         run: echo "::set-output name=suffix::$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}"
@@ -56,17 +56,17 @@ jobs:
         run: echo "::set-output name=version::${{ env.next-release-version }}-preview-${{ steps.format-suffix.outputs.suffix }}"
       - name: Build Simulator
         working-directory: build
-        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Pack OpenSilver
         working-directory: build
         run: |
           mkdir temp; echo "OpenSilver ${{ steps.format-version.outputs.version }}" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=${{ steps.format-version.outputs.version }};Configuration=SL;Target=OpenSilver;RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
+          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release;RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
       - name: Pack Simulator
         working-directory: build
         run: |
           echo "OpenSilver.Simulator ${{ steps.format-version.outputs.version }}" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver"  -BasePath ".\" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
+          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver"  -BasePath ".\" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release;RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
       - uses: actions/upload-artifact@v2
         with:
           name: OpenSilver

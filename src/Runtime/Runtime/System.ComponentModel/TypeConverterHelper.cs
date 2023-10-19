@@ -18,19 +18,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Input;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-#else
-using Windows.Foundation;
-using Windows.UI;
-using Windows.UI.Text;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
 namespace System.ComponentModel
 {
@@ -369,10 +359,8 @@ namespace System.ComponentModel
                 [typeof(Rect)] = new RectConverter(),
                 [typeof(Size)] = new SizeConverter(),
                 [typeof(Thickness)] = new ThicknessConverter(),
-#if MIGRATION
                 [typeof(FontStyle)] = new FontStyleConverter(),
                 [typeof(TextDecorationCollection)] = new TextDecorationCollectionConverter(),
-#endif
                 [typeof(CacheMode)] = new CacheModeConverter(),
                 [typeof(FontStretch)] = new FontStretchConverter(),
             };

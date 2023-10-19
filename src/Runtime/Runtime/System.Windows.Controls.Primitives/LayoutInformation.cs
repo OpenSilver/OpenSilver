@@ -11,22 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Threading;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Dispatcher = Windows.UI.Core.CoreDispatcher;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Defines methods that provide additional information about the layout of an element.

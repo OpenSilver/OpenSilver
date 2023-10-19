@@ -26,14 +26,13 @@ namespace OpenSilver.Compiler
             string assemblyNameWithoutExtension,
             AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
-            bool isSLMigration,
             string outputRootPath,
             string outputAppFilesPath,
             string outputLibrariesPath,
             string outputResourcesPath,
             ILogger logger)
         {
-            ConversionSettings settings = isSLMigration ? ConversionSettingsCS.Silverlight : ConversionSettingsCS.UWP;
+            ConversionSettings settings = ConversionSettingsCS.Silverlight;
 
             // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it could be badly formatted and not be parsable using XDocument.Parse.
             xaml = ProcessingHtmlPresenterNodes.Process(xaml);

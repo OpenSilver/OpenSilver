@@ -18,15 +18,7 @@ using CSHTML5;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     internal interface ITextMeasurementService
     {

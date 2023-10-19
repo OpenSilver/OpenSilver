@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Represents an easing function that creates an animation that accelerates
@@ -33,14 +21,9 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         const string FUNCTION_TYPE_STRING = "Quint";
 
-        //// Summary:
-        ////     Initializes a new instance of the QuinticEase class.
-        //public QuinticEase();
-
         internal override string GetFunctionAsString()
         {
             return GetEasingModeAsString() + FUNCTION_TYPE_STRING;
         }
     }
 }
-

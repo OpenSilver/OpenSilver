@@ -1,10 +1,4 @@
-﻿using System;
-
-#if MIGRATION
-namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
+﻿namespace System.Windows.Documents
 {
     /// <summary>
     /// Provides access to a rich set of OpenType typography properties. 

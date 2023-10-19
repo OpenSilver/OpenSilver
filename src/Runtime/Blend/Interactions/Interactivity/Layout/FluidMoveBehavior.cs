@@ -1,35 +1,22 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Windows.Interactivity;
+using System.Diagnostics.CodeAnalysis;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
+using Microsoft.Expression.Interactivity.Core;
+
 namespace Microsoft.Expression.Interactivity.Layout
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Windows.Interactivity;
-    using Microsoft.Expression.Interactivity.Core;
-    using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Controls.Primitives;
-    using System.Windows.Data;
-    using System.Windows.Media;
-    using System.Windows.Media.Animation;
-    using System.Windows.Media.Imaging;
-    using System.Windows.Shapes;
-#else
-    using Windows.Foundation;
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Controls;
-    using Windows.UI.Xaml.Controls.Primitives;
-    using Windows.UI.Xaml.Data;
-    using Windows.UI.Xaml.Media;
-    using Windows.UI.Xaml.Media.Animation;
-    using Windows.UI.Xaml.Media.Imaging;
-    using Windows.UI.Xaml.Shapes;
-#endif
-
     /// <summary>
     /// This enumerated type indicates whether a FluidMoveBehavior applies to the element to which it is attached, or to the children of that element.
     /// "Self" is useful when there is a single element that should behave in a special manner; "Children" is useful when the same behavior should apply to all

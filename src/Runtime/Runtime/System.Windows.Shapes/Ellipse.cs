@@ -11,21 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.Windows.Media;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Shapes
-#else
-namespace Windows.UI.Xaml.Shapes
-#endif
 {
     /// <summary>
     /// Draws an ellipse.

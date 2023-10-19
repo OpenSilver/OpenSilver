@@ -12,17 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if (!FOR_DESIGN_TIME) && CORE
-extern alias ToBeReplacedAtRuntime;
-#endif
-
-#if BRIDGE
-using Bridge;
-#else
-using JSIL.Meta;
-#endif
-
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -37,20 +26,10 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 using System.Xml;
+using System.Windows;
 using CSHTML5.Internal;
 using static System.ServiceModel.INTERNAL_WebMethodsCaller;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
-
-#if OPENSILVER
 using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer_CSHTML5Ver;
-#else // BRIDGE
-using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer;
-#endif
 
 namespace System.ServiceModel
 {

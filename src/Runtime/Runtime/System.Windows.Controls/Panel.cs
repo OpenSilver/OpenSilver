@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -20,30 +19,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides a base class for all Panel elements. Use Panel elements to position
     /// and arrange child objects in a UI page.
     /// </summary>
-    [ContentProperty("Children")]
-    public abstract partial class Panel : FrameworkElement, IPanel
+    [ContentProperty(nameof(Children))]
+    public abstract class Panel : FrameworkElement, IPanel
     {
         private UIElementCollection _uiElementCollection;
         private ItemContainerGenerator _itemContainerGenerator;

@@ -14,11 +14,7 @@
 using System;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides a set of predefined font stretches as static property values.

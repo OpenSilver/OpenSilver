@@ -11,17 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.Windows.Controls;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI;
-#endif
 
 namespace System.Windows.Media.Effects
 {
@@ -29,7 +21,7 @@ namespace System.Windows.Media.Effects
     /// Applies a shadow behind a visual object at a slight offset. The offset is determined
     /// by mimicking a casting shadow from an imaginary light source.
     /// </summary>
-    public sealed partial class DropShadowEffect : Effect
+    public sealed class DropShadowEffect : Effect
     {
         // Note: If we want to allow inwards shadows, we can use "inset" in the string that is set.
         // From what I could gather, the shadows in WPF are naturally going both ways (inwards and

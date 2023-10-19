@@ -11,18 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 
-#if !MIGRATION
-using Dispatcher = Windows.UI.Core.CoreDispatcher;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Threading;
-#else
-namespace Windows.UI.Core;
-#endif
 
 /// <summary>
 /// Represents an operation that has been posted to the <see cref="Dispatcher"/> queue.

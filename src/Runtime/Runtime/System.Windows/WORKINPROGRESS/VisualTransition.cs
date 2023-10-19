@@ -15,17 +15,9 @@
 
 using System;
 using System.Windows.Markup;
-#if MIGRATION
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     #region Not supported yet
     /// <summary>

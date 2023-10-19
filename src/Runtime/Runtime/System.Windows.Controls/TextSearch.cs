@@ -11,21 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows.Data;
 using System.Windows.Threading;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Enables the user to search a list of items in an <see cref="ItemsControl"/>
@@ -422,12 +412,7 @@ namespace Windows.UI.Xaml.Controls
             return (o != null) ? o.ToString() : string.Empty;
         }
 
-#if MIGRATION
-        private void OnTimeout(object sender, EventArgs e)
-#else
-        private void OnTimeout(object sender, object e)
-#endif
-            => ResetState();
+        private void OnTimeout(object sender, EventArgs e) => ResetState();
 
         private void ResetState()
         {

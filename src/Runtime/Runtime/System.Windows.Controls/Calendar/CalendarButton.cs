@@ -3,22 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents a button on a <see cref="Calendar" />.
@@ -143,11 +131,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Builds the visual tree for the <see cref="CalendarButton" /> when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             ChangeVisualState(false);
@@ -195,17 +179,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// handled in some situations, you should use the Click event instead
         /// to detect a button click.
         /// </remarks>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(MouseButtonEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
 
             MouseButtonEventHandler handler = CalendarButtonMouseDown;
             if (null != handler)
@@ -231,17 +207,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// some situations, you should use the Click event instead to detect a
         /// button click.
         /// </remarks>
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(MouseButtonEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
 
             MouseButtonEventHandler handler = CalendarButtonMouseUp;
             if (null != handler)
@@ -260,11 +228,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         internal void SendMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             e.Handled = false;
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
         }
 
         /// <summary>

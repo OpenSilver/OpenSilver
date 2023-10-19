@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,27 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-using Windows.UI.Xaml.Input;
-#endif
+using CSHTML5;
+using CSHTML5.Internal;
 
 namespace DotNetForHtml5.Core // Important: do not rename this class without updating the Simulator as well! The class is called via reflection from the Simulator.
 {

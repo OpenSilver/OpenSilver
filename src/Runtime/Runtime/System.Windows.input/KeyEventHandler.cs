@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     /// <summary>
     /// Represents the method that handles the KeyUp and KeyDown events.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-#if MIGRATION
     public delegate void KeyEventHandler(object sender, KeyEventArgs e);
-#else
-    public delegate void KeyEventHandler(object sender, KeyRoutedEventArgs e);
-#endif
 }

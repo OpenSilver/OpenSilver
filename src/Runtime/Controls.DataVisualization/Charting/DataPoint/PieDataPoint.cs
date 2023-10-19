@@ -3,26 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Windows;
-
-#if MIGRATION
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a data point used for a pie series.
@@ -504,10 +489,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         public PieDataPoint()
         {
-#if !MIGRATION
-            DefaultStyleKey = typeof(PieDataPoint);
-#endif
-
             if (DesignerProperties.GetIsInDesignMode(this))
             {
                 // Create default design-mode-friendly settings
@@ -519,29 +500,18 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
                 };
             }
 
-#if MIGRATION
             DefaultStyleKey = typeof(PieDataPoint);
-#endif
         }
 
         /// <summary>
         /// Builds the visual tree for the PieDataPoint when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             if (null != SliceElement)
             {
-#if MIGRATION
                 SliceElement.MouseEnter -= SliceElement_MouseEnter;
                 SliceElement.MouseLeave -= SliceElement_MouseLeave;
-#else
-                SliceElement.PointerEntered -= SliceElement_MouseEnter;
-                SliceElement.PointerExited -= SliceElement_MouseLeave;
-#endif
             }
 
             base.OnApplyTemplate();
@@ -550,13 +520,8 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 
             if (null != SliceElement)
             {
-#if MIGRATION
                 SliceElement.MouseEnter += SliceElement_MouseEnter;
                 SliceElement.MouseLeave += SliceElement_MouseLeave;
-#else
-                SliceElement.PointerEntered += SliceElement_MouseEnter;
-                SliceElement.PointerExited += SliceElement_MouseLeave;
-#endif
             }
         }
 
@@ -564,11 +529,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Provides handling for the MouseEnter event.
         /// </summary>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
             // Do nothing because PieDataPoint handles SliceElement.MouseEnter instead
         }
@@ -577,11 +538,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Provides handling for the MouseLeave event.
         /// </summary>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
             // Do nothing because PieDataPoint handles SliceElement.MouseLeave instead
         }
@@ -591,18 +548,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="sender">Event source.</param>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         private void SliceElement_MouseEnter(object sender, MouseEventArgs e)
-#else
-        private void SliceElement_MouseEnter(object sender, PointerRoutedEventArgs e)
-#endif
         {
             // Defer to Control's default MouseEnter handling
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
         }
 
         /// <summary>
@@ -610,18 +559,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="sender">Event source.</param>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         private void SliceElement_MouseLeave(object sender, MouseEventArgs e)
-#else
-        private void SliceElement_MouseLeave(object sender, PointerRoutedEventArgs e)
-#endif
         {
             // Defer to Control's default MouseLeave handling            
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
         }
     }
 }

@@ -37,12 +37,6 @@ using System.Reflection;
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes",
     Scope = "namespace", Target = "Microsoft.Expression.Media.Effects")]
 
-// TODO: JKuhne- the following seem to be quirks with the current build of VS
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA904:DeclareTypesInMicrosoftOrSystemNamespace",
-    Scope = "namespace", Target = "XamlGeneratedNamespace")]
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes",
-    Scope = "namespace", Target = "XamlGeneratedNamespace")]
-
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1824:MarkAssembliesWithNeutralResourcesLanguage")]
 [assembly: System.Resources.NeutralResourcesLanguage("en", System.Resources.UltimateResourceFallbackLocation.MainAssembly)]
 

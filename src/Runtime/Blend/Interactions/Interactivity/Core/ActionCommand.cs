@@ -1,11 +1,12 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Windows.Input;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Windows.Input;
-
     /// <summary>
     /// A basic implementation of ICommand that wraps a method that takes no parameters or a method that takes one parameter.
     /// </summary>

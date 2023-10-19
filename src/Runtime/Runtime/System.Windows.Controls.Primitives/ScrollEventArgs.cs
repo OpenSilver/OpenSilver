@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Provides data for the Scroll event.

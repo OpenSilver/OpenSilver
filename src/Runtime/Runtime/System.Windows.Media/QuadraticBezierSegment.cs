@@ -11,18 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Creates a quadratic Bezier curve between two points in a <see cref="PathFigure"/>.

@@ -4,24 +4,10 @@
 // All other rights reserved.
 
 using System.Collections;
-
-#if MIGRATION
-using System.Windows;
 using System.Windows.Automation.Peers;
-using System.Windows.Controls;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines an item collection, selection members, and key handling for the
@@ -72,11 +58,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">A <see cref="T:System.Windows.Input.KeyEventArgs" />
         /// that contains data about the
         /// <see cref="E:System.Windows.UIElement.KeyDown" /> event.</param>
-#if MIGRATION
         void HandleKeyDown(KeyEventArgs e);
-#else
-        void HandleKeyDown(KeyRoutedEventArgs e);
-#endif
 
         /// <summary>
         /// Returns an automation peer for the selection adapter, for use by the

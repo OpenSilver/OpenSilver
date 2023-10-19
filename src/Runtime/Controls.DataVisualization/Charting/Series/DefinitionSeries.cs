@@ -3,31 +3,20 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Controls.DataVisualization.Charting.Primitives;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Implements a series that is defined by one or more instances of the DefinitionSeries class.
@@ -36,7 +25,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
     [ContentProperty("SeriesDefinitions")]
     [TemplatePart(Name = SeriesAreaName, Type = typeof(Grid))]
     [TemplatePart(Name = ItemContainerName, Type = typeof(DelegatingListBox))]
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class is maintainable.")]
     public abstract class DefinitionSeries : Control, ISeries, IAxisListener, IRangeProvider, IValueMarginProvider, IDataProvider, ISeriesHost
     {
         /// <summary>
@@ -126,7 +114,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Performs one-time initialization of DefinitionSeries data.
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static DefinitionSeries()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DefinitionSeries), new FrameworkPropertyMetadata(typeof(DefinitionSeries)));
@@ -138,17 +125,12 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         protected DefinitionSeries()
         {
-#if !MIGRATION
-            this.DefaultStyleKey = typeof(DefinitionSeries);
-#endif
             _seriesDefinitions.CollectionChanged += new NotifyCollectionChangedEventHandler(SeriesDefinitionsCollectionChanged);
             _seriesAreaChildrenListAdapter.Collection = _seriesDefinitions;
             _selectedItems.CollectionChanged += new NotifyCollectionChangedEventHandler(SelectedItemsCollectionChanged);
             DataItems = new ObservableCollection<DataItem>();
 
-#if MIGRATION
             this.DefaultStyleKey = typeof(DefinitionSeries);
-#endif
         }
 
         /// <summary>
@@ -181,8 +163,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">Old value.</param>
         /// <param name="newValue">New value.</param>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "oldValue", Justification = "Parameter is part of the pattern for DependencyProperty change handlers.")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "newValue", Justification = "Parameter is part of the pattern for DependencyProperty change handlers.")]
         private void OnDependentAxisChanged(IAxis oldValue, IAxis newValue)
         {
             if (null != ActualDependentAxis)
@@ -221,8 +201,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">Old value.</param>
         /// <param name="newValue">New value.</param>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "oldValue", Justification = "Parameter is part of the pattern for DependencyProperty change handlers.")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "newValue", Justification = "Parameter is part of the pattern for DependencyProperty change handlers.")]
         private void OnIndependentAxisChanged(IAxis oldValue, IAxis newValue)
         {
             if (null != ActualIndependentAxis)
@@ -326,8 +304,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets the collection of SeriesDefinitions that define the series.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "value", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
         public Collection<SeriesDefinition> SeriesDefinitions
         {
             get { return _seriesDefinitions; }
@@ -364,7 +340,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">Old value.</param>
         /// <param name="newValue">New value.</param>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "oldValue", Justification = "Parameter is part of the pattern for DependencyProperty change handlers.")]
         private void OnSelectionModeChanged(SeriesSelectionMode oldValue, SeriesSelectionMode newValue)
         {
             if (null != _itemContainer)
@@ -547,11 +522,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Builds the visual tree for the control when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             if (null != _itemContainer)
             {
@@ -924,7 +895,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="oldStartingIndex">Starting index of old items.</param>
         /// <param name="newItems">Sequence of new items.</param>
         /// <param name="newStartingIndex">Starting index of new items.</param>
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Linq is artificially increasing the rating.")]
         internal void SeriesDefinitionItemsSourceCollectionChanged(SeriesDefinition definition, NotifyCollectionChangedAction action, IList oldItems, int oldStartingIndex, IList newItems, int newStartingIndex)
         {
             if (NotifyCollectionChangedAction.Replace == action)
@@ -1280,7 +1250,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets a sequence of sequences of the dependent values associated with each independent value.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Nesting reflects the actual hierarchy of the data.")]
         protected IEnumerable<IEnumerable<double>> IndependentValueDependentValues
         {
             get
@@ -1507,11 +1476,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
-#if MIGRATION
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-#else
-            public object Convert(object value, Type targetType, object parameter, string language)
-#endif
             {
                 return _dataItems.Where(di => di.Value == value).FirstOrDefault();
             }
@@ -1525,11 +1490,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
             /// 
-#if MIGRATION
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-#else
-            public object ConvertBack(object value, Type targetType, object parameter, string language)
-#endif
             {
                 DataItem dataItem = value as DataItem;
                 return (null != dataItem) ? dataItem.Value : null;
@@ -1556,11 +1517,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
-#if MIGRATION
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-#else
-            public object Convert(object value, Type targetType, object parameter, string language)
-#endif
             {
                 bool isSelectionEnabled = false;
                 if (value is SeriesSelectionMode)
@@ -1578,11 +1535,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
-#if MIGRATION
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-#else
-            public object ConvertBack(object value, Type targetType, object parameter, string language)
-#endif
             {
                 throw new NotImplementedException();
             }
@@ -1591,7 +1544,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets the axes for the series as a series host.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Property exists as an interface requirement; implementation is unnecessary.")]
         ObservableCollection<IAxis> ISeriesHost.Axes
         {
             get { throw new NotImplementedException(); }
@@ -1608,7 +1560,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets the foreground elements for the series as a series host.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Property exists as an interface requirement; implementation is unnecessary.")]
         ObservableCollection<UIElement> ISeriesHost.ForegroundElements
         {
             get { throw new NotImplementedException(); }
@@ -1617,7 +1568,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets the background elements for the series as a series host.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Property exists as an interface requirement; implementation is unnecessary.")]
         ObservableCollection<UIElement> ISeriesHost.BackgroundElements
         {
             get { throw new NotImplementedException(); }
@@ -1636,7 +1586,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Event that is triggered when the available ResourceDictionaries change.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Property exists as an interface requirement; implementation is unnecessary.")]
         event EventHandler IResourceDictionaryDispenser.ResourceDictionariesChanged
         {
             add { throw new NotImplementedException(); }

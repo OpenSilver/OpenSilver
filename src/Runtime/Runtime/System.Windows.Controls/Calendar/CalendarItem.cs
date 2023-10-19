@@ -6,23 +6,9 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using Globalization = System.Globalization;
-
-#if MIGRATION
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Input;
-using MouseEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents the currently displayed month or year on a <see cref="Calendar" />.
@@ -226,22 +212,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 if (_monthView != null)
                 {
-#if MIGRATION
                     _monthView.MouseLeave -= MonthView_MouseLeave;
-#else
-                    _monthView.PointerExited -= MonthView_MouseLeave;
-#endif
                 }
 
                 _monthView = value;
 
                 if (_monthView != null)
                 {
-#if MIGRATION
                     _monthView.MouseLeave += MonthView_MouseLeave;
-#else
-                    _monthView.PointerExited += MonthView_MouseLeave;
-#endif
                 }
             }
         }
@@ -261,22 +239,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 if (_yearView != null)
                 {
-#if MIGRATION
                     _yearView.MouseLeave -= YearView_MouseLeave;
-#else
-                    _yearView.PointerExited -= YearView_MouseLeave;
-#endif
                 }
 
                 _yearView = value;
 
                 if (_yearView != null)
                 {
-#if MIGRATION
                     _yearView.MouseLeave += YearView_MouseLeave;
-#else
-                    _yearView.PointerExited += YearView_MouseLeave;
-#endif
                 }
             }
         }
@@ -365,11 +335,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Builds the visual tree for the <see cref="CalendarItem" /> when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -461,13 +427,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         cell.SetValue(Grid.ColumnProperty, j);
                         cell.CalendarDayButtonMouseDown += new MouseButtonEventHandler(Cell_MouseLeftButtonDown);
                         cell.CalendarDayButtonMouseUp += new MouseButtonEventHandler(Cell_MouseLeftButtonUp);
-#if MIGRATION
                         cell.MouseEnter += new MouseEventHandler(Cell_MouseEnter);
                         cell.MouseLeave += new MouseEventHandler(Cell_MouseLeave);
-#else
-                        cell.PointerEntered += new MouseEventHandler(Cell_MouseEnter);
-                        cell.PointerExited += new MouseEventHandler(Cell_MouseLeave);
-#endif
                         cell.Click += new RoutedEventHandler(Cell_Click);
                         MonthView.Children.Add(cell);
                     }
@@ -496,13 +457,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         month.SetValue(Grid.ColumnProperty, j);
                         month.CalendarButtonMouseDown += new MouseButtonEventHandler(Month_CalendarButtonMouseDown);
                         month.CalendarButtonMouseUp += new MouseButtonEventHandler(Month_CalendarButtonMouseUp);
-#if MIGRATION
                         month.MouseEnter += new MouseEventHandler(Month_MouseEnter);
                         month.MouseLeave += new MouseEventHandler(Month_MouseLeave);
-#else
-                        month.PointerEntered += new MouseEventHandler(Month_MouseEnter);
-                        month.PointerExited += new MouseEventHandler(Month_MouseLeave);
-#endif
                         YearView.Children.Add(month);
                         count++;
                     }
@@ -1185,11 +1141,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 CalendarDayButton b = sender as CalendarDayButton;
                 // The button is in Pressed state. Change the state to normal.
-#if MIGRATION
                 b.ReleaseMouseCapture();
-#else
-                b.ReleasePointerCapture(e.Pointer);
-#endif
+
                 // null check is added for unit tests
                 if (_downEventArg != null)
                 {
@@ -1593,11 +1546,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 CalendarButton b = sender as CalendarButton;
                 // The button is in Pressed state. Change the state to normal.
-#if MIGRATION
                 b.ReleaseMouseCapture();
-#else
-                b.ReleasePointerCapture(e.Pointer);
-#endif
+
                 if (_downEventArgYearView != null)
                 {
                     b.SendMouseLeftButtonUp(_downEventArgYearView);
@@ -1615,11 +1565,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (_lastCalendarDayButton != null)
             {
-#if MIGRATION
                 _lastCalendarDayButton.CaptureMouse();
-#else
-                _lastCalendarDayButton.CapturePointer(e.Pointer);
-#endif
             }
         }
 
@@ -1632,11 +1578,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (_lastCalendarButton != null)
             {
-#if MIGRATION
                 _lastCalendarButton.CaptureMouse();
-#else
-                _lastCalendarButton.CapturePointer(e.Pointer);
-#endif
             }
         }
 #endregion Mouse Events

@@ -1,11 +1,7 @@
 using System.IO;
 using System.Security;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     [OpenSilver.NotImplemented]
     public sealed partial class SaveFileDialog

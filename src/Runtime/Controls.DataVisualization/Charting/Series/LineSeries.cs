@@ -4,22 +4,13 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 #if !DEFINITION_SERIES_COMPATIBILITY_MODE
 
-#if MIGRATION
-using System.Windows.Media;
-using System.Windows.Shapes;
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that contains a data series to be rendered in X/Y 
@@ -30,7 +21,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
     [StyleTypedProperty(Property = "LegendItemStyle", StyleTargetType = typeof(LegendItem))]
     [StyleTypedProperty(Property = "PolylineStyle", StyleTargetType = typeof(Polyline))]
     [TemplatePart(Name = DataPointSeries.PlotAreaName, Type = typeof(Canvas))]
-    [SuppressMessage("Microsoft.Maintainability", "CA1501:AvoidExcessiveInheritance", Justification = "Depth of hierarchy is necessary to avoid code duplication.")]
     public partial class LineSeries : LineAreaBaseSeries<LineDataPoint>
     {
         #region public PointCollection Points
@@ -59,7 +49,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Gets or sets the style of the Polyline object that follows the data 
         /// points.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
         public Style PolylineStyle
         {
             get { return GetValue(PolylineStyleProperty) as Style; }
@@ -69,7 +58,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the PolylineStyle dependency property.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
         public static readonly DependencyProperty PolylineStyleProperty =
             DependencyProperty.Register(
                 "PolylineStyle",

@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Represents the method that will handle the <c>NavigationService.Navigated</c>

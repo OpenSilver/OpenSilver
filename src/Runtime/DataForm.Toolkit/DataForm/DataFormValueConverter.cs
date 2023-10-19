@@ -7,21 +7,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Value converter for the DataForm.
@@ -37,11 +26,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="parameter">The parameter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The converted value.</returns>
-#if MIGRATION
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-#else
-        public object Convert(object value, Type targetType, object parameter, string culture)
-#endif
         {
             return value;
         }
@@ -54,11 +39,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="parameter">The parameter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The converted value.</returns>
-#if MIGRATION
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-#else
-        public object ConvertBack(object value, Type targetType, object parameter, string culture)
-#endif
         {
             if (targetType != null && IsNullableType(targetType))
             {

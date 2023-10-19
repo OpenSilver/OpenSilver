@@ -11,20 +11,15 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using CSHTML5.Types;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
+using CSHTML5.Internal;
+using CSHTML5.Types;
+using OpenSilver.Internal;
 
 namespace OpenSilver
 {

@@ -1,17 +1,12 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Windows.Interactivity;
+using System.Windows;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Windows.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// Represents a trigger that performs actions when the bound data have changed. 
     /// </summary>

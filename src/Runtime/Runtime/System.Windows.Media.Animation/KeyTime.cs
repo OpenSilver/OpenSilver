@@ -11,18 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Specifies when a particular key frame should take place during an animation.
     /// </summary>
-    public partial struct KeyTime
+    public struct KeyTime
     {
         internal KeyTime(TimeSpan timeSpan)
         {

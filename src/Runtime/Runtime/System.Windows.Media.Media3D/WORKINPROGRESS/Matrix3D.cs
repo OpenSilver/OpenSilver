@@ -11,16 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media.Media3D
-#else
-namespace Windows.UI.Xaml.Media.Media3D
-#endif
 {
 	[OpenSilver.NotImplemented]
-    public partial struct Matrix3D : IFormattable
+    public struct Matrix3D : IFormattable
     {
         static Matrix3D()
         {

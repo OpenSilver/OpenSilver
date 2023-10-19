@@ -15,11 +15,7 @@ using System;
 using System.ComponentModel;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     public enum WhenToCallPropertyChangedEnum
     {

@@ -11,30 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Windows.Input;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a scrollable area that can contain other visible elements.
@@ -326,11 +309,7 @@ namespace Windows.UI.Xaml.Controls
             element.SetValue(VerticalScrollBarVisibilityProperty, verticalScrollBarVisibility);
         }
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -765,17 +744,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(MouseButtonEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
 
             if (!e.Handled && Focus())
             {
@@ -793,32 +764,16 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(MouseButtonEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
 
             _touchInfo = null;
         }
 
-#if MIGRATION
         protected override void OnMouseMove(MouseEventArgs e)
-#else
-        protected override void OnPointerMoved(MouseButtonEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseMove(e);
-#else
-            base.OnPointerMoved(e);
-#endif
 
             if (!e.IsTouchEvent || Pointer.INTERNAL_captured is not null || ScrollInfo is null || _touchInfo is null)
             {
@@ -843,17 +798,9 @@ namespace Windows.UI.Xaml.Controls
             _touchInfo.Y = position.Y;
         }
 
-#if MIGRATION
         protected override void OnMouseWheel(MouseWheelEventArgs e)
-#else
-        protected override void OnPointerWheelChanged(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseWheel(e);
-#else
-            base.OnPointerWheelChanged(e);
-#endif
 
             if (e.Handled || ScrollInfo is null || e.Delta == 0)
             {

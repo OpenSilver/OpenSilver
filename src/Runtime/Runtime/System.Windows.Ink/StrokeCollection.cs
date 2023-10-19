@@ -11,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Ink
-#else
-namespace Windows.UI.Xaml.Ink
-#endif
 {
     /// <summary>
     /// Represents a collection of <see cref="Stroke"/> objects.

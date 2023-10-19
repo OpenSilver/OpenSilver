@@ -15,14 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenSilver.IO;
-
-#if MIGRATION
 using System.Windows;
-#else
-using System;
-using Windows.UI.Xaml;
-#endif
+using OpenSilver.IO;
 
 namespace OpenSilver.Controls
 {

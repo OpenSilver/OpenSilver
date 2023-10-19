@@ -15,23 +15,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Data;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Threading;
 using System.Windows.Data;
-#else
-using Windows.UI.Core;
-using Windows.UI.Xaml.Data;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents an object that participates in the dependency property system. DependencyObject
@@ -723,21 +713,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets the CoreDispatcher that this object is associated with.
         /// </summary>
-#if MIGRATION
-        public Dispatcher Dispatcher
-#else
-        public CoreDispatcher Dispatcher
-#endif
-        {
-            get
-            {
-#if MIGRATION
-                return Dispatcher.CurrentDispatcher;
-#else
-                return CoreDispatcher.CurrentDispatcher;
-#endif
-            }
-        }
+        public Dispatcher Dispatcher => Dispatcher.CurrentDispatcher;
 
 
         #region Binding related elements

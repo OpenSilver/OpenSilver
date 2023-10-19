@@ -17,20 +17,10 @@ using System.ComponentModel;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Applies a value to a property in a Style.

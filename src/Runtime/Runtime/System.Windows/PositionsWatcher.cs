@@ -14,18 +14,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Threading;
-#else
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     internal sealed class PositionsWatcher
     {

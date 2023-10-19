@@ -11,44 +11,22 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Globalization;
+using System.Windows.Controls.Primitives;
 using CSHTML5;
 using CSHTML5.Internal;
 
-#if MIGRATION
-using System.Windows.Controls.Primitives;
-#else
-using System.Windows.Input;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.Foundation;
-using Windows.UI.Input;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     /// <summary>
     /// Provides event data for pointer message events related to specific user interface
     /// elements, such as PointerPressed.
     /// </summary>
-#if MIGRATION
     public class MouseEventArgs : RoutedEventArgs
-#else
-    public class PointerRoutedEventArgs : RoutedEventArgs
-#endif
     {
         internal override void InvokeHandler(Delegate handler, object target)
         {
-#if MIGRATION
             ((MouseEventHandler)handler)(target, this);
-#else
-            ((PointerEventHandler)handler)(target, this);
-#endif
         }
 
         internal double _pointerAbsoluteX = 0d; // Note: they are actually "relative" to the XAML Window root.
@@ -167,24 +145,8 @@ namespace Windows.UI.Xaml.Input
         /// of reference of the overall window. If a non-null relativeTo was passed,
         /// the coordinates are relative to the object referenced by relativeTo.
         /// </returns>
-#if MIGRATION
         public Point GetPosition(UIElement relativeTo)
             => GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
-#else
-        public PointerPoint GetCurrentPoint(UIElement relativeTo)
-        {
-            PointerPoint pointerPoint = new PointerPoint();
-            pointerPoint.Properties.MouseWheelDelta = PointerPointProperties.GetPointerWheelDelta(UIEventArg);
-            pointerPoint.Position = GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
-
-            return pointerPoint;
-        }
-
-        internal Point GetPosition(UIElement relativeTo)
-            => GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
-
-        internal int Delta => GetCurrentPoint(null).Properties.MouseWheelDelta;
-#endif
 
         internal static Point GetPosition(Point origin, UIElement relativeTo)
         {
@@ -216,9 +178,7 @@ namespace Windows.UI.Xaml.Input
             return new Point(0.0, 0.0);
         }
 
-#if MIGRATION
         [OpenSilver.NotImplemented]
         public int Delta { get; private set; }
-#endif
     }
 }

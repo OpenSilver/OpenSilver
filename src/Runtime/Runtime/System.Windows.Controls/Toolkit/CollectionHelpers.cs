@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// A set of extension methods for manipulating collections.

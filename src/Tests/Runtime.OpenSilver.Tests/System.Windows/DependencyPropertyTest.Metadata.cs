@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Runtime.CompilerServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if MIGRATION
 namespace System.Windows.Tests;
-#else
-namespace Windows.UI.Xaml.Tests;
-#endif
 
 public partial class DependencyPropertyTest
 {

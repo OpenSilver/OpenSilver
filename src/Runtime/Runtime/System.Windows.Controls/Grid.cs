@@ -11,24 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines a flexible grid area that consists of columns and rows. Child elements

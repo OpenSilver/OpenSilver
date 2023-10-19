@@ -11,35 +11,15 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
 using System.Windows.Input;
 using System.ComponentModel;
-
-#if MIGRATION
 using System.Windows.Media;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Text;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Input;
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents the base class for UI elements that use a ControlTemplate to define
@@ -216,13 +196,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(FontStyle),
                 typeof(FontStyle),
                 typeof(Control),
-                new FrameworkPropertyMetadata(
-#if MIGRATION
-                    FontStyles.Normal
-#else
-                    FontStyle.Normal
-#endif
-                    , FrameworkPropertyMetadataOptions.AffectsMeasure)
+                new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
@@ -336,7 +310,6 @@ namespace Windows.UI.Xaml.Controls
         // TEXTDECORATION
         //-----------------------
         // Note: this was moved from TextBlock because it is more practical for styling.
-#if MIGRATION
         /// <summary>
         /// Gets or sets the text decorations (underline, strikethrough...).
         /// </summary>
@@ -347,14 +320,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.TextDecorations"/> dependency property.
+        /// Identifies the <see cref="TextDecorations"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TextDecorationsProperty = 
             DependencyProperty.Register(
                 nameof(TextDecorations),
                 typeof(TextDecorationCollection),
                 typeof(Control),
-                new FrameworkPropertyMetadata(null)
+                new FrameworkPropertyMetadata((object)null)
                 {
                     MethodToUpdateDom = static (d, newValue) =>
                     {
@@ -362,47 +335,6 @@ namespace Windows.UI.Xaml.Controls
                         domStyle.textDecoration = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
                     },
                 });
-#else
-        /// <summary>
-        /// Gets or sets the text decorations (underline, strikethrough...).
-        /// </summary>
-        public TextDecorations? TextDecorations
-        {
-            get { return (TextDecorations?)GetValue(TextDecorationsProperty); }
-            set { SetValue(TextDecorationsProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the TextDecorations dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TextDecorationsProperty =
-            DependencyProperty.Register(
-                nameof(TextDecorations), 
-                typeof(TextDecorations?), 
-                typeof(Control), 
-                new PropertyMetadata((object)null)
-                {
-                    MethodToUpdateDom = static (d, newValue) =>
-                    {
-                        var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((Control)d).INTERNAL_OuterDomElement);
-                        var newTextDecoration = (TextDecorations?)newValue;
-                        if (newTextDecoration.HasValue)
-                        {
-                            domStyle.textDecoration = newTextDecoration switch
-                            {
-                                Text.TextDecorations.OverLine => "overline",
-                                Text.TextDecorations.Strikethrough => "line-through",
-                                Text.TextDecorations.Underline => "underline",
-                                _ => "",
-                            };
-                        }
-                        else
-                        {
-                            domStyle.textDecoration = "";
-                        }
-                    },
-                });
-#endif
 
         //-----------------------
         // PADDING
@@ -668,11 +600,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         internal virtual bool HandlesScrolling => false;
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

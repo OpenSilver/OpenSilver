@@ -12,14 +12,8 @@
 \*====================================================================================*/
 
 using System;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Markup;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Markup;
-#endif
 
 namespace OpenSilver.Internal
 {

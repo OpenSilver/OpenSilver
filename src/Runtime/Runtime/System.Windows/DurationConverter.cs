@@ -15,11 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides type conversion support for the <see cref="Duration"/> structure.

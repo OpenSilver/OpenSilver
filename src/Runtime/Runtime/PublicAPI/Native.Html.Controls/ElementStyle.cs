@@ -19,12 +19,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.UI;
-using Windows.UI.Xaml.Media;
-#endif
 
 namespace CSHTML5.Native.Html.Controls
 {

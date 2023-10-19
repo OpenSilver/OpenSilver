@@ -11,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     ///Represents a collection of <see cref="TimelineMarker"/> objects that can be individually accessed by index.

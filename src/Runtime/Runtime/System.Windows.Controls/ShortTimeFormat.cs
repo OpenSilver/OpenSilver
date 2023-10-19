@@ -6,11 +6,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents the short time format used for parsing and formatting.

@@ -1,8 +1,4 @@
-﻿#if MIGRATION
-namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
+﻿namespace System.Windows
 {
 	/// <summary>Defines constants that indicate the installation state of an application that is configured to run outside the browser.</summary>
 	public enum InstallState

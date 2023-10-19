@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Xaml;
 using System.Xaml.Schema;
-
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
 namespace System.Windows.Markup
 {

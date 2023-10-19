@@ -11,16 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using OpenSilver.Internal.Media;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a family of related fonts.

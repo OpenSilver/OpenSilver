@@ -3,26 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-#endif
-
-#if OPENSILVER
 using Properties = OpenSilver.Controls.Properties;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Exposes AccordionItem types to UI Automation.

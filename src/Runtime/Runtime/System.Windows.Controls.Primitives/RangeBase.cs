@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents an element that has a value within a specific range, such as the 
@@ -290,11 +285,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Occurs when the range value changes.
         /// </summary> 
-#if MIGRATION
         public event RoutedPropertyChangedEventHandler<double> ValueChanged;
-#else
-        public event RangeBaseValueChangedEventHandler ValueChanged;
-#endif
 
         /// <summary> 
         /// Initializes a new instance of the <see cref="RangeBase"/> class.
@@ -340,11 +331,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </param>
         protected virtual void OnValueChanged(double oldValue, double newValue)
         {
-#if MIGRATION
             ValueChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
-#else
-            ValueChanged?.Invoke(this, new RangeBaseValueChangedEventArgs(oldValue, newValue));
-#endif
         }
 
         /// <summary> 

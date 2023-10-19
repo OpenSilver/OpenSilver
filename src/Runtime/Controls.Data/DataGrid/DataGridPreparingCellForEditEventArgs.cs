@@ -3,13 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-using System;
-
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides data for the <see cref="E:System.Windows.Controls.DataGrid.PreparingCellForEdit" /> event.
@@ -24,8 +18,8 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="row">The row that contains the cell to be edited.</param>
         /// <param name="editingEventArgs">Information about the user gesture that caused the cell to enter edit mode.</param>
         /// <param name="editingElement">The element that the column displays for a cell in editing mode.</param>
-        public DataGridPreparingCellForEditEventArgs(DataGridColumn column, 
-                                                     DataGridRow row, 
+        public DataGridPreparingCellForEditEventArgs(DataGridColumn column,
+                                                     DataGridRow row,
                                                      RoutedEventArgs editingEventArgs,
                                                      FrameworkElement editingElement)
         {

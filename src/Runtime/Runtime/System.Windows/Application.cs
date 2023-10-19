@@ -21,35 +21,20 @@ using System.Threading.Tasks;
 using System.Text;
 using System.Windows;
 using System.Windows.Resources;
-using CSHTML5;
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
 using System.Text.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Xaml.Markup;
-
-#if MIGRATION
 using System.ApplicationModel.Activation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-#else
-using Windows.ApplicationModel.Activation;
-using Windows.UI.Core;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Dispatcher = Windows.UI.Core.CoreDispatcher;
-#endif
+using CSHTML5;
+using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Encapsulates the app and its available services.
@@ -113,13 +98,6 @@ namespace Windows.UI.Xaml
 
             // Keep a reference to the startup assembly:
             StartupAssemblyInfo.StartupAssembly = this.GetType().Assembly;
-
-            // Remember whether we are in "SL Migration" mode or not:
-#if MIGRATION
-            OpenSilver.Interop.ExecuteJavaScriptVoid(@"document.isSLMigration = true", false);
-#else
-            OpenSilver.Interop.ExecuteJavaScriptVoid(@"document.isSLMigration = false", false);
-#endif
 
             Window.Current = _mainWindow = new Window(true);
             _mainWindow.AttachToDomElement(_rootDiv);

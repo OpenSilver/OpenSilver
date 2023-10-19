@@ -3,30 +3,14 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
 
-#endif
-
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Reservoir of attached properties for use by extension methods that require non-static information about objects.
@@ -150,7 +134,7 @@ namespace Windows.UI.Xaml.Controls
                 // Does the list have anything in it?
 
                 IEnumerator en = list.GetEnumerator();
-                if (en.MoveNext() && en.Current != null) 
+                if (en.MoveNext() && en.Current != null)
                 {
                     return en.Current.GetType();
                 }

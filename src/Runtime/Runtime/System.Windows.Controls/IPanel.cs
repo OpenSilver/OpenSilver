@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Controls;
-#else
-namespace Windows.UI.Xaml.Controls;
-#endif
 
 internal interface IPanel
 {

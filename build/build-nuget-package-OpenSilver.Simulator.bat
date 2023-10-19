@@ -6,8 +6,6 @@ PAUSE
 EXIT
 )
 
-
-
 rem Define the escape character for colored text
 for /F %%a in ('"prompt $E$S & echo on & for %%b in (1) do rem"') do set "ESC=%%a"
 
@@ -34,8 +32,8 @@ nuget restore ../src/OpenSilver.sln -v quiet
 echo. 
 echo %ESC%[95mBuilding and packaging %ESC%[0mOpenSilver.Simulator %ESC%[0m
 echo. 
-msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly
-nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver" -BasePath "%batDirectory%" -Properties "PackageVersion=%PackageVersion%;RepositoryUrl=https://github.com/OpenSilver/OpenSilver"
+msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=Release -clp:ErrorsOnly
+nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver" -BasePath "%batDirectory%" -Properties "PackageVersion=%PackageVersion%;RepositoryUrl=https://github.com/OpenSilver/OpenSilver;Configuration=Release"
 
 explorer "output\OpenSilver"
 

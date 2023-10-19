@@ -11,30 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using CSHTML5;
 
-#if !MIGRATION
-using Key = Windows.System.VirtualKey;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     /// <summary>
     /// Provides data for the KeyUp and KeyDown routed events, as well as related
     /// attached and Preview events.
     /// </summary>
-#if MIGRATION
     public sealed class KeyEventArgs : RoutedEventArgs
-#else
-    public sealed class KeyRoutedEventArgs : RoutedEventArgs
-#endif
     {
         internal override void InvokeHandler(Delegate handler, object target)
         {

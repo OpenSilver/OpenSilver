@@ -382,8 +382,7 @@
              Importance="normal"/>
 
     <PropertyGroup>
-      <_OpenSilverPkgPath Condition="'$(IsSLMigration)' == 'True'">$(PkgOpenSilver)</_OpenSilverPkgPath>
-      <_OpenSilverPkgPath Condition="'$(IsSLMigration)' != 'True'">$(PkgOpenSilver_UWPCompatible)</_OpenSilverPkgPath>
+      <_OpenSilverPkgPath>$(PkgOpenSilver)</_OpenSilverPkgPath>
     </PropertyGroup>
 	  
 	  <Updates Condition="'$(IsBrowserProject)'=='True' AND '$(SkipOpenSilverUpdates)'==''"
@@ -398,7 +397,6 @@
     <BeforeXamlPreprocessor
       Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
       IsSecondPass="$(IsSecondPass)"
-      IsSLMigration="$(IsSLMigration)"      
       Flags="$(Flags)"
       Language="$(Language)"
       ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
@@ -416,7 +414,6 @@
     FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     IsSecondPass="$(IsSecondPass)"
-    IsSLMigration="$(IsSLMigration)"
     OverrideOutputOnlyIfSourceHasChanged="false"
     OutputRootPath="$(Cshtml5OutputRootPath)"
     OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
@@ -436,7 +433,6 @@
     FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     IsSecondPass="$(IsSecondPass)"
-    IsSLMigration="$(IsSLMigration)"
     OverrideOutputOnlyIfSourceHasChanged="false"
     OutputRootPath="$(Cshtml5OutputRootPath)"
     OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
@@ -632,7 +628,6 @@
     <BeforeXamlPreprocessor
       Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
       IsSecondPass="false"
-      IsSLMigration="$(IsSLMigration)"
       Flags="$(Flags)"
       Language="$(Language)"
       ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
@@ -648,7 +643,6 @@
     FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     IsSecondPass="false"
-    IsSLMigration="$(IsSLMigration)"
     OverrideOutputOnlyIfSourceHasChanged="false"
     OutputRootPath="$(Cshtml5OutputRootPath)"
     OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
@@ -668,7 +662,6 @@
     FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     IsSecondPass="false"
-    IsSLMigration="$(IsSLMigration)"
     OverrideOutputOnlyIfSourceHasChanged="false"
     OutputRootPath="$(Cshtml5OutputRootPath)"
     OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"

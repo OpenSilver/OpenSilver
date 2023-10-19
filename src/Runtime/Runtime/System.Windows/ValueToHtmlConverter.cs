@@ -19,11 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     public delegate object ValueToHtmlConverter(DependencyObject d, object value);
 }

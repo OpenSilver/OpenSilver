@@ -12,14 +12,8 @@
 \*====================================================================================*/
 
 using System;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
 namespace OpenSilver
 {

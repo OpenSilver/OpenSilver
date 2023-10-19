@@ -14,11 +14,7 @@
 using System;
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows;
-#else
-namespace Windows.UI.Xaml;
-#endif
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IUIElement : IDependencyObject

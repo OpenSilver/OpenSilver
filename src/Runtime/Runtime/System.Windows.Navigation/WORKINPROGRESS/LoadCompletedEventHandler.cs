@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,30 +11,19 @@
 *  
 \*====================================================================================*/
 
+using System.Windows.Controls;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
-    //
-    // Summary:
-    //     Represents the method that will handle the System.Windows.Controls.WebBrowser.LoadCompleted
-    //     event.
-    //
-    // Parameters:
-    //   sender:
-    //     The source of the event.
-    //
-    //   e:
-    //     The event data.
+    /// <summary>
+    /// Represents the method that will handle the <see cref="WebBrowser.LoadCompleted"/> event.
+    /// </summary>
+    /// <param name="sender">
+    /// The source of the event.
+    /// </param>
+    /// <param name="e">
+    /// The event data.
+    /// </param>
     public delegate void LoadCompletedEventHandler(object sender, NavigationEventArgs e);
 }
 

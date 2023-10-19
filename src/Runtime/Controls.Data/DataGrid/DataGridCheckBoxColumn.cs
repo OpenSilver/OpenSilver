@@ -5,20 +5,9 @@
 
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System;
-#if MIGRATION
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Input;
-using Windows.Foundation;
-#endif
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> column that hosts 
@@ -32,7 +21,7 @@ namespace Windows.UI.Xaml.Controls
         #region Constants
 
         private const string DATAGRIDCHECKBOXCOLUMN_isThreeStateName = "IsThreeState";
-        
+
         #endregion Constants
 
         #region Data
@@ -133,7 +122,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A new, read-only <see cref="T:System.Windows.Controls.CheckBox" /> control that is bound to the column's <see cref="P:System.Windows.Controls.DataGridBoundColumn.Binding" /> property value.
         /// </returns>
-       protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
         {
             bool isEnabled = false;
             CheckBox checkBoxElement = new CheckBox();
@@ -176,20 +165,12 @@ namespace Windows.UI.Xaml.Controls
             if (editingCheckBox != null)
             {
                 bool? uneditedValue = editingCheckBox.IsChecked;
-#if MIGRATION
                 MouseButtonEventArgs mouseButtonEventArgs = editingEventArgs as MouseButtonEventArgs;
-#else
-                PointerRoutedEventArgs mouseButtonEventArgs = editingEventArgs as PointerRoutedEventArgs;
-#endif
                 bool editValue = false;
                 if (mouseButtonEventArgs != null)
                 {
-#if MIGRATION
                     // Editing was triggered by a mouse click
                     Point position = mouseButtonEventArgs.GetPosition(editingCheckBox);
-#else
-                    Point position = mouseButtonEventArgs.GetCurrentPoint(editingCheckBox).Position;
-#endif
                     Rect rect = new Rect(0, 0, editingCheckBox.ActualWidth, editingCheckBox.ActualHeight);
                     editValue = rect.Contains(position);
                 }
@@ -226,7 +207,7 @@ namespace Windows.UI.Xaml.Controls
             }
             return false;
         }
-        
+
         /// <summary>
         /// Called by the DataGrid control when this column asks for its elements to be
         /// updated, because its CheckBoxContent or IsThreeState property changed.
@@ -252,9 +233,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-#region Private Methods
+        #region Private Methods
 
         private void Columns_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -271,8 +252,8 @@ namespace Windows.UI.Xaml.Controls
         private void ConfigureCheckBox(CheckBox checkBox)
         {
             checkBox.HorizontalAlignment = HorizontalAlignment.Center;
-            checkBox.VerticalAlignment   = VerticalAlignment.Center;
-            checkBox.IsThreeState        = this.IsThreeState;
+            checkBox.VerticalAlignment = VerticalAlignment.Center;
+            checkBox.IsThreeState = this.IsThreeState;
             if (this.Binding != null || !DesignerProperties.IsInDesignTool)
             {
                 checkBox.SetBinding(this.BindingTarget, this.Binding);
@@ -295,7 +276,7 @@ namespace Windows.UI.Xaml.Controls
             }
             return false;
         }
- 
+
         private void OwningGrid_CurrentCellChanged(object sender, EventArgs e)
         {
             if (_currentCheckBox != null)
@@ -317,7 +298,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-#if MIGRATION
+
         private void OwningGrid_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space && this.OwningGrid != null &&
@@ -337,27 +318,6 @@ namespace Windows.UI.Xaml.Controls
             }
             _beganEditWithKeyboard = false;
         }
-#else
-        private void OwningGrid_KeyDown(object sender,KeyRoutedEventArgs e)
-        {
-            if (e.Key == System.VirtualKey.Space && this.OwningGrid != null &&
-                this.OwningGrid.CurrentColumn == this)
-            {
-                DataGridRow row = this.OwningGrid.DisplayData.GetDisplayedElement(this.OwningGrid.CurrentSlot) as DataGridRow;
-                if (row != null)
-                {
-                    CheckBox checkBox = this.GetCellContent(row) as CheckBox;
-                    if (checkBox == _currentCheckBox)
-                    {
-                        _beganEditWithKeyboard = true;
-                        this.OwningGrid.BeginEdit();
-                        return;
-                    }
-                }
-            }
-            _beganEditWithKeyboard = false;
-        }
-#endif
 
         private void OwningGrid_LoadingRow(object sender, DataGridRowEventArgs e)
         {
@@ -383,6 +343,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
     }
 }

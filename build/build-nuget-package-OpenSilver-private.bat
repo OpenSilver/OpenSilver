@@ -31,22 +31,14 @@ echo.
 nuget restore ../src/OpenSilver.sln -v quiet
 
 echo. 
-echo %ESC%[95mBuilding %ESC%[0mSL %ESC%[95mconfiguration%ESC%[0m
+echo %ESC%[95mBuilding %ESC%[0mRelease %ESC%[95mconfiguration%ESC%[0m
 echo. 
-msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+msbuild slnf/OpenSilver.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
+
 echo. 
 echo %ESC%[95mPacking %ESC%[0mOpenSilver %ESC%[95mNuGet package%ESC%[0m
 echo. 
-nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=%CURRENT_VERSION_PREFIX%%PackageVersion%;Configuration=SL;Target=OpenSilver;RepositoryUrl=https://github.com/OpenSilver/OpenSilver"
-
-echo. 
-echo %ESC%[95mBuilding %ESC%[0mUWP %ESC%[95mconfiguration%ESC%[0m
-echo. 
-msbuild slnf/OpenSilver.slnf -p:Configuration=UWP -clp:ErrorsOnly -restore
-echo. 
-echo %ESC%[95mPacking %ESC%[0mOpenSilver.UWPCompatible %ESC%[95mNuGet package%ESC%[0m
-echo. 
-nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver.UWPCompatible;PackageVersion=%CURRENT_VERSION_PREFIX%%PackageVersion%;Configuration=UWP;Target=OpenSilver.UwpCompatible;RepositoryUrl=https://github.com/OpenSilver/OpenSilver"
+nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=%CURRENT_VERSION_PREFIX%%PackageVersion%;Configuration=Release;RepositoryUrl=https://github.com/OpenSilver/OpenSilver"
 
 explorer "output\OpenSilver"
 

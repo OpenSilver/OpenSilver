@@ -14,15 +14,7 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if !MIGRATION
-using System;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Tests
-#else
-namespace Windows.UI.Xaml.Tests
-#endif
 {
     [TestClass]
     public class DependencyObjectCollectionTest

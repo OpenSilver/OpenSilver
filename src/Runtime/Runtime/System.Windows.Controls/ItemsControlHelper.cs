@@ -3,36 +3,22 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// The ItemContainerGenerator provides useful utilities for ItemsControls.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    internal sealed partial class ItemsControlHelper
+    internal sealed class ItemsControlHelper
     {
         /// <summary>
         /// Gets or sets the ItemsControl being tracked by the

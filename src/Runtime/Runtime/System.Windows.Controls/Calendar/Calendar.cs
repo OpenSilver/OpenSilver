@@ -7,29 +7,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that enables a user to select a date by using a
@@ -1464,11 +1447,7 @@ namespace Windows.UI.Xaml.Controls
             GotFocus += new RoutedEventHandler(Calendar_GotFocus);
             LostFocus += new RoutedEventHandler(Calendar_LostFocus);
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-#if MIGRATION
             MouseLeftButtonUp += new MouseButtonEventHandler(Calendar_MouseLeftButtonUp);
-#else
-            PointerReleased += new MouseButtonEventHandler(Calendar_MouseLeftButtonUp);
-#endif
             BlackoutDates = new CalendarBlackoutDatesCollection(this);
             SelectedDates = new SelectedDatesCollection(this);
             RemovedItems = new Collection<DateTime>();
@@ -1478,11 +1457,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the <see cref="Calendar" /> when a new
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -2201,18 +2176,10 @@ namespace Windows.UI.Xaml.Controls
         /// Default mouse wheel handler for the calendar control.
         /// </summary>
         /// <param name="e">Mouse wheel event args.</param>
-#if MIGRATION
-
         protected override void OnMouseWheel(MouseWheelEventArgs e)
-#else
-        protected override void OnPointerWheelChanged(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseWheel(e);
-#else
-            base.OnPointerWheelChanged(e);
-#endif
+
             if (!e.Handled)
             {
                 bool ctrl, shift;

@@ -7,7 +7,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -15,26 +14,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Automation;
 using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation;
-using Windows.UI.Xaml.Controls.Common;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Contains a control and generates labels and descriptions for it.
@@ -997,11 +983,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Applies the template for this field.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -1292,11 +1274,7 @@ namespace Windows.UI.Xaml.Controls
             labelGrid.SetBinding(FrameworkElement.HorizontalAlignmentProperty, new Binding("HorizontalAlignment") { Source = this.InternalLabel });
             grid.Children.Add(labelGrid);
 
-#if MIGRATION
             this.InternalLabel.MouseLeftButtonDown += new MouseButtonEventHandler(this.OnLabelMouseLeftButtonDown);
-#else
-            this.InternalLabel.PointerPressed += new PointerEventHandler(this.OnLabelMouseLeftButtonDown);
-#endif
             this.InternalLabel.SizeChanged += new SizeChangedEventHandler(this.OnLabelSizeChanged);
 
             if (this.Content != null)
@@ -1548,11 +1526,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The element.</param>
         /// <param name="e">The event args.</param>
-#if MIGRATION
         private void OnLabelMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-#else
-        private void OnLabelMouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
-#endif
         {
             e.Handled = true;
 

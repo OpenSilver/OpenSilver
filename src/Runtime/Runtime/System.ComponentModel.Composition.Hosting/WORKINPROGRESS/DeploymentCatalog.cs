@@ -3,12 +3,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace System.ComponentModel.Composition.Hosting
 {

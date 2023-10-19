@@ -3,7 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,21 +10,17 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal static class TypeHelper
     {
-#region Internal Fields
+        #region Internal Fields
 
         internal const char LeftIndexerToken = '[';
         internal const char PropertyNameSeparator = '.';
         internal const char RightIndexerToken = ']';
 
-#endregion
+        #endregion
 
         // Methods
         private static Type FindGenericType(Type definition, Type type)

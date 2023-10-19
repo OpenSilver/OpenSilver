@@ -16,25 +16,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-#if OPENSILVER
-using OpenSilver; 
-#endif
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
-#endif
+using OpenSilver;
 
 namespace CSHTML5.Internal
 {

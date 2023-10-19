@@ -3,28 +3,16 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
-using System.Windows;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// This set of internal extension methods provide general solutions and 
     /// utilities in a small enough number to not warrant a dedicated extension
     /// methods class.
     /// </summary>
-    internal static partial class Extensions
+    internal static class Extensions
     {
         /// <summary>
         /// Inverts a Matrix. The Invert functionality on the Matrix type is 

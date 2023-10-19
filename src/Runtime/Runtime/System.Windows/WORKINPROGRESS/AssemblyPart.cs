@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,11 @@
 *  
 \*====================================================================================*/
 
-
 using System.IO;
 using System.Reflection;
 using System.Security;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
 	[OpenSilver.NotImplemented]
     public sealed partial class AssemblyPart : DependencyObject

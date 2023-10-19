@@ -13,25 +13,13 @@
 
 using System;
 using System.Diagnostics;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     public partial class UIElement
     {

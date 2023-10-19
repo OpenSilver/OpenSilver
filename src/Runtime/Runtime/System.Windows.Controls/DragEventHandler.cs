@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace Microsoft.Windows
-#else
-namespace System.Windows
-#endif
 {
     /// <summary>
     /// Represents the method that will handle the UIElement.DragEnter,

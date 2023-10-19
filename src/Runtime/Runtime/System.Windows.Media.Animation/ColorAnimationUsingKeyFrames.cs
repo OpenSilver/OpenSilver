@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,31 +11,20 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Markup;
-using CSHTML5;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else 
-using Windows.UI.Xaml.Controls;
-#endif
+using CSHTML5;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// This class is used to animate a Color property value along a set of key frames.
     /// </summary>
-    [ContentProperty("KeyFrames")]
-    public partial class ColorAnimationUsingKeyFrames : AnimationTimeline
+    [ContentProperty(nameof(KeyFrames))]
+    public class ColorAnimationUsingKeyFrames : AnimationTimeline
     {
         private ColorKeyFrameCollection _keyFrames;
 

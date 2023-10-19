@@ -15,25 +15,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents the visual appearance of the control when it is in a specific
     /// state.
     /// </summary>
-    [ContentProperty("Storyboard")]
+    [ContentProperty(nameof(Storyboard))]
     public sealed class VisualState : DependencyObject
     {
         /// <summary>

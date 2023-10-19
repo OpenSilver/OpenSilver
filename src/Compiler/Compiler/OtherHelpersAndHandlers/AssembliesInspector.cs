@@ -30,9 +30,9 @@ namespace OpenSilver.Compiler
 
         private readonly MonoCecilAssembliesInspectorImpl _monoCecilVersion;
 
-        public AssembliesInspector(bool isSlMigration, SupportedLanguage compilerType)
+        public AssembliesInspector(SupportedLanguage compilerType)
         {
-            _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(isSlMigration, compilerType);
+            _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(compilerType);
         }
 
         public void Dispose()

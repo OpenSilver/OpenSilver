@@ -1,23 +1,15 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Windows.Input;
+using System.Windows.Interactivity;
+using System.Windows;
+using System.Windows.Media;
+
 namespace Microsoft.Expression.Interactivity.Input
 {
-    using System;
-    using System.Windows.Input;
-    using System.Windows.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Input;
-    using Windows.UI.Xaml.Media;
-    using Key = Windows.System.VirtualKey;
-    using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
-
     public enum KeyTriggerFiredOn
     {
         KeyDown,
@@ -91,11 +83,7 @@ namespace Microsoft.Expression.Interactivity.Input
             return "Loaded";
         }
 
-#if MIGRATION
         private void OnKeyPress(object sender, KeyEventArgs e)
-#else
-        private void OnKeyPress(object sender, KeyRoutedEventArgs e)
-#endif
         {
             if (e.Key == this.Key &&
                 Keyboard.Modifiers == GetActualModifiers(e.Key, this.Modifiers))
@@ -121,25 +109,14 @@ namespace Microsoft.Expression.Interactivity.Input
             }
             return modifiers;
 #else
-#if MIGRATION
             if (key == Key.Ctrl)
-#else
-            if (key == Key.Control)
-#endif
             {
                 modifiers |= ModifierKeys.Control;
             }
-#if MIGRATION
             else if (key == Key.Alt)
             {
                 modifiers |= ModifierKeys.Alt;
             }
-#else
-            else if (key == Key.Menu)
-            {
-                modifiers |= ModifierKeys.Menu;
-            }
-#endif
             else if (key == Key.Shift)
             {
                 modifiers |= ModifierKeys.Shift;
@@ -148,11 +125,7 @@ namespace Microsoft.Expression.Interactivity.Input
 #endif
         }
 
-#if MIGRATION
         protected override void OnEvent(EventArgs eventArgs)
-#else
-        protected override void OnEvent(RoutedEventArgs eventArgs)
-#endif
         {
             // Listen to keyboard events.
             if (this.ActiveOnFocus)

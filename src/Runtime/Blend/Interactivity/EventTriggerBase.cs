@@ -1,22 +1,15 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.Reflection;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using global::Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// Represents a trigger that can listen to an element other than its AssociatedObject.
     /// </summary>
@@ -216,7 +209,6 @@ namespace System.Windows.Interactivity
         /// Specifies the name of the Event this EventTriggerBase is listening for.
         /// </summary>
         /// <returns></returns>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "NikhilKo convinced us this was the right choice.")]
         protected abstract string GetEventName();
 
         /// <summary>
@@ -224,11 +216,7 @@ namespace System.Windows.Interactivity
         /// </summary>
         /// <param name="eventArgs">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         /// <remarks>Override this to provide more granular control over when actions associated with this trigger will be invoked.</remarks>
-#if MIGRATION
         protected virtual void OnEvent(EventArgs eventArgs)
-#else
-        protected virtual void OnEvent(RoutedEventArgs eventArgs)
-#endif
         {
             this.InvokeActions(eventArgs);
         }
@@ -512,11 +500,7 @@ namespace System.Windows.Interactivity
             this.eventHandlerMethodInfo = null;
         }
 
-#if MIGRATION
         private void OnEventImpl(object sender, EventArgs eventArgs)
-#else
-        private void OnEventImpl(object sender, RoutedEventArgs eventArgs)
-#endif
         {
             this.OnEvent(eventArgs);
         }

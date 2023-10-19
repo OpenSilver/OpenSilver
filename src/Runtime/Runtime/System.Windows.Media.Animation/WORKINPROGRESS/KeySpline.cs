@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     [OpenSilver.NotImplemented]
-    public sealed partial class KeySpline : DependencyObject
+    public sealed class KeySpline : DependencyObject
     {
         /// <summary>
         /// Gets or sets the first control point used to define a Bezier curve that describes a <see cref="T:System.Windows.Media.Animation.KeySpline" />.

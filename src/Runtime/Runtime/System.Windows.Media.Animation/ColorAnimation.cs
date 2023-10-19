@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,31 +11,18 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using CSHTML5;
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
+using CSHTML5;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Animates the value of a Color property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-    public sealed partial class ColorAnimation : AnimationTimeline
+    public sealed class ColorAnimation : AnimationTimeline
     {
         /// <summary>
         /// Gets or sets the easing function applied to this animation.

@@ -12,12 +12,7 @@
 \*====================================================================================*/
 
 using System;
-
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
 namespace OpenSilver.Internal.Data
 {

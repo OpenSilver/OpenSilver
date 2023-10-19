@@ -11,16 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI
-#endif
 {
     /// <summary>
     /// ColorConverter Parses a color.

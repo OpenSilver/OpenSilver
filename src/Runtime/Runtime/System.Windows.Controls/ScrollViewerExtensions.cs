@@ -3,25 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media.Animation;
-using MouseWheelEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides useful extensions to ScrollViewer instances.
@@ -94,19 +81,11 @@ namespace Windows.UI.Xaml.Controls
             // Attach or detach from the MouseWheel event
             if (enabled)
             {
-#if MIGRATION
                 source.MouseWheel += OnMouseWheel;
-#else
-                source.PointerWheelChanged += OnMouseWheel;
-#endif
             }
             else
             {
-#if MIGRATION
                 source.MouseWheel -= OnMouseWheel;
-#else
-                source.PointerWheelChanged -= OnMouseWheel;
-#endif
             }
         }
 
@@ -124,11 +103,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (!e.Handled)
             {
-#if MIGRATION
                 double position = CoerceVerticalOffset(viewer, viewer.VerticalOffset - e.Delta); 
-#else
-                double position = CoerceVerticalOffset(viewer, viewer.VerticalOffset - e.GetCurrentPoint(null).Properties.MouseWheelDelta);
-#endif
                 viewer.ScrollToVerticalOffset(position);
                 e.Handled = true;
             }

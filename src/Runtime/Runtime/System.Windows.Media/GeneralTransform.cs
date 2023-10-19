@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,25 +11,15 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Provides generalized transformation support for objects, such as points and
     /// rectangles.
     /// </summary>
-    public abstract partial class GeneralTransform : DependencyObject
+    public abstract class GeneralTransform : DependencyObject
     {
         internal UIElement INTERNAL_parent;
 
@@ -41,7 +30,6 @@ namespace Windows.UI.Xaml.Media
         {
         }
 
-        // For UWP compatibility
         /// <summary>
         /// Transforms the specified point and returns the result.
         /// </summary>

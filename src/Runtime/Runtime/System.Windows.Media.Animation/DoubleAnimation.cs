@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,32 +11,18 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
 
     /// <summary>
     /// Animates the value of a Double property between two target values using linear
     /// interpolation over a specified Duration.
     /// </summary>
-    public partial class DoubleAnimation : AnimationTimeline
+    public class DoubleAnimation : AnimationTimeline
     {
         public IEasingFunction EasingFunction
         {

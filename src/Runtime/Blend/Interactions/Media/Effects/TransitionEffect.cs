@@ -2,20 +2,12 @@
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
 
+using System.Windows.Media.Effects;
+using System.Windows;
+using System.Windows.Media;
+
 namespace Microsoft.Expression.Media.Effects
 {
-	using System.Windows.Media.Effects;
-
-#if MIGRATION
-	using System.Windows;
-	using System.Windows.Media;
-	using System.Windows.Shapes;
-#else
-	using Windows.UI.Xaml;
-	using Windows.UI.Xaml.Media;
-	using Windows.UI.Xaml.Shapes;
-#endif
-
 	/// <summary>
 	/// Defines a transition effect shader that transitions from one visual to another visual
 	/// using an interpolated value between 0 and 1.

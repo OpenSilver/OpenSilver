@@ -11,37 +11,24 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Windows.Markup;
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
-using OpenSilver.Internal.Controls;
 using System.Collections;
 using System.Diagnostics;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
 using System.Windows.Data;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Data;
-#endif
+using CSHTML5.Internal;
+using DotNetForHtml5.Core;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Displays content on top of existing content, within the bounds of the application window.
     /// </summary>
-    [ContentProperty("Child")]
+    [ContentProperty(nameof(Child))]
     public class Popup : FrameworkElement
     {
         // Note for proper placement of the popup:

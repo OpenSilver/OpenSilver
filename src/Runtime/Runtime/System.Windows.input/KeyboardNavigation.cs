@@ -11,31 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Keyboard = System.Windows.Input.Keyboard;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-using Key = Windows.System.VirtualKey;
-#endif
+using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows.Input;
-#else
-namespace Windows.UI.Xaml.Input;
-#endif
 
 ///<summary>
 /// KeyboardNavigation class provide methods for logical (Tab) navigation between focusable controls

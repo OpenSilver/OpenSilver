@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows.Media.Imaging
-#else
-namespace Windows.UI.Xaml.Media.Imaging
-#endif
 {
     /// <summary>
     /// Provides a <see cref="BitmapSource"/> that can be written to and updated.

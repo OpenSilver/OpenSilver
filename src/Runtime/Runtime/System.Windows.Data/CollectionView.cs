@@ -1,6 +1,5 @@
 ﻿// Copyright (C) 2003 by Microsoft Corporation.  All rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,20 +8,11 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Threading;
+using System.Windows.Controls;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     internal class CollectionView : ICollectionView, INotifyCollectionChanged, INotifyPropertyChanged
     {

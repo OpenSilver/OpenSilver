@@ -3,19 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Windows;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides data for the Spinner.Spin event.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    public partial class SpinEventArgs : RoutedEventArgs
+    public class SpinEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Gets the SpinDirection for the spin that has been initiated by the 

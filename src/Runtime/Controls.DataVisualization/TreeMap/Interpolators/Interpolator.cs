@@ -4,16 +4,9 @@
 // All other rights reserved.
 
 using System.Globalization;
-using System;
-
-#if MIGRATION
 using System.Windows.Data;
+
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Data;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Abstract base class for Interpolator converters.

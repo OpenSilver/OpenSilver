@@ -8,20 +8,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System;
-
-#if MIGRATION
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Shapes;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Control base class for displaying values as a stacked area/line chart visualization.
@@ -45,11 +35,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Builds the visual tree for the control when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             SynchronizeSeriesDefinitionShapes(SeriesDefinitions, null);
             base.OnApplyTemplate();

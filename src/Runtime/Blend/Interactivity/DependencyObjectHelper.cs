@@ -1,18 +1,12 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Collections.Generic;
+using System.Windows.Media;
+
 namespace System.Windows.Interactivity
 {
-    using System.Collections.Generic;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media;
-#else
-    using global::Windows.UI.Xaml;
-    using global::Windows.UI.Xaml.Media;
-#endif
-
     public static class DependencyObjectHelper
     {
         /// <summary>

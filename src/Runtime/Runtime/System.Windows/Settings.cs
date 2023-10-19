@@ -16,19 +16,11 @@
 using System;
 using System.ComponentModel;
 using System.Net;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Interop;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System
 {

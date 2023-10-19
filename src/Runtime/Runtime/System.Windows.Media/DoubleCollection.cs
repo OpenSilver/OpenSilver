@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Globalization;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents an ordered collection of Double values.

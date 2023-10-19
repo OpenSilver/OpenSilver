@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,37 +11,21 @@
 *  
 \*====================================================================================*/
 
-
-using DotNetForHtml5.Core;
 using System.Collections.Generic;
 using System.Linq;
-using OpenSilver.Internal;
 using System.ComponentModel;
-using CSHTML5;
-#if MIGRATION
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using Microsoft.Windows;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using Microsoft.Windows;
+using CSHTML5;
+using DotNetForHtml5.Core;
+using OpenSilver.Internal;
 using MS = Microsoft.Windows;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-using System;
-using System.Windows;
-using Windows.UI.Xaml.Shapes;
-using MS = System.Windows;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     //-----------------
     // Open-source code reference: https://github.com/MicrosoftArchive/SilverlightToolkit/blob/8dd7fb1f77bd61f7ed3eb5f40f69d725c79749bd/Release/Silverlight4/Source/Controls.Toolkit/DragDrop/DragDropTarget.cs
@@ -106,36 +89,21 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected DragDropTarget()
         {
-#if MIGRATION
             AddHandler(MouseLeftButtonDownEvent, (MouseButtonEventHandler)DragDropTarget_MouseLeftButtonDown, true);
-#else
-            AddHandler(PointerPressedEvent, (PointerEventHandler)DragDropTarget_PointerPressed, true);
-#endif
         }
 
 
-#if MIGRATION
-        void DragDropTarget_MouseLeftButtonDown(object sender, Input.MouseButtonEventArgs e)
-#else
-        private void DragDropTarget_PointerPressed(object sender, PointerRoutedEventArgs e)
-#endif
+        private void DragDropTarget_MouseLeftButtonDown(object sender, Input.MouseButtonEventArgs e)
         {
             //----------------------------------
             // DRAG OPERATION STARTS HERE
             //----------------------------------
 
-#if MIGRATION
             // Add mouse events to the window to enable dropping on any other elements
             this.INTERNAL_ParentWindow.MouseMove -= DragDropTarget_MouseMove;
             this.INTERNAL_ParentWindow.MouseMove += DragDropTarget_MouseMove;
             this.INTERNAL_ParentWindow.MouseLeftButtonUp -= DragDropTarget_MouseLeftButtonUp;
             this.INTERNAL_ParentWindow.MouseLeftButtonUp += DragDropTarget_MouseLeftButtonUp;
-#else
-            this.INTERNAL_ParentWindow.PointerMoved -= DragDropTarget_PointerMoved;
-            this.INTERNAL_ParentWindow.PointerMoved += DragDropTarget_PointerMoved;
-            this.INTERNAL_ParentWindow.PointerReleased -= DragDropTarget_PointerReleased;
-            this.INTERNAL_ParentWindow.PointerReleased += DragDropTarget_PointerReleased;
-#endif
 
             // Prevent the PointerPressed event from bubbling up so that if there are two nested DragDropTargets, only the inner one will be dragged:
             e.Handled = true;
@@ -148,13 +116,9 @@ namespace Windows.UI.Xaml.Controls
                 _previousdragDropTargetUnderPointer = null;
 
                 // Remember the current pointer position:
-#if MIGRATION
                 _pointerX = e.GetPosition(null).X;
                 _pointerY = e.GetPosition(null).Y;
-#else
-                _pointerX = e.GetCurrentPoint(null).Position.X;
-                _pointerY = e.GetCurrentPoint(null).Position.Y;
-#endif
+
                 // Get the source DragDropTarget element that is under the pointer, if any:
                 DragDropTarget<TItemsControlType, TItemContainerType> sourceDragDropTarget = GetDragDropTargetUnderPointer(_pointerX, _pointerY, out _sourceItemContainer, out _);
                 if (sourceDragDropTarget is not null && sourceDragDropTarget != this)
@@ -166,11 +130,7 @@ namespace Windows.UI.Xaml.Controls
                     // Get a reference to the ItemsControl:
                     _sourceItemsControl = GetItemsControlAncestor(_sourceItemContainer);
 
-#if MIGRATION
                     this.ReleaseMouseCapture();
-#else
-                    this.ReleasePointerCapture();
-#endif
 
                     // Remember that the pointer is currently captured:
                     _isPointerCaptured = true;
@@ -180,11 +140,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-#if MIGRATION
-        void DragDropTarget_MouseMove(object sender, Input.MouseEventArgs e)
-#else
-        private void DragDropTarget_PointerMoved(object sender, Input.PointerRoutedEventArgs e)
-#endif
+        private void DragDropTarget_MouseMove(object sender, Input.MouseEventArgs e)
         {
             //----------------------------------
             // POINTER MOVE
@@ -243,22 +199,12 @@ namespace Windows.UI.Xaml.Controls
                 else
                 {
                     // Calculate the delta of the movement:
-#if MIGRATION
                     double horizontalChange = e.GetPosition(null).X - _pointerX;
                     double verticalChange = e.GetPosition(null).Y - _pointerY;
-#else
-                    double horizontalChange = e.GetCurrentPoint(null).Position.X - _pointerX;
-                    double verticalChange = e.GetCurrentPoint(null).Position.Y - _pointerY;
-#endif
 
                     // Remember the new pointer position:  
-#if MIGRATION
                     _pointerX = e.GetPosition(null).X;
                     _pointerY = e.GetPosition(null).Y;
-#else
-                    _pointerX = e.GetCurrentPoint(null).Position.X;
-                    _pointerY = e.GetCurrentPoint(null).Position.Y;
-#endif
 
                     // Move the popup and may raise the events DragEnter, DragOver and DragLeave:
                     MovePopupAndRaiseEvents(horizontalChange, verticalChange);
@@ -344,31 +290,17 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
-        void DragDropTarget_MouseLeftButtonUp(object sender, Input.MouseButtonEventArgs e)
-#else
-        void DragDropTarget_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
-#endif
+        private void DragDropTarget_MouseLeftButtonUp(object sender, Input.MouseButtonEventArgs e)
         {
             //----------------------------------
             // POINTER RELEASED
             //----------------------------------
-#if MIGRATION
             this.INTERNAL_ParentWindow.MouseMove -= DragDropTarget_MouseMove;
             this.INTERNAL_ParentWindow.MouseLeftButtonUp -= DragDropTarget_MouseLeftButtonUp;
-#else
-            this.INTERNAL_ParentWindow.PointerMoved -= DragDropTarget_PointerMoved;
-            this.INTERNAL_ParentWindow.PointerReleased -= DragDropTarget_PointerReleased;
-#endif
 
             // Remember the new pointer position:  
-#if MIGRATION
             _pointerX = e.GetPosition(null).X;
             _pointerY = e.GetPosition(null).Y;
-#else
-            _pointerX = e.GetCurrentPoint(null).Position.X;
-            _pointerY = e.GetCurrentPoint(null).Position.Y;
-#endif
 
             if (_isPointerCaptured && e.Pointer == _capturedPointer && _popup?.IsOpen == true)
             {
@@ -383,13 +315,8 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
-        void OnDropped(MouseButtonEventArgs e)
-#else
-        void OnDropped(PointerRoutedEventArgs e)
-#endif
+        private void OnDropped(MouseButtonEventArgs e)
         {
-
             _popup.IsOpen = false;
 
             //We no longer have use for the popup

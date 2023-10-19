@@ -5,14 +5,8 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Collections;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// An observable collection that cannot be reset.  When clear is called

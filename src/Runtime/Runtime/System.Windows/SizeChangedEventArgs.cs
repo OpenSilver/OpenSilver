@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides data related to the SizeChanged event.

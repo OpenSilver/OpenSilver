@@ -10,14 +10,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Data;
-#endif
 
 namespace OpenSilver.Internal.Data
 {
@@ -37,18 +31,10 @@ namespace OpenSilver.Internal.Data
 
         internal object Convert(object value, Type targetType)
         {
-#if MIGRATION
             return Convert(value, targetType, null, CultureInfo.InvariantCulture);
-#else
-            return Convert(value, targetType, null, string.Empty);
-#endif
         }
 
-#if MIGRATION
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-#else
-        public object Convert(object value, Type targetType, object parameter, string culture)
-#endif
         {
             object result = DependencyProperty.UnsetValue;  // meaning: failure to convert
 
@@ -73,11 +59,7 @@ namespace OpenSilver.Internal.Data
             return result;
         }
 
-#if MIGRATION
         public object ConvertBack(object value, Type sourceType, object parameter, CultureInfo culture)
-#else
-        public object ConvertBack(object value, Type sourceType, object parameter, string culture)
-#endif
         {
             object result = DependencyProperty.UnsetValue;  // meaning: failure to convert
 

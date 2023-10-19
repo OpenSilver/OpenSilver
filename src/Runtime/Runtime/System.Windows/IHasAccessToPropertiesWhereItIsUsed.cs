@@ -21,11 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     [Obsolete(Helper.ObsoleteMemberMessage)]
     public interface IHasAccessToPropertiesWhereItIsUsed

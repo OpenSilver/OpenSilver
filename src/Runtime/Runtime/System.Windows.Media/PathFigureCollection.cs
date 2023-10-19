@@ -11,21 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a collection of <see cref="PathFigure"/> objects that collectively

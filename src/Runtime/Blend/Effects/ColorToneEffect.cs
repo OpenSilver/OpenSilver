@@ -12,14 +12,8 @@
 \*====================================================================================*/
 
 using System.Windows.Media.Effects;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Media;
-#else
-using Windows.UI;
-using Windows.UI.Xaml;
-#endif
 
 namespace Microsoft.Expression.Media.Effects
 {

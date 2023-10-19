@@ -5,11 +5,7 @@
 
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Names and helpers for visual states in the controls.
@@ -93,7 +89,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public const string GroupSelection = "SelectionStates";
 
-        
+
         #endregion GroupSelection
 
         #region GroupActive
@@ -229,7 +225,7 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         public static void GoToState(Control control, bool useTransitions, params string[] stateNames)
         {
-            Debug.Assert(control != null);  
+            Debug.Assert(control != null);
 
             if (stateNames == null)
             {

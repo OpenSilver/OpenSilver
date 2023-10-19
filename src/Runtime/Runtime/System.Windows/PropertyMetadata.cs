@@ -18,11 +18,7 @@ using System.Runtime.CompilerServices;
 using OpenSilver.Internal;
 using OpenSilver.Utility;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Defines certain behavior aspects of a dependency property, including conditions

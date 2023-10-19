@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,24 +11,14 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
-
-#if BRIDGE
-using Bridge;
-#endif
+using CSHTML5;
+using CSHTML5.Internal;
 
 namespace System
 {

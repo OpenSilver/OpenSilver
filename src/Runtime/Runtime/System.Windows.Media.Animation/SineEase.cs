@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Represents an easing function that creates an animation that accelerates
@@ -32,10 +20,6 @@ namespace Windows.UI.Xaml.Media.Animation
     public sealed partial class SineEase : EasingFunctionBase
     {
         const string FUNCTION_TYPE_STRING = "Sine";
-
-        //// Summary:
-        ////     Initializes a new instance of the SineEase class.
-        //public SineEase();
 
         internal override string GetFunctionAsString()
         {

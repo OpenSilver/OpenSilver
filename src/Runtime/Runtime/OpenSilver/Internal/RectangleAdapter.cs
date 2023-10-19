@@ -11,21 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-#endif
 
 namespace OpenSilver.Internal;
 

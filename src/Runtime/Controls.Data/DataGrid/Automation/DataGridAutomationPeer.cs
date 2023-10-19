@@ -5,42 +5,12 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-#endif
 
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IGridProvider.ColumnCount", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IGridProvider.GetItem(System.Int32,System.Int32)", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IGridProvider.RowCount", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.HorizontallyScrollable", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.HorizontalScrollPercent", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.HorizontalViewSize", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.Scroll(System.Windows.Automation.ScrollAmount,System.Windows.Automation.ScrollAmount)", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.SetScrollPercent(System.Double,System.Double)", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.VerticallyScrollable", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.VerticalScrollPercent", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.IScrollProvider.VerticalViewSize", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ISelectionProvider.CanSelectMultiple", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ISelectionProvider.GetSelection()", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ISelectionProvider.IsSelectionRequired", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ITableProvider.GetColumnHeaders()", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ITableProvider.GetRowHeaders()", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridAutomationPeer.#System.Windows.Automation.Provider.ITableProvider.RowOrColumnMajor", Justification = "Base functionality is available through the GetPattern method.")]
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Exposes <see cref="T:System.Windows.Controls.DataGrid" /> types to UI Automation.

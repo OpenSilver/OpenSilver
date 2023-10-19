@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,27 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-#if BRIDGE
-using Bridge;
-#endif
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     internal static class AnimationHelpers
     {

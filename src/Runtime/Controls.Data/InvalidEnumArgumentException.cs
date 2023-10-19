@@ -3,25 +3,14 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using OpenSilver.Controls;
 
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
-
 namespace System.ComponentModel
 {
-    // 
-
-
     /// <summary>
     /// The exception thrown when using invalid arguments that are enumerators. 
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Exception(SerializationInfo, StreamingContext) does not exist in Silverlight, so neither can the derived InvalidEnumArgumentException constructor")]
     [Obsolete("InvalidEnumArgumentException is obsolete. Use ArgumentException instead.")]
     public class InvalidEnumArgumentException : Exception
     {

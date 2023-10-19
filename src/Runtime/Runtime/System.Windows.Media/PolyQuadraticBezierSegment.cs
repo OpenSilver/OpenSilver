@@ -11,21 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using OpenSilver.Internal;
 using System.Windows.Markup;
 using System.Collections.Specialized;
 using System.Collections.Generic;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a set of quadratic Bezier segments.

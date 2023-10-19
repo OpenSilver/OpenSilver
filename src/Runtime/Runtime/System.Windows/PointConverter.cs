@@ -15,11 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.Foundation
-#endif
 {
     /// <summary>
     /// PointConverter - Converter class for converting instances of other types to and from Point instances

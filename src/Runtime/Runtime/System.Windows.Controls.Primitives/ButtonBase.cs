@@ -11,24 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Input;
+using System.Windows.Automation.Provider;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Automation.Provider;
-#else
-using Windows.UI.Xaml.Input;
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Provider;
-using Key = Windows.System.VirtualKey;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents the base class for all button controls, such as <see cref="Button"/>,
@@ -251,11 +238,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Builds the visual tree for the <see cref="ButtonBase" /> control when 
         /// a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             UpdateVisualState(false);
@@ -296,11 +279,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
-#else
-        protected override void OnKeyDown(KeyRoutedEventArgs e)
-#endif
         {
             base.OnKeyDown(e);
             if (e.Handled)
@@ -377,11 +356,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnKeyUp(KeyEventArgs e)
-#else
-        protected override void OnKeyUp(KeyRoutedEventArgs e)
-#endif
         {
             base.OnKeyUp(e);
             if (e.Handled)
@@ -446,17 +421,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
 
             IsMouseOver = true;
 
@@ -477,17 +444,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
 
             IsMouseOver = false;
 
@@ -508,17 +467,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
 
             if (e.Handled)
             {
@@ -557,17 +508,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
 
             if (e.Handled)
             {
@@ -595,33 +538,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnLostMouseCapture(MouseEventArgs e)
-#else
-        protected override void OnPointerCaptureLost(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnLostMouseCapture(e);
-#else
-            base.OnPointerCaptureLost(e);
-#endif
             ReleaseMouseCaptureInternal();
             IsPressed = false;
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseMove(MouseEventArgs e)
-#else
-        protected override void OnPointerMoved(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseMove(e);
-#else
-            base.OnPointerMoved(e);
-#endif
             // Cache the latest mouse position.
             _mousePosition = e.GetPosition(this);
 
@@ -720,11 +647,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (!_isMouseCaptured)
             {
-#if MIGRATION
                 _isMouseCaptured = CaptureMouse();
-#else
-                _isMouseCaptured = CapturePointer();
-#endif
             }
         }
 
@@ -733,11 +656,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         private void ReleaseMouseCaptureInternal()
         {
-#if MIGRATION
             ReleaseMouseCapture();
-#else
-            ReleasePointerCapture();
-#endif
             _isMouseCaptured = false;
         }
 

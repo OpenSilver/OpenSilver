@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace System.Windows.Input
 {
     /// <summary>
-    /// Provides event data for mouse button input events, for example System.Windows.UIElement.MouseLeftButtonDown
-    /// and System.Windows.UIElement.MouseRightButtonUp.
+    /// Provides event data for mouse button input events, for example <see cref="UIElement.MouseLeftButtonDown"/>
+    /// and <see cref="UIElement.MouseRightButtonUp"/>.
     /// </summary>
-    public partial class MouseButtonEventArgs : MouseEventArgs
+    public class MouseButtonEventArgs : MouseEventArgs
     {
         internal override void InvokeHandler(Delegate handler, object target)
         {
@@ -34,4 +25,3 @@ namespace System.Windows.Input
         }
     }
 }
-#endif

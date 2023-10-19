@@ -19,53 +19,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides event data for exceptions that are raised as events by asynchronous operations, such as MediaFailed or ImageFailed.
     /// </summary>
     public partial class ExceptionRoutedEventArgs : RoutedEventArgs
     {
-#if MIGRATION
         /// <summary>
         /// The exception that describes the media failure.
         /// </summary>
-        public Exception ErrorException
-        {
-            get
-            {
-                return _errorException;
-            }
-        }
-
-        private Exception _errorException;
-#else
-        private string _errorMessage = "";
-
-        /// <summary>
-        /// Gets the message component of the exception, as a string.
-        /// </summary>
-        public string ErrorMessage
-        {
-            get
-            {
-                return _errorMessage;
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of Windows.UI.Xaml.ExceptionRoutedEventArgs with the specified error message.
-        /// </summary>
-        /// <param name="errorMessage">The error message.</param>
-        public ExceptionRoutedEventArgs(string errorMessage) :base()
-        {
-            _errorMessage = errorMessage;
-        }
-#endif
+        public Exception ErrorException { get; }
 
         /// <summary>
         /// Initializes a new instance of Windows.UI.Xaml.ExceptionRoutedEventArgs.

@@ -32,14 +32,6 @@ namespace OpenSilver.Compiler
                 CoreTypesConverter = CoreTypesConvertersCS.Silverlight,
                 EnableImplicitAssemblyRedirection = true,
             };
-
-        public static ConversionSettings UWP { get; } =
-            new ConversionSettings
-            {
-                Metadata = MetadatasCS.UWP,
-                CoreTypesConverter = CoreTypesConvertersCS.UWP,
-                EnableImplicitAssemblyRedirection = false,
-            };
     }
 
     internal static class ConversionSettingsVB
@@ -50,14 +42,6 @@ namespace OpenSilver.Compiler
                 Metadata = MetadatasVB.Silverlight,
                 CoreTypesConverter = CoreTypesConvertersVB.Silverlight,
                 EnableImplicitAssemblyRedirection = true,
-            };
-
-        public static ConversionSettings UWP { get; } =
-            new ConversionSettings
-            {
-                Metadata = MetadatasVB.UWP,
-                CoreTypesConverter = CoreTypesConvertersVB.UWP,
-                EnableImplicitAssemblyRedirection = false,
             };
     }
 }

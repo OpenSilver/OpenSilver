@@ -11,15 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <exclude/>
     public class UIElementCollection : PresentationFrameworkCollection<UIElement>

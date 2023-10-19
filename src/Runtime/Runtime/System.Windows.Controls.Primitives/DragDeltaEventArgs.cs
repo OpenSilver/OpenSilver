@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Provides data for the DragDelta event that occurs one or more times when
     /// a user drags a Thumb control with the mouse.
     /// </summary>
-    public partial class DragDeltaEventArgs : RoutedEventArgs
+    public class DragDeltaEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the DragDeltaEventArgs class.

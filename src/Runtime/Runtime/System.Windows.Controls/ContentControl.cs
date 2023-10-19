@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,36 +11,19 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
-using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Data;
-using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-#endif
+using OpenSilver.Internal.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control with a single piece of content. Controls such as Button,
     /// CheckBox, and ScrollViewer directly or indirectly inherit from this class.
     /// </summary>
-    [ContentProperty("Content")]
-    public partial class ContentControl : Control
+    [ContentProperty(nameof(Content))]
+    public class ContentControl : Control
     {
 #region Constructor
 

@@ -11,20 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Globalization;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a 3x3 affine transformation matrix used for transformations in two-dimensional

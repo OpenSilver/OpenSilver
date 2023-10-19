@@ -29,12 +29,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace OpenSilver.Internal
 {

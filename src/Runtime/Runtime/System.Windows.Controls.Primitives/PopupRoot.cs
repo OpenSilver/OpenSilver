@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 
-#if MIGRATION
-using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Input;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     internal sealed class PopupRoot : FrameworkElement
     {
@@ -114,17 +102,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             popupRoot.SetLayoutSize();
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
 
             // Note: If a popup has StayOpen=True, the value of "StayOpen" of its parents is ignored.
             // In other words, the parents of a popup that has StayOpen=True will always stay open

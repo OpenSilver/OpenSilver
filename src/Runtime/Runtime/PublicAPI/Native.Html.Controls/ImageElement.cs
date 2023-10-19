@@ -18,12 +18,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CSHTML5.Internal;
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
+using CSHTML5.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {

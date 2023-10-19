@@ -13,11 +13,7 @@
 
 using System;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents a collection of objects that inherit from <see cref="SetterBase"/>.

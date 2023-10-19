@@ -3,20 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Input;
 
-#if !MIGRATION
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Inherited code: Requires comment.

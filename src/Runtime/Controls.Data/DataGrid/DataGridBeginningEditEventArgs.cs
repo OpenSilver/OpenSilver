@@ -5,17 +5,13 @@
 
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-/// <summary>
-/// Provides data for the <see cref="E:System.Windows.Controls.DataGrid.BeginningEdit" /> event.
-/// </summary>
-/// <QualityBand>Mature</QualityBand>
-public class DataGridBeginningEditEventArgs : CancelEventArgs
+    /// <summary>
+    /// Provides data for the <see cref="E:System.Windows.Controls.DataGrid.BeginningEdit" /> event.
+    /// </summary>
+    /// <QualityBand>Mature</QualityBand>
+    public class DataGridBeginningEditEventArgs : CancelEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the 

@@ -7,17 +7,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using OpenSilver.Internal.Navigation;
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Defines a URI to URI mapping.

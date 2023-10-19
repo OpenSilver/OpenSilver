@@ -3,34 +3,18 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Automation;
-#else
-using Windows.System;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Automation;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a time picker popup that allows choosing time from a ListBox.
@@ -77,11 +61,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (_listBoxPart != null)
                 {
-#if MIGRATION
                     _listBoxPart.MouseLeftButtonUp -= ItemSelectedByMouse;
-#else
-                    _listBoxPart.PointerReleased -= ItemSelectedByMouse;
-#endif
                     _listBoxPart.SelectionChanged -= RaiseAutomationPeerSelectionChanged;
                 }
 
@@ -89,11 +69,7 @@ namespace Windows.UI.Xaml.Controls
 
                 if (_listBoxPart != null)
                 {
-#if MIGRATION
                     _listBoxPart.MouseLeftButtonUp += ItemSelectedByMouse;
-#else
-                    _listBoxPart.PointerReleased += ItemSelectedByMouse;
-#endif
                     _listBoxPart.SelectionChanged += RaiseAutomationPeerSelectionChanged;
                 }
             }
@@ -246,11 +222,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the ListTimePickerPopup control when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -550,20 +522,12 @@ namespace Windows.UI.Xaml.Controls
 
             switch (e.Key)
             {
-#if MIGRATION
                 case Key.Enter:
-#else
-                case VirtualKey.Enter:
-#endif
                     {
                         DoCommit();
                         break;
                     }
-#if MIGRATION
                 case Key.Escape:
-#else
-                case VirtualKey.Escape:
-#endif
                     {
                         DoCancel();
                         break;

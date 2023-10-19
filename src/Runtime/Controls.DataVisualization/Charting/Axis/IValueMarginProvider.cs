@@ -4,13 +4,8 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Provides information about margins necessary for values.
@@ -23,7 +18,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="consumer">The axis to retrieve the value margins 
         /// for.</param>
         /// <returns>The margins required for values.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method does a substantial amount of work.")]
         IEnumerable<ValueMargin> GetValueMargins(IValueMarginConsumer consumer);
     }
 }

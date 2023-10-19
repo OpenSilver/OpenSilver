@@ -3,18 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Collections
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
-#endif
 {
     /// <summary>
     /// Implements a dictionary that can store multiple values for the same key and sorts the values.
@@ -30,7 +23,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
         /// <param name="allowDuplicateValues">The parameter is not used.</param>
         /// <param name="keyComparison">Key comparison class.</param>
         /// <param name="valueComparison">Value comparison class.</param>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "allowDuplicateValues", Justification = "Unused parameter exists for API compatibility.")]
         public OrderedMultipleDictionary(bool allowDuplicateValues, Comparison<TKey> keyComparison, Comparison<TValue> valueComparison)
         {
             Debug.Assert(null != keyComparison, "keyComparison must not be null.");

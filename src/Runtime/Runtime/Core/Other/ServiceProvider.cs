@@ -14,12 +14,7 @@
 
 using System.Collections.Generic;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace System
 {

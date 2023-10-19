@@ -11,31 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using DotNetForHtml5.Core;
 
-#if !MIGRATION
-using Windows.Foundation;
-using Dispatcher = Windows.UI.Core.CoreDispatcher;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Threading;
-#else
-namespace Windows.UI.Core;
-#endif
 
 /// <summary>
 /// Provides services for managing the queue of work items for a thread.
 /// </summary>
-#if MIGRATION
 public class Dispatcher
-#else
-public class CoreDispatcher
-#endif
 {
     private static Dispatcher _currentDispatcher;
 
@@ -44,11 +30,7 @@ public class CoreDispatcher
     private int _disableProcessingRequests;
     private bool _isProcessQueueScheduled;
 
-#if MIGRATION
     public Dispatcher()
-#else
-    public CoreDispatcher()
-#endif
     {
         _queue = new PriorityQueue<DispatcherOperation>((int)DispatcherPriority.Send - (int)DispatcherPriority.Invalid);
         _disableProcessingToken = new DispatcherProcessingDisabled(this);

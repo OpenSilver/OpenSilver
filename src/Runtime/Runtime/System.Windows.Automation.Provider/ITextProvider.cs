@@ -11,15 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Automation.Provider
-#else
-namespace Windows.UI.Xaml.Automation.Provider
-#endif
 {
     /// <summary>
     /// Exposes methods and properties to support UI Automation client access to 

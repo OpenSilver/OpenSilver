@@ -5,22 +5,12 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-#endif
 
 [assembly: SuppressMessage("Compatibility", "SWC4000:GeneralWPFCompatibilityRule", MessageId = "HierarchicalDataTemplate.get_ItemsSource(), System.Windows.Data.Binding (Silverlight) vs System.Windows.Data.BindingBase (wpf)", Justification = "BindingBase isn't sufficiently rich enough for this purpose.  We use Binding instead, just like FrameworkElement.SetBinding.")]
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents a <see cref="DataTemplate" /> that supports

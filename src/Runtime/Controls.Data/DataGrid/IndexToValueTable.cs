@@ -3,16 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal class IndexToValueTable<T> : IEnumerable<Range<T>>
     {
@@ -630,7 +625,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 // Need to split this up
                 _list.Insert(lowerRangeIndex, new Range<T>(_list[lowerRangeIndex].LowerBound, startIndex - 1, _list[lowerRangeIndex].Value));
-                lowerRangeIndex ++;
+                lowerRangeIndex++;
             }
             _list[lowerRangeIndex].LowerBound = startIndex + count;
             if (!RemoveRangeIfInvalid(_list[lowerRangeIndex], lowerRangeIndex))
@@ -641,7 +636,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 _list.RemoveAt(lowerRangeIndex);
             }
-            if ((lowerRangeIndex < _list.Count) && (_list[lowerRangeIndex].UpperBound >= startIndex + count) && 
+            if ((lowerRangeIndex < _list.Count) && (_list[lowerRangeIndex].UpperBound >= startIndex + count) &&
                 (_list[lowerRangeIndex].LowerBound < startIndex + count))
             {
                 // Chop off the start of the remaining Range if it contains values that we're removing
@@ -756,7 +751,7 @@ namespace Windows.UI.Xaml.Controls
                     return median;
                 }
             }
-            
+
             if (front == end)
             {
                 range = _list[front];
@@ -765,7 +760,7 @@ namespace Windows.UI.Xaml.Controls
                     // we found it or the index isn't there and we're one range before
                     return front;
                 }
-                else 
+                else
                 {
                     // not found and we're one range after
                     return front - 1;

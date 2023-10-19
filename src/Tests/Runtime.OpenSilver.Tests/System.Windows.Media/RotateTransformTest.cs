@@ -10,21 +10,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if MIGRATION
-
-#else
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media.Tests
-#else
-namespace Windows.UI.Xaml.Media.Tests
-#endif
 {
     [TestClass]
     public class RotateTransformTest

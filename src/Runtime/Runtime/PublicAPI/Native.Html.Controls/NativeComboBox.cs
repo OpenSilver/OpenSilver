@@ -14,15 +14,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
+using CSHTML5.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {

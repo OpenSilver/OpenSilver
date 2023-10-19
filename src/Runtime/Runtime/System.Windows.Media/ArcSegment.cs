@@ -11,18 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents an elliptical arc between two points.

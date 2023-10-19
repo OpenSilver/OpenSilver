@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Defines values that specify the current state of the window for purposes of user or 

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using SW = Microsoft.Windows;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-using SW = System.Windows;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public class TreeViewDragDropTarget : ItemsControlDragDropTarget<ItemsControl, TreeViewItem>
     {
@@ -98,11 +84,7 @@ namespace Windows.UI.Xaml.Controls
                 if (orientation != null && targetItemContainer != null)
                 {
                     Rect treeViewItemRect = GetTreeViewItemRectExcludingChildren(targetItemContainer);
-#if MIGRATION
                     Point relativePoint = args.GetPosition(targetItemContainer);
-#else
-                    Point relativePoint = args.GetPosition(targetItemContainer).Position;
-#endif
                     double thirdWidth = treeViewItemRect.Width / 3.0;
                     double thirdHeight = treeViewItemRect.Height / 3.0;
 

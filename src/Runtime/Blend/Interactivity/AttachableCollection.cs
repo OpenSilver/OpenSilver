@@ -1,22 +1,16 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Globalization;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.Diagnostics;
-    using System.ComponentModel;
-    using System.Globalization;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using global::Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// Represents a collection of IAttachedObject with a shared AssociatedObject and provides change notifications to its contents when that AssociatedObject changes.
     /// </summary>

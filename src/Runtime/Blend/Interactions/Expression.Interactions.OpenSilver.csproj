@@ -6,10 +6,8 @@
     <RootNamespace>Microsoft.Expression.Interactivity</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Configurations>SL;UWP</Configurations>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-    <DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
+    <DefineTrace>true</DefineTrace>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 

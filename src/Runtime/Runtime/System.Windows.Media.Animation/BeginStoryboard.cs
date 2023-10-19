@@ -13,11 +13,7 @@
 
 using System.Windows.Markup;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// A trigger action that begins a <see cref="Animation.Storyboard"/> and

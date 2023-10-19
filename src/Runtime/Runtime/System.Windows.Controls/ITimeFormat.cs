@@ -5,11 +5,7 @@
 
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines time formats used for formatting and parsing DateTime values.

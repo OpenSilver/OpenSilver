@@ -11,19 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using CSHTML5.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Scales an object in the two-dimensional x-y coordinate system.

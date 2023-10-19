@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Contains values that specify the <see cref="ToggleState" /> of a UI automation element.

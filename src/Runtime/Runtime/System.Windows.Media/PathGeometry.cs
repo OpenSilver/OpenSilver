@@ -11,25 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Windows.Shapes;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a complex shape that may be composed of arcs, curves, ellipses, lines,

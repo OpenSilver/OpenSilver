@@ -11,21 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using OpenSilver.Tests;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media.Tests
-#else
-namespace Windows.UI.Xaml.Media.Tests
-#endif
 {
     [TestClass]
     public class PointCollectionConverterTest : TypeConverterTestBase

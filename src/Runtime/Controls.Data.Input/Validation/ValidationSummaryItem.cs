@@ -6,17 +6,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents an individual validation error.

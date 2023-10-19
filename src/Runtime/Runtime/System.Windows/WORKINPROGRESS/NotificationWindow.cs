@@ -1,5 +1,3 @@
-#if MIGRATION
-
 using System.Security;
 
 namespace System.Windows
@@ -156,5 +154,3 @@ namespace System.Windows
 		}
 	}
 }
-
-#endif

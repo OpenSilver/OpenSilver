@@ -11,25 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Controls.Primitives;
+using System.Windows.Controls;
 using CSHTML5;
 using CSHTML5.Internal;
 
-#if MIGRATION
-using System.Windows.Controls.Primitives;
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Controls;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Printing
-#else
-namespace Windows.UI.Xaml.Printing
-#endif
 {
     public partial class PrintDocument : DependencyObject
     {

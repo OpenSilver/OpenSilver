@@ -24,9 +24,8 @@ namespace OpenSilver.Compiler
     internal static class CoreTypesConvertersVB
     {
         public static ICoreTypesConverter Silverlight { get; } = new SLCoreTypesConverterVB();
-
-        public static ICoreTypesConverter UWP { get; } = new UWPCoreTypesConverterVB();
     }
+
     internal sealed class SLCoreTypesConverterVB : CoreTypesConverterBase
     {
         protected override Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }
@@ -79,60 +78,6 @@ namespace OpenSilver.Compiler
                 ["system.windows.fontstyle"] = (s => CoreTypesHelperVB.ConvertToFontStyle(s, "Global.System.Windows.FontStyle", "Global.System.Windows.FontStyles")),
                 ["system.windows.textdecorationcollection"] = (s => CoreTypesHelperVB.ConvertToTextDecorationCollection(s, "Global.System.Windows.TextDecorationCollection", "Global.System.Windows.TextDecorations")),
                 ["system.windows.media.imagesource"] = (s => CoreTypesHelperVB.ConvertToImageSource(s, "Global.System.Windows.Media.ImageSource", "Global.System.Windows.Media.Imaging.BitmapImage")),
-            };
-        }
-    }
-
-    internal sealed class UWPCoreTypesConverterVB : CoreTypesConverterBase
-    {
-        protected override Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }
-            = GetSupportedCoreTypes();
-
-        //
-        // IMPORTANT: Do not modify this dictionary unless you made changes in the file
-        // 'TypeConverterHelper.cs' in the Runtime project. This dictionary and the 
-        // dictionary 'TypeConverterHelper.CoreTypeConverters' must stay in sync.
-        //
-        // ImageSource is the only type to be present in this dictionary and not in the
-        // one from the Runtime. This is due to the fact that we need to support the 
-        // following XAML syntax : <ImageSource>whatever/you/want</ImageSource> which
-        // normally requires the ContentPropertyAttribute to be defined on the type we
-        // are trying to instantiate but this is not the case for ImageSource.
-        // However, ImageSource has a registered TypeConverter via TypeConverterAttribute,
-        // so this is why we do not want to register it in the CoreTypeConverters
-        // dictionary, as it would prevent derived types (BitmapSource and BitmapImage)
-        // from finding the converter.
-        //
-        private static Dictionary<string, Func<string, string>> GetSupportedCoreTypes()
-        {
-            return new Dictionary<string, Func<string, string>>(25)
-            {
-                ["system.windows.input.cursor"] = (s => CoreTypesHelperVB.ConvertToCursor(s, "Global.System.Windows.Input.Cursor", "Global.System.Windows.Input.Cursors")),
-                ["windows.ui.xaml.media.animation.keytime"] = (s => CoreTypesHelperVB.ConvertToKeyTime(s, "Global.Windows.UI.Xaml.Media.Animation.KeyTime")),
-                ["windows.ui.xaml.media.animation.repeatbehavior"] = (s => CoreTypesHelperVB.ConvertToRepeatBehavior(s, "Global.Windows.UI.Xaml.Media.Animation.RepeatBehavior")),
-                ["windows.ui.xaml.media.brush"] = (s => CoreTypesHelperVB.ConvertToBrush(s, "Global.Windows.UI.Xaml.Media.SolidColorBrush", "Global.Windows.UI.Color")),
-                ["windows.ui.xaml.media.solidcolorbrush"] = (s => CoreTypesHelperVB.ConvertToBrush(s, "Global.Windows.UI.Xaml.Media.SolidColorBrush", "Global.Windows.UI.Color")),
-                ["windows.ui.color"] = (s => CoreTypesHelperVB.ConvertToColor(s, "Global.Windows.UI.Color")),
-                ["windows.ui.xaml.media.doublecollection"] = (s => CoreTypesHelperVB.ConvertToDoubleCollection(s, "Global.Windows.UI.Xaml.Media.DoubleCollection")),
-                ["windows.ui.xaml.media.fontfamily"] = (s => CoreTypesHelperVB.ConvertToFontFamily(s, "Global.Windows.UI.Xaml.Media.FontFamily")),
-                ["windows.ui.xaml.media.geometry"] = (s => CoreTypesHelperVB.ConvertToGeometry(s, "Global.Windows.UI.Xaml.Media.Geometry")),
-                ["windows.ui.xaml.media.pathgeometry"] = (s => CoreTypesHelperVB.ConvertToGeometry(s, "Global.Windows.UI.Xaml.Media.PathGeometry")),
-                ["windows.ui.xaml.media.matrix"] = (s => CoreTypesHelperVB.ConvertToMatrix(s, "Global.Windows.UI.Xaml.Media.Matrix")),
-                ["windows.ui.xaml.media.pointcollection"] = (s => CoreTypesHelperVB.ConvertToPointCollection(s, "Global.Windows.UI.Xaml.Media.PointCollection", "Global.Windows.Foundation.Point")),
-                ["windows.ui.xaml.media.transform"] = (s => CoreTypesHelperVB.ConvertToTransform(s, "Global.Windows.UI.Xaml.Media.MatrixTransform", "Global.Windows.UI.Xaml.Media.Matrix")),
-                ["windows.ui.xaml.media.matrixtransform"] = (s => CoreTypesHelperVB.ConvertToTransform(s, "Global.Windows.UI.Xaml.Media.MatrixTransform", "Global.Windows.UI.Xaml.Media.Matrix")),
-                ["windows.ui.xaml.media.cachemode"] = (s => CoreTypesHelperVB.ConvertToCacheMode(s, "Global.Windows.UI.Xaml.Media.CacheMode", "Global.Windows.UI.Xaml.Media.BitmapCache")),
-                ["windows.ui.xaml.cornerradius"] = (s => CoreTypesHelperVB.ConvertToCornerRadius(s, "Global.Windows.UI.Xaml.CornerRadius")),
-                ["windows.ui.xaml.duration"] = (s => CoreTypesHelperVB.ConvertToDuration(s, "Global.Windows.UI.Xaml.Duration")),
-                ["windows.ui.text.fontweight"] = (s => CoreTypesHelperVB.ConvertToFontWeight(s, "Global.Windows.UI.Text.FontWeight", "Global.Windows.UI.Text.FontWeights")),
-                ["windows.ui.xaml.gridlength"] = (s => CoreTypesHelperVB.ConvertToGridLength(s, "Global.Windows.UI.Xaml.GridLength", "Global.Windows.UI.Xaml.GridUnitType")),
-                ["windows.foundation.point"] = (s => CoreTypesHelperVB.ConvertToPoint(s, "Global.Windows.Foundation.Point")),
-                ["windows.ui.xaml.propertypath"] = (s => CoreTypesHelperVB.ConvertToPropertyPath(s, "Global.Windows.UI.Xaml.PropertyPath")),
-                ["windows.foundation.rect"] = (s => CoreTypesHelperVB.ConvertToRect(s, "Global.Windows.Foundation.Rect")),
-                ["windows.foundation.size"] = (s => CoreTypesHelperVB.ConvertToSize(s, "Global.Windows.Foundation.Size")),
-                ["windows.ui.xaml.thickness"] = (s => CoreTypesHelperVB.ConvertToThickness(s, "Global.Windows.UI.Xaml.Thickness")),
-                ["windows.ui.xaml.fontstretch"] = (s => CoreTypesHelperVB.ConvertToFontStretch(s, "Global.Windows.UI.Xaml.FontStretch")),
-                ["windows.ui.xaml.media.imagesource"] = (s => CoreTypesHelperVB.ConvertToImageSource(s, "Global.Windows.UI.Xaml.Media.ImageSource", "Global.Windows.UI.Xaml.Media.Imaging.BitmapImage")),
             };
         }
     }

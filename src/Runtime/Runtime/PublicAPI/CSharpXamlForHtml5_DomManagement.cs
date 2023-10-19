@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
@@ -26,11 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 public static partial class CSharpXamlForHtml5
 {

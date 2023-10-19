@@ -17,20 +17,11 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Markup;
-#else
-using Windows.UI.Xaml.Markup;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Defines a dictionary that contains resources used by components of the app.

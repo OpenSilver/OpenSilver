@@ -10,19 +10,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if MIGRATION
 namespace System.Windows.Tests
-#else
-namespace Windows.Foundation.Tests
-#endif
 {
     [TestClass]
     public class RectTest

@@ -7,28 +7,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using OpenSilver.Internal.Navigation;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Common;
 using System.Windows.Controls.Primitives;
 using System.Windows.Navigation;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Common;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Navigation;
-#endif
+using OpenSilver.Internal.Navigation;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a content control that supports navigation.
@@ -490,11 +477,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Called when the template generation for the visual tree is created.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

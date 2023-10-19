@@ -14,21 +14,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Threading;
 using CSHTML5.Internal;
 
-#if MIGRATION
-using System.Windows.Threading;
-#else
-using Windows.Foundation;
-using Windows.UI.Core;
-using Dispatcher = Windows.UI.Core.CoreDispatcher;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     internal sealed class LayoutManager
     {

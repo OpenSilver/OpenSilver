@@ -11,17 +11,10 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Data;
+
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Data;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Represents a control which can display hierarchical data as a set of nested rectangles. 
@@ -373,28 +366,18 @@ namespace Windows.UI.Xaml.Controls.DataVisualization
         {
             _helper = new BindingExtractor();
 
-#if !MIGRATION
-            DefaultStyleKey = typeof(TreeMap);
-#endif
-
             SetValue(InterpolatorsProperty, new ObservableCollection<Interpolator>());
             (Interpolators as ObservableCollection<Interpolator>).CollectionChanged += 
                 new NotifyCollectionChangedEventHandler(OnInterpolatorsCollectionChanged);
 
-#if MIGRATION
             DefaultStyleKey = typeof(TreeMap);
-#endif
         }
 
         /// <summary>
         /// Invoked whenever application code or internal processes call ApplyTemplate. Gets references
         /// to the template parts required by this control.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

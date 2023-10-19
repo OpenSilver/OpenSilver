@@ -13,11 +13,7 @@
 
 using System;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     ///     This is the data that is passed through the DescendentsWalker

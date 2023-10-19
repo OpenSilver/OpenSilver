@@ -11,17 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents the geometry of a line.

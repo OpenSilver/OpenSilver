@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows;
-#else
-namespace Windows.UI.Xaml;
-#endif
 
 /// <summary>
 ///     Creates and recycles instance of EventRoute

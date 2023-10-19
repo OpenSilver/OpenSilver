@@ -1,12 +1,4 @@
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
 	//
 	// Summary:

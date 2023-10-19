@@ -7,20 +7,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.ComponentModel;
-using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Navigation;
-#else
-using Windows.UI.Xaml.Navigation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Encapsulates content that can be navigated to by a <see cref="Frame" />. 

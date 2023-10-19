@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// FontFamilyConverter - converter class for converting between the FontFamily

@@ -7,14 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// A class that rotates through a list of ResourceDictionaries.

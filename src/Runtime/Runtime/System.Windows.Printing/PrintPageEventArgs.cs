@@ -11,17 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Printing
-#else
-namespace Windows.UI.Xaml.Printing
-#endif
 {
     /// <summary>
     /// Provides data for the <see cref="PrintDocument.PrintPage"/> event.

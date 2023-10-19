@@ -14,10 +14,6 @@
 using System;
 using System.Linq;
 
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
-
 namespace System.Windows
 {
     /// <summary>

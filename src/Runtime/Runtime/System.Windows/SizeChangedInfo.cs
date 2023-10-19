@@ -11,17 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     ///  The SizeChangedinfo class is used as a parameter to OnSizeRenderChanged.

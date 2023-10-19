@@ -1,16 +1,6 @@
-using System;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     ///     EventArgs for VisualStateGroup.CurrentStateChanging and CurrentStateChanged events.

@@ -11,21 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using OpenSilver.Internal.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Handles the layout of <see cref="TabItem" /> objects on 
     /// a <see cref="TabControl" />.
     /// </summary>
-    public partial class TabPanel : WrapPanel
+    public class TabPanel : WrapPanel
     {
         public TabPanel()
         {

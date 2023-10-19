@@ -1,13 +1,12 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Diagnostics;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Diagnostics;
-    using System.ComponentModel;
-    using OpenSilver.Internal.Interactivity;
-
     /// <summary>
     /// Represents a collection of actions with a shared AssociatedObject and provides change notifications to its contents when that AssociatedObject changes.
     /// </summary>

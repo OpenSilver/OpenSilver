@@ -21,22 +21,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media.Effects;
 using OpenSilver.Internal.Controls;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Core;
-#endif
 
 namespace OpenSilver.MemoryLeak.Tests;
 
@@ -70,11 +60,7 @@ public class MemoryLeakTest
         {
             var resetEvent = new ManualResetEvent(false);
             var trackableCallback = new ItemWithTrackableCallback(c, resetEvent);
-#if MIGRATION
             Dispatcher.CurrentDispatcher.BeginInvoke(trackableCallback.Callback);
-#else
-            CoreDispatcher.CurrentDispatcher.BeginInvoke(trackableCallback.Callback);
-#endif
             resetEvent.WaitOne(5000);
         }
 

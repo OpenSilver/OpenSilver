@@ -3,34 +3,21 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-#endif
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public partial class DataGrid
     {
-#region Private Properties
-#endregion Private Properties
+        #region Private Properties
+        #endregion Private Properties
 
-#region Protected Methods
+        #region Protected Methods
 
         protected virtual void OnColumnDisplayIndexChanged(DataGridColumnEventArgs e)
         {
@@ -61,9 +48,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-#region Internal Methods
+        #region Internal Methods
 
         /// <summary>
         /// Adjusts the widths of all columns with DisplayIndex >= displayIndex such that the total
@@ -382,7 +369,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-        
+
         internal void OnColumnElementStyleChanged(DataGridBoundColumn column)
         {
             // Update Element Style in Displayed rows
@@ -444,7 +431,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     // If the column was previously limited by its maximum value but has more room now, 
                     // attempt to resize the column to its desired width.
-                    column.Resize(column.Width.Value,column.Width.UnitType,column.Width.DesiredValue, column.Width.DesiredValue, false);
+                    column.Resize(column.Width.Value, column.Width.UnitType, column.Width.DesiredValue, column.Width.DesiredValue, false);
                 }
                 OnColumnWidthChanged(column);
             }
@@ -502,7 +489,7 @@ namespace Windows.UI.Xaml.Controls
             EnsureHorizontalLayout();
             InvalidateColumnHeadersMeasure();
 
-            if (updatedColumn.IsVisible && 
+            if (updatedColumn.IsVisible &&
                 this.ColumnsInternal.VisibleColumnCount == 1 && this.CurrentColumnIndex == -1)
             {
                 Debug.Assert(this.SelectedIndex == this.DataConnection.IndexOf(this.SelectedItem));
@@ -531,7 +518,7 @@ namespace Windows.UI.Xaml.Controls
         {
             Debug.Assert(targetColumn != null);
 
-            if (targetColumn.IsVisible && 
+            if (targetColumn.IsVisible &&
                 this.CurrentColumn == targetColumn)
             {
                 // Column of the current cell is made invisible. Trying to move the current cell to a neighbor column. May throw an exception.
@@ -580,8 +567,8 @@ namespace Windows.UI.Xaml.Controls
             if (newCurrentCellCoordinates.ColumnIndex != -1)
             {
                 Debug.Assert(this.CurrentColumnIndex == -1);
-                SetAndSelectCurrentCell(newCurrentCellCoordinates.ColumnIndex, 
-                                        newCurrentCellCoordinates.Slot, 
+                SetAndSelectCurrentCell(newCurrentCellCoordinates.ColumnIndex,
+                                        newCurrentCellCoordinates.Slot,
                                         this.ColumnsInternal.VisibleColumnCount == 1 /*forceCurrentCellSelection*/);
 
                 if (newDisplayIndex < this.FrozenColumnCountWithFiller)
@@ -809,7 +796,7 @@ namespace Windows.UI.Xaml.Controls
                     this._hScrollBar.Value = this._horizontalOffset;
                 }
             }
-            
+
             return newCurrentCellCoordinates;
         }
 
@@ -822,7 +809,7 @@ namespace Windows.UI.Xaml.Controls
             Debug.Assert(dataGridColumn != null);
 
             // Take care of the non-displayed loaded rows
-            for (int index = 0; index < this._loadedRows.Count; )
+            for (int index = 0; index < this._loadedRows.Count;)
             {
                 DataGridRow dataGridRow = this._loadedRows[index];
                 Debug.Assert(dataGridRow != null);
@@ -846,9 +833,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Internal Methods
-        
-#region Private Methods
+        #endregion Internal Methods
+
+        #region Private Methods
 
         private bool AddGeneratedColumn(DataGridAutoGeneratingColumnEventArgs e)
         {
@@ -1008,7 +995,7 @@ namespace Windows.UI.Xaml.Controls
                 // raise a Reset if its Enumeration changed.  In that case, we don't want to generate again.
                 return;
             }
-            
+
             _autoGeneratingColumnOperationCount++;
             try
             {
@@ -1023,9 +1010,7 @@ namespace Windows.UI.Xaml.Controls
                 _autoGeneratingColumnOperationCount--;
             }
         }
-#if MIGRATION
-        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-#endif
+        
         private bool ComputeDisplayedColumns()
         {
             bool invalidate = false;
@@ -1248,7 +1233,7 @@ namespace Windows.UI.Xaml.Controls
                 // as do the DisplayIndexMap values of modified column Indexes
                 DataGridColumn column;
                 this.ColumnsInternal.DisplayIndexMap.RemoveAt(deletedColumn.DisplayIndexWithFiller);
-                for (int displayIndex = 0; displayIndex < this.ColumnsInternal.DisplayIndexMap.Count; displayIndex++ )
+                for (int displayIndex = 0; displayIndex < this.ColumnsInternal.DisplayIndexMap.Count; displayIndex++)
                 {
                     if (this.ColumnsInternal.DisplayIndexMap[displayIndex] > deletedColumn.Index)
                     {
@@ -1760,7 +1745,7 @@ namespace Windows.UI.Xaml.Controls
                         }
                     }
                     this.DisplayData.FirstDisplayedScrollingCol = newFirstDisplayedScrollingCol.Index;
-                    
+
                     // At this point DisplayData.FirstDisplayedScrollingColumn and LastDisplayedScrollingColumn 
                     // should be correct
                     if (change != 0)
@@ -1852,6 +1837,6 @@ namespace Windows.UI.Xaml.Controls
             ComputeDisplayedColumns();
         }
 
-#endregion Private Methods
+        #endregion Private Methods
     }
 }

@@ -14,11 +14,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows.Media.Imaging
-#else
-namespace Windows.UI.Xaml.Media.Imaging
-#endif
 {
     public sealed partial class WriteableBitmap
     {

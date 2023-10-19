@@ -11,14 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace OpenSilver.Internal.Tests;
 

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// This class is used as part of a PointKeyFrameCollection in conjunction
@@ -28,7 +20,7 @@ namespace Windows.UI.Xaml.Media.Animation
     ///
     /// </summary>
     [OpenSilver.NotImplemented]
-    public sealed partial class SplinePointKeyFrame : PointKeyFrame
+    public sealed class SplinePointKeyFrame : PointKeyFrame
     {
         /// <summary>
         /// Identifies the <see cref="P:System.Windows.Media.Animation.SplinePointKeyFrame.KeySpline" /> dependency property.

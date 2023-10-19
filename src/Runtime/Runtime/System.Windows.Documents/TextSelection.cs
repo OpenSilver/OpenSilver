@@ -11,19 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     /// <summary>
     /// Encapsulates the selection state for the <see cref="RichTextBox"/> control.

@@ -7,11 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Wrapper class used to sort paths based on the order derived from a DisplayAttribute.

@@ -11,17 +11,9 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Automation.Provider;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Contains values that specify the <see cref="IExpandCollapseProvider.ExpandCollapseState" /> 

@@ -1,29 +1,18 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Windows.Interactivity;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+using Microsoft.Expression.Interactivity.Core;
+
 namespace Microsoft.Expression.Interactivity.Layout
 {
-    using System;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Windows.Interactivity;
-    using Microsoft.Expression.Interactivity.Core;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Input;
-    using System.Windows.Media;
-#else
-    using Windows.Foundation;
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Input;
-    using Windows.UI.Xaml.Media;
-    using MouseEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-    using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-    using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-    using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
-
     /// <summary>
     /// Repositions the attached element in response to mouse drag gestures on the element.
     /// </summary>
@@ -445,19 +434,11 @@ namespace Microsoft.Expression.Interactivity.Layout
         {
             this.relativePosition = positionInElementCoordinates;
 
-#if MIGRATION
             this.AssociatedObject.CaptureMouse();
 
             this.AssociatedObject.MouseMove += this.OnMouseMove;
             this.AssociatedObject.LostMouseCapture += this.OnLostMouseCapture;
             this.AssociatedObject.AddHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonUp), false /* handledEventsToo */);
-#else
-            this.AssociatedObject.CapturePointer();
-            this.AssociatedObject.PointerMoved += this.OnMouseMove;
-            this.AssociatedObject.PointerCaptureLost += this.OnLostMouseCapture;
-            this.AssociatedObject.AddHandler(UIElement.PointerReleasedEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonUp), false /* handledEventsToo */);
-#endif
-
         }
 
         internal void HandleDrag(Point newPositionInElementCoordinates)
@@ -476,24 +457,14 @@ namespace Microsoft.Expression.Interactivity.Layout
 
         internal void EndDrag()
         {
-#if MIGRATION
             this.AssociatedObject.MouseMove -= this.OnMouseMove;
             this.AssociatedObject.LostMouseCapture -= this.OnLostMouseCapture;
             this.AssociatedObject.RemoveHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonUp));
-#else
-            this.AssociatedObject.PointerMoved -= this.OnMouseMove;
-            this.AssociatedObject.PointerCaptureLost -= this.OnLostMouseCapture;
-            this.AssociatedObject.RemoveHandler(UIElement.PointerReleasedEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonUp));
-#endif
         }
 
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-#if MIGRATION
             this.StartDrag(e.GetPosition(this.AssociatedObject));
-#else
-            this.StartDrag(e.GetCurrentPoint(this.AssociatedObject).Position);
-#endif
 
             if (this.DragBegun != null)
             {
@@ -513,20 +484,12 @@ namespace Microsoft.Expression.Interactivity.Layout
 
         private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-#if MIGRATION
             this.AssociatedObject.ReleaseMouseCapture();
-#else
-            this.AssociatedObject.ReleasePointerCapture();
-#endif
         }
 
         private void OnMouseMove(object sender, MouseEventArgs e)
         {
-#if MIGRATION
             this.HandleDrag(e.GetPosition(this.AssociatedObject));
-#else
-            this.HandleDrag(e.GetCurrentPoint(this.AssociatedObject).Position);
-#endif
 
             if (this.Dragging != null)
             {
@@ -585,11 +548,7 @@ namespace Microsoft.Expression.Interactivity.Layout
         /// <remarks>Override this to hook up functionality to the AssociatedObject.</remarks>
         protected override void OnAttached()
         {
-#if MIGRATION
             this.AssociatedObject.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonDown), false /* handledEventsToo */);
-#else
-            this.AssociatedObject.AddHandler(UIElement.PointerPressedEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonDown), false /* handledEventsToo */);
-#endif
         }
 
         /// <summary>
@@ -598,11 +557,7 @@ namespace Microsoft.Expression.Interactivity.Layout
         /// <remarks>Override this to unhook functionality from the AssociatedObject.</remarks>
         protected override void OnDetaching()
         {
-#if MIGRATION
             this.AssociatedObject.RemoveHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonDown));
-#else
-            this.AssociatedObject.RemoveHandler(UIElement.PointerPressedEvent, new MouseButtonEventHandler(this.OnMouseLeftButtonDown));
-#endif
         }
     }
 }

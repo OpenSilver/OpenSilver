@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,33 +11,19 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
-using CSHTML5.Internal;
-#if MIGRATION
 using System.Windows.Controls;
-#else 
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Animates the value of a Double property along a set of key frames.
     /// </summary>
-    [ContentProperty("KeyFrames")]
-    public sealed partial class DoubleAnimationUsingKeyFrames : AnimationTimeline
+    [ContentProperty(nameof(KeyFrames))]
+    public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline
     {
         private DoubleKeyFrameCollection _keyFrames;
 

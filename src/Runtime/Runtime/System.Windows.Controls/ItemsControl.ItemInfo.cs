@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public partial class ItemsControl
     {

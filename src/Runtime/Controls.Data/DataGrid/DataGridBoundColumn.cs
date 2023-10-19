@@ -3,19 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> column that can 
@@ -26,19 +17,19 @@ namespace Windows.UI.Xaml.Controls
     [StyleTypedProperty(Property = "EditingElementStyle", StyleTargetType = typeof(FrameworkElement))]
     public abstract class DataGridBoundColumn : DataGridColumn
     {
-#region Constants
+        #region Constants
 
-#endregion Constants
+        #endregion Constants
 
-#region Data
+        #region Data
 
         private Binding _binding;
-        private Style _elementStyle; 
-        private Style _editingElementStyle; 
+        private Style _elementStyle;
+        private Style _editingElementStyle;
 
-#endregion Data
+        #endregion Data
 
-#region Dependency Properties
+        #region Dependency Properties
         // 
 
 
@@ -134,9 +125,9 @@ namespace Windows.UI.Xaml.Controls
 
 
 
-#endregion
+        #endregion
 
-#region Public Properties
+        #region Public Properties
 
         /// <summary>
         /// Gets or sets the binding that associates the column with a property in the data source.
@@ -251,15 +242,15 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Public Properties
+        #endregion Public Properties
 
-#region Internal Properties
+        #region Internal Properties
 
         internal DependencyProperty BindingTarget { get; set; }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
-#region Internal Methods
+        #region Internal Methods
 
         internal override List<string> CreateBindingPaths()
         {
@@ -311,6 +302,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
     }
 }

@@ -1,12 +1,8 @@
 ﻿using System.Windows.Markup;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
-    [ContentProperty("KeyFrames")]  
+    [ContentProperty(nameof(KeyFrames))]  
     [OpenSilver.NotImplemented]
     public sealed class PointAnimationUsingKeyFrames : Timeline
     {

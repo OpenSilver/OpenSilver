@@ -4,18 +4,9 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// AutomationPeer for DataGridRowsPresenter
@@ -72,7 +63,6 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
 
         ///
-        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Required method signature for automation peers")]
         protected override List<AutomationPeer> GetChildrenCore()
         {
             if (this.OwningRowsPresenter.OwningGrid == null)

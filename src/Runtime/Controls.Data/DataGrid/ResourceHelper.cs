@@ -3,25 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Markup;
 
-
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Markup;
-#endif
-
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal sealed class ResourceHelper
     {
@@ -60,7 +46,7 @@ namespace Windows.UI.Xaml.Controls
                     return result;
 #if DEBUG
                 }
-                catch 
+                catch
                 {
                     throw;
                 }
@@ -74,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (!_cache.TryGetValue(resourceName, out template))
             {
-                 Stream s = type.Assembly.GetManifestResourceStream(resourceName + ".xaml");
+                Stream s = type.Assembly.GetManifestResourceStream(resourceName + ".xaml");
                 if (s != null)
                 {
                     template = new StreamReader(s).ReadToEnd();

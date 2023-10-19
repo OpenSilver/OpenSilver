@@ -1,16 +1,12 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Windows.Interactivity;
+using System.Windows;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System.Windows.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// An action that will change the value of a property from a data store object.
     /// This class is identical to ChangePropertyAction. The only difference is that the data store picker is loaded 

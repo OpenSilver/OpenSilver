@@ -3,38 +3,18 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation;
-#else
-using Windows.Foundation;
-using Windows.System;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Interop;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Automation;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that uses a spinner and textbox to allow a user to 
@@ -142,11 +122,7 @@ namespace Windows.UI.Xaml.Controls
 
                 if (_timeHintPopupPart != null && _timeHintPopupPart.Child != null)
                 {
-#if MIGRATION
                     _timeHintPopupPart.Child.MouseLeftButtonDown -= OnTimeHintMouseLeftButtonDown;
-#else
-                    _timeHintPopupPart.Child.PointerPressed -= OnTimeHintMouseLeftButtonDown;
-#endif
                 }
 
                 _timeHintPopupPart = value;
@@ -155,11 +131,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     if (_timeHintPopupPart.Child != null)
                     {
-#if MIGRATION
                         _timeHintPopupPart.Child.MouseLeftButtonDown += OnTimeHintMouseLeftButtonDown;
-#else
-                        _timeHintPopupPart.Child.PointerPressed += OnTimeHintMouseLeftButtonDown;
-#endif
                     }
                     // Defer opening of the Popup to avoid an exception
                     Dispatcher.BeginInvoke(() => _timeHintPopupPart.IsOpen = true);
@@ -770,11 +742,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the TimeUpDown control when a new
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             if (Text != null)
             {
@@ -1211,11 +1179,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (Text.Text != _lastParsedText)
             {
-#if MIGRATION
                 if (e.Key == Key.Up || e.Key == Key.Down)
-#else
-                if (e.Key == VirtualKey.Up || e.Key == VirtualKey.Down)
-#endif
                 {
                     int caretPosition = Text.SelectionStart;
                     ApplyValue(Text.Text);
@@ -1225,11 +1189,7 @@ namespace Windows.UI.Xaml.Controls
                         // there are situations where the caretposition
                         // is not correct. However, this is the 99% case.
                         Text.SelectionStart = caretPosition;
-#if MIGRATION
                         if (e.Key == Key.Up)
-#else
-                        if (e.Key == VirtualKey.Up)
-#endif
                         {
                             OnIncrement();
                         }
@@ -1278,20 +1238,12 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseEnter event.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(MouseEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseEnter(e))
             {
                 Interaction.OnMouseEnterBase();
-#if MIGRATION
                 base.OnMouseEnter(e);
-#else
-                base.OnPointerEntered(e);
-#endif
             }
         }
 
@@ -1299,20 +1251,12 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseLeave event.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(MouseEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeave(e))
             {
                 Interaction.OnMouseLeaveBase();
-#if MIGRATION
                 base.OnMouseLeave(e);
-#else
-                base.OnPointerExited(e);
-#endif
             }
         }
 
@@ -1320,20 +1264,12 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseLeftButtonDown event.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(MouseButtonEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeftButtonDown(e))
             {
                 Interaction.OnMouseLeftButtonDownBase();
-#if MIGRATION
                 base.OnMouseLeave(e);
-#else
-                base.OnPointerPressed(e);
-#endif
             }
         }
 
@@ -1341,20 +1277,12 @@ namespace Windows.UI.Xaml.Controls
         /// Called before the MouseLeftButtonUp event occurs.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(MouseButtonEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeftButtonUp(e))
             {
                 Interaction.OnMouseLeftButtonUpBase();
-#if MIGRATION
                 base.OnMouseLeftButtonUp(e);
-#else
-                base.OnPointerReleased(e);
-#endif
             }
         }
 

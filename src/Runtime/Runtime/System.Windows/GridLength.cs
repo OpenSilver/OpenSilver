@@ -14,11 +14,7 @@
 using System;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents the length of elements that explicitly support <see cref="GridUnitType.Star"/>

@@ -4,11 +4,7 @@
 
 using System;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Specifies the types of framework-level property behavior that pertain to a particular

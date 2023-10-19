@@ -3,25 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Windows;
-
-#if MIGRATION
-using System.Windows.Media;
-using System.Windows.Controls;
 using System.Windows.Shapes;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Controls;
-using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// An axis that has a range.
@@ -164,9 +151,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         protected RangeAxis()
         {
-#if !MIGRATION
-            this.DefaultStyleKey = typeof(RangeAxis);
-#endif
             this._labelPool = new ObjectPool<Control>(() => CreateAxisLabel());
             this._majorTickMarkPool = new ObjectPool<Line>(() => CreateMajorTickMark());
             this._minorTickMarkPool = new ObjectPool<Line>(() => CreateMinorTickMark());
@@ -182,9 +166,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             };
             SizeChanged += handler;
 
-#if MIGRATION
             this.DefaultStyleKey = typeof(RangeAxis);
-#endif
         }
 
         /// <summary>

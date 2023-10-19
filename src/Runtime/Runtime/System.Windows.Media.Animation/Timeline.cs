@@ -11,29 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
-using System.Reflection;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Threading;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Defines a segment of time.
     /// </summary>
-    public abstract partial class Timeline : DependencyObject
+    public abstract class Timeline : DependencyObject
     {
         internal INameResolver NameResolver { get; set; }
 

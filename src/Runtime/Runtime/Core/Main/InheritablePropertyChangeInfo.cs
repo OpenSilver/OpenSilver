@@ -1,11 +1,6 @@
-﻿using CSHTML5.Internal;
-using System;
-
-#if MIGRATION
+﻿using System;
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
+using CSHTML5.Internal;
 
 namespace OpenSilver.Internal
 {

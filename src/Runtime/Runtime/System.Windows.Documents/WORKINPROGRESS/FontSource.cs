@@ -13,31 +13,20 @@
 
 using System.IO;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
-    //
-    // Summary:
-    //     Represents one or more fonts created from a stream.
+    /// <summary>
+    /// Represents one or more fonts created from a stream.
+    /// </summary>
     [OpenSilver.NotImplemented]
     public class FontSource
     {
-        //
-        // Summary:
-        //     Initializes a new instance of the System.Windows.Documents.FontSource class.
-        //
-        // Parameters:
-        //   stream:
-        //     The stream that contains the font source.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FontSource"/> class.
+        /// </summary>
+        /// <param name="stream">
+        /// The stream that contains the font source.
+        /// </param>
         [OpenSilver.NotImplemented]
         public FontSource(Stream stream)
         {

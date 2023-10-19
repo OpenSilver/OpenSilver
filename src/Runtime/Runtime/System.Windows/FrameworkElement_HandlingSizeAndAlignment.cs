@@ -14,24 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Markup;
-#endif
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides a framework of common APIs for objects that participate in UI and

@@ -3,16 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 { 
 /// <summary>
 /// Collection of functions that manipulate streams of ranges.

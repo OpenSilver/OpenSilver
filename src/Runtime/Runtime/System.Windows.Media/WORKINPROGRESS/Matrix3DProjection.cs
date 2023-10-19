@@ -1,24 +1,14 @@
-using System;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Media.Media3D;
-#else
-using Windows.UI.Xaml.Media.Media3D;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
 	/// <summary>
 	///  Enables you to apply a <see cref="Matrix3D"/> to an object.
 	/// </summary>
-	[ContentProperty("ProjectionMatrix")]
+	[ContentProperty(nameof(ProjectionMatrix))]
     [OpenSilver.NotImplemented]
-	public sealed partial class Matrix3DProjection : Projection
+	public sealed class Matrix3DProjection : Projection
 	{
 		/// <summary>
 		/// Initializes a new instance of a <see cref="Matrix3DProjection"/> class.

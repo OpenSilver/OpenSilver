@@ -11,26 +11,13 @@
 *
 \*====================================================================================*/
 
-using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers.Tests
-#else
-namespace Windows.UI.Xaml.Automation.Peers.Tests
-#endif
 {
     [TestClass]
     public class FrameworkElementAutomationPeerTest

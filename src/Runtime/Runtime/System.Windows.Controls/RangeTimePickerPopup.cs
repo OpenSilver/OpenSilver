@@ -3,24 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-using System.Linq;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a time picker popup that allows choosing time through 3 
@@ -361,11 +348,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the RangeTimePickerPopup control when a 
         /// new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -400,11 +383,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
-#if MIGRATION
         private void SecondsChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-#else
-        private void SecondsChanged(object sender, RangeBaseValueChangedEventArgs e)
-#endif
         {
             if (_ignoreSliderChange)
             {
@@ -433,11 +412,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>        
-#if MIGRATION
         private void MinutesChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-#else
-        private void MinutesChanged(object sender, RangeBaseValueChangedEventArgs e)
-#endif
         {
             if (_ignoreSliderChange)
             {
@@ -466,11 +441,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
-#if MIGRATION
         private void HoursChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-#else
-        private void HoursChanged(object sender, RangeBaseValueChangedEventArgs e)
-#endif
         {
             if (_ignoreSliderChange)
             {

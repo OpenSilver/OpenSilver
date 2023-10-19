@@ -20,26 +20,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-#if !BRIDGE
-//BRIDGETODO:
-//Apparently, using below is useless
-using System.Runtime.Serialization.Formatters.Binary;
 using JSIL.Meta;
-#else
-using Bridge;
-#endif
 using System.Text;
 using System.Threading.Tasks;
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
-#if OPENSILVER
 using OpenSilver;
-#else
-using CSHTML5;
-#endif
 
 namespace System.IO.IsolatedStorage
 {

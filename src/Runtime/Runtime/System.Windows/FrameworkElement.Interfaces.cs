@@ -15,17 +15,7 @@ using System;
 using System.Collections;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
-
-#if MIGRATION
 namespace System.Windows;
-#else
-namespace Windows.UI.Xaml;
-#endif
 
 public partial class FrameworkElement : IInternalFrameworkElement
 {

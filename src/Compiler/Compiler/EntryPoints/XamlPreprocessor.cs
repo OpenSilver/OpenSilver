@@ -55,9 +55,6 @@ namespace OpenSilver.Compiler
         public bool OverrideOutputOnlyIfSourceHasChanged { get; set; }
 
         [Required]
-        public bool IsSLMigration { get; set; }
-
-        [Required]
         public string OutputRootPath { get; set; }
 
         [Required]
@@ -85,7 +82,6 @@ namespace OpenSilver.Compiler
                 FileNameWithPathRelativeToProjectRoot,
                 AssemblyNameWithoutExtension,
                 IsSecondPass,
-                IsSLMigration,
                 new LoggerThatUsesTaskOutput(this),
                 OverrideOutputOnlyIfSourceHasChanged,
                 OutputRootPath,
@@ -103,7 +99,6 @@ namespace OpenSilver.Compiler
             string fileNameWithPathRelativeToProjectRoot,
             string assemblyNameWithoutExtension,
             bool isSecondPass,
-            bool isSLMigration,
             ILogger logger,
             bool overrideOutputOnlyIfSourceHasChanged,
             string outputRootPath,
@@ -167,7 +162,6 @@ namespace OpenSilver.Compiler
                                     assemblyNameWithoutExtension,
                                     reflectionOnSeparateAppDomain,
                                     isFirstPass: !isSecondPass,
-                                    isSLMigration: isSLMigration,
                                     outputRootPath: outputRootPath,
                                     outputAppFilesPath: outputAppFilesPath,
                                     outputLibrariesPath: outputLibrariesPath,
@@ -191,7 +185,6 @@ namespace OpenSilver.Compiler
                                     rootNamespace,
                                     reflectionOnSeparateAppDomain,
                                     isFirstPass: !isSecondPass,
-                                    isSLMigration: isSLMigration,
                                     outputRootPath: outputRootPath,
                                     outputAppFilesPath: outputAppFilesPath,
                                     outputLibrariesPath: outputLibrariesPath,

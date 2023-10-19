@@ -11,31 +11,19 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays the content of a <see cref="ContentControl"/>.
     /// </summary>
     [ContentProperty(nameof(Content))]
-    public partial class ContentPresenter : FrameworkElement
+    public class ContentPresenter : FrameworkElement
     {
         private DataTemplate _templateCache;
         private bool _templateIsCurrent;

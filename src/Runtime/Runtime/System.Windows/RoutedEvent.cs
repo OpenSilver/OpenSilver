@@ -14,11 +14,7 @@
 using System;
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents a routed event to the Silverlight event system.

@@ -1,16 +1,11 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Diagnostics.CodeAnalysis;
+
 namespace System.Windows.Interactivity
 {
-    using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using global::Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// A trigger that listens for a specified event on its source and fires when that event is fired.
     /// </summary>

@@ -7,25 +7,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Browser;
-using OpenSilver.Internal.Navigation;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
+using OpenSilver.Internal.Navigation;
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Used to programmatically initiate navigation, primarily from within a <see cref="Page"/>.

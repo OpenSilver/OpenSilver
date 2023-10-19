@@ -11,20 +11,10 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Exposes <see cref="ScrollBar"/> types to UI automation.

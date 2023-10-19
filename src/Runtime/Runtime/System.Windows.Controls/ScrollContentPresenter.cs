@@ -11,22 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
+using System.Windows.Controls.Primitives;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls.Primitives;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays the content of a <see cref="ScrollViewer"/> control.
@@ -180,11 +169,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the <see cref="ScrollContentPresenter"/>
         /// when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

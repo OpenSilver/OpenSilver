@@ -11,19 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using CSHTML5.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Rotates an object clockwise about a specified point in a two-dimensional

@@ -13,11 +13,7 @@
 
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Input;
-#else
-namespace Windows.UI.Xaml.Input;
-#endif
 /// <summary>
 /// Represents a request to an element to move focus to another control.
 /// </summary>

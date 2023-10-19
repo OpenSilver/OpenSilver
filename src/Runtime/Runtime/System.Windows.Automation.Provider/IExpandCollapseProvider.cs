@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Automation.Provider
-#else
-namespace Windows.UI.Xaml.Automation.Provider
-#endif
 {
     /// <summary>
     /// Exposes methods and properties to support access by a UI automation client to controls 

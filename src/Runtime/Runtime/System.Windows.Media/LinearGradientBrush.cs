@@ -11,28 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Paints an area with a linear gradient.

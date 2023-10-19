@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,32 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using CSHTML5.Internal;
-using CSHTML5.Native.Html.Controls;
-using DotNetForHtml5.Core;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that creates a pop-up window that displays information for an element in the UI.
     /// </summary>
     [TemplateVisualState(Name = VisualStates.StateToolTipOpen, GroupName = VisualStates.GroupToolTip)]
     [TemplateVisualState(Name = VisualStates.StateToolTipClosed, GroupName = VisualStates.GroupToolTip)]
-    public partial class ToolTip : ContentControl
+    public class ToolTip : ContentControl
     {
         private Popup _parentPopup;
         private FrameworkElement _owner;

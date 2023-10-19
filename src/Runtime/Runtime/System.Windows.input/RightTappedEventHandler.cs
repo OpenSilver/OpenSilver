@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     /// <summary>
     /// Represents the method that will handle a RightTapped routed event.
@@ -28,5 +19,4 @@ namespace Windows.UI.Xaml.Input
     /// <param name="sender"></param>
     /// <param name="e"></param>
     public delegate void RightTappedEventHandler(object sender, RightTappedRoutedEventArgs e);
-
 }

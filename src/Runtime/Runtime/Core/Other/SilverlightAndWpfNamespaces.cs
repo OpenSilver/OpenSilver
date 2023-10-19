@@ -13,8 +13,6 @@
 \*====================================================================================*/
 
 
-#if MIGRATION
-
 //-------------------------------------------------------------------------------
 // Note: The following "empty" namespaces are useful when migrating Silverlight
 // and WPF apps because they help prevent compilation errors that says that the
@@ -57,4 +55,3 @@ namespace System.Windows.Navigation
 {
     public static class Empty { }
 }
-#endif

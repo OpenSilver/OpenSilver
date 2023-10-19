@@ -11,18 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
 using OpenSilver.Internal.Media.Animation;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     public abstract class AnimationTimeline : Timeline
     {

@@ -11,20 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Specialized;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a subsection of a geometry, a single connected series of two-dimensional

@@ -11,20 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Arranges child elements into a single line that can be oriented horizontally

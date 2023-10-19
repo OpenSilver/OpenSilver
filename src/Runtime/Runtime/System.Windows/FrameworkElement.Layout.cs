@@ -17,18 +17,7 @@ using System.ComponentModel;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     public partial class FrameworkElement
     {

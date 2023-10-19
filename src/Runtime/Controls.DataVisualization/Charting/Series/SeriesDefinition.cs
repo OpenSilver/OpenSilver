@@ -3,27 +3,17 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Shapes;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Defines the attributes of a series that is to be rendered by the DefinitionSeries class.

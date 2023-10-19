@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Specifies whether data in a table should be read primarily by row or by column.

@@ -15,11 +15,7 @@ using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Documents;
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     /// <summary>
     /// Provides a block-level content element that is used to group content into a paragraph.

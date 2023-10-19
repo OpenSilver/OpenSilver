@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Collections.ObjectModel
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// A class that holds a selected item.
     /// </summary>
-    public sealed partial class Selection
+    public sealed class Selection
     {
         /// <summary>
         /// Initializes an instance of the Selection class.

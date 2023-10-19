@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Provides data for the DragCompleted event that occurs when a user completes
     /// a drag operation with the mouse of a Thumb control.
     /// </summary>
-    public partial class DragCompletedEventArgs : RoutedEventArgs
+    public class DragCompletedEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the DragCompletedEventArgs class.

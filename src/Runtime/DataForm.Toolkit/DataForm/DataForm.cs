@@ -7,7 +7,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,34 +18,15 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
-
-#if MIGRATION
-#if OPENSILVER
 using System.Windows.Automation.Peers;
-#endif
 using System.Windows.Controls.Common;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
-#else
-#if OPENSILVER
-using Windows.UI.Xaml.Automation.Peers;
-#endif
-using Windows.UI.Xaml.Controls.Common;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
 using resources = OpenSilver.Internal.Controls.Data.DataForm.Toolkit.Resources;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays data in a customizable form.
@@ -2364,12 +2344,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Applies the template for this control.
         /// </summary>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "No need to split up the method; it only has a large number of if statements.")]
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -3620,11 +3595,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     if (valueConverter != null)
                     {
-#if MIGRATION
                         value = valueConverter.ConvertBack(value, originalType, converterParameter, converterCulture);
-#else
-                        value = valueConverter.ConvertBack(value, originalType, converterParameter, converterCulture.Name);
-#endif
                     }
                     else
                     {
@@ -5256,12 +5227,7 @@ namespace Windows.UI.Xaml.Controls
                             propertyInfo != null ? propertyInfo.PropertyType : null,
                             bindingExpression.ParentBinding.Converter,
                             bindingExpression.ParentBinding.ConverterParameter,
-#if MIGRATION
                             bindingExpression.ParentBinding.ConverterCulture ?? (textBox.Language != null ? new CultureInfo(textBox.Language.IetfLanguageTag) : CultureInfo.CurrentCulture));
-#else
-                            bindingExpression.ParentBinding.ConverterLanguage != null ? new CultureInfo(bindingExpression.ParentBinding.ConverterLanguage) :
-                                (textBox.Language != null ? new CultureInfo(textBox.Language.IetfLanguageTag) : CultureInfo.CurrentCulture));
-#endif
                     }
                 }
             }

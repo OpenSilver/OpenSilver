@@ -1,10 +1,6 @@
 ﻿using System;
 
-#if MIGRATION
 namespace System.Windows.Interop
-#else
-namespace Windows.UI.Xaml.Interop
-#endif
 {
 	/// <summary>
 	/// Defines constants that indicate the behavior of full-screen mode. 

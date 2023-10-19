@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Printing
-#else
-namespace Windows.UI.Xaml.Printing
-#endif
 {
     /// <summary>
     /// Provides device specific settings for printers that have vector printing limitations.

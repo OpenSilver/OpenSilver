@@ -1,24 +1,16 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Collections;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using Microsoft.Expression.Interactivity.Core;
+
 namespace Microsoft.Expression.Interactivity
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using Microsoft.Expression.Interactivity.Core;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Media;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Controls;
-    using Windows.UI.Xaml.Media;
-#endif
-
     /// <summary>
     /// This class provides various platform agnostic standard operations for working with VisualStateManager.
     /// </summary>

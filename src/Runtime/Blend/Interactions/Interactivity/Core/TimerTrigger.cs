@@ -1,17 +1,13 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Windows.Threading;
+using System.Windows;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Windows.Threading;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// A trigger that is triggered by a specified event occurring on its source and fires after a delay when that event is fired.
     /// </summary>
@@ -38,11 +34,7 @@ namespace Microsoft.Expression.Interactivity.Core
                                                                                                     );
 
         private ITickTimer timer;
-#if MIGRATION
         private EventArgs eventArgs;
-#else
-        private RoutedEventArgs eventArgs;
-#endif
         private int tickCount;
 
         /// <summary>
@@ -77,11 +69,7 @@ namespace Microsoft.Expression.Interactivity.Core
             set { this.SetValue(TotalTicksProperty, value); }
         }
 
-#if MIGRATION
         protected override void OnEvent(EventArgs eventArgs)
-#else
-        protected override void OnEvent(RoutedEventArgs eventArgs)
-#endif
         {
             this.StopTimer();
 
@@ -117,11 +105,7 @@ namespace Microsoft.Expression.Interactivity.Core
             }
         }
 
-#if MIGRATION
         private void OnTimerTick(object sender, EventArgs e)
-#else
-        private void OnTimerTick(object sender, object e)
-#endif
         {
             if (this.TotalTicks > 0 && ++this.tickCount >= this.TotalTicks)
             {
@@ -140,11 +124,7 @@ namespace Microsoft.Expression.Interactivity.Core
                 this.dispatcherTimer = new DispatcherTimer();
             }
 
-#if MIGRATION
             public event EventHandler Tick
-#else
-            public event EventHandler<object> Tick
-#endif
             {
                 add { this.dispatcherTimer.Tick += value; }
                 remove { this.dispatcherTimer.Tick -= value; }

@@ -7,13 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls.Common
-#else
-namespace Windows.UI.Xaml.Controls.Common
-#endif
 {
     /// <summary>
     /// Reservoir of attached properties for use by extension methods that require non-static information about objects.

@@ -11,32 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Windows.Input;
-using OpenSilver.Internal;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Input;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-using Key = Windows.System.VirtualKey;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-#endif
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Contains a list of selectable items.
@@ -152,11 +136,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             // _scrollHost must be set before calling base
             _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
@@ -203,11 +183,7 @@ namespace Windows.UI.Xaml.Controls
                 switch (e.Key)
                 {
                     case Key.Space:
-#if MIGRATION
                         if (ModifierKeys.Alt != (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Alt))
-#else
-                        if (ModifierKeys.Menu != (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Menu))
-#endif
                             && FocusManager.GetFocusedElement() is ListBoxItem listBoxItem)
                         {
                             MakeKeyboardSelection(listBoxItem);

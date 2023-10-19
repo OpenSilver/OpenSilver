@@ -7,18 +7,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Windows.Browser;
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     internal static class UriParsingHelper
     {

@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public abstract class INTERNAL_CalendarOrClockBase : FrameworkElement
     {

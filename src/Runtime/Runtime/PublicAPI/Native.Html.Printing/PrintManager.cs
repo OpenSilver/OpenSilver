@@ -18,19 +18,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-#if MIGRATION
 using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using System.Windows;
-#endif
 
 namespace CSHTML5.Native.Html.Printing
 {
@@ -185,12 +176,7 @@ namespace CSHTML5.Native.Html.Printing
                     // Listen to the "Loaded" event of the container, so that we are notified when the element becomes visible:
                     container.Loaded += (s2, e2) =>
                     {
-#if MIGRATION
-                        Dispatcher
-#else
-                        CoreDispatcher
-#endif
-                        .CurrentDispatcher.BeginInvoke(() =>
+                        Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                         {
                             // Print the element:
                             PrintManager.Print(element);

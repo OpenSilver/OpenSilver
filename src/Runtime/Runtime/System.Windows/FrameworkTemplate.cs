@@ -18,21 +18,13 @@ using System.Windows.Markup;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml.Context;
 
-#if !MIGRATION
-using Windows.UI.Xaml.Markup;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Creates an element tree of elements.
     /// </summary>
-    [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
-    public abstract partial class FrameworkTemplate : DependencyObject
+    [ContentProperty(nameof(ContentPropertyUsefulOnlyDuringTheCompilation))]
+    public abstract class FrameworkTemplate : DependencyObject
     {
         private TemplateContent _template;
         private bool _isSealed;

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,38 +11,17 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 using System.Windows.Input;
-using Microsoft.Windows;
 using System.Windows;
-#else
-using Windows.UI.Xaml.Input;
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Input;
-using System.Windows;
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace Microsoft.Windows
-#else
-namespace System.Windows
-#endif
 {
     /// <summary>
     /// Provides data for drag-and-drop events in Silverlight.
     /// </summary>
-    public sealed partial class DragEventArgs : ExtendedRoutedEventArgs
+    public sealed class DragEventArgs : ExtendedRoutedEventArgs
     {
-#if MIGRATION
         internal MouseEventArgs MouseEventArgs { get; set; }
-#else
-        internal PointerRoutedEventArgs PointerRoutedEventArgs { get; set; }
-#endif
 
         /// <summary>
         /// Initializes a new instance of the DragEventArgs class.
@@ -56,18 +34,10 @@ namespace System.Windows
         /// <summary>
         /// Initializes a new instance of the DragEventArgs class.
         /// </summary>
-#if MIGRATION
         internal DragEventArgs(IDataObject data, MouseEventArgs e) //todo: check whether this should be "MouseButtonEventArgs"
-#else
-        internal DragEventArgs(IDataObject data, PointerRoutedEventArgs e)
-#endif
         {
             this.Data = data;
-#if MIGRATION
             this.MouseEventArgs = e;
-#else
-            this.PointerRoutedEventArgs = e;
-#endif
         }
 
         /// <summary>
@@ -87,17 +57,10 @@ namespace System.Windows
         /// </summary>
         /// <param name="relativeTo">The UIElement for which to get a relative drop point.</param>
         /// <returns> A drop point that is relative to the element specified in relativeTo.</returns>
-#if MIGRATION
         public Point GetPosition(UIElement relativeTo)
         {
             return MouseEventArgs.GetPosition(relativeTo);
         }
-#else
-        public PointerPoint GetPosition(UIElement relativeTo)
-        {
-            return PointerRoutedEventArgs.GetCurrentPoint(relativeTo);
-        }
-#endif
 
         /// <summary>
         /// Gets a member of the System.Windows.DragDropEffects enumeration that specifies

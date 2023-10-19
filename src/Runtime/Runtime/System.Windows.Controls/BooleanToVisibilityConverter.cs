@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 using System.Windows.Data;
 using System.Globalization;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Convert between boolean and visibility
@@ -39,26 +27,20 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="value"></param>
         /// <param name="targetType"></param>
         /// <param name="parameter"></param>
-        /// <param name="language"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
-        public object Convert(object value, Type targetType, object parameter,
-#if MIGRATION
-            CultureInfo culture)
-#else
-            string language)
-#endif
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             bool booleanValue = false;
             if (value is bool)
             {
                 booleanValue = (bool)value;
             }
-            else if (value is Nullable<bool>)
+            else if (value is bool?)
             {
-                Nullable<bool> nullableValue = (Nullable<bool>)value;
-                booleanValue = nullableValue.HasValue ? nullableValue.Value : false;
+                booleanValue = (bool?)value ?? false;
             }
-            return (booleanValue) ? Visibility.Visible : Visibility.Collapsed;
+            return booleanValue ? Visibility.Visible : Visibility.Collapsed;
         }
 
         /// <summary>
@@ -67,23 +49,11 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="value"></param>
         /// <param name="targetType"></param>
         /// <param name="parameter"></param>
-        /// <param name="language"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
-        public object ConvertBack(object value, Type targetType, object parameter,
-#if MIGRATION
-            CultureInfo culture)
-#else
-            string language)
-#endif
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Visibility)
-            {
-                return (Visibility)value == Visibility.Visible;
-            }
-            else
-            {
-                return false;
-            }
+            return value is Visibility visibility && visibility == Visibility.Visible;
         }
     }
 }

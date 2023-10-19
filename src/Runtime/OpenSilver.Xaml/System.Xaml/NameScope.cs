@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-#if MIGRATION
 using System.Windows.Markup;
-#else
-using Windows.UI.Xaml.Markup;
-#endif
 
 namespace System.Xaml
 {

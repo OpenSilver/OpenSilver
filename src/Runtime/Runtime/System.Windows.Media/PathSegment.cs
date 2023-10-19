@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a segment of a <see cref="PathFigure"/> object.

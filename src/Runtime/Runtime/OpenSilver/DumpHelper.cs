@@ -16,14 +16,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using CSHTML5.Internal;
 using Microsoft.JSInterop;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace OpenSilver;
 

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,15 @@
 *  
 \*====================================================================================*/
 
-
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
-#if MIGRATION
 namespace System.Collections.ObjectModel
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// A collection of selected items.
     /// </summary>
-    public sealed partial class SelectionCollection : Collection<Selection>
+    public sealed class SelectionCollection : Collection<Selection>
     {
 
         /// <summary>

@@ -7,30 +7,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
-using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
-
-//Note about below: We cannot use "VisualStates" as the alias because Bridge will use the VisualStates class defined in Runtime.CSHTML5 instead of using this alias.
-//                  It is due to the fact it recognizes VisualStates as a type defined in the current namespace before recognizing it as the alias.
-#if MIGRATION
 using System.Windows.Data;
 using System.Windows.Controls.Common;
-using InternalVisualStates = System.Windows.Controls.Internal.VisualStates; // See note above #if
-#else
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Controls.Common;
-using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; // See note above #if
-#endif
+using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
+using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays a caption, required field indicator, and validation error indicator for a control.
@@ -311,11 +297,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// When the template is applied, this loads all the template parts
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

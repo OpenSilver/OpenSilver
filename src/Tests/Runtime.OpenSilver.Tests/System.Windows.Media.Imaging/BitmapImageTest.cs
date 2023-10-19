@@ -1,19 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using System;
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media.Imaging.Tests
-#else
-namespace Windows.UI.Xaml.Media.Imaging.Tests
-#endif
 {
     [TestClass]
     public class BitmapImageTest

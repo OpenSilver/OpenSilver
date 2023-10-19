@@ -1,50 +1,20 @@
-using System;
-
-#if MIGRATION
 namespace System.Windows.Interop
-#else
-namespace Windows.UI.Xaml.Interop
-#endif
 {
     [OpenSilver.NotImplemented]
-	public partial class SilverlightHost
-	{
-		private Uri _source;
-		private Settings _settings;
-		private Content _content;
+    public class SilverlightHost
+    {
         [OpenSilver.NotImplemented]
-		public Uri Source
-		{
-			get
-			{
-				return _source;
-			}
-		}
+        public Uri Source { get; }
 
         [OpenSilver.NotImplemented]
-		public Settings Settings
-		{
-			get
-			{
-				return _settings;
-			}
-		}
+        public Settings Settings { get; }
 
         [OpenSilver.NotImplemented]
-		public Content Content
-		{
-			get
-			{
-				return _content;
-			}
-		}
+        public Content Content { get; }
 
         [OpenSilver.NotImplemented]
-		public SilverlightHost()
-		{
-			_source = null;
-			_settings = null;
-			_content = null;
-		}
-	}
+        public SilverlightHost()
+        {
+        }
+    }
 }

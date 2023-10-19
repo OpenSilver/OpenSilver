@@ -9,11 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a collection of non-selectable dates in a <see cref="Calendar" />.

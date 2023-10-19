@@ -7,11 +7,7 @@
 // Description: Holds the information regarding the matched text from text search
 //
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal sealed class MatchedTextInfo
     {

@@ -1,8 +1,4 @@
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
 	//
 	// Summary:
@@ -10,7 +6,6 @@ namespace Windows.UI.Xaml.Media.Animation
 	//     custom easing functions by inheriting from this class.
 	public abstract partial class EasingFunctionBase : DependencyObject, IEasingFunction
 	{
-#if OPENSILVER
 		//
 		// Summary:
 		//     Initializes a new instance of the System.Windows.Media.Animation.EasingFunctionBase
@@ -34,8 +29,7 @@ namespace Windows.UI.Xaml.Media.Animation
 		//     A double that represents the transformed progress.
         [OpenSilver.NotImplemented]
 		protected abstract double EaseInCore(double normalizedTime);
-#endif
-		
+
 		//
 		// Summary:
 		//     Transforms normalized time to control the pace of an animation.

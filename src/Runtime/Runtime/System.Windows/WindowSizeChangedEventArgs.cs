@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Core
-#endif
 {
     /// <summary>
     /// Contains the argument returned by a window size change event.

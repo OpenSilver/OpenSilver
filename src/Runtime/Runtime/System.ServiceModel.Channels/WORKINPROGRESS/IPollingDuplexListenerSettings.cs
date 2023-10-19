@@ -1,6 +1,4 @@
-﻿#if MIGRATION
-
-namespace System.ServiceModel.Channels
+﻿namespace System.ServiceModel.Channels
 {
     internal interface IPollingDuplexListenerSettings : IPollingDuplexSettings
     {
@@ -11,5 +9,3 @@ namespace System.ServiceModel.Channels
         int MaxPendingMessagesPerSession { get; set; }
     }
 }
-
-#endif

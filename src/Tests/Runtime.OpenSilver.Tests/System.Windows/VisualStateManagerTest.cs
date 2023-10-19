@@ -10,24 +10,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Tests
-#else
-namespace Windows.UI.Xaml.Tests
-#endif
 {
     [TestClass]
     public class VisualStateManagerTest

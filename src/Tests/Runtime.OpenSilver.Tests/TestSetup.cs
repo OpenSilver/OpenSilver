@@ -12,7 +12,6 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using DotNetForHtml5;
 using DotNetForHtml5.Core;
@@ -23,14 +22,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
 
 namespace Runtime.OpenSilver.Tests
 {

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     /// <summary>
     /// Represents the method that will handle the Tapped event.
@@ -31,5 +19,4 @@ namespace Windows.UI.Xaml.Input
     /// <param name="sender"></param>
     /// <param name="e"></param>
     public delegate void TappedEventHandler(object sender, TappedRoutedEventArgs e);
-
 }

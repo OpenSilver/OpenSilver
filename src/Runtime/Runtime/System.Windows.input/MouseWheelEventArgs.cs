@@ -11,30 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
-#if MIGRATION
-    public partial class MouseWheelEventArgs : MouseEventArgs
-#else
-    public partial class PointerPointProperties
-#endif
+    public class MouseWheelEventArgs : MouseEventArgs
     {
-#if MIGRATION
         internal override void InvokeHandler(Delegate handler, object target)
         {
             ((MouseWheelEventHandler)handler)(target, this);
         }
-#endif
 
-#if MIGRATION
         public new int Delta { get; internal set; }
-#endif
 
         internal static int GetPointerWheelDelta(object jsEventArg)
         {

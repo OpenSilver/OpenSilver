@@ -3,25 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Linq;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Media.Animation;
-#endif
-
-#if OPENSILVER
 using Properties = OpenSilver.Controls.Properties;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control with a single piece of content and when that content 
@@ -291,11 +278,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the TransitioningContentControl control 
         /// when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             if (IsTransitioning)
             {

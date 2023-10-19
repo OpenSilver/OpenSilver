@@ -13,19 +13,10 @@
 
 using System;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.System;
-#endif
 
 namespace OpenSilver.Controls
 {
@@ -157,11 +148,7 @@ namespace OpenSilver.Controls
             IsDropDownOpen = false; // close the popup
         }
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -178,11 +165,7 @@ namespace OpenSilver.Controls
             SetSelectedDate();
         }
 
-#if MIGRATION
         private void OnTextBoxKeyDown(object sender, KeyEventArgs e)
-#else
-        private void OnTextBoxKeyDown(object sender, KeyRoutedEventArgs e)
-#endif
         {
             if (!e.Handled)
             {
@@ -303,7 +286,6 @@ namespace OpenSilver.Controls
             return DateTimeHelper.GetCurrentDateFormat();
         }
 
-#if MIGRATION
         private bool ProcessDatePickerKey(KeyEventArgs e)
         {
             switch (e.Key)
@@ -322,27 +304,6 @@ namespace OpenSilver.Controls
 
             return false;
         }
-#else
-        private bool ProcessDatePickerKey(KeyRoutedEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case VirtualKey.Enter:
-                    SetSelectedDate();
-                    return true;
-
-                case VirtualKey.Down:
-                    if ((global::System.Windows.Input.Keyboard.Modifiers & VirtualKeyModifiers.Control) == VirtualKeyModifiers.Control)
-                    {
-                        HandlePopUp();
-                    }
-                    return true;
-            }
-
-            return false;
-        }
-#endif
-
 
         private void HandlePopUp()
         {
@@ -350,19 +311,11 @@ namespace OpenSilver.Controls
             {
                 this.Focus();
                 this.IsDropDownOpen = false;
-#if MIGRATION
                 _calendarOrClock.ReleaseMouseCapture();
-#else
-                _calendarOrClock.ReleasePointerCapture();
-#endif
             }
             else
             {
-#if MIGRATION
                 _calendarOrClock.CaptureMouse();
-#else
-                _calendarOrClock.CapturePointer();
-#endif
                 ProcessTextBox();
             }
         }

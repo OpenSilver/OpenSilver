@@ -1,20 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     ///     This is a static helper class that has methods

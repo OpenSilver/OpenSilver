@@ -12,25 +12,15 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using OpenSilver.Internal.Data;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
-using System.Threading;
+using OpenSilver.Internal.Data;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// The XAML proxy of a collection view class.

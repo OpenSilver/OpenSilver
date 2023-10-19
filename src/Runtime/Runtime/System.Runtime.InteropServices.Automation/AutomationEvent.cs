@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 namespace System.Runtime.InteropServices.Automation
 {
     /// <summary>
@@ -45,5 +43,3 @@ namespace System.Runtime.InteropServices.Automation
         public void RemoveEventHandler(Delegate handler) { }
     }
 }
-
-#endif

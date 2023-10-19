@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,31 +11,17 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Specifies the panel that the ItemsPresenter creates for the layout of the
     /// items of an ItemsControl.
     /// </summary>
-    public partial class ItemsPanelTemplate : FrameworkTemplate
+    public class ItemsPanelTemplate : FrameworkTemplate
     {
         /// <summary>
         /// Initializes a new instance of the ItemsPanelTemplate class.
         /// </summary>
-        public ItemsPanelTemplate() : base() { }
+        public ItemsPanelTemplate() { }
     }
 }

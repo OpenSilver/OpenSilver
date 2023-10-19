@@ -16,11 +16,7 @@ using System;
 using DotNetForHtml5.Core;
 using System.Threading;
 
-#if MIGRATION
 namespace System.Windows.Threading
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides a timer that is integrated into the Dispatcher queue, which is processed
@@ -86,11 +82,8 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Occurs when the timer interval has elapsed.
         /// </summary>
-#if MIGRATION
         public event EventHandler Tick;
-#else
-        public event EventHandler<object> Tick;
-#endif
+        
         /// <summary>
         /// Raises the Tick event.
         /// </summary>

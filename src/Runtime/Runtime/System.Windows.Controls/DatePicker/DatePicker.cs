@@ -3,35 +3,16 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Input;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that allows the user to select a date.
@@ -791,11 +772,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the <see cref="DatePicker" /> control when a
         /// new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -815,11 +792,7 @@ namespace Windows.UI.Xaml.Controls
                     _outsidePopupCanvas.Background = new SolidColorBrush(Colors.Transparent);
                     _outsideCanvas.Children.Add(this._outsidePopupCanvas);
                     _outsideCanvas.Children.Add(this._calendar);
-#if MIGRATION
                     _outsidePopupCanvas.MouseLeftButtonDown += new MouseButtonEventHandler(OutsidePopupCanvas_MouseLeftButtonDown);
-#else
-                    _outsidePopupCanvas.PointerPressed += new MouseButtonEventHandler(OutsidePopupCanvas_MouseLeftButtonDown);
-#endif
                 }
 
                 _popUp.Child = this._outsideCanvas;
@@ -945,11 +918,7 @@ namespace Windows.UI.Xaml.Controls
         {
             this.Focus();
             this.IsDropDownOpen = false;
-#if MIGRATION
             _calendar.ReleaseMouseCapture();
-#else
-            _calendar.ReleasePointerCapture(e.Pointer);
-#endif
         }
 
         /// <summary>
@@ -1001,17 +970,9 @@ namespace Windows.UI.Xaml.Controls
         /// Default mouse wheel handler for the DatePicker control.
         /// </summary>
         /// <param name="e">Mouse wheel event args.</param>
-#if MIGRATION
         protected override void OnMouseWheel(MouseWheelEventArgs e)
-#else
-        protected override void OnPointerWheelChanged(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseWheel(e);
-#else
-            base.OnPointerWheelChanged(e);
-#endif
             if (!e.Handled && this.SelectedDate.HasValue)
             {
                 DateTime selectedDate = this.SelectedDate.Value;
@@ -1171,20 +1132,12 @@ namespace Windows.UI.Xaml.Controls
             {
                 this.Focus();
                 this.IsDropDownOpen = false;
-#if MIGRATION
                 _calendar.ReleaseMouseCapture();
-#else
-                _calendar.ReleasePointerCapture();
-#endif
             }
             else
             {
                 Debug.Assert(!this.IsDropDownOpen, "The drop down should be closed!");
-#if MIGRATION
                 _calendar.CaptureMouse();
-#else
-                _calendar.CapturePointer();
-#endif
                 ProcessTextBox();
             }
         }
@@ -1198,11 +1151,7 @@ namespace Windows.UI.Xaml.Controls
             _calendar.DayButtonMouseUp += new MouseButtonEventHandler(Calendar_DayButtonMouseUp);
             _calendar.DisplayDateChanged += new EventHandler<CalendarDateChangedEventArgs>(Calendar_DisplayDateChanged);
             _calendar.SelectedDatesChanged += new EventHandler<SelectionChangedEventArgs>(Calendar_SelectedDatesChanged);
-#if MIGRATION
             _calendar.MouseLeftButtonDown += new MouseButtonEventHandler(Calendar_MouseLeftButtonDown);
-#else
-            _calendar.PointerPressed += new MouseButtonEventHandler(Calendar_MouseLeftButtonDown);
-#endif
             _calendar.KeyDown += new KeyEventHandler(Calendar_KeyDown);
             _calendar.SelectionMode = CalendarSelectionMode.SingleDate;
             _calendar.SizeChanged += new SizeChangedEventHandler(Calendar_SizeChanged);

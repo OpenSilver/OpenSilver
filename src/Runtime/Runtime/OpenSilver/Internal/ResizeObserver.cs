@@ -13,14 +13,8 @@
 
 using System;
 using System.Globalization;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-#endif
+using CSHTML5.Internal;
 
 namespace OpenSilver.Internal;
 

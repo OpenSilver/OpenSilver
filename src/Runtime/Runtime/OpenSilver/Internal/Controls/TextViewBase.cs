@@ -12,16 +12,9 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Input;
-#endif
+using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 

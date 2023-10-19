@@ -3,7 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,29 +13,14 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
-using System.Windows;
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays data in a customizable grid.
@@ -2884,13 +2868,8 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Builds the visual tree for the column header when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
         {
-#else
-        protected override void OnApplyTemplate()
-        {
-#endif
             // The template has changed, so we need to refresh the visuals
             this._measured = false;
 
@@ -3132,7 +3111,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
         /// <summary>
         /// Scrolls the DataGrid according to the direction of the delta.
         /// </summary>
@@ -3167,7 +3145,6 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-#endif
 
         /// <summary>
         /// Raises the PreparingCellForEdit event.
@@ -3288,9 +3265,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-#region Internal Methods
+        #region Internal Methods
 
         /// <summary>
         /// Cancels editing mode for the specified DataGridEditingUnit and restores its original value.
@@ -3943,14 +3920,8 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if MIGRATION
         internal bool UpdateStateOnMouseLeftButtonDown(MouseButtonEventArgs mouseButtonEventArgs, int columnIndex, int slot, bool allowEdit)
         {
-#else
-        internal bool UpdateStateOnMouseLeftButtonDown(PointerRoutedEventArgs mouseButtonEventArgs, int columnIndex, int slot, bool allowEdit)
-        {
-#endif
-
             bool ctrl, shift;
             KeyboardHelper.GetMetaKeyState(out ctrl, out shift);
 
@@ -4001,9 +3972,9 @@ namespace Windows.UI.Xaml.Controls
             return false;
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
-#region Private Methods
+        #region Private Methods
 
         private void AddNewCellPrivate(DataGridRow row, DataGridColumn column)
         {
@@ -4782,24 +4753,18 @@ namespace Windows.UI.Xaml.Controls
             UpdateDisabledVisual();
         }
 
-#if MIGRATION
         private void DataGrid_KeyDown(object sender, KeyEventArgs e)
-        { 
-#else
-        private void DataGrid_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-#endif
             if (!e.Handled)
             {
                 e.Handled = ProcessDataGridKey(e);
             }
         }
 
-#if MIGRATION
         private void DataGrid_KeyUp(object sender, KeyEventArgs e)
         {
 
-                 if (e.Key == Key.Tab && this.CurrentColumnIndex != -1 && e.OriginalSource == this)
+            if (e.Key == Key.Tab && this.CurrentColumnIndex != -1 && e.OriginalSource == this)
             {
                 bool success = ScrollSlotIntoView(this.CurrentColumnIndex, this.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/);
                 Debug.Assert(success);
@@ -4809,931 +4774,851 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-#else
-            private void DataGrid_KeyUp(object sender, KeyRoutedEventArgs e)
+
+        private void DataGrid_LostFocus(object sender, RoutedEventArgs e)
+        {
+            _focusedObject = null;
+            if (this.ContainsFocus)
             {
-                if (e.Key == System.VirtualKey.Tab && this.CurrentColumnIndex != -1 && e.OriginalSource == this)
+                bool focusLeftDataGrid = true;
+                bool dataGridWillReceiveRoutedEvent = true;
+                object focusedObject = FocusManager.GetFocusedElement();
+                DependencyObject focusedDependencyObject = focusedObject as DependencyObject;
+
+                while (focusedDependencyObject != null)
                 {
-                    bool success = ScrollSlotIntoView(this.CurrentColumnIndex, this.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/);
-                    Debug.Assert(success);
-                    if (this.CurrentColumnIndex != -1 && this.SelectedItem == null)
+                    if (focusedDependencyObject == this)
                     {
-                        SetRowSelection(this.CurrentSlot, true /*isSelected*/, true /*setAnchorSlot*/);
-                    }
-                }
-            }
-#endif
-
-            private void DataGrid_LostFocus(object sender, RoutedEventArgs e)
-            {
-                _focusedObject = null;
-                if (this.ContainsFocus)
-                {
-                    bool focusLeftDataGrid = true;
-                    bool dataGridWillReceiveRoutedEvent = true;
-                    object focusedObject = FocusManager.GetFocusedElement();
-                    DependencyObject focusedDependencyObject = focusedObject as DependencyObject;
-
-                    while (focusedDependencyObject != null)
-                    {
-                        if (focusedDependencyObject == this)
-                        {
-                            focusLeftDataGrid = false;
-                            break;
-                        }
-
-                        // Walk up the visual tree.  If we hit the root, try using the framework element's
-                        // parent.  We do this because Popups behave differently with respect to the visual tree,
-                        // and it could have a parent even if the VisualTreeHelper doesn't find it.
-                        DependencyObject parent = VisualTreeHelper.GetParent(focusedDependencyObject);
-                        if (parent == null)
-                        {
-                            FrameworkElement element = focusedDependencyObject as FrameworkElement;
-                            if (element != null)
-                            {
-                                parent = element.Parent;
-                                if (parent != null)
-                                {
-                                    dataGridWillReceiveRoutedEvent = false;
-                                }
-                            }
-                        }
-                        focusedDependencyObject = parent;
+                        focusLeftDataGrid = false;
+                        break;
                     }
 
-                    if (focusLeftDataGrid)
+                    // Walk up the visual tree.  If we hit the root, try using the framework element's
+                    // parent.  We do this because Popups behave differently with respect to the visual tree,
+                    // and it could have a parent even if the VisualTreeHelper doesn't find it.
+                    DependencyObject parent = VisualTreeHelper.GetParent(focusedDependencyObject);
+                    if (parent == null)
                     {
-                        this.ContainsFocus = false;
-                        if (this.EditingRow != null)
+                        FrameworkElement element = focusedDependencyObject as FrameworkElement;
+                        if (element != null)
                         {
-                            CommitEdit(DataGridEditingUnit.Row, true /*exitEditingMode*/);
-                        }
-                        ResetFocusedRow();
-                        ApplyDisplayedRowsState(this.DisplayData.FirstScrollingSlot, this.DisplayData.LastScrollingSlot);
-                        if (this.CurrentColumnIndex != -1 && this.IsSlotVisible(this.CurrentSlot))
-                        {
-                            DataGridRow row = this.DisplayData.GetDisplayedElement(this.CurrentSlot) as DataGridRow;
-                            if (row != null)
+                            parent = element.Parent;
+                            if (parent != null)
                             {
-                                row.Cells[this.CurrentColumnIndex].ApplyCellState(true /*animate*/);
+                                dataGridWillReceiveRoutedEvent = false;
                             }
                         }
                     }
-                    else if (!dataGridWillReceiveRoutedEvent)
+                    focusedDependencyObject = parent;
+                }
+
+                if (focusLeftDataGrid)
+                {
+                    this.ContainsFocus = false;
+                    if (this.EditingRow != null)
                     {
-                        FrameworkElement focusedElement = focusedObject as FrameworkElement;
-                        if (focusedElement != null)
+                        CommitEdit(DataGridEditingUnit.Row, true /*exitEditingMode*/);
+                    }
+                    ResetFocusedRow();
+                    ApplyDisplayedRowsState(this.DisplayData.FirstScrollingSlot, this.DisplayData.LastScrollingSlot);
+                    if (this.CurrentColumnIndex != -1 && this.IsSlotVisible(this.CurrentSlot))
+                    {
+                        DataGridRow row = this.DisplayData.GetDisplayedElement(this.CurrentSlot) as DataGridRow;
+                        if (row != null)
                         {
-                            focusedElement.LostFocus += new RoutedEventHandler(ExternalEditingElement_LostFocus);
+                            row.Cells[this.CurrentColumnIndex].ApplyCellState(true /*animate*/);
                         }
                     }
                 }
+                else if (!dataGridWillReceiveRoutedEvent)
+                {
+                    FrameworkElement focusedElement = focusedObject as FrameworkElement;
+                    if (focusedElement != null)
+                    {
+                        focusedElement.LostFocus += new RoutedEventHandler(ExternalEditingElement_LostFocus);
+                    }
+                }
             }
+        }
 
-            private void EditingElement_BindingValidationError(object sender, ValidationErrorEventArgs e)
+        private void EditingElement_BindingValidationError(object sender, ValidationErrorEventArgs e)
+        {
+            if (e.Action == ValidationErrorEventAction.Added && e.Error.Exception != null && e.Error.ErrorContent != null)
             {
-                if (e.Action == ValidationErrorEventAction.Added && e.Error.Exception != null && e.Error.ErrorContent != null)
-                {
-                    ValidationResult validationResult = new ValidationResult(e.Error.ErrorContent.ToString(), new List<string>() { this._updateSourcePath });
-                    this._bindingValidationResults.AddIfNew(validationResult);
-                }
+                ValidationResult validationResult = new ValidationResult(e.Error.ErrorContent.ToString(), new List<string>() { this._updateSourcePath });
+                this._bindingValidationResults.AddIfNew(validationResult);
             }
+        }
 
-            private void EditingElement_Loaded(object sender, RoutedEventArgs e)
+        private void EditingElement_Loaded(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement element = sender as FrameworkElement;
+            if (element != null)
             {
-                FrameworkElement element = sender as FrameworkElement;
-                if (element != null)
-                {
-                    element.Loaded -= new RoutedEventHandler(EditingElement_Loaded);
-                }
-                PreparingCellForEditPrivate(element);
+                element.Loaded -= new RoutedEventHandler(EditingElement_Loaded);
             }
+            PreparingCellForEditPrivate(element);
+        }
 
-            [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-            private bool EndCellEdit(DataGridEditAction editAction, bool exitEditingMode, bool keepFocus, bool raiseEvents)
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        private bool EndCellEdit(DataGridEditAction editAction, bool exitEditingMode, bool keepFocus, bool raiseEvents)
+        {
+            if (this._editingColumnIndex == -1)
             {
-                if (this._editingColumnIndex == -1)
-                {
-                    return true;
-                }
-                Debug.Assert(this.EditingRow != null);
-                Debug.Assert(this._editingColumnIndex >= 0);
-                Debug.Assert(this._editingColumnIndex < this.ColumnsItemsInternal.Count);
-                Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
-                Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
-
-                // Cache these to see if they change later
-                int currentSlot = this.CurrentSlot;
-                int currentColumnIndex = this.CurrentColumnIndex;
-
-                // We're ready to start ending, so raise the event
-                DataGridCell editingCell = this.EditingRow.Cells[this._editingColumnIndex];
-                FrameworkElement editingElement = editingCell.Content as FrameworkElement;
-                if (editingElement == null)
-                {
-                    return false;
-                }
-                if (raiseEvents)
-                {
-                    DataGridCellEditEndingEventArgs e = new DataGridCellEditEndingEventArgs(this.CurrentColumn, this.EditingRow, editingElement, editAction);
-                    OnCellEditEnding(e);
-                    if (e.Cancel)
-                    {
-                        // CellEditEnding has been cancelled
-                        return false;
-                    }
-
-                    // Ensure that the current cell wasn't changed in the user's CellEditEnding handler
-                    if (this._editingColumnIndex == -1 ||
-                        currentSlot != this.CurrentSlot ||
-                        currentColumnIndex != this.CurrentColumnIndex)
-                    {
-                        return true;
-                    }
-                    Debug.Assert(this.EditingRow != null);
-                    Debug.Assert(this.EditingRow.Slot == currentSlot);
-                    Debug.Assert(this._editingColumnIndex != -1);
-                    Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
-                }
-
-                this._bindingValidationResults.Clear();
-
-                // If we're canceling, let the editing column repopulate its old value if it wants
-                if (editAction == DataGridEditAction.Cancel)
-                {
-                    this.CurrentColumn.CancelCellEditInternal(editingElement, this._uneditedValue);
-
-                    // Ensure that the current cell wasn't changed in the user column's CancelCellEdit
-                    if (this._editingColumnIndex == -1 ||
-                        currentSlot != this.CurrentSlot ||
-                        currentColumnIndex != this.CurrentColumnIndex)
-                    {
-                        return true;
-                    }
-                    Debug.Assert(this.EditingRow != null);
-                    Debug.Assert(this.EditingRow.Slot == currentSlot);
-                    Debug.Assert(this._editingColumnIndex != -1);
-                    Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
-
-                    // Re-validate
-                    this.ValidateEditingRow(true /*scrollIntoView*/, false /*wireEvents*/);
-                }
-
-                // If we're committing, explicitly update the source but watch out for any validation errors
-                if (editAction == DataGridEditAction.Commit)
-                {
-                    foreach (BindingInfo bindingData in this.CurrentColumn.GetInputBindings(editingElement, this.CurrentItem))
-                    {
-                        Debug.Assert(bindingData.BindingExpression.ParentBinding != null);
-                        this._updateSourcePath = bindingData.BindingExpression.ParentBinding.Path != null ? bindingData.BindingExpression.ParentBinding.Path.Path : null;
-                        bindingData.Element.BindingValidationError += new EventHandler<ValidationErrorEventArgs>(EditingElement_BindingValidationError);
-                        bindingData.BindingExpression.UpdateSource();
-                        bindingData.Element.BindingValidationError -= new EventHandler<ValidationErrorEventArgs>(EditingElement_BindingValidationError);
-                    }
-
-                    // Re-validate
-                    this.ValidateEditingRow(true /*scrollIntoView*/, false /*wireEvents*/);
-
-                    if (this._bindingValidationResults.Count > 0)
-                    {
-                        ScrollSlotIntoView(this.CurrentColumnIndex, this.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/);
-                        return false;
-                    }
-                }
-
-                if (exitEditingMode)
-                {
-                    this._editingColumnIndex = -1;
-                    editingCell.ApplyCellState(true /*animate*/);
-
-                    //
-                    this.IsTabStop = true;
-                    if (keepFocus && editingElement.ContainsFocusedElement())
-                    {
-                        this.Focus();
-                    }
-
-                    PopulateCellContent(!exitEditingMode /*isCellEdited*/, this.CurrentColumn, this.EditingRow, editingCell);
-                }
-
-                // We're done, so raise the CellEditEnded event
-                if (raiseEvents)
-                {
-                    OnCellEditEnded(new DataGridCellEditEndedEventArgs(this.CurrentColumn, this.EditingRow, editAction));
-                }
-
-                // There's a chance that somebody reopened this cell for edit within the CellEditEnded handler,
-                // so we should return false if we were supposed to exit editing mode, but we didn't
-                return !(exitEditingMode && currentColumnIndex == this._editingColumnIndex);
-            }
-
-            private bool EndRowEdit(DataGridEditAction editAction, bool exitEditingMode, bool raiseEvents)
-            {
-                if (this.EditingRow == null || this.DataConnection.CommittingEdit)
-                {
-                    return true;
-                }
-                if (this._editingColumnIndex != -1 || (editAction == DataGridEditAction.Cancel && raiseEvents &&
-                    !((this.DataConnection.EditableCollectionView != null && this.DataConnection.EditableCollectionView.CanCancelEdit) || (this.EditingRow.DataContext is IEditableObject))))
-                {
-                    // Ending the row edit will fail immediately under the following conditions:
-                    // 1. We haven't ended the cell edit yet.
-                    // 2. We're trying to cancel edit when the underlying DataType is not an IEditableObject,
-                    //    because we have no way to properly restore the old value.  We will only allow this to occur
-                    //    if raiseEvents == false, which means we're internally forcing a cancel.
-                    return false;
-                }
-                DataGridRow editingRow = this.EditingRow;
-
-                if (raiseEvents)
-                {
-                    DataGridRowEditEndingEventArgs e = new DataGridRowEditEndingEventArgs(this.EditingRow, editAction);
-                    OnRowEditEnding(e);
-                    if (e.Cancel)
-                    {
-                        // RowEditEnding has been cancelled
-                        return false;
-                    }
-
-                    // Editing states might have been changed in the RowEditEnding handlers
-                    if (this._editingColumnIndex != -1)
-                    {
-                        return false;
-                    }
-                    if (editingRow != this.EditingRow)
-                    {
-                        return true;
-                    }
-                }
-
-                // Call the appropriate commit or cancel methods
-                if (editAction == DataGridEditAction.Commit)
-                {
-                    if (!CommitRowEdit(exitEditingMode))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (!CancelRowEdit(exitEditingMode) && raiseEvents)
-                    {
-                        // We failed to cancel edit so we should abort unless we're forcing a cancel
-                        return false;
-                    }
-                }
-                ResetValidationStatus();
-
-                // Update the previously edited row's state
-                if (exitEditingMode && editingRow == this.EditingRow)
-                {
-                    // Unwire the INDEI event handlers
-                    foreach (INotifyDataErrorInfo indei in this._validationItems.Keys)
-                    {
-                        indei.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(ValidationItem_ErrorsChanged);
-                    }
-                    this._validationItems.Clear();
-                    this.RemoveEditingElements();
-                    ResetEditingRow();
-                }
-
-                // Raise the RowEditEnded event
-                if (raiseEvents)
-                {
-                    OnRowEditEnded(new DataGridRowEditEndedEventArgs(editingRow, editAction));
-                }
-
                 return true;
             }
+            Debug.Assert(this.EditingRow != null);
+            Debug.Assert(this._editingColumnIndex >= 0);
+            Debug.Assert(this._editingColumnIndex < this.ColumnsItemsInternal.Count);
+            Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
+            Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
 
-            private void EnsureColumnHeadersVisibility()
+            // Cache these to see if they change later
+            int currentSlot = this.CurrentSlot;
+            int currentColumnIndex = this.CurrentColumnIndex;
+
+            // We're ready to start ending, so raise the event
+            DataGridCell editingCell = this.EditingRow.Cells[this._editingColumnIndex];
+            FrameworkElement editingElement = editingCell.Content as FrameworkElement;
+            if (editingElement == null)
             {
-                if (_columnHeadersPresenter != null)
-                {
-                    _columnHeadersPresenter.Visibility = this.AreColumnHeadersVisible ? Visibility.Visible : Visibility.Collapsed;
-                }
+                return false;
             }
-
-            // Applies the given Style to the Row if it's supposed to use DataGrid.RowStyle
-            private static void EnsureElementStyle(FrameworkElement element, Style oldDataGridStyle, Style newDataGridStyle)
+            if (raiseEvents)
             {
-                Debug.Assert(element != null);
-
-                // Apply the DataGrid style if the row was using the old DataGridRowStyle before
-                if (element != null && (element.Style == null || element.Style == oldDataGridStyle))
+                DataGridCellEditEndingEventArgs e = new DataGridCellEditEndingEventArgs(this.CurrentColumn, this.EditingRow, editingElement, editAction);
+                OnCellEditEnding(e);
+                if (e.Cancel)
                 {
-                    element.SetStyleWithType(newDataGridStyle);
-                }
-            }
-
-            private void EnsureVerticalGridLines()
-            {
-                if (this.AreColumnHeadersVisible)
-                {
-                    double totalColumnsWidth = 0;
-                    foreach (DataGridColumn column in this.ColumnsInternal)
-                    {
-                        totalColumnsWidth += column.ActualWidth;
-
-                        column.HeaderCell.SeparatorVisibility = (column != this.ColumnsInternal.LastVisibleColumn || totalColumnsWidth < this.CellsWidth) ?
-                            Visibility.Visible : Visibility.Collapsed;
-                    }
-                }
-
-                foreach (DataGridRow row in GetAllRows())
-                {
-                    row.EnsureGridLines();
-                }
-            }
-
-            /// <summary>
-            /// Exits editing mode without trying to commit or revert the editing, and 
-            /// without repopulating the edited row's cell.
-            /// </summary>
-            private void ExitEdit(bool keepFocus)
-            {
-                if (this.EditingRow == null || this.DataConnection.CommittingEdit)
-                {
-                    Debug.Assert(this._editingColumnIndex == -1);
-                    return;
-                }
-
-                if (this._editingColumnIndex != -1)
-                {
-                    Debug.Assert(this._editingColumnIndex >= 0);
-                    Debug.Assert(this._editingColumnIndex < this.ColumnsItemsInternal.Count);
-                    Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
-                    Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
-
-                    this._editingColumnIndex = -1;
-                    this.EditingRow.Cells[this.CurrentColumnIndex].ApplyCellState(false /*animate*/);
-                }
-                //
-                this.IsTabStop = true;
-                if (this.IsSlotVisible(this.EditingRow.Slot))
-                {
-                    this.EditingRow.ApplyState(true /*animate*/);
-                }
-                ResetEditingRow();
-                if (keepFocus)
-                {
-                    bool success = Focus();
-                    Debug.Assert(success);
-                }
-            }
-
-            private void ExternalEditingElement_LostFocus(object sender, RoutedEventArgs e)
-            {
-                FrameworkElement element = sender as FrameworkElement;
-                if (element != null)
-                {
-                    element.LostFocus -= new RoutedEventHandler(ExternalEditingElement_LostFocus);
-                    DataGrid_LostFocus(sender, e);
-                }
-            }
-
-            private void FlushCurrentCellChanged()
-            {
-                if (this._makeFirstDisplayedCellCurrentCellPending)
-                {
-                    return;
-                }
-                if (this.SelectionHasChanged)
-                {
-                    // selection is changing, don't raise CurrentCellChanged until it's done
-                    this._flushCurrentCellChanged = true;
-                    FlushSelectionChanged();
-                    return;
-                }
-
-                // We don't want to expand all intermediate currency positions, so we only expand
-                // the last current item before we flush the event
-                if (this._collapsedSlotsTable.Contains(this.CurrentSlot))
-                {
-                    DataGridRowGroupInfo rowGroupInfo = this.RowGroupHeadersTable.GetValueAt(this.RowGroupHeadersTable.GetPreviousIndex(this.CurrentSlot));
-                    Debug.Assert(rowGroupInfo != null);
-                    if (rowGroupInfo != null)
-                    {
-                        this.ExpandRowGroupParentChain(rowGroupInfo.Level, rowGroupInfo.Slot);
-                    }
-                }
-
-                if (this.CurrentColumn != this._previousCurrentColumn
-                    || this.CurrentItem != this._previousCurrentItem)
-                {
-                    this.CoerceSelectedItem();
-                    this._previousCurrentColumn = this.CurrentColumn;
-                    this._previousCurrentItem = this.CurrentItem;
-
-                    OnCurrentCellChanged(EventArgs.Empty);
-                }
-
-                DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(this) as DataGridAutomationPeer;
-                if (peer != null && this.CurrentCellCoordinates != this._previousAutomationFocusCoordinates)
-                {
-                    this._previousAutomationFocusCoordinates = new DataGridCellCoordinates(this.CurrentCellCoordinates);
-
-                    // If the DataGrid itself has focus, we want to move automation focus to the new current element
-                    if (FocusManager.GetFocusedElement() == this)
-                    {
-                        if (AutomationPeer.ListenerExists(AutomationEvents.AutomationFocusChanged))
-                        {
-                            peer.RaiseAutomationFocusChangedEvent(this.CurrentSlot, this.CurrentColumnIndex);
-                        }
-                    }
-                }
-
-                this._flushCurrentCellChanged = false;
-            }
-
-            private void FlushSelectionChanged()
-            {
-                if (this.SelectionHasChanged && this._noSelectionChangeCount == 0 && !this._makeFirstDisplayedCellCurrentCellPending)
-                {
-                    this.CoerceSelectedItem();
-                    if (this.NoCurrentCellChangeCount != 0)
-                    {
-                        // current cell is changing, don't raise SelectionChanged until it's done
-                        return;
-                    }
-                    this.SelectionHasChanged = false;
-
-                    if (this._flushCurrentCellChanged)
-                    {
-                        FlushCurrentCellChanged();
-                    }
-
-                    SelectionChangedEventArgs e = this._selectedItems.GetSelectionChangedEventArgs();
-                    if (e.AddedItems.Count > 0 || e.RemovedItems.Count > 0)
-                    {
-                        OnSelectionChanged(e);
-                    }
-                }
-            }
-
-            private bool FocusEditingCell(bool setFocus)
-            {
-                Debug.Assert(this.CurrentColumnIndex >= 0);
-                Debug.Assert(this.CurrentColumnIndex < this.ColumnsItemsInternal.Count);
-                Debug.Assert(this.CurrentSlot >= -1);
-                Debug.Assert(this.CurrentSlot < this.SlotCount);
-                Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
-                Debug.Assert(this._editingColumnIndex != -1);
-
-                //
-
-                this.IsTabStop = false;
-                this._focusEditingControl = false;
-
-                bool success = false;
-                DataGridCell dataGridCell = this.EditingRow.Cells[this._editingColumnIndex];
-                if (setFocus)
-                {
-                    success = dataGridCell.ContainsFocusedElement() ? true : dataGridCell.Focus();
-                    this._focusEditingControl = !success;
-                }
-                return success;
-            }
-
-            /// <summary>
-            /// This method formats a row (specified by a DataGridRowClipboardEventArgs) into
-            /// a single string to be added to the Clipboard when the DataGrid is copying its contents.
-            /// </summary>
-            /// <param name="e">DataGridRowClipboardEventArgs</param>
-            /// <returns>The formatted string.</returns>
-            private string FormatClipboardContent(DataGridRowClipboardEventArgs e)
-            {
-                StringBuilder text = new StringBuilder();
-                for (int cellIndex = 0; cellIndex < e.ClipboardRowContent.Count; cellIndex++)
-                {
-                    DataGridClipboardCellContent cellContent = e.ClipboardRowContent[cellIndex];
-                    if (cellContent != null)
-                    {
-                        text.Append(cellContent.Content);
-                    }
-                    if (cellIndex < e.ClipboardRowContent.Count - 1)
-                    {
-                        text.Append('\t');
-                    }
-                    else
-                    {
-                        text.Append('\r');
-                        text.Append('\n');
-                    }
-                }
-                return text.ToString();
-            }
-
-            // Calculates the amount to scroll for the ScrollLeft button
-            // This is a method rather than a property to emphasize a calculation
-            private double GetHorizontalSmallScrollDecrease()
-            {
-                // If the first column is covered up, scroll to the start of it when the user clicks the left button
-                if (_negHorizontalOffset > 0)
-                {
-                    return _negHorizontalOffset;
-                }
-                else
-                {
-                    // The entire first column is displayed, show the entire previous column when the user clicks
-                    // the left button
-                    DataGridColumn previousColumn = this.ColumnsInternal.GetPreviousVisibleScrollingColumn(
-                        this.ColumnsItemsInternal[DisplayData.FirstDisplayedScrollingCol]);
-                    if (previousColumn != null)
-                    {
-                        return GetEdgedColumnWidth(previousColumn);
-                    }
-                    else
-                    {
-                        // There's no previous column so don't move
-                        return 0;
-                    }
-                }
-            }
-
-            // Calculates the amount to scroll for the ScrollRight button
-            // This is a method rather than a property to emphasize a calculation
-            private double GetHorizontalSmallScrollIncrease()
-            {
-                if (this.DisplayData.FirstDisplayedScrollingCol >= 0)
-                {
-                    return GetEdgedColumnWidth(this.ColumnsItemsInternal[DisplayData.FirstDisplayedScrollingCol]) - _negHorizontalOffset;
-                }
-                return 0;
-            }
-
-            // Calculates the amount the ScrollDown button should scroll
-            // This is a method rather than a property to emphasize that calculations are taking place
-            private double GetVerticalSmallScrollIncrease()
-            {
-                if (this.DisplayData.FirstScrollingSlot >= 0)
-                {
-                    return GetExactSlotElementHeight(this.DisplayData.FirstScrollingSlot) - this.NegVerticalOffset;
-                }
-                return 0;
-            }
-
-            private void HorizontalScrollBar_Scroll(object sender, ScrollEventArgs e)
-            {
-                ProcessHorizontalScroll(e.ScrollEventType);
-            }
-
-            private bool IsColumnOutOfBounds(int columnIndex)
-            {
-                return columnIndex >= this.ColumnsItemsInternal.Count || columnIndex < 0;
-            }
-
-            private bool IsInnerCellOutOfBounds(int columnIndex, int slot)
-            {
-                return IsColumnOutOfBounds(columnIndex) || IsSlotOutOfBounds(slot);
-            }
-
-            private bool IsInnerCellOutOfSelectionBounds(int columnIndex, int slot)
-            {
-                return IsColumnOutOfBounds(columnIndex) || IsSlotOutOfSelectionBounds(slot);
-            }
-
-            private bool IsSlotOutOfBounds(int slot)
-            {
-                return slot >= this.SlotCount || slot < -1 || _collapsedSlotsTable.Contains(slot);
-            }
-
-            private bool IsSlotOutOfSelectionBounds(int slot)
-            {
-                if (this.RowGroupHeadersTable.Contains(slot))
-                {
-                    Debug.Assert(slot >= 0 && slot < this.SlotCount);
+                    // CellEditEnding has been cancelled
                     return false;
                 }
-                else
-                {
-                    int rowIndex = RowIndexFromSlot(slot);
-                    return rowIndex < 0 || rowIndex >= this.DataConnection.Count;
-                }
-            }
 
-            private void MakeFirstDisplayedCellCurrentCell()
-            {
-                if (this.CurrentColumnIndex != -1)
-                {
-                    this._makeFirstDisplayedCellCurrentCellPending = false;
-                    this._desiredCurrentColumnIndex = -1;
-                    this.FlushCurrentCellChanged();
-                    return;
-                }
-                if (this.SlotCount != SlotFromRowIndex(this.DataConnection.Count))
-                {
-                    this._makeFirstDisplayedCellCurrentCellPending = true;
-                    return;
-                }
-
-                // No current cell, therefore no selection either - try to set the current cell to the
-                // ItemsSource's ICollectionView.CurrentItem if it exists, otherwise use the first displayed cell.
-                int slot = 0;
-                if (this.DataConnection.CollectionView != null)
-                {
-                    if (this.DataConnection.CollectionView.IsCurrentBeforeFirst ||
-                        this.DataConnection.CollectionView.IsCurrentAfterLast)
-                    {
-                        slot = this.RowGroupHeadersTable.Contains(0) ? 0 : -1;
-                    }
-                    else
-                    {
-                        slot = SlotFromRowIndex(this.DataConnection.CollectionView.CurrentPosition);
-                    }
-                }
-                else
-                {
-                    if (this.SelectedIndex == -1)
-                    {
-                        // Try to default to the first row
-                        slot = SlotFromRowIndex(0);
-                        if (!this.IsSlotVisible(slot))
-                        {
-                            slot = -1;
-                        }
-                    }
-                    else
-                    {
-                        slot = SlotFromRowIndex(this.SelectedIndex);
-                    }
-                }
-                int columnIndex = this.FirstDisplayedNonFillerColumnIndex;
-                if (_desiredCurrentColumnIndex >= 0 && _desiredCurrentColumnIndex < this.ColumnsItemsInternal.Count)
-                {
-                    columnIndex = _desiredCurrentColumnIndex;
-                }
-
-                SetAndSelectCurrentCell(columnIndex,
-                                        slot,
-                                        false /*forceCurrentCellSelection*/);
-                this.AnchorSlot = slot;
-                this._makeFirstDisplayedCellCurrentCellPending = false;
-                this._desiredCurrentColumnIndex = -1;
-                FlushCurrentCellChanged();
-            }
-
-            private void PopulateCellContent(bool isCellEdited,
-                                             DataGridColumn dataGridColumn,
-                                             DataGridRow dataGridRow,
-                                             DataGridCell dataGridCell)
-            {
-                Debug.Assert(dataGridColumn != null);
-                Debug.Assert(dataGridRow != null);
-                Debug.Assert(dataGridCell != null);
-
-                FrameworkElement element = null;
-                DataGridBoundColumn dataGridBoundColumn = dataGridColumn as DataGridBoundColumn;
-                if (isCellEdited)
-                {
-                    // Generate EditingElement and apply column style if available
-                    element = dataGridColumn.GenerateEditingElementInternal(dataGridCell, dataGridRow.DataContext);
-                    if (element != null)
-                    {
-                        if (dataGridBoundColumn != null && dataGridBoundColumn.EditingElementStyle != null)
-                        {
-                            element.SetStyleWithType(dataGridBoundColumn.EditingElementStyle);
-                        }
-
-                        // Subscribe to the new element's events
-                        element.Loaded += new RoutedEventHandler(EditingElement_Loaded);
-                    }
-                }
-                else
-                {
-                    // Generate Element and apply column style if available
-                    element = dataGridColumn.GenerateElementInternal(dataGridCell, dataGridRow.DataContext);
-                    if (element != null)
-                    {
-                        if (dataGridBoundColumn != null && dataGridBoundColumn.ElementStyle != null)
-                        {
-                            element.SetStyleWithType(dataGridBoundColumn.ElementStyle);
-                        }
-                    }
-                }
-
-                dataGridCell.Content = element;
-            }
-
-            private void PreparingCellForEditPrivate(FrameworkElement editingElement)
-            {
+                // Ensure that the current cell wasn't changed in the user's CellEditEnding handler
                 if (this._editingColumnIndex == -1 ||
-                    this.CurrentColumnIndex == -1 ||
-                    this.EditingRow.Cells[this.CurrentColumnIndex].Content != editingElement)
+                    currentSlot != this.CurrentSlot ||
+                    currentColumnIndex != this.CurrentColumnIndex)
                 {
-                    // The current cell has changed since the call to BeginCellEdit, so the fact
-                    // that this element has loaded is no longer relevant
-                    return;
-                }
-
-                Debug.Assert(this.EditingRow != null);
-                Debug.Assert(this._editingColumnIndex >= 0);
-                Debug.Assert(this._editingColumnIndex < this.ColumnsItemsInternal.Count);
-                Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
-                Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
-
-                FocusEditingCell(this.ContainsFocus || this._focusEditingControl /*setFocus*/);
-
-                // Prepare the cell for editing and raise the PreparingCellForEdit event for all columns
-                DataGridColumn dataGridColumn = this.CurrentColumn;
-                this._uneditedValue = dataGridColumn.PrepareCellForEditInternal(editingElement, this._editingEventArgs);
-                OnPreparingCellForEdit(new DataGridPreparingCellForEditEventArgs(dataGridColumn, this.EditingRow, this._editingEventArgs, editingElement));
-            }
-
-            private bool ProcessAKey()
-            {
-                bool ctrl, shift, alt;
-
-                KeyboardHelper.GetMetaKeyState(out ctrl, out shift, out alt);
-
-                if (ctrl && !shift && !alt && this.SelectionMode == DataGridSelectionMode.Extended)
-                {
-                    SelectAll();
                     return true;
                 }
-                return false;
+                Debug.Assert(this.EditingRow != null);
+                Debug.Assert(this.EditingRow.Slot == currentSlot);
+                Debug.Assert(this._editingColumnIndex != -1);
+                Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
             }
 
-            /// <summary>
-            /// Handles the case where a 'Copy' key ('C' or 'Insert') has been pressed.  If pressed in combination with
-            /// the control key, and the necessary prerequisites are met, the DataGrid will copy its contents
-            /// to the Clipboard as text.
-            /// </summary>
-            /// <returns>Whether or not the DataGrid handled the key press.</returns>
-            private bool ProcessCopyKey()
+            this._bindingValidationResults.Clear();
+
+            // If we're canceling, let the editing column repopulate its old value if it wants
+            if (editAction == DataGridEditAction.Cancel)
             {
-                bool ctrl, shift, alt;
-                KeyboardHelper.GetMetaKeyState(out ctrl, out shift, out alt);
+                this.CurrentColumn.CancelCellEditInternal(editingElement, this._uneditedValue);
 
-                if (ctrl && !shift && !alt && this.ClipboardCopyMode != DataGridClipboardCopyMode.None && this.SelectedItems.Count > 0)
+                // Ensure that the current cell wasn't changed in the user column's CancelCellEdit
+                if (this._editingColumnIndex == -1 ||
+                    currentSlot != this.CurrentSlot ||
+                    currentColumnIndex != this.CurrentColumnIndex)
                 {
-                    StringBuilder textBuilder = new StringBuilder();
-
-                    if (this.ClipboardCopyMode == DataGridClipboardCopyMode.IncludeHeader)
-                    {
-                        DataGridRowClipboardEventArgs headerArgs = new DataGridRowClipboardEventArgs(null, true);
-                        foreach (DataGridColumn column in this.ColumnsInternal.GetVisibleColumns())
-                        {
-                            headerArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(null, column, column.Header));
-                        }
-                        this.OnCopyingRowClipboardContent(headerArgs);
-                        textBuilder.Append(FormatClipboardContent(headerArgs));
-                    }
-
-                    for (int index = 0; index < this.SelectedItems.Count; index++)
-                    {
-                        object item = this.SelectedItems[index];
-                        DataGridRowClipboardEventArgs itemArgs = new DataGridRowClipboardEventArgs(item, false);
-                        foreach (DataGridColumn column in this.ColumnsInternal.GetVisibleColumns())
-                        {
-                            object content = column.GetCellValue(item, column.ClipboardContentBinding);
-                            itemArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(item, column, content));
-                        }
-                        this.OnCopyingRowClipboardContent(itemArgs);
-                        textBuilder.Append(FormatClipboardContent(itemArgs));
-                    }
-
-                    string text = textBuilder.ToString();
-
-                    if (!string.IsNullOrEmpty(text))
-                    {
-                        try
-                        {
-                            Clipboard.SetText(text);
-                        }
-                        catch (SecurityException)
-                        {
-                            // We will get a SecurityException if the user does not allow access to the clipboard.
-                        }
-                        return true;
-                    }
+                    return true;
                 }
-                return false;
+                Debug.Assert(this.EditingRow != null);
+                Debug.Assert(this.EditingRow.Slot == currentSlot);
+                Debug.Assert(this._editingColumnIndex != -1);
+                Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
+
+                // Re-validate
+                this.ValidateEditingRow(true /*scrollIntoView*/, false /*wireEvents*/);
             }
-#if MIGRATION
-        private bool ProcessDataGridKey(KeyEventArgs e)
-           {
-                bool focusDataGrid = false;
-                switch (e.Key)
+
+            // If we're committing, explicitly update the source but watch out for any validation errors
+            if (editAction == DataGridEditAction.Commit)
+            {
+                foreach (BindingInfo bindingData in this.CurrentColumn.GetInputBindings(editingElement, this.CurrentItem))
                 {
-                    case Key.Tab:
-                        return ProcessTabKey(e);
-
-                    case Key.Up:
-                        focusDataGrid = ProcessUpKey();
-                        break;
-
-                    case Key.Down:
-                        focusDataGrid = ProcessDownKey();
-                        break;
-
-                    case Key.PageDown:
-                        focusDataGrid = ProcessNextKey();
-                        break;
-
-                    case Key.PageUp:
-                        focusDataGrid = ProcessPriorKey();
-                        break;
-
-                    case Key.Left:
-                        focusDataGrid = this.FlowDirection == FlowDirection.LeftToRight ? ProcessLeftKey() : ProcessRightKey();
-                        break;
-
-                    case Key.Right:
-                        focusDataGrid = this.FlowDirection == FlowDirection.LeftToRight ? ProcessRightKey() : ProcessLeftKey();
-                        break;
-
-                    case Key.F2:
-                        return ProcessF2Key(e);
-
-                    case Key.Home:
-                        focusDataGrid = ProcessHomeKey();
-                        break;
-
-                    case Key.End:
-                        focusDataGrid = ProcessEndKey();
-                        break;
-
-                    case Key.Enter:
-                        focusDataGrid = ProcessEnterKey();
-                        break;
-
-                    case Key.Escape:
-                        return ProcessEscapeKey();
-
-                    case Key.A:
-                        return ProcessAKey();
-
-                    case Key.C:
-                        return ProcessCopyKey();
-
-                    case Key.Insert:
-                        return ProcessCopyKey();
+                    Debug.Assert(bindingData.BindingExpression.ParentBinding != null);
+                    this._updateSourcePath = bindingData.BindingExpression.ParentBinding.Path != null ? bindingData.BindingExpression.ParentBinding.Path.Path : null;
+                    bindingData.Element.BindingValidationError += new EventHandler<ValidationErrorEventArgs>(EditingElement_BindingValidationError);
+                    bindingData.BindingExpression.UpdateSource();
+                    bindingData.Element.BindingValidationError -= new EventHandler<ValidationErrorEventArgs>(EditingElement_BindingValidationError);
                 }
-                if (focusDataGrid && this.IsTabStop)
+
+                // Re-validate
+                this.ValidateEditingRow(true /*scrollIntoView*/, false /*wireEvents*/);
+
+                if (this._bindingValidationResults.Count > 0)
+                {
+                    ScrollSlotIntoView(this.CurrentColumnIndex, this.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/);
+                    return false;
+                }
+            }
+
+            if (exitEditingMode)
+            {
+                this._editingColumnIndex = -1;
+                editingCell.ApplyCellState(true /*animate*/);
+
+                //
+                this.IsTabStop = true;
+                if (keepFocus && editingElement.ContainsFocusedElement())
                 {
                     this.Focus();
                 }
-                return focusDataGrid;
+
+                PopulateCellContent(!exitEditingMode /*isCellEdited*/, this.CurrentColumn, this.EditingRow, editingCell);
             }
-#else
-            private bool ProcessDataGridKey(KeyRoutedEventArgs e)
+
+            // We're done, so raise the CellEditEnded event
+            if (raiseEvents)
+            {
+                OnCellEditEnded(new DataGridCellEditEndedEventArgs(this.CurrentColumn, this.EditingRow, editAction));
+            }
+
+            // There's a chance that somebody reopened this cell for edit within the CellEditEnded handler,
+            // so we should return false if we were supposed to exit editing mode, but we didn't
+            return !(exitEditingMode && currentColumnIndex == this._editingColumnIndex);
+        }
+
+        private bool EndRowEdit(DataGridEditAction editAction, bool exitEditingMode, bool raiseEvents)
+        {
+            if (this.EditingRow == null || this.DataConnection.CommittingEdit)
+            {
+                return true;
+            }
+            if (this._editingColumnIndex != -1 || (editAction == DataGridEditAction.Cancel && raiseEvents &&
+                !((this.DataConnection.EditableCollectionView != null && this.DataConnection.EditableCollectionView.CanCancelEdit) || (this.EditingRow.DataContext is IEditableObject))))
+            {
+                // Ending the row edit will fail immediately under the following conditions:
+                // 1. We haven't ended the cell edit yet.
+                // 2. We're trying to cancel edit when the underlying DataType is not an IEditableObject,
+                //    because we have no way to properly restore the old value.  We will only allow this to occur
+                //    if raiseEvents == false, which means we're internally forcing a cancel.
+                return false;
+            }
+            DataGridRow editingRow = this.EditingRow;
+
+            if (raiseEvents)
+            {
+                DataGridRowEditEndingEventArgs e = new DataGridRowEditEndingEventArgs(this.EditingRow, editAction);
+                OnRowEditEnding(e);
+                if (e.Cancel)
+                {
+                    // RowEditEnding has been cancelled
+                    return false;
+                }
+
+                // Editing states might have been changed in the RowEditEnding handlers
+                if (this._editingColumnIndex != -1)
+                {
+                    return false;
+                }
+                if (editingRow != this.EditingRow)
+                {
+                    return true;
+                }
+            }
+
+            // Call the appropriate commit or cancel methods
+            if (editAction == DataGridEditAction.Commit)
+            {
+                if (!CommitRowEdit(exitEditingMode))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!CancelRowEdit(exitEditingMode) && raiseEvents)
+                {
+                    // We failed to cancel edit so we should abort unless we're forcing a cancel
+                    return false;
+                }
+            }
+            ResetValidationStatus();
+
+            // Update the previously edited row's state
+            if (exitEditingMode && editingRow == this.EditingRow)
+            {
+                // Unwire the INDEI event handlers
+                foreach (INotifyDataErrorInfo indei in this._validationItems.Keys)
+                {
+                    indei.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(ValidationItem_ErrorsChanged);
+                }
+                this._validationItems.Clear();
+                this.RemoveEditingElements();
+                ResetEditingRow();
+            }
+
+            // Raise the RowEditEnded event
+            if (raiseEvents)
+            {
+                OnRowEditEnded(new DataGridRowEditEndedEventArgs(editingRow, editAction));
+            }
+
+            return true;
+        }
+
+        private void EnsureColumnHeadersVisibility()
+        {
+            if (_columnHeadersPresenter != null)
+            {
+                _columnHeadersPresenter.Visibility = this.AreColumnHeadersVisible ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        // Applies the given Style to the Row if it's supposed to use DataGrid.RowStyle
+        private static void EnsureElementStyle(FrameworkElement element, Style oldDataGridStyle, Style newDataGridStyle)
+        {
+            Debug.Assert(element != null);
+
+            // Apply the DataGrid style if the row was using the old DataGridRowStyle before
+            if (element != null && (element.Style == null || element.Style == oldDataGridStyle))
+            {
+                element.SetStyleWithType(newDataGridStyle);
+            }
+        }
+
+        private void EnsureVerticalGridLines()
+        {
+            if (this.AreColumnHeadersVisible)
+            {
+                double totalColumnsWidth = 0;
+                foreach (DataGridColumn column in this.ColumnsInternal)
+                {
+                    totalColumnsWidth += column.ActualWidth;
+
+                    column.HeaderCell.SeparatorVisibility = (column != this.ColumnsInternal.LastVisibleColumn || totalColumnsWidth < this.CellsWidth) ?
+                        Visibility.Visible : Visibility.Collapsed;
+                }
+            }
+
+            foreach (DataGridRow row in GetAllRows())
+            {
+                row.EnsureGridLines();
+            }
+        }
+
+        /// <summary>
+        /// Exits editing mode without trying to commit or revert the editing, and 
+        /// without repopulating the edited row's cell.
+        /// </summary>
+        private void ExitEdit(bool keepFocus)
+        {
+            if (this.EditingRow == null || this.DataConnection.CommittingEdit)
+            {
+                Debug.Assert(this._editingColumnIndex == -1);
+                return;
+            }
+
+            if (this._editingColumnIndex != -1)
+            {
+                Debug.Assert(this._editingColumnIndex >= 0);
+                Debug.Assert(this._editingColumnIndex < this.ColumnsItemsInternal.Count);
+                Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
+                Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
+
+                this._editingColumnIndex = -1;
+                this.EditingRow.Cells[this.CurrentColumnIndex].ApplyCellState(false /*animate*/);
+            }
+            //
+            this.IsTabStop = true;
+            if (this.IsSlotVisible(this.EditingRow.Slot))
+            {
+                this.EditingRow.ApplyState(true /*animate*/);
+            }
+            ResetEditingRow();
+            if (keepFocus)
+            {
+                bool success = Focus();
+                Debug.Assert(success);
+            }
+        }
+
+        private void ExternalEditingElement_LostFocus(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement element = sender as FrameworkElement;
+            if (element != null)
+            {
+                element.LostFocus -= new RoutedEventHandler(ExternalEditingElement_LostFocus);
+                DataGrid_LostFocus(sender, e);
+            }
+        }
+
+        private void FlushCurrentCellChanged()
+        {
+            if (this._makeFirstDisplayedCellCurrentCellPending)
+            {
+                return;
+            }
+            if (this.SelectionHasChanged)
+            {
+                // selection is changing, don't raise CurrentCellChanged until it's done
+                this._flushCurrentCellChanged = true;
+                FlushSelectionChanged();
+                return;
+            }
+
+            // We don't want to expand all intermediate currency positions, so we only expand
+            // the last current item before we flush the event
+            if (this._collapsedSlotsTable.Contains(this.CurrentSlot))
+            {
+                DataGridRowGroupInfo rowGroupInfo = this.RowGroupHeadersTable.GetValueAt(this.RowGroupHeadersTable.GetPreviousIndex(this.CurrentSlot));
+                Debug.Assert(rowGroupInfo != null);
+                if (rowGroupInfo != null)
+                {
+                    this.ExpandRowGroupParentChain(rowGroupInfo.Level, rowGroupInfo.Slot);
+                }
+            }
+
+            if (this.CurrentColumn != this._previousCurrentColumn
+                || this.CurrentItem != this._previousCurrentItem)
+            {
+                this.CoerceSelectedItem();
+                this._previousCurrentColumn = this.CurrentColumn;
+                this._previousCurrentItem = this.CurrentItem;
+
+                OnCurrentCellChanged(EventArgs.Empty);
+            }
+
+            DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(this) as DataGridAutomationPeer;
+            if (peer != null && this.CurrentCellCoordinates != this._previousAutomationFocusCoordinates)
+            {
+                this._previousAutomationFocusCoordinates = new DataGridCellCoordinates(this.CurrentCellCoordinates);
+
+                // If the DataGrid itself has focus, we want to move automation focus to the new current element
+                if (FocusManager.GetFocusedElement() == this)
+                {
+                    if (AutomationPeer.ListenerExists(AutomationEvents.AutomationFocusChanged))
+                    {
+                        peer.RaiseAutomationFocusChangedEvent(this.CurrentSlot, this.CurrentColumnIndex);
+                    }
+                }
+            }
+
+            this._flushCurrentCellChanged = false;
+        }
+
+        private void FlushSelectionChanged()
+        {
+            if (this.SelectionHasChanged && this._noSelectionChangeCount == 0 && !this._makeFirstDisplayedCellCurrentCellPending)
+            {
+                this.CoerceSelectedItem();
+                if (this.NoCurrentCellChangeCount != 0)
+                {
+                    // current cell is changing, don't raise SelectionChanged until it's done
+                    return;
+                }
+                this.SelectionHasChanged = false;
+
+                if (this._flushCurrentCellChanged)
+                {
+                    FlushCurrentCellChanged();
+                }
+
+                SelectionChangedEventArgs e = this._selectedItems.GetSelectionChangedEventArgs();
+                if (e.AddedItems.Count > 0 || e.RemovedItems.Count > 0)
+                {
+                    OnSelectionChanged(e);
+                }
+            }
+        }
+
+        private bool FocusEditingCell(bool setFocus)
+        {
+            Debug.Assert(this.CurrentColumnIndex >= 0);
+            Debug.Assert(this.CurrentColumnIndex < this.ColumnsItemsInternal.Count);
+            Debug.Assert(this.CurrentSlot >= -1);
+            Debug.Assert(this.CurrentSlot < this.SlotCount);
+            Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
+            Debug.Assert(this._editingColumnIndex != -1);
+
+            //
+
+            this.IsTabStop = false;
+            this._focusEditingControl = false;
+
+            bool success = false;
+            DataGridCell dataGridCell = this.EditingRow.Cells[this._editingColumnIndex];
+            if (setFocus)
+            {
+                success = dataGridCell.ContainsFocusedElement() ? true : dataGridCell.Focus();
+                this._focusEditingControl = !success;
+            }
+            return success;
+        }
+
+        /// <summary>
+        /// This method formats a row (specified by a DataGridRowClipboardEventArgs) into
+        /// a single string to be added to the Clipboard when the DataGrid is copying its contents.
+        /// </summary>
+        /// <param name="e">DataGridRowClipboardEventArgs</param>
+        /// <returns>The formatted string.</returns>
+        private string FormatClipboardContent(DataGridRowClipboardEventArgs e)
+        {
+            StringBuilder text = new StringBuilder();
+            for (int cellIndex = 0; cellIndex < e.ClipboardRowContent.Count; cellIndex++)
+            {
+                DataGridClipboardCellContent cellContent = e.ClipboardRowContent[cellIndex];
+                if (cellContent != null)
+                {
+                    text.Append(cellContent.Content);
+                }
+                if (cellIndex < e.ClipboardRowContent.Count - 1)
+                {
+                    text.Append('\t');
+                }
+                else
+                {
+                    text.Append('\r');
+                    text.Append('\n');
+                }
+            }
+            return text.ToString();
+        }
+
+        // Calculates the amount to scroll for the ScrollLeft button
+        // This is a method rather than a property to emphasize a calculation
+        private double GetHorizontalSmallScrollDecrease()
+        {
+            // If the first column is covered up, scroll to the start of it when the user clicks the left button
+            if (_negHorizontalOffset > 0)
+            {
+                return _negHorizontalOffset;
+            }
+            else
+            {
+                // The entire first column is displayed, show the entire previous column when the user clicks
+                // the left button
+                DataGridColumn previousColumn = this.ColumnsInternal.GetPreviousVisibleScrollingColumn(
+                    this.ColumnsItemsInternal[DisplayData.FirstDisplayedScrollingCol]);
+                if (previousColumn != null)
+                {
+                    return GetEdgedColumnWidth(previousColumn);
+                }
+                else
+                {
+                    // There's no previous column so don't move
+                    return 0;
+                }
+            }
+        }
+
+        // Calculates the amount to scroll for the ScrollRight button
+        // This is a method rather than a property to emphasize a calculation
+        private double GetHorizontalSmallScrollIncrease()
+        {
+            if (this.DisplayData.FirstDisplayedScrollingCol >= 0)
+            {
+                return GetEdgedColumnWidth(this.ColumnsItemsInternal[DisplayData.FirstDisplayedScrollingCol]) - _negHorizontalOffset;
+            }
+            return 0;
+        }
+
+        // Calculates the amount the ScrollDown button should scroll
+        // This is a method rather than a property to emphasize that calculations are taking place
+        private double GetVerticalSmallScrollIncrease()
+        {
+            if (this.DisplayData.FirstScrollingSlot >= 0)
+            {
+                return GetExactSlotElementHeight(this.DisplayData.FirstScrollingSlot) - this.NegVerticalOffset;
+            }
+            return 0;
+        }
+
+        private void HorizontalScrollBar_Scroll(object sender, ScrollEventArgs e)
+        {
+            ProcessHorizontalScroll(e.ScrollEventType);
+        }
+
+        private bool IsColumnOutOfBounds(int columnIndex)
+        {
+            return columnIndex >= this.ColumnsItemsInternal.Count || columnIndex < 0;
+        }
+
+        private bool IsInnerCellOutOfBounds(int columnIndex, int slot)
+        {
+            return IsColumnOutOfBounds(columnIndex) || IsSlotOutOfBounds(slot);
+        }
+
+        private bool IsInnerCellOutOfSelectionBounds(int columnIndex, int slot)
+        {
+            return IsColumnOutOfBounds(columnIndex) || IsSlotOutOfSelectionBounds(slot);
+        }
+
+        private bool IsSlotOutOfBounds(int slot)
+        {
+            return slot >= this.SlotCount || slot < -1 || _collapsedSlotsTable.Contains(slot);
+        }
+
+        private bool IsSlotOutOfSelectionBounds(int slot)
+        {
+            if (this.RowGroupHeadersTable.Contains(slot))
+            {
+                Debug.Assert(slot >= 0 && slot < this.SlotCount);
+                return false;
+            }
+            else
+            {
+                int rowIndex = RowIndexFromSlot(slot);
+                return rowIndex < 0 || rowIndex >= this.DataConnection.Count;
+            }
+        }
+
+        private void MakeFirstDisplayedCellCurrentCell()
+        {
+            if (this.CurrentColumnIndex != -1)
+            {
+                this._makeFirstDisplayedCellCurrentCellPending = false;
+                this._desiredCurrentColumnIndex = -1;
+                this.FlushCurrentCellChanged();
+                return;
+            }
+            if (this.SlotCount != SlotFromRowIndex(this.DataConnection.Count))
+            {
+                this._makeFirstDisplayedCellCurrentCellPending = true;
+                return;
+            }
+
+            // No current cell, therefore no selection either - try to set the current cell to the
+            // ItemsSource's ICollectionView.CurrentItem if it exists, otherwise use the first displayed cell.
+            int slot = 0;
+            if (this.DataConnection.CollectionView != null)
+            {
+                if (this.DataConnection.CollectionView.IsCurrentBeforeFirst ||
+                    this.DataConnection.CollectionView.IsCurrentAfterLast)
+                {
+                    slot = this.RowGroupHeadersTable.Contains(0) ? 0 : -1;
+                }
+                else
+                {
+                    slot = SlotFromRowIndex(this.DataConnection.CollectionView.CurrentPosition);
+                }
+            }
+            else
+            {
+                if (this.SelectedIndex == -1)
+                {
+                    // Try to default to the first row
+                    slot = SlotFromRowIndex(0);
+                    if (!this.IsSlotVisible(slot))
+                    {
+                        slot = -1;
+                    }
+                }
+                else
+                {
+                    slot = SlotFromRowIndex(this.SelectedIndex);
+                }
+            }
+            int columnIndex = this.FirstDisplayedNonFillerColumnIndex;
+            if (_desiredCurrentColumnIndex >= 0 && _desiredCurrentColumnIndex < this.ColumnsItemsInternal.Count)
+            {
+                columnIndex = _desiredCurrentColumnIndex;
+            }
+
+            SetAndSelectCurrentCell(columnIndex,
+                                    slot,
+                                    false /*forceCurrentCellSelection*/);
+            this.AnchorSlot = slot;
+            this._makeFirstDisplayedCellCurrentCellPending = false;
+            this._desiredCurrentColumnIndex = -1;
+            FlushCurrentCellChanged();
+        }
+
+        private void PopulateCellContent(bool isCellEdited,
+                                         DataGridColumn dataGridColumn,
+                                         DataGridRow dataGridRow,
+                                         DataGridCell dataGridCell)
+        {
+            Debug.Assert(dataGridColumn != null);
+            Debug.Assert(dataGridRow != null);
+            Debug.Assert(dataGridCell != null);
+
+            FrameworkElement element = null;
+            DataGridBoundColumn dataGridBoundColumn = dataGridColumn as DataGridBoundColumn;
+            if (isCellEdited)
+            {
+                // Generate EditingElement and apply column style if available
+                element = dataGridColumn.GenerateEditingElementInternal(dataGridCell, dataGridRow.DataContext);
+                if (element != null)
+                {
+                    if (dataGridBoundColumn != null && dataGridBoundColumn.EditingElementStyle != null)
+                    {
+                        element.SetStyleWithType(dataGridBoundColumn.EditingElementStyle);
+                    }
+
+                    // Subscribe to the new element's events
+                    element.Loaded += new RoutedEventHandler(EditingElement_Loaded);
+                }
+            }
+            else
+            {
+                // Generate Element and apply column style if available
+                element = dataGridColumn.GenerateElementInternal(dataGridCell, dataGridRow.DataContext);
+                if (element != null)
+                {
+                    if (dataGridBoundColumn != null && dataGridBoundColumn.ElementStyle != null)
+                    {
+                        element.SetStyleWithType(dataGridBoundColumn.ElementStyle);
+                    }
+                }
+            }
+
+            dataGridCell.Content = element;
+        }
+
+        private void PreparingCellForEditPrivate(FrameworkElement editingElement)
+        {
+            if (this._editingColumnIndex == -1 ||
+                this.CurrentColumnIndex == -1 ||
+                this.EditingRow.Cells[this.CurrentColumnIndex].Content != editingElement)
+            {
+                // The current cell has changed since the call to BeginCellEdit, so the fact
+                // that this element has loaded is no longer relevant
+                return;
+            }
+
+            Debug.Assert(this.EditingRow != null);
+            Debug.Assert(this._editingColumnIndex >= 0);
+            Debug.Assert(this._editingColumnIndex < this.ColumnsItemsInternal.Count);
+            Debug.Assert(this._editingColumnIndex == this.CurrentColumnIndex);
+            Debug.Assert(this.EditingRow != null && this.EditingRow.Slot == this.CurrentSlot);
+
+            FocusEditingCell(this.ContainsFocus || this._focusEditingControl /*setFocus*/);
+
+            // Prepare the cell for editing and raise the PreparingCellForEdit event for all columns
+            DataGridColumn dataGridColumn = this.CurrentColumn;
+            this._uneditedValue = dataGridColumn.PrepareCellForEditInternal(editingElement, this._editingEventArgs);
+            OnPreparingCellForEdit(new DataGridPreparingCellForEditEventArgs(dataGridColumn, this.EditingRow, this._editingEventArgs, editingElement));
+        }
+
+        private bool ProcessAKey()
+        {
+            bool ctrl, shift, alt;
+
+            KeyboardHelper.GetMetaKeyState(out ctrl, out shift, out alt);
+
+            if (ctrl && !shift && !alt && this.SelectionMode == DataGridSelectionMode.Extended)
+            {
+                SelectAll();
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Handles the case where a 'Copy' key ('C' or 'Insert') has been pressed.  If pressed in combination with
+        /// the control key, and the necessary prerequisites are met, the DataGrid will copy its contents
+        /// to the Clipboard as text.
+        /// </summary>
+        /// <returns>Whether or not the DataGrid handled the key press.</returns>
+        private bool ProcessCopyKey()
+        {
+            bool ctrl, shift, alt;
+            KeyboardHelper.GetMetaKeyState(out ctrl, out shift, out alt);
+
+            if (ctrl && !shift && !alt && this.ClipboardCopyMode != DataGridClipboardCopyMode.None && this.SelectedItems.Count > 0)
+            {
+                StringBuilder textBuilder = new StringBuilder();
+
+                if (this.ClipboardCopyMode == DataGridClipboardCopyMode.IncludeHeader)
+                {
+                    DataGridRowClipboardEventArgs headerArgs = new DataGridRowClipboardEventArgs(null, true);
+                    foreach (DataGridColumn column in this.ColumnsInternal.GetVisibleColumns())
+                    {
+                        headerArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(null, column, column.Header));
+                    }
+                    this.OnCopyingRowClipboardContent(headerArgs);
+                    textBuilder.Append(FormatClipboardContent(headerArgs));
+                }
+
+                for (int index = 0; index < this.SelectedItems.Count; index++)
+                {
+                    object item = this.SelectedItems[index];
+                    DataGridRowClipboardEventArgs itemArgs = new DataGridRowClipboardEventArgs(item, false);
+                    foreach (DataGridColumn column in this.ColumnsInternal.GetVisibleColumns())
+                    {
+                        object content = column.GetCellValue(item, column.ClipboardContentBinding);
+                        itemArgs.ClipboardRowContent.Add(new DataGridClipboardCellContent(item, column, content));
+                    }
+                    this.OnCopyingRowClipboardContent(itemArgs);
+                    textBuilder.Append(FormatClipboardContent(itemArgs));
+                }
+
+                string text = textBuilder.ToString();
+
+                if (!string.IsNullOrEmpty(text))
+                {
+                    try
+                    {
+                        _ = Clipboard.SetTextAsync(text);
+                    }
+                    catch (SecurityException)
+                    {
+                        // We will get a SecurityException if the user does not allow access to the clipboard.
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ProcessDataGridKey(KeyEventArgs e)
         {
             bool focusDataGrid = false;
             switch (e.Key)
             {
-                case System.VirtualKey.Tab:
+                case Key.Tab:
                     return ProcessTabKey(e);
 
-                case  System.VirtualKey.Up:
+                case Key.Up:
                     focusDataGrid = ProcessUpKey();
                     break;
 
-                case  System.VirtualKey.Down:
+                case Key.Down:
                     focusDataGrid = ProcessDownKey();
                     break;
 
-                case  System.VirtualKey.PageDown:
+                case Key.PageDown:
                     focusDataGrid = ProcessNextKey();
                     break;
 
-                case  System.VirtualKey.PageUp:
+                case Key.PageUp:
                     focusDataGrid = ProcessPriorKey();
                     break;
 
-                case  System.VirtualKey.Left:
+                case Key.Left:
                     focusDataGrid = this.FlowDirection == FlowDirection.LeftToRight ? ProcessLeftKey() : ProcessRightKey();
                     break;
 
-                case  System.VirtualKey.Right:
+                case Key.Right:
                     focusDataGrid = this.FlowDirection == FlowDirection.LeftToRight ? ProcessRightKey() : ProcessLeftKey();
                     break;
 
-                case  System.VirtualKey.F2:
+                case Key.F2:
                     return ProcessF2Key(e);
 
-                case  System.VirtualKey.Home:
+                case Key.Home:
                     focusDataGrid = ProcessHomeKey();
                     break;
 
-                case  System.VirtualKey.End:
+                case Key.End:
                     focusDataGrid = ProcessEndKey();
                     break;
 
-                case  System.VirtualKey.Enter:
+                case Key.Enter:
                     focusDataGrid = ProcessEnterKey();
                     break;
 
-                case  System.VirtualKey.Escape:
+                case Key.Escape:
                     return ProcessEscapeKey();
 
-                case  System.VirtualKey.A:
+                case Key.A:
                     return ProcessAKey();
 
-                case  System.VirtualKey.C:
+                case Key.C:
                     return ProcessCopyKey();
 
-                case  System.VirtualKey.Insert:
+                case Key.Insert:
                     return ProcessCopyKey();
             }
             if (focusDataGrid && this.IsTabStop)
@@ -5742,1731 +5627,1705 @@ namespace Windows.UI.Xaml.Controls
             }
             return focusDataGrid;
         }
-#endif
 
         private bool ProcessDownKeyInternal(bool shift, bool ctrl)
+        {
+            DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleColumn;
+            int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            int lastSlot = this.LastVisibleSlot;
+            if (firstVisibleColumnIndex == -1 || lastSlot == -1)
             {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleColumn;
-                int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                int lastSlot = this.LastVisibleSlot;
-                if (firstVisibleColumnIndex == -1 || lastSlot == -1)
-                {
-                    return false;
-                }
-
-                if (this.WaitForLostFocus(delegate { this.ProcessDownKeyInternal(shift, ctrl); }))
-                {
-                    return true;
-                }
-
-                int nextSlot = -1;
-                if (this.CurrentSlot != -1)
-                {
-                    nextSlot = this.GetNextVisibleSlot(this.CurrentSlot);
-                    if (nextSlot >= this.SlotCount)
-                    {
-                        nextSlot = -1;
-                    }
-                }
-
-                _noSelectionChangeCount++;
-                try
-                {
-                    int desiredSlot;
-                    int columnIndex;
-                    DataGridSelectionAction action;
-                    if (this.CurrentColumnIndex == -1)
-                    {
-                        desiredSlot = this.FirstVisibleSlot;
-                        columnIndex = firstVisibleColumnIndex;
-                        action = DataGridSelectionAction.SelectCurrent;
-                    }
-                    else if (ctrl)
-                    {
-                        if (shift)
-                        {
-                            // Both Ctrl and Shift
-                            desiredSlot = lastSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = (this.SelectionMode == DataGridSelectionMode.Extended)
-                                ? DataGridSelectionAction.SelectFromAnchorToCurrent
-                                : DataGridSelectionAction.SelectCurrent;
-                        }
-                        else
-                        {
-                            // Ctrl without Shift
-                            desiredSlot = lastSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = DataGridSelectionAction.SelectCurrent;
-                        }
-                    }
-                    else
-                    {
-                        if (nextSlot == -1)
-                        {
-                            return true;
-                        }
-                        if (shift)
-                        {
-                            // Shift without Ctrl
-                            desiredSlot = nextSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = DataGridSelectionAction.SelectFromAnchorToCurrent;
-                        }
-                        else
-                        {
-                            // Neither Ctrl nor Shift
-                            desiredSlot = nextSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = DataGridSelectionAction.SelectCurrent;
-                        }
-                    }
-                    UpdateSelectionAndCurrency(columnIndex, desiredSlot, action, true /*scrollIntoView*/);
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
+                return false;
             }
 
-            private bool ProcessEndKey(bool shift, bool ctrl)
+            if (this.WaitForLostFocus(delegate { this.ProcessDownKeyInternal(shift, ctrl); }))
             {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.LastVisibleColumn;
-                int lastVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                int firstVisibleSlot = this.FirstVisibleSlot;
-                int lastVisibleSlot = this.LastVisibleSlot;
-                if (lastVisibleColumnIndex == -1 || firstVisibleSlot == -1)
-                {
-                    return false;
-                }
-
-                if (this.WaitForLostFocus(delegate { this.ProcessEndKey(shift, ctrl); }))
-                {
-                    return true;
-                }
-
-                this._noSelectionChangeCount++;
-                try
-                {
-                    if (!ctrl)
-                    {
-                        return ProcessRightMost(lastVisibleColumnIndex, firstVisibleSlot);
-                    }
-                    else
-                    {
-                        DataGridSelectionAction action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
-                            ? DataGridSelectionAction.SelectFromAnchorToCurrent
-                            : DataGridSelectionAction.SelectCurrent;
-                        UpdateSelectionAndCurrency(lastVisibleColumnIndex, lastVisibleSlot, action, true /*scrollIntoView*/);
-                    }
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
-            }
-
-            private bool ProcessEnterKey(bool shift, bool ctrl)
-            {
-                int oldCurrentSlot = this.CurrentSlot;
-
-                if (!ctrl)
-                {
-                    // If Enter was used by a TextBox, we shouldn't handle the key
-                    TextBox focusedTextBox = FocusManager.GetFocusedElement() as TextBox;
-                    if (focusedTextBox != null && focusedTextBox.AcceptsReturn)
-                    {
-                        return false;
-                    }
-
-                    if (this.WaitForLostFocus(delegate { this.ProcessEnterKey(shift, ctrl); }))
-                    {
-                        return true;
-                    }
-
-                    // Enter behaves like down arrow - it commits the potential editing and goes down one cell.
-                    if (!ProcessDownKeyInternal(false, ctrl))
-                    {
-                        return false;
-                    }
-                }
-                else if (this.WaitForLostFocus(delegate { this.ProcessEnterKey(shift, ctrl); }))
-                {
-                    return true;
-                }
-
-                // Try to commit the potential editing
-                if (oldCurrentSlot == this.CurrentSlot && EndCellEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, true /*keepFocus*/, true /*raiseEvents*/) && this.EditingRow != null)
-                {
-                    EndRowEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, true /*raiseEvents*/);
-                    ScrollIntoView(this.CurrentItem, this.CurrentColumn);
-                }
-
                 return true;
             }
 
-            private bool ProcessEscapeKey()
+            int nextSlot = -1;
+            if (this.CurrentSlot != -1)
             {
-                if (this.WaitForLostFocus(delegate { this.ProcessEscapeKey(); }))
+                nextSlot = this.GetNextVisibleSlot(this.CurrentSlot);
+                if (nextSlot >= this.SlotCount)
                 {
-                    return true;
+                    nextSlot = -1;
                 }
-
-                if (this._editingColumnIndex != -1)
-                {
-                    // Revert the potential cell editing and exit cell editing.
-                    EndCellEdit(DataGridEditAction.Cancel, true /*exitEditingMode*/, true /*keepFocus*/, true /*raiseEvents*/);
-                    return true;
-                }
-                else if (this.EditingRow != null)
-                {
-                    // Revert the potential row editing and exit row editing.
-                    EndRowEdit(DataGridEditAction.Cancel, true /*exitEditingMode*/, true /*raiseEvents*/);
-                    return true;
-                }
-                return false;
             }
 
-#if MIGRATION
-        private bool ProcessF2Key(KeyEventArgs e)
+            _noSelectionChangeCount++;
+            try
             {
-#else
-        private bool ProcessF2Key(KeyRoutedEventArgs e)
+                int desiredSlot;
+                int columnIndex;
+                DataGridSelectionAction action;
+                if (this.CurrentColumnIndex == -1)
+                {
+                    desiredSlot = this.FirstVisibleSlot;
+                    columnIndex = firstVisibleColumnIndex;
+                    action = DataGridSelectionAction.SelectCurrent;
+                }
+                else if (ctrl)
+                {
+                    if (shift)
+                    {
+                        // Both Ctrl and Shift
+                        desiredSlot = lastSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = (this.SelectionMode == DataGridSelectionMode.Extended)
+                            ? DataGridSelectionAction.SelectFromAnchorToCurrent
+                            : DataGridSelectionAction.SelectCurrent;
+                    }
+                    else
+                    {
+                        // Ctrl without Shift
+                        desiredSlot = lastSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = DataGridSelectionAction.SelectCurrent;
+                    }
+                }
+                else
+                {
+                    if (nextSlot == -1)
+                    {
+                        return true;
+                    }
+                    if (shift)
+                    {
+                        // Shift without Ctrl
+                        desiredSlot = nextSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = DataGridSelectionAction.SelectFromAnchorToCurrent;
+                    }
+                    else
+                    {
+                        // Neither Ctrl nor Shift
+                        desiredSlot = nextSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = DataGridSelectionAction.SelectCurrent;
+                    }
+                }
+                UpdateSelectionAndCurrency(columnIndex, desiredSlot, action, true /*scrollIntoView*/);
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        private bool ProcessEndKey(bool shift, bool ctrl)
         {
-#endif
-            bool ctrl, shift;
-                KeyboardHelper.GetMetaKeyState(out ctrl, out shift);
-
-                if (!shift && !ctrl &&
-                    this._editingColumnIndex == -1 && this.CurrentColumnIndex != -1 && GetRowSelection(this.CurrentSlot) &&
-                    !GetColumnEffectiveReadOnlyState(this.CurrentColumn))
-                {
-                    if (ScrollSlotIntoView(this.CurrentColumnIndex, this.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/))
-                    {
-                        BeginCellEdit(e);
-                    }
-                    return true;
-                }
-
+            DataGridColumn dataGridColumn = this.ColumnsInternal.LastVisibleColumn;
+            int lastVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            int firstVisibleSlot = this.FirstVisibleSlot;
+            int lastVisibleSlot = this.LastVisibleSlot;
+            if (lastVisibleColumnIndex == -1 || firstVisibleSlot == -1)
+            {
                 return false;
             }
 
-            private bool ProcessHomeKey(bool shift, bool ctrl)
+            if (this.WaitForLostFocus(delegate { this.ProcessEndKey(shift, ctrl); }))
             {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
-                int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                int firstVisibleSlot = this.FirstVisibleSlot;
-                if (firstVisibleColumnIndex == -1 || firstVisibleSlot == -1)
+                return true;
+            }
+
+            this._noSelectionChangeCount++;
+            try
+            {
+                if (!ctrl)
+                {
+                    return ProcessRightMost(lastVisibleColumnIndex, firstVisibleSlot);
+                }
+                else
+                {
+                    DataGridSelectionAction action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
+                        ? DataGridSelectionAction.SelectFromAnchorToCurrent
+                        : DataGridSelectionAction.SelectCurrent;
+                    UpdateSelectionAndCurrency(lastVisibleColumnIndex, lastVisibleSlot, action, true /*scrollIntoView*/);
+                }
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        private bool ProcessEnterKey(bool shift, bool ctrl)
+        {
+            int oldCurrentSlot = this.CurrentSlot;
+
+            if (!ctrl)
+            {
+                // If Enter was used by a TextBox, we shouldn't handle the key
+                TextBox focusedTextBox = FocusManager.GetFocusedElement() as TextBox;
+                if (focusedTextBox != null && focusedTextBox.AcceptsReturn)
                 {
                     return false;
                 }
 
-                if (this.WaitForLostFocus(delegate { this.ProcessHomeKey(shift, ctrl); }))
+                if (this.WaitForLostFocus(delegate { this.ProcessEnterKey(shift, ctrl); }))
                 {
                     return true;
                 }
 
-                this._noSelectionChangeCount++;
-                try
-                {
-                    if (!ctrl)
-                    {
-                        return ProcessLeftMost(firstVisibleColumnIndex, firstVisibleSlot);
-                    }
-                    else
-                    {
-                        DataGridSelectionAction action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
-                            ? DataGridSelectionAction.SelectFromAnchorToCurrent
-                            : DataGridSelectionAction.SelectCurrent;
-                        UpdateSelectionAndCurrency(firstVisibleColumnIndex, firstVisibleSlot, action, true /*scrollIntoView*/);
-                    }
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
-            }
-
-            private bool ProcessLeftKey(bool shift, bool ctrl)
-            {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
-                int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                int firstVisibleSlot = this.FirstVisibleSlot;
-                if (firstVisibleColumnIndex == -1 || firstVisibleSlot == -1)
+                // Enter behaves like down arrow - it commits the potential editing and goes down one cell.
+                if (!ProcessDownKeyInternal(false, ctrl))
                 {
                     return false;
                 }
-
-                if (this.WaitForLostFocus(delegate { this.ProcessLeftKey(shift, ctrl); }))
-                {
-                    return true;
-                }
-
-                int previousVisibleColumnIndex = -1;
-                if (this.CurrentColumnIndex != -1)
-                {
-                    dataGridColumn = this.ColumnsInternal.GetPreviousVisibleNonFillerColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
-                    if (dataGridColumn != null)
-                    {
-                        previousVisibleColumnIndex = dataGridColumn.Index;
-                    }
-                }
-
-                this._noSelectionChangeCount++;
-                try
-                {
-                    if (ctrl)
-                    {
-                        return ProcessLeftMost(firstVisibleColumnIndex, firstVisibleSlot);
-                    }
-                    else
-                    {
-                        if (this.RowGroupHeadersTable.Contains(this.CurrentSlot))
-                        {
-                            CollapseRowGroup(this.RowGroupHeadersTable.GetValueAt(this.CurrentSlot).CollectionViewGroup, false /*collapseAllSubgroups*/);
-                        }
-                        else if (this.CurrentColumnIndex == -1)
-                        {
-                            UpdateSelectionAndCurrency(firstVisibleColumnIndex, firstVisibleSlot, DataGridSelectionAction.SelectCurrent, true /*scrollIntoView*/);
-                        }
-                        else
-                        {
-                            if (previousVisibleColumnIndex == -1)
-                            {
-                                return true;
-                            }
-                            UpdateSelectionAndCurrency(previousVisibleColumnIndex, this.CurrentSlot, DataGridSelectionAction.None, true /*scrollIntoView*/);
-                        }
-                    }
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
             }
-
-            // Ctrl Left <==> Home
-            private bool ProcessLeftMost(int firstVisibleColumnIndex, int firstVisibleSlot)
+            else if (this.WaitForLostFocus(delegate { this.ProcessEnterKey(shift, ctrl); }))
             {
-                this._noSelectionChangeCount++;
-                try
-                {
-                    int desiredSlot;
-                    DataGridSelectionAction action;
-                    if (this.CurrentColumnIndex == -1)
-                    {
-                        desiredSlot = firstVisibleSlot;
-                        action = DataGridSelectionAction.SelectCurrent;
-                        Debug.Assert(_selectedItems.Count == 0);
-                    }
-                    else
-                    {
-                        desiredSlot = this.CurrentSlot;
-                        action = DataGridSelectionAction.None;
-                    }
-                    UpdateSelectionAndCurrency(firstVisibleColumnIndex, desiredSlot, action, true /*scrollIntoView*/);
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
+                return true;
             }
 
-            private bool ProcessNextKey(bool shift, bool ctrl)
+            // Try to commit the potential editing
+            if (oldCurrentSlot == this.CurrentSlot && EndCellEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, true /*keepFocus*/, true /*raiseEvents*/) && this.EditingRow != null)
             {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
-                int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                if (firstVisibleColumnIndex == -1 || this.DisplayData.FirstScrollingSlot == -1)
-                {
-                    return false;
-                }
-
-                if (this.WaitForLostFocus(delegate { this.ProcessNextKey(shift, ctrl); }))
-                {
-                    return true;
-                }
-
-                int nextPageSlot = this.CurrentSlot == -1 ? this.DisplayData.FirstScrollingSlot : this.CurrentSlot;
-                Debug.Assert(nextPageSlot != -1);
-                int slot = GetNextVisibleSlot(nextPageSlot);
-
-                int scrollCount = this.DisplayData.NumTotallyDisplayedScrollingElements;
-                while (scrollCount > 0 && slot < this.SlotCount)
-                {
-                    nextPageSlot = slot;
-                    scrollCount--;
-                    slot = GetNextVisibleSlot(slot);
-                }
-
-                this._noSelectionChangeCount++;
-                try
-                {
-                    DataGridSelectionAction action;
-                    int columnIndex;
-                    if (this.CurrentColumnIndex == -1)
-                    {
-                        columnIndex = firstVisibleColumnIndex;
-                        action = DataGridSelectionAction.SelectCurrent;
-                    }
-                    else
-                    {
-                        columnIndex = this.CurrentColumnIndex;
-                        action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
-                            ? action = DataGridSelectionAction.SelectFromAnchorToCurrent
-                            : action = DataGridSelectionAction.SelectCurrent;
-                    }
-                    UpdateSelectionAndCurrency(columnIndex, nextPageSlot, action, true /*scrollIntoView*/);
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
+                EndRowEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, true /*raiseEvents*/);
+                ScrollIntoView(this.CurrentItem, this.CurrentColumn);
             }
 
-            private bool ProcessPriorKey(bool shift, bool ctrl)
+            return true;
+        }
+
+        private bool ProcessEscapeKey()
+        {
+            if (this.WaitForLostFocus(delegate { this.ProcessEscapeKey(); }))
             {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
-                int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                if (firstVisibleColumnIndex == -1 || this.DisplayData.FirstScrollingSlot == -1)
-                {
-                    return false;
-                }
-
-                if (this.WaitForLostFocus(delegate { this.ProcessPriorKey(shift, ctrl); }))
-                {
-                    return true;
-                }
-
-                int previousPageSlot = (this.CurrentSlot == -1) ? this.DisplayData.FirstScrollingSlot : this.CurrentSlot;
-                Debug.Assert(previousPageSlot != -1);
-
-                int scrollCount = this.DisplayData.NumTotallyDisplayedScrollingElements;
-                int slot = GetPreviousVisibleSlot(previousPageSlot);
-                while (scrollCount > 0 && slot != -1)
-                {
-                    previousPageSlot = slot;
-                    scrollCount--;
-                    slot = GetPreviousVisibleSlot(slot);
-                }
-                Debug.Assert(previousPageSlot != -1);
-
-                this._noSelectionChangeCount++;
-                try
-                {
-                    int columnIndex;
-                    DataGridSelectionAction action;
-                    if (this.CurrentColumnIndex == -1)
-                    {
-                        columnIndex = firstVisibleColumnIndex;
-                        action = DataGridSelectionAction.SelectCurrent;
-                    }
-                    else
-                    {
-                        columnIndex = this.CurrentColumnIndex;
-                        action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
-                            ? DataGridSelectionAction.SelectFromAnchorToCurrent
-                            : DataGridSelectionAction.SelectCurrent;
-                    }
-                    UpdateSelectionAndCurrency(columnIndex, previousPageSlot, action, true /*scrollIntoView*/);
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
+                return true;
             }
 
-            private bool ProcessRightKey(bool shift, bool ctrl)
+            if (this._editingColumnIndex != -1)
             {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.LastVisibleColumn;
-                int lastVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                int firstVisibleSlot = this.FirstVisibleSlot;
-                if (lastVisibleColumnIndex == -1 || firstVisibleSlot == -1)
-                {
-                    return false;
-                }
+                // Revert the potential cell editing and exit cell editing.
+                EndCellEdit(DataGridEditAction.Cancel, true /*exitEditingMode*/, true /*keepFocus*/, true /*raiseEvents*/);
+                return true;
+            }
+            else if (this.EditingRow != null)
+            {
+                // Revert the potential row editing and exit row editing.
+                EndRowEdit(DataGridEditAction.Cancel, true /*exitEditingMode*/, true /*raiseEvents*/);
+                return true;
+            }
+            return false;
+        }
 
-                if (this.WaitForLostFocus(delegate { this.ProcessRightKey(shift, ctrl); }))
-                {
-                    return true;
-                }
+        private bool ProcessF2Key(KeyEventArgs e)
+        {
+            bool ctrl, shift;
+            KeyboardHelper.GetMetaKeyState(out ctrl, out shift);
 
-                int nextVisibleColumnIndex = -1;
-                if (this.CurrentColumnIndex != -1)
+            if (!shift && !ctrl &&
+                this._editingColumnIndex == -1 && this.CurrentColumnIndex != -1 && GetRowSelection(this.CurrentSlot) &&
+                !GetColumnEffectiveReadOnlyState(this.CurrentColumn))
+            {
+                if (ScrollSlotIntoView(this.CurrentColumnIndex, this.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/))
                 {
-                    dataGridColumn = this.ColumnsInternal.GetNextVisibleColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
-                    if (dataGridColumn != null)
+                    BeginCellEdit(e);
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ProcessHomeKey(bool shift, bool ctrl)
+        {
+            DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
+            int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            int firstVisibleSlot = this.FirstVisibleSlot;
+            if (firstVisibleColumnIndex == -1 || firstVisibleSlot == -1)
+            {
+                return false;
+            }
+
+            if (this.WaitForLostFocus(delegate { this.ProcessHomeKey(shift, ctrl); }))
+            {
+                return true;
+            }
+
+            this._noSelectionChangeCount++;
+            try
+            {
+                if (!ctrl)
+                {
+                    return ProcessLeftMost(firstVisibleColumnIndex, firstVisibleSlot);
+                }
+                else
+                {
+                    DataGridSelectionAction action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
+                        ? DataGridSelectionAction.SelectFromAnchorToCurrent
+                        : DataGridSelectionAction.SelectCurrent;
+                    UpdateSelectionAndCurrency(firstVisibleColumnIndex, firstVisibleSlot, action, true /*scrollIntoView*/);
+                }
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        private bool ProcessLeftKey(bool shift, bool ctrl)
+        {
+            DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
+            int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            int firstVisibleSlot = this.FirstVisibleSlot;
+            if (firstVisibleColumnIndex == -1 || firstVisibleSlot == -1)
+            {
+                return false;
+            }
+
+            if (this.WaitForLostFocus(delegate { this.ProcessLeftKey(shift, ctrl); }))
+            {
+                return true;
+            }
+
+            int previousVisibleColumnIndex = -1;
+            if (this.CurrentColumnIndex != -1)
+            {
+                dataGridColumn = this.ColumnsInternal.GetPreviousVisibleNonFillerColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
+                if (dataGridColumn != null)
+                {
+                    previousVisibleColumnIndex = dataGridColumn.Index;
+                }
+            }
+
+            this._noSelectionChangeCount++;
+            try
+            {
+                if (ctrl)
+                {
+                    return ProcessLeftMost(firstVisibleColumnIndex, firstVisibleSlot);
+                }
+                else
+                {
+                    if (this.RowGroupHeadersTable.Contains(this.CurrentSlot))
                     {
-                        nextVisibleColumnIndex = dataGridColumn.Index;
+                        CollapseRowGroup(this.RowGroupHeadersTable.GetValueAt(this.CurrentSlot).CollectionViewGroup, false /*collapseAllSubgroups*/);
                     }
-                }
-                this._noSelectionChangeCount++;
-                try
-                {
-                    if (ctrl)
+                    else if (this.CurrentColumnIndex == -1)
                     {
-                        return ProcessRightMost(lastVisibleColumnIndex, firstVisibleSlot);
+                        UpdateSelectionAndCurrency(firstVisibleColumnIndex, firstVisibleSlot, DataGridSelectionAction.SelectCurrent, true /*scrollIntoView*/);
                     }
                     else
                     {
-                        if (this.RowGroupHeadersTable.Contains(this.CurrentSlot))
+                        if (previousVisibleColumnIndex == -1)
                         {
-                            ExpandRowGroup(this.RowGroupHeadersTable.GetValueAt(this.CurrentSlot).CollectionViewGroup, false /*expandAllSubgroups*/);
+                            return true;
                         }
-                        else if (this.CurrentColumnIndex == -1)
-                        {
-                            int firstVisibleColumnIndex = this.ColumnsInternal.FirstVisibleColumn == null ? -1 : this.ColumnsInternal.FirstVisibleColumn.Index;
-                            UpdateSelectionAndCurrency(firstVisibleColumnIndex, firstVisibleSlot, DataGridSelectionAction.SelectCurrent, true /*scrollIntoView*/);
-                        }
-                        else
-                        {
-                            if (nextVisibleColumnIndex == -1)
-                            {
-                                return true;
-                            }
-                            UpdateSelectionAndCurrency(nextVisibleColumnIndex, this.CurrentSlot, DataGridSelectionAction.None, true /*scrollIntoView*/);
-                        }
+                        UpdateSelectionAndCurrency(previousVisibleColumnIndex, this.CurrentSlot, DataGridSelectionAction.None, true /*scrollIntoView*/);
                     }
                 }
-                finally
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        // Ctrl Left <==> Home
+        private bool ProcessLeftMost(int firstVisibleColumnIndex, int firstVisibleSlot)
+        {
+            this._noSelectionChangeCount++;
+            try
+            {
+                int desiredSlot;
+                DataGridSelectionAction action;
+                if (this.CurrentColumnIndex == -1)
                 {
-                    this.NoSelectionChangeCount--;
+                    desiredSlot = firstVisibleSlot;
+                    action = DataGridSelectionAction.SelectCurrent;
+                    Debug.Assert(_selectedItems.Count == 0);
                 }
-                return this._successfullyUpdatedSelection;
+                else
+                {
+                    desiredSlot = this.CurrentSlot;
+                    action = DataGridSelectionAction.None;
+                }
+                UpdateSelectionAndCurrency(firstVisibleColumnIndex, desiredSlot, action, true /*scrollIntoView*/);
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        private bool ProcessNextKey(bool shift, bool ctrl)
+        {
+            DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
+            int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            if (firstVisibleColumnIndex == -1 || this.DisplayData.FirstScrollingSlot == -1)
+            {
+                return false;
             }
 
-            // Ctrl Right <==> End
-            private bool ProcessRightMost(int lastVisibleColumnIndex, int firstVisibleSlot)
+            if (this.WaitForLostFocus(delegate { this.ProcessNextKey(shift, ctrl); }))
             {
-                this._noSelectionChangeCount++;
-                try
+                return true;
+            }
+
+            int nextPageSlot = this.CurrentSlot == -1 ? this.DisplayData.FirstScrollingSlot : this.CurrentSlot;
+            Debug.Assert(nextPageSlot != -1);
+            int slot = GetNextVisibleSlot(nextPageSlot);
+
+            int scrollCount = this.DisplayData.NumTotallyDisplayedScrollingElements;
+            while (scrollCount > 0 && slot < this.SlotCount)
+            {
+                nextPageSlot = slot;
+                scrollCount--;
+                slot = GetNextVisibleSlot(slot);
+            }
+
+            this._noSelectionChangeCount++;
+            try
+            {
+                DataGridSelectionAction action;
+                int columnIndex;
+                if (this.CurrentColumnIndex == -1)
                 {
-                    int desiredSlot;
-                    DataGridSelectionAction action;
-                    if (this.CurrentColumnIndex == -1)
+                    columnIndex = firstVisibleColumnIndex;
+                    action = DataGridSelectionAction.SelectCurrent;
+                }
+                else
+                {
+                    columnIndex = this.CurrentColumnIndex;
+                    action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
+                        ? action = DataGridSelectionAction.SelectFromAnchorToCurrent
+                        : action = DataGridSelectionAction.SelectCurrent;
+                }
+                UpdateSelectionAndCurrency(columnIndex, nextPageSlot, action, true /*scrollIntoView*/);
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        private bool ProcessPriorKey(bool shift, bool ctrl)
+        {
+            DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
+            int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            if (firstVisibleColumnIndex == -1 || this.DisplayData.FirstScrollingSlot == -1)
+            {
+                return false;
+            }
+
+            if (this.WaitForLostFocus(delegate { this.ProcessPriorKey(shift, ctrl); }))
+            {
+                return true;
+            }
+
+            int previousPageSlot = (this.CurrentSlot == -1) ? this.DisplayData.FirstScrollingSlot : this.CurrentSlot;
+            Debug.Assert(previousPageSlot != -1);
+
+            int scrollCount = this.DisplayData.NumTotallyDisplayedScrollingElements;
+            int slot = GetPreviousVisibleSlot(previousPageSlot);
+            while (scrollCount > 0 && slot != -1)
+            {
+                previousPageSlot = slot;
+                scrollCount--;
+                slot = GetPreviousVisibleSlot(slot);
+            }
+            Debug.Assert(previousPageSlot != -1);
+
+            this._noSelectionChangeCount++;
+            try
+            {
+                int columnIndex;
+                DataGridSelectionAction action;
+                if (this.CurrentColumnIndex == -1)
+                {
+                    columnIndex = firstVisibleColumnIndex;
+                    action = DataGridSelectionAction.SelectCurrent;
+                }
+                else
+                {
+                    columnIndex = this.CurrentColumnIndex;
+                    action = (shift && this.SelectionMode == DataGridSelectionMode.Extended)
+                        ? DataGridSelectionAction.SelectFromAnchorToCurrent
+                        : DataGridSelectionAction.SelectCurrent;
+                }
+                UpdateSelectionAndCurrency(columnIndex, previousPageSlot, action, true /*scrollIntoView*/);
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        private bool ProcessRightKey(bool shift, bool ctrl)
+        {
+            DataGridColumn dataGridColumn = this.ColumnsInternal.LastVisibleColumn;
+            int lastVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            int firstVisibleSlot = this.FirstVisibleSlot;
+            if (lastVisibleColumnIndex == -1 || firstVisibleSlot == -1)
+            {
+                return false;
+            }
+
+            if (this.WaitForLostFocus(delegate { this.ProcessRightKey(shift, ctrl); }))
+            {
+                return true;
+            }
+
+            int nextVisibleColumnIndex = -1;
+            if (this.CurrentColumnIndex != -1)
+            {
+                dataGridColumn = this.ColumnsInternal.GetNextVisibleColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
+                if (dataGridColumn != null)
+                {
+                    nextVisibleColumnIndex = dataGridColumn.Index;
+                }
+            }
+            this._noSelectionChangeCount++;
+            try
+            {
+                if (ctrl)
+                {
+                    return ProcessRightMost(lastVisibleColumnIndex, firstVisibleSlot);
+                }
+                else
+                {
+                    if (this.RowGroupHeadersTable.Contains(this.CurrentSlot))
                     {
-                        desiredSlot = firstVisibleSlot;
-                        action = DataGridSelectionAction.SelectCurrent;
+                        ExpandRowGroup(this.RowGroupHeadersTable.GetValueAt(this.CurrentSlot).CollectionViewGroup, false /*expandAllSubgroups*/);
+                    }
+                    else if (this.CurrentColumnIndex == -1)
+                    {
+                        int firstVisibleColumnIndex = this.ColumnsInternal.FirstVisibleColumn == null ? -1 : this.ColumnsInternal.FirstVisibleColumn.Index;
+                        UpdateSelectionAndCurrency(firstVisibleColumnIndex, firstVisibleSlot, DataGridSelectionAction.SelectCurrent, true /*scrollIntoView*/);
                     }
                     else
                     {
-                        desiredSlot = this.CurrentSlot;
-                        action = DataGridSelectionAction.None;
+                        if (nextVisibleColumnIndex == -1)
+                        {
+                            return true;
+                        }
+                        UpdateSelectionAndCurrency(nextVisibleColumnIndex, this.CurrentSlot, DataGridSelectionAction.None, true /*scrollIntoView*/);
                     }
-                    UpdateSelectionAndCurrency(lastVisibleColumnIndex, desiredSlot, action, true /*scrollIntoView*/);
                 }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
             }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
 
-#if MIGRATION
+        // Ctrl Right <==> End
+        private bool ProcessRightMost(int lastVisibleColumnIndex, int firstVisibleSlot)
+        {
+            this._noSelectionChangeCount++;
+            try
+            {
+                int desiredSlot;
+                DataGridSelectionAction action;
+                if (this.CurrentColumnIndex == -1)
+                {
+                    desiredSlot = firstVisibleSlot;
+                    action = DataGridSelectionAction.SelectCurrent;
+                }
+                else
+                {
+                    desiredSlot = this.CurrentSlot;
+                    action = DataGridSelectionAction.None;
+                }
+                UpdateSelectionAndCurrency(lastVisibleColumnIndex, desiredSlot, action, true /*scrollIntoView*/);
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
         private bool ProcessTabKey(KeyEventArgs e)
-            {
-                bool ctrl, shift;
-                KeyboardHelper.GetMetaKeyState(out ctrl, out shift);
-                return this.ProcessTabKey(e, shift, ctrl);
-            }
-#else
-        private bool ProcessTabKey(KeyRoutedEventArgs e)
         {
             bool ctrl, shift;
             KeyboardHelper.GetMetaKeyState(out ctrl, out shift);
             return this.ProcessTabKey(e, shift, ctrl);
         }
-#endif
 
-#if MIGRATION
         private bool ProcessTabKey(KeyEventArgs e, bool shift, bool ctrl)
-            {
-#else
-        private bool ProcessTabKey(KeyRoutedEventArgs e, bool shift, bool ctrl)
         {
-#endif
             if (ctrl || this._editingColumnIndex == -1 || this.IsReadOnly)
+            {
+                //Go to the next/previous control on the page when 
+                // - Ctrl key is used
+                // - Potential current cell is not edited, or the datagrid is read-only. 
+                return false;
+            }
+
+            // Try to locate a writable cell before/after the current cell
+            Debug.Assert(this.CurrentColumnIndex != -1);
+            Debug.Assert(this.CurrentSlot != -1);
+
+            int neighborVisibleWritableColumnIndex, neighborSlot;
+            DataGridColumn dataGridColumn;
+            if (shift)
+            {
+                dataGridColumn = this.ColumnsInternal.GetPreviousVisibleWritableColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
+                neighborSlot = GetPreviousVisibleSlot(this.CurrentSlot);
+                if (this.EditingRow != null)
                 {
-                    //Go to the next/previous control on the page when 
-                    // - Ctrl key is used
-                    // - Potential current cell is not edited, or the datagrid is read-only. 
-                    return false;
+                    while (neighborSlot != -1 && this.RowGroupHeadersTable.Contains(neighborSlot))
+                    {
+                        neighborSlot = GetPreviousVisibleSlot(neighborSlot);
+                    }
+                }
+            }
+            else
+            {
+                dataGridColumn = this.ColumnsInternal.GetNextVisibleWritableColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
+                neighborSlot = GetNextVisibleSlot(this.CurrentSlot);
+                if (this.EditingRow != null)
+                {
+                    while (neighborSlot < this.SlotCount && this.RowGroupHeadersTable.Contains(neighborSlot))
+                    {
+                        neighborSlot = GetNextVisibleSlot(neighborSlot);
+                    }
+                }
+            }
+            neighborVisibleWritableColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+
+            if (neighborVisibleWritableColumnIndex == -1 && (neighborSlot == -1 || neighborSlot >= this.SlotCount))
+            {
+                // There is no previous/next row and no previous/next writable cell on the current row
+                return false;
+            }
+
+            if (this.WaitForLostFocus(delegate { this.ProcessTabKey(e, shift, ctrl); }))
+            {
+                return true;
+            }
+
+            int targetSlot = -1, targetColumnIndex = -1;
+
+            this._noSelectionChangeCount++;
+            try
+            {
+                if (neighborVisibleWritableColumnIndex == -1)
+                {
+                    targetSlot = neighborSlot;
+                    if (shift)
+                    {
+                        Debug.Assert(this.ColumnsInternal.LastVisibleWritableColumn != null);
+                        targetColumnIndex = this.ColumnsInternal.LastVisibleWritableColumn.Index;
+                    }
+                    else
+                    {
+                        Debug.Assert(this.ColumnsInternal.FirstVisibleWritableColumn != null);
+                        targetColumnIndex = this.ColumnsInternal.FirstVisibleWritableColumn.Index;
+                    }
+                }
+                else
+                {
+                    targetSlot = this.CurrentSlot;
+                    targetColumnIndex = neighborVisibleWritableColumnIndex;
                 }
 
-                // Try to locate a writable cell before/after the current cell
-                Debug.Assert(this.CurrentColumnIndex != -1);
-                Debug.Assert(this.CurrentSlot != -1);
-
-                int neighborVisibleWritableColumnIndex, neighborSlot;
-                DataGridColumn dataGridColumn;
-                if (shift)
+                DataGridSelectionAction action;
+                if (targetSlot != this.CurrentSlot || (this.SelectionMode == DataGridSelectionMode.Extended))
                 {
-                    dataGridColumn = this.ColumnsInternal.GetPreviousVisibleWritableColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
-                    neighborSlot = GetPreviousVisibleSlot(this.CurrentSlot);
-                    if (this.EditingRow != null)
+                    if (IsSlotOutOfBounds(targetSlot))
                     {
-                        while (neighborSlot != -1 && this.RowGroupHeadersTable.Contains(neighborSlot))
+                        return true;
+                    }
+                    action = DataGridSelectionAction.SelectCurrent;
+                }
+                else
+                {
+                    action = DataGridSelectionAction.None;
+                }
+                UpdateSelectionAndCurrency(targetColumnIndex, targetSlot, action, true /*scrollIntoView*/);
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+
+            if (this._successfullyUpdatedSelection && !this.RowGroupHeadersTable.Contains(targetSlot))
+            {
+                BeginCellEdit(e);
+            }
+
+            // Return true to say we handled the key event even if the operation was unsuccessful. If we don't
+            // say we handled this event, the framework will continue to process the tab key and change focus.
+            return true;
+        }
+
+        private bool ProcessUpKey(bool shift, bool ctrl)
+        {
+            DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
+            int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
+            int firstVisibleSlot = this.FirstVisibleSlot;
+            if (firstVisibleColumnIndex == -1 || firstVisibleSlot == -1)
+            {
+                return false;
+            }
+
+            if (this.WaitForLostFocus(delegate { this.ProcessUpKey(shift, ctrl); }))
+            {
+                return true;
+            }
+
+            int previousVisibleSlot = (this.CurrentSlot != -1) ? GetPreviousVisibleSlot(this.CurrentSlot) : -1;
+
+            this._noSelectionChangeCount++;
+
+            try
+            {
+                int slot;
+                int columnIndex;
+                DataGridSelectionAction action;
+                if (this.CurrentColumnIndex == -1)
+                {
+                    slot = firstVisibleSlot;
+                    columnIndex = firstVisibleColumnIndex;
+                    action = DataGridSelectionAction.SelectCurrent;
+                }
+                else if (ctrl)
+                {
+                    if (shift)
+                    {
+                        // Both Ctrl and Shift
+                        slot = firstVisibleSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = (this.SelectionMode == DataGridSelectionMode.Extended)
+                            ? DataGridSelectionAction.SelectFromAnchorToCurrent
+                            : DataGridSelectionAction.SelectCurrent;
+                    }
+                    else
+                    {
+                        // Ctrl without Shift
+                        slot = firstVisibleSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = DataGridSelectionAction.SelectCurrent;
+                    }
+                }
+                else
+                {
+                    if (previousVisibleSlot == -1)
+                    {
+                        return true;
+                    }
+                    if (shift)
+                    {
+                        // Shift without Ctrl
+                        slot = previousVisibleSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = DataGridSelectionAction.SelectFromAnchorToCurrent;
+                    }
+                    else
+                    {
+                        // Neither Shift nor Ctrl
+                        slot = previousVisibleSlot;
+                        columnIndex = this.CurrentColumnIndex;
+                        action = DataGridSelectionAction.SelectCurrent;
+                    }
+                }
+                UpdateSelectionAndCurrency(columnIndex, slot, action, true /*scrollIntoView*/);
+            }
+            finally
+            {
+                this.NoSelectionChangeCount--;
+            }
+            return this._successfullyUpdatedSelection;
+        }
+
+        private void RemoveDisplayedColumnHeader(DataGridColumn dataGridColumn)
+        {
+            if (_columnHeadersPresenter != null)
+            {
+                _columnHeadersPresenter.Children.Remove(dataGridColumn.HeaderCell);
+            }
+        }
+
+        private void RemoveDisplayedColumnHeaders()
+        {
+            if (_columnHeadersPresenter != null)
+            {
+                _columnHeadersPresenter.Children.Clear();
+            }
+            this.ColumnsInternal.FillerColumn.IsRepresented = false;
+        }
+
+        private bool ResetCurrentCellCore()
+        {
+            return (this.CurrentColumnIndex == -1 || SetCurrentCellCore(-1, -1));
+        }
+
+        private void ResetEditingRow()
+        {
+            if (this.EditingRow != null
+                && this.EditingRow != this._focusedRow
+                && !IsSlotVisible(this.EditingRow.Slot))
+            {
+                // Unload the old editing row if it's off screen
+                this.EditingRow.Clip = null;
+                UnloadRow(this.EditingRow);
+                this.DisplayData.FullyRecycleElements();
+            }
+            this.EditingRow = null;
+        }
+
+        private void ResetFocusedRow()
+        {
+            if (this._focusedRow != null
+                && this._focusedRow != this.EditingRow
+                && !IsSlotVisible(this._focusedRow.Slot))
+            {
+                // Unload the old focused row if it's off screen
+                this._focusedRow.Clip = null;
+                UnloadRow(this._focusedRow);
+                this.DisplayData.FullyRecycleElements();
+            }
+            this._focusedRow = null;
+        }
+
+        private void ResetValidationStatus()
+        {
+            // Clear the invalid status of the Cell, Row and DataGrid
+            if (this.EditingRow != null)
+            {
+                this.EditingRow.IsValid = true;
+                if (this.EditingRow.Index != -1)
+                {
+                    foreach (DataGridCell cell in this.EditingRow.Cells)
+                    {
+                        if (!cell.IsValid)
                         {
-                            neighborSlot = GetPreviousVisibleSlot(neighborSlot);
+                            cell.IsValid = true;
+                            cell.ApplyCellState(true);
+                        }
+                    }
+                    this.EditingRow.ApplyState(true);
+                }
+            }
+            this.IsValid = true;
+
+            // Clear the previous validation results
+            this._validationResults.Clear();
+
+            // Hide the error list if validation succeeded
+            if (this._validationSummary != null && this._validationSummary.Errors.Count > 0)
+            {
+                this._validationSummary.Errors.Clear();
+                if (this.EditingRow != null)
+                {
+                    int editingRowSlot = this.EditingRow.Slot;
+
+                    InvalidateMeasure();
+                    this.Dispatcher.BeginInvoke(delegate
+                    {
+                        // It's possible that the DataContext or ItemsSource has changed by the time we reach this code,
+                        // so we need to ensure that the editing row still exists before scrolling it into view
+                        if (!IsSlotOutOfBounds(editingRowSlot))
+                        {
+                            ScrollSlotIntoView(editingRowSlot, false /*scrolledHorizontally*/);
+                        }
+                    });
+                }
+            }
+        }
+
+        private void RowGroupHeaderStyles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (_rowsPresenter != null)
+            {
+                Style oldLastStyle = _rowGroupHeaderStylesOld.Count > 0 ? _rowGroupHeaderStylesOld[_rowGroupHeaderStylesOld.Count - 1] : null;
+                while (_rowGroupHeaderStylesOld.Count < _rowGroupHeaderStyles.Count)
+                {
+                    _rowGroupHeaderStylesOld.Add(oldLastStyle);
+                }
+
+                Style lastStyle = _rowGroupHeaderStyles.Count > 0 ? _rowGroupHeaderStyles[_rowGroupHeaderStyles.Count - 1] : null;
+                foreach (UIElement element in _rowsPresenter.Children)
+                {
+                    DataGridRowGroupHeader groupHeader = element as DataGridRowGroupHeader;
+                    if (groupHeader != null)
+                    {
+                        Style oldStyle = groupHeader.Level < _rowGroupHeaderStylesOld.Count ? _rowGroupHeaderStylesOld[groupHeader.Level] : oldLastStyle;
+                        Style newStyle = groupHeader.Level < _rowGroupHeaderStyles.Count ? _rowGroupHeaderStyles[groupHeader.Level] : lastStyle;
+                        EnsureElementStyle(groupHeader, oldStyle, newStyle);
+                    }
+                }
+            }
+            _rowGroupHeaderStylesOld.Clear();
+            foreach (Style style in _rowGroupHeaderStyles)
+            {
+                _rowGroupHeaderStylesOld.Add(style);
+            }
+        }
+
+        private void SelectAll()
+        {
+            SetRowsSelection(0, this.SlotCount - 1);
+        }
+
+        private void SetAndSelectCurrentCell(int columnIndex,
+                                             int slot,
+                                             bool forceCurrentCellSelection)
+        {
+            DataGridSelectionAction action = forceCurrentCellSelection ? DataGridSelectionAction.SelectCurrent : DataGridSelectionAction.None;
+            UpdateSelectionAndCurrency(columnIndex, slot, action, false /*scrollIntoView*/);
+        }
+
+        // columnIndex = 2, rowIndex = -1 --> current cell belongs to the 'new row'.
+        // columnIndex = 2, rowIndex = 2 --> current cell is an inner cell
+        // columnIndex = -1, rowIndex = -1 --> current cell is reset
+        // columnIndex = -1, rowIndex = 2 --> Unexpected
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        private bool SetCurrentCellCore(int columnIndex, int slot, bool commitEdit, bool endRowEdit)
+        {
+            Debug.Assert(columnIndex < this.ColumnsItemsInternal.Count);
+            Debug.Assert(slot < this.SlotCount);
+            Debug.Assert(columnIndex == -1 || this.ColumnsItemsInternal[columnIndex].IsVisible);
+            Debug.Assert(!(columnIndex > -1 && slot == -1));
+
+            if (columnIndex == this.CurrentColumnIndex &&
+                slot == this.CurrentSlot)
+            {
+                Debug.Assert(this.DataConnection != null);
+                Debug.Assert(this._editingColumnIndex == -1 || this._editingColumnIndex == this.CurrentColumnIndex);
+                Debug.Assert(this.EditingRow == null || this.EditingRow.Slot == this.CurrentSlot || this.DataConnection.CommittingEdit);
+                return true;
+            }
+
+            UIElement oldDisplayedElement = null;
+            DataGridCellCoordinates oldCurrentCell = new DataGridCellCoordinates(this.CurrentCellCoordinates);
+
+            object newCurrentItem = null;
+            if (!this.RowGroupHeadersTable.Contains(slot))
+            {
+                int rowIndex = this.RowIndexFromSlot(slot);
+                if (rowIndex >= 0 && rowIndex < this.DataConnection.Count)
+                {
+                    newCurrentItem = this.DataConnection.GetDataItem(rowIndex);
+                }
+            }
+
+            if (this.CurrentColumnIndex > -1)
+            {
+                Debug.Assert(this.CurrentColumnIndex < this.ColumnsItemsInternal.Count);
+                Debug.Assert(this.CurrentSlot < this.SlotCount);
+
+                if (!IsInnerCellOutOfBounds(oldCurrentCell.ColumnIndex, oldCurrentCell.Slot) &&
+                    this.IsSlotVisible(oldCurrentCell.Slot))
+                {
+                    oldDisplayedElement = this.DisplayData.GetDisplayedElement(oldCurrentCell.Slot);
+                }
+
+                if (!this.RowGroupHeadersTable.Contains(oldCurrentCell.Slot) && !this._temporarilyResetCurrentCell)
+                {
+                    bool keepFocus = this.ContainsFocus;
+                    if (commitEdit)
+                    {
+                        if (!EndCellEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, keepFocus, true /*raiseEvents*/))
+                        {
+                            return false;
+                        }
+                        // Resetting the current cell: setting it to (-1, -1) is not considered setting it out of bounds
+                        if ((columnIndex != -1 && slot != -1 && IsInnerCellOutOfSelectionBounds(columnIndex, slot)) ||
+                            IsInnerCellOutOfSelectionBounds(oldCurrentCell.ColumnIndex, oldCurrentCell.Slot))
+                        {
+                            return false;
+                        }
+                        if (endRowEdit && !EndRowEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, true /*raiseEvents*/))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        this.CancelEdit(DataGridEditingUnit.Row, false);
+                        ExitEdit(keepFocus);
+                    }
+                }
+            }
+
+            if (newCurrentItem != null)
+            {
+                slot = this.SlotFromRowIndex(this.DataConnection.IndexOf(newCurrentItem));
+            }
+            if (slot == -1 && columnIndex != -1)
+            {
+                return false;
+            }
+            this.CurrentColumnIndex = columnIndex;
+            this.CurrentSlot = slot;
+
+
+            if (this._temporarilyResetCurrentCell)
+            {
+                if (columnIndex != -1)
+                {
+                    this._temporarilyResetCurrentCell = false;
+                }
+            }
+            if (!this._temporarilyResetCurrentCell && this._editingColumnIndex != -1)
+            {
+                this._editingColumnIndex = columnIndex;
+            }
+
+            if (oldDisplayedElement != null)
+            {
+                DataGridRow row = oldDisplayedElement as DataGridRow;
+                if (row != null)
+                {
+                    // Don't reset the state of the current cell if we're editing it because that would put it in an invalid state
+                    UpdateCurrentState(oldDisplayedElement, oldCurrentCell.ColumnIndex, !(this._temporarilyResetCurrentCell && row.IsEditing && this._editingColumnIndex == oldCurrentCell.ColumnIndex));
+                }
+                else
+                {
+                    UpdateCurrentState(oldDisplayedElement, oldCurrentCell.ColumnIndex, false /*applyCellState*/);
+                }
+            }
+
+            if (this.CurrentColumnIndex > -1)
+            {
+                Debug.Assert(this.CurrentSlot > -1);
+                Debug.Assert(this.CurrentColumnIndex < this.ColumnsItemsInternal.Count);
+                Debug.Assert(this.CurrentSlot < this.SlotCount);
+                if (this.IsSlotVisible(this.CurrentSlot))
+                {
+                    UpdateCurrentState(this.DisplayData.GetDisplayedElement(this.CurrentSlot), this.CurrentColumnIndex, true /*applyCellState*/);
+                }
+            }
+
+            return true;
+        }
+
+        private void SetVerticalOffset(double newVerticalOffset)
+        {
+            _verticalOffset = newVerticalOffset;
+            if (_vScrollBar != null && !DoubleUtil.AreClose(newVerticalOffset, _vScrollBar.Value))
+            {
+                _vScrollBar.Value = _verticalOffset;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether or not a specific validation result should be displayed in the ValidationSummary.
+        /// </summary>
+        /// <param name="validationResult">Validation result to display.</param>
+        /// <returns>True if it should be added to the ValidationSummary, false otherwise.</returns>
+        private bool ShouldDisplayValidationResult(ValidationResult validationResult)
+        {
+            if (this.EditingRow != null)
+            {
+                return !this._bindingValidationResults.ContainsEqualValidationResult(validationResult) ||
+                    this.EditingRow.DataContext is IDataErrorInfo || this.EditingRow.DataContext is INotifyDataErrorInfo;
+            }
+            return false;
+        }
+
+        private void UpdateCurrentState(UIElement displayedElement, int columnIndex, bool applyCellState)
+        {
+            DataGridRow row = displayedElement as DataGridRow;
+            if (row != null)
+            {
+                if (this.AreRowHeadersVisible)
+                {
+                    row.ApplyHeaderStatus(true /*animate*/);
+                }
+                DataGridCell cell = row.Cells[columnIndex];
+                if (applyCellState)
+                {
+                    cell.ApplyCellState(true /*animate*/);
+                }
+            }
+            else
+            {
+                DataGridRowGroupHeader groupHeader = displayedElement as DataGridRowGroupHeader;
+                if (groupHeader != null)
+                {
+                    groupHeader.ApplyState(true /*useTransitions*/);
+                    if (this.AreRowHeadersVisible)
+                    {
+                        groupHeader.ApplyHeaderStatus(true /*animate*/);
+                    }
+                }
+            }
+        }
+
+        private void UpdateDisabledVisual()
+        {
+            if (this.IsEnabled)
+            {
+                VisualStates.GoToState(this, true, VisualStates.StateNormal);
+            }
+            else
+            {
+                VisualStates.GoToState(this, true, VisualStates.StateDisabled, VisualStates.StateNormal);
+            }
+        }
+
+        private void UpdateHorizontalScrollBar(bool needHorizScrollbar, bool forceHorizScrollbar, double totalVisibleWidth, double totalVisibleFrozenWidth, double cellsWidth)
+        {
+            if (this._hScrollBar != null)
+            {
+                if (needHorizScrollbar || forceHorizScrollbar)
+                {
+                    //          viewportSize
+                    //        v---v
+                    //|<|_____|###|>|
+                    //  ^     ^
+                    //  min   max
+
+                    // we want to make the relative size of the thumb reflect the relative size of the viewing area
+                    // viewportSize / (max + viewportSize) = cellsWidth / max
+                    // -> viewportSize = max * cellsWidth / (max - cellsWidth)
+
+                    // always zero
+                    this._hScrollBar.Minimum = 0;
+                    if (needHorizScrollbar)
+                    {
+                        // maximum travel distance -- not the total width
+                        this._hScrollBar.Maximum = totalVisibleWidth - cellsWidth;
+                        Debug.Assert(totalVisibleFrozenWidth >= 0);
+                        if (this._frozenColumnScrollBarSpacer != null)
+                        {
+                            this._frozenColumnScrollBarSpacer.Width = totalVisibleFrozenWidth;
+                        }
+                        Debug.Assert(this._hScrollBar.Maximum >= 0);
+
+                        // width of the scrollable viewing area
+                        double viewPortSize = Math.Max(0, cellsWidth - totalVisibleFrozenWidth);
+                        this._hScrollBar.ViewportSize = viewPortSize;
+                        this._hScrollBar.LargeChange = viewPortSize;
+                        // The ScrollBar should be in sync with HorizontalOffset at this point.  There's a resize case
+                        // where the ScrollBar will coerce an old value here, but we don't want that
+                        if (this._hScrollBar.Value != this._horizontalOffset)
+                        {
+                            this._hScrollBar.Value = this._horizontalOffset;
+                        }
+                        this._hScrollBar.IsEnabled = true;
+                    }
+                    else
+                    {
+                        this._hScrollBar.Maximum = 0;
+                        this._hScrollBar.ViewportSize = 0;
+                        this._hScrollBar.IsEnabled = false;
+                    }
+
+                    if (this._hScrollBar.Visibility != Visibility.Visible)
+                    {
+                        // This will trigger a call to this method via Cells_SizeChanged for
+                        this._ignoreNextScrollBarsLayout = true;
+                        // which no processing is needed.
+                        this._hScrollBar.Visibility = Visibility.Visible;
+                        if (this._hScrollBar.DesiredSize.Height == 0)
+                        {
+                            // We need to know the height for the rest of layout to work correctly so measure it now
+                            this._hScrollBar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                         }
                     }
                 }
                 else
                 {
-                    dataGridColumn = this.ColumnsInternal.GetNextVisibleWritableColumn(this.ColumnsItemsInternal[this.CurrentColumnIndex]);
-                    neighborSlot = GetNextVisibleSlot(this.CurrentSlot);
-                    if (this.EditingRow != null)
+                    this._hScrollBar.Maximum = 0;
+                    if (this._hScrollBar.Visibility != Visibility.Collapsed)
                     {
-                        while (neighborSlot < this.SlotCount && this.RowGroupHeadersTable.Contains(neighborSlot))
+                        // This will trigger a call to this method via Cells_SizeChanged for 
+                        // which no processing is needed.
+                        this._hScrollBar.Visibility = Visibility.Collapsed;
+                        this._ignoreNextScrollBarsLayout = true;
+                    }
+                }
+
+                DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(this) as DataGridAutomationPeer;
+                if (peer != null)
+                {
+                    peer.RaiseAutomationScrollEvents();
+                }
+            }
+        }
+
+        private void UpdateRowDetailsVisibilityMode(DataGridRowDetailsVisibilityMode newDetailsMode)
+        {
+            int itemCount = this.DataConnection.Count;
+            if (this._rowsPresenter != null && itemCount > 0)
+            {
+                Visibility newDetailsVisibility = Visibility.Collapsed;
+                switch (newDetailsMode)
+                {
+                    case DataGridRowDetailsVisibilityMode.Visible:
+                        newDetailsVisibility = Visibility.Visible;
+                        this._showDetailsTable.AddValues(0, itemCount, Visibility.Visible);
+                        break;
+                    case DataGridRowDetailsVisibilityMode.Collapsed:
+                        newDetailsVisibility = Visibility.Collapsed;
+                        this._showDetailsTable.AddValues(0, itemCount, Visibility.Collapsed);
+                        break;
+                    case DataGridRowDetailsVisibilityMode.VisibleWhenSelected:
+                        this._showDetailsTable.Clear();
+                        break;
+                }
+
+                bool updated = false;
+                foreach (DataGridRow row in this.GetAllRows())
+                {
+                    if (row.Visibility == Visibility.Visible)
+                    {
+                        if (newDetailsMode == DataGridRowDetailsVisibilityMode.VisibleWhenSelected)
                         {
-                            neighborSlot = GetNextVisibleSlot(neighborSlot);
+                            // For VisibleWhenSelected, we need to calculate the value for each individual row
+                            newDetailsVisibility = this._selectedItems.ContainsSlot(row.Slot) ? Visibility.Visible : Visibility.Collapsed;
+                        }
+                        if (row.DetailsVisibility != newDetailsVisibility)
+                        {
+                            updated = true;
+                            row.SetDetailsVisibilityInternal(newDetailsVisibility, true /* raiseNotification */, false /* animate */);
                         }
                     }
                 }
-                neighborVisibleWritableColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-
-                if (neighborVisibleWritableColumnIndex == -1 && (neighborSlot == -1 || neighborSlot >= this.SlotCount))
+                if (updated)
                 {
-                    // There is no previous/next row and no previous/next writable cell on the current row
-                    return false;
+                    UpdateDisplayedRows(this.DisplayData.FirstScrollingSlot, this.CellsHeight);
+                    InvalidateRowsMeasure(false /*invalidateIndividualElements*/);
+
+                    InvalidateRowsArrange(); // force invalidate
                 }
+            }
+        }
 
-                if (this.WaitForLostFocus(delegate { this.ProcessTabKey(e, shift, ctrl); }))
-                {
-                    return true;
-                }
+        private bool UpdateStateOnMouseLeftButtonDown(MouseButtonEventArgs mouseButtonEventArgs, int columnIndex, int slot, bool allowEdit, bool shift, bool ctrl)
+        {
+            bool beginEdit;
 
-                int targetSlot = -1, targetColumnIndex = -1;
+            Debug.Assert(slot >= 0);
 
+            // Before changing selection, check if the current cell needs to be committed, and
+            // check if the current row needs to be committed. If any of those two operations are required and fail, 
+            // do not change selection, and do not change current cell.
+
+            bool wasInEdit = this.EditingColumnIndex != -1;
+
+            if (IsSlotOutOfBounds(slot))
+            {
+                return true;
+            }
+
+            if (wasInEdit && (columnIndex != this.EditingColumnIndex || slot != this.CurrentSlot) &&
+                this.WaitForLostFocus(delegate { this.UpdateStateOnMouseLeftButtonDown(mouseButtonEventArgs, columnIndex, slot, allowEdit, shift, ctrl); }))
+            {
+                return true;
+            }
+
+            try
+            {
                 this._noSelectionChangeCount++;
-                try
-                {
-                    if (neighborVisibleWritableColumnIndex == -1)
-                    {
-                        targetSlot = neighborSlot;
-                        if (shift)
-                        {
-                            Debug.Assert(this.ColumnsInternal.LastVisibleWritableColumn != null);
-                            targetColumnIndex = this.ColumnsInternal.LastVisibleWritableColumn.Index;
-                        }
-                        else
-                        {
-                            Debug.Assert(this.ColumnsInternal.FirstVisibleWritableColumn != null);
-                            targetColumnIndex = this.ColumnsInternal.FirstVisibleWritableColumn.Index;
-                        }
-                    }
-                    else
-                    {
-                        targetSlot = this.CurrentSlot;
-                        targetColumnIndex = neighborVisibleWritableColumnIndex;
-                    }
 
-                    DataGridSelectionAction action;
-                    if (targetSlot != this.CurrentSlot || (this.SelectionMode == DataGridSelectionMode.Extended))
+                beginEdit = allowEdit &&
+                            this.CurrentSlot == slot &&
+                            columnIndex != -1 &&
+                            (wasInEdit || this.CurrentColumnIndex == columnIndex) &&
+                            !GetColumnEffectiveReadOnlyState(this.ColumnsItemsInternal[columnIndex]);
+
+                DataGridSelectionAction action;
+                if (this.SelectionMode == DataGridSelectionMode.Extended && shift)
+                {
+                    // Shift select multiple rows
+                    action = DataGridSelectionAction.SelectFromAnchorToCurrent;
+                }
+                else if (GetRowSelection(slot))  // Unselecting single row or Selecting a previously multi-selected row
+                {
+                    if (!ctrl && this.SelectionMode == DataGridSelectionMode.Extended && _selectedItems.Count != 0)
                     {
-                        if (IsSlotOutOfBounds(targetSlot))
-                        {
-                            return true;
-                        }
+                        // Unselect everything except the row that was clicked on
                         action = DataGridSelectionAction.SelectCurrent;
+                    }
+                    else if (ctrl && this.EditingRow == null)
+                    {
+                        action = DataGridSelectionAction.RemoveCurrentFromSelection;
                     }
                     else
                     {
                         action = DataGridSelectionAction.None;
                     }
-                    UpdateSelectionAndCurrency(targetColumnIndex, targetSlot, action, true /*scrollIntoView*/);
                 }
-                finally
+                else // Selecting a single row or multi-selecting with Ctrl
                 {
-                    this.NoSelectionChangeCount--;
-                }
-
-                if (this._successfullyUpdatedSelection && !this.RowGroupHeadersTable.Contains(targetSlot))
-                {
-                    BeginCellEdit(e);
-                }
-
-                // Return true to say we handled the key event even if the operation was unsuccessful. If we don't
-                // say we handled this event, the framework will continue to process the tab key and change focus.
-                return true;
-            }
-
-            private bool ProcessUpKey(bool shift, bool ctrl)
-            {
-                DataGridColumn dataGridColumn = this.ColumnsInternal.FirstVisibleNonFillerColumn;
-                int firstVisibleColumnIndex = (dataGridColumn == null) ? -1 : dataGridColumn.Index;
-                int firstVisibleSlot = this.FirstVisibleSlot;
-                if (firstVisibleColumnIndex == -1 || firstVisibleSlot == -1)
-                {
-                    return false;
-                }
-
-                if (this.WaitForLostFocus(delegate { this.ProcessUpKey(shift, ctrl); }))
-                {
-                    return true;
-                }
-
-                int previousVisibleSlot = (this.CurrentSlot != -1) ? GetPreviousVisibleSlot(this.CurrentSlot) : -1;
-
-                this._noSelectionChangeCount++;
-
-                try
-                {
-                    int slot;
-                    int columnIndex;
-                    DataGridSelectionAction action;
-                    if (this.CurrentColumnIndex == -1)
+                    if (this.SelectionMode == DataGridSelectionMode.Single || !ctrl)
                     {
-                        slot = firstVisibleSlot;
-                        columnIndex = firstVisibleColumnIndex;
+                        // Unselect the currectly selected rows except the new selected row
                         action = DataGridSelectionAction.SelectCurrent;
                     }
-                    else if (ctrl)
-                    {
-                        if (shift)
-                        {
-                            // Both Ctrl and Shift
-                            slot = firstVisibleSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = (this.SelectionMode == DataGridSelectionMode.Extended)
-                                ? DataGridSelectionAction.SelectFromAnchorToCurrent
-                                : DataGridSelectionAction.SelectCurrent;
-                        }
-                        else
-                        {
-                            // Ctrl without Shift
-                            slot = firstVisibleSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = DataGridSelectionAction.SelectCurrent;
-                        }
-                    }
                     else
                     {
-                        if (previousVisibleSlot == -1)
-                        {
-                            return true;
-                        }
-                        if (shift)
-                        {
-                            // Shift without Ctrl
-                            slot = previousVisibleSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = DataGridSelectionAction.SelectFromAnchorToCurrent;
-                        }
-                        else
-                        {
-                            // Neither Shift nor Ctrl
-                            slot = previousVisibleSlot;
-                            columnIndex = this.CurrentColumnIndex;
-                            action = DataGridSelectionAction.SelectCurrent;
-                        }
-                    }
-                    UpdateSelectionAndCurrency(columnIndex, slot, action, true /*scrollIntoView*/);
-                }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-                return this._successfullyUpdatedSelection;
-            }
-
-            private void RemoveDisplayedColumnHeader(DataGridColumn dataGridColumn)
-            {
-                if (_columnHeadersPresenter != null)
-                {
-                    _columnHeadersPresenter.Children.Remove(dataGridColumn.HeaderCell);
-                }
-            }
-
-            private void RemoveDisplayedColumnHeaders()
-            {
-                if (_columnHeadersPresenter != null)
-                {
-                    _columnHeadersPresenter.Children.Clear();
-                }
-                this.ColumnsInternal.FillerColumn.IsRepresented = false;
-            }
-
-            private bool ResetCurrentCellCore()
-            {
-                return (this.CurrentColumnIndex == -1 || SetCurrentCellCore(-1, -1));
-            }
-
-            private void ResetEditingRow()
-            {
-                if (this.EditingRow != null
-                    && this.EditingRow != this._focusedRow
-                    && !IsSlotVisible(this.EditingRow.Slot))
-                {
-                    // Unload the old editing row if it's off screen
-                    this.EditingRow.Clip = null;
-                    UnloadRow(this.EditingRow);
-                    this.DisplayData.FullyRecycleElements();
-                }
-                this.EditingRow = null;
-            }
-
-            private void ResetFocusedRow()
-            {
-                if (this._focusedRow != null
-                    && this._focusedRow != this.EditingRow
-                    && !IsSlotVisible(this._focusedRow.Slot))
-                {
-                    // Unload the old focused row if it's off screen
-                    this._focusedRow.Clip = null;
-                    UnloadRow(this._focusedRow);
-                    this.DisplayData.FullyRecycleElements();
-                }
-                this._focusedRow = null;
-            }
-
-            private void ResetValidationStatus()
-            {
-                // Clear the invalid status of the Cell, Row and DataGrid
-                if (this.EditingRow != null)
-                {
-                    this.EditingRow.IsValid = true;
-                    if (this.EditingRow.Index != -1)
-                    {
-                        foreach (DataGridCell cell in this.EditingRow.Cells)
-                        {
-                            if (!cell.IsValid)
-                            {
-                                cell.IsValid = true;
-                                cell.ApplyCellState(true);
-                            }
-                        }
-                        this.EditingRow.ApplyState(true);
+                        action = DataGridSelectionAction.AddCurrentToSelection;
                     }
                 }
-                this.IsValid = true;
-
-                // Clear the previous validation results
-                this._validationResults.Clear();
-
-                // Hide the error list if validation succeeded
-                if (this._validationSummary != null && this._validationSummary.Errors.Count > 0)
-                {
-                    this._validationSummary.Errors.Clear();
-                    if (this.EditingRow != null)
-                    {
-                        int editingRowSlot = this.EditingRow.Slot;
-
-                        InvalidateMeasure();
-                        this.Dispatcher.BeginInvoke(delegate
-                        {
-                        // It's possible that the DataContext or ItemsSource has changed by the time we reach this code,
-                        // so we need to ensure that the editing row still exists before scrolling it into view
-                        if (!IsSlotOutOfBounds(editingRowSlot))
-                            {
-                                ScrollSlotIntoView(editingRowSlot, false /*scrolledHorizontally*/);
-                            }
-                        });
-                    }
-                }
-            }
-
-            private void RowGroupHeaderStyles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-            {
-                if (_rowsPresenter != null)
-                {
-                    Style oldLastStyle = _rowGroupHeaderStylesOld.Count > 0 ? _rowGroupHeaderStylesOld[_rowGroupHeaderStylesOld.Count - 1] : null;
-                    while (_rowGroupHeaderStylesOld.Count < _rowGroupHeaderStyles.Count)
-                    {
-                        _rowGroupHeaderStylesOld.Add(oldLastStyle);
-                    }
-
-                    Style lastStyle = _rowGroupHeaderStyles.Count > 0 ? _rowGroupHeaderStyles[_rowGroupHeaderStyles.Count - 1] : null;
-                    foreach (UIElement element in _rowsPresenter.Children)
-                    {
-                        DataGridRowGroupHeader groupHeader = element as DataGridRowGroupHeader;
-                        if (groupHeader != null)
-                        {
-                            Style oldStyle = groupHeader.Level < _rowGroupHeaderStylesOld.Count ? _rowGroupHeaderStylesOld[groupHeader.Level] : oldLastStyle;
-                            Style newStyle = groupHeader.Level < _rowGroupHeaderStyles.Count ? _rowGroupHeaderStyles[groupHeader.Level] : lastStyle;
-                            EnsureElementStyle(groupHeader, oldStyle, newStyle);
-                        }
-                    }
-                }
-                _rowGroupHeaderStylesOld.Clear();
-                foreach (Style style in _rowGroupHeaderStyles)
-                {
-                    _rowGroupHeaderStylesOld.Add(style);
-                }
-            }
-
-            private void SelectAll()
-            {
-                SetRowsSelection(0, this.SlotCount - 1);
-            }
-
-            private void SetAndSelectCurrentCell(int columnIndex,
-                                                 int slot,
-                                                 bool forceCurrentCellSelection)
-            {
-                DataGridSelectionAction action = forceCurrentCellSelection ? DataGridSelectionAction.SelectCurrent : DataGridSelectionAction.None;
                 UpdateSelectionAndCurrency(columnIndex, slot, action, false /*scrollIntoView*/);
             }
-
-            // columnIndex = 2, rowIndex = -1 --> current cell belongs to the 'new row'.
-            // columnIndex = 2, rowIndex = 2 --> current cell is an inner cell
-            // columnIndex = -1, rowIndex = -1 --> current cell is reset
-            // columnIndex = -1, rowIndex = 2 --> Unexpected
-            [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-            private bool SetCurrentCellCore(int columnIndex, int slot, bool commitEdit, bool endRowEdit)
+            finally
             {
-                Debug.Assert(columnIndex < this.ColumnsItemsInternal.Count);
-                Debug.Assert(slot < this.SlotCount);
-                Debug.Assert(columnIndex == -1 || this.ColumnsItemsInternal[columnIndex].IsVisible);
-                Debug.Assert(!(columnIndex > -1 && slot == -1));
-
-                if (columnIndex == this.CurrentColumnIndex &&
-                    slot == this.CurrentSlot)
-                {
-                    Debug.Assert(this.DataConnection != null);
-                    Debug.Assert(this._editingColumnIndex == -1 || this._editingColumnIndex == this.CurrentColumnIndex);
-                    Debug.Assert(this.EditingRow == null || this.EditingRow.Slot == this.CurrentSlot || this.DataConnection.CommittingEdit);
-                    return true;
-                }
-
-                UIElement oldDisplayedElement = null;
-                DataGridCellCoordinates oldCurrentCell = new DataGridCellCoordinates(this.CurrentCellCoordinates);
-
-                object newCurrentItem = null;
-                if (!this.RowGroupHeadersTable.Contains(slot))
-                {
-                    int rowIndex = this.RowIndexFromSlot(slot);
-                    if (rowIndex >= 0 && rowIndex < this.DataConnection.Count)
-                    {
-                        newCurrentItem = this.DataConnection.GetDataItem(rowIndex);
-                    }
-                }
-
-                if (this.CurrentColumnIndex > -1)
-                {
-                    Debug.Assert(this.CurrentColumnIndex < this.ColumnsItemsInternal.Count);
-                    Debug.Assert(this.CurrentSlot < this.SlotCount);
-
-                    if (!IsInnerCellOutOfBounds(oldCurrentCell.ColumnIndex, oldCurrentCell.Slot) &&
-                        this.IsSlotVisible(oldCurrentCell.Slot))
-                    {
-                        oldDisplayedElement = this.DisplayData.GetDisplayedElement(oldCurrentCell.Slot);
-                    }
-
-                    if (!this.RowGroupHeadersTable.Contains(oldCurrentCell.Slot) && !this._temporarilyResetCurrentCell)
-                    {
-                        bool keepFocus = this.ContainsFocus;
-                        if (commitEdit)
-                        {
-                            if (!EndCellEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, keepFocus, true /*raiseEvents*/))
-                            {
-                                return false;
-                            }
-                            // Resetting the current cell: setting it to (-1, -1) is not considered setting it out of bounds
-                            if ((columnIndex != -1 && slot != -1 && IsInnerCellOutOfSelectionBounds(columnIndex, slot)) ||
-                                IsInnerCellOutOfSelectionBounds(oldCurrentCell.ColumnIndex, oldCurrentCell.Slot))
-                            {
-                                return false;
-                            }
-                            if (endRowEdit && !EndRowEdit(DataGridEditAction.Commit, true /*exitEditingMode*/, true /*raiseEvents*/))
-                            {
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            this.CancelEdit(DataGridEditingUnit.Row, false);
-                            ExitEdit(keepFocus);
-                        }
-                    }
-                }
-
-                if (newCurrentItem != null)
-                {
-                    slot = this.SlotFromRowIndex(this.DataConnection.IndexOf(newCurrentItem));
-                }
-                if (slot == -1 && columnIndex != -1)
-                {
-                    return false;
-                }
-                this.CurrentColumnIndex = columnIndex;
-                this.CurrentSlot = slot;
-
-
-                if (this._temporarilyResetCurrentCell)
-                {
-                    if (columnIndex != -1)
-                    {
-                        this._temporarilyResetCurrentCell = false;
-                    }
-                }
-                if (!this._temporarilyResetCurrentCell && this._editingColumnIndex != -1)
-                {
-                    this._editingColumnIndex = columnIndex;
-                }
-
-                if (oldDisplayedElement != null)
-                {
-                    DataGridRow row = oldDisplayedElement as DataGridRow;
-                    if (row != null)
-                    {
-                        // Don't reset the state of the current cell if we're editing it because that would put it in an invalid state
-                        UpdateCurrentState(oldDisplayedElement, oldCurrentCell.ColumnIndex, !(this._temporarilyResetCurrentCell && row.IsEditing && this._editingColumnIndex == oldCurrentCell.ColumnIndex));
-                    }
-                    else
-                    {
-                        UpdateCurrentState(oldDisplayedElement, oldCurrentCell.ColumnIndex, false /*applyCellState*/);
-                    }
-                }
-
-                if (this.CurrentColumnIndex > -1)
-                {
-                    Debug.Assert(this.CurrentSlot > -1);
-                    Debug.Assert(this.CurrentColumnIndex < this.ColumnsItemsInternal.Count);
-                    Debug.Assert(this.CurrentSlot < this.SlotCount);
-                    if (this.IsSlotVisible(this.CurrentSlot))
-                    {
-                        UpdateCurrentState(this.DisplayData.GetDisplayedElement(this.CurrentSlot), this.CurrentColumnIndex, true /*applyCellState*/);
-                    }
-                }
-
-                return true;
+                this.NoSelectionChangeCount--;
             }
 
-            private void SetVerticalOffset(double newVerticalOffset)
+            if (this._successfullyUpdatedSelection && beginEdit && BeginCellEdit(mouseButtonEventArgs))
             {
-                _verticalOffset = newVerticalOffset;
-                if (_vScrollBar != null && !DoubleUtil.AreClose(newVerticalOffset, _vScrollBar.Value))
-                {
-                    _vScrollBar.Value = _verticalOffset;
-                }
+                FocusEditingCell(true /*setFocus*/);
             }
 
-            /// <summary>
-            /// Determines whether or not a specific validation result should be displayed in the ValidationSummary.
-            /// </summary>
-            /// <param name="validationResult">Validation result to display.</param>
-            /// <returns>True if it should be added to the ValidationSummary, false otherwise.</returns>
-            private bool ShouldDisplayValidationResult(ValidationResult validationResult)
-            {
-                if (this.EditingRow != null)
-                {
-                    return !this._bindingValidationResults.ContainsEqualValidationResult(validationResult) ||
-                        this.EditingRow.DataContext is IDataErrorInfo || this.EditingRow.DataContext is INotifyDataErrorInfo;
-                }
-                return false;
-            }
+            return true;
+        }
 
-            private void UpdateCurrentState(UIElement displayedElement, int columnIndex, bool applyCellState)
-            {
-                DataGridRow row = displayedElement as DataGridRow;
-                if (row != null)
-                {
-                    if (this.AreRowHeadersVisible)
-                    {
-                        row.ApplyHeaderStatus(true /*animate*/);
-                    }
-                    DataGridCell cell = row.Cells[columnIndex];
-                    if (applyCellState)
-                    {
-                        cell.ApplyCellState(true /*animate*/);
-                    }
-                }
-                else
-                {
-                    DataGridRowGroupHeader groupHeader = displayedElement as DataGridRowGroupHeader;
-                    if (groupHeader != null)
-                    {
-                        groupHeader.ApplyState(true /*useTransitions*/);
-                        if (this.AreRowHeadersVisible)
-                        {
-                            groupHeader.ApplyHeaderStatus(true /*animate*/);
-                        }
-                    }
-                }
-            }
-
-            private void UpdateDisabledVisual()
-            {
-                if (this.IsEnabled)
-                {
-                    VisualStates.GoToState(this, true, VisualStates.StateNormal);
-                }
-                else
-                {
-                    VisualStates.GoToState(this, true, VisualStates.StateDisabled, VisualStates.StateNormal);
-                }
-            }
-
-            private void UpdateHorizontalScrollBar(bool needHorizScrollbar, bool forceHorizScrollbar, double totalVisibleWidth, double totalVisibleFrozenWidth, double cellsWidth)
-            {
-                if (this._hScrollBar != null)
-                {
-                    if (needHorizScrollbar || forceHorizScrollbar)
-                    {
-                        //          viewportSize
-                        //        v---v
-                        //|<|_____|###|>|
-                        //  ^     ^
-                        //  min   max
-
-                        // we want to make the relative size of the thumb reflect the relative size of the viewing area
-                        // viewportSize / (max + viewportSize) = cellsWidth / max
-                        // -> viewportSize = max * cellsWidth / (max - cellsWidth)
-
-                        // always zero
-                        this._hScrollBar.Minimum = 0;
-                        if (needHorizScrollbar)
-                        {
-                            // maximum travel distance -- not the total width
-                            this._hScrollBar.Maximum = totalVisibleWidth - cellsWidth;
-                            Debug.Assert(totalVisibleFrozenWidth >= 0);
-                            if (this._frozenColumnScrollBarSpacer != null)
-                            {
-                                this._frozenColumnScrollBarSpacer.Width = totalVisibleFrozenWidth;
-                            }
-                            Debug.Assert(this._hScrollBar.Maximum >= 0);
-
-                            // width of the scrollable viewing area
-                            double viewPortSize = Math.Max(0, cellsWidth - totalVisibleFrozenWidth);
-                            this._hScrollBar.ViewportSize = viewPortSize;
-                            this._hScrollBar.LargeChange = viewPortSize;
-                            // The ScrollBar should be in sync with HorizontalOffset at this point.  There's a resize case
-                            // where the ScrollBar will coerce an old value here, but we don't want that
-                            if (this._hScrollBar.Value != this._horizontalOffset)
-                            {
-                                this._hScrollBar.Value = this._horizontalOffset;
-                            }
-                            this._hScrollBar.IsEnabled = true;
-                        }
-                        else
-                        {
-                            this._hScrollBar.Maximum = 0;
-                            this._hScrollBar.ViewportSize = 0;
-                            this._hScrollBar.IsEnabled = false;
-                        }
-
-                        if (this._hScrollBar.Visibility != Visibility.Visible)
-                        {
-                            // This will trigger a call to this method via Cells_SizeChanged for
-                            this._ignoreNextScrollBarsLayout = true;
-                            // which no processing is needed.
-                            this._hScrollBar.Visibility = Visibility.Visible;
-                            if (this._hScrollBar.DesiredSize.Height == 0)
-                            {
-                                // We need to know the height for the rest of layout to work correctly so measure it now
-                                this._hScrollBar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        this._hScrollBar.Maximum = 0;
-                        if (this._hScrollBar.Visibility != Visibility.Collapsed)
-                        {
-                            // This will trigger a call to this method via Cells_SizeChanged for 
-                            // which no processing is needed.
-                            this._hScrollBar.Visibility = Visibility.Collapsed;
-                            this._ignoreNextScrollBarsLayout = true;
-                        }
-                    }
-
-                    DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(this) as DataGridAutomationPeer;
-                    if (peer != null)
-                    {
-                        peer.RaiseAutomationScrollEvents();
-                    }
-                }
-            }
-
-            private void UpdateRowDetailsVisibilityMode(DataGridRowDetailsVisibilityMode newDetailsMode)
-            {
-                int itemCount = this.DataConnection.Count;
-                if (this._rowsPresenter != null && itemCount > 0)
-                {
-                    Visibility newDetailsVisibility = Visibility.Collapsed;
-                    switch (newDetailsMode)
-                    {
-                        case DataGridRowDetailsVisibilityMode.Visible:
-                            newDetailsVisibility = Visibility.Visible;
-                            this._showDetailsTable.AddValues(0, itemCount, Visibility.Visible);
-                            break;
-                        case DataGridRowDetailsVisibilityMode.Collapsed:
-                            newDetailsVisibility = Visibility.Collapsed;
-                            this._showDetailsTable.AddValues(0, itemCount, Visibility.Collapsed);
-                            break;
-                        case DataGridRowDetailsVisibilityMode.VisibleWhenSelected:
-                            this._showDetailsTable.Clear();
-                            break;
-                    }
-
-                    bool updated = false;
-                    foreach (DataGridRow row in this.GetAllRows())
-                    {
-                        if (row.Visibility == Visibility.Visible)
-                        {
-                            if (newDetailsMode == DataGridRowDetailsVisibilityMode.VisibleWhenSelected)
-                            {
-                                // For VisibleWhenSelected, we need to calculate the value for each individual row
-                                newDetailsVisibility = this._selectedItems.ContainsSlot(row.Slot) ? Visibility.Visible : Visibility.Collapsed;
-                            }
-                            if (row.DetailsVisibility != newDetailsVisibility)
-                            {
-                                updated = true;
-                                row.SetDetailsVisibilityInternal(newDetailsVisibility, true /* raiseNotification */, false /* animate */);
-                            }
-                        }
-                    }
-                    if (updated)
-                    {
-                        UpdateDisplayedRows(this.DisplayData.FirstScrollingSlot, this.CellsHeight);
-                        InvalidateRowsMeasure(false /*invalidateIndividualElements*/);
-
-                        InvalidateRowsArrange(); // force invalidate
-                    }
-                }
-            }
-
-            [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-#if MIGRATION
-        private bool UpdateStateOnMouseLeftButtonDown(MouseButtonEventArgs mouseButtonEventArgs, int columnIndex, int slot, bool allowEdit, bool shift, bool ctrl)
-            {
-#else
-        private bool UpdateStateOnMouseLeftButtonDown(PointerRoutedEventArgs mouseButtonEventArgs, int columnIndex, int slot, bool allowEdit, bool shift, bool ctrl)
+        /// <summary>
+        /// Updates the DataGrid's validation results, modifies the ValidationSummary's items,
+        /// and sets the IsValid states of the UIElements.
+        /// </summary>
+        /// <param name="newValidationResults">New validation results.</param>
+        /// <param name="scrollIntoView">If the validation results have changed, scrolls the editing row into view.</param>
+        private void UpdateValidationResults(List<ValidationResult> newValidationResults, bool scrollIntoView)
         {
-#endif
-            bool beginEdit;
+            bool validationResultsChanged = false;
+            Debug.Assert(this.EditingRow != null);
 
-                Debug.Assert(slot >= 0);
-
-                // Before changing selection, check if the current cell needs to be committed, and
-                // check if the current row needs to be committed. If any of those two operations are required and fail, 
-                // do not change selection, and do not change current cell.
-
-                bool wasInEdit = this.EditingColumnIndex != -1;
-
-                if (IsSlotOutOfBounds(slot))
+            // Remove the validation results that have been fixed
+            List<ValidationResult> removedValidationResults = new List<ValidationResult>();
+            foreach (ValidationResult oldValidationResult in this._validationResults)
+            {
+                if (oldValidationResult != null && !newValidationResults.ContainsEqualValidationResult(oldValidationResult))
                 {
-                    return true;
+                    removedValidationResults.Add(oldValidationResult);
+                    validationResultsChanged = true;
                 }
-
-                if (wasInEdit && (columnIndex != this.EditingColumnIndex || slot != this.CurrentSlot) &&
-                    this.WaitForLostFocus(delegate { this.UpdateStateOnMouseLeftButtonDown(mouseButtonEventArgs, columnIndex, slot, allowEdit, shift, ctrl); }))
+            }
+            foreach (ValidationResult removedValidationResult in removedValidationResults)
+            {
+                this._validationResults.Remove(removedValidationResult);
+                if (this._validationSummary != null)
                 {
-                    return true;
-                }
-
-                try
-                {
-                    this._noSelectionChangeCount++;
-
-                    beginEdit = allowEdit &&
-                                this.CurrentSlot == slot &&
-                                columnIndex != -1 &&
-                                (wasInEdit || this.CurrentColumnIndex == columnIndex) &&
-                                !GetColumnEffectiveReadOnlyState(this.ColumnsItemsInternal[columnIndex]);
-
-                    DataGridSelectionAction action;
-                    if (this.SelectionMode == DataGridSelectionMode.Extended && shift)
+                    ValidationSummaryItem removedValidationSummaryItem = this.FindValidationSummaryItem(removedValidationResult);
+                    if (removedValidationSummaryItem != null)
                     {
-                        // Shift select multiple rows
-                        action = DataGridSelectionAction.SelectFromAnchorToCurrent;
+                        this._validationSummary.Errors.Remove(removedValidationSummaryItem);
                     }
-                    else if (GetRowSelection(slot))  // Unselecting single row or Selecting a previously multi-selected row
-                    {
-                        if (!ctrl && this.SelectionMode == DataGridSelectionMode.Extended && _selectedItems.Count != 0)
-                        {
-                            // Unselect everything except the row that was clicked on
-                            action = DataGridSelectionAction.SelectCurrent;
-                        }
-                        else if (ctrl && this.EditingRow == null)
-                        {
-                            action = DataGridSelectionAction.RemoveCurrentFromSelection;
-                        }
-                        else
-                        {
-                            action = DataGridSelectionAction.None;
-                        }
-                    }
-                    else // Selecting a single row or multi-selecting with Ctrl
-                    {
-                        if (this.SelectionMode == DataGridSelectionMode.Single || !ctrl)
-                        {
-                            // Unselect the currectly selected rows except the new selected row
-                            action = DataGridSelectionAction.SelectCurrent;
-                        }
-                        else
-                        {
-                            action = DataGridSelectionAction.AddCurrentToSelection;
-                        }
-                    }
-                    UpdateSelectionAndCurrency(columnIndex, slot, action, false /*scrollIntoView*/);
                 }
-                finally
-                {
-                    this.NoSelectionChangeCount--;
-                }
-
-                if (this._successfullyUpdatedSelection && beginEdit && BeginCellEdit(mouseButtonEventArgs))
-                {
-                    FocusEditingCell(true /*setFocus*/);
-                }
-
-                return true;
             }
 
-            /// <summary>
-            /// Updates the DataGrid's validation results, modifies the ValidationSummary's items,
-            /// and sets the IsValid states of the UIElements.
-            /// </summary>
-            /// <param name="newValidationResults">New validation results.</param>
-            /// <param name="scrollIntoView">If the validation results have changed, scrolls the editing row into view.</param>
-            private void UpdateValidationResults(List<ValidationResult> newValidationResults, bool scrollIntoView)
+            // Add any validation results that were just introduced
+            foreach (ValidationResult newValidationResult in newValidationResults)
             {
-                bool validationResultsChanged = false;
-                Debug.Assert(this.EditingRow != null);
-
-                // Remove the validation results that have been fixed
-                List<ValidationResult> removedValidationResults = new List<ValidationResult>();
-                foreach (ValidationResult oldValidationResult in this._validationResults)
+                if (newValidationResult != null && !this._validationResults.ContainsEqualValidationResult(newValidationResult))
                 {
-                    if (oldValidationResult != null && !newValidationResults.ContainsEqualValidationResult(oldValidationResult))
+                    this._validationResults.Add(newValidationResult);
+                    if (this._validationSummary != null && ShouldDisplayValidationResult(newValidationResult))
                     {
-                        removedValidationResults.Add(oldValidationResult);
-                        validationResultsChanged = true;
-                    }
-                }
-                foreach (ValidationResult removedValidationResult in removedValidationResults)
-                {
-                    this._validationResults.Remove(removedValidationResult);
-                    if (this._validationSummary != null)
-                    {
-                        ValidationSummaryItem removedValidationSummaryItem = this.FindValidationSummaryItem(removedValidationResult);
-                        if (removedValidationSummaryItem != null)
+                        ValidationSummaryItem newValidationSummaryItem = this.CreateValidationSummaryItem(newValidationResult);
+                        if (newValidationSummaryItem != null)
                         {
-                            this._validationSummary.Errors.Remove(removedValidationSummaryItem);
+                            this._validationSummary.Errors.Add(newValidationSummaryItem);
                         }
                     }
+                    validationResultsChanged = true;
                 }
+            }
 
-                // Add any validation results that were just introduced
-                foreach (ValidationResult newValidationResult in newValidationResults)
+            if (validationResultsChanged)
+            {
+                this.UpdateValidationStatus();
+            }
+            if (!this.IsValid && scrollIntoView)
+            {
+                // Scroll the row with the error into view.
+                int editingRowSlot = this.EditingRow.Slot;
+                if (this._validationSummary != null)
                 {
-                    if (newValidationResult != null && !this._validationResults.ContainsEqualValidationResult(newValidationResult))
+                    // If the number of errors has changed, then the ValidationSummary will be a different size,
+                    // and we need to delay our call to ScrollSlotIntoView
+                    this.InvalidateMeasure();
+                    this.Dispatcher.BeginInvoke(delegate
                     {
-                        this._validationResults.Add(newValidationResult);
-                        if (this._validationSummary != null && ShouldDisplayValidationResult(newValidationResult))
-                        {
-                            ValidationSummaryItem newValidationSummaryItem = this.CreateValidationSummaryItem(newValidationResult);
-                            if (newValidationSummaryItem != null)
-                            {
-                                this._validationSummary.Errors.Add(newValidationSummaryItem);
-                            }
-                        }
-                        validationResultsChanged = true;
-                    }
-                }
-
-                if (validationResultsChanged)
-                {
-                    this.UpdateValidationStatus();
-                }
-                if (!this.IsValid && scrollIntoView)
-                {
-                    // Scroll the row with the error into view.
-                    int editingRowSlot = this.EditingRow.Slot;
-                    if (this._validationSummary != null)
-                    {
-                        // If the number of errors has changed, then the ValidationSummary will be a different size,
-                        // and we need to delay our call to ScrollSlotIntoView
-                        this.InvalidateMeasure();
-                        this.Dispatcher.BeginInvoke(delegate
-                        {
                         // It's possible that the DataContext or ItemsSource has changed by the time we reach this code,
                         // so we need to ensure that the editing row still exists before scrolling it into view
                         if (!this.IsSlotOutOfBounds(editingRowSlot))
-                            {
-                                this.ScrollSlotIntoView(editingRowSlot, false /*scrolledHorizontally*/);
-                            }
-                        });
-                    }
-                    else
-                    {
-                        this.ScrollSlotIntoView(editingRowSlot, false /*scrolledHorizontally*/);
-                    }
+                        {
+                            this.ScrollSlotIntoView(editingRowSlot, false /*scrolledHorizontally*/);
+                        }
+                    });
+                }
+                else
+                {
+                    this.ScrollSlotIntoView(editingRowSlot, false /*scrolledHorizontally*/);
                 }
             }
+        }
 
-            /// <summary>
-            /// Updates the IsValid states of the DataGrid, the EditingRow and its cells. All cells related to
-            /// property-level errors are set to Invalid.  If there is an object-level error selected in the
-            /// ValidationSummary, then its associated cells will also be flagged (if there are any).
-            /// </summary>
-            private void UpdateValidationStatus()
+        /// <summary>
+        /// Updates the IsValid states of the DataGrid, the EditingRow and its cells. All cells related to
+        /// property-level errors are set to Invalid.  If there is an object-level error selected in the
+        /// ValidationSummary, then its associated cells will also be flagged (if there are any).
+        /// </summary>
+        private void UpdateValidationStatus()
+        {
+            if (this.EditingRow != null)
             {
-                if (this.EditingRow != null)
+                foreach (DataGridCell cell in this.EditingRow.Cells)
                 {
-                    foreach (DataGridCell cell in this.EditingRow.Cells)
-                    {
-                        bool isCellValid = true;
+                    bool isCellValid = true;
 
-                        Debug.Assert(cell.OwningColumn != null);
-                        if (!cell.OwningColumn.IsReadOnly)
+                    Debug.Assert(cell.OwningColumn != null);
+                    if (!cell.OwningColumn.IsReadOnly)
+                    {
+                        foreach (ValidationResult validationResult in this._validationResults)
                         {
-                            foreach (ValidationResult validationResult in this._validationResults)
+                            if (this._propertyValidationResults.ContainsEqualValidationResult(validationResult) ||
+                                this._selectedValidationSummaryItem != null && this._selectedValidationSummaryItem.Context == validationResult)
                             {
-                                if (this._propertyValidationResults.ContainsEqualValidationResult(validationResult) ||
-                                    this._selectedValidationSummaryItem != null && this._selectedValidationSummaryItem.Context == validationResult)
+                                foreach (string bindingPath in validationResult.MemberNames)
                                 {
-                                    foreach (string bindingPath in validationResult.MemberNames)
+                                    if (cell.OwningColumn.BindingPaths.Contains(bindingPath))
                                     {
-                                        if (cell.OwningColumn.BindingPaths.Contains(bindingPath))
-                                        {
-                                            isCellValid = false;
-                                            break;
-                                        }
+                                        isCellValid = false;
+                                        break;
                                     }
                                 }
                             }
                         }
-                        if (cell.IsValid != isCellValid)
-                        {
-                            cell.IsValid = isCellValid;
-                            cell.ApplyCellState(true /*animate*/);
-                        }
                     }
-                    bool isRowValid = this._validationResults.Count == 0;
-                    if (this.EditingRow.IsValid != isRowValid)
+                    if (cell.IsValid != isCellValid)
                     {
-                        this.EditingRow.IsValid = isRowValid;
-                        this.EditingRow.ApplyState(true /*animate*/);
+                        cell.IsValid = isCellValid;
+                        cell.ApplyCellState(true /*animate*/);
                     }
-                    this.IsValid = isRowValid;
                 }
-                else
+                bool isRowValid = this._validationResults.Count == 0;
+                if (this.EditingRow.IsValid != isRowValid)
                 {
-                    this.IsValid = true;
+                    this.EditingRow.IsValid = isRowValid;
+                    this.EditingRow.ApplyState(true /*animate*/);
                 }
-
+                this.IsValid = isRowValid;
+            }
+            else
+            {
+                this.IsValid = true;
             }
 
-            private void UpdateVerticalScrollBar(bool needVertScrollbar, bool forceVertScrollbar, double totalVisibleHeight, double cellsHeight)
+        }
+
+        private void UpdateVerticalScrollBar(bool needVertScrollbar, bool forceVertScrollbar, double totalVisibleHeight, double cellsHeight)
+        {
+            if (this._vScrollBar != null)
             {
-                if (this._vScrollBar != null)
+                if (needVertScrollbar || forceVertScrollbar)
                 {
-                    if (needVertScrollbar || forceVertScrollbar)
+                    //          viewportSize
+                    //        v---v
+                    //|<|_____|###|>|
+                    //  ^     ^
+                    //  min   max
+
+                    // we want to make the relative size of the thumb reflect the relative size of the viewing area
+                    // viewportSize / (max + viewportSize) = cellsWidth / max
+                    // -> viewportSize = max * cellsHeight / (totalVisibleHeight - cellsHeight)
+                    // ->              = max * cellsHeight / (totalVisibleHeight - cellsHeight)
+                    // ->              = max * cellsHeight / max
+                    // ->              = cellsHeight
+
+                    // always zero
+                    this._vScrollBar.Minimum = 0;
+                    if (needVertScrollbar && !double.IsInfinity(cellsHeight))
                     {
-                        //          viewportSize
-                        //        v---v
-                        //|<|_____|###|>|
-                        //  ^     ^
-                        //  min   max
+                        // maximum travel distance -- not the total height
+                        this._vScrollBar.Maximum = totalVisibleHeight - cellsHeight;
+                        Debug.Assert(this._vScrollBar.Maximum >= 0);
 
-                        // we want to make the relative size of the thumb reflect the relative size of the viewing area
-                        // viewportSize / (max + viewportSize) = cellsWidth / max
-                        // -> viewportSize = max * cellsHeight / (totalVisibleHeight - cellsHeight)
-                        // ->              = max * cellsHeight / (totalVisibleHeight - cellsHeight)
-                        // ->              = max * cellsHeight / max
-                        // ->              = cellsHeight
-
-                        // always zero
-                        this._vScrollBar.Minimum = 0;
-                        if (needVertScrollbar && !double.IsInfinity(cellsHeight))
-                        {
-                            // maximum travel distance -- not the total height
-                            this._vScrollBar.Maximum = totalVisibleHeight - cellsHeight;
-                            Debug.Assert(this._vScrollBar.Maximum >= 0);
-
-                            // total height of the display area
-                            this._vScrollBar.ViewportSize = cellsHeight;
-                            this._vScrollBar.LargeChange = cellsHeight;
-                            this._vScrollBar.IsEnabled = true;
-                        }
-                        else
-                        {
-                            this._vScrollBar.Maximum = 0;
-                            this._vScrollBar.ViewportSize = 0;
-                            this._vScrollBar.IsEnabled = false;
-                        }
-
-                        if (this._vScrollBar.Visibility != Visibility.Visible)
-                        {
-                            // This will trigger a call to this method via Cells_SizeChanged for 
-                            // which no processing is needed.
-                            this._vScrollBar.Visibility = Visibility.Visible;
-                            if (this._vScrollBar.DesiredSize.Width == 0)
-                            {
-                                // We need to know the width for the rest of layout to work correctly so measure it now
-                                this._vScrollBar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                            }
-                            this._ignoreNextScrollBarsLayout = true;
-                        }
+                        // total height of the display area
+                        this._vScrollBar.ViewportSize = cellsHeight;
+                        this._vScrollBar.LargeChange = cellsHeight;
+                        this._vScrollBar.IsEnabled = true;
                     }
                     else
                     {
                         this._vScrollBar.Maximum = 0;
-                        if (this._vScrollBar.Visibility != Visibility.Collapsed)
-                        {
-                            // This will trigger a call to this method via Cells_SizeChanged for 
-                            // which no processing is needed.
-                            this._vScrollBar.Visibility = Visibility.Collapsed;
-                            this._ignoreNextScrollBarsLayout = true;
-                        }
+                        this._vScrollBar.ViewportSize = 0;
+                        this._vScrollBar.IsEnabled = false;
                     }
 
-                    DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(this) as DataGridAutomationPeer;
-                    if (peer != null)
+                    if (this._vScrollBar.Visibility != Visibility.Visible)
                     {
-                        peer.RaiseAutomationScrollEvents();
+                        // This will trigger a call to this method via Cells_SizeChanged for 
+                        // which no processing is needed.
+                        this._vScrollBar.Visibility = Visibility.Visible;
+                        if (this._vScrollBar.DesiredSize.Width == 0)
+                        {
+                            // We need to know the width for the rest of layout to work correctly so measure it now
+                            this._vScrollBar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                        }
+                        this._ignoreNextScrollBarsLayout = true;
                     }
+                }
+                else
+                {
+                    this._vScrollBar.Maximum = 0;
+                    if (this._vScrollBar.Visibility != Visibility.Collapsed)
+                    {
+                        // This will trigger a call to this method via Cells_SizeChanged for 
+                        // which no processing is needed.
+                        this._vScrollBar.Visibility = Visibility.Collapsed;
+                        this._ignoreNextScrollBarsLayout = true;
+                    }
+                }
+
+                DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(this) as DataGridAutomationPeer;
+                if (peer != null)
+                {
+                    peer.RaiseAutomationScrollEvents();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validates the current editing row and updates the visual states.
+        /// </summary>
+        /// <param name="scrollIntoView">If true, will scroll the editing row into view when a new error is introduced.</param>
+        /// <param name="wireEvents">If true, subscribes to the asynchronous INDEI ErrorsChanged events.</param>
+        /// <returns>True if the editing row is valid, false otherwise.</returns>
+        private bool ValidateEditingRow(bool scrollIntoView, bool wireEvents)
+        {
+            this._propertyValidationResults.Clear();
+            this._indeiValidationResults.Clear();
+
+            if (this.EditingRow != null)
+            {
+                Object dataItem = this.EditingRow.DataContext;
+                Debug.Assert(dataItem != null);
+
+                // Validate using the Validator.
+                List<ValidationResult> validationResults = new List<ValidationResult>();
+                ValidationContext context = new ValidationContext(dataItem, null, null);
+                Validator.TryValidateObject(dataItem, context, validationResults, true);
+
+                // Add any existing exception errors (in case we're editing a cell).
+                // Note: these errors will only be displayed in the ValidationSummary if the
+                // editing data item implements IDEI or INDEI.
+                foreach (ValidationResult validationResult in this._bindingValidationResults)
+                {
+                    validationResults.AddIfNew(validationResult);
+                    this._propertyValidationResults.Add(validationResult);
+                }
+
+                // IDEI entity validation.
+                this.ValidateIdei(dataItem as IDataErrorInfo, null, null, validationResults);
+
+                // INDEI entity validation.
+                this.ValidateIndei(dataItem as INotifyDataErrorInfo, null, null, null, validationResults, wireEvents);
+
+                // IDEI and INDEI property validation.
+                foreach (DataGridColumn column in this.ColumnsInternal.GetDisplayedColumns(c => c.IsVisible && !c.IsReadOnly))
+                {
+                    foreach (string bindingPath in column.BindingPaths)
+                    {
+                        string declaringPath = null;
+                        object declaringItem = dataItem;
+                        string bindingProperty = bindingPath;
+
+                        // Check for nested paths.
+                        int lastIndexOfSeparator = bindingPath.LastIndexOfAny(new char[] { TypeHelper.PropertyNameSeparator, TypeHelper.LeftIndexerToken });
+                        if (lastIndexOfSeparator >= 0)
+                        {
+                            declaringPath = bindingPath.Substring(0, lastIndexOfSeparator);
+                            declaringItem = TypeHelper.GetNestedPropertyValue(dataItem, declaringPath);
+                            if (bindingProperty[lastIndexOfSeparator] == TypeHelper.LeftIndexerToken)
+                            {
+                                bindingProperty = TypeHelper.PrependDefaultMemberName(declaringItem, bindingPath.Substring(lastIndexOfSeparator));
+                            }
+                            else
+                            {
+                                bindingProperty = bindingPath.Substring(lastIndexOfSeparator + 1);
+                            }
+                        }
+
+                        // IDEI property validation.
+                        this.ValidateIdei(declaringItem as IDataErrorInfo, bindingProperty, bindingPath, validationResults);
+
+                        // INDEI property validation.
+                        this.ValidateIndei(declaringItem as INotifyDataErrorInfo, bindingProperty, bindingPath, declaringPath, validationResults, wireEvents);
+                    }
+                }
+
+                // Merge the new validation results with the existing ones.
+                this.UpdateValidationResults(validationResults, scrollIntoView);
+
+                // Return false if there are validation errors.
+                if (!this.IsValid)
+                {
+                    return false;
                 }
             }
 
-            /// <summary>
-            /// Validates the current editing row and updates the visual states.
-            /// </summary>
-            /// <param name="scrollIntoView">If true, will scroll the editing row into view when a new error is introduced.</param>
-            /// <param name="wireEvents">If true, subscribes to the asynchronous INDEI ErrorsChanged events.</param>
-            /// <returns>True if the editing row is valid, false otherwise.</returns>
-            private bool ValidateEditingRow(bool scrollIntoView, bool wireEvents)
+            // Return true if there are no errors or there is no editing row.
+            this.ResetValidationStatus();
+            return true;
+        }
+
+        /// <summary>
+        /// Checks an IDEI data object for errors for the specified property. New errors are added to the
+        /// list of validation results.
+        /// </summary>
+        /// <param name="idei">IDEI object to validate.</param>
+        /// <param name="bindingProperty">Name of the property to validate.</param>
+        /// <param name="bindingPath">Path of the binding.</param>
+        /// <param name="validationResults">List of results to add to.</param>
+        private void ValidateIdei(IDataErrorInfo idei, string bindingProperty, string bindingPath, List<ValidationResult> validationResults)
+        {
+            if (idei != null)
             {
-                this._propertyValidationResults.Clear();
-                this._indeiValidationResults.Clear();
-
-                if (this.EditingRow != null)
+                string errorString = null;
+                if (string.IsNullOrEmpty(bindingProperty))
                 {
-                    Object dataItem = this.EditingRow.DataContext;
-                    Debug.Assert(dataItem != null);
-
-                    // Validate using the Validator.
-                    List<ValidationResult> validationResults = new List<ValidationResult>();
-                    ValidationContext context = new ValidationContext(dataItem, null, null);
-                    Validator.TryValidateObject(dataItem, context, validationResults, true);
-
-                    // Add any existing exception errors (in case we're editing a cell).
-                    // Note: these errors will only be displayed in the ValidationSummary if the
-                    // editing data item implements IDEI or INDEI.
-                    foreach (ValidationResult validationResult in this._bindingValidationResults)
+                    Debug.Assert(string.IsNullOrEmpty(bindingPath));
+                    ValidationUtil.CatchNonCriticalExceptions(() => { errorString = idei.Error; });
+                    if (!string.IsNullOrEmpty(errorString))
                     {
+                        validationResults.AddIfNew(new ValidationResult(errorString));
+                    }
+                }
+                else
+                {
+                    ValidationUtil.CatchNonCriticalExceptions(() => { errorString = idei[bindingProperty]; });
+                    if (!string.IsNullOrEmpty(errorString))
+                    {
+                        ValidationResult validationResult = new ValidationResult(errorString, new List<string>() { bindingPath });
                         validationResults.AddIfNew(validationResult);
                         this._propertyValidationResults.Add(validationResult);
                     }
-
-                    // IDEI entity validation.
-                    this.ValidateIdei(dataItem as IDataErrorInfo, null, null, validationResults);
-
-                    // INDEI entity validation.
-                    this.ValidateIndei(dataItem as INotifyDataErrorInfo, null, null, null, validationResults, wireEvents);
-
-                    // IDEI and INDEI property validation.
-                    foreach (DataGridColumn column in this.ColumnsInternal.GetDisplayedColumns(c => c.IsVisible && !c.IsReadOnly))
-                    {
-                        foreach (string bindingPath in column.BindingPaths)
-                        {
-                            string declaringPath = null;
-                            object declaringItem = dataItem;
-                            string bindingProperty = bindingPath;
-
-                            // Check for nested paths.
-                            int lastIndexOfSeparator = bindingPath.LastIndexOfAny(new char[] { TypeHelper.PropertyNameSeparator, TypeHelper.LeftIndexerToken });
-                            if (lastIndexOfSeparator >= 0)
-                            {
-                                declaringPath = bindingPath.Substring(0, lastIndexOfSeparator);
-                                declaringItem = TypeHelper.GetNestedPropertyValue(dataItem, declaringPath);
-                                if (bindingProperty[lastIndexOfSeparator] == TypeHelper.LeftIndexerToken)
-                                {
-                                    bindingProperty = TypeHelper.PrependDefaultMemberName(declaringItem, bindingPath.Substring(lastIndexOfSeparator));
-                                }
-                                else
-                                {
-                                    bindingProperty = bindingPath.Substring(lastIndexOfSeparator + 1);
-                                }
-                            }
-
-                            // IDEI property validation.
-                            this.ValidateIdei(declaringItem as IDataErrorInfo, bindingProperty, bindingPath, validationResults);
-
-                            // INDEI property validation.
-                            this.ValidateIndei(declaringItem as INotifyDataErrorInfo, bindingProperty, bindingPath, declaringPath, validationResults, wireEvents);
-                        }
-                    }
-
-                    // Merge the new validation results with the existing ones.
-                    this.UpdateValidationResults(validationResults, scrollIntoView);
-
-                    // Return false if there are validation errors.
-                    if (!this.IsValid)
-                    {
-                        return false;
-                    }
-                }
-
-                // Return true if there are no errors or there is no editing row.
-                this.ResetValidationStatus();
-                return true;
-            }
-
-            /// <summary>
-            /// Checks an IDEI data object for errors for the specified property. New errors are added to the
-            /// list of validation results.
-            /// </summary>
-            /// <param name="idei">IDEI object to validate.</param>
-            /// <param name="bindingProperty">Name of the property to validate.</param>
-            /// <param name="bindingPath">Path of the binding.</param>
-            /// <param name="validationResults">List of results to add to.</param>
-            private void ValidateIdei(IDataErrorInfo idei, string bindingProperty, string bindingPath, List<ValidationResult> validationResults)
-            {
-                if (idei != null)
-                {
-                    string errorString = null;
-                    if (string.IsNullOrEmpty(bindingProperty))
-                    {
-                        Debug.Assert(string.IsNullOrEmpty(bindingPath));
-                        ValidationUtil.CatchNonCriticalExceptions(() => { errorString = idei.Error; });
-                        if (!string.IsNullOrEmpty(errorString))
-                        {
-                            validationResults.AddIfNew(new ValidationResult(errorString));
-                        }
-                    }
-                    else
-                    {
-                        ValidationUtil.CatchNonCriticalExceptions(() => { errorString = idei[bindingProperty]; });
-                        if (!string.IsNullOrEmpty(errorString))
-                        {
-                            ValidationResult validationResult = new ValidationResult(errorString, new List<string>() { bindingPath });
-                            validationResults.AddIfNew(validationResult);
-                            this._propertyValidationResults.Add(validationResult);
-                        }
-                    }
                 }
             }
-
-            /// <summary>
-            /// Checks an INDEI data object for errors on the specified path. New errors are added to the
-            /// list of validation results.
-            /// </summary>
-            /// <param name="indei">INDEI object to validate.</param>
-            /// <param name="bindingProperty">Name of the property to validate.</param>
-            /// <param name="bindingPath">Path of the binding.</param>
-            /// <param name="declaringPath">Path of the INDEI object.</param>
-            /// <param name="validationResults">List of results to add to.</param>
-            /// <param name="wireEvents">True if the ErrorsChanged event should be subscribed to.</param>
-            private void ValidateIndei(INotifyDataErrorInfo indei, string bindingProperty, string bindingPath, string declaringPath, List<ValidationResult> validationResults, bool wireEvents)
-            {
-                if (indei != null)
-                {
-                    if (indei.HasErrors)
-                    {
-                        IEnumerable errors = null;
-                        ValidationUtil.CatchNonCriticalExceptions(() => { errors = indei.GetErrors(bindingProperty); });
-                        if (errors != null)
-                        {
-                            foreach (object errorItem in errors)
-                            {
-                                if (errorItem != null)
-                                {
-                                    string errorString = null;
-                                    ValidationUtil.CatchNonCriticalExceptions(() => { errorString = errorItem.ToString(); });
-                                    if (!string.IsNullOrEmpty(errorString))
-                                    {
-                                        ValidationResult validationResult;
-                                        if (!string.IsNullOrEmpty(bindingProperty))
-                                        {
-                                            validationResult = new ValidationResult(errorString, new List<string>() { bindingPath });
-                                            this._propertyValidationResults.Add(validationResult);
-                                        }
-                                        else
-                                        {
-                                            Debug.Assert(string.IsNullOrEmpty(bindingPath));
-                                            validationResult = new ValidationResult(errorString);
-                                        }
-                                        validationResults.AddIfNew(validationResult);
-                                        this._indeiValidationResults.AddIfNew(validationResult);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (wireEvents)
-                    {
-                        indei.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(ValidationItem_ErrorsChanged);
-                        if (!this._validationItems.ContainsKey(indei))
-                        {
-                            this._validationItems.Add(indei, declaringPath);
-                        }
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Handles the asynchronous INDEI errors that occur while the DataGrid is in editing mode.
-            /// </summary>
-            /// <param name="sender">INDEI item whose errors changed.</param>
-            /// <param name="e">Error event arguments.</param>
-            private void ValidationItem_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
-            {
-                INotifyDataErrorInfo indei = sender as INotifyDataErrorInfo;
-                if (this._validationItems.ContainsKey(indei))
-                {
-                    Debug.Assert(this.EditingRow != null);
-
-                    // Determine the binding path.
-                    string bindingPath = this._validationItems[indei];
-                    if (string.IsNullOrEmpty(bindingPath))
-                    {
-                        bindingPath = e.PropertyName;
-                    }
-                    else if (!string.IsNullOrEmpty(e.PropertyName) && e.PropertyName.IndexOf(TypeHelper.LeftIndexerToken) >= 0)
-                    {
-                        bindingPath += TypeHelper.RemoveDefaultMemberName(e.PropertyName);
-                    }
-                    else
-                    {
-                        bindingPath += TypeHelper.PropertyNameSeparator + e.PropertyName;
-                    }
-
-                    // Remove the old errors.
-                    List<ValidationResult> validationResults = new List<ValidationResult>();
-                    foreach (ValidationResult validationResult in this._validationResults)
-                    {
-                        ValidationResult oldValidationResult = this._indeiValidationResults.FindEqualValidationResult(validationResult);
-                        if (oldValidationResult != null && oldValidationResult.ContainsMemberName(bindingPath))
-                        {
-                            this._indeiValidationResults.Remove(oldValidationResult);
-                        }
-                        else
-                        {
-                            validationResults.Add(validationResult);
-                        }
-                    }
-
-                    // Find any new errors and update the visuals.
-                    this.ValidateIndei(indei, e.PropertyName, bindingPath, null, validationResults, false /*wireEvents*/);
-                    this.UpdateValidationResults(validationResults, false /*scrollIntoView*/);
-
-                    // If we're valid now then reset our status.
-                    if (this.IsValid)
-                    {
-                        this.ResetValidationStatus();
-                    }
-                }
-                else if (indei != null)
-                {
-                    indei.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(ValidationItem_ErrorsChanged);
-                }
-            }
-
-            private void VerticalScrollBar_Scroll(object sender, ScrollEventArgs e)
-            {
-                ProcessVerticalScroll(e.ScrollEventType);
-            }
-
-#endregion Private Methods
         }
+
+        /// <summary>
+        /// Checks an INDEI data object for errors on the specified path. New errors are added to the
+        /// list of validation results.
+        /// </summary>
+        /// <param name="indei">INDEI object to validate.</param>
+        /// <param name="bindingProperty">Name of the property to validate.</param>
+        /// <param name="bindingPath">Path of the binding.</param>
+        /// <param name="declaringPath">Path of the INDEI object.</param>
+        /// <param name="validationResults">List of results to add to.</param>
+        /// <param name="wireEvents">True if the ErrorsChanged event should be subscribed to.</param>
+        private void ValidateIndei(INotifyDataErrorInfo indei, string bindingProperty, string bindingPath, string declaringPath, List<ValidationResult> validationResults, bool wireEvents)
+        {
+            if (indei != null)
+            {
+                if (indei.HasErrors)
+                {
+                    IEnumerable errors = null;
+                    ValidationUtil.CatchNonCriticalExceptions(() => { errors = indei.GetErrors(bindingProperty); });
+                    if (errors != null)
+                    {
+                        foreach (object errorItem in errors)
+                        {
+                            if (errorItem != null)
+                            {
+                                string errorString = null;
+                                ValidationUtil.CatchNonCriticalExceptions(() => { errorString = errorItem.ToString(); });
+                                if (!string.IsNullOrEmpty(errorString))
+                                {
+                                    ValidationResult validationResult;
+                                    if (!string.IsNullOrEmpty(bindingProperty))
+                                    {
+                                        validationResult = new ValidationResult(errorString, new List<string>() { bindingPath });
+                                        this._propertyValidationResults.Add(validationResult);
+                                    }
+                                    else
+                                    {
+                                        Debug.Assert(string.IsNullOrEmpty(bindingPath));
+                                        validationResult = new ValidationResult(errorString);
+                                    }
+                                    validationResults.AddIfNew(validationResult);
+                                    this._indeiValidationResults.AddIfNew(validationResult);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (wireEvents)
+                {
+                    indei.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(ValidationItem_ErrorsChanged);
+                    if (!this._validationItems.ContainsKey(indei))
+                    {
+                        this._validationItems.Add(indei, declaringPath);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the asynchronous INDEI errors that occur while the DataGrid is in editing mode.
+        /// </summary>
+        /// <param name="sender">INDEI item whose errors changed.</param>
+        /// <param name="e">Error event arguments.</param>
+        private void ValidationItem_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            INotifyDataErrorInfo indei = sender as INotifyDataErrorInfo;
+            if (this._validationItems.ContainsKey(indei))
+            {
+                Debug.Assert(this.EditingRow != null);
+
+                // Determine the binding path.
+                string bindingPath = this._validationItems[indei];
+                if (string.IsNullOrEmpty(bindingPath))
+                {
+                    bindingPath = e.PropertyName;
+                }
+                else if (!string.IsNullOrEmpty(e.PropertyName) && e.PropertyName.IndexOf(TypeHelper.LeftIndexerToken) >= 0)
+                {
+                    bindingPath += TypeHelper.RemoveDefaultMemberName(e.PropertyName);
+                }
+                else
+                {
+                    bindingPath += TypeHelper.PropertyNameSeparator + e.PropertyName;
+                }
+
+                // Remove the old errors.
+                List<ValidationResult> validationResults = new List<ValidationResult>();
+                foreach (ValidationResult validationResult in this._validationResults)
+                {
+                    ValidationResult oldValidationResult = this._indeiValidationResults.FindEqualValidationResult(validationResult);
+                    if (oldValidationResult != null && oldValidationResult.ContainsMemberName(bindingPath))
+                    {
+                        this._indeiValidationResults.Remove(oldValidationResult);
+                    }
+                    else
+                    {
+                        validationResults.Add(validationResult);
+                    }
+                }
+
+                // Find any new errors and update the visuals.
+                this.ValidateIndei(indei, e.PropertyName, bindingPath, null, validationResults, false /*wireEvents*/);
+                this.UpdateValidationResults(validationResults, false /*scrollIntoView*/);
+
+                // If we're valid now then reset our status.
+                if (this.IsValid)
+                {
+                    this.ResetValidationStatus();
+                }
+            }
+            else if (indei != null)
+            {
+                indei.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(ValidationItem_ErrorsChanged);
+            }
+        }
+
+        private void VerticalScrollBar_Scroll(object sender, ScrollEventArgs e)
+        {
+            ProcessVerticalScroll(e.ScrollEventType);
+        }
+
+        #endregion Private Methods
     }
+}

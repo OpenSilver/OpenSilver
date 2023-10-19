@@ -3,29 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.ComponentModel;
 using System.Linq;
-
-#if MIGRATION
-using System.Windows.Media;
-using System.Windows.Controls.Primitives;
 using System.Windows.Automation.Peers;
-using System.Windows.Automation;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Automation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Base class for a control that can be used as the popup portion in a TimePicker.
@@ -789,11 +773,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the TimePickerPopup control when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

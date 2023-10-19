@@ -11,19 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Provides support for getting or setting the value of instance-level values of automation properties.

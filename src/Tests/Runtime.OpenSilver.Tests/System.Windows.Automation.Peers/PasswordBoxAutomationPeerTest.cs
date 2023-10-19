@@ -11,24 +11,12 @@
 *
 \*====================================================================================*/
 
-using System;
 using FluentAssertions;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-#endif
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers.Tests
-#else
-namespace Windows.UI.Xaml.Automation.Peers.Tests
-#endif
 {
     [TestClass]
     public class PasswordBoxAutomationPeerTest

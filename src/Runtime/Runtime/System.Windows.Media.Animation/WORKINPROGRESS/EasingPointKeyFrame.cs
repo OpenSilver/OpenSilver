@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     [OpenSilver.NotImplemented]
-    public sealed partial class EasingPointKeyFrame : PointKeyFrame
+    public sealed class EasingPointKeyFrame : PointKeyFrame
     {
     }
 }

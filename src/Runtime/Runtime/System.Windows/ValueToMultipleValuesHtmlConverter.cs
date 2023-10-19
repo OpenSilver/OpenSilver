@@ -16,11 +16,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     [Obsolete(Helper.ObsoleteMemberMessage)]
     [EditorBrowsable(EditorBrowsableState.Never)]

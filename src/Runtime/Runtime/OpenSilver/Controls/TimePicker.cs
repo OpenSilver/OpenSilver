@@ -19,9 +19,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
-
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -29,12 +26,6 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Input;
-#endif
 
 namespace OpenSilver.Controls
 {

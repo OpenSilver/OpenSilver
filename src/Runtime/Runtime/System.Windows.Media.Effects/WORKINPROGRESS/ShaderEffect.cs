@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-#if !MIGRATION
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-#endif
-
 namespace System.Windows.Media.Effects
 {
 	[OpenSilver.NotImplemented]
-    public abstract partial class ShaderEffect : Effect
+    public abstract class ShaderEffect : Effect
     {
 		[OpenSilver.NotImplemented]
         protected static readonly DependencyProperty PixelShaderProperty = DependencyProperty.Register(nameof(PixelShader), typeof(PixelShader), typeof(ShaderEffect), new PropertyMetadata());

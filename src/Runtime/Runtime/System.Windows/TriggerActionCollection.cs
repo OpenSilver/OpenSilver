@@ -11,19 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents a collection of <see cref="BeginStoryboard"/> objects.

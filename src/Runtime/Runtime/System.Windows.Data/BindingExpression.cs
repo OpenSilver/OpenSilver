@@ -11,29 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Data;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// Contains information about a single instance of a <see cref="Binding" />.
@@ -187,11 +175,11 @@ namespace Windows.UI.Xaml.Data
 
             if (ParentBinding.Converter != null)
             {
-#if MIGRATION
-                value = ParentBinding.Converter.Convert(value, TargetProperty.PropertyType, ParentBinding.ConverterParameter, ParentBinding.ConverterCulture);
-#else
-                value = ParentBinding.Converter.Convert(value, TargetProperty.PropertyType, ParentBinding.ConverterParameter, ParentBinding.ConverterLanguage);
-#endif
+                value = ParentBinding.Converter.Convert(value,
+                    TargetProperty.PropertyType,
+                    ParentBinding.ConverterParameter,
+                    ParentBinding.ConverterCulture);
+                
                 if (value == DependencyProperty.UnsetValue)
                 {
                     value = ParentBinding.FallbackValue ?? GetDefaultValue();
@@ -684,11 +672,10 @@ namespace Windows.UI.Xaml.Data
             {
                 if (expectedType != null && ParentBinding.Converter != null)
                 {
-#if MIGRATION
-                    convertedValue = ParentBinding.Converter.ConvertBack(value, expectedType, ParentBinding.ConverterParameter, ParentBinding.ConverterCulture);
-#else
-                    convertedValue = ParentBinding.Converter.ConvertBack(value, expectedType, ParentBinding.ConverterParameter, ParentBinding.ConverterLanguage);
-#endif
+                    convertedValue = ParentBinding.Converter.ConvertBack(value,
+                        expectedType,
+                        ParentBinding.ConverterParameter,
+                        ParentBinding.ConverterCulture);
 
                     if (convertedValue == DependencyProperty.UnsetValue)
                     {
@@ -698,11 +685,10 @@ namespace Windows.UI.Xaml.Data
 
                 if (!DependencyProperty.IsValidType(convertedValue, expectedType))
                 {
-#if MIGRATION
-                    convertedValue = DynamicConverter.Convert(convertedValue, expectedType, null, ParentBinding.ConverterCulture);
-#else
-                    convertedValue = DynamicConverter.Convert(convertedValue, expectedType, null, ParentBinding.ConverterLanguage);
-#endif
+                    convertedValue = DynamicConverter.Convert(convertedValue,
+                        expectedType,
+                        null,
+                        ParentBinding.ConverterCulture);
 
                     if (convertedValue == DependencyProperty.UnsetValue)
                     {
@@ -822,11 +808,10 @@ namespace Windows.UI.Xaml.Data
             object convertedValue;
             try
             {
-#if MIGRATION
-                convertedValue = DynamicConverter.Convert(value, targetType, ParentBinding.ConverterParameter, ParentBinding.ConverterCulture);
-#else
-                convertedValue = DynamicConverter.Convert(value, targetType, ParentBinding.ConverterParameter, ParentBinding.ConverterLanguage);
-#endif
+                convertedValue = DynamicConverter.Convert(value,
+                    targetType,
+                    ParentBinding.ConverterParameter,
+                    ParentBinding.ConverterCulture);
             }
             catch (Exception ex)
             {

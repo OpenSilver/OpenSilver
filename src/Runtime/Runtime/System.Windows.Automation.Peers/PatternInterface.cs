@@ -11,17 +11,9 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Automation.Provider;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Specifies the control pattern that the <see cref="AutomationPeer.GetPattern(PatternInterface)" /> method returns.

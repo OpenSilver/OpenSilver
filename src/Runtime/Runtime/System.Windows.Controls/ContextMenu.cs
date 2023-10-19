@@ -3,33 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.ComponentModel;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a pop-up menu that enables a control to expose functionality that is specific to the context of the control.
@@ -75,11 +55,7 @@ namespace Windows.UI.Xaml.Controls
                     FrameworkElement ownerFrameworkElement = _owner as FrameworkElement;
                     if (null != ownerFrameworkElement)
                     {
-#if MIGRATION
                         ownerFrameworkElement.MouseRightButtonDown -= new MouseButtonEventHandler(HandleOwnerMouseRightButtonDown);
-#else
-                        ownerFrameworkElement.RightTapped -= new RightTappedEventHandler(HandleOwnerMouseRightButtonDown);
-#endif
                     }
                 }
                 _owner = value;
@@ -88,11 +64,7 @@ namespace Windows.UI.Xaml.Controls
                     FrameworkElement ownerFrameworkElement = _owner as FrameworkElement;
                     if (null != ownerFrameworkElement)
                     {
-#if MIGRATION
                         ownerFrameworkElement.MouseRightButtonDown += new MouseButtonEventHandler(HandleOwnerMouseRightButtonDown);
-#else
-                        ownerFrameworkElement.RightTapped += new RightTappedEventHandler(HandleOwnerMouseRightButtonDown);
-#endif
                     }
                 }
             }
@@ -242,37 +214,21 @@ namespace Windows.UI.Xaml.Controls
         /// Called when the left mouse button is pressed.
         /// </summary>
         /// <param name="e">The event data for the MouseLeftButtonDown event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             e.Handled = true;
             base.OnMouseLeftButtonDown(e);
         }
-#else
-        protected override void OnPointerPressed(MouseButtonEventArgs e)
-        {
-            e.Handled = true;
-            base.OnPointerPressed(e);
-        }
-#endif
 
         /// <summary>
         /// Called when the right mouse button is pressed.
         /// </summary>
         /// <param name="e">The event data for the MouseRightButtonDown event.</param>
-#if MIGRATION
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
             e.Handled = true;
             base.OnMouseRightButtonDown(e);
         }
-#else
-        protected override void OnRightTapped(RightTappedRoutedEventArgs e)
-        {
-            e.Handled = true;
-            base.OnRightTapped(e);
-        }
-#endif
 
         /// <summary>
         /// Responds to the KeyDown event.
@@ -368,14 +324,6 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
         }
 
-#if !MIGRATION
-        private void HandleOverlayMouseButtonDown(object sender, RightTappedRoutedEventArgs e)
-        {
-            ClosePopup();
-            e.Handled = true;
-        }
-#endif
-
         /// <summary>
         /// Updates the location and size of the Popup and overlay.
         /// </summary>
@@ -413,13 +361,8 @@ namespace Windows.UI.Xaml.Controls
             _popupAlignmentPoint = position;
 
             _overlay = new Canvas { Background = new SolidColorBrush(Colors.Transparent) };
-#if MIGRATION
             _overlay.MouseLeftButtonDown += new MouseButtonEventHandler(HandleOverlayMouseButtonDown);
             _overlay.MouseRightButtonDown += new MouseButtonEventHandler(HandleOverlayMouseButtonDown);
-#else
-            _overlay.PointerPressed += new MouseButtonEventHandler(HandleOverlayMouseButtonDown);
-            _overlay.RightTapped += new RightTappedEventHandler(HandleOverlayMouseButtonDown);
-#endif
             _overlay.Children.Add(this);
 
             _popup = new Popup { Child = _overlay };

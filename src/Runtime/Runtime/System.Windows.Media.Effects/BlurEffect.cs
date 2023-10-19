@@ -14,10 +14,6 @@
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
-
 namespace System.Windows.Media.Effects
 {
     /// <summary>

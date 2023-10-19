@@ -11,23 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Key = Windows.System.VirtualKey;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives;
-#else
-namespace Windows.UI.Xaml.Controls.Primitives;
-#endif
 
 public partial class Selector
 {

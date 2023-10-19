@@ -3,24 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
-
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Used within the template of a <see cref="T:System.Windows.Controls.DataGrid" /> to specify the 
@@ -37,7 +24,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         #endregion Data
 
         #region Properties
-        
+
         /// <summary>
         /// Tracks which column is currently being dragged.
         /// </summary>

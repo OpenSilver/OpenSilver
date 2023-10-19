@@ -12,16 +12,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     [OpenSilver.NotImplemented]
-    public abstract partial class Projection : DependencyObject
+    public abstract class Projection : DependencyObject
     {
     }
 }

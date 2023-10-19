@@ -3,26 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// The InteractionHelper provides controls with support for all of the
@@ -30,7 +17,7 @@ namespace Windows.UI.Xaml.Controls
     /// etc., and also incorporates proper event semantics when the control is
     /// disabled.
     /// </summary>
-    internal sealed partial class InteractionHelper
+    internal sealed class InteractionHelper
     {
         // TODO: Consult with user experience experts to validate the double
         // click distance and time thresholds.
@@ -312,11 +299,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value indicating whether the event should be handled.
         /// </returns>
-#if MIGRATION
         public bool AllowMouseEnter(MouseEventArgs e)
-#else
-        public bool AllowMouseEnter(PointerRoutedEventArgs e)
-#endif
         {
             if (e == null)
             {
@@ -348,11 +331,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value indicating whether the event should be handled.
         /// </returns>
-#if MIGRATION
         public bool AllowMouseLeave(MouseEventArgs e)
-#else
-        public bool AllowMouseLeave(PointerRoutedEventArgs e)
-#endif
         {
             if (e == null)
             {
@@ -384,11 +363,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value indicating whether the event should be handled.
         /// </returns>
-#if MIGRATION
         public bool AllowMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        public bool AllowMouseLeftButtonDown(PointerRoutedEventArgs e)        
-#endif
         {
             if (e == null)
             {
@@ -400,11 +375,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 // Get the current position and time
                 DateTime now = DateTime.UtcNow;
-#if MIGRATION
                 Point position = e.GetPosition(Control);
-#else
-                Point position = e.GetCurrentPoint(Control).Position;
-#endif
 
                 // Compute the deltas from the last click
                 double timeDelta = (now - LastClickTime).TotalMilliseconds;
@@ -461,11 +432,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value indicating whether the event should be handled.
         /// </returns>
-#if MIGRATION
         public bool AllowMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        public bool AllowMouseLeftButtonUp(PointerRoutedEventArgs e)
-#endif
         {
             if (e == null)
             {
@@ -497,11 +464,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value indicating whether the event should be handled.
         /// </returns>
-#if MIGRATION
         public bool AllowKeyDown(KeyEventArgs e)
-#else
-        public bool AllowKeyDown(KeyRoutedEventArgs e)
-#endif
         {
             if (e == null)
             {
@@ -520,11 +483,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A value indicating whether the event should be handled.
         /// </returns>
-#if MIGRATION
         public bool AllowKeyUp(KeyEventArgs e)
-#else
-        public bool AllowKeyUp(KeyRoutedEventArgs e)
-#endif
         {
             if (e == null)
             {
@@ -544,8 +503,6 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A translated key code, indicating how the original key should be interpreted.
         /// </returns>
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Linked file.")]
-#if MIGRATION
         public static Key GetLogicalKey(FlowDirection flowDirection, Key originalKey)
         {
             Key result = originalKey;
@@ -563,25 +520,7 @@ namespace Windows.UI.Xaml.Controls
             }
             return result;
         }
-#else
-        public static System.VirtualKey GetLogicalKey(FlowDirection flowDirection, System.VirtualKey originalKey)
-        {
-            System.VirtualKey result = originalKey;
-            if (flowDirection == FlowDirection.RightToLeft)
-            {
-                switch (originalKey)
-                {
-                    case System.VirtualKey.Left:
-                        result = System.VirtualKey.Right;
-                        break;
-                    case System.VirtualKey.Right:
-                        result = System.VirtualKey.Left;
-                        break;
-                }
-            }
-            return result;
-        }
-#endif
+
         #endregion
     }
 }

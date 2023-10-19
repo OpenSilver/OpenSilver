@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,35 +11,20 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.ComponentModel;
 using System.Globalization;
-#if MIGRATION
-using System.Windows.Controls;
 using System.Windows.Threading;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Animates the value of an Object property along a set of KeyFrames over a
     /// specified Duration.
     /// </summary>
-    [ContentProperty("KeyFrames")]
-    public sealed partial class ObjectAnimationUsingKeyFrames : AnimationTimeline
+    [ContentProperty(nameof(KeyFrames))]
+    public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline
     {
         private ObjectKeyFrameCollection _keyFrames;
 
@@ -258,11 +242,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 return timer;
             }
 
-#if MIGRATION
             private void Timer_Tick(object sender, EventArgs e)
-#else
-            private void Timer_Tick(object sender, object e)
-#endif
             {
                 INTERNAL_RaiseCompletedEvent();
                 Stop();

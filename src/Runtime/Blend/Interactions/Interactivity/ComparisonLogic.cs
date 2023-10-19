@@ -1,14 +1,15 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.ComponentModel;
+using System.Globalization;
+using Microsoft.Expression.Interactivity.Core;
+using OpenSilver.Internal.Expression.Interactivity;
+
 namespace Microsoft.Expression.Interactivity
 {
-    using System;
-    using System.ComponentModel;
-    using System.Globalization;
-    using Microsoft.Expression.Interactivity.Core;
-    using OpenSilver.Internal.Expression.Interactivity;
-
     internal static class ComparisonLogic
     {
         /// <summary>

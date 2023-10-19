@@ -11,29 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Security;
 
-#if MIGRATION
-using System.Windows.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using System.Windows;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Printing
-#else
-namespace Windows.UI.Xaml.Printing
-#endif
 {
     /// <summary>
     /// Provides printing capabilities for a Silverlight application.

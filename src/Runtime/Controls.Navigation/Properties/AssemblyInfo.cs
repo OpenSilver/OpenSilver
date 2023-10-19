@@ -17,11 +17,7 @@ using System.Windows.Markup;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-#if OPENSILVER
 [assembly: AssemblyTitle("OpenSilver.Controls.Navigation")]
-#elif BRIDGE
-[assembly: AssemblyTitle("CSHTML5.Controls.Navigation")]
-#endif
 [assembly: AssemblyDescription("Silverlight Navigation Controls for OpenSilver")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -41,7 +37,6 @@ using System.Windows.Markup;
 
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "sdk")]
 
-#if MIGRATION
 // Note: Silverlight does not define an XmlnsDefinition for the default xaml namespace, this
 // is only here for backward compatibility reasons
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]
@@ -49,13 +44,6 @@ using System.Windows.Markup;
 
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Controls")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Navigation")]
-#else
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "Windows.UI.Xaml.Controls")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "Windows.UI.Xaml.Navigation")]
-
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "Windows.UI.Xaml.Controls")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "Windows.UI.Xaml.Navigation")]
-#endif
 
 [assembly: NeutralResourcesLanguageAttribute("en-us")]
 

@@ -7,11 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Enumeration denoting a description viewer position.

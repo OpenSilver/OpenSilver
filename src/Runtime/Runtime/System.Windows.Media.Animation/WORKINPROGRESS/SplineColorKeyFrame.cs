@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// This class is used as part of a ColorKeyFrameCollection in
@@ -30,7 +22,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// the previous key frame and its own Value to produce its output value.
     /// </summary>
     [OpenSilver.NotImplemented]
-    public sealed partial class SplineColorKeyFrame : ColorKeyFrame
+    public sealed class SplineColorKeyFrame : ColorKeyFrame
     {
         /// <summary>Identifies the <see cref="P:System.Windows.Media.Animation.SplineColorKeyFrame.KeySpline" /> dependency property.</summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Media.Animation.SplineColorKeyFrame.KeySpline" /> dependency property.</returns>

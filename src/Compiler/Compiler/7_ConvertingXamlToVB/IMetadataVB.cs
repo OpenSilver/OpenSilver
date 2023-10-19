@@ -19,9 +19,6 @@ namespace OpenSilver.Compiler
     internal static class MetadatasVB
     {
         public static IMetadata Silverlight { get; } = new SLMetadataVB();
-
-        public static IMetadata UWP { get; } = new UWPMetadataVB();
-
     }
 
     internal class SLMetadataVB : IMetadata
@@ -35,18 +32,5 @@ namespace OpenSilver.Compiler
         public string SystemWindowsControlsNS { get; } = "System.Windows.Controls";
         public string SystemWindowsMediaNS { get; } = "System.Windows.Media";
         public string SystemWindowsMediaAnimationNS { get; } = "System.Windows.Media.Animation";
-    }
-
-    internal class UWPMetadataVB : IMetadata
-    {
-        public string FieldModifier { get; } = "Protected";
-
-        public string SystemWindowsDLL => throw new NotSupportedException();
-
-        public string SystemWindowsNS { get; } = "Windows.UI.Xaml";
-        public string SystemWindowsDataNS { get; } = "Windows.UI.Xaml.Data";
-        public string SystemWindowsControlsNS { get; } = "Windows.UI.Xaml.Controls";
-        public string SystemWindowsMediaNS { get; } = "Windows.UI.Xaml.Media";
-        public string SystemWindowsMediaAnimationNS { get; } = "Windows.UI.Xaml.Media.Animation";
     }
 }

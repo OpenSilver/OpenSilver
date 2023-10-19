@@ -11,17 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using OpenSilver.Tests;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if MIGRATION
 namespace System.Windows.Tests
-#else
-namespace Windows.UI.Xaml.Tests
-#endif
 {
     [TestClass]
     public class DurationConverterTest : TypeConverterTestBase

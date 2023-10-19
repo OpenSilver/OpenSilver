@@ -7,15 +7,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Type converter for DataForm.CommandButtonsVisibility.

@@ -7,15 +7,11 @@
     <EnableDefaultItems>false</EnableDefaultItems>
     <AssemblyName>OpenSilver.Controls.Layout.Toolkit</AssemblyName>
     <RootNamespace>System.Windows.Controls</RootNamespace>
-    <Configurations>SL;UWP</Configurations>
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Optimize>true</Optimize>
     <DefineTrace>true</DefineTrace>
-    <DefineConstants>$(DefineConstants);SILVERLIGHT</DefineConstants>
-    <DefineConstants Condition="$(Optimize) != true">$(DefineConstants);DEBUG</DefineConstants>
-    <DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
+    <DefineSilverlight>true</DefineSilverlight>
   </PropertyGroup>
 
   <ItemGroup>

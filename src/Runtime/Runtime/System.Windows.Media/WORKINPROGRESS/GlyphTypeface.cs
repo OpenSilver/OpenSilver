@@ -1,14 +1,10 @@
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
 	//
 	// Summary:
 	//     Specifies a physical font face that corresponds to a font file on the disk.
     [OpenSilver.NotImplemented]
-	public sealed partial class GlyphTypeface
+	public sealed class GlyphTypeface
 	{
 		//
 		// Summary:

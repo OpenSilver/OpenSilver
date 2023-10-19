@@ -11,33 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using System.Windows.Input;
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseWheelEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-using INTERNAL_VirtualKeysHelpers = Windows.System.INTERNAL_VirtualKeysHelpers;
-#endif
+using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows.Input;
-#else
-namespace Windows.UI.Xaml.Input;
-#endif
 
 internal sealed class InputManager
 {
@@ -303,11 +284,7 @@ internal sealed class InputManager
 
                 uie.RaiseEvent(new MouseEventArgs
                 {
-#if MIGRATION
                     RoutedEvent = UIElement.MouseLeaveEvent,
-#else
-                RoutedEvent = UIElement.PointerExitedEvent,
-#endif
                     OriginalSource = uie,
                 });
             }
@@ -343,11 +320,7 @@ internal sealed class InputManager
             // is released (if it does ever happen).
             if (Pointer.INTERNAL_captured == uie)
             {
-#if MIGRATION
                 uie.ReleaseMouseCapture();
-#else
-                uie.ReleasePointerCapture();
-#endif
             }
         }
     }
@@ -531,12 +504,7 @@ internal sealed class InputManager
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
-#if MIGRATION
-            RoutedEvent routedEvent = UIElement.MouseMoveEvent;
-#else
-            RoutedEvent routedEvent = UIElement.PointerMovedEvent;
-#endif
-            ProcessPointerEvent(mouseTarget, jsEventArg, routedEvent);
+            ProcessPointerEvent(mouseTarget, jsEventArg, UIElement.MouseMoveEvent);
         }
     }
 
@@ -545,15 +513,10 @@ internal sealed class InputManager
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
-#if MIGRATION
-            RoutedEvent routedEvent = UIElement.MouseLeftButtonDownEvent;
-#else
-            RoutedEvent routedEvent = UIElement.PointerPressedEvent;
-#endif
             ProcessMouseButtonEvent(
                 mouseTarget,
                 jsEventArg,
-                routedEvent,
+                UIElement.MouseLeftButtonDownEvent,
                 MouseButton.Left,
                 Environment.TickCount,
                 refreshClickCount: true,
@@ -566,15 +529,10 @@ internal sealed class InputManager
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
-#if MIGRATION
-            RoutedEvent routedEvent = UIElement.MouseLeftButtonUpEvent;
-#else
-            RoutedEvent routedEvent = UIElement.PointerReleasedEvent;
-#endif
             ProcessMouseButtonEvent(
                 mouseTarget,
                 jsEventArg,
-                routedEvent,
+                UIElement.MouseLeftButtonUpEvent,
                 MouseButton.Left,
                 Environment.TickCount,
                 refreshClickCount: false,
@@ -588,7 +546,6 @@ internal sealed class InputManager
 
     private void ProcessOnMouseRightButtonDown(UIElement uie, object jsEventArg)
     {
-#if MIGRATION
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
@@ -606,7 +563,6 @@ internal sealed class InputManager
                 OpenSilver.Interop.ExecuteJavaScriptVoid("document.inputManager.suppressContextMenu(true);");
             }
         }
-#endif
     }
 
     private void ProcessOnMouseRightButtonUp(UIElement uie, object jsEventArg)
@@ -614,21 +570,12 @@ internal sealed class InputManager
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
-#if MIGRATION
             var e = new MouseButtonEventArgs()
             {
                 RoutedEvent = UIElement.MouseRightButtonUpEvent,
                 OriginalSource = mouseTarget,
                 UIEventArg = jsEventArg,
             };
-#else
-            var e = new RightTappedRoutedEventArgs()
-            {
-                RoutedEvent = UIElement.RightTappedEvent,
-                OriginalSource = mouseTarget,
-                UIEventArg = jsEventArg,
-            };
-#endif
 
             e.FillEventArgs(mouseTarget, jsEventArg);
             mouseTarget.RaiseEvent(e);
@@ -642,24 +589,17 @@ internal sealed class InputManager
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
-#if MIGRATION
-            RoutedEvent routedEvent = UIElement.MouseWheelEvent;
-#else
-            RoutedEvent routedEvent = UIElement.PointerWheelChangedEvent;
-#endif
             var e = new MouseWheelEventArgs
             {
-                RoutedEvent = routedEvent,
+                RoutedEvent = UIElement.MouseWheelEvent,
                 OriginalSource = mouseTarget,
                 UIEventArg = jsEventArg,
             };
 
             e.FillEventArgs(mouseTarget, jsEventArg);
 
-#if MIGRATION
             // fill the Mouse Wheel delta:
             e.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
-#endif
 
             mouseTarget.RaiseEvent(e);
         }
@@ -672,12 +612,7 @@ internal sealed class InputManager
         {
             mouseTarget.IsPointerOver = true;
 
-#if MIGRATION
-            RoutedEvent routedEvent = UIElement.MouseEnterEvent;
-#else
-            RoutedEvent routedEvent = UIElement.PointerEnteredEvent;
-#endif
-            ProcessPointerEvent(mouseTarget, jsEventArg, routedEvent);
+            ProcessPointerEvent(mouseTarget, jsEventArg, UIElement.MouseEnterEvent);
         }
     }
 
@@ -688,12 +623,7 @@ internal sealed class InputManager
         {
             mouseTarget.IsPointerOver = false;
 
-#if MIGRATION
-            RoutedEvent routedEvent = UIElement.MouseLeaveEvent;
-#else
-            RoutedEvent routedEvent = UIElement.PointerExitedEvent;
-#endif
-            ProcessPointerEvent(mouseTarget, jsEventArg, routedEvent);
+            ProcessPointerEvent(mouseTarget, jsEventArg, UIElement.MouseLeaveEvent);
         }
     }
 
@@ -706,9 +636,7 @@ internal sealed class InputManager
             return;
         }
 
-#if MIGRATION
         keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
-#endif
         var e = new KeyEventArgs()
         {
             RoutedEvent = UIElement.KeyDownEvent,
@@ -741,9 +669,7 @@ internal sealed class InputManager
             return;
         }
 
-#if MIGRATION
         keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
-#endif
         var e = new KeyEventArgs()
         {
             RoutedEvent = UIElement.KeyUpEvent,
@@ -842,15 +768,9 @@ internal sealed class InputManager
         UIElement uie,
         object jsEventArg)
     {
-#if MIGRATION
-        RoutedEvent routedEvent = UIElement.MouseLeftButtonUpEvent;
-#else
-        RoutedEvent routedEvent = UIElement.PointerReleasedEvent;
-#endif
-
         var e = new MouseButtonEventArgs()
         {
-            RoutedEvent = routedEvent,
+            RoutedEvent = UIElement.MouseLeftButtonUpEvent,
             OriginalSource = uie,
             UIEventArg = jsEventArg,
         };

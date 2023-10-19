@@ -15,11 +15,7 @@ using System;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides static methods that facilitate transferring data to and from the system

@@ -19,26 +19,13 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.ComponentModel;
 using System.Xaml.Markup;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Markup;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides a framework of common APIs for objects that participate in UI and
@@ -556,7 +543,6 @@ namespace Windows.UI.Xaml
         /// 1. By ContentPresenter/ItemsPresenter to choose the template to be applied in this case.
         internal virtual void OnPreApplyTemplate()
         {
-
         }
 
         /// <summary>
@@ -565,13 +551,8 @@ namespace Windows.UI.Xaml
         /// is called just before a UI element displays in your app. Override this method
         /// to influence the default post-template logic of a class.
         /// </summary>
-#if MIGRATION
         public virtual void OnApplyTemplate()
-#else
-        protected virtual void OnApplyTemplate()
-#endif
         {
-            
         }
 
         //

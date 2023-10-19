@@ -11,20 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Represents a collection of ObjectKeyFrame objects that can be individually
     /// accessed by index.
     /// </summary>
-    public sealed partial class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
+    public sealed class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
     {
         public ObjectKeyFrameCollection()
             : base(false)

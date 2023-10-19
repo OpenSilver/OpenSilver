@@ -18,17 +18,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if MIGRATION
 using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-using Dispatcher = Windows.UI.Core.CoreDispatcher;
-#endif
 
 namespace CSHTML5.Internal
 {

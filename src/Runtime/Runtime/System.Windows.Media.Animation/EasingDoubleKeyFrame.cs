@@ -12,22 +12,16 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
-    public sealed partial class EasingDoubleKeyFrame : DoubleKeyFrame
+    public sealed class EasingDoubleKeyFrame : DoubleKeyFrame
     {
-        public static readonly DependencyProperty EasingFunctionProperty =  DependencyProperty.Register("EasingFunction",
-                                                                                                        typeof(EasingFunctionBase),
-                                                                                                        typeof(EasingDoubleKeyFrame),
-                                                                                                        new PropertyMetadata(null));
+        public static readonly DependencyProperty EasingFunctionProperty = 
+            DependencyProperty.Register(
+                "EasingFunction",
+                typeof(EasingFunctionBase),
+                typeof(EasingDoubleKeyFrame),
+                new PropertyMetadata(null));
 
         public IEasingFunction EasingFunction
         {

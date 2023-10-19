@@ -11,21 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows.Media.Imaging
-#else
-namespace Windows.UI.Xaml.Media.Imaging
-#endif
 {
     /// <summary>
     /// Provides the practical object source type for the Source and ImageSource properties.
     /// </summary>
-    public sealed partial class BitmapImage : BitmapSource
+    public sealed class BitmapImage : BitmapSource
     {
         /// <summary>
         /// Initializes a new instance of the BitmapImage class.

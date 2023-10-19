@@ -10,24 +10,12 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Tests
-#else
-namespace Windows.UI.Xaml.Tests
-#endif
 {
     [TestClass]
     public class SetterBaseCollectionTest

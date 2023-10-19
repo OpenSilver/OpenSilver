@@ -9,11 +9,7 @@
 
 using System.Collections.ObjectModel;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents all of the validation items associated with a given input control

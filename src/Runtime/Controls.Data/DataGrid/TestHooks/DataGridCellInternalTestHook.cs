@@ -5,13 +5,9 @@
 
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-public sealed partial class DataGridCell
+    public sealed partial class DataGridCell
     {
         private InternalTestHook _testHook;
 

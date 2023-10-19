@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides a dialog box that enables the user to select one or more files.

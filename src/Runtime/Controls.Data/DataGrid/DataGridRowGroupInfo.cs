@@ -3,23 +3,15 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal class DataGridRowGroupInfo
     {
         public DataGridRowGroupInfo(
-            CollectionViewGroup collectionViewGroup, 
-            Visibility visibility, 
+            CollectionViewGroup collectionViewGroup,
+            Visibility visibility,
             int level,
             int slot,
             int lastSubItemSlot)

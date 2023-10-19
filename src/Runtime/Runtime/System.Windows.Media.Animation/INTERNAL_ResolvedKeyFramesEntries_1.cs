@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
-    internal partial class INTERNAL_ResolvedKeyFramesEntries<T> : IEnumerable<int> where T : IKeyFrame
+    internal class INTERNAL_ResolvedKeyFramesEntries<T> : IEnumerable<int> where T : IKeyFrame
     {
         private List<int> _resolvedKeyFramesIndexes;
 

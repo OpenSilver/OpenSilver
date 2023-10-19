@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// MatrixConverter - Converter class for converting instances of other types to and from Matrix instances

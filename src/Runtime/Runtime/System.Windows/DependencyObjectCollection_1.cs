@@ -17,11 +17,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents a collection of <see cref="DependencyObject"/> instances of a specified

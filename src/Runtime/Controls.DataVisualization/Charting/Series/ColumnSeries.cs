@@ -4,23 +4,16 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System;
 
 #if !DEFINITION_SERIES_COMPATIBILITY_MODE
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that contains a data series to be rendered in column format.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [SuppressMessage("Microsoft.Maintainability", "CA1501:AvoidExcessiveInheritance", Justification = "Depth of hierarchy is necessary to avoid code duplication.")]
     [StyleTypedProperty(Property = DataPointStyleName, StyleTargetType = typeof(ColumnDataPoint))]
     [StyleTypedProperty(Property = "LegendItemStyle", StyleTargetType = typeof(LegendItem))]
     [TemplatePart(Name = DataPointSeries.PlotAreaName, Type = typeof(Canvas))]

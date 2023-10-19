@@ -1,25 +1,18 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Windows.Interactivity;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Windows;
+using OpenSilver.Internal.Expression.Interactivity;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Windows.Interactivity;
-    using Microsoft.Expression.Interactivity;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using OpenSilver.Internal.Expression.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Controls;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Controls;
-#endif
-
     /// <summary>
     /// Toggles between two states based on a conditional statement.
     /// </summary>

@@ -11,20 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Ink
-#else
-namespace Windows.UI.Xaml.Ink
-#endif
 {
     /// <summary>
     /// Specifies drawing attributes that are used to draw a <see cref="Stroke" />.

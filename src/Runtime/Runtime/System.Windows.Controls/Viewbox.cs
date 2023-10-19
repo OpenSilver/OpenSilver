@@ -11,22 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines a content decorator that can stretch and scale a single child to fill
@@ -162,11 +151,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the <see cref="Viewbox"/> control when a new
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             // Get the element that contains the content:
             ChildElement = GetTemplateChild(ChildElementName) as ContentPresenter;

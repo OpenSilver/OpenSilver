@@ -5,36 +5,20 @@
 
 using System.ComponentModel;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Linq;
-using System;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Xaml;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
+using CSHTML5.Internal;
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public partial class DataGrid
     {
-#region Internal Properties
+        #region Internal Properties
 
         internal bool AreRowBottomGridLinesRequired
         {
@@ -75,9 +59,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
-#region Private Properties
+        #region Private Properties
 
         // Cumulated height of all known rows, including the gridlines and details section.
         // This property returns an approximation of the actual total row heights and also
@@ -145,9 +129,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Private Properties
+        #endregion Private Properties
 
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Collapses the DataGridRowGroupHeader that represents a given CollectionViewGroup
@@ -187,9 +171,9 @@ namespace Windows.UI.Xaml.Controls
             if (this.WaitForLostFocus(delegate { this.ExpandRowGroup(collectionViewGroup, expandAllSubgroups); }) ||
                 collectionViewGroup == null || !this.CommitEdit())
                 if (collectionViewGroup == null || !this.CommitEdit())
-            {
-                return;
-            }
+                {
+                    return;
+                }
 
             EnsureRowGroupVisibility(RowGroupInfoFromCollectionViewGroup(collectionViewGroup), Visibility.Visible, true);
 
@@ -229,9 +213,9 @@ namespace Windows.UI.Xaml.Controls
 
 
 
-#endregion Public Methods
+        #endregion Public Methods
 
-#region Protected Methods
+        #region Protected Methods
 
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Controls.DataGrid.RowDetailsVisibilityChanged" /> event.
@@ -247,9 +231,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-#region Internal Methods
+        #region Internal Methods
 
         /// <summary>
         /// Clears the entire selection. Displayed rows are deselected explicitly to visualize
@@ -371,7 +355,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal Visibility GetRowDetailsVisibility(int rowIndex)
         {
-            return GetRowDetailsVisibility(rowIndex, this.RowDetailsVisibilityMode);   
+            return GetRowDetailsVisibility(rowIndex, this.RowDetailsVisibilityMode);
         }
 
         internal Visibility GetRowDetailsVisibility(int rowIndex, DataGridRowDetailsVisibilityMode gridLevelRowDetailsVisibility)
@@ -545,7 +529,7 @@ namespace Windows.UI.Xaml.Controls
 
             EnsureRowGroupSpacerColumnWidth(groupLevelCount);
         }
-        
+
         internal void RefreshRows(bool recycleRows, bool clearRows)
         {
             if (_measured)
@@ -822,9 +806,9 @@ namespace Windows.UI.Xaml.Controls
             return rowIndex + this.RowGroupHeadersTable.GetIndexCountBeforeGap(0, rowIndex);
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
-#region Private Methods
+        #region Private Methods
 
         private void AddSlotElement(int slot, UIElement element)
         {
@@ -886,7 +870,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         private bool _isProgressiveLoadingInProgress;
-        private bool[] _pendingRefreshRowsArgs;        
+        private bool[] _pendingRefreshRowsArgs;
 
         internal class SlotCreationParams
         {
@@ -1180,7 +1164,7 @@ namespace Windows.UI.Xaml.Controls
             Debug.Assert(slotDeleted >= 0);
 
             // Take care of the non-visible loaded rows
-            for (int index = 0; index < this._loadedRows.Count; )
+            for (int index = 0; index < this._loadedRows.Count;)
             {
                 DataGridRow dataGridRow = this._loadedRows[index];
                 if (this.IsSlotVisible(dataGridRow.Slot))
@@ -1353,7 +1337,7 @@ namespace Windows.UI.Xaml.Controls
             // accounted for, that means the ICollectionView is still in the process of updating its groups.  It will
             // send a reset notification when it's done, at which point we can update our visuals.
 
-            if (this._rowGroupHeightsByLevel != null && 
+            if (this._rowGroupHeightsByLevel != null &&
                 this.DataConnection.CollectionView != null &&
                 this.DataConnection.CollectionView.GroupDescriptions != null &&
                 this.DataConnection.CollectionView.GroupDescriptions.Count == this._rowGroupHeightsByLevel.Length)
@@ -1810,7 +1794,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private double GetExactSlotElementHeight(int slot)
         {
-            Debug.Assert((slot >= 0 ) && slot < this.SlotCount);
+            Debug.Assert((slot >= 0) && slot < this.SlotCount);
 
             if (this.IsSlotVisible(slot))
             {
@@ -1983,7 +1967,7 @@ namespace Windows.UI.Xaml.Controls
             // since they need to be added to the visual tree for us to Measure them.
             Debug.Assert(this.DisplayData.FirstScrollingSlot == -1 || slot >= GetPreviousVisibleSlot(this.DisplayData.FirstScrollingSlot) && slot <= GetNextVisibleSlot(this.DisplayData.LastScrollingSlot));
             Debug.Assert(element != null);
-            
+
             if (this._rowsPresenter != null)
             {
                 DataGridRowGroupHeader groupHeader = null;
@@ -2276,7 +2260,7 @@ namespace Windows.UI.Xaml.Controls
             // Note that the row needs to be deleted no matter what. The underlying data row was already deleted.
 
             Debug.Assert(slotDeleted >= 0 && slotDeleted < this.SlotCount);
-            this._temporarilyResetCurrentCell = false; 
+            this._temporarilyResetCurrentCell = false;
 
             // Reset the current cell's address if it's on the deleted row, or after it.
             if (this.CurrentSlot != -1 && slotDeleted <= this.CurrentSlot)
@@ -2513,7 +2497,7 @@ namespace Windows.UI.Xaml.Controls
                             OnUnloadingRow(new DataGridRowEventArgs(row));
                         }
                     }
-                    else 
+                    else
                     {
                         // Raise Unloading Row for all the RowGroupHeaders we're displaying
                         DataGridRowGroupHeader groupHeader = element as DataGridRowGroupHeader;
@@ -2841,7 +2825,7 @@ namespace Windows.UI.Xaml.Controls
         private void SelectSlots(int startSlot, int endSlot, bool isSelected)
         {
             _selectedItems.SelectSlots(startSlot, endSlot, isSelected);
-            
+
             // Apply the correct row state for display rows and also expand or collapse detail accordingly
             int firstSlot = Math.Max(this.DisplayData.FirstScrollingSlot, startSlot);
             int lastSlot = Math.Min(this.DisplayData.LastScrollingSlot, endSlot);
@@ -2942,7 +2926,7 @@ namespace Windows.UI.Xaml.Controls
                 dataGridRow.DetachFromDataGrid(false);
             }
         }
-        
+
         private void UpdateDisplayedRows(int newFirstDisplayedSlot, double displayHeight)
         {
             Debug.Assert(!_collapsedSlotsTable.Contains(newFirstDisplayedSlot));
@@ -3084,9 +3068,6 @@ namespace Windows.UI.Xaml.Controls
         // be applied this header
         // Returns the number of pixels that were expanded or (collapsed); however, if we're expanding displayed rows, we only expand up
         // to what we can display
-#if MIGRATION
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-#endif
         private double UpdateRowGroupVisibility(DataGridRowGroupInfo targetRowGroupInfo, Visibility newVisibility, bool isDisplayed)
         {
             double heightChange = 0;
@@ -3259,7 +3240,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
 
 #if DEBUG
         internal void PrintRowGroupInfo()

@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows
 {
     /// <summary>
@@ -99,38 +98,3 @@ namespace System.Windows
         //Baseline = 3,
     }
 }
-#else
-namespace Windows.UI.Text
-{
-    /// <summary>
-    /// Provides a set of predefined text decorations.
-    /// </summary>
-    public enum TextDecorations
-    {
-        /// <summary>
-        /// Defines a line above the text
-        /// </summary>
-        None = 0,
-
-        ///// <summary>
-        ///// Defines a line below the text
-        ///// </summary>
-        //Baseline = 1,
-
-        /// <summary>
-        /// Defines a line above the text
-        /// </summary>
-        OverLine = 2,
-
-        /// <summary>
-        /// Defines a line through the text
-        /// </summary>
-        Strikethrough = 3,
-
-        /// <summary>
-        /// Defines a line below the text
-        /// </summary>
-        Underline = 4
-    }
-}
-#endif

@@ -4,9 +4,7 @@
   <PropertyGroup>
     <OpenSilverDependencyVersion>2.0.0</OpenSilverDependencyVersion>
     <OpenSilverTargetsDirectory>$(MSBuildThisFileDirectory)..\packages\OpenSilver.$(OpenSilverDependencyVersion)\build</OpenSilverTargetsDirectory>
-    <OpenSilverTargetsDirectory Condition="'$(Configuration)' == 'UWP'">$(MSBuildThisFileDirectory)..\packages\OpenSilver.UWPCompatible.$(OpenSilverDependencyVersion)\build</OpenSilverTargetsDirectory>
     <OpenSilverTargets>$(OpenSilverTargetsDirectory)\OpenSilver.targets</OpenSilverTargets>
-    <OpenSilverTargets Condition="'$(Configuration)' == 'UWP'">$(OpenSilverTargetsDirectory)\OpenSilver.UWPCompatible.targets</OpenSilverTargets>
     <OpenSilverGenerateAssemblyInfoTargets>$(OpenSilverTargetsDirectory)\OpenSilver.GenerateAssemblyInfo.targets</OpenSilverGenerateAssemblyInfoTargets>
 
     <OpenSilverGenerateAssemblyInfo>true</OpenSilverGenerateAssemblyInfo>

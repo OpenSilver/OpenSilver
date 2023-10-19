@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines column-specific properties that apply to <see cref="Grid"/> objects.

@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 namespace System.Windows
 {
     public sealed class TextDecorationCollection
@@ -52,5 +50,3 @@ namespace System.Windows
         internal TextDecorationLocation Location { get; private set; }
     }
 }
-
-#endif

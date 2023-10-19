@@ -3,7 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -11,19 +10,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal class DataGridDataConnection
     {
@@ -375,7 +364,7 @@ namespace Windows.UI.Xaml.Controls
         public object GetDataItem(int index)
         {
             Debug.Assert(index >= 0);
-            
+
             IList list = this.List;
             if (list != null)
             {

@@ -5,12 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace OpenSilver.Utility
 {

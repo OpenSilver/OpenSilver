@@ -6,13 +6,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
-using System;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Holds the information needed by the tree map layout algorithm, such as the area

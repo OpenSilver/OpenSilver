@@ -3,28 +3,17 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 using System.Windows.Controls.DataVisualization.Collections;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.DataVisualization.Collections;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that contains a dynamic data series.
@@ -660,15 +649,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         protected DataPointSeries()
         {
-#if !MIGRATION
-            this.DefaultStyleKey = typeof(DataPointSeries);
-#endif
             ClipGeometry = new RectangleGeometry();
             Clip = ClipGeometry;
 
-#if MIGRATION
             this.DefaultStyleKey = typeof(DataPointSeries);
-#endif
         }
 
         /// <summary>
@@ -843,11 +827,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Attaches handler plot area after loading it from XAML.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

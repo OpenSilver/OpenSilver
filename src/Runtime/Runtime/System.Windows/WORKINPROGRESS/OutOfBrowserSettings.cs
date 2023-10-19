@@ -18,11 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
 	[OpenSilver.NotImplemented]
     public sealed partial class OutOfBrowserSettings : DependencyObject

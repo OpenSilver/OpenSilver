@@ -1,21 +1,11 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media;
-#else
-    using global::Windows.UI.Xaml;
-    using global::Windows.UI.Xaml.Media;
-#endif
-
     /// <summary>
     /// Static class that owns the Triggers and Behaviors attached properties. Handles propagation of AssociatedObject change notifications.
     /// </summary>

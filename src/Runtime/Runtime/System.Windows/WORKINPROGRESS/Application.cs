@@ -17,15 +17,7 @@ using System;
 using System.Collections;
 using System.Windows.Resources;
 
-#if !MIGRATION
-using System.Windows;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     public delegate void CheckAndDownloadUpdateCompletedEventHandler(object sender,
         CheckAndDownloadUpdateCompletedEventArgs e);
@@ -66,15 +58,6 @@ namespace Windows.UI.Xaml
                 UnhandledException(this, new ApplicationUnhandledExceptionEventArgs(exception, handled));
             }
         }
-
-        //        void RaiseUnhandledException(object jsElement)
-        //        {
-        //#if !MIGRATION
-        //            UnhandledException(null, new ApplicationUnhandledExceptionEventArgs())
-        //#else
-        //            UnhandledException(null, new ApplicationUnhandledExceptionEventArgs(null, true));
-        //#endif
-        //        }
 
         [OpenSilver.NotImplemented]
         public bool IsRunningOutOfBrowser

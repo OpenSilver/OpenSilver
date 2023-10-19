@@ -16,13 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Markup;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace OpenSilver.Internal.Data
 {

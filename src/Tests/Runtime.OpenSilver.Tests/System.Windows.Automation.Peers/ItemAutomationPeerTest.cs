@@ -11,25 +11,13 @@
 *
 \*====================================================================================*/
 
-using System;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver;
-
-#if MIGRATION
-using System.Windows.Automation.Provider;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers.Tests
-#else
-namespace Windows.UI.Xaml.Automation.Peers.Tests
-#endif
 {
     [TestClass]
     public class ItemAutomationPeerTest

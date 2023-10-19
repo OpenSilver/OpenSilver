@@ -3,15 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// DataGridLengthConverter - Converter class for converting instances of other types to and from DataGridLength instances.
@@ -24,7 +19,7 @@ namespace Windows.UI.Xaml.Controls
         private static string _starSuffix = "*";
         private static string[] _valueInvariantUnitStrings = { "auto", "sizetocells", "sizetoheader" };
         private static DataGridLength[] _valueInvariantDataGridLengths = { DataGridLength.Auto, DataGridLength.SizeToCells, DataGridLength.SizeToHeader };
-        
+
         #endregion Data
 
         #region Methods

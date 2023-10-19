@@ -1,21 +1,12 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Globalization;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.ComponentModel;
-    using System.Globalization;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media.Animation;
-#else
-    using global::Windows.UI.Xaml;
-    using global::Windows.UI.Xaml.Media.Animation;
-#endif
-
     /// <summary>
     /// Encapsulates state information and zero or more ICommands into an attachable object.
     /// </summary>

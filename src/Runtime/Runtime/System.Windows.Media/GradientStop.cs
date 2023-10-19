@@ -11,22 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Describes the location and color of a transition point in a gradient.
     /// </summary>
-    [ContentProperty("Color")]
+    [ContentProperty(nameof(Color))]
     public sealed class GradientStop : DependencyObject
     {
         internal Brush INTERNAL_ParentBrush;

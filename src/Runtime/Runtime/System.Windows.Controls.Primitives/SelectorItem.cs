@@ -11,18 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Provides a base class for ListBoxItem, ComboBoxItem, or potentially for other item types.
     /// </summary>
-    public partial class SelectorItem : ContentControl
+    public class SelectorItem : ContentControl
     {
         /// <summary>
         /// Provides base class initialization behavior for SelectorItem-derived classes.

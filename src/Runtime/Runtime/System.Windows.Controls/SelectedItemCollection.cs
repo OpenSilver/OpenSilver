@@ -11,21 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections;
 using System.Collections.ObjectModel;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// This class represent the collection of SelectedItems in Selector. It extends the ObservableCollection by providing methods for bulk selection.

@@ -11,20 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Specialized;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides a framework for <see cref="Panel"/> elements that virtualize

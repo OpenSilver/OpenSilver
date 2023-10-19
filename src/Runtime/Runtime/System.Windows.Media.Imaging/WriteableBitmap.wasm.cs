@@ -11,18 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 
-#if MIGRATION
 namespace System.Windows.Media.Imaging
-#else
-namespace Windows.UI.Xaml.Media.Imaging
-#endif
 {
     public sealed partial class WriteableBitmap
     {

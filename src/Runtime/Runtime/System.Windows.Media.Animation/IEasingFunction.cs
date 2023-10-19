@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
-    public partial interface IEasingFunction
+    public interface IEasingFunction
     {
         /// <summary>Transforms normalized time to control the pace of an animation.</summary>
         /// <returns>The transformed progress.</returns>

@@ -3,20 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 
-
-#if MIGRATION
-using System.Windows;
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.Foundation;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// A set of functions for data conversion operations.

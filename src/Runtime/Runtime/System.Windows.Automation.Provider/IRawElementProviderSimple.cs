@@ -11,20 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Provider
-#else
-namespace Windows.UI.Xaml.Automation.Provider
-#endif
 {
 	/// <summary>
 	/// Provides methods and properties that expose basic information about a UI element.

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,20 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Specialized;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
 	/// <summary>
 	/// The ItemsChanged event is raised by an ItemContainerGenerator to inform
 	/// layouts that the items collection has changed.
 	/// </summary>
-	public partial class ItemsChangedEventArgs : EventArgs
+	public class ItemsChangedEventArgs : EventArgs
 	{
         //------------------------------------------------------
         //

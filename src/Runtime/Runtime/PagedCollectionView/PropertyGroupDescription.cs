@@ -10,18 +10,9 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Common;
-#else
-using Windows.UI.Xaml.Common;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     
 
@@ -213,11 +204,7 @@ namespace Windows.UI.Xaml.Data
 
                 if (this.Converter != null)
                 {
-#if MIGRATION
                     return this.Converter.Convert(propertyValue, typeof(object), null, culture);
-#else
-                    return this.Converter.Convert(propertyValue, typeof(object), null, culture.Name);
-#endif
                 }
                 else
                 {

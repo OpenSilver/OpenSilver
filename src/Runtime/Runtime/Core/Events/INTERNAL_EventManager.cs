@@ -23,9 +23,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
 namespace CSHTML5.Internal
 {

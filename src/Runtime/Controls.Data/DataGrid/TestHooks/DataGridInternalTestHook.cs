@@ -3,21 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-#endif
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public partial class DataGrid
     {
@@ -83,9 +72,9 @@ namespace Windows.UI.Xaml.Controls
 
             internal static double DATAGRID_minimumRowHeadersWidth
             {
-                get 
+                get
                 {
-                    return DataGrid.DATAGRID_minimumRowHeaderWidth; 
+                    return DataGrid.DATAGRID_minimumRowHeaderWidth;
                 }
             }
 
@@ -104,7 +93,7 @@ namespace Windows.UI.Xaml.Controls
                     return DataGrid.DATAGRID_minimumColumnHeaderHeight;
                 }
             }
-           
+
             internal DataGridDisplayData DisplayData
             {
                 get
@@ -153,7 +142,7 @@ namespace Windows.UI.Xaml.Controls
                     return _grid._validationSummary;
                 }
             }
-            
+
             #endregion
 
             #region Internal Methods
@@ -179,11 +168,7 @@ namespace Windows.UI.Xaml.Controls
 
             //key processing methods
 
-#if MIGRATION
             internal void ProcessDataGridKey(KeyEventArgs e)
-#else
-            internal void ProcessDataGridKey(KeyRoutedEventArgs e)
-#endif
             {
                 _grid.ProcessDataGridKey(e);
             }
@@ -237,20 +222,16 @@ namespace Windows.UI.Xaml.Controls
             {
                 return _grid.ProcessRightKey();
             }
-#if MIGRATION
+            
             internal bool ProcessTabKey(KeyEventArgs e)
             {
-#else
-            internal bool ProcessTabKey(KeyRoutedEventArgs e)
-            {
-#endif
                 return _grid.ProcessTabKey(e);
             }
 
             internal bool ProcessUpKey()
             {
                 return _grid.ProcessUpKey();
-            }           
+            }
 
             internal void SetRowSelection(int rowIndex, bool isSelected, bool setAnchorSlot)
             {
@@ -272,7 +253,7 @@ namespace Windows.UI.Xaml.Controls
                 _grid.ValidationSummary_FocusingInvalidControl(sender, e);
             }
 
-#endregion
+            #endregion
         }
 
 

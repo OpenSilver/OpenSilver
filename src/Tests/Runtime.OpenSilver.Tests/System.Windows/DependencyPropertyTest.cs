@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#if MIGRATION
 namespace System.Windows.Tests;
-#else
-namespace Windows.UI.Xaml.Tests;
-#endif
 
 [TestClass]
 public partial class DependencyPropertyTest
@@ -225,7 +220,6 @@ public partial class DependencyPropertyTest
         static List<CSSEquivalent> GetCSSEquivalents(DependencyObject d) => null;
     }
     
-#if MIGRATION
     [TestMethod]
     public void Register_Should_Allow_Overridding_Property()
     {
@@ -243,7 +237,6 @@ public partial class DependencyPropertyTest
 
         Assert.AreEqual(dp2, DependencyProperty.FromName(nameof(Register_Should_Allow_Overridding_Property), typeof(MyDependencyObject1)));
     }
-#endif
 
     [TestMethod]
     public void Callback_Should_Not_Be_Called_When_Value_Does_Not_Change()

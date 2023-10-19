@@ -11,15 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if !MIGRATION
-using Windows.UI.Text;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     /// <summary>
     /// Provides an inline-level content element that causes content to render with a bold font weight.
@@ -31,11 +23,7 @@ namespace Windows.UI.Xaml.Documents
         /// </summary>
         public Italic()
         {
-#if MIGRATION
             FontStyle = FontStyles.Italic;
-#else
-            FontStyle = FontStyle.Italic;
-#endif
         }
     }
 }

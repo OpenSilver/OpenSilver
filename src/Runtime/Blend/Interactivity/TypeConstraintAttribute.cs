@@ -1,10 +1,9 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
 namespace System.Windows.Interactivity
 {
-    using System;
-
     /// <summary>
     /// Specifies type constraints on the AssociatedObject of TargetedTriggerAction and EventTriggerBase.
     /// </summary>

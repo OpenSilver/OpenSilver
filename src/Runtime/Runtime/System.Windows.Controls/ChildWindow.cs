@@ -3,41 +3,18 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
-#if MIGRATION
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-using MouseEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides a window that can be displayed over a parent window and blocks
@@ -822,11 +799,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     this.Focus();
                 }
-#if MIGRATION
                 this._chrome.CaptureMouse();
-#else
-                this._chrome.CapturePointer();
-#endif
                 this._isMouseCaptured = true;
                 this._clickPoint = e.GetPosition(sender as UIElement);
             }
@@ -842,11 +815,7 @@ namespace Windows.UI.Xaml.Controls
             if (this._chrome != null)
             {
                 e.Handled = true;
-#if MIGRATION
                 this._chrome.ReleaseMouseCapture();
-#else
-                this._chrome.ReleasePointerCapture();
-#endif
                 this._isMouseCaptured = false;
             }
         }
@@ -977,11 +946,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the <see cref="ChildWindow" /> control when a
         /// new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             this.UnsubscribeFromTemplatePartEvents();
 
@@ -1321,15 +1286,9 @@ namespace Windows.UI.Xaml.Controls
 
             if (this._chrome != null)
             {
-#if MIGRATION
                 this._chrome.MouseLeftButtonDown += new MouseButtonEventHandler(this.Chrome_MouseLeftButtonDown);
                 this._chrome.MouseLeftButtonUp += new MouseButtonEventHandler(this.Chrome_MouseLeftButtonUp);
                 this._chrome.MouseMove += new MouseEventHandler(this.Chrome_MouseMove);
-#else
-                this._chrome.PointerPressed += new MouseButtonEventHandler(this.Chrome_MouseLeftButtonDown);
-                this._chrome.PointerReleased += new MouseButtonEventHandler(this.Chrome_MouseLeftButtonUp);
-                this._chrome.PointerMoved += new MouseEventHandler(this.Chrome_MouseMove);
-#endif
             }
 
             if (this._contentPresenter != null)
@@ -1366,15 +1325,9 @@ namespace Windows.UI.Xaml.Controls
 
             if (this._chrome != null)
             {
-#if MIGRATION
                 this._chrome.MouseLeftButtonDown -= new MouseButtonEventHandler(this.Chrome_MouseLeftButtonDown);
                 this._chrome.MouseLeftButtonUp -= new MouseButtonEventHandler(this.Chrome_MouseLeftButtonUp);
                 this._chrome.MouseMove -= new MouseEventHandler(this.Chrome_MouseMove);
-#else
-                this._chrome.PointerPressed -= new MouseButtonEventHandler(this.Chrome_MouseLeftButtonDown);
-                this._chrome.PointerReleased -= new MouseButtonEventHandler(this.Chrome_MouseLeftButtonUp);
-                this._chrome.PointerMoved -= new MouseEventHandler(this.Chrome_MouseMove);
-#endif
             }
 
             if (this._contentPresenter != null)

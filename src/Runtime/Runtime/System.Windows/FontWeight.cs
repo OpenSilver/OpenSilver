@@ -16,11 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Text
-#endif
 {
     /// <summary>
     /// Refers to the density of a typeface, in terms of the lightness or heaviness of

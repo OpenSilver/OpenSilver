@@ -8,24 +8,11 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyName>OpenSilver.Controls.Navigation</AssemblyName>
     <RootNamespace>System.Windows.Navigation</RootNamespace>
-    <Configurations>SL;UWP</Configurations>
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Optimize>true</Optimize>
     <DefineSilverlight>true</DefineSilverlight>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;MIGRATION</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="$(Optimize) != true">
-    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+    <DefineTrace>true</DefineTrace>
   </PropertyGroup>
 
   <ItemGroup>

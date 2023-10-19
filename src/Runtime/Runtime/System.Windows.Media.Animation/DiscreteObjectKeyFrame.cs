@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,28 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Animates from the Object value of the previous key frame to its own Value
     /// using discrete values.
     /// </summary>
-    public sealed partial class DiscreteObjectKeyFrame : ObjectKeyFrame
+    public sealed class DiscreteObjectKeyFrame : ObjectKeyFrame
     {
-        ///// <summary>
-        ///// Initializes a new instance of the DiscreteObjectKeyFrame class.
-        ///// </summary>
-        //public DiscreteObjectKeyFrame();
     }
 }

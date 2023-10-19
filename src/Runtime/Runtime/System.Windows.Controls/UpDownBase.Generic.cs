@@ -3,20 +3,9 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
 using System.Windows.Input;
-#else
-using Windows.System;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Base class for all controls that provide value manipulation with a 
@@ -35,7 +24,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = UpDownBase.ElementTextName, Type = typeof(TextBox))]
     [TemplatePart(Name = UpDownBase.ElementSpinnerName, Type = typeof(Spinner))]
     [StyleTypedProperty(Property = UpDownBase.SpinnerStyleName, StyleTargetType = typeof(Spinner))]
-    public abstract partial class UpDownBase<T> : UpDownBase
+    public abstract class UpDownBase<T> : UpDownBase
     {
 #region Template Parts
         /// <summary>
@@ -277,11 +266,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the UpDownBase(of T) control when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -305,7 +290,6 @@ namespace Windows.UI.Xaml.Controls
         /// Only support up and down arrow keys.
         /// </remarks>
         /// <param name="e">Key event args.</param>
-#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
@@ -333,41 +317,11 @@ namespace Windows.UI.Xaml.Controls
                     break;
             }
         }
-#else
-        protected override void OnKeyDown(KeyRoutedEventArgs e)
-        {
-            base.OnKeyDown(e);
-
-            if (e.Handled)
-            {
-                return;
-            }
-
-            switch (e.Key)
-            {
-                case VirtualKey.Up:
-                    DoIncrement();
-                    e.Handled = true;
-                    break;
-
-                case VirtualKey.Down:
-                    DoDecrement();
-                    e.Handled = true;
-                    break;
-
-                case VirtualKey.Enter:
-                    ProcessUserInput();
-                    e.Handled = true;
-                    break;
-            }
-        }
-#endif
 
         /// <summary>
         /// Provides handling for the MouseWheel event.
         /// </summary>
         /// <param name="e">Mouse wheel event args.</param>
-#if MIGRATION
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
             base.OnMouseWheel(e);
@@ -386,12 +340,6 @@ namespace Windows.UI.Xaml.Controls
                 e.Handled = true;
             }
         }
-#else
-        protected override void OnPointerWheelChanged(PointerRoutedEventArgs e)
-        {
-            base.OnPointerWheelChanged(e);
-        }
-#endif
 
 #endregion
 

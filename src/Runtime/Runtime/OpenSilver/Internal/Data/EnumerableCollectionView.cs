@@ -9,16 +9,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Controls;
-#endif
 
 namespace OpenSilver.Internal.Data
 {

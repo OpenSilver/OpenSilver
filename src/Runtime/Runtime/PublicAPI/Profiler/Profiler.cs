@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,30 +11,12 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-
-#if !BRIDGE
-using JSIL.Meta;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
-#else
-using Bridge;
-#endif
 
-
-#if MIGRATION
-using System.Windows;
-#else
-
-#endif
-
-#if OPENSILVER
 namespace OpenSilver
-#else
-namespace CSHTML5 
-#endif
 {
     /// <summary>
     /// Provides static methods for profiling performance in the browser.

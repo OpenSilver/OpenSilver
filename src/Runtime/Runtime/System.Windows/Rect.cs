@@ -15,11 +15,7 @@ using System;
 using System.Globalization;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.Foundation
-#endif
 {
     /// <summary>
     /// Describes the width, height, and point origin of a rectangle.

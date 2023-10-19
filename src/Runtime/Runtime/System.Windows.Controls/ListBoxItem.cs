@@ -11,21 +11,11 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a selectable item in a <see cref="ListBox"/>.
@@ -71,11 +61,7 @@ namespace Windows.UI.Xaml.Controls
             set { base.IsSelected = value; }
         }
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             this.UpdateVisualStates();
@@ -91,11 +77,7 @@ namespace Windows.UI.Xaml.Controls
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ListBoxItemAutomationPeer(this);
 
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
             if (!e.Handled)
             {
@@ -108,24 +90,12 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
         }
 
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
             if (this.ParentSelector != null)
             {
                 this.ParentSelector.NotifyItemMouseEnter(this);
@@ -135,17 +105,9 @@ namespace Windows.UI.Xaml.Controls
             this.UpdateVisualStates();
         }
 
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
             this.IsMouseOver = false;
             this.UpdateVisualStates();
         }

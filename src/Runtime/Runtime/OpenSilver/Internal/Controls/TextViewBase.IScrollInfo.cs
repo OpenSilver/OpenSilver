@@ -13,17 +13,9 @@
 
 using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
 namespace OpenSilver.Internal.Controls;
 

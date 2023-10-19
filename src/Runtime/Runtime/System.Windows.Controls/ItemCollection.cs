@@ -19,11 +19,7 @@ using System.Diagnostics;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public sealed class ItemCollection : PresentationFrameworkCollection<object>, INotifyCollectionChanged
     {

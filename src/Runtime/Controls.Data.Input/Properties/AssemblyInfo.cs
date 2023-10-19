@@ -7,21 +7,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Reflection;
 using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Markup;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-#if OPENSILVER
 [assembly: AssemblyTitle("OpenSilver.Controls.Data.Input")]
-#elif BRIDGE
-[assembly: AssemblyTitle("CSHTML5.Controls.Data.Input")]
-#endif
 [assembly: AssemblyDescription("Silverlight Data Input Controls for OpenSilver")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -43,13 +37,8 @@ using System.Windows.Markup;
 #endif
 
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "sdk")]
-#if MIGRATION
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Controls")]
-#else
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "Windows.UI.Xaml.Controls")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "Windows.UI.Xaml.Controls")]
-#endif
 
 [assembly: NeutralResourcesLanguageAttribute("en-us")]
 #if false

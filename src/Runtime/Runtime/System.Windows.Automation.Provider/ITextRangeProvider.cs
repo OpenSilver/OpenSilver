@@ -11,17 +11,9 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Automation.Text;
-#else
-using Windows.UI.Xaml.Automation.Text;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Provider
-#else
-namespace Windows.UI.Xaml.Automation.Provider
-#endif
 {
     /// <summary>
     /// Exposes methods and properties to support UI automation client access to a span 

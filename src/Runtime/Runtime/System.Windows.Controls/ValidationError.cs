@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a validation error that is created either by the binding engine
@@ -31,7 +19,7 @@ namespace Windows.UI.Xaml.Controls
     /// or through the System.Windows.Controls.Validation.MarkInvalid(System.Windows.Data.BindingExpressionBase,System.Windows.Controls.ValidationError)
     /// method explicitly.
     /// </summary>
-    public partial class ValidationError
+    public class ValidationError
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Controls.ValidationError

@@ -4,24 +4,12 @@
 // All other rights reserved.
 
 using System.Diagnostics;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Shapes;
-#endif
+using OpenSilver.Internal;
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents an individual <see cref="T:System.Windows.Controls.DataGrid" /> cell.
@@ -43,7 +31,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
     public sealed partial class DataGridCell : ContentControl
     {
-#region Constants
+        #region Constants
 
         private const string DATAGRIDCELL_elementRightGridLine = "RightGridLine";
 
@@ -57,21 +45,15 @@ namespace Windows.UI.Xaml.Controls
 
         public DataGridCell()
         {
-#if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridCell_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridCell_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridCell_MouseLeave);
-#else
-            this.AddHandler(FrameworkElement.PointerReleasedEvent, new PointerEventHandler(DataGridCell_MouseLeftButtonDown), true);
-            this.PointerEntered += new PointerEventHandler(DataGridCell_MouseEnter);
-            this.PointerReleased += new PointerEventHandler(DataGridCell_MouseLeave);
-#endif
             DefaultStyleKey = typeof(DataGridCell);
         }
 
-#region Dependency Properties
+        #region Dependency Properties
 
-#region IsValid
+        #region IsValid
         /// <summary>
         /// Gets a value that indicates whether the data in a cell is valid. 
         /// </summary>
@@ -111,21 +93,21 @@ namespace Windows.UI.Xaml.Controls
                 throw DataGridError.DataGrid.UnderlyingPropertyIsReadOnly("IsValid");
             }
         }
-#endregion IsValid
+        #endregion IsValid
 
-#endregion Dependency Properties
+        #endregion Dependency Properties
 
-#region Public Properties
+        #region Public Properties
 
-#endregion Public Properties
-
-
-#region Protected Properties
-
-#endregion Protected Properties
+        #endregion Public Properties
 
 
-#region Internal Properties
+        #region Protected Properties
+
+        #endregion Protected Properties
+
+
+        #region Internal Properties
 
         internal double ActualRightGridLineWidth
         {
@@ -201,10 +183,10 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
 
-#region Private Properties
+        #region Private Properties
 
         private bool IsEdited
         {
@@ -252,17 +234,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Builds the visual tree for the cell control when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
         {
-#else
-        protected override void OnApplyTemplate()
-        {
-#endif
             base.OnApplyTemplate();
 
             ApplyCellState(false /*animate*/);
-            
+
             this._rightGridLine = RectangleAdapterProvider.From(GetTemplateChild(DATAGRIDCELL_elementRightGridLine));
 
             if (_rightGridLine != null && this.OwningColumn == null)
@@ -290,10 +267,10 @@ namespace Windows.UI.Xaml.Controls
             return base.OnCreateAutomationPeer();
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-        
-#region Internal Methods
+
+        #region Internal Methods
 
         internal void ApplyCellState(bool animate)
         {
@@ -401,7 +378,7 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 Visibility newVisibility = (this.OwningGrid.GridLinesVisibility == DataGridGridLinesVisibility.Vertical || this.OwningGrid.GridLinesVisibility == DataGridGridLinesVisibility.All) &&
-                    (this.OwningGrid.ColumnsInternal.FillerColumn.IsActive || this.OwningColumn != lastVisibleColumn) 
+                    (this.OwningGrid.ColumnsInternal.FillerColumn.IsActive || this.OwningColumn != lastVisibleColumn)
                     ? Visibility.Visible : Visibility.Collapsed;
 
                 if (newVisibility != _rightGridLine.Visibility)
@@ -411,11 +388,10 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
 
-#region Private Methods
-#if MIGRATION
+        #region Private Methods
         private void DataGridCell_MouseEnter(object sender, MouseEventArgs e)
         {
             if (this.OwningRow != null)
@@ -451,43 +427,6 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-#else
-        private void DataGridCell_MouseEnter(object sender, PointerRoutedEventArgs e)
-        {
-            if (this.OwningRow != null)
-            {
-                this.IsMouseOver = true;
-            }
-        }
-
-        private void DataGridCell_MouseLeave(object sender, PointerRoutedEventArgs e)
-        {
-            if (this.OwningRow != null)
-            {
-                this.IsMouseOver = false;
-            }
-        }
-
-        private void DataGridCell_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
-        {
-            // OwningGrid is null for TopLeftHeaderCell and TopRightHeaderCell because they have no OwningRow
-            if (this.OwningGrid != null)
-            {
-                if (!e.Handled && this.OwningGrid.IsTabStop)
-                {
-                    bool success = this.OwningGrid.Focus();
-                    Debug.Assert(success);
-                }
-                if (this.OwningRow != null)
-                {
-                    Debug.Assert(sender is DataGridCell);
-                    Debug.Assert(sender == this);
-                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, this.ColumnIndex, this.OwningRow.Slot, !e.Handled);
-                    this.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
-                }
-            }
-        }
-#endif
-#endregion Private Methods
+        #endregion Private Methods
     }
 }

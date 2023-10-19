@@ -11,26 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Markup;
+using System.Windows.Documents;
+using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Documents;
-using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Text;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that displays read-only rich text.
@@ -156,13 +143,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(FontStyle),
                 typeof(FontStyle),
                 typeof(RichTextBlock),
-                new FrameworkPropertyMetadata(
-#if MIGRATION
-                    FontStyles.Normal,
-#else
-                    FontStyle.Normal,
-#endif
-                    FrameworkPropertyMetadataOptions.AffectsMeasure)
+                new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {

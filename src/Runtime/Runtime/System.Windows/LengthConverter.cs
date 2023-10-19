@@ -15,11 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// LengthConverter - Converter class for converting instances of other types to and from double representing length.

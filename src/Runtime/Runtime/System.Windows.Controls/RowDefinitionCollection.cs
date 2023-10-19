@@ -11,16 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <exclude/>
-    public sealed partial class RowDefinitionCollection : PresentationFrameworkCollection<RowDefinition>
+    public sealed class RowDefinitionCollection : PresentationFrameworkCollection<RowDefinition>
     {
         private readonly Grid _parentGrid;
 

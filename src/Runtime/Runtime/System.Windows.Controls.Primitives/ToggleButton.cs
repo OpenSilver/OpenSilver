@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,24 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
-using System.Collections.ObjectModel;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
-using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Base class for controls that can switch states, such as <see cref="CheckBox"/>

@@ -1,22 +1,12 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Diagnostics.CodeAnalysis;
+using System.Windows;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Reflection;
-    using System.Windows.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Data;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Data;
-#endif
-
     /// <summary>
     /// Represents a trigger that performs actions when the bound data meets a specified condition.
     /// </summary>

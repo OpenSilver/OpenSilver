@@ -1,14 +1,13 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Collections;
+using System.Globalization;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Collections;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using OpenSilver.Internal.Interactivity;
-
     /// <summary>
     /// Provides design tools information about what <see cref="TriggerBase"/> to instantiate for a given action or command.
     /// </summary>
@@ -16,7 +15,6 @@ namespace System.Windows.Interactivity
     [AttributeUsage(AttributeTargets.Class |
                     AttributeTargets.Property,
                     AllowMultiple = true)]
-    [SuppressMessage("Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Justification = "FxCop is complaining about our single parameter override")]
     public sealed class DefaultTriggerAttribute : Attribute
     {
         private Type targetType;
@@ -91,7 +89,6 @@ namespace System.Windows.Interactivity
         /// Instantiates this instance.
         /// </summary>
         /// <returns>The <see cref="TriggerBase"/> specified by the DefaultTriggerAttribute.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Activator.CreateInstance could be calling user code which we don't want to bring us down.")]
         public TriggerBase Instantiate()
         {
             object trigger = null;

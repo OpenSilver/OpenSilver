@@ -11,18 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Shapes
-#else
-namespace Windows.UI.Xaml.Shapes
-#endif
 {
     /// <summary>
     /// Draws a straight line between two points.

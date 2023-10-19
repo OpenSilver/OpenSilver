@@ -17,11 +17,7 @@ using System.Windows.Browser;
 using System.Windows.Interop;
 using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     public class Host
     {

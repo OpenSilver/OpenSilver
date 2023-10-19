@@ -14,11 +14,7 @@
 using System;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Text
-#endif
 {
     /// <summary>
     /// Provides a set of predefined font weights as static property values.

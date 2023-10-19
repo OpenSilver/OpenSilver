@@ -3,36 +3,20 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> column.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
-#if MIGRATION
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes", Justification = "IComparable in Jolt has only one method, probably a false positive in FxCop.")]
-#endif
     [StyleTypedProperty(Property = "CellStyle", StyleTargetType = typeof(DataGridCell))]
     [StyleTypedProperty(Property = "DragIndicatorStyle", StyleTargetType = typeof(ContentControl))]
     [StyleTypedProperty(Property = "HeaderStyle", StyleTargetType = typeof(DataGridColumnHeader))]

@@ -11,20 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
-
-#if MIGRATION
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Ink
-#else
-namespace Windows.UI.Xaml.Ink
-#endif
 {
     /// <summary>
     /// Represents a collection of points that correspond to a stylus-down, move, and stylus-up sequence.

@@ -12,21 +12,10 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.UI.Text;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Documents;
-#else
-namespace Windows.UI.Xaml.Documents;
-#endif
 
 internal static class TextElementProperties
 {

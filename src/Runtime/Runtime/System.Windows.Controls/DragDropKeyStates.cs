@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
-#if MIGRATION
 namespace Microsoft.Windows
-#else
-namespace System.Windows
-#endif
 {
     /// <summary>
     /// Specifies the current state of the modifier keys (SHIFT, CTRL, and ALT),

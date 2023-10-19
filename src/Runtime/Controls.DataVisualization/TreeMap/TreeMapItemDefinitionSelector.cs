@@ -3,14 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Collections.ObjectModel;
-using System.Windows.Markup;
-
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Provides a way to choose a TreeMapItemDefinition based on the data item and 

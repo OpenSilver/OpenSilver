@@ -18,18 +18,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Markup;
 using System.Xaml.Markup;
-
-#if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Contains property setters that can be shared between instances of a type.

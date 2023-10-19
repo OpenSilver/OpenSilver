@@ -3,25 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// The ScrollExtensions class provides utility methods for scrolling items
@@ -31,7 +16,7 @@ namespace Windows.UI.Xaml.Controls
     // ScrollViewerExtensions class, this has been changed to public.
     // TODO: change back to internal when theses classes will be moved to
     // separate projects.
-    public static partial class ScrollExtensions
+    public static class ScrollExtensions
     {
         /// <summary>
         /// The amount to scroll a ScrollViewer for a line change.

@@ -14,17 +14,13 @@
 using System;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Describes the characteristics of a rounded corner, such as can be applied to
     /// a <see cref="Controls.Border"/>.
     /// </summary>
-    public partial struct CornerRadius
+    public struct CornerRadius
     {
         /// <summary>
         /// Initializes a new <see cref="CornerRadius"/> structure, applying the same uniform

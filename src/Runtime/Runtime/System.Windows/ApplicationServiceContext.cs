@@ -13,11 +13,7 @@
 
 using System.Collections.Generic;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
 	/// <summary>
 	/// Represents the initial state of a Silverlight application when application extension

@@ -12,20 +12,10 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Text;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-#endif
+using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -147,7 +137,6 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         }
     }
 
-#if MIGRATION
     internal void OnTextDecorationsChanged(TextDecorationCollection tdc)
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
@@ -160,43 +149,6 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
     {
         cssStyle.textDecoration = tdc?.ToHtmlString() ?? string.Empty;
     }
-#else
-    internal void OnTextDecorationsChanged(TextDecorations? tdc)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
-        {
-            ApplyTextDecorations(INTERNAL_HtmlDomManager.GetDomElementStyleForModification(InputDiv), tdc);
-        }
-    }
-
-    private static void ApplyTextDecorations(INTERNAL_HtmlDomStyleReference cssStyle, TextDecorations? tdc)
-    {
-        cssStyle.textDecoration = TextDecorationsToHtmlString(tdc);
-    }
-
-    private static string TextDecorationsToHtmlString(TextDecorations? tdc)
-    {
-        if (tdc.HasValue)
-        {
-            switch (tdc.Value)
-            {
-                case TextDecorations.OverLine:
-                    return "overline";
-                case TextDecorations.Strikethrough:
-                    return "line-through";
-                case TextDecorations.Underline:
-                    return "underline";
-                case TextDecorations.None:
-                default:
-                    return string.Empty;
-            }
-        }
-        else
-        {
-            return string.Empty;
-        }
-    }
-#endif
 
     internal void OnIsReadOnlyChanged(bool isReadOnly)
     {

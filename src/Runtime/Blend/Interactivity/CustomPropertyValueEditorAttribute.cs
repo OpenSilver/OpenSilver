@@ -3,8 +3,6 @@
 // -------------------------------------------------------------------
 namespace System.Windows.Interactivity
 {
-    using System;
-
     /// <summary>
     /// Enumerates possible values for reusable property value editors.
     /// </summary>

@@ -15,11 +15,7 @@
 
 using System;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Define an expected VisualState in the contract between a Control and its

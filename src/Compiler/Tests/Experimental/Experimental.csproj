@@ -5,11 +5,6 @@
     <EnableDefaultItems>false</EnableDefaultItems>
     <DefineSilverlight>true</DefineSilverlight>
     <AssemblyVersion>1.0.2</AssemblyVersion>
-    <Configurations>SL;UWP</Configurations>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'SL' ">
-    <DefineConstants>MIGRATION</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace Microsoft.Windows
-#else
-namespace System.Windows
-#endif
 {
     /// <summary>
     /// Provides helper methods and fields for drag-and-drop operations.

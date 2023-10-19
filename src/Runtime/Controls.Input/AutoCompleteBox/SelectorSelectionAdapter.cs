@@ -6,26 +6,10 @@
 using System.Collections;
 using System.Linq;
 using System.Windows.Input;
-
-#if MIGRATION
-using System.Windows;
 using System.Windows.Automation.Peers;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.System;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents the selection adapter contained in the drop-down portion of
@@ -62,11 +46,7 @@ namespace Windows.UI.Xaml.Controls
                 if (_selector != null)
                 {
                     _selector.SelectionChanged -= OnSelectionChanged;
-#if MIGRATION
                     _selector.MouseLeftButtonUp -= OnSelectorMouseLeftButtonUp;
-#else
-                    _selector.PointerReleased -= OnSelectorMouseLeftButtonUp;
-#endif
                 }
 
                 _selector = value;
@@ -74,11 +54,7 @@ namespace Windows.UI.Xaml.Controls
                 if (_selector != null)
                 {
                     _selector.SelectionChanged += OnSelectionChanged;
-#if MIGRATION
                     _selector.MouseLeftButtonUp += OnSelectorMouseLeftButtonUp;
-#else
-                    _selector.PointerReleased += OnSelectorMouseLeftButtonUp;
-#endif
                 }
             }
         }
@@ -198,11 +174,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source object.</param>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         private void OnSelectorMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-#else
-        private void OnSelectorMouseLeftButtonUp(object sender, PointerRoutedEventArgs e)
-#endif
         {
             OnCommit();
         }
@@ -273,53 +245,29 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">A <see cref="T:System.Windows.Input.KeyEventArgs" />
         /// that contains data about the
         /// <see cref="E:System.Windows.UIElement.KeyDown" /> event.</param>
-#if MIGRATION
         public void HandleKeyDown(KeyEventArgs e)
-#else
-        public void HandleKeyDown(KeyRoutedEventArgs e)
-#endif
         {
             switch (e.Key)
             {
-#if MIGRATION
                 case Key.Enter:
-#else
-                case VirtualKey.Enter:
-#endif
                     OnCommit();
                     e.Handled = true;
                     break;
 
-#if MIGRATION
                 case Key.Up:
-#else
-                case VirtualKey.Up:
-#endif
                     SelectedIndexDecrement();
                     e.Handled = true;
                     break;
 
-#if MIGRATION
                 case Key.Down:
-#else
-                case VirtualKey.Down:
-#endif
-#if MIGRATION
                     if ((ModifierKeys.Alt & Keyboard.Modifiers) == ModifierKeys.None)
-#else
-                    if ((VirtualKeyModifiers.Menu & Keyboard.Modifiers) == VirtualKeyModifiers.None)
-#endif
                     {
                         SelectedIndexIncrement();
                         e.Handled = true;
                     }
                     break;
 
-#if MIGRATION
                 case Key.Escape:
-#else
-                case VirtualKey.Escape:
-#endif
                     OnCancel();
                     e.Handled = true;
                     break;

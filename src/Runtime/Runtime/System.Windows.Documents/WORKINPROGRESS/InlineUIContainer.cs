@@ -14,11 +14,7 @@
 using System.Windows.Markup;
 using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     // This class is not finished because there is an issue displaying the element "inline" instead of on a new line.
     /// <summary>

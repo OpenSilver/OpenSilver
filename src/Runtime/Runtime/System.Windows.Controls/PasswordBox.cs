@@ -11,27 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
-using OpenSilver.Internal.Controls;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
 
     /// <summary>
@@ -48,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
     public class PasswordBox : Control
     {
-        private const string ContentElementName = "ContentElement"; // Sl & UWP
+        private const string ContentElementName = "ContentElement"; // SL
         private const string ContentElementName_WPF = "PART_ContentHost"; // WPF
 
         private bool _isProcessingInput;
@@ -214,31 +201,15 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion
 
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
             UpdateVisualStates();
         }
 
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
             UpdateVisualStates();
         }
 
@@ -256,17 +227,9 @@ namespace Windows.UI.Xaml.Controls
             UpdateVisualStates();
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
 
             if (e.Handled)
             {
@@ -277,18 +240,9 @@ namespace Windows.UI.Xaml.Controls
             Focus();
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
-
             e.Handled = true;
         }
 
@@ -296,11 +250,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the <see cref="PasswordBox" /> control when 
         /// a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

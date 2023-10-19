@@ -11,21 +11,11 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     /// <summary>
     /// An abstract class used as the base class for the also-abstract Block and Inline classes. 

@@ -14,20 +14,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     partial class UIElement
     {
@@ -43,7 +33,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-#if MIGRATION
         private static void RegisterEvents(Type type)
         {
             RoutedEvent.RegisterClassHandler(MouseMoveEvent, new MouseEventHandler(OnMouseMoveThunk));
@@ -92,53 +81,6 @@ namespace Windows.UI.Xaml
         private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
 
         private static void OnLostMouseCaptureThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnLostMouseCapture(e);
-#else
-        private static void RegisterEvents(Type type)
-        {
-            RoutedEvent.RegisterClassHandler(PointerMovedEvent, new PointerEventHandler(OnMouseMoveThunk));
-            RoutedEvent.RegisterClassHandler(PointerPressedEvent, new PointerEventHandler(OnMouseLeftButtonDownThunk));
-            RoutedEvent.RegisterClassHandler(PointerWheelChangedEvent, new PointerEventHandler(OnMouseWheelThunk));
-            RoutedEvent.RegisterClassHandler(PointerReleasedEvent, new PointerEventHandler(OnMouseLeftButtonUpThunk));
-            RoutedEvent.RegisterClassHandler(PointerEnteredEvent, new PointerEventHandler(OnMouseEnterThunk));
-            RoutedEvent.RegisterClassHandler(PointerExitedEvent, new PointerEventHandler(OnMouseLeaveThunk));
-            RoutedEvent.RegisterClassHandler(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk));
-            RoutedEvent.RegisterClassHandler(TappedEvent, new TappedEventHandler(OnTappedThunk));
-            RoutedEvent.RegisterClassHandler(RightTappedEvent, new RightTappedEventHandler(OnMouseRightButtonUpThunk));
-            RoutedEvent.RegisterClassHandler(KeyDownEvent, new KeyEventHandler(OnKeyDownThunk));
-            RoutedEvent.RegisterClassHandler(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk));
-            RoutedEvent.RegisterClassHandler(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk));
-            RoutedEvent.RegisterClassHandler(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk));
-            RoutedEvent.RegisterClassHandler(LostMouseCaptureEvent, new PointerEventHandler(OnLostMouseCaptureThunk));
-        }
-
-        private static void OnMouseMoveThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerMoved(e);
-
-        private static void OnMouseLeftButtonDownThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerPressed(e);
-
-        private static void OnMouseWheelThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerWheelChanged(e);
-
-        private static void OnMouseLeftButtonUpThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerReleased(e);
-
-        private static void OnMouseEnterThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerEntered(e);
-
-        private static void OnMouseLeaveThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerExited(e);
-
-        private static void OnTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInput(e);
-
-        private static void OnTappedThunk(object sender, TappedRoutedEventArgs e) => ((UIElement)sender).OnTapped(e);
-
-        private static void OnMouseRightButtonUpThunk(object sender, RightTappedRoutedEventArgs e) => ((UIElement)sender).OnRightTapped(e);
-
-        private static void OnKeyDownThunk(object sender, KeyRoutedEventArgs e) => ((UIElement)sender).OnKeyDown(e);
-
-        private static void OnKeyUpThunk(object sender, KeyRoutedEventArgs e) => ((UIElement)sender).OnKeyUp(e);
-
-        private static void OnGotFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnGotFocus(e);
-
-        private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
-
-        private static void OnLostMouseCaptureThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerCaptureLost(e);
-#endif
 
         /// <summary>
         /// Adds a routed event handler for a specified routed event, adding the handler
@@ -349,17 +291,12 @@ namespace Windows.UI.Xaml
 
         #region Pointer moved event
 
-#if MIGRATION
         public static readonly RoutedEvent MouseMoveEvent;
-#else
-        public static readonly RoutedEvent PointerMovedEvent;
-#endif
 
         /// <summary>
         /// Occurs when the pointer device that previously initiated a Press action is
         /// moved, while within this element.
         /// </summary>
-#if MIGRATION
         public event MouseEventHandler MouseMove
         {
             add
@@ -371,52 +308,26 @@ namespace Windows.UI.Xaml
                 RemoveHandler(MouseMoveEvent, value);
             }
         }
-#else
-        public event PointerEventHandler PointerMoved
-        {
-            add
-            {
-                AddHandler(PointerMovedEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(PointerMovedEvent, value);
-            }
-        }
-#endif
-
 
         /// <summary>
         /// Raises the PointerMoved event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
 
-#if MIGRATION
         protected virtual void OnMouseMove(MouseEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnPointerMoved(PointerRoutedEventArgs eventArgs)
-        {
-        }
-#endif
-
 
         #endregion
 
         #region Pointer pressed event
 
-#if MIGRATION
         public static readonly RoutedEvent MouseLeftButtonDownEvent;
-#else
-        public static readonly RoutedEvent PointerPressedEvent;
-#endif
 
         /// <summary>
         /// Occurs when the pointer device that previously initiated a Press action is
         /// pressed, while within this element.
         /// </summary>
-#if MIGRATION
         public event MouseButtonEventHandler MouseLeftButtonDown
         {
             add
@@ -428,39 +339,18 @@ namespace Windows.UI.Xaml
                 RemoveHandler(MouseLeftButtonDownEvent, value);
             }
         }
-#else
-        public event PointerEventHandler PointerPressed
-        {
-            add
-            {
-                AddHandler(PointerPressedEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(PointerPressedEvent, value);
-            }
-        }
-#endif
 
         /// <summary>
         /// Raises the PointerPressed event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnPointerPressed(PointerRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
-        #region MouseRightButtonDown (no equivalent in UWP)
-
-#if MIGRATION
+        #region MouseRightButtonDown
 
         /// <summary>
         /// Identifies the <see cref="MouseRightButtonDown"/> routed event.
@@ -487,25 +377,15 @@ namespace Windows.UI.Xaml
         {
         }
 
-#endif
-
         #endregion
 
         #region PointerWheelChanged event (or MouseWheel)
 
-#if MIGRATION
         /// <summary>
         /// Identifies the <see cref="MouseWheel"/> routed event.
         /// </summary>
         public static readonly RoutedEvent MouseWheelEvent;
-#else
-        /// <summary>
-        /// Identifies the <see cref="PointerWheelChanged"/> routed event.
-        /// </summary>
-        public static readonly RoutedEvent PointerWheelChangedEvent;
-#endif
 
-#if MIGRATION
         /// <summary>
         /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
         /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
@@ -521,54 +401,26 @@ namespace Windows.UI.Xaml
                 RemoveHandler(MouseWheelEvent, value);
             }
         }
-#else
-        /// <summary>
-        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
-        /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
-        /// </summary>
-        public event PointerEventHandler PointerWheelChanged
-        {
-            add
-            {
-                AddHandler(PointerWheelChangedEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(PointerWheelChangedEvent, value);
-            }
-        }
-#endif
 
         /// <summary>
         /// Raises the PointerWheelChanged event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnMouseWheel(MouseWheelEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnPointerWheelChanged(PointerRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
 
         #region Pointer released event
 
-#if MIGRATION
         public static readonly RoutedEvent MouseLeftButtonUpEvent;
-#else
-        public static readonly RoutedEvent PointerReleasedEvent;
-#endif
 
         /// <summary>
         /// Occurs when the pointer device that previously initiated a Press action is
         /// released, while within this element.
         /// </summary>
-#if MIGRATION
         public event MouseButtonEventHandler MouseLeftButtonUp
         {
             add
@@ -580,48 +432,24 @@ namespace Windows.UI.Xaml
                 RemoveHandler(MouseLeftButtonUpEvent, value);
             }
         }
-#else
-        public event PointerEventHandler PointerReleased
-        {
-            add
-            {
-                AddHandler(PointerReleasedEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(PointerReleasedEvent, value);
-            }
-        }
-#endif
 
         /// <summary>
         /// Raises the PointerReleased event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnMouseLeftButtonUp(MouseButtonEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnPointerReleased(PointerRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
         #region Pointer entered event
 
-#if MIGRATION
         public static readonly RoutedEvent MouseEnterEvent;
-#else
-        public static readonly RoutedEvent PointerEnteredEvent;
-#endif
 
         /// <summary>
         /// Occurs when a pointer enters the hit test area of this element.
         /// </summary>
-#if MIGRATION
         public event MouseEventHandler MouseEnter
         {
             add
@@ -633,48 +461,24 @@ namespace Windows.UI.Xaml
                 RemoveHandler(MouseEnterEvent, value);
             }
         }
-#else
-        public event PointerEventHandler PointerEntered
-        {
-            add
-            {
-                AddHandler(PointerEnteredEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(PointerEnteredEvent, value);
-            }
-        }
-#endif
 
         /// <summary>
         /// Raises the PointerEntered event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnMouseEnter(MouseEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnPointerEntered(PointerRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
         #region Pointer exited event
 
-#if MIGRATION
         public static readonly RoutedEvent MouseLeaveEvent;
-#else
-        public static readonly RoutedEvent PointerExitedEvent;
-#endif
 
         /// <summary>
         /// Occurs when a pointer leaves the hit test area of this element.
         /// </summary>
-#if MIGRATION
         public event MouseEventHandler MouseLeave
         {
             add
@@ -686,33 +490,14 @@ namespace Windows.UI.Xaml
                 RemoveHandler(MouseLeaveEvent, value);
             }
         }
-#else
-        public event PointerEventHandler PointerExited
-        {
-            add
-            {
-                AddHandler(PointerExitedEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(PointerExitedEvent, value);
-            }
-        }
-#endif
 
         /// <summary>
         /// Raises the PointerExited event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnMouseLeave(MouseEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnPointerExited(PointerRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
@@ -807,17 +592,12 @@ namespace Windows.UI.Xaml
 
         #region RightTapped (aka MouseRightButtonUp) event
 
-#if MIGRATION
         public static readonly RoutedEvent MouseRightButtonUpEvent;
-#else
-        public static readonly RoutedEvent RightTappedEvent;
-#endif
 
         /// <summary>
         /// Occurs when a right-tap input stimulus happens while the pointer is over
         /// the element.
         /// </summary>
-#if MIGRATION
         public event MouseButtonEventHandler MouseRightButtonUp
         {
             add
@@ -829,33 +609,14 @@ namespace Windows.UI.Xaml
                 RemoveHandler(MouseRightButtonUpEvent, value);
             }
         }
-#else
-        public event RightTappedEventHandler RightTapped
-        {
-            add
-            {
-                AddHandler(RightTappedEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(RightTappedEvent, value);
-            }
-        }
-#endif
 
         /// <summary>
         /// Raises the RightTapped event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnMouseRightButtonUp(MouseButtonEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnRightTapped(RightTappedRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
@@ -882,15 +643,9 @@ namespace Windows.UI.Xaml
         /// Raises the KeyDown event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnKeyDown(KeyEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnKeyDown(KeyRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
@@ -917,15 +672,9 @@ namespace Windows.UI.Xaml
         /// Raises the KeyUp event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-#if MIGRATION
         protected virtual void OnKeyUp(KeyEventArgs eventArgs)
         {
         }
-#else
-        protected virtual void OnKeyUp(KeyRoutedEventArgs eventArgs)
-        {
-        }
-#endif
 
         #endregion
 
@@ -993,7 +742,6 @@ namespace Windows.UI.Xaml
 
         internal static readonly RoutedEvent LostMouseCaptureEvent;
 
-#if MIGRATION
         public event MouseEventHandler LostMouseCapture
         {
             add
@@ -1005,25 +753,8 @@ namespace Windows.UI.Xaml
                 RemoveHandler(LostMouseCaptureEvent, value);
             }
         }
-#else
-        public event PointerEventHandler PointerCaptureLost
-        {
-            add
-            {
-                AddHandler(LostMouseCaptureEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(LostMouseCaptureEvent, value);
-            }
-        }
-#endif
 
-#if MIGRATION
         protected virtual void OnLostMouseCapture(MouseEventArgs e) { }
-#else
-        protected virtual void OnPointerCaptureLost(PointerRoutedEventArgs e) { }
-#endif
 
         #endregion
 

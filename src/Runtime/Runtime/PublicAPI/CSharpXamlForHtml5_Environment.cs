@@ -15,19 +15,11 @@
 
 using CSHTML5;
 using CSHTML5.Internal;
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
 public static partial class CSharpXamlForHtml5
 {

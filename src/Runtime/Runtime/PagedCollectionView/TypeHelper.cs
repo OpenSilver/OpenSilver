@@ -15,11 +15,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-#if MIGRATION
 namespace System.Windows.Common
-#else
-namespace Windows.UI.Xaml.Common
-#endif
 {
     /// <summary>
     /// Utility class for Type related operations

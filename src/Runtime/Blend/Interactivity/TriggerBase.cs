@@ -1,21 +1,13 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Windows.Markup;
+using System.Globalization;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Windows.Markup;
-    using System.Globalization;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media.Animation;
-#else
-    using global::Windows.UI.Xaml;
-    using global::Windows.UI.Xaml.Media.Animation;
-#endif
-    
     /// <summary>
     /// Represents an object that can invoke actions conditionally.
     /// </summary>

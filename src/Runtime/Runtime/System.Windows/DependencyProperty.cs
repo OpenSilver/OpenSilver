@@ -8,20 +8,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 using OpenSilver.Internal;
 using OpenSilver.Utility;
 
-#if MIGRATION
-using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents a dependency property that is registered with the Silverlight 
@@ -391,19 +382,6 @@ namespace Windows.UI.Xaml
             ValidateValueCallback validateValueCallback)
         {
             FromNameKey key = new FromNameKey(name, ownerType);
-
-            // The following check is disabled in the Silverlight compatible version
-            // because it appears that Silverlight is tolerant to declaring multiple
-            // times the same dependency property.
-#if !MIGRATION
-            lock (Synchronized)
-            {
-                if (PropertyFromName.ContainsKey(key))
-                {
-                    throw new ArgumentException(string.Format("'{0}' property was already registered by '{1}'.", name, ownerType.Name));
-                }
-            }
-#endif
 
             // Establish default metadata for all types, if none is provided
             if (defaultMetadata == null)

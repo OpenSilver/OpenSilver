@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,27 +11,18 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSHTML5.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Provides an abstract class for controls that allow multiple items to be selected.
     /// </summary>
-    public abstract partial class MultiSelector : Selector
+    public abstract class MultiSelector : Selector
     {
         /// <summary>
         /// This value is used to state that we do not want SelectedItems_Changed to fire the SelectionChanged event.

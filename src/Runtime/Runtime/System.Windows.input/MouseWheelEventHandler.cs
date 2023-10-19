@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 namespace System.Windows.Input
 {
     /// <summary>
@@ -20,5 +18,3 @@ namespace System.Windows.Input
     /// </summary>
     public delegate void MouseWheelEventHandler(object sender, MouseWheelEventArgs e); 
 }
-
-#endif

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,35 +11,15 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Diagnostics;
-using System.Windows;
-
-#if MIGRATION
 using SW = Microsoft.Windows;
 using System.Collections.ObjectModel;
-#else
-using SW = System.Windows;
-using Windows.UI.Xaml;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Information describing a drag event on a UIElement.
     /// </summary>
-    public sealed partial class ItemDragEventArgs : EventArgs
+    public sealed class ItemDragEventArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new instance of the ItemDragEventArgs class.

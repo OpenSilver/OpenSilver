@@ -3,27 +3,14 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Interop;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// PopupHelper is a simple wrapper type that helps abstract platform
@@ -390,11 +377,7 @@ namespace Windows.UI.Xaml.Controls
 
                     OutsidePopupCanvas = new Canvas();
                     OutsidePopupCanvas.Background = new SolidColorBrush(Colors.Transparent);
-#if MIGRATION
                     OutsidePopupCanvas.MouseLeftButtonDown += OutsidePopup_MouseLeftButtonDown;
-#else
-                    OutsidePopupCanvas.PointerPressed += OutsidePopup_MouseLeftButtonDown;
-#endif
 
                     PopupChildCanvas.Children.Add(OutsidePopupCanvas);
                     PopupChildCanvas.Children.Add(PopupChild);
@@ -402,13 +385,8 @@ namespace Windows.UI.Xaml.Controls
 
                     PopupChild.GotFocus += PopupChild_GotFocus;
                     PopupChild.LostFocus += PopupChild_LostFocus;
-#if MIGRATION
                     PopupChild.MouseEnter += PopupChild_MouseEnter;
                     PopupChild.MouseLeave += PopupChild_MouseLeave;
-#else
-                    PopupChild.PointerEntered += PopupChild_MouseEnter;
-                    PopupChild.PointerExited += PopupChild_MouseLeave;
-#endif
                     PopupChild.SizeChanged += PopupChild_SizeChanged;
                 }
             }
@@ -429,11 +407,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source object.</param>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         private void OutsidePopup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-#else
-        private void OutsidePopup_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
-#endif
         {
             if (Popup != null)
             {
@@ -503,11 +477,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source object.</param>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         private void PopupChild_MouseEnter(object sender, MouseEventArgs e)
-#else
-        private void PopupChild_MouseEnter(object sender, PointerRoutedEventArgs e)
-#endif
         {
             OnUpdateVisualStates(EventArgs.Empty);
         }
@@ -517,11 +487,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source object.</param>
         /// <param name="e">The event data.</param>
-#if MIGRATION
         private void PopupChild_MouseLeave(object sender, MouseEventArgs e)
-#else
-        private void PopupChild_MouseLeave(object sender, PointerRoutedEventArgs e)
-#endif
         {
             OnUpdateVisualStates(EventArgs.Empty);
         }

@@ -11,21 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
-
-#if MIGRATION
 using System.Windows.Shapes;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a line drawn between two points, which can be part of a <see cref="PathFigure"/>

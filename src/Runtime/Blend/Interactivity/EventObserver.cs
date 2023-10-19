@@ -1,11 +1,11 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Reflection;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.Reflection;
-
     /// <summary>
     /// EventObserver is designed to help manage event handlers by detatching when disposed. Creating this object will also attach in the constructor.
     /// </summary>

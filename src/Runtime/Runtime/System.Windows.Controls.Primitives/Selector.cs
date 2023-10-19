@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Media;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents a control that allows a user to select an item from a collection
@@ -407,11 +396,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Builds the visual tree for the <see cref="Selector"/> control
         /// when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             ConnectToScrollHost();

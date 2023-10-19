@@ -3,29 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-
-#if MIGRATION
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Markup;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Markup;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Text;
-
-#endif
-
 using System.ComponentModel;
-using System;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> column that hosts textual content in its cells.
@@ -35,7 +17,7 @@ namespace Windows.UI.Xaml.Controls
     [StyleTypedProperty(Property = "EditingElementStyle", StyleTargetType = typeof(TextBox))]
     public class DataGridTextColumn : DataGridBoundColumn
     {
-#region Constants
+        #region Constants
 
         private const string DATAGRIDTEXTCOLUMN_fontFamilyName = "FontFamily";
         private const string DATAGRIDTEXTCOLUMN_fontSizeName = "FontSize";
@@ -43,16 +25,16 @@ namespace Windows.UI.Xaml.Controls
         private const string DATAGRIDTEXTCOLUMN_fontWeightName = "FontWeight";
         private const string DATAGRIDTEXTCOLUMN_foregroundName = "Foreground";
 
-#endregion Constants
+        #endregion Constants
 
-#region Data
+        #region Data
 
         private double? _fontSize;
         private FontStyle? _fontStyle;
         private FontWeight? _fontWeight;
         private Brush _foreground;
 
-#endregion Data
+        #endregion Data
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGridTextColumn" /> class.
@@ -62,9 +44,9 @@ namespace Windows.UI.Xaml.Controls
             this.BindingTarget = TextBox.TextProperty;
         }
 
-#region DependencyProperties
+        #region DependencyProperties
 
-#region FontFamily
+        #region FontFamily
         /// <summary>
         /// Gets or sets the font name.
         /// </summary>
@@ -89,11 +71,11 @@ namespace Windows.UI.Xaml.Controls
             DataGridTextColumn textColumn = (DataGridTextColumn)d;
             textColumn.NotifyPropertyChanged(DATAGRIDTEXTCOLUMN_fontFamilyName);
         }
-#endregion FontFamily
+        #endregion FontFamily
 
-#endregion DependencyProperties
+        #endregion DependencyProperties
 
-#region Public Properties
+        #region Public Properties
 
         /// <summary>
         /// Gets or sets the font size.
@@ -123,11 +105,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-#if MIGRATION
                 return this._fontStyle ?? FontStyles.Normal;
-#else
-                return this._fontStyle ?? FontStyle.Normal;
-#endif
             }
             set
             {
@@ -177,13 +155,13 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Public Properties
+        #endregion Public Properties
 
-#region Internal Properties
+        #region Internal Properties
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
-#region Protected Methods
+        #region Protected Methods
 
         /// <summary>
         /// Causes the column cell being edited to revert to the specified value.
@@ -199,7 +177,7 @@ namespace Windows.UI.Xaml.Controls
                 textBox.Text = uneditedString ?? string.Empty;
             }
         }
-        
+
         /// <summary>
         /// Gets a <see cref="T:System.Windows.Controls.TextBox" /> control that is bound to the column's <see cref="P:System.Windows.Controls.DataGridBoundColumn.Binding" /> property value.
         /// </summary>
@@ -239,7 +217,7 @@ namespace Windows.UI.Xaml.Controls
             }
             return textBox;
         }
-        
+
         /// <summary>
         /// Gets a read-only <see cref="T:System.Windows.Controls.TextBlock" /> element that is bound to the column's <see cref="P:System.Windows.Controls.DataGridBoundColumn.Binding" /> property value.
         /// </summary>
@@ -284,7 +262,6 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="editingElement">The element that the column displays for a cell in editing mode.</param>
         /// <param name="editingEventArgs">Information about the user gesture that is causing a cell to enter editing mode.</param>
         /// <returns>The unedited value. </returns>
-#if MIGRATION
         protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
         {
             TextBox textBox = editingElement as TextBox;
@@ -307,30 +284,6 @@ namespace Windows.UI.Xaml.Controls
             }
             return string.Empty;
         }
-#else
-        protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
-        {
-            TextBox textBox = editingElement as TextBox;
-            if (textBox != null)
-            {
-                string uneditedText = textBox.Text;
-                int len = uneditedText.Length;
-                KeyRoutedEventArgs keyEventArgs = editingEventArgs as KeyRoutedEventArgs;
-                if (keyEventArgs != null && keyEventArgs.Key == System.VirtualKey.F2)
-                {
-                    // Put caret at the end of the text
-                    textBox.Select(len, len);
-                }
-                else
-                {
-                    // Select all text
-                    textBox.Select(0, len);
-                }
-                return uneditedText;
-            }
-            return string.Empty;
-        }
-#endif
 
         /// <summary>
         /// Called by the DataGrid control when this column asks for its elements to be
@@ -422,13 +375,13 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-#region Internal Methods
+        #region Internal Methods
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
-#region Private Methods
+        #region Private Methods
 
         private void SetTextFontSize(DependencyObject textElement, DependencyProperty fontSizeProperty)
         {
@@ -443,6 +396,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
     }
 }

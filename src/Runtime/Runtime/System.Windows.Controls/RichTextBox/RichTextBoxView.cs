@@ -11,33 +11,19 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Web;
 using System.Windows.Input;
 using System.Xml;
+using System.Windows.Documents;
+using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Media;
 
-#if MIGRATION
-using System.Windows.Documents;
-using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Text;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal sealed class RichTextBoxView : FrameworkElement
     {
@@ -189,19 +175,11 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 }
                 else if (prop == Control.FontStyleProperty)
                 {
-#if MIGRATION
                     return format.Italic ? FontStyles.Italic : FontStyles.Normal;
-#else
-                    return format.Italic ? FontStyle.Italic : FontStyle.Normal;
-#endif
                 }
                 else if (prop == Inline.TextDecorationsProperty)
                 {
-#if MIGRATION
                     return format.Underline ? TextDecorations.Underline : null;
-#else
-                    return format.Underline ? TextDecorations.Underline : TextDecorations.None;
-#endif
                 }
                 else if (prop == Control.FontFamilyProperty)
                 {
@@ -259,17 +237,12 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             {
                 if (value is FontStyle fontStyle)
                 {
-#if MIGRATION
                     bool isItalic = fontStyle == FontStyles.Italic;
-#else
-                    bool isItalic = fontStyle == FontStyle.Italic;
-#endif
                     OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'italic',$3)", flushQueue: false, _quill, start, length, isItalic);
                 }
             }
             else if (prop == Inline.TextDecorationsProperty)
             {
-#if MIGRATION
                 if (value is TextDecorationCollection textDecoration)
                 {
                     string format = "";
@@ -285,7 +258,6 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                     OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'underline',false)", flushQueue: false, _quill, start, length);
                     OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'strike',false)", flushQueue: false, _quill, start, length);
                 }
-#endif
             }
             else if (prop == Control.FontFamilyProperty)
             {

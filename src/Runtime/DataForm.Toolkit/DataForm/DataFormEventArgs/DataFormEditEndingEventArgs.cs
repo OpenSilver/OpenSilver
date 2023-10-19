@@ -9,11 +9,7 @@
 
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Event args for the EditEnding event.

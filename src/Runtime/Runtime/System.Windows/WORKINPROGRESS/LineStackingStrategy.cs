@@ -1,8 +1,4 @@
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
 	/// <summary>
 	/// Describes the mechanism by which a line box is determined for each line.

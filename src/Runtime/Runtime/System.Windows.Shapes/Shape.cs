@@ -11,26 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
 using OpenSilver.Internal;
 using System.Linq;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Windows.Media;
 using CSHTML5.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-using Windows.UI.Core;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Shapes
-#else
-namespace Windows.UI.Xaml.Shapes
-#endif
 {
     /// <summary>
     /// Provides a base class for shape elements, such as <see cref="Ellipse"/>,

@@ -11,31 +11,18 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using DotNetForHtml5.Core;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Documents;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Provides utility methods that can used to traverse object relationships (along

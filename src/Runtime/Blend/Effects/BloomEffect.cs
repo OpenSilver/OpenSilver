@@ -12,13 +12,7 @@
 \*====================================================================================*/
 
 using System.Windows.Media.Effects;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-#endif
 
 namespace Microsoft.Expression.Media.Effects
 {

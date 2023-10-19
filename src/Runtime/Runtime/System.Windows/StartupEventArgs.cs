@@ -14,11 +14,7 @@
 using System;
 using System.Collections.Generic;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Contains the event data for the <see cref="Application.Startup"/> event.

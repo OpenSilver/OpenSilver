@@ -11,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Text;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     // for details on how the animations are supposed to behave depending on RepeatBehavior, see:
     // https://msdn.microsoft.com/en-us/library/system.windows.media.animation.timeline.repeatbehavior(v=vs.100).aspx

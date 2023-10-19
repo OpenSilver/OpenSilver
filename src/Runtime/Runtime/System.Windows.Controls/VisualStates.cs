@@ -12,21 +12,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Names and helpers for visual states in the controls.
@@ -52,11 +42,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// MouseOver state of the Common state group.
         /// </summary>
-#if MIGRATION
         public const string StateMouseOver = "MouseOver"; 
-#else
-        public const string StateMouseOver = "PointerOver";
-#endif
 
         /// <summary>
         /// Pressed state of the Common state group.

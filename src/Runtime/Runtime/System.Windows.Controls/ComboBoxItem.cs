@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,49 +11,27 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents the container for an item in a ListBox control.
     /// </summary>
-    public partial class ComboBoxItem : ListBoxItem
+    public class ComboBoxItem : ListBoxItem
     {
         public ComboBoxItem()
         {
             this.DefaultStyleKey = typeof(ComboBoxItem);
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             e.Handled = true;
 
             base.OnMouseLeftButtonDown(e);
         }
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-        {
-            e.Handled = true;
 
-            base.OnPointerPressed(e);
-        }
-#endif
-
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -68,28 +45,7 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnMouseLeftButtonUp(e);
         }
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-        {
-            e.Handled = true;
 
-            ComboBox parent = ParentComboBox;
-
-            if (parent != null)
-            {
-                parent.NotifyComboBoxItemMouseUp(this);
-            }
-
-            base.OnPointerReleased(e);
-        }
-#endif
-
-        internal ComboBox ParentComboBox
-        {
-            get 
-            { 
-                return ParentSelector as ComboBox; 
-            }
-        }
+        internal ComboBox ParentComboBox => ParentSelector as ComboBox;
     }
 }

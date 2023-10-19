@@ -11,20 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Globalization;
 using System.Text;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI
-#endif
 {
     /// <summary>
     /// Describes a color in terms of alpha, red, green, and blue channels.

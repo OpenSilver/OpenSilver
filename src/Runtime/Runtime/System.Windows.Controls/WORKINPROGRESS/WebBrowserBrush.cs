@@ -11,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows.Media;
+
 namespace System.Windows.Controls
-#else
-using Windows.UI.Xaml.Media;
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides a brush that renders the currently hosted HTML.

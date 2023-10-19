@@ -3,21 +3,16 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Common TypeConverter functionality.
     /// </summary>
-    internal static partial class TypeConverters
+    internal static class TypeConverters
     {
         /// <summary>
         /// Returns a value indicating whether this converter can convert an

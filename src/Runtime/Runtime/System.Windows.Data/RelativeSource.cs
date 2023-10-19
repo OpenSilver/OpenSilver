@@ -11,20 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Markup;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// Implements a markup extension that describes the location of the binding source relative to the position of the binding target.
     /// </summary>
-    [ContentProperty("Mode")]
-    public partial class RelativeSource : MarkupExtension
+    [ContentProperty(nameof(Mode))]
+    public class RelativeSource : MarkupExtension
     {
         /// <summary>
         /// Initializes a new instance of the RelativeSource class by using default relative source mode.

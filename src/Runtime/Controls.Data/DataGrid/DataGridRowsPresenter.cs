@@ -4,24 +4,10 @@
 // All other rights reserved.
 
 using System.Diagnostics;
-using System;
-
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
 
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Used within the template of a <see cref="T:System.Windows.Controls.DataGrid" /> to specify the 
@@ -30,7 +16,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <QualityBand>Mature</QualityBand>
     public sealed class DataGridRowsPresenter : Panel
     {
-#region Properties
+        #region Properties
 
         internal DataGrid OwningGrid
         {
@@ -38,9 +24,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             set;
         }
 
-#endregion
+        #endregion
 
-#region Methods
+        #region Methods
 
         /// <summary>
         /// Arranges the content of the <see cref="T:System.Windows.Controls.Primitives.DataGridRowsPresenter" />.
@@ -175,8 +161,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return new DataGridRowsPresenterAutomationPeer(this);
         }
 
-#endregion Methods
-         
+        #endregion Methods
+
 #if DEBUG
         internal void PrintChildren()
         {

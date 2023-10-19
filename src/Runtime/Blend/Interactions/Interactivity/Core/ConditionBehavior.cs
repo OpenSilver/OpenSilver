@@ -1,17 +1,13 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Windows.Interactivity;
+using System.Windows.Markup;
+using System.Windows;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System.Windows.Interactivity;
-    using System.Windows.Markup;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// A behavior that attaches to a trigger and controls the conditions
     /// to fire the actions. 

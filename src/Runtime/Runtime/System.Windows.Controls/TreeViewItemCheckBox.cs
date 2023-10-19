@@ -3,13 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a CheckBox whose value is associated with the
@@ -28,7 +22,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(Name = "Unchecked", GroupName = "CheckStates")]
     [TemplateVisualState(Name = "Indeterminate", GroupName = "CheckStates")]
     [TemplateVisualState(Name = "Checked", GroupName = "CheckStates")]
-    public sealed partial class TreeViewItemCheckBox : CheckBox
+    public sealed class TreeViewItemCheckBox : CheckBox
     {
         /// <summary>
         /// The parent TreeViewItem of the CheckBox.

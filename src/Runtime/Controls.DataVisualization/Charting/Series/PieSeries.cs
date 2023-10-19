@@ -7,18 +7,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System;
-
-#if MIGRATION
 using System.Windows.Data;
 using System.Windows.Media;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Data;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that contains a data series to be rendered in pie
@@ -93,18 +85,13 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         public PieSeries()
         {
-#if !MIGRATION
-            this.DefaultStyleKey = typeof(PieSeries);
-#endif
             this.ResourceDictionaryDispenser = new ResourceDictionaryDispenser();
             ResourceDictionaryDispenser.ResourceDictionariesChanged += delegate
             {
                 OnResourceDictionariesChanged(EventArgs.Empty);
             };
 
-#if MIGRATION
             this.DefaultStyleKey = typeof(PieSeries);
-#endif
         }
 
         /// <summary>

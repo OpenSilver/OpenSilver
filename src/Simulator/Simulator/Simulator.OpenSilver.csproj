@@ -11,9 +11,6 @@
     <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
     <AssemblyName>OpenSilver.Simulator</AssemblyName>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
-    <AssemblyName>OpenSilver.Simulator</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>

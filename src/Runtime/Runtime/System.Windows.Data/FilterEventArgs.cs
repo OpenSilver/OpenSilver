@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// Arguments for the Filter event.
@@ -29,7 +20,7 @@ namespace Windows.UI.Xaml.Data
     /// <p>The event receiver should set Accepted to true if the item
     /// passes the filter, or false if it fails.</p>
     /// </remarks>
-    public partial class FilterEventArgs : EventArgs
+    public class FilterEventArgs : EventArgs
     {
         public FilterEventArgs(object item)
         {

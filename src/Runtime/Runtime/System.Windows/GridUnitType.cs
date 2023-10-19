@@ -15,11 +15,7 @@
 
 using System;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Describes the kind of value that a Windows.UI.Xaml.GridLength

@@ -4,21 +4,9 @@
 // All other rights reserved.
 
 using System.Diagnostics;
-using System;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
-
 {
     /// <summary>
     /// Used within the template of a <see cref="T:System.Windows.Controls.DataGrid" />
@@ -95,7 +83,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 DataGridCell cell = this.OwningRow.Cells[column.Index];
                 Debug.Assert(cell.OwningColumn == column);
                 Debug.Assert(column.IsVisible);
-                
+
                 if (column.IsFrozen)
                 {
                     cellLeftEdge = frozenLeftEdge;

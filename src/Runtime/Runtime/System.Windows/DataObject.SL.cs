@@ -14,11 +14,7 @@
 using System;
 using System.Security;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides a basic implementation of the <see cref="IDataObject"/> interface,

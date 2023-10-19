@@ -3,34 +3,17 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Shapes;
-using Windows.Foundation;
-#endif
+using OpenSilver.Internal;
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a <see cref="T:System.Windows.Controls.DataGrid" /> row.
@@ -220,15 +203,9 @@ namespace Windows.UI.Xaml.Controls
             this.Cells.CellAdded += new EventHandler<DataGridCellEventArgs>(DataGridCellCollection_CellAdded);
             this.Cells.CellRemoved += new EventHandler<DataGridCellEventArgs>(DataGridCellCollection_CellRemoved);
 
-#if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRow_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridRow_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridRow_MouseLeave);
-#else
-            this.AddHandler(FrameworkElement.PointerReleasedEvent, new PointerEventHandler(DataGridRow_MouseLeftButtonDown), true);
-            this.PointerEntered += new PointerEventHandler(DataGridRow_MouseEnter);
-            this.PointerReleased += new PointerEventHandler(DataGridRow_MouseLeave);
-#endif
 
             DefaultStyleKey = typeof(DataGridRow);
         }
@@ -900,14 +877,8 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Builds the visual tree for the column header when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
         {
-#else
-        protected override void OnApplyTemplate()
-        {
-#endif
-
             this.RootElement = GetTemplateChild(DATAGRIDROW_elementRoot) as Panel;
             // 
             if (this.RootElement != null)
@@ -1366,35 +1337,19 @@ namespace Windows.UI.Xaml.Controls
                 this._cellsElement.Children.Remove(e.Cell);
             }
         }
-#if MIGRATION
-
+        
         private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
         {
-#else
-        private void DataGridRow_MouseEnter(object sender, PointerRoutedEventArgs e)
-        {
-#endif
             this.IsMouseOver = true;
         }
 
-#if MIGRATION
         private void DataGridRow_MouseLeave(object sender, MouseEventArgs e)
         {
-#else
-        private void DataGridRow_MouseLeave(object sender, PointerRoutedEventArgs e)
-        {
-#endif
             this.IsMouseOver = false;
         }
 
-#if MIGRATION
-
         private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-#else
-        private void DataGridRow_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
-        {
-#endif
             if (this.OwningGrid != null)
             {
                 this.OwningGrid.IsDoubleClickRecordsClickOnCall(this);

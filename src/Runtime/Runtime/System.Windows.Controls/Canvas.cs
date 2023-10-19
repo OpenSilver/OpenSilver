@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,24 +11,12 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using OpenSilver.Internal;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines an area within which you can explicitly position child objects, using

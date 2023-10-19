@@ -3,13 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
-#endif
 {
     /// <summary>
     /// Subclasses ListBox to provide an easy way for a consumer of

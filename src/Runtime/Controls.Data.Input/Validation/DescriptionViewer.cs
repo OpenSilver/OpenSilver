@@ -7,37 +7,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Automation.Peers;
 using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
-#else
-using Windows.UI.Xaml.Controls.Common;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
-#endif
-
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
-#if OPENSILVER
-#if MIGRATION
-using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-#endif
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays a description and tracks error state for a control.
@@ -387,11 +366,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// When the template is applied, this loads all the template parts
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

@@ -13,11 +13,7 @@
 
 using System;
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Contains values that specify whether a text provider supports selection and, if so, 

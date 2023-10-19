@@ -3,19 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
-using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Input;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Base class for all controls that provide value manipulation with a 
@@ -41,7 +29,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = UpDownBase.ElementTextName, Type = typeof(TextBox))]
     [TemplatePart(Name = UpDownBase.ElementSpinnerName, Type = typeof(Spinner))]
     [StyleTypedProperty(Property = UpDownBase.SpinnerStyleName, StyleTargetType = typeof(Spinner))]
-    public abstract partial class UpDownBase : Control
+    public abstract class UpDownBase : Control
     {
         #region Template Parts Name Constants
         /// <summary>

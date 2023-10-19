@@ -11,26 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Input;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Input;
-#else
-using MouseEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public partial class Control : FrameworkElement
     {
@@ -147,24 +134,14 @@ namespace Windows.UI.Xaml.Controls
 
                     if (hasMouseOverState)
                     {
-#if MIGRATION
                         _owner.MouseEnter += new MouseEventHandler(OnMouseEnter);
                         _owner.MouseLeave += new MouseEventHandler(OnMouseLeave);
-#else
-                        _owner.PointerEntered += new MouseEventHandler(OnMouseEnter);
-                        _owner.PointerExited += new MouseEventHandler(OnMouseLeave);
-#endif
                     }
 
                     if (hasPressedState)
                     {
-#if MIGRATION
                         _owner.MouseLeftButtonDown += new MouseButtonEventHandler(OnMouseLeftButtonDown);
                         _owner.MouseLeftButtonUp += new MouseButtonEventHandler(OnMouseLeftButtonUp);
-#else
-                        _owner.PointerPressed += new MouseButtonEventHandler(OnMouseLeftButtonDown);
-                        _owner.PointerReleased += new MouseButtonEventHandler(OnMouseLeftButtonUp);
-#endif
                     }
 
                     if (hasFocusedState)
@@ -250,17 +227,10 @@ namespace Windows.UI.Xaml.Controls
 
             public void Dispose()
             {
-#if MIGRATION
                 _owner.MouseEnter -= new MouseEventHandler(OnMouseEnter);
                 _owner.MouseLeave -= new MouseEventHandler(OnMouseLeave);
                 _owner.MouseLeftButtonDown -= new MouseButtonEventHandler(OnMouseLeftButtonDown);
                 _owner.MouseLeftButtonUp -= new MouseButtonEventHandler(OnMouseLeftButtonUp);
-#else
-                _owner.PointerEntered -= new MouseEventHandler(OnMouseEnter);
-                _owner.PointerExited -= new MouseEventHandler(OnMouseLeave);
-                _owner.PointerPressed -= new MouseButtonEventHandler(OnMouseLeftButtonDown);
-                _owner.PointerReleased -= new MouseButtonEventHandler(OnMouseLeftButtonUp);
-#endif
                 _owner.IsEnabledChanged -= new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
                 _owner.GotFocus -= new RoutedEventHandler(OnGotFocus);
                 _owner.LostFocus -= new RoutedEventHandler(OnLostFocus);

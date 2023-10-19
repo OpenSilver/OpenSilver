@@ -15,19 +15,12 @@ using System;
 using System.ComponentModel;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Contains state information and event data associated with a routed event.
     /// </summary>
-    public class RoutedEventArgs
-#if MIGRATION
-        : EventArgs
-#endif
+    public class RoutedEventArgs : EventArgs
     {
         private object _originalSource;
 

@@ -1,8 +1,4 @@
-﻿#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
+﻿using System.Windows.Controls;
 
 namespace Experimental
 {

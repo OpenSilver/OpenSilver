@@ -3,25 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved. 
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary> 
     /// Represents a control that can be dragged by the user.
@@ -124,11 +111,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Builds the visual tree for the <see cref="Thumb"/> control when 
         /// a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             UpdateVisualState(false);
@@ -147,17 +130,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
             if (e.Handled)
             {
                 return;
@@ -167,20 +142,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 e.Handled = true;
 
-#if MIGRATION
                 CaptureMouse();
-#else
-                CapturePointer();
-#endif
                 IsDragging = true;
 
                 Debug.Assert(Parent is UIElement);
 
-#if MIGRATION
                 _origin = _previousPosition = e.GetPosition((UIElement)Parent);
-#else
-                _origin = _previousPosition = e.GetCurrentPoint((UIElement)Parent).Position;
-#endif
 
                 // Raise the DragStarted event 
                 bool success = false;
@@ -200,57 +167,29 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
 
             if (Pointer.INTERNAL_captured == this)
             {
-#if MIGRATION
                 ReleaseMouseCapture();
-#else
-                ReleasePointerCapture();
-#endif
             }
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnLostMouseCapture(MouseEventArgs e)
-#else
-        protected override void OnPointerCaptureLost(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnLostMouseCapture(e);
-#else
-            base.OnPointerCaptureLost(e);
-#endif
 
             RaiseDragCompleted(false);
             IsDragging = false;
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
 
             if (IsEnabled)
             {
@@ -260,17 +199,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
 
             if (IsEnabled)
             {
@@ -280,27 +211,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <inheritdoc />
-#if MIGRATION
         protected override void OnMouseMove(MouseEventArgs e)
-#else
-        protected override void OnPointerMoved(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseMove(e);
-#else
-            base.OnPointerMoved(e);
-#endif
 
             if (IsDragging)
             {
                 Debug.Assert(Parent is UIElement);
 
-#if MIGRATION
                 Point position = e.GetPosition((UIElement)Parent);
-#else
-                Point position = e.GetCurrentPoint((UIElement)Parent).Position;
-#endif
 
                 if (position != _previousPosition)
                 {

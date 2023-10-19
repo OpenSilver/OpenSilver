@@ -3,19 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-using System;
-
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-/// <summary>
-/// Provides information just after a cell has exited editing mode.
-/// </summary>
-/// <QualityBand>Preview</QualityBand>
-public class DataGridCellEditEndedEventArgs : EventArgs
+    /// <summary>
+    /// Provides information just after a cell has exited editing mode.
+    /// </summary>
+    /// <QualityBand>Preview</QualityBand>
+    public class DataGridCellEditEndedEventArgs : EventArgs
     {
         /// <summary>
         /// Instantiates a new instance of this class.

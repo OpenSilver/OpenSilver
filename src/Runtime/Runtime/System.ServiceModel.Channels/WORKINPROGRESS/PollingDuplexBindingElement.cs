@@ -1,6 +1,4 @@
-﻿#if MIGRATION
-
-namespace System.ServiceModel.Channels
+﻿namespace System.ServiceModel.Channels
 {
 	[OpenSilver.NotImplemented]
     public class PollingDuplexBindingElement :
@@ -43,7 +41,3 @@ namespace System.ServiceModel.Channels
         }
     }
 }
-
-#endif
-
-

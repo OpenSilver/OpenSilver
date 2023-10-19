@@ -1,4 +1,3 @@
-#if MIGRATION
 using System.Collections.ObjectModel;
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
@@ -475,4 +474,3 @@ namespace System.Windows.Controls
 		}
 	}
 }
-#endif

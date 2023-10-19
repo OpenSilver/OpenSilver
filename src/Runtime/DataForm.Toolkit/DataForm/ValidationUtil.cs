@@ -11,24 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Utility class that contains static methods for DataForm validation purposes.
@@ -50,11 +38,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             copy.Converter = source.Converter;
-#if MIGRATION
             copy.ConverterCulture = source.ConverterCulture;
-#else
-            copy.ConverterLanguage = source.ConverterLanguage;
-#endif
             copy.ConverterParameter = source.ConverterParameter;
             copy.FallbackValue = source.FallbackValue;
             copy.Mode = source.Mode;

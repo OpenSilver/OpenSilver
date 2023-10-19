@@ -28,10 +28,6 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 
-#if !MIGRATION
-using Windows.UI.Xaml.Markup;
-#endif
-
 namespace System.Xaml
 {
     internal class XamlObjectWriterSettings : XamlWriterSettings

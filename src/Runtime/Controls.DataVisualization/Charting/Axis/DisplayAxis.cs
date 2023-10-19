@@ -3,24 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Windows;
-
-#if MIGRATION
 using System.Windows.Media;
-using System.Windows.Controls;
 using System.Windows.Shapes;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Shapes;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// An axis that has a range.
@@ -519,11 +507,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         {
             this.OrientedPanel = new OrientedPanel();
             this.OrientedPanel.UseLayoutRounding = true;
-
-#if !MIGRATION
-            this.DefaultStyleKey = typeof(DisplayAxis);
-#endif
-
             this.DependentAxisGrid = new Grid();
             this.TitleLayoutTransformControl = new LayoutTransformControl();
             this.TitleLayoutTransformControl.HorizontalAlignment = HorizontalAlignment.Center;
@@ -531,9 +514,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 
             this.SizeChanged += new SizeChangedEventHandler(DisplayAxisSizeChanged);
 
-#if MIGRATION
             this.DefaultStyleKey = typeof(DisplayAxis);
-#endif
         }
 
         /// <summary>
@@ -583,11 +564,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Retrieves template parts and configures layout.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

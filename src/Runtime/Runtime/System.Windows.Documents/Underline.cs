@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     /// <summary>
     /// Provides an inline-level content element that causes content to render with a bold font weight.
@@ -27,11 +23,7 @@ namespace Windows.UI.Xaml.Documents
         /// </summary>
         public Underline()
         {
-#if MIGRATION
             TextDecorations = Windows.TextDecorations.Underline;
-#else
-            TextDecorations = Windows.UI.Text.TextDecorations.Underline;
-#endif
         }
     }
 }

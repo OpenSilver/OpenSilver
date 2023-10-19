@@ -11,22 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Browser;
 using System.Windows.Input;
+using System.Windows.Media;
 using CSHTML5.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
     /// <summary>
     /// Provides an inline-level content element that provides facilities for hosting hyperlinks.
@@ -42,11 +32,7 @@ namespace Windows.UI.Xaml.Documents
         {
             Foreground = new SolidColorBrush(Color.FromArgb(255, 51, 124, 187));
             Cursor = Cursors.Hand;
-#if MIGRATION
             TextDecorations = Windows.TextDecorations.Underline;
-#else
-            TextDecorations = Text.TextDecorations.Underline;
-#endif
         }
 
         /// <summary>
@@ -142,7 +128,6 @@ namespace Windows.UI.Xaml.Documents
             set => SetValue(MouseOverForegroundProperty, value);
         }
 
-#if MIGRATION
         /// <summary>
         /// Identifies the <see cref="MouseOverTextDecorations"/> dependency property.
         /// </summary>
@@ -176,47 +161,6 @@ namespace Windows.UI.Xaml.Documents
             get => (TextDecorationCollection)GetValue(MouseOverTextDecorationsProperty);
             set => SetValue(MouseOverTextDecorationsProperty, value);
         }
-#else
-        /// <summary>
-        /// Identifies the <see cref="MouseOverTextDecorations"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MouseOverTextDecorationsProperty =
-            DependencyProperty.Register(
-                nameof(MouseOverTextDecorations),
-                typeof(Text.TextDecorations?),
-                typeof(Hyperlink),
-                new PropertyMetadata(Text.TextDecorations.Underline)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        const string MouseOverTextDecorationsVariable = "--mouse-over-decoration";
-
-                        Hyperlink hyperlink = (Hyperlink)d;
-                        string value = (Text.TextDecorations?)newValue switch
-                        {
-                            Text.TextDecorations.OverLine => "overline",
-                            Text.TextDecorations.Strikethrough => "line-through",
-                            Text.TextDecorations.Underline => "underline",
-                            _ => string.Empty,
-                        };
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(hyperlink.INTERNAL_OuterDomElement).setProperty(
-                            MouseOverTextDecorationsVariable,
-                            value);
-                    },
-                });
-
-        /// <summary>
-        /// Gets or sets the <see cref="Text.TextDecorations"/> that decorates the <see cref="Hyperlink"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="Text.TextDecorations"/> that decorates the <see cref="Hyperlink"/>.
-        /// </returns>
-        public Text.TextDecorations? MouseOverTextDecorations
-        {
-            get => (Text.TextDecorations?)GetValue(MouseOverTextDecorationsProperty);
-            set => SetValue(MouseOverTextDecorationsProperty, value);
-        }
-#endif
 
         /// <summary>
         /// Identifies the <see cref="NavigateUri"/> dependency property.

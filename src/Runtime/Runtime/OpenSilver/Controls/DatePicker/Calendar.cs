@@ -12,16 +12,8 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
 
 namespace OpenSilver.Controls
 {

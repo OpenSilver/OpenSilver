@@ -1,8 +1,4 @@
-﻿#if MIGRATION
-namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
+﻿namespace System.Windows.Media.Animation
 {
     /// <summary>
     /// Animates from the <see cref="Point"/> value of the previous key frame to its

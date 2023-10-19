@@ -11,30 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using MouseButtonEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a service that provides static methods to display a tooltip.
@@ -283,11 +265,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         // This method should be executed on the UI thread 
-#if MIGRATION
         private static void CloseAutomaticToolTip(object sender, EventArgs e)
-#else
-        private static void CloseAutomaticToolTip(object sender, object e)
-#endif
         {
             _closeTimer.Stop();
 
@@ -315,11 +293,7 @@ namespace Windows.UI.Xaml.Controls
 
         private static void OnOwnerMouseEnter(object sender, MouseEventArgs e)
         {
-#if MIGRATION
             PopupService.MousePosition = e.GetPosition(null);
-#else
-            PopupService.MousePosition = e.GetCurrentPoint(null).Position;
-#endif
 
             OnOwnerMouseEnterInternal(sender, e.OriginalSource);
         }
@@ -328,11 +302,7 @@ namespace Windows.UI.Xaml.Controls
         {
             switch (key)
             {
-#if MIGRATION
                 case Key.Alt:
-#else
-                case Key.Menu:
-#endif
                 case Key.Back:
                 case Key.Delete:
                 case Key.Down:
@@ -385,11 +355,7 @@ namespace Windows.UI.Xaml.Controls
             CloseAutomaticToolTip(null, EventArgs.Empty);
         }
 
-#if MIGRATION
         private static void OpenAutomaticToolTip(object sender, EventArgs e)
-#else
-        private static void OpenAutomaticToolTip(object sender, object e)
-#endif
         {
             _openTimer.Stop();
 
@@ -411,13 +377,8 @@ namespace Windows.UI.Xaml.Controls
             Debug.Assert(owner != null, "ToolTip must have an owner");
             Debug.Assert(toolTip != null, "ToolTip can not be null");
 
-#if MIGRATION
             owner.MouseEnter += new MouseEventHandler(OnOwnerMouseEnter);
             owner.MouseLeave += new MouseEventHandler(OnOwnerMouseLeave);
-#else
-            owner.PointerEntered += new MouseEventHandler(OnOwnerMouseEnter);
-            owner.PointerExited += new MouseEventHandler(OnOwnerMouseLeave);
-#endif
             var converted = ConvertToToolTip(toolTip);
             owner.SetValue(ToolTipInternalProperty, converted);
             converted.SetOwner(owner);
@@ -432,13 +393,8 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-#if MIGRATION
             owner.MouseEnter -= new MouseEventHandler(OnOwnerMouseEnter);
             owner.MouseLeave -= new MouseEventHandler(OnOwnerMouseLeave);
-#else
-            owner.PointerEntered -= new MouseEventHandler(OnOwnerMouseEnter);
-            owner.PointerExited -= new MouseEventHandler(OnOwnerMouseLeave);
-#endif
 
             ToolTip toolTip = (ToolTip)owner.GetValue(ToolTipInternalProperty);
             toolTip.SetOwner(null);

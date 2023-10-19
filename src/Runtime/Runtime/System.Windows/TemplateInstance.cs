@@ -14,11 +14,7 @@
 using System;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Defines a generated instance of a FrameworkTemplate.

@@ -14,19 +14,10 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Markup;
+using System.Windows.Media.Animation;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Media.Animation;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Represents a trigger that applies a set of actions (animation storyboards) in

@@ -3,27 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that lets the user select from a range of values by moving
@@ -59,11 +44,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the <see cref="Slider"/> control when a
         /// new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -307,17 +288,9 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">
         /// A <see cref="MouseEventArgs"/> that contains the event data.
         /// </param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(MouseEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
             IsMouseOver = true;
             if ((Orientation == Orientation.Horizontal && ElementHorizontalThumb != null && !ElementHorizontalThumb.IsDragging) ||
                 (Orientation == Orientation.Vertical && ElementVerticalThumb != null && !ElementVerticalThumb.IsDragging))
@@ -332,17 +305,9 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">
         /// A <see cref="MouseEventArgs"/> that contains the event data.
         /// </param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(MouseEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
             IsMouseOver = false;
             if ((Orientation == Orientation.Horizontal && ElementHorizontalThumb != null && !ElementHorizontalThumb.IsDragging) ||
                 (Orientation == Orientation.Vertical && ElementVerticalThumb != null && !ElementVerticalThumb.IsDragging))
@@ -354,55 +319,31 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Provides class handling for the <see cref="UIElement.MouseLeftButtonDown"/> event.
         /// </summary>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(MouseButtonEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
             if (e.Handled)
             {
                 return;
             }
             e.Handled = true;
             Focus();
-#if MIGRATION
             CaptureMouse();
-#else
-            CapturePointer(e.Pointer);
-#endif
         }
 
         /// <summary>
         /// Responds to the MouseLeftButtonUp event. 
         /// </summary>
         /// <param name="e">The event data for the MouseLeftButtonUp event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(MouseButtonEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
             if (e.Handled)
             {
                 return;
             }
             e.Handled = true;
-#if MIGRATION
             ReleaseMouseCapture();
-#else
-            ReleasePointerCapture(e.Pointer);
-#endif
             UpdateVisualState();
         }
 

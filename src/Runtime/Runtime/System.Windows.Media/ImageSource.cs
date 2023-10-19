@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Provides an object source type for Source and ImageSource.

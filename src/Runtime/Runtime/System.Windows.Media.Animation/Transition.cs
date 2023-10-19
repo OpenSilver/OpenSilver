@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Represents a visual behavior that occurs when a control is affected by a
@@ -31,7 +19,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// using the Transitions property, or applied to the children of a Panel using
     /// the ChildrenTransitions property.
     /// </summary>
-    public partial class Transition : DependencyObject
+    public class Transition : DependencyObject
     {
     }
 }

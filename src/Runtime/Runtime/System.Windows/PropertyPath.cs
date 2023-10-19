@@ -19,11 +19,7 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Implements a data structure for describing a property as a path below another

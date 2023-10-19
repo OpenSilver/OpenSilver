@@ -55,17 +55,17 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         }
 
         private SystemTypesHelper _systemTypesHelper;
-        public MonoCecilAssembliesInspectorImpl(bool isSlMigration, SupportedLanguage compilerType)
+        public MonoCecilAssembliesInspectorImpl(SupportedLanguage compilerType)
         {
             CompilerType = compilerType;
             if (CompilerType == SupportedLanguage.CSharp)
             {
-                _metadata = isSlMigration ? MetadatasCS.Silverlight : MetadatasCS.UWP;
+                _metadata = MetadatasCS.Silverlight;
                 _systemTypesHelper = new SystemTypesHelperCS();
             }
             else if (CompilerType == SupportedLanguage.VBNet)
             {
-                _metadata = isSlMigration ? MetadatasVB.Silverlight : MetadatasVB.UWP;
+                _metadata = MetadatasVB.Silverlight;
                 _systemTypesHelper = new SystemTypesHelperVB();
             }
             else

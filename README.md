@@ -40,25 +40,11 @@ Due to continous updates, this restored version can sometimes have outdated Open
 
 8. **Use the newly built packages:** The previous command will create new NuGet packages inside the "build/output/OpenSilver" folder. You can now reference those packages from any OpenSilver application project ([here is how](https://stackoverflow.com/a/55167481/17088417)) (Note: you may need to check the options "Include prerelease" in the "Manage NuGet Packages" window in order to see the newly created NuGet packages). For example, to use them on a new "Hello World" OpenSilver application, make sure you have the VSIX installed (see the top of this document), then launch Visual Studio, click "Create a new project" -> "OpenSilver application", and replace the default NuGet package references with the new packages that you have built.
   
-For convenience, instead of re-building the whole packages every time that you make a change to the OpenSilver code, you can build only the OpenSilver Runtime DLL, To do so, open the solution file "OpenSilver.sln" and choose the appropriate "Solution Configuration" (see list of configurations below).
+For convenience, instead of re-building the whole packages every time that you make a change to the OpenSilver code, you can build only the OpenSilver Runtime DLL.
   
 To reduce the development inner loop time, you can also add a "Post Build" action to the OpenSilver Runtime project that will automatically copy the Runtime DLL from the "bin" folder into the OpenSilver NuGet package folder at "C:\Users\YOUR_USER_NAME\.nuget\packages\opensilver\ENTER_LATEST_VERSION_HERE\lib\netstandard2.0\"
 
 Note: while rarely needed, there is also a .BAT file for building the Simulator package.
-
-# What are those solution configurations?
-
-### &nbsp;&nbsp;&nbsp;&nbsp;OpenSilver configurations:
-
-- **SL**: Uses the Silverlight-like dialect of XAML.
-- **UWP**: Uses the UWP-like dialect of XAML.
-
-### &nbsp;&nbsp;&nbsp;&nbsp;CSHTML5 configurations:
-
-- **Debug**: Uses the UWP-like dialect of XAML.
-- **Migration**: Uses the Silverlight-like dialect of XAML.
-
-Note: the legacy **"WorkInProgress"** configurations have been removed as the unimplemented members have been merged into the current configurations.
 
 # What if I get a compilation error with the code in this repository?
 

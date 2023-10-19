@@ -1,26 +1,6 @@
-﻿using System.Collections.Generic;
-using CSHTML5.Internal;
+﻿using System.Windows.Media;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
-
-#if OPENSILVER
-#if MIGRATION
-using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-#endif
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     public abstract partial class UIElement
     {

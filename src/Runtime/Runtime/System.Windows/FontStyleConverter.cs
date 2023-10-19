@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 using System.ComponentModel;
 using System.Globalization;
 
@@ -101,5 +99,3 @@ namespace System.Windows
         }
     }
 }
-
-#endif

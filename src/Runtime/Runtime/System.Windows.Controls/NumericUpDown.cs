@@ -3,25 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
 using System.Globalization;
-
-#if OPENSILVER
-#if MIGRATION
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Automation;
-using Windows.UI.Xaml.Automation.Peers;
-#endif
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that enables single value selection from a numeric
@@ -428,11 +415,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the NumericUpDown control when a new
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 

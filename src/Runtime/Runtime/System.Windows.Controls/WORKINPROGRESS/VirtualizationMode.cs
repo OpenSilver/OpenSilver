@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,21 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-    // Summary:
-    //     Specifies the method the System.Windows.Controls.VirtualizingStackPanel uses
-    //     to manage virtualizing its child items.
+    /// <summary>
+    /// Specifies the method the <see cref="VirtualizingStackPanel"/> uses
+    /// to manage virtualizing its child items.
+    /// </summary>
     public enum VirtualizationMode
     {
-        // Summary:                                                                           
-        //     Create and discard the item containers.
+        /// <summary>
+        /// Create and discard the item containers.
+        /// </summary>
         Standard = 0,
-        //
-        // Summary:
-        //     Reuse the item containers.
+        /// <summary>
+        /// Reuse the item containers.
+        /// </summary>
         Recycling = 1,
     }
 }

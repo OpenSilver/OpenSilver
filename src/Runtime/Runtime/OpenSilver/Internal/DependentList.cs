@@ -14,13 +14,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using OpenSilver.Internal.Data;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
+using OpenSilver.Internal.Data;
 
 namespace OpenSilver.Internal;
 

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,36 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-//TODOBRIDGE: usefull using?
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Browser;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a button control that displays a hyperlink.
@@ -57,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
     /// MyStackPanel.Children.Add(hyperlinkButton);
     /// </code>
     /// </example>
-    public partial class HyperlinkButton : ButtonBase
+    public class HyperlinkButton : ButtonBase
     {
         private static readonly HashSet<string> ExternalTargets = new HashSet<string>
         {
@@ -115,11 +91,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (string.IsNullOrEmpty(target))
             {
-#if MIGRATION
                 target = "_self";
-#else
-                target = "_blank";
-#endif
             }
 
             HtmlPage.Window.Navigate(navigateUri, target);

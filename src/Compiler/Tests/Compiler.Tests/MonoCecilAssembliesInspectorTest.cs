@@ -18,14 +18,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Experimental;
 using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 using OpenSilver.Compiler;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
 
 namespace Compiler.Tests
 {
@@ -38,14 +32,7 @@ namespace Compiler.Tests
         private const string ExperimentalNamespace = "Experimental";
         private const string Content = "Content";
 
-        private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(
-#if MIGRATION
-            true
-#else
-            false
-#endif
-            , SupportedLanguage.CSharp
-        );
+        private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(SupportedLanguage.CSharp);
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext _)

@@ -1,11 +1,4 @@
-using System;
-using System.Windows;
-
-#if MIGRATION
 namespace System.Windows.Input
-#else
-namespace Windows.UI.Xaml.Input
-#endif
 {
     [OpenSilver.NotImplemented]
 	public sealed partial class TouchFrameEventArgs : EventArgs

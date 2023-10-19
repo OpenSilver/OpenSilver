@@ -1,21 +1,15 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Windows.Interactivity;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+
 namespace Microsoft.Expression.Interactivity.Media
 {
-    using System;
-    using System.Windows.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Controls.Primitives;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Controls;
-    using Windows.UI.Xaml.Controls.Primitives;
-#endif
-
     /// <summary>
     /// An action that will play a sound to completion.
     /// </summary>

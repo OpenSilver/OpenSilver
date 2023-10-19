@@ -5,31 +5,13 @@
 
 using System.Diagnostics;
 using System.Globalization;
-using System;
-using OpenSilver.Controls;
-
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
+using OpenSilver.Controls;
 
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents the header of a <see cref="T:System.Windows.Controls.DataGrid" /> row group. 
@@ -64,11 +46,7 @@ namespace Windows.UI.Xaml.Controls
         public DataGridRowGroupHeader()
         {
             DefaultStyleKey = typeof(DataGridRowGroupHeader);
-#if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
-#else
-            this.AddHandler(FrameworkElement.PointerReleasedEvent, new PointerEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
-#endif
         }
 
         #region Dependency Properties
@@ -383,13 +361,9 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-#if MIGRATION
+
         private void DataGridRowGroupHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-#else
-        private void DataGridRowGroupHeader_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
-        {
-#endif
             if (this.OwningGrid != null)
             {
                 if (this.OwningGrid.IsDoubleClickRecordsClickOnCall(this) && !e.Handled)
@@ -474,13 +448,10 @@ namespace Windows.UI.Xaml.Controls
             ApplyState(false /*useTransitions*/);
             ApplyHeaderStatus(false);
         }
-#if MIGRATION
+
+        /// <inheritdoc/>
         public override void OnApplyTemplate()
         {
-#else
-        protected override void OnApplyTemplate()
-        {
-#endif
             _rootElement = GetTemplateChild(DataGridRow.DATAGRIDROW_elementRoot) as Panel;
 
             if (_expanderButton != null)
@@ -522,7 +493,7 @@ namespace Windows.UI.Xaml.Controls
             return new DataGridRowGroupHeaderAutomationPeer(this);
         }
 
-#if MIGRATION
+        /// <inheritdoc/>
         protected override void OnMouseEnter(MouseEventArgs e)
         {
 
@@ -535,6 +506,7 @@ namespace Windows.UI.Xaml.Controls
             ApplyState(true /*useTransitions*/);
         }
 
+        /// <inheritdoc/>
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             if (!this.IsEnabled)
@@ -545,7 +517,7 @@ namespace Windows.UI.Xaml.Controls
             this.IsMouseOver = false;
             ApplyState(true /*useTransitions*/);
         }
-#endif
+
         private void SetIsCheckedNoCallBack(bool value)
         {
             if (_expanderButton != null && _expanderButton.IsChecked != value)
@@ -597,6 +569,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Methods
+        #endregion Methods
     }
 }

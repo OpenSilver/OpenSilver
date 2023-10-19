@@ -12,25 +12,16 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Types;
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.Threading;
-using OpenSilver.Internal;
-
-#if OPENSILVER
-using System.Text.Json;
-using DotNetForHtml5.Core;
-#endif
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
+using CSHTML5.Types;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using DotNetForHtml5.Core;
 
 namespace CSHTML5
 {

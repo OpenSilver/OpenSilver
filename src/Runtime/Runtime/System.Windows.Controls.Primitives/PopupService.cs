@@ -11,21 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Input;
-#else
-using Windows.Foundation;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseEventHandler = Windows.UI.Xaml.Input.PointerEventHandler;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     internal static class PopupService
     {
@@ -46,22 +34,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 if (RootVisual != null)
                 {
                     // keep caching mouse position because we can't query it from Silverlight 
-#if MIGRATION
                     RootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
-#else
-                    RootVisual.PointerMoved += new MouseEventHandler(OnRootMouseMove);
-#endif
                 }
             }
         }
 
         private static void OnRootMouseMove(object sender, MouseEventArgs e)
         {
-#if MIGRATION
             MousePosition = e.GetPosition(null);
-#else
-            MousePosition = e.GetCurrentPoint(null).Position;
-#endif
         }
     }
 }

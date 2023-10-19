@@ -6,20 +6,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Automation.Provider;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Exposes ListTimePickerPopup types to UI Automation.

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,37 +11,18 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if MIGRATION
-using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.System;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that contains multiple items that share the same
     /// space on the screen.
     /// </summary>
-    public partial class TabControl : ItemsControl //todo: would it not be better to inherit from Selector?
+    public class TabControl : ItemsControl //todo: would it not be better to inherit from Selector?
     {
         /// <summary>
         /// Initializes a new instance of the
@@ -51,11 +31,7 @@ namespace Windows.UI.Xaml.Controls
         public TabControl()
         {
             SelectedIndex = -1;
-#if MIGRATION
             KeyDown += delegate (object sender, KeyEventArgs e) { /*OnKeyDown(e);*/ };
-#else
-            KeyDown += delegate (object sender, KeyRoutedEventArgs e) { /*OnKeyDown(e);*/ };
-#endif
             SelectionChanged += delegate (object sender, SelectionChangedEventArgs e) { OnSelectionChanged(e); };
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
             DefaultStyleKey = typeof(TabControl);
@@ -64,11 +40,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Builds the visual tree for the TabControl when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -580,11 +552,7 @@ namespace Windows.UI.Xaml.Controls
         /// This is the method that responds to the KeyDown event.
         /// </summary>
         /// <param name="e">Data used by the event.</param>
-#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
-#else
-        protected override void OnKeyDown(KeyRoutedEventArgs e)
-#endif
         {
             base.OnKeyDown(e);
             if (e.Handled)
@@ -597,19 +565,11 @@ namespace Windows.UI.Xaml.Controls
             int startIndex = -1;
             switch (e.Key)
             {
-#if MIGRATION
                 case Key.Home:
-#else
-                case VirtualKey.Home:
-#endif
                     direction = 1;
                     startIndex = -1;
                     break;
-#if MIGRATION
                 case Key.End:
-#else
-                case VirtualKey.End:
-#endif
                     direction = -1;
                     startIndex = Items.Count;
                     break;

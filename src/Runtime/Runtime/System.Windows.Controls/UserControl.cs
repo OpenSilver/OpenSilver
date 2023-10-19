@@ -11,30 +11,18 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Windows.Markup;
 using OpenSilver.Internal.Controls;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Markup;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides the base class for defining a new control that encapsulates related
     /// existing controls and provides its own logic.
     /// </summary>
-    [ContentProperty("Content")]
-    public partial class UserControl : Control, IUserControl
+    [ContentProperty(nameof(Content))]
+    public class UserControl : Control, IUserControl
     {
         /// <summary> 
         /// Returns enumerator to logical children.

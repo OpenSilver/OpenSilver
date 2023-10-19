@@ -20,11 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Diagnostics;
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace CSHTML5.Native.Html.Controls
 {

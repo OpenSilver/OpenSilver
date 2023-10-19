@@ -3,21 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-using System;
-
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal static class DoubleUtil
     {
-        // 
-
-
-
-
         internal const double DBL_EPSILON = 1e-6;
 
         /// <summary>
@@ -38,11 +27,11 @@ namespace Windows.UI.Xaml.Controls
         public static bool AreClose(double value1, double value2)
         {
             //in case they are Infinities (then epsilon check does not work)
-            if(value1 == value2) return true;
+            if (value1 == value2) return true;
             // This computes (|value1-value2| / (|value1| + |value2| + 10.0)) < DBL_EPSILON
             double eps = (Math.Abs(value1) + Math.Abs(value2) + 10.0) * DBL_EPSILON;
             double delta = value1 - value2;
-            return(-eps < delta) && (eps > delta);
+            return (-eps < delta) && (eps > delta);
         }
 
         /// <summary>

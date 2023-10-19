@@ -4,32 +4,12 @@
 // All other rights reserved.
 
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using OpenSilver.Controls;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.IInvokeProvider.Invoke()", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.IScrollItemProvider.ScrollIntoView()", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.ITransformProvider.CanMove", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.ITransformProvider.CanResize", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.ITransformProvider.CanRotate", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.ITransformProvider.Move(System.Double,System.Double)", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.ITransformProvider.Resize(System.Double,System.Double)", Justification = "Base functionality is available through the GetPattern method.")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.DataGridColumnHeaderAutomationPeer.#System.Windows.Automation.Provider.ITransformProvider.Rotate(System.Double)", Justification = "Base functionality is available through the GetPattern method.")]
+using OpenSilver.Controls;
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// AutomationPeer for DataGridColumnHeader

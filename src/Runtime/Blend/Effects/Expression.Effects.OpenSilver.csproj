@@ -5,10 +5,8 @@
     <AssemblyName>OpenSilver.Expression.Effects</AssemblyName>
     <RootNamespace>Microsoft.Expression.Media.Effects</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Configurations>SL;UWP</Configurations>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-    <DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
+    <DefineTrace>true</DefineTrace>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 

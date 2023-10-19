@@ -11,15 +11,7 @@
 *  
 \*====================================================================================*/
 
-#if !MIGRATION
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents the main scrollable region inside a <see cref="ScrollViewer"/>

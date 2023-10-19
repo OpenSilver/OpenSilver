@@ -7,11 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Specifies the type of navigation that is occurring.

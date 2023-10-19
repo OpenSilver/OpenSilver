@@ -4,20 +4,11 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Shapes;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Control that displays values as a stacked area chart visualization.
@@ -106,7 +97,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="polygon">Polygon to set the Points property of.</param>
         /// <param name="pointCollection">Specified PointCollection.</param>
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Silverlight implementation is not static.")]
         protected void SetPolygonPointsProperty(Polygon polygon, PointCollection pointCollection)
         {
 #if SILVERLIGHT

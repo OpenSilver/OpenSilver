@@ -11,24 +11,19 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
 {
     /// <summary>
     /// Controls animations with a timeline, and provides object and property targeting
     /// information for its child animations.
     /// </summary>
-    [ContentProperty("Children")]
-    public sealed partial class Storyboard : Timeline
+    [ContentProperty(nameof(Children))]
+    public sealed class Storyboard : Timeline
     {
         private TimelineCollection _children;
         private Dictionary<Tuple<string, string>, Timeline> INTERNAL_propertiesChanged; //todo: change this into a Hashset.

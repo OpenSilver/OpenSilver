@@ -11,13 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if !MIGRATION
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-#endif
-
 namespace System.Windows.Media.Effects
 {
     /// <summary>

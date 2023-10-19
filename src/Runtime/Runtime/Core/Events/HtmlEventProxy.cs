@@ -16,11 +16,7 @@ using System;
 using System.Globalization;
 using System.Reflection;
 using System.Diagnostics;
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Core;
-#endif
 
 namespace CSHTML5.Internal
 {

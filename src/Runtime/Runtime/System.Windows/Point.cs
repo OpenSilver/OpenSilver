@@ -15,11 +15,7 @@ using System;
 using System.Globalization;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.Foundation
-#endif
 {
     /// <summary>
     /// Represents an x- and y-coordinate pair in two-dimensional space. Can also represent

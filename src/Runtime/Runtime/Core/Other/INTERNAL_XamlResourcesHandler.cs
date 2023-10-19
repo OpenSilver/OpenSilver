@@ -19,15 +19,8 @@ using System.Diagnostics;
 using System.Reflection;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Media;
-#else
-using Windows.UI;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-#endif
 
 namespace CSHTML5.Internal
 {

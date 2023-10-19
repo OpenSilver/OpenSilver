@@ -11,33 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-
-using CSHTML5.Internals.Controls;
 using System.Diagnostics;
-
-#if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;   // IItemContainerGenerator
 using System.Windows.Data;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;   // IItemContainerGenerator
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internals.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// An ItemContainerGenerator is responsible for generating the UI on behalf of

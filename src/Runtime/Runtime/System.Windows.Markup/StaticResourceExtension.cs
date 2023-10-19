@@ -11,23 +11,18 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xaml;
 using OpenSilver.Internal.Xaml;
-
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
 namespace System.Windows.Markup
 {
     /// <summary>
     /// Class used to access elements inside the XAML code
     /// </summary>
-    [ContentProperty("ResourceKey")]
-    public partial class StaticResourceExtension : MarkupExtension
+    [ContentProperty(nameof(ResourceKey))]
+    public class StaticResourceExtension : MarkupExtension
     {
         /// <summary>
         /// The key of the StaticResource.

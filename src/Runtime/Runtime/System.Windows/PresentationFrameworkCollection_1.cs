@@ -17,11 +17,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Specialized;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides a common collection class for Silverlight collections.

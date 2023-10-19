@@ -7,8 +7,7 @@
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <AssemblyName>OpenSilver.Compiler</AssemblyName>
     <RootNamespace>OpenSilver.Compiler</RootNamespace>
-    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
-    <Optimize>true</Optimize>
+    <DefineTrace>true</DefineTrace>
   </PropertyGroup>
 
   <ItemGroup>

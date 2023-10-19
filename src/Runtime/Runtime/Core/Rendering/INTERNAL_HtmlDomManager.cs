@@ -19,22 +19,12 @@ using System.Text;
 using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
-using OpenSilver.Internal;
-using OpenSilver.Internal.Controls;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Shapes;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Shapes;
-#endif
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
 {

@@ -18,18 +18,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows.Common;
-#else
-using Windows.UI.Xaml.Common;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// PagedCollectionView view over an IEnumerable.

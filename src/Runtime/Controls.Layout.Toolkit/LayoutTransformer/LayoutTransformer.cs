@@ -6,22 +6,10 @@
 // Un-comment the following line for diagnostic output
 // #define DIAGNOSTICWRITELINE
 
-using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that applies a layout transformation to its Content.
@@ -137,11 +125,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the LayoutTransformer control when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             // Apply new template
             base.OnApplyTemplate();

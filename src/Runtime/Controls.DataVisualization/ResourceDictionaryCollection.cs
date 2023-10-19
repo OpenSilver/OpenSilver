@@ -5,11 +5,7 @@
 
 using System.Collections.ObjectModel;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Represents a collection of ResourceDictionary objects.

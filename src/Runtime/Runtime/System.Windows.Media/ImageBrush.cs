@@ -11,17 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Paints an area with an image.

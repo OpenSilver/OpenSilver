@@ -3,31 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
 
-[assembly: SuppressMessage(
-    "Microsoft.Design",
-    "CA1020:AvoidNamespacesWithFewTypes",
-    Scope = "namespace",
-    Target = "System.Windows.Controls.Primitives",
-    Justification = "Placing in the Primitives namespace because these extensions are only needed in advanced scenarios.")]
-
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Provides useful extensions for working with the visual tree.

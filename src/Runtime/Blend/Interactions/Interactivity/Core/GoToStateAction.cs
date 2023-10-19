@@ -1,21 +1,15 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Globalization;
+using System.Windows.Interactivity;
+using System.Windows;
+using OpenSilver.Internal.Expression.Interactivity;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Globalization;
-    using System.Windows.Interactivity;
-    using OpenSilver.Internal.Expression.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Controls.Primitives;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Controls.Primitives;
-#endif
-
     /// <summary>
     /// An action that will transition a FrameworkElement to a specified VisualState when invoked.
     /// </summary>

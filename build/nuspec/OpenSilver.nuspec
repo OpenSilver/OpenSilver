@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<package >
+<package>
   <metadata>
-    <id>$PackageId$</id>
+    <id>OpenSilver</id>
     <version>$PackageVersion$</version>
     <authors>Userware</authors>
     <projectUrl>https://www.opensilver.net</projectUrl>
@@ -57,29 +57,27 @@
     <file src="../../src/Runtime/Blend/Effects/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Effects.dll" target="lib/netstandard2.0/OpenSilver.Expression.Effects.dll" />
     <file src="../../src/Runtime/Blend/Effects/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Effects.pdb" target="lib/netstandard2.0/OpenSilver.Expression.Effects.pdb" />
     <file src="../../src/Runtime/Blend/Effects/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Effects.xml" target="lib/netstandard2.0/OpenSilver.Expression.Effects.xml" />
-
     <file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.dll" />
     <file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.pdb" />
     <file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.xml" target="lib/netstandard2.0/OpenSilver.Controls.Data.xml" />
 
     <!-- OpenSilver targets -->
-    <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" />
-    <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
+    <file src="../../src/Targets/OpenSilver.targets" target="build/OpenSilver.targets" />
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
     <file src="../../src/Targets/OpenSilver.GenerateAssemblyInfo.targets" target="build/OpenSilver.GenerateAssemblyInfo.targets" />
 
     <!-- OpenSilver compiler -->
-    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
-    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/net461/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
 
-    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
-    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
-    <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
-    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/Release/net461/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
-    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/Release/net461/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
+    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
+    <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
+    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
+    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
 
     <!-- OpenSilver analyzers -->
-    <file src="../../src/Analyzers/NotImplemented/bin/Release/netstandard2.0/OpenSilver.Analyzers.dll" target="analyzers/dotnet/cs/OpenSilver.Analyzers.dll" />
+    <file src="../../src/Analyzers/NotImplemented/bin/$Configuration$/netstandard2.0/OpenSilver.Analyzers.dll" target="analyzers/dotnet/cs/OpenSilver.Analyzers.dll" />
 
     <!-- OpenSilver JS and CSS files -->
     <file src="../../src/Runtime/Scripts/opensilver.js" target="js_css/opensilver.js" />

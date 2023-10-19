@@ -6,16 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-
-#if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// A set of extension methods for the Grid container.

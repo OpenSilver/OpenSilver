@@ -7,23 +7,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows;
-using System.Windows.Markup;
-using System.Windows.Resources;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Navigation;
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Default implementation of INavigationContentLoader that is capable of resolving URI values to XAML types located in the application deployment XAP.

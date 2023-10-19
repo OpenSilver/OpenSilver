@@ -4,20 +4,11 @@
 // All other rights reserved.
 
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-internal class DataGridFillerColumn : DataGridColumn
+    internal class DataGridFillerColumn : DataGridColumn
     {
         public DataGridFillerColumn(DataGrid owningGrid)
         {

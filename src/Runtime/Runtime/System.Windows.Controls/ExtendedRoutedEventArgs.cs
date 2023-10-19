@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,11 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
-#if MIGRATION
 namespace Microsoft.Windows
-#else
-namespace System.Windows
-#endif
 {
-    public abstract partial class ExtendedRoutedEventArgs : EventArgs
+    public abstract class ExtendedRoutedEventArgs : EventArgs
     {
         /// <summary>
         /// Gets or sets a value indicating whether the present state of the 

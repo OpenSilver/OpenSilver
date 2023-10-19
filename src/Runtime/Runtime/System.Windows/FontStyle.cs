@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 using System.Diagnostics;
 
 namespace System.Windows
@@ -121,5 +119,3 @@ namespace System.Windows
         }
     }
 }
-
-#endif

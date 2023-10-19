@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,19 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Defines a method for internal navigation in an application.
     /// </summary>
-    public partial interface INavigate
+    public interface INavigate
     {
         /// <summary>
         /// Displays the content located at the specified URI.

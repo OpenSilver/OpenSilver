@@ -3,24 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a spinner control that includes two Buttons.
@@ -160,11 +148,7 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the ButtonSpinner control when a new 
         /// template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             IncreaseButton = GetTemplateChild(ElementIncreaseButtonName) as ButtonBase;
@@ -207,25 +191,14 @@ namespace Windows.UI.Xaml.Controls
         /// been changed to disabled.
         /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
+
             Point mousePosition;
             if (IncreaseButton != null && IncreaseButton.IsEnabled == false)
             {
-#if MIGRATION
                 mousePosition = e.GetPosition(IncreaseButton);
-#else
-                mousePosition = e.GetCurrentPoint(IncreaseButton).Position;
-#endif
                 if (mousePosition.X > 0 && mousePosition.X < IncreaseButton.ActualWidth &&
                     mousePosition.Y > 0 && mousePosition.Y < IncreaseButton.ActualHeight)
                 {
@@ -235,11 +208,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (DecreaseButton != null && DecreaseButton.IsEnabled == false)
             {
-#if MIGRATION
                 mousePosition = e.GetPosition(DecreaseButton);
-#else
-                mousePosition = e.GetCurrentPoint(DecreaseButton).Position;
-#endif
 
                 if (mousePosition.X > 0 && mousePosition.X < DecreaseButton.ActualWidth &&
                     mousePosition.Y > 0 && mousePosition.Y < DecreaseButton.ActualHeight)
@@ -279,20 +248,13 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseEnter event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseEnter(e))
             {
                 Interaction.OnMouseEnterBase();
-#if MIGRATION
+
                 base.OnMouseEnter(e);
-#else
-                base.OnPointerEntered(e);
-#endif
             }
         }
 
@@ -300,21 +262,13 @@ namespace Windows.UI.Xaml.Controls
         /// Provides handling for the MouseLeave event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeave(e))
             {
                 Interaction.OnMouseLeaveBase();
 
-#if MIGRATION
                 base.OnMouseLeave(e);
-#else
-                base.OnPointerExited(e);
-#endif
             }
         }
 
@@ -327,20 +281,13 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="T:System.Windows.Input.MouseButtonEventArgs" /> that
         /// contains the event data.
         /// </param>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
             if (Interaction.AllowMouseLeftButtonDown(e))
             {
                 Interaction.OnMouseLeftButtonDownBase();
-#if MIGRATION
+
                 base.OnMouseLeftButtonDown(e);
-#else
-                base.OnPointerPressed(e);
-#endif
             }
         }
 

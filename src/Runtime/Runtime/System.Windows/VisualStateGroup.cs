@@ -17,25 +17,16 @@ using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Controls;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Contains mutually exclusive VisualState objects and VisualTransition objects
     /// that are used to go from one state to another.
     /// </summary>
-    [ContentProperty("States")]
+    [ContentProperty(nameof(States))]
     public sealed class VisualStateGroup : DependencyObject
     {
         private Collection<VisualState> _states;

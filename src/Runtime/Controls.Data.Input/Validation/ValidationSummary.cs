@@ -6,44 +6,21 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Automation.Peers;
 using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
-#else
-using Windows.System;
-using Windows.UI.Xaml.Controls.Common;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using InternalVisualStates = Windows.UI.Xaml.Controls.Internal.VisualStates; 
-#endif
-
 using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
-#if OPENSILVER
-#if MIGRATION
-using System.Windows.Automation.Peers;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-#endif
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Displays a summary of validation errors on a form.
@@ -671,29 +648,17 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// When the template is applied, this loads all the template parts
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
-#if MIGRATION
             MouseButtonEventHandler mouseUpHandler = new MouseButtonEventHandler(this.ErrorsListBox_MouseLeftButtonUp);
-#else
-            PointerEventHandler mouseUpHandler = new PointerEventHandler(this.ErrorsListBox_MouseLeftButtonUp);
-#endif
             KeyEventHandler keyDownHandler = new KeyEventHandler(this.ErrorsListBox_KeyDown);
             SelectionChangedEventHandler selectionChangedHandler = new SelectionChangedEventHandler(this.ErrorsListBox_SelectionChanged);
 
             if (this._errorsListBox != null)
             {
                 // If the ErrorsListBox was already set (due to multiple calls to OnApplyTemplate), unload the handlers first.
-#if MIGRATION
                 this._errorsListBox.MouseLeftButtonUp -= mouseUpHandler;
-#else
-                this._errorsListBox.PointerReleased -= mouseUpHandler;
-#endif
                 this._errorsListBox.KeyDown -= keyDownHandler;
                 this._errorsListBox.SelectionChanged -= selectionChangedHandler;
             }
@@ -701,11 +666,7 @@ namespace Windows.UI.Xaml.Controls
             this._errorsListBox = GetTemplateChild(PART_SummaryListBox) as ListBox;
             if (this._errorsListBox != null)
             {
-#if MIGRATION
                 this._errorsListBox.MouseLeftButtonUp += mouseUpHandler;
-#else
-                this._errorsListBox.PointerReleased += mouseUpHandler;
-#endif
                 this._errorsListBox.KeyDown += keyDownHandler;
                 this._errorsListBox.ItemsSource = this.DisplayedErrors;
                 this._errorsListBox.SelectionChanged += selectionChangedHandler;
@@ -825,7 +786,6 @@ namespace Windows.UI.Xaml.Controls
 
 #region Private Methods
 
-#if MIGRATION
         private void ErrorsListBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -833,27 +793,11 @@ namespace Windows.UI.Xaml.Controls
                 this.ExecuteClick(sender);
             }
         }
-#else
-        private void ErrorsListBox_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (e.Key == VirtualKey.Enter)
-            {
-                this.ExecuteClick(sender);
-            }
-        }
-#endif
 
-#if MIGRATION
         private void ErrorsListBox_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             this.ExecuteClick(sender);
         }
-#else
-        private void ErrorsListBox_MouseLeftButtonUp(object sender, PointerRoutedEventArgs e)
-        {
-            this.ExecuteClick(sender);
-        }
-#endif
 
         private void ErrorsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,40 +11,25 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Markup;
-using System.Diagnostics;
-using CSHTML5.Internals.Controls;
-using OpenSilver.Internal.Xaml.Context;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internals.Controls;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml.Context;
+using OpenSilver.Internal.Controls;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that can be used to present a collection of items.
     /// </summary>
-    [ContentProperty("Items")]
+    [ContentProperty(nameof(Items))]
     public partial class ItemsControl : Control, IGeneratorHost
     {
         #region Data

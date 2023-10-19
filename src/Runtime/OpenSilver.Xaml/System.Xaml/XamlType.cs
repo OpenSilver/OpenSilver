@@ -35,10 +35,6 @@ using System.Xaml.Markup;
 using System.Xaml.Schema;
 using System.Xml.Serialization;
 
-#if !MIGRATION
-using Windows.UI.Xaml.Markup;
-#endif
-
 namespace System.Xaml
 {
 	internal class ReferenceComparer : IEqualityComparer<object>

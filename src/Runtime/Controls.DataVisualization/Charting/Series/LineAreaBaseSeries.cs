@@ -3,20 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
-
-#if MIGRATION
 using System.Windows.Controls.DataVisualization.Collections;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.DataVisualization.Collections;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// A base class that contains methods used by both the line and area series.
@@ -38,7 +30,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the DependentRangeAxis dependency property.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "This member is necessary because child classes need to share this dependency property.")]
         public static readonly DependencyProperty DependentRangeAxisProperty =
             DependencyProperty.Register(
                 "DependentRangeAxis",
@@ -81,7 +72,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the IndependentAxis dependency property.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "This member is necessary because child classes need to share this dependency property.")]
         public static readonly DependencyProperty IndependentAxisProperty =
             DependencyProperty.Register(
                 "IndependentAxis",
@@ -143,11 +133,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Creates a DataPoint for determining the line color.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
             if (null != PlotArea)

@@ -11,35 +11,30 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 namespace System.Windows.Threading;
-#else
-namespace Windows.UI.Core;
-#endif
 
 /// <summary>
-///     An enunmeration describing the status of a DispatcherOperation.
+/// An enunmeration describing the status of a DispatcherOperation.
 /// </summary>
-///
 public enum DispatcherOperationStatus
 {
     /// <summary>
-    ///     The operation is still pending.
+    /// The operation is still pending.
     /// </summary>
     Pending,
 
     /// <summary>
-    ///     The operation has been aborted.
+    /// The operation has been aborted.
     /// </summary>
     Aborted,
 
     /// <summary>
-    ///     The operation has been completed.
+    /// The operation has been completed.
     /// </summary>
     Completed,
 
     /// <summary>
-    ///     The operation has started executing, but has not completed yet.
+    /// The operation has started executing, but has not completed yet.
     /// </summary>
     Executing
 }

@@ -11,20 +11,10 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// A CollectionViewGroupInternal, as created by a PagedCollectionView 

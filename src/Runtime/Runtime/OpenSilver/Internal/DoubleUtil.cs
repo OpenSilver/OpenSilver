@@ -15,12 +15,7 @@
 //
 
 using System;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.Foundation;
-#endif
 
 namespace OpenSilver.Internal
 {

@@ -1,4 +1,3 @@
-#if MIGRATION
 namespace System.Windows.Controls
 {
 	//
@@ -46,4 +45,3 @@ namespace System.Windows.Controls
 		}
 	}
 }
-#endif

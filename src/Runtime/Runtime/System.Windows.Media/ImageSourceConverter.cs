@@ -11,21 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Media.Imaging;
-#else
-using Windows.UI.Xaml.Media.Imaging;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Converts a <see cref="ImageSource"/> to and from other data types.

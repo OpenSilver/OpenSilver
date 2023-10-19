@@ -1,9 +1,7 @@
-#if MIGRATION
-
 namespace System.Windows.Media
 {
     [OpenSilver.NotImplemented]
-	public static partial class TextOptions
+	public static class TextOptions
     {
         /// <summary> Text formatting mode Property </summary>
         [OpenSilver.NotImplemented]
@@ -132,5 +130,3 @@ namespace System.Windows.Media
         }
     }
 }
-
-#endif

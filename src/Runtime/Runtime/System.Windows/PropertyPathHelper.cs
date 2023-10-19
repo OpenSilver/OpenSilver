@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Reflection;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     internal static class PropertyPathHelper
     {

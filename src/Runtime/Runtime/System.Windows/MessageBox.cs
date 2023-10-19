@@ -14,18 +14,9 @@
 
 
 using System;
-
-#if MIGRATION
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Displays a message box.
@@ -96,11 +87,7 @@ namespace Windows.UI.Xaml
 
             if (Pointer.INTERNAL_captured != null)
             {
-#if MIGRATION
                 Pointer.INTERNAL_captured.ReleaseMouseCapture();
-#else
-                Pointer.INTERNAL_captured.ReleasePointerCapture();
-#endif
             }
 
             //todo: raise the "PointerReleased" event as well.

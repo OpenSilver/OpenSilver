@@ -3,22 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System.Windows.Controls.Primitives;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls.Primitives;
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Shapes;
-#endif
-
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public partial class DataGridRow
     {
@@ -49,7 +37,7 @@ namespace Windows.UI.Xaml.Controls
                 _row = row;
             }
 
-#region Internal Properties
+            #region Internal Properties
 
             internal IRectangleAdapter BottomGridLine
             {
@@ -82,7 +70,7 @@ namespace Windows.UI.Xaml.Controls
                     return _row._detailsElement;
                 }
             }
-#endregion
+            #endregion
         }
 
 

@@ -3,28 +3,15 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Input;
-
-#if MIGRATION
-using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Threading;
 using CommonKeys = System.Windows.Input.ModifierKeys;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using CommonKeys = Windows.System.VirtualKeyModifiers;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that displays a data point.
@@ -865,11 +852,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Builds the visual tree for the DataPoint when a new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             // Unhook CurrentStateChanged handler
             VisualStateGroup groupReveal = VisualStateManager.GetVisualStateGroups(ImplementationRoot).CastWrapper<VisualStateGroup>().Where(group => GroupRevealStates == group.Name).FirstOrDefault();
@@ -941,17 +924,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Provides handling for the MouseEnter event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
 
             if (IsSelectionEnabled)
             {
@@ -963,17 +938,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Provides handling for the MouseLeave event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
              base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
            
             if (IsSelectionEnabled)
             {
@@ -985,11 +952,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Provides handling for the MouseLeftButtonDown event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
             if (DefinitionSeriesIsSelectionEnabledHandling)
             {
@@ -1000,20 +963,12 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
                     // to avoid letting ListBoxItem select the item
                     e.Handled = true;
                 }
-#if MIGRATION
                 base.OnMouseLeftButtonDown(e);
-#else
-                base.OnPointerPressed(e);
-#endif
             }
             else
             {
                 // Traditional handling
-#if MIGRATION
                 base.OnMouseLeftButtonDown(e);
-#else
-                base.OnPointerPressed(e);
-#endif
                 if (IsSelectionEnabled)
                 {
                     IsSelected = (CommonKeys.None == (CommonKeys.Control & Keyboard.Modifiers));

@@ -17,23 +17,12 @@ using System.Globalization;
 using System.Windows.Media.Effects;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Windows.Input;
+using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Input;
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// UIElement is a base class for most of the objects that have visual appearance
@@ -43,7 +32,6 @@ namespace Windows.UI.Xaml
     {
         static UIElement()
         {
-#if MIGRATION
             MouseMoveEvent = new RoutedEvent(nameof(MouseMove), RoutingStrategy.Bubble, typeof(MouseEventHandler), typeof(UIElement));
             MouseLeftButtonDownEvent = new RoutedEvent(nameof(MouseLeftButtonDown), RoutingStrategy.Bubble, typeof(MouseButtonEventHandler), typeof(UIElement));
             MouseRightButtonDownEvent = new RoutedEvent(nameof(MouseRightButtonDown), RoutingStrategy.Bubble, typeof(MouseButtonEventHandler), typeof(UIElement));
@@ -61,24 +49,6 @@ namespace Windows.UI.Xaml
             GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
             LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
             LostMouseCaptureEvent = new RoutedEvent(nameof(LostMouseCapture), RoutingStrategy.Bubble, typeof(MouseEventHandler), typeof(UIElement));
-#else
-            PointerMovedEvent = new RoutedEvent(nameof(PointerMoved), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
-            PointerPressedEvent = new RoutedEvent(nameof(PointerPressed), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
-            PointerWheelChangedEvent = new RoutedEvent(nameof(PointerWheelChanged), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
-            PointerReleasedEvent = new RoutedEvent(nameof(PointerReleased), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
-            PointerEnteredEvent = new RoutedEvent(nameof(PointerEntered), RoutingStrategy.Direct, typeof(PointerEventHandler), typeof(UIElement));
-            PointerExitedEvent = new RoutedEvent(nameof(PointerExited), RoutingStrategy.Direct, typeof(PointerEventHandler), typeof(UIElement));
-            TextInputEvent = new RoutedEvent(nameof(TextInput), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
-            TextInputStartEvent = new RoutedEvent(nameof(TextInputStart), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
-            TextInputUpdateEvent = new RoutedEvent(nameof(TextInputUpdate), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
-            TappedEvent = new RoutedEvent(nameof(Tapped), RoutingStrategy.Bubble, typeof(TappedEventHandler), typeof(UIElement));
-            RightTappedEvent = new RoutedEvent(nameof(RightTapped), RoutingStrategy.Bubble, typeof(RightTappedEventHandler), typeof(UIElement));
-            KeyDownEvent = new RoutedEvent(nameof(KeyDown), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
-            KeyUpEvent = new RoutedEvent(nameof(KeyUp), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
-            GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
-            LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
-            LostMouseCaptureEvent = new RoutedEvent(nameof(PointerCaptureLost), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
-#endif
 
             RegisterEvents(typeof(UIElement));
         }
@@ -1067,45 +1037,21 @@ namespace Windows.UI.Xaml
         /// Sets pointer capture to a UIElement.
         /// </summary>
         /// <returns>True if the object has pointer capture; otherwise, false.</returns>
-#if MIGRATION
-        public bool CaptureMouse()
-#else
-        public bool CapturePointer(Pointer value = null)
-#endif
-        {
-            return InputManager.Current.CaptureMouse(this);
-        }
+        public bool CaptureMouse() => InputManager.Current.CaptureMouse(this);
 
         /// <summary>
         /// Gets a value indicating whether the pointer is captured to this element.
         /// </summary>
-#if MIGRATION
-        public bool IsMouseCaptured
-#else
-        public bool IsPointerCaptured
-#endif
-        {
-            get
-            {
-                return (Pointer.INTERNAL_captured == this);
-            }
-        }
+        public bool IsMouseCaptured => Pointer.INTERNAL_captured == this;
 
         /// <summary>
         /// Releases pointer captures for capture of one specific pointer by this UIElement.
         /// </summary>
-#if MIGRATION
-        public void ReleaseMouseCapture()
-#else
-        public void ReleasePointerCapture(Pointer value = null)
-#endif
-        {
-            InputManager.Current.ReleaseMouseCapture(this);
-        }
+        public void ReleaseMouseCapture() => InputManager.Current.ReleaseMouseCapture(this);
 
-#endregion
+        #endregion
 
-#region AllowScrollOnTouchMove
+        #region AllowScrollOnTouchMove
 
         /// <summary>
         /// Gets or sets whether pressing (touchscreen devices) on this UIElement then moving should allow scrolling or not. The default value is True.

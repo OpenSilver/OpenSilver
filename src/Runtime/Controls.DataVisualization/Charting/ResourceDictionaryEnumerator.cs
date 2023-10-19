@@ -4,16 +4,9 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-
-using System;
 using System.Collections;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// An enumerator that dispenses ResourceDictionaries sequentially by coordinating with

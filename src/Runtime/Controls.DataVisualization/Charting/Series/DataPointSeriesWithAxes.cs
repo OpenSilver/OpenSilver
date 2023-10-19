@@ -3,24 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
-
-#if MIGRATION
-using System.Windows.Controls;
-using System.Windows.Controls.DataVisualization;
 using System.Windows.Controls.DataVisualization.Collections;
+
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.DataVisualization;
-using Windows.UI.Xaml.Controls.DataVisualization.Collections;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a dynamic series that uses axes to display data points.

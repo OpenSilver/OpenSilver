@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,36 +11,17 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if MIGRATION
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a selectable item in a
     /// <see cref="T:System.Windows.Controls.TabControl" />.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
-    public partial class TabItem : ContentControl
+    public class TabItem : ContentControl
     {
         /// <summary>
         /// Initializes a new instance of the
@@ -50,15 +30,9 @@ namespace Windows.UI.Xaml.Controls
         public TabItem()
             : base()
         {
-#if MIGRATION
             MouseLeftButtonDown += OnMouseLeftButtonDown;
             MouseEnter += OnMouseEnter;
             MouseLeave += OnMouseLeave;
-#else
-            PointerPressed += OnPointerPressed;
-            PointerEntered += OnPointerEntered;
-            PointerExited += OnPointerExited;
-#endif
             GotFocus += delegate { IsFocused = true; };
             LostFocus += delegate { IsFocused = false; };
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
@@ -70,11 +44,7 @@ namespace Windows.UI.Xaml.Controls
         /// <see cref="T:System.Windows.Controls.TabItem" /> when a new template
         /// is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -559,11 +529,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The MouseEventArgs.</param>
-#if MIGRATION
         private void OnMouseLeave(object sender, MouseEventArgs e)
-#else
-        private void OnPointerExited(object sender, PointerRoutedEventArgs e)
-#endif
         {
             _isMouseOver = false;
             UpdateVisualState();
@@ -574,11 +540,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The MouseEventArgs.</param>
-#if MIGRATION
         private void OnMouseEnter(object sender, MouseEventArgs e)
-#else
-        private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
-#endif
         {
             _isMouseOver = true;
             UpdateVisualState();
@@ -589,11 +551,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The MouseButtonEventArgs.</param>
-#if MIGRATION
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-#else
-        private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
-#endif
         {
             if (IsEnabled && TabControlParent != null && !IsSelected && !e.Handled)
             {

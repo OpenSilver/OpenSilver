@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <Configurations>SL;UWP</Configurations>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -21,13 +20,5 @@
     <ProjectReference Include="..\..\Compiler\Compiler.OpenSilver.csproj" />
     <ProjectReference Include="..\Experimental\Experimental.csproj" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>$(DefineConstants);OPENSILVER;MIGRATION</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
-  </PropertyGroup>
 
 </Project>

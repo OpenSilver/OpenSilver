@@ -11,20 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Windows.Markup;
 using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Globalization;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     /// <summary>
     /// Defines a binding that connects the properties of binding targets and data sources.
@@ -79,11 +71,7 @@ namespace Windows.UI.Xaml.Data
     {
         internal bool _isInStyle;
         private IValueConverter _converter;
-#if MIGRATION
         private CultureInfo _culture;
-#else
-        private string _culture;
-#endif
         private object _converterParameter;
         private string _elementName;
         private BindingMode _mode = BindingMode.OneWay;
@@ -143,11 +131,7 @@ namespace Windows.UI.Xaml.Data
 
                 _isInStyle = original._isInStyle;
                 _converter = original._converter;
-#if MIGRATION
                 _culture = original._culture;
-#else
-                _culture = original._culture;
-#endif
                 _converterParameter = original._converterParameter;
                 _elementName = original._elementName;
                 _mode = original._mode;
@@ -175,7 +159,6 @@ namespace Windows.UI.Xaml.Data
             set { CheckSealed(); _converter = value; }
         }
 
-#if MIGRATION
         /// <summary>
         /// Gets or sets the culture to be used by the Binding.Converter.
         /// Returns the System.Globalization.CultureInfo used by the Binding.Converter.
@@ -185,18 +168,6 @@ namespace Windows.UI.Xaml.Data
             get { return _culture; }
             set { CheckSealed(); _culture = value; }
         }
-#else
-        /// <summary>
-        /// Gets or sets a value that names the language to pass to any converter specified
-        /// by the Converter property.
-        /// Returns a string that names a language. Interpretation of this value is ultimately up to the converter logic.
-        /// </summary>
-        public string ConverterLanguage
-        {
-            get { return _culture; }
-            set { CheckSealed(); _culture = value; }
-        }
-#endif
 
         /// <summary>
         /// Gets or sets a parameter that can be used in the Converter logic.

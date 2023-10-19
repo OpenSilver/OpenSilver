@@ -12,12 +12,7 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace CSHTML5.Internal
 {

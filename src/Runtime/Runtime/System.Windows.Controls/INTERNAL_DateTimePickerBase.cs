@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,27 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Threading.Tasks;
-using DotNetForHtml5.Core;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-#endif
 
 // Credits: https://github.com/MicrosoftArchive/SilverlightToolkit/tree/master/Release/Silverlight4/Source/Controls/DatePicker
 // (c) Copyright Microsoft Corporation.
 // License: Microsoft Public License (Ms-PL)
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-    public abstract partial class INTERNAL_DateTimePickerBase : Control
+    public abstract class INTERNAL_DateTimePickerBase : Control
     {
         protected FrameworkElement _root;
         protected TextBox _textBox;
@@ -53,11 +40,7 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_SelectedDate = null;
         }
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -100,27 +83,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this._dropDownButton != null)
             {
-#if MIGRATION
                 // See comment below
                 if (this._dropDownButton.IsMouseCaptured)
                 {
                     this._dropDownButton.ReleaseMouseCapture();
                 }
-
-#else
-                // In case the pointer is captured by the toggle button, we need to release it because the Click event would be triggered right after the popup was closed, 
-                // resulting in the popup to reopen right away.
-                // To reproduce the issue that happens if we remove the "if" block of code below: create a DatePicker/TimePicker, click the ToggleButton to
-                // open the drop-down popup, then click it again to close the drop-down. Expected result: the drop-down is closed. Actual result: the popup closes and re-opens.
-                // The issue was due to the fact that, when we clicked on the ToggleButton to close the drop-down, the toggle button became Unchecked due to the
-                // "Popup.ClosedDueToOutsideClick" event (resulting in the popup being successfully closed), but then it reopened because the "PointerReleased" event of the
-                // ToggleButton was raised, which re-checked the unchecked ToggleButton. By releasing the capture, we prevent the "PointerReleased" event of the ToggleButton
-                // to be raised.
-                if (this._dropDownButton.IsPointerCaptured)
-                {
-                    this._dropDownButton.ReleasePointerCapture();
-                }
-#endif
+                
                 this.IsDropDownOpen = false; // Note: this has other effects as well: see the "IsDropDownOpen_Changed" method
             }
         }

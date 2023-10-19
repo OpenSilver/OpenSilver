@@ -3,18 +3,12 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-/// <summary>
-/// Defines modes that indicates how DataGrid content is copied to the Clipboard. 
-/// </summary>
-public enum DataGridClipboardCopyMode
+    /// <summary>
+    /// Defines modes that indicates how DataGrid content is copied to the Clipboard. 
+    /// </summary>
+    public enum DataGridClipboardCopyMode
     {
         /// <summary>
         /// Disable the DataGrid's ability to copy selected items as text.
@@ -63,10 +57,7 @@ public enum DataGridClipboardCopyMode
     /// Determines whether the inner cells' vertical/horizontal gridlines are shown or not.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
-#if MIGRATION
     [Flags]
-    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
-#endif
     public enum DataGridGridLinesVisibility
     {
         None = 0,
@@ -86,10 +77,7 @@ public enum DataGridClipboardCopyMode
     /// Determines whether the row/column headers are shown or not.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
-#if MIGRATION
     [Flags]
-#endif
-    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
     public enum DataGridHeadersVisibility
     {
         /// <summary>
@@ -101,7 +89,7 @@ public enum DataGridClipboardCopyMode
         /// Show only Column Headers with top-right corner Header
         /// </summary>
         Column = 0x01,
-        
+
         /// <summary>
         /// Show only Row Headers with bottom-left corner
         /// </summary>

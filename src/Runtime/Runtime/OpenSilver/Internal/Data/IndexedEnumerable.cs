@@ -7,14 +7,8 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-#endif
 
 namespace OpenSilver.Internal.Data
 {

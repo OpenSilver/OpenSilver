@@ -15,11 +15,7 @@
 
 using System;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Style authors should be able to identify the part type used for styling the specific class.

@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
-using System.Windows;
-using System;
-#else
-using Windows.UI.Xaml;
-#endif
-
 namespace System.Windows.Media.Effects
 {
 	[OpenSilver.NotImplemented]
-    public sealed partial class PixelShader : DependencyObject
+    public sealed class PixelShader : DependencyObject
     {
 		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty UriSourceProperty = DependencyProperty.Register(nameof(UriSource), typeof(Uri), typeof(PixelShader), new PropertyMetadata());

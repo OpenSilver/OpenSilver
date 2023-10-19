@@ -15,11 +15,7 @@ using System.Collections;
 using System.ComponentModel;
 using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows;
-#else
-namespace Windows.UI.Xaml;
-#endif
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IFrameworkElement : IUIElement

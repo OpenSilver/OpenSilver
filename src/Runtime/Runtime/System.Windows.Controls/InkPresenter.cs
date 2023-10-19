@@ -14,23 +14,12 @@
 using System;
 using System.Collections.Specialized;
 using System.Text;
+using System.Windows.Ink;
+using System.Windows.Input;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Ink;
-using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Ink;
-using Windows.UI.Xaml.Input;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Implements a rectangular surface that displays ink strokes.

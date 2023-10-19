@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +20,6 @@ using System.Threading.Tasks;
 using System.Windows.Browser.Internal;
 using CSHTML5.Internal;
 using CSHTML5.Types;
-
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
 namespace System.Windows.Browser
 {

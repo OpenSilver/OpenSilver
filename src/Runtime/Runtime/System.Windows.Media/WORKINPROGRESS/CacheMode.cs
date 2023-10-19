@@ -11,16 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     [OpenSilver.NotImplemented]
-    public abstract partial class CacheMode : DependencyObject
+    public abstract class CacheMode : DependencyObject
     {
         /// <summary>
         /// Parse - this method is called by the type converter to parse a CacheMode's string 

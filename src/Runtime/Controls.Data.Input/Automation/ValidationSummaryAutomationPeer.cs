@@ -7,28 +7,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if OPENSILVER
-
-using System;
-
-#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Automation.Provider;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Automation.Provider;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Exposes <see cref="ValidationSummary" /> types to UI Automation.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public class ValidationSummaryAutomationPeer : FrameworkElementAutomationPeer, IInvokeProvider
     {
         /// <summary>
@@ -108,5 +94,3 @@ namespace Windows.UI.Xaml.Automation.Peers
         #endregion
     }
 }
-
-#endif // OPENSILVER

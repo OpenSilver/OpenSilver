@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
-
-#if MIGRATION
 namespace Microsoft.Windows
-#else
-namespace System.Windows
-#endif
 {
     /// <summary>
     /// Specifies the effects of a drag-and-drop operation.

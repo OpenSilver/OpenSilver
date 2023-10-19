@@ -14,19 +14,9 @@
 using System;
 using System.Windows.Markup;
 using System.ComponentModel;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     [ContentProperty(nameof(Path))]
     public class TemplateBindingExtension : MarkupExtension

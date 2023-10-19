@@ -16,10 +16,6 @@ using System.ComponentModel;
 using System.Windows.Browser.Internal;
 using OpenSilver.Internal;
 
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
-
 namespace System.Windows.Browser
 {
     public sealed class HtmlWindow : HtmlObject

@@ -11,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.IO;
 using System.Threading.Tasks;
 
-#if MIGRATION
 namespace System.Windows.Media.Imaging
-#else
-namespace Windows.UI.Xaml.Media.Imaging
-#endif
 {
     /// <summary>
     /// Provides a source object for properties that use a bitmap.

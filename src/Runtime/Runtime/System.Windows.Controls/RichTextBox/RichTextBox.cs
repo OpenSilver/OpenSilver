@@ -11,34 +11,19 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Markup;
 using System.Collections.Generic;
-using OpenSilver.Internal.Controls;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Text;
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
+using OpenSilver.Internal.Controls;
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-    [ContentProperty("Blocks")]
-    public partial class RichTextBox : Control
+    [ContentProperty(nameof(Blocks))]
+    public class RichTextBox : Control
     {
         private const string ContentElementName = "ContentElement";
 
@@ -394,11 +379,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void SelectAll() => _textViewHost?.View.SelectAll();
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             base.OnApplyTemplate();
 
@@ -488,11 +469,7 @@ namespace Windows.UI.Xaml.Controls
         /// The data for the event.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
-#else
-		protected override void OnKeyDown(KeyRoutedEventArgs e)
-#endif
         {
             base.OnKeyDown(e);
         }
@@ -504,11 +481,7 @@ namespace Windows.UI.Xaml.Controls
         /// The data for the event.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnKeyUp(KeyEventArgs e)
-#else
-		protected override void OnKeyUp(KeyRoutedEventArgs e)
-#endif
         {
             base.OnKeyUp(e);
         }
@@ -532,17 +505,9 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="MouseEventArgs"/> that contains the event data.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnLostMouseCapture(MouseEventArgs e)
-#else
-		protected override void OnPointerCaptureLost(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnLostMouseCapture(e);
-#else
-            base.OnPointerCaptureLost(e);
-#endif
         }
 
         /// <summary>
@@ -552,17 +517,9 @@ namespace Windows.UI.Xaml.Controls
         /// The data for the event.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-		protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
         }
 
         /// <summary>
@@ -572,17 +529,9 @@ namespace Windows.UI.Xaml.Controls
         /// The data for the event.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-		protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerExited(e);
-#endif
         }
 
         /// <summary>
@@ -592,17 +541,9 @@ namespace Windows.UI.Xaml.Controls
         /// The data for the event.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-		protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
         }
 
         /// <summary>
@@ -612,17 +553,9 @@ namespace Windows.UI.Xaml.Controls
         /// The data for the event.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-		protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
         }
 
         /// <summary>
@@ -632,17 +565,9 @@ namespace Windows.UI.Xaml.Controls
         /// The data for the event.
         /// </param>
         [OpenSilver.NotImplemented]
-#if MIGRATION
         protected override void OnMouseMove(MouseEventArgs e)
-#else
-		protected override void OnPointerMoved(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseMove(e);
-#else
-            base.OnPointerMoved(e);
-#endif
         }
 
         /// <summary>
@@ -721,11 +646,7 @@ namespace Windows.UI.Xaml.Controls
                         format.Add("font-family", run.FontFamily.ToString());
                     if (run.FontWeight != null)
                         format.Add("bold", run.FontWeight.ToOpenTypeWeight() > 500);
-#if MIGRATION
                     if (run.FontStyle == FontStyles.Italic)
-#else
-                    if (run.FontStyle == FontStyle.Italic)
-#endif
                         format.Add("italic", true);
                     if (run.Margin != null)
                         format.Add("margin", run.Margin.ToString());

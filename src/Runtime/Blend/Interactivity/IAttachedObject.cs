@@ -1,14 +1,9 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
 namespace System.Windows.Interactivity
 {
-#if MIGRATION
-    using System.Windows;
-#else
-    using global::Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// An interface for an object that can be attached to another object.
     /// </summary>

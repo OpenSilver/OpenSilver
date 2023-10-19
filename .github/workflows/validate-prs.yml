@@ -35,26 +35,18 @@ jobs:
           cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
           cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil*dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
           cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
-      - name: Copy Compiler UWP Assemblies
-        run: |
-          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
-          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil*dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
-          cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
       - name: Copy Targets
         run: |
           cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
           cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
           cp src/Targets/OpenSilver.GenerateAssemblyInfo.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
-          cp src/Targets/OpenSilver.UwpCompatible.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
-          cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
-          cp src/Targets/OpenSilver.GenerateAssemblyInfo.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
       # There is the TestApplication for SL version in the Solution, so we need to build the latest SL package
       - name: Build OpenSilver
         working-directory: build
-        run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+        run: msbuild slnf/OpenSilver.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Build Simulator
         working-directory: build
-        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Format Version Suffix
         id: format-suffix
         run: echo "::set-output name=suffix::$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}"
@@ -65,8 +57,8 @@ jobs:
         working-directory: build
         run: |
           mkdir temp; echo "OpenSilver ${{ steps.format-version.outputs.version }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=${{ steps.format-version.outputs.version }};Configuration=SL;Target=OpenSilver"
-          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -BasePath "$pwd" -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};"
+          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release;"
+          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -BasePath "$pwd" -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release"
       - name: Replace existing package with actual one
         run: |
           nuget sources Add -Name localbuild -Source "$(Get-Location)\build\output\OpenSilver"
@@ -76,25 +68,16 @@ jobs:
       - name: Drop all bin and obj folders
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash
-      - name: Verify Building of OpenSilver Solution SL Configuration
-        run: msbuild src/OpenSilver.sln -p:Configuration=SL -clp:ErrorsOnly -restore
-      - name: Run Compiler Tests SL Configuration
-        run: dotnet test src/Compiler/Tests/Compiler.Tests/bin/SL/net472/Compiler.Tests.dll
-      - name: Run Runtime Tests SL Configuration
-        run: dotnet test src/Tests/Runtime.OpenSilver.Tests/bin/SL/net472/Runtime.OpenSilver.Tests.dll
+      - name: Verify Building of OpenSilver Solution Release Configuration
+        run: msbuild src/OpenSilver.sln -p:Configuration=Release -clp:ErrorsOnly -restore
+      - name: Run Compiler Tests Release Configuration
+        run: dotnet test src/Compiler/Tests/Compiler.Tests/bin/Release/net472/Compiler.Tests.dll
+      - name: Run Runtime Tests Release Configuration
+        run: dotnet test src/Tests/Runtime.OpenSilver.Tests/bin/Release/net472/Runtime.OpenSilver.Tests.dll
       - name: Run Analyzers Tests Configuration
-        run: dotnet test src/Analyzers/NotImplemented.Tests/bin/Debug/net472/OpenSilver.Analyzers.Tests.dll
+        run: dotnet test src/Analyzers/NotImplemented.Tests/bin/Release/net472/OpenSilver.Analyzers.Tests.dll
       - name: Verify Building of TestApplication
         run: msbuild src/Tests/TestApplication/TestApplication.OpenSilver.sln -p:Configuration=Release -clp:ErrorsOnly -restore
-      - name: Drop all bin and obj folders
-        run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
-        shell: bash
-      - name: Verify Building of OpenSilver Solution UWP Configuration
-        run: msbuild src/OpenSilver.sln -p:Configuration=UWP -clp:ErrorsOnly -restore
-      - name: Run Compiler Tests UWP Configuration
-        run: dotnet test src/Compiler/Tests/Compiler.Tests/bin/UWP/net472/Compiler.Tests.dll
-      - name: Run Runtime Tests UWP Configuration
-        run: dotnet test src/Tests/Runtime.OpenSilver.Tests/bin/UWP/net472/Runtime.OpenSilver.Tests.dll
       - name: Drop all bin and obj folders
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash

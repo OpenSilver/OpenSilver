@@ -11,16 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
 
 namespace System.Windows.Input;
 

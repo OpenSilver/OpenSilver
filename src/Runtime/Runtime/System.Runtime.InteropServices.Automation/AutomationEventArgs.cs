@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 namespace System.Runtime.InteropServices.Automation
 {
     /// <summary>
@@ -35,5 +33,3 @@ namespace System.Runtime.InteropServices.Automation
         public object[] Arguments { get; }
     }
 }
-
-#endif

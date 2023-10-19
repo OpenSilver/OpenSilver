@@ -8,23 +8,11 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
-using System;
-using OpenSilver.Controls;
-
-#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
-using Windows.Foundation;
-#endif
+using OpenSilver.Controls;
 
-#if MIGRATION
 namespace System.Windows.Automation.Peers
-#else
-namespace Windows.UI.Xaml.Automation.Peers
-#endif
 {
     /// <summary>
     /// Automation peer for the <see cref="T:System.Windows.Controls.DataPager" /> control.

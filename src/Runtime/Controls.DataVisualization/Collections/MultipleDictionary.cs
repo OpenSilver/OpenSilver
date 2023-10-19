@@ -5,14 +5,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Collections
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
-#endif
 {
     /// <summary>
     /// Implements a dictionary that can store multiple values for the same key.
@@ -39,7 +34,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
         /// <param name="allowDuplicateValues">The parameter is not used.</param>
         /// <param name="keyEqualityComparer">The parameter is not used.</param>
         /// <param name="valueEqualityComparer">The parameter is not used.</param>
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "allowDuplicateValues", Justification = "Unused parameter exists for API compatibility.")]
         public MultipleDictionary(bool allowDuplicateValues, IEqualityComparer<TKey> keyEqualityComparer, IEqualityComparer<TValue> valueEqualityComparer)
         {
             Debug.Assert(null != keyEqualityComparer, "keyEqualityComparer must not be null.");

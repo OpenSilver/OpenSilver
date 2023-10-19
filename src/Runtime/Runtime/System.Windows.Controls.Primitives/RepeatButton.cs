@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,28 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Threading;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Input;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents a control that raises its Click event repeatedly from the time it is pressed until it is released.
     /// </summary>
-    public partial class RepeatButton : ButtonBase
+    public class RepeatButton : ButtonBase
     {
         private DispatcherTimer _timer;
 
@@ -47,21 +34,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Initializes a new instance of the RepeatButton class.
         /// </summary>
         public RepeatButton()
-            : base()
         {
-            this.DefaultStyleKey = typeof(RepeatButton);
-
-#if UNCOMMENT_WHEN_CLICKMODE_HOVER_WILL_BE_IMPLEMENTED
-
-#if MIGRATION
-            base.MouseEnter += (s, e) => { }; // cf. note below
-            base.MouseLeave += (s, e) => { }; // cf. note below
-#else
-            base.PointerEntered += (s, e) => { }; // Note: even though the logic for PointerEntered is located in the overridden method "OnPointerEntered" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM event (cf. see the "Add" accessor of the "PointerEntered" event definition).
-            base.PointerExited += (s, e) => { }; // Note: even though the logic for PointerExited is located in the overridden method "OnPointerExited" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM event (cf. see the "Add" accessor of the "PointerExited" event definition).
-#endif
-
-#endif
+            DefaultStyleKey = typeof(RepeatButton);
         }
 
 #region Dependencies and Events
@@ -149,11 +123,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-#if MIGRATION
         private void OnTimeout(object sender, EventArgs e)
-#else
-        private void OnTimeout(object sender, object e)
-#endif
         {
             TimeSpan interval = TimeSpan.FromMilliseconds(Interval);
             if (_timer.Interval != interval)
@@ -178,11 +148,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.OnClick();
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
-#else
-        protected override void OnPointerPressed(Input.PointerRoutedEventArgs eventArgs)
-#endif
         {
             //if (IsPressed && ClickMode != ClickMode.Hover)
             //{
@@ -204,24 +170,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             // You will then notice that there is an infinite number of message boxes.
             //--------------------------------------------------------------------------
 
-#if MIGRATION
             base.OnMouseLeftButtonDown(eventArgs);
-#else
-            base.OnPointerPressed(eventArgs);
-#endif
         }
 
-#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs eventArgs)
-#else
-        protected override void OnPointerReleased(Input.PointerRoutedEventArgs eventArgs)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonUp(eventArgs);
-#else
-            base.OnPointerReleased(eventArgs);
-#endif
 
             //if (ClickMode != ClickMode.Hover)
             //{
@@ -233,108 +187,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
         ///     Called when this element loses mouse capture.
         /// </summary>
         /// <param name="e"></param>
-#if MIGRATION
         protected override void OnLostMouseCapture(MouseEventArgs e)
-#else
-        protected override void OnPointerCaptureLost(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnLostMouseCapture(e);
-#else
-            base.OnPointerCaptureLost(e);
-#endif
             StopTimer();
         }
-
-
-#region Not supported
-
-        /*
-        /// <summary>
-        ///     An event reporting the mouse entered this element.
-        /// </summary>
-        /// <param name="e">Event arguments</param>
-#if MIGRATION
-        protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
-        {
-            base.OnPointerEntered(e);
-            if (HandleIsMouseOverChanged())
-            {
-                e.Handled = true;
-            }
-        }
-
-        /// <summary>
-        ///     An event reporting the mouse left this element.
-        /// </summary>
-        /// <param name="e">Event arguments</param>
-#if MIGRATION
-        protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
-        {
-            base.OnPointerExited(e);
-            if (HandleIsMouseOverChanged())
-            {
-                e.Handled = true;
-            }
-        }
-
-        /// <summary>
-        ///     An event reporting that the IsMouseOver property changed.
-        /// </summary>
-        private bool HandleIsMouseOverChanged()
-        {
-            if (ClickMode == ClickMode.Hover)
-            {
-                if (IsMouseOver)
-                {
-                    StartTimer();
-                }
-                else
-                {
-                    StopTimer();
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-         */
-
-        ///// <summary>
-        ///// This is the method that responds to the KeyDown event.
-        ///// </summary>
-        ///// <param name="e"></param>
-        //protected override void OnKeyDown(KeyEventArgs e)
-        //{
-        //    base.OnKeyDown(e);
-        //    if ((e.Key == Key.Space) && (ClickMode != ClickMode.Hover))
-        //    {
-        //        StartTimer();
-        //    }
-        //}
-
-        ///// <summary>
-        ///// This is the method that responds to the KeyUp event.
-        ///// </summary>
-        ///// <param name="e"></param>
-        //protected override void OnKeyUp(KeyEventArgs e)
-        //{
-        //    if ((e.Key == Key.Space) && (ClickMode != ClickMode.Hover))
-        //    {
-        //        StopTimer();
-        //    }
-        //    base.OnKeyUp(e);
-        //}
-
-#endregion
 
 #endregion
     }

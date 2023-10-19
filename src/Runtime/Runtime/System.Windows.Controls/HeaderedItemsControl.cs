@@ -3,36 +3,17 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a control that contains a collection of items and a header.
     /// </summary>
     /// <QualityBand>Stable</QualityBand>
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Headered", Justification = "Consistency with WPF")]
     [StyleTypedProperty(Property = "ItemContainerStyle", StyleTargetType = typeof(ContentPresenter))]
-    public partial class HeaderedItemsControl : ItemsControl
+    public class HeaderedItemsControl : ItemsControl
     {
         /// <summary>
         /// Gets or sets a value indicating whether the Header property has been
@@ -245,11 +226,7 @@ namespace Windows.UI.Xaml.Controls
         /// <see cref="HeaderedItemsControl" /> when a
         /// new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             ItemsControlHelper.OnApplyTemplate();
             base.OnApplyTemplate();
@@ -349,11 +326,7 @@ namespace Windows.UI.Xaml.Controls
                             new Binding
                             {
                                 Converter = headerTemplate.ItemsSource.Converter,
-#if MIGRATION
                                 ConverterCulture = headerTemplate.ItemsSource.ConverterCulture,
-#else
-                                ConverterLanguage = headerTemplate.ItemsSource.ConverterLanguage,
-#endif
                                 ConverterParameter = headerTemplate.ItemsSource.ConverterParameter,
                                 Mode = headerTemplate.ItemsSource.Mode,
                                 NotifyOnValidationError = headerTemplate.ItemsSource.NotifyOnValidationError,

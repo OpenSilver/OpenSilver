@@ -13,41 +13,24 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Native.Html.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Input;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Native.Html.Controls;
 
 namespace CSHTML5.Native.Html.Input
 {
-#if MIGRATION
     public class HtmlCanvasPointerRoutedEventArgs : MouseButtonEventArgs
-#else
-    public class HtmlCanvasPointerRoutedEventArgs : PointerRoutedEventArgs
-#endif
     {
         public readonly HtmlCanvas HtmlCanvas;
 
         // Note: there are multiple constructor overloads.
-#if MIGRATION
         public HtmlCanvasPointerRoutedEventArgs(MouseEventArgs e, HtmlCanvas htmlCanvas)
-#else
-        public HtmlCanvasPointerRoutedEventArgs(PointerRoutedEventArgs e, HtmlCanvas htmlCanvas)
-#endif
         {
             this.OriginalSource = e.OriginalSource;
             this.Handled = e.Handled;
@@ -71,36 +54,19 @@ namespace CSHTML5.Native.Html.Input
         }
 
 
-#if MIGRATION
         public Point GetPosition(HtmlCanvasElement relativeTo)
-#else
-        public PointerPoint GetCurrentPoint(HtmlCanvasElement relativeTo)
-#endif
         {
             if (relativeTo == null)
             {
-#if MIGRATION
                 return base.GetPosition(null);
-#else
-                return base.GetCurrentPoint(null);
-#endif
             }
             else
             {
-#if MIGRATION
                 Point pointerPoint = base.GetPosition(this.HtmlCanvas);
-#else
-                PointerPoint pointerPoint = base.GetCurrentPoint(this.HtmlCanvas);
-#endif
                 Stack<HtmlCanvasElement> elem = HtmlCanvas.SearchElement(this.HtmlCanvas, relativeTo);
 
-#if MIGRATION
                 double x = pointerPoint.X;
                 double y = pointerPoint.Y;
-#else
-                double x = pointerPoint.Position.X;
-                double y = pointerPoint.Position.Y;
-#endif
                 if (elem == null)
                     return pointerPoint;
 
@@ -112,11 +78,7 @@ namespace CSHTML5.Native.Html.Input
                 }
 
 
-#if MIGRATION
                 pointerPoint = new Point(x, y);
-#else
-                pointerPoint.Position = new Point(x, y);
-#endif
                 return pointerPoint;
             }
         }

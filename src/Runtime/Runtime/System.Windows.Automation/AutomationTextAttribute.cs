@@ -13,11 +13,7 @@
 
 using System.Collections.Generic;
 
-#if MIGRATION
 namespace System.Windows.Automation
-#else
-namespace Windows.UI.Xaml.Automation
-#endif
 {
     /// <summary>
     /// Identifies UI Automation text attributes.

@@ -11,16 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     [OpenSilver.NotImplemented]
-    public sealed partial class BitmapCache : CacheMode
+    public sealed class BitmapCache : CacheMode
     {
     }
 }

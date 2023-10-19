@@ -11,25 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.Windows.Shapes;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media.Animation;
 
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Paints an area with a solid color.

@@ -3,25 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Globalization;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
-
-#if OPENSILVER
 using Properties = OpenSilver.Controls.Properties;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents a control with a single piece of content that expands or 
@@ -447,11 +433,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Builds the visual tree for the ExpandableContentControl control when a 
         /// new template is applied.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             ContentSite = GetTemplateChild(ElementContentSiteName) as ContentPresenter;
 

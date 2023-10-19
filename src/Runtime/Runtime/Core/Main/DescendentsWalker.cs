@@ -2,14 +2,8 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-#endif
 
 namespace OpenSilver.Internal
 {

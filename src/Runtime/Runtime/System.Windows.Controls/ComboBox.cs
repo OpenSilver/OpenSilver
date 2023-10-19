@@ -13,25 +13,12 @@
 
 using System;
 using System.Diagnostics;
-using OpenSilver.Internal;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
-using Key = Windows.System.VirtualKey;
-#endif
+using OpenSilver.Internal;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Represents a selection control that combines a non-editable text box and a drop-down
@@ -163,11 +150,7 @@ namespace Windows.UI.Xaml.Controls
             SelectionBoxItemTemplate = selectionBoxItemTemplate;
         }
 
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             if (_popup != null)
             {
@@ -396,17 +379,9 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">
         /// The event data.
         /// </param>
-#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeftButtonDown(e);
-#else
-            base.OnPointerPressed(e);
-#endif
 
             if (e.Handled)
             {
@@ -426,17 +401,9 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">
         /// The event data.
         /// </param>
-#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseEnter(e);
-#else
-            base.OnPointerEntered(e);
-#endif
             _isMouseOver = true;
             UpdateVisualStates();
         }
@@ -448,17 +415,9 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">
         /// The event data.
         /// </param>
-#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseLeave(e);
-#else
-            base.OnPointerReleased(e);
-#endif
             _isMouseOver = false;
             UpdateVisualStates();
         }
@@ -586,47 +545,29 @@ namespace Windows.UI.Xaml.Controls
         /// Invoked when the DropDownClosed event is raised.
         /// </summary>
         /// <param name="e">Event data for the event.</param>
-#if MIGRATION
         protected virtual void OnDropDownClosed(EventArgs e)
-#else
-        protected virtual void OnDropDownClosed(RoutedEventArgs e)
-#endif
         {
-            if (DropDownClosed != null)
-                DropDownClosed(this, e);
+            DropDownClosed?.Invoke(this, e);
         }
 
         /// <summary>
         /// Invoked when the DropDownOpened event is raised.
         /// </summary>
         /// <param name="e">Event data for the event.</param>
-#if MIGRATION
         protected virtual void OnDropDownOpened(EventArgs e)
-#else
-        protected virtual void OnDropDownOpened(RoutedEventArgs e)
-#endif
         {
-            if (DropDownOpened != null)
-                DropDownOpened(this, e);
+            DropDownOpened?.Invoke(this, e);
         }
 
         /// <summary>
         /// Occurs when the drop-down portion of the ComboBox closes.
         /// </summary>
-#if MIGRATION
         public event EventHandler DropDownClosed;
-#else
-        public event RoutedEventHandler DropDownClosed;
-#endif
 
         /// <summary>
         /// Occurs when the drop-down portion of the ComboBox opens.
         /// </summary>
-#if MIGRATION
         public event EventHandler DropDownOpened;
-#else
-        public event RoutedEventHandler DropDownOpened;
-#endif
 
         /// <summary>
         /// Gets or sets a value that indicates whether the drop-down portion of the
@@ -682,11 +623,7 @@ namespace Windows.UI.Xaml.Controls
                 comboBox.UpdatePresenter();
 
                 // Raise the Opened event:
-#if MIGRATION
                 comboBox.OnDropDownOpened(EventArgs.Empty);
-#else
-                comboBox.OnDropDownOpened(new RoutedEventArgs());
-#endif
 
                 if (FocusManager.HasFocus(comboBox, false))
                 {
@@ -716,11 +653,7 @@ namespace Windows.UI.Xaml.Controls
                 comboBox.UpdatePresenter();
 
                 // Raise the Closed event:
-#if MIGRATION
                 comboBox.OnDropDownClosed(EventArgs.Empty);
-#else
-                comboBox.OnDropDownClosed(new RoutedEventArgs());
-#endif
 
                 if (hasFocus)
                 {

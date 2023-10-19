@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,29 +11,18 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.Windows.Media;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Draws a border, background, or both, around another object.

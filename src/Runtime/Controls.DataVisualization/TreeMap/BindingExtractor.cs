@@ -3,15 +3,9 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-
-#if MIGRATION
 using System.Windows.Data;
+
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.UI.Xaml.Data;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Helper class which can extract the value from a source object using a binding path. It 
@@ -57,11 +51,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization
             {
                 BindsDirectlyToSource = valueBinding.BindsDirectlyToSource,
                 Converter = valueBinding.Converter,
-#if MIGRATION
                 ConverterCulture = valueBinding.ConverterCulture,
-#else
-                ConverterLanguage = valueBinding.ConverterLanguage,
-#endif
                 ConverterParameter = valueBinding.ConverterParameter,
                 Mode = valueBinding.Mode,
                 NotifyOnValidationError = valueBinding.NotifyOnValidationError,

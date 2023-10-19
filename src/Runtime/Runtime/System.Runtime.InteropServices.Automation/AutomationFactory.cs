@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 using System.ComponentModel;
 
 namespace System.Runtime.InteropServices.Automation
@@ -92,5 +90,3 @@ namespace System.Runtime.InteropServices.Automation
             => throw new NotImplementedException();
     }
 }
-
-#endif

@@ -1,19 +1,14 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System;
+using System.Windows.Interactivity;
+using System.Windows;
+using System.Windows.Media.Animation;
+
 namespace Microsoft.Expression.Interactivity.Media
 {
-    using System;
-    using System.Windows.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Media.Animation;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Media.Animation;
-#endif
-
     /// <summary>
     /// An abstract class that provides the ability to target a Storyboard.
     /// </summary>

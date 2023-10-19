@@ -7,15 +7,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Diagnostics;
 using System.Reflection;
 
-#if MIGRATION
 namespace System.Windows.Controls.Common
-#else
-namespace Windows.UI.Xaml.Controls.Common
-#endif
 {
     /// <summary>
     /// Utility class for Type related operations

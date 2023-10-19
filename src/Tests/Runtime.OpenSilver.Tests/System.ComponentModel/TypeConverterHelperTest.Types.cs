@@ -11,27 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Globalization;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using NullableConverter2 = System.ComponentModel.TypeConverterHelper.NullableConverter2;
 using System.Windows.Input;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-#else
-using Windows.Foundation;
-using Windows.UI;
-using Windows.UI.Text;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
 namespace System.ComponentModel.Tests
 {
@@ -288,8 +276,6 @@ namespace System.ComponentModel.Tests
                 .BeOfType<FontStretchConverter>();
         }
 
-#if MIGRATION
-
         [TestMethod]
         public void GetConverter_When_FontStyle()
         {
@@ -309,8 +295,6 @@ namespace System.ComponentModel.Tests
                 .And
                 .BeOfType<TextDecorationCollectionConverter>();
         }
-
-#endif // MIGRATION
 
         [TestMethod]
         public void GetConverter_When_Boolean()

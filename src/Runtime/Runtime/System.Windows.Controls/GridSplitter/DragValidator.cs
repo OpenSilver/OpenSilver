@@ -3,25 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Class to encapsulate drag behavior for a UIElement.
@@ -71,15 +57,9 @@ namespace Windows.UI.Xaml.Controls
 
             _targetElement = targetElement;
 
-#if MIGRATION
             _targetElement.MouseLeftButtonDown += new MouseButtonEventHandler(TargetElement_MouseLeftButtonDown);
             _targetElement.MouseLeftButtonUp += new MouseButtonEventHandler(TargetElement_MouseLeftButtonUp);
             _targetElement.MouseMove += new MouseEventHandler(TargetElement_MouseMove);
-#else
-            _targetElement.PointerPressed += new PointerEventHandler(TargetElement_MouseLeftButtonDown);
-            _targetElement.PointerReleased += new PointerEventHandler(TargetElement_MouseLeftButtonUp);
-            _targetElement.PointerMoved += new PointerEventHandler(TargetElement_MouseMove);
-#endif
         }
 
         /// <summary>
@@ -104,11 +84,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">Inherited code: Requires comment 1.</param>
         private void TargetElement_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-#if MIGRATION
             _targetElement.ReleaseMouseCapture();
-#else
-            _targetElement.ReleasePointerCapture();
-#endif
             _draggingActive = false;
             OnDragCompleted(e, false);
         }
@@ -121,21 +97,13 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">Inherited code: Requires comment 1.</param>
         private void TargetElement_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-#if MIGRATION
             _start = e.GetPosition(_targetElement);
-#else
-            _start = e.GetCurrentPoint(_targetElement).Position;
-#endif
             if (_targetElement.RenderTransform != null)
             {
                 _start = _targetElement.RenderTransform.Transform(_start);
             }
 
-#if MIGRATION
             _draggingActive = _targetElement.CaptureMouse();
-#else
-            _draggingActive = _targetElement.CapturePointer();
-#endif
 
             // Only start the drag operation if CaptureMouse succeeded
             if (_draggingActive)
@@ -165,11 +133,7 @@ namespace Windows.UI.Xaml.Controls
             EventHandler<DragDeltaEventArgs> handler = this.DragDeltaEvent;
             if (handler != null)
             {
-#if MIGRATION
                 Point p = e.GetPosition(_targetElement);
-#else
-                Point p = e.GetCurrentPoint(_targetElement).Position;
-#endif
                 if (_targetElement.RenderTransform != null)
                 {
                     p = _targetElement.RenderTransform.Transform(p);
@@ -195,11 +159,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-#if MIGRATION
                     Point p = e.GetPosition(_targetElement);
-#else
-                    Point p = e.GetCurrentPoint(_targetElement).Position;
-#endif
                     if (_targetElement.RenderTransform != null)
                     {
                         p = _targetElement.RenderTransform.Transform(p);

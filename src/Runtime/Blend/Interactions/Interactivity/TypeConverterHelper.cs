@@ -1,13 +1,14 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.ComponentModel;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+
 namespace Microsoft.Expression.Interactivity
 {
-	using System.ComponentModel;
-	using System;
-	using System.Diagnostics.CodeAnalysis;
-	using System.Globalization;
-
 	internal static class TypeConverterHelper
 	{	
 		internal static object DoConversionFrom(TypeConverter converter, object value)

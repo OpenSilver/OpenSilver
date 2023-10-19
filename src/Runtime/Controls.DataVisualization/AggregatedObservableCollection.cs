@@ -10,11 +10,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Aggregated observable collection.

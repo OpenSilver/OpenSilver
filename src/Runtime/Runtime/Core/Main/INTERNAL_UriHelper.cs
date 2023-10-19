@@ -30,15 +30,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Browser;
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-#endif
 
 namespace CSHTML5.Internal
 {

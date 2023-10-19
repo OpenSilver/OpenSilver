@@ -11,19 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Represents a collection of GradientStop objects that can be individually
     /// accessed by index.
     /// </summary>
-    public sealed partial class GradientStopCollection : PresentationFrameworkCollection<GradientStop>
+    public sealed class GradientStopCollection : PresentationFrameworkCollection<GradientStop>
     {
         private Brush _parentBrush;
 

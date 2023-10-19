@@ -11,23 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Linq;
 using System.Collections.Specialized;
+using System.Windows.Media;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Shapes
-#else
-namespace Windows.UI.Xaml.Shapes
-#endif
 {
     /// <summary>
     /// Draws a series of connected straight lines.

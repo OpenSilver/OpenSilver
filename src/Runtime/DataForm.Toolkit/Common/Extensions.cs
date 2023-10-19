@@ -7,21 +7,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-#if MIGRATION
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Common
-#else
-namespace Windows.UI.Xaml.Controls.Common
-#endif
 {
     /// <summary>
     /// Reservoir of attached properties for use by extension methods that require non-static information about objects.

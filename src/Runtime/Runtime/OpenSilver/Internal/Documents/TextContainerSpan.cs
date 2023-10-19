@@ -12,15 +12,9 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
-
-#if MIGRATION
 using System.Windows.Documents;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Media;
-#endif
+using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Documents;
 

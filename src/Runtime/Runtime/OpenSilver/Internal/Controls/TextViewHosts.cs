@@ -15,14 +15,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
-
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
 
 namespace OpenSilver.Internal.Controls;
 

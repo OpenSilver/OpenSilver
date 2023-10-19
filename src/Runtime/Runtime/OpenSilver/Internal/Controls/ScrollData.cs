@@ -11,13 +11,8 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-#endif
 
 namespace OpenSilver.Internal.Controls;
 

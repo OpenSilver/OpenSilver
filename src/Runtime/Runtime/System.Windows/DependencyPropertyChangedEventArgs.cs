@@ -14,11 +14,7 @@
 using System;
 using OpenSilver.Internal.Data;
 
-#if MIGRATION
 namespace System.Windows
-#else
-namespace Windows.UI.Xaml
-#endif
 {
     /// <summary>
     /// Provides data for a PropertyChangedCallback implementation.

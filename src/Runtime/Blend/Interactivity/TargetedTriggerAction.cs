@@ -1,19 +1,13 @@
 ﻿// -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.ComponentModel;
+using System.Globalization;
+using OpenSilver.Internal.Interactivity;
+
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.ComponentModel;
-    using System.Globalization;
-    using OpenSilver.Internal.Interactivity;
-
-#if MIGRATION
-    using System.Windows;
-#else
-    using global::Windows.UI.Xaml;
-#endif
-
     /// <summary>
     /// Represents an action that can be targeted to affect an object other than its AssociatedObject.
     /// </summary>

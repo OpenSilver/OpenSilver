@@ -13,12 +13,7 @@
 
 using System;
 using System.Diagnostics;
-
-#if MIGRATION
 using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace OpenSilver.Internal.Data
 {

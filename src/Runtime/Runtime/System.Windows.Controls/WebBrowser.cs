@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,42 +11,24 @@
 *  
 \*====================================================================================*/
 
-
+using System.Windows.Navigation;
 using CSHTML5;
 using CSHTML5.Internal;
-using System;
-#if MIGRATION
-using System.Windows.Navigation;
-#else
-using Windows.UI.Xaml.Navigation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides a control that hosts an HTML page in an app using an iframe.
     /// Note: some websites explicitly forbid being embedded in an iframe.
     /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
     /// </summary>
-#if MIGRATION
     public partial class WebBrowser : FrameworkElement
-#else
-    public partial class WebView : FrameworkElement
-#endif
     {
         private object _iFrame;
         private string _htmlString;
         private JavaScriptCallback _jsCallbackOnIframeLoaded;
 
-#if MIGRATION
         public WebBrowser()
-#else
-        public WebView()
-#endif
         {
             Unloaded += (o, e) => DisposeJsCallbacks();
         }
@@ -76,11 +57,7 @@ namespace Windows.UI.Xaml.Controls
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                 $"{sIFrame}.onload = {INTERNAL_InteropImplementation.GetVariableStringForJS(_jsCallbackOnIframeLoaded)}");
 
-#if MIGRATION
             var source = this.SourceUri;
-#else
-            var source = this.Source;
-#endif
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
@@ -105,49 +82,27 @@ namespace Windows.UI.Xaml.Controls
         /// Note: some websites explicitly forbid being embedded in an iframe.
         /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
         /// </summary>
-#if MIGRATION
         public Uri SourceUri
         {
             get { return (Uri)GetValue(SourceUriProperty); }
             set { SetValue(SourceUriProperty, value); }
         }
-#else
-        public Uri Source
-        {
-            get { return (Uri)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
-        }
-#endif
         /// <summary>
         /// Gets or sets the Uniform Resource Identifier (URI) source of the HTML content to display in the control inside an iframe.
         /// Note: some websites explicitly forbid being embedded in an iframe.
         /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
         /// </summary>
-#if MIGRATION
         public static readonly DependencyProperty SourceUriProperty =
             DependencyProperty.Register("SourceUri", typeof(Uri), typeof(WebBrowser), new PropertyMetadata(null, Source_Changed)
             { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-#else
-        public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(Uri), typeof(WebView), new PropertyMetadata(null, Source_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-#endif
 
         private static void Source_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-#if MIGRATION
             WebBrowser webView = (WebBrowser)d;
-#else
-            WebView webView = (WebView)d;
-#endif
 
             if (webView._isLoaded) // Note: if not loaded, we will set the source later when adding the control to the visual tree.
             {
-#if MIGRATION
                 var source = webView.SourceUri;
-#else
-                var source = webView.Source;
-#endif
                 string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(webView._iFrame);
                 if (source != null && !string.IsNullOrEmpty(source.OriginalString))
                 {
@@ -170,11 +125,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="source">The Uniform Resource Identifier (URI) to load.</param>
         public void Navigate(Uri source)
         {
-#if MIGRATION
             this.SourceUri = source;
-#else
-            this.Source = source;
-#endif
         }
 
         /// <summary>
@@ -214,11 +165,7 @@ namespace Windows.UI.Xaml.Controls
             if (null != LoadCompleted && this._isLoaded)
             {
                 Uri source;
-#if MIGRATION
                 source = this.SourceUri;
-#else
-                source = this.Source;
-#endif
                 LoadCompleted(this, new NavigationEventArgs(null, source));
             }
         }

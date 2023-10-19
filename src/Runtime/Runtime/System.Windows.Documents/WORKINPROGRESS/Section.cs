@@ -15,11 +15,7 @@ using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Documents;
 
-#if MIGRATION
 namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
 {
 	/// <summary>
 	/// A block-level element used for grouping other <see cref="Block"/>

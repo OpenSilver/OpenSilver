@@ -1,7 +1,5 @@
 ﻿// Copyright (C) 2003 by Microsoft Corporation.  All rights reserved.
 
-using OpenSilver.Internal.Data;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,18 +7,10 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
-
-#if MIGRATION
 using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
+using OpenSilver.Internal.Data;
 
-#if MIGRATION
 namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
 {
     internal class ListCollectionView : CollectionView, IComparer, IEditableCollectionView
 #if WPF

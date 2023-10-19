@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
-using System.Globalization;
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI
-#endif
 {
     /// <summary>
     /// Implements a set of predefined colors. See Color for usage information.

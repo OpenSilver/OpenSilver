@@ -3,14 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Interface describing the common value, maximum and minimum properties
@@ -18,7 +11,6 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     /// <remarks>Used for internal coercion of these properties.</remarks>
     /// <QualityBand>Preview</QualityBand>
-    [SuppressMessage("Microsoft.Design", "CA1064:ExceptionsShouldBePublic", Justification = "Not an exception class.")]
     internal interface ITimeInput
     {
         /// <summary>

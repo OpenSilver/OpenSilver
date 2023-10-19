@@ -7,14 +7,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Navigation
-#else
-namespace Windows.UI.Xaml.Navigation
-#endif
 {
     /// <summary>
     /// Provides data for the <c>Page.OnNavigatingFrom(NavigatingCancelEventArgs)</c>

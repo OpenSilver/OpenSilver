@@ -3,20 +3,15 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
-/// <summary>
-/// Provides data for the <see cref="E:System.Windows.Controls.DataGrid.AutoGeneratingColumn" /> event. 
-/// </summary>
-/// <QualityBand>Mature</QualityBand>
-public class DataGridAutoGeneratingColumnEventArgs : CancelEventArgs
+    /// <summary>
+    /// Provides data for the <see cref="E:System.Windows.Controls.DataGrid.AutoGeneratingColumn" /> event. 
+    /// </summary>
+    /// <QualityBand>Mature</QualityBand>
+    public class DataGridAutoGeneratingColumnEventArgs : CancelEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGridAutoGeneratingColumnEventArgs" /> class.

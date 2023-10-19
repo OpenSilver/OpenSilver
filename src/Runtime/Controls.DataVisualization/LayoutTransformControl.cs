@@ -3,21 +3,11 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Windows.Markup;
 using System.Diagnostics.CodeAnalysis;
-
-#if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
+
 namespace System.Windows.Controls.DataVisualization
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Control that implements support for transformations as if applied by
@@ -118,11 +108,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization
         /// <summary>
         /// Called whenever the control's template changes.
         /// </summary>
-#if MIGRATION
         public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
         {
             // Save existing content and remove it from the visual tree
             FrameworkElement savedContent = Child;

@@ -5,16 +5,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-using Windows.Foundation;
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Control base class for displaying values as a stacked bar/column chart visualization.
@@ -83,7 +76,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="rangeConsumer">Consumer of the range.</param>
         /// <returns>Range of values.</returns>
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Linq is artificially increasing the rating.")]
         protected override Range<IComparable> IRangeProviderGetRange(IRangeConsumer rangeConsumer)
         {
             if (rangeConsumer == ActualDependentAxis)
@@ -211,7 +203,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Updates the placement of the DataItems (data points) of the series.
         /// </summary>
         /// <param name="dataItems">DataItems in need of an update.</param>
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Linq is artificially increasing the rating.")]
         protected override void UpdateDataItemPlacement(IEnumerable<DefinitionSeries.DataItem> dataItems)
         {
             IAxis actualIndependentAxis = ActualIndependentAxis;

@@ -1,19 +1,11 @@
 // -------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All Rights Reserved.
 // -------------------------------------------------------------------
+
+using System.Windows;
+
 namespace Microsoft.Expression.Interactivity.Core
 {
-    using System;
-    using System.Globalization;
-
-#if MIGRATION
-    using System.Windows;
-    using System.Windows.Data;
-#else
-    using Windows.UI.Xaml;
-    using Windows.UI.Xaml.Data;
-#endif
-
     /// <summary>
     /// Represents one ternary condition.
     /// </summary>

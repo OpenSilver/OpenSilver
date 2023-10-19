@@ -11,20 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Provides a base class for objects that define geometric shapes. <see cref="Geometry"/>

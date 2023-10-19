@@ -14,19 +14,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
+using System.Windows.Documents;
 using DotNetForHtml5.Core;
 
-#if MIGRATION
-using System.Windows.Documents;
-#else
-using Windows.UI.Xaml.Documents;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     internal static class RichTextXamlParser
     {

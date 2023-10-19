@@ -11,29 +11,18 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Threading;
+using System.Windows.Controls;
+using System.Windows.Shapes;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-#if MIGRATION
-using System.Windows.Controls;
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Shapes;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Media
-#else
-namespace Windows.UI.Xaml.Media
-#endif
 {
     /// <summary>
     /// Defines objects used to paint graphical objects. Classes that derive from

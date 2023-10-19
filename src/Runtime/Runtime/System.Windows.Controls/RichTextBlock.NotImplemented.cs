@@ -11,22 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Automation.Peers;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     public sealed partial class RichTextBlock : FrameworkElement
     {

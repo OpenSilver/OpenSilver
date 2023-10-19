@@ -5,24 +5,11 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-
-
-#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
-#else
-using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.Primitives
-#endif
 {
     /// <summary>
     /// Represents an individual <see cref="T:System.Windows.Controls.DataGrid" /> row header. 
@@ -53,7 +40,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     [TemplateVisualState(Name = VisualStates.StateRowValid, GroupName = VisualStates.GroupValidation)]
     public partial class DataGridRowHeader : ContentControl
     {
-#region Constants
+        #region Constants
 
         private const string DATAGRIDROWHEADER_elementRootName = "Root";
         private const double DATAGRIDROWHEADER_separatorThickness = 1;
@@ -163,7 +150,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         // In SL 2, our state names had spaces.  Going forward, we are removing the spaces but still 
         // supporting the legacy state names
-        private static string[] _legacyStateNames = new string[] 
+        private static string[] _legacyStateNames = new string[]
         {
             DATAGRIDROWHEADER_stateMouseOver,
             DATAGRIDROWHEADER_stateMouseOverCurrentRowLegacy,
@@ -183,7 +170,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DATAGRIDROWHEADER_stateSelectedFocusedLegacy
         };
 
-        private static string[] _stateNames = new string[] 
+        private static string[] _stateNames = new string[]
         {
             DATAGRIDROWHEADER_stateMouseOver,
             DATAGRIDROWHEADER_stateMouseOverCurrentRow,
@@ -202,35 +189,29 @@ namespace Windows.UI.Xaml.Controls.Primitives
             DATAGRIDROWHEADER_stateSelectedCurrentRowFocused,
             DATAGRIDROWHEADER_stateSelectedFocused
         };
-        
-#endregion Constants
 
-#region Data
+        #endregion Constants
+
+        #region Data
 
         private FrameworkElement _rootElement;
 
-#endregion Data
+        #endregion Data
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Primitives.DataGridRowHeader" /> class. 
         /// </summary>
         public DataGridRowHeader()
         {
-#if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridRowHeader_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridRowHeader_MouseLeave);
-#else
-            this.AddHandler(FrameworkElement.PointerReleasedEvent, new PointerEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
-            this.PointerEntered += new PointerEventHandler(DataGridRowHeader_MouseEnter);
-            this.PointerReleased += new PointerEventHandler(DataGridRowHeader_MouseLeave);
-#endif
             DefaultStyleKey = typeof(DataGridRowHeader);
         }
 
-#region Dependency Properties
+        #region Dependency Properties
 
-#region SeparatorBrush
+        #region SeparatorBrush
 
         /// <summary>
         /// Gets or sets the <see cref="T:System.Windows.Media.Brush" /> used to paint the row header separator lines. 
@@ -250,9 +231,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 typeof(DataGridRowHeader),
                 null);
 
-#endregion SeparatorBrush
+        #endregion SeparatorBrush
 
-#region SeparatorVisibility
+        #region SeparatorVisibility
 
         /// <summary>
         /// Gets or sets a value indicating whether the row header separator lines are visible.
@@ -272,22 +253,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 typeof(DataGridRowHeader),
                 null);
 
-#endregion SeparatorVisibility
+        #endregion SeparatorVisibility
 
-#endregion Dependency Properties
-
-
-#region Public Properties
-
-#endregion Public Properties
+        #endregion Dependency Properties
 
 
-#region Protected Properties
+        #region Public Properties
 
-#endregion Protected Properties
+        #endregion Public Properties
 
 
-#region Internal Properties
+        #region Protected Properties
+
+        #endregion Protected Properties
+
+
+        #region Internal Properties
 
         private DataGrid OwningGrid
         {
@@ -327,10 +308,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             set;
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
 
-#region Private Properties
+        #region Private Properties
 
         private int Slot
         {
@@ -356,14 +337,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Builds the visual tree for the row header when a new template is applied. 
         /// </summary>
-#if MIGRATION
-
         public override void OnApplyTemplate()
         {
-#else
-        protected override void OnApplyTemplate()
-        {
-#endif
             base.OnApplyTemplate();
 
             this._rootElement = GetTemplateChild(DATAGRIDROWHEADER_elementRootName) as FrameworkElement;
@@ -373,10 +348,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-#endregion Public Methods
+        #endregion Public Methods
 
 
-#region Protected Methods
+        #region Protected Methods
 
         /// <summary>
         /// Measures the children of a <see cref="T:System.Windows.Controls.Primitives.DataGridRowHeader" /> to prepare for arranging them during the <see cref="M:System.Windows.FrameworkElement.ArrangeOverride(System.Windows.Size)" /> pass.
@@ -414,10 +389,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return new DataGridRowHeaderAutomationPeer(this);
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
 
-#region Internal Methods
+        #region Internal Methods
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         internal void ApplyOwnerStatus(bool animate)
@@ -464,7 +439,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 else if (this.OwningRowGroupHeader != null && this.OwningGrid != null && this.OwningGrid.CurrentSlot == this.OwningRowGroupHeader.RowGroupInfo.Slot)
                 {
                     idealStateMappingIndex += 16;
-                } 
+                }
 
                 byte stateCode = _idealStateMapping[idealStateMappingIndex];
                 Debug.Assert(stateCode != DATAGRIDROWHEADER_stateNullCode);
@@ -513,12 +488,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.SetStyleWithType(style);
         }
 
-#endregion Internal Methods
+        #endregion Internal Methods
 
 
-#region Private Methods
+        #region Private Methods
 
-#if MIGRATION
         private void DataGridRowHeader_MouseEnter(object sender, MouseEventArgs e)
         {
             if (this.OwningRow != null)
@@ -553,42 +527,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 }
             }
         }
-#else
-        private void DataGridRowHeader_MouseEnter(object sender, PointerRoutedEventArgs e)
-        {
-            if (this.OwningRow != null)
-            {
-                this.OwningRow.IsMouseOver = true;
-            }
-        }
-
-        private void DataGridRowHeader_MouseLeave(object sender, PointerRoutedEventArgs e)
-        {
-            if (this.OwningRow != null)
-            {
-                this.OwningRow.IsMouseOver = false;
-            }
-        }
-
-        private void DataGridRowHeader_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
-        {
-            if (this.OwningGrid != null)
-            {
-                if (!e.Handled && this.OwningGrid.IsTabStop)
-                {
-                    bool success = this.OwningGrid.Focus();
-                    Debug.Assert(success);
-                }
-                if (this.OwningRow != null)
-                {
-                    Debug.Assert(sender is DataGridRowHeader);
-                    Debug.Assert(sender == this);
-                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, this.Slot, false);
-                    this.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
-                }
-            }
-        }
-#endif
-#endregion Private Methods
+        #endregion Private Methods
     }
 }

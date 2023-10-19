@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 using System.ComponentModel;
 using OpenSilver.Tests;
 using FluentAssertions;
@@ -179,5 +177,3 @@ namespace System.Windows.Tests
         }
     }
 }
-
-#endif

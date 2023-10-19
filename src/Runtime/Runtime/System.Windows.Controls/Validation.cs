@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,28 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-#if MIGRATION
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
 {
     /// <summary>
     /// Provides methods and attached properties that support data validation and govern

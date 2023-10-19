@@ -1,8 +1,4 @@
-﻿#if MIGRATION
-namespace System.Windows.Media.Animation
-#else
-namespace Windows.UI.Xaml.Media.Animation
-#endif
+﻿namespace System.Windows.Media.Animation
 {
     /// <summary>
     /// This class implements an easing function that backs up before going to the destination.
