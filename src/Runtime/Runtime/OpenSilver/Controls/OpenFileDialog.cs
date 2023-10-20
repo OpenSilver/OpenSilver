@@ -280,9 +280,9 @@ namespace OpenSilver.Controls
             _windowFocusCallback = Interop.ExecuteJavaScript(@"
                 (function() {
                     var isChrome = !!window.chrome;
-
+                    var isMozilla = navigator.userAgent.toLowerCase().includes('firefox');
                     var windowFocusCallbackForFileDialogCancel = function(e) {
-                        if (isChrome) {
+                        if (isChrome || isMozilla) {
                             // If on Chrome, verifies flag after timeout because the window 'focus' is called before
                             // the 'change' event, timeout should be enough to make sure 'change' hasn't been triggered
                             setTimeout(function() {
