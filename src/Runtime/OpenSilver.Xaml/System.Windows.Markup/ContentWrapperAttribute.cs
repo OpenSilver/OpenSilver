@@ -45,11 +45,7 @@ namespace System.Windows.Markup
         /// <summary>
         /// Gets a unique identifier for this attribute.
         /// </summary>
-#if NETSTANDARD
         public override object TypeId
-#else // BRIDGE
-        public object TypeId
-#endif
         {
             get { return this; }
         }

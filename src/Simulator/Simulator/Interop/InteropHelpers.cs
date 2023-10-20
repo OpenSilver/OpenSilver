@@ -23,12 +23,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
     static class InteropHelpers
     {
-#if OPENSILVER
         internal static void InjectIsRunningInTheSimulator_WorkAround(Assembly coreAssembly)
         {
             InjectPropertyValue("IsRunningInTheSimulator_WorkAround", true, coreAssembly);
         }
-#endif
 
         internal static void InjectWebControlDispatcher(WebView2 webControl, Assembly coreAssembly)
         {
@@ -44,11 +42,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         internal static void InjectJavaScriptExecutionHandler(dynamic javaScriptExecutionHandler, Assembly coreAssembly)
         {
-#if OPENSILVER
             InjectPropertyValue("DynamicJavaScriptExecutionHandler", javaScriptExecutionHandler, coreAssembly);
-#else
-            InjectPropertyValue("JavaScriptExecutionHandler", javaScriptExecutionHandler, coreAssembly);
-#endif
         }
 
         internal static void InjectWebClientFactory(Assembly coreAssembly)

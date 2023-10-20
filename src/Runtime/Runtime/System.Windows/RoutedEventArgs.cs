@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using OpenSilver.Internal;
 
@@ -81,12 +80,8 @@ namespace System.Windows
             }
             else
             {
-#if BRIDGE
-                handler.Apply(new object[] { target, this });
-#else
                 // Restricted Action - reflection permission required
                 handler.DynamicInvoke(new object[] { target, this });
-#endif
             }
         }
 

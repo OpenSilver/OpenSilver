@@ -541,16 +541,12 @@ namespace OpenSilver.Internal.Data
                     value = (int)_reflectedCount.GetValue(Enumerable, null);
                     isNativeValue = true;
                 }
-#if NETSTANDARD
                 catch (MethodAccessException)
-#else // BRIDGE
-                catch
-#endif
                 {
-                // revert to walking the IEnumerable
-                // under partial trust, some properties are not accessible even though they are public
-                // see bug 1415832
-                _reflectedCount = null;
+                    // revert to walking the IEnumerable
+                    // under partial trust, some properties are not accessible even though they are public
+                    // see bug 1415832
+                    _reflectedCount = null;
                     isNativeValue = false;
                 }
             }
@@ -578,16 +574,12 @@ namespace OpenSilver.Internal.Data
                     isEmpty = ((int)_reflectedCount.GetValue(Enumerable, null) == 0);
                     isNativeValue = true;
                 }
-#if NETSTANDARD
                 catch (MethodAccessException)
-#else // BRIDGE
-                catch
-#endif
                 {
-                // revert to walking the IEnumerable
-                // under partial trust, some properties are not accessible even though they are public
-                // see bug 1415832
-                _reflectedCount = null;
+                    // revert to walking the IEnumerable
+                    // under partial trust, some properties are not accessible even though they are public
+                    // see bug 1415832
+                    _reflectedCount = null;
                     isNativeValue = false;
                 }
             }
@@ -615,16 +607,12 @@ namespace OpenSilver.Internal.Data
                     value = (int)_reflectedIndexOf.Invoke(Enumerable, new object[] { item });
                     isNativeValue = true;
                 }
-#if NETSTANDARD
                 catch (MethodAccessException)
-#else // BRIDGE
-                catch
-#endif
                 {
-                // revert to walking the IEnumerable
-                // under partial trust, some properties are not accessible even though they are public
-                // see bug 1415832
-                _reflectedIndexOf = null;
+                    // revert to walking the IEnumerable
+                    // under partial trust, some properties are not accessible even though they are public
+                    // see bug 1415832
+                    _reflectedIndexOf = null;
                     isNativeValue = false;
                 }
             }
@@ -652,11 +640,7 @@ namespace OpenSilver.Internal.Data
                     value = _reflectedItemAt.GetValue(Enumerable, new object[] { index });
                     isNativeValue = true;
                 }
-#if NETSTANDARD
                 catch (MethodAccessException)
-#else // BRIDGE
-                catch
-#endif
                 {
                     // revert to walking the IEnumerable
                     // under partial trust, some properties are not accessible even though they are public

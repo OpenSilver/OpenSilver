@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,24 +11,14 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Linq;
 using System.Runtime.Serialization;
-#if !BRIDGE
 using System.Runtime.Serialization.Formatters.Binary;
-#endif
-using System.Text;
-using System.Threading.Tasks;
 
 namespace System.IO.IsolatedStorage
 {
-    internal partial class IsolatedStorageSettingsForCSharp : IDictionary<string, Object>
+    internal sealed class IsolatedStorageSettingsForCSharp : IDictionary<string, object>
     {
         #region Constants/Variables
 
@@ -38,16 +27,12 @@ namespace System.IO.IsolatedStorage
 
         private static readonly IsolatedStorageSettingsForCSharp StaticIsolatedStorageSettings = new IsolatedStorageSettingsForCSharp();
 
-        //TODO implemente bellow with BRIDGE (seems long)
-#if !BRIDGE
         private static readonly IFormatter Formatter = new BinaryFormatter();
-#endif
 
         #endregion
 
         #region Singleton Implementation
 
-#if !BRIDGE
         /// <summary>
         ///     Its static constructor.
         /// </summary>
@@ -55,7 +40,6 @@ namespace System.IO.IsolatedStorage
         {
             LoadData();
         }
-#endif
 
         /// <summary>
         ///     Its a private constructor.
@@ -72,9 +56,6 @@ namespace System.IO.IsolatedStorage
             get { return StaticIsolatedStorageSettings; }
         }
 
-        //TODO : verify we don't need the method below using Bridge
-#if !BRIDGE
-        // public acces´s for tests
         public static void LoadData()
         {
             // IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
@@ -106,7 +87,6 @@ namespace System.IO.IsolatedStorage
                 stream.Close();
             }
         }
-#endif
 
         #endregion
 
@@ -130,9 +110,7 @@ namespace System.IO.IsolatedStorage
             set
             {
                 AppDictionary[key] = value;
-#if !BRIDGE
                 Save();
-#endif
             }
         }
 
@@ -141,9 +119,6 @@ namespace System.IO.IsolatedStorage
         /// </summary>
         public void Save()
         {
-            //BRIDGETODO : implemente the code below
-#if !BRIDGE
-            // IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
             IsolatedStorageFile isoStore = IsolatedStorageFile.GetUserStoreForAssembly();
 
             Stream stream = new IsolatedStorageFileStream(Filename, FileMode.Create, isoStore);
@@ -156,7 +131,6 @@ namespace System.IO.IsolatedStorage
             {
                 stream.Close();
             }      
-#endif
         }
 
         #endregion
@@ -166,9 +140,7 @@ namespace System.IO.IsolatedStorage
         public void Add(string key, object value)
         {
             AppDictionary.Add(key, value);
-#if !BRIDGE
             Save();
-#endif
         }
 
         public bool ContainsKey(string key)
@@ -185,9 +157,7 @@ namespace System.IO.IsolatedStorage
         {
             try
             {
-#if !BRIDGE
                 Save();
-#endif
                 AppDictionary.Remove(key);
                 return true;
             }
@@ -206,11 +176,7 @@ namespace System.IO.IsolatedStorage
         {
             get
             {
-#if BRIDGE
-                return INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(AppDictionary).ToList();
-#else
                 return AppDictionary.Values;
-#endif
             }
         }
 
@@ -220,9 +186,7 @@ namespace System.IO.IsolatedStorage
             set
             {
                 AppDictionary[key] = value;
-#if !BRIDGE
                 Save();
-#endif
             }
         }
 
@@ -235,9 +199,7 @@ namespace System.IO.IsolatedStorage
         public void Clear()
         {
             AppDictionary.Clear();
-#if !BRIDGE
             Save();
-#endif
         }
 
         public bool Contains(KeyValuePair<string, object> item)

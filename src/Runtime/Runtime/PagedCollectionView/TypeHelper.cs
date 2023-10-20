@@ -53,7 +53,6 @@ namespace System.Windows.Common
             return null;
         }
 
-#if NETSTANDARD
         /// <summary>
         /// Gets the default member name that is used for an indexer (e.g. "Item").
         /// </summary>
@@ -72,36 +71,6 @@ namespace System.Windows.Common
                 return null;
             }
         }
-#else // BRIDGE
-        /// <summary>
-        /// Gets the default member name that is used for an indexer (e.g. "Item").
-        /// </summary>
-        /// <param name="type">Type to check.</param>
-        /// <returns>Default member name.</returns>
-        private static string GetDefaultMemberName(this Type type)
-        {
-            object[] attributes = type.GetCustomAttributes(true);
-            List<object> dmAttributes = new List<object>();
-            foreach (object attr in attributes)
-            {
-                Type t = attr.GetType();
-                if (t.Name == "DefaultMemberAttribute" &&
-                    t.Namespace == "System.Reflection")
-                {
-                    dmAttributes.Add(attr);
-                }
-            }
-            if (dmAttributes != null && dmAttributes.Count == 1)
-            {
-                object defaultMemberAttribute = attributes[0];
-                return (string)defaultMemberAttribute.GetType().GetProperty("MemberName").GetValue(defaultMemberAttribute);
-            }
-            else
-            {
-                return null;
-            }
-        }
-#endif
 
         internal static Type GetEnumerableItemType(this Type enumerableType)
         {
@@ -280,11 +249,7 @@ namespace System.Windows.Common
                         if (parameterInfos[0].ParameterType == typeof(int))
                         {
                             int intIndex = -1;
-#if NETSTANDARD
                             if (Int32.TryParse(stringIndex.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out intIndex))
-#else
-                            if (Int32.TryParse(stringIndex.Trim(), out intIndex))
-#endif
                             {
                                 indexer = propertyInfo;
                                 index = new object[] { intIndex };

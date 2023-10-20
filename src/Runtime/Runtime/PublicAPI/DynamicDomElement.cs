@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
 using System.Dynamic;
-#else
-using Bridge;
-#endif
 using System;
 using CSHTML5.Internal;
 using System.Collections.Generic;
@@ -32,14 +25,7 @@ public static partial class CSharpXamlForHtml5
             // Verify : this class is not supposed to be called by bridge.NET itself
             // Note: this class is intented to be used by the Simulator only, not when compiled to JavaScript.
 
-#if !BRIDGE
-            [JSIgnore]
             public class DynamicDomElement : DynamicObject
-#else
-            //class used for C# compilation
-            [External]
-            public class DynamicDomElement
-#endif
             {
                 Dictionary<Tuple<string, Action<object>>, HtmlEventProxy> _eventNameAndHandlerToHtmlEventProxy = null;
 
@@ -50,7 +36,6 @@ public static partial class CSharpXamlForHtml5
                     _domElementRef = domElementRef;
                 }
 
-#if !BRIDGE
                 public override bool TrySetMember(SetMemberBinder binder, object value)
                 {
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(_domElementRef, binder.Name, value);
@@ -66,7 +51,6 @@ public static partial class CSharpXamlForHtml5
                         result = INTERNAL_HtmlDomManager.GetDomElementAttribute(_domElementRef, attributeName);
                     return true;
                 }
-#endif
 
                 public void removeAttribute(string attributeName) //todo: generalize to all the methods (thanks to DynamicObject)
                 {

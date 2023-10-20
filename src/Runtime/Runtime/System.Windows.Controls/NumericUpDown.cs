@@ -96,19 +96,15 @@ namespace System.Windows.Controls
             nud._levelsFromRootCall--;
             if (nud._levelsFromRootCall == 0)
             {
-#if OPENSILVER
                 NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
-#endif
 
                 double minimum = nud.Minimum;
                 if (nud._initialMin != minimum)
                 {
-#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MinimumProperty, nud._initialMin, minimum);
                     }
-#endif
 
                     nud.OnMinimumChanged(nud._initialMin, minimum);
                 }
@@ -116,12 +112,10 @@ namespace System.Windows.Controls
                 double maximum = nud.Maximum;
                 if (nud._initialMax != maximum)
                 {
-#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MaximumProperty, nud._initialMax, maximum);
                     }
-#endif
 
                     nud.OnMaximumChanged(nud._initialMax, maximum);
                 }
@@ -197,19 +191,15 @@ namespace System.Windows.Controls
             nud._levelsFromRootCall--;
             if (nud._levelsFromRootCall == 0)
             {
-#if OPENSILVER
                 NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
-#endif
 
                 double maximum = nud.Maximum;
                 if (nud._initialMax != maximum)
                 {
-#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MaximumProperty, nud._initialMax, maximum);
                     }
-#endif
 
                     nud.OnMaximumChanged(nud._initialMax, maximum);
                 }
@@ -287,19 +277,15 @@ namespace System.Windows.Controls
             // ----------
             if (nud._levelsFromRootCall == 0)
             {
-#if OPENSILVER
                 NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
-#endif
 
                 double increment = nud.Increment;
                 if (nud._initialInc != increment)
                 {
-#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.SmallChangeProperty, nud._initialInc, increment);
                     }
-#endif
 
                     nud.OnIncrementChanged(nud._initialInc, increment);
                 }
@@ -422,7 +408,6 @@ namespace System.Windows.Controls
             SetValidSpinDirection();
         }
 
-#if OPENSILVER
         /// <summary>
         /// Returns a NumericUpDownAutomationPeer for use by the Silverlight
         /// automation infrastructure.
@@ -432,7 +417,6 @@ namespace System.Windows.Controls
         {
             return new NumericUpDownAutomationPeer(this);
         }
-#endif
 
         /// <summary>
         /// Override UpDownBase&lt;T&gt;.OnValueChanging to do validation and coercion.
@@ -482,13 +466,11 @@ namespace System.Windows.Controls
         /// <param name="e">Event args.</param>
         protected override void OnValueChanged(RoutedPropertyChangedEventArgs<double> e)
         {
-#if OPENSILVER
             NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(this) as NumericUpDownAutomationPeer;
             if (peer != null)
             {
                 peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.ValueProperty, e.OldValue, e.NewValue);
             }
-#endif
 
             // reevaluate the valid spin direction
             SetValidSpinDirection();

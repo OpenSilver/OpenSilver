@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,27 +11,17 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Browser;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using DotNetForHtml5.Core;
+using OpenSilver.Internal;
+using System.ComponentModel;
 
 namespace CSHTML5.Internal
 {
@@ -97,17 +86,12 @@ namespace CSHTML5.Internal
                 // Add the above relative path to the beginning of the path:
                 html5Path = outputResourcesPath + html5Path;
 
-#if CSHTML5BLAZOR
                 if (Interop.IsRunningInTheSimulator_WorkAround) // Checks that we are in the Simulator as opposed to running in WebAssembly.
                 {
                     // Support running in the simulator:
                     html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
                 }
-#else
-                // Support running in the simulator (note: the following method is not translated to JavaScript, so it only runs in the Simulator):
-                html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
-#endif
-
+                
                 return html5Path;
             }
             else if (originalStringLowercase.StartsWith(@"http://") || originalStringLowercase.StartsWith(@"https://"))
@@ -153,15 +137,10 @@ namespace CSHTML5.Internal
                 // Add the above relative path to the beginning of the path:
                 html5Path = outputResourcesPath + html5Path;
 
-#if !CSHTML5NETSTANDARD
-                // Support running in the simulator (note: the following method is not translated to JavaScript, so it only runs in the Simulator):
-                html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
-#else
-                if(Interop.IsRunningInTheSimulator_WorkAround)
+                if (Interop.IsRunningInTheSimulator_WorkAround)
                 {
                     html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
                 }
-#endif
 
                 return html5Path;
             }
@@ -187,15 +166,10 @@ namespace CSHTML5.Internal
                 // Combine the path:
                 string html5Path = outputResourcesPath + assemblyName + "/" + relativeFolderAndFileName.ToLower();
 
-#if !CSHTML5NETSTANDARD
-                // Support running in the simulator:
-                html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
-#else
                 if (Interop.IsRunningInTheSimulator_WorkAround)
                 {
                     html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
                 }
-#endif
 
                 return html5Path;
             }
@@ -373,30 +347,7 @@ namespace CSHTML5.Internal
 
         static string[] GetListOfLoadedAssemblies()
         {
-            string[] listOfAssemblies;
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-#if !BRIDGE
-                listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
-#else
-                listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(a)).ToArray();
-#endif
-            }
-            else
-            {
-#if CSHTML5NETSTANDARD
-                listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
-#elif !BRIDGE
-                listOfAssemblies = JSIL.Verbatim.Expression("Object.keys(JSIL.AssemblyShortNames)");
-#else
-                listOfAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => GetAssemblyName(a.FullName)).ToArray();//Script.Write<string[]>("Object.keys(JSIL.AssemblyShortNames);");
-#endif
-            }
-            return listOfAssemblies;
+            return AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
         }
 
         //we use this function in order to get the assembly to Bridge
@@ -413,13 +364,6 @@ namespace CSHTML5.Internal
                 return fullName.Substring(0, tmpIndex);
         }
 
-//#if !CSHTML5NETSTANDARD
-
-#if !BRIDGE
-        [JSReplacement("$relativePath")]
-#else
-        [Template("{relativePath}")]
-#endif
         static string GetAbsolutePathIfRunningInCSharp(string relativePath) //todo: test what happens if the path is very long.
         {
             // This method is skipped when translated to JavaScript (due to the attributes above).
@@ -498,63 +442,11 @@ namespace CSHTML5.Internal
             }
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static string GetJavaScriptCallingAssembly()
         {
             return null;
-
-#if false //Disabled because causes IE10 to crash with "Number Expected" error in Bootstrap.Text line 1882
-            string jsStackTrace = Convert.ToString(JSIL.Verbatim.Expression(@"getStackTrace()"));
-
-            // Get all the files listed in the stack trace:
-            List<string> assemblyNames = new List<string>();
-            foreach (Match match in Regex.Matches(jsStackTrace, @"[^\/]*\.js\?"))
-            {
-                // "match" here is in the form of "filename.js?", so we need to remove the 4 last characters to get the actual file name without extension:
-                string assemblyName = match.Value.Substring(0, match.Length - 4);
-
-                assemblyNames.Add(assemblyName);
-            }
-            /* Example of output:
-             * JSIL.Host.js?
-             * JSIL.Host.js?
-             * JSIL.Core.js?
-             * JSIL.Core.js?
-             * JSIL.Core.js?
-             * JSIL.Core.js?
-             * CSharpXamlForHtml5.js?
-             * CSharpXamlForHtml5.js?
-             * SmallTests.js?
-             * SmallTests.js?
-             */
-
-            // Find out the current assembly name,
-            // which is the name of the assembly
-            // that contains Core:
-            string currentAssemblyName = "CSharpXamlForHtml5"; //System.Reflection.Assembly.GetAssembly(typeof(INTERNAL_JSObjectReference)).GetName().Name;
-
-            // Find out the first filename that is after the current assembly:
-            bool currentAssemblyFound = false;
-            foreach (string assemblyName in assemblyNames)
-            {
-                if (currentAssemblyFound)
-                {
-                    if (assemblyName != currentAssemblyName)
-                    {
-                        return assemblyName;
-                    }
-                }
-                else
-                {
-                    if (assemblyName == currentAssemblyName)
-                    {
-                        currentAssemblyFound = true;
-                    }
-                }
-            }
-
-            // If not found, return an empty string:
-            return string.Empty;
-#endif
         }
     }
 }

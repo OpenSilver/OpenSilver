@@ -15,32 +15,16 @@
 //
 //===============================================================================
 
-
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if OPENSILVER
 using System.Net;
-#endif
 
-#if OPENSILVER
 namespace OpenSilver.Compatibility
-#else
-namespace System.Net
-#endif
 {
-    // Summary:
-    //     
     /// <summary>
     /// Provides data for the System.Net.WebClient.UploadStringCompleted event.
     /// </summary>
-    public partial class UploadStringCompletedEventArgs //: AsyncCompletedEventArgs //todo: AsyncCompletedEventArgs() is obsolete, see what we should do (it might be that it is only obsolete for use by the user, but not for us)
+    public partial class UploadStringCompletedEventArgs
     {
-        
         //[EditorBrowsable(EditorBrowsableState.Never)]
         //[Obsolete("This API supports the .NET Framework infrastructure and is not intended to be used directly from your code.", true)]
         /// <summary>
@@ -65,7 +49,7 @@ namespace System.Net
             Cancelled = cancelled;
             UserState = userState;
         }
-        internal UploadStringCompletedEventArgs(System.Net.DownloadStringCompletedEventArgs e) //it is normal that the parameter is of type DownloadStringCompletedEventArgs instead of UploadStringCompletedEventArgs.
+        internal UploadStringCompletedEventArgs(DownloadStringCompletedEventArgs e)
         {
             Result = e.Result;
             UserState = e.UserState;

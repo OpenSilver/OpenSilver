@@ -7,10 +7,6 @@ namespace TestApplication.Tests
         public TextBlockTest()
         {
             InitializeComponent();
-
-#if OPENSILVER
-            EllipsisTrimmedCustomLayoutBorder.CustomLayout = true;
-#endif
         }
     }
 }

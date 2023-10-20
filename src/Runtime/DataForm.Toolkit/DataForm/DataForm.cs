@@ -23,7 +23,6 @@ using System.Windows.Controls.Common;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
-
 using resources = OpenSilver.Internal.Controls.Data.DataForm.Toolkit.Resources;
 
 namespace System.Windows.Controls
@@ -1604,13 +1603,11 @@ namespace System.Windows.Controls
             }
         }
 
-#if OPENSILVER
         /// <summary>
         /// Gets or sets a value that indicates if datafields should run the alignment logic.
         /// The default value is true.
         /// </summary>
         public bool ForceAlignment { get; set; } = true;
-#endif
 
 #endregion Public Properties
 
@@ -2686,12 +2683,10 @@ namespace System.Windows.Controls
                 if (contentRootElement != null)
                 {
                     contentRootElement.Loaded += new RoutedEventHandler(this.OnContentRootElementLoaded);
-#if OPENSILVER
                     // Note: we need to set the DataContext to the right value before adding 'contentRootElement'
                     // to the ContentPresenter or the DataContext will be inherited from the DataForm and then
                     // propagated to the generated fields.
                     contentRootElement.DataContext = this.CurrentItem;
-#endif
                 }
 
                 this._contentPresenter.Content = contentRootElement;
@@ -3171,7 +3166,6 @@ namespace System.Windows.Controls
             }
         }
 
-#if OPENSILVER
         /// <summary>
         /// Returns an automation peer for this DataForm.
         /// </summary>
@@ -3180,7 +3174,6 @@ namespace System.Windows.Controls
         {
             return new DataFormAutomationPeer(this);
         }
-#endif
 
         /// <summary>
         /// Raises the CurrentItemChanged event.
@@ -3411,14 +3404,12 @@ namespace System.Windows.Controls
                 return false;
             }
 
-#if OPENSILVER
             FrameworkElementAutomationPeer elementPeer = FrameworkElementAutomationPeer.CreatePeerForElement(element) as FrameworkElementAutomationPeer;
 
             if (elementPeer != null)
             {
                 return elementPeer.IsKeyboardFocusable();
             }
-#endif
 
             return false;
         }

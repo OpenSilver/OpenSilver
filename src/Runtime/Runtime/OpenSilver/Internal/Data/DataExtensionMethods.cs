@@ -17,20 +17,10 @@ namespace OpenSilver.Internal.Data
         internal static int Search(this IList list, int index, int count, object value, IComparer comparer)
         {
             List<object> al;
-#if false // no live shaping
-            LiveShapingList lsList;
-#endif // no live shaping
-
             if ((al = list as List<object>) != null)
             {
                 return al.BinarySearch(index, count, value, comparer);
             }
-#if false // no live shaping
-            else if ((lsList = list as LiveShapingList) != null)
-            {
-                return lsList.Search(index, count, value);
-            }
-#endif // no live shaping
 
             // we should never get here, but the compiler doesn't know that
             Debug.Assert(false, "Unsupported list passed to Search");
@@ -48,22 +38,12 @@ namespace OpenSilver.Internal.Data
         internal static void Move(this IList list, int oldIndex, int newIndex)
         {
             List<object> al;
-#if false // no live shaping
-            LiveShapingList lsList;
-#endif // no live shaping
-
             if ((al = list as List<object>) != null)
             {
                 object item = al[oldIndex];
                 al.RemoveAt(oldIndex);
                 al.Insert(newIndex, item);
             }
-#if false // no live shaping
-            else if ((lsList = list as LiveShapingList) != null)
-            {
-                lsList.Move(oldIndex, newIndex);
-            }
-#endif // no live shaping
         }
 
 
@@ -71,20 +51,10 @@ namespace OpenSilver.Internal.Data
         internal static void Sort(this IList list, IComparer comparer)
         {
             List<object> al;
-#if false // no live shaping
-            LiveShapingList lsList;
-#endif // no live shaping
-
             if ((al = list as List<object>) != null)
             {
                 ListHelpers.Sort(al, comparer);
             }
-#if false // no live shaping
-            else if ((lsList = list as LiveShapingList) != null)
-            {
-                lsList.Sort();
-            }
-#endif // no live shaping
         }
     }
 }

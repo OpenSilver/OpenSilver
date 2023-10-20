@@ -28,75 +28,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         static Assembly _coreAssembly;
         static Dictionary<string, Type> _typesCacheForPerformance = new Dictionary<string, Type>();
 
-        internal static bool TryDetermineTypeThatInheritsFromApplication(Assembly entryPointAssembly, out Type typeThatInheritsFromApplication, out Assembly coreAssembly)
-        {
-            coreAssembly = null;
-            string errorMessage = "No entry point was found. Please make sure that the application contains a class that inherits from \"Application\". The default constructor of that class will be used as the entry point of the application.\r\n\r\nTo see an example, under Visual Studio, click File -> New -> Project, and create a project of type \"C#/XAML for HTML5\" application";
-            typeThatInheritsFromApplication = null;
-            try
-            {
-                // Get the list of types in the entryPointAssembly:
-                //--------------
-                // IMPORTANT: we must do this before calling "AppDomain.CurrentDomain.GetAssemblies" because this will raise the "AssemblyResolve" event which is used to load the Core assembly.
-                //--------------
-                Type[] typesInEntryPointAssembly = null;
-
-                try
-                {
-                    typesInEntryPointAssembly = entryPointAssembly.GetTypes();
-                }
-                catch (Exception ex)
-                {
-                    // The following lines provide no functionality but they make it easier to obtain the LoaderExceptions information when doing step-by-step debugging on the compiler.
-                    if (ex is System.Reflection.ReflectionTypeLoadException)
-                    {
-                        var typeLoadException = ex as ReflectionTypeLoadException;
-                        var loaderExceptions = typeLoadException.LoaderExceptions;
-                    }
-                    throw;
-                }
-
-                // Find the type "Application" in Core:
-                Type baseApplicationType;
-                if (TryGetTypeInCoreAssembly(
-                    typeNamespace: "Windows.UI.Xaml",
-                    typeAlternativeNamespaceOrNull: "System.Windows",
-                    typeName: "Application",
-                    type: out baseApplicationType,
-                    coreAssembly: out coreAssembly))
-                {
-                    // Find the type that inherits from "Application" (note: we don't use "linq" because performance is better with the "return" statement that breaks the foreach).
-                    foreach (Type type in typesInEntryPointAssembly)
-                    {
-                        if (baseApplicationType.IsAssignableFrom(type))
-                        {
-                            typeThatInheritsFromApplication = type;
-                            return true;
-                        }
-                    }
-                }
-                else
-                {
-                    // A message box has already been displayed.
-                    return false;
-                }
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-                var errorMessages = string.Join("\r\n", from loaderException in ex.LoaderExceptions select (loaderException.Message));
-                MessageBox.Show(errorMessages);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(errorMessage + "\r\n\r\n" + ex.Message);
-                return false;
-            }
-
-            MessageBox.Show(errorMessage);
-            return false;
-        }
-
         internal static bool TryGetPathOfAssemblyThatContainsEntryPoint(out string path)
         {
             path = null;
@@ -233,24 +164,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             }
         }
 
-        internal static bool WasAssemblyWasCompiledInSLMigrationMode()
-        {
-            Assembly coreAssembly;
-            if (TryGetCoreAssembly(out coreAssembly))
-            {
-                if (coreAssembly.GetName().Name.StartsWith("SLMigration."))
-                    return true;
-                else
-                    return false;
-            }
-            else
-            {
-                // A message box has already been displayed by the method "TryGetCoreAssembly".
-                return false;
-            }
-        }
-
-
         internal static void GetOutputPathsByReadingAssemblyAttributes(
             Assembly entryPointAssembly,
             out string outputRootPath,
@@ -259,7 +172,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             out string outputResourcesPath,
             out string intermediateOutputAbsolutePath)
         {
-#if OPENSILVER
             // todo: see if the path can be not hard-coded
             // In the OpenSilver version, the app use the wwwroot folder to store the libs and resources
             // This folder is not inside the build dir (bin\Debug\netstandard2.0) but at the root level
@@ -268,105 +180,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             outputResourcesPath = @"\app-cshtml5\res\";
             outputAppFilesPath = @"";
             intermediateOutputAbsolutePath = @"";
-#elif BRIDGE
-            // In the Bridge-based version, the paths are hard-coded because they cannot be configured by the user at this time:
-            outputRootPath = @"Output\";
-            outputLibrariesPath = @"app-cshtml5\libs\";
-            outputResourcesPath = @"app-cshtml5\res\";
-            outputAppFilesPath = null; // Not used in the Bridge-based version
-            intermediateOutputAbsolutePath = null; // Not used in the Bridge-based version because the Simulator does not do the compilation.
-#else
-            outputRootPath = null;
-            outputAppFilesPath = null;
-            outputLibrariesPath = null;
-            outputResourcesPath = null;
-            intermediateOutputAbsolutePath = null;
-
-            foreach (Attribute attribute in entryPointAssembly.GetCustomAttributes())
-            {
-                Type attributeType = attribute.GetType();
-                string attributeName = attributeType.Name;
-
-                if (attributeName == "OutputRootPathAttribute")
-                    outputRootPath = GetPropertyValue<string>(attributeType, attribute, attributeName, "OutputRootPath");
-
-                if (attributeName == "OutputAppFilesPathAttribute")
-                    outputAppFilesPath = GetPropertyValue<string>(attributeType, attribute, attributeName, "OutputAppFilesPath");
-
-                if (attributeName == "OutputLibrariesPathAttribute")
-                    outputLibrariesPath = GetPropertyValue<string>(attributeType, attribute, attributeName, "OutputLibrariesPath");
-
-                if (attributeName == "OutputResourcesPathAttribute")
-                    outputResourcesPath = GetPropertyValue<string>(attributeType, attribute, attributeName, "OutputResourcesPath");
-
-                if (attributeName == "IntermediateOutputAbsolutePathAttribute")
-                    intermediateOutputAbsolutePath = GetPropertyValue<string>(attributeType, attribute, attributeName, "IntermediateOutputAbsolutePath");
-            }
-
-            if (outputRootPath == null
-                || outputAppFilesPath == null
-                || outputLibrariesPath == null
-                || outputResourcesPath == null
-                || intermediateOutputAbsolutePath == null
-                )
-                throw new Exception("One of the output path attributes could not be found. Please contact support.");
-#endif
-        }
-
-        internal static void GetSettingsByReadingAssemblyAttributes(
-            Assembly entryPointAssembly,
-            out bool generateJavaScriptDuringBuild)
-        {
-            // Default values:
-            generateJavaScriptDuringBuild = false;
-
-            // Find the "SettingsAttribute" and read its properties:
-            foreach (Attribute attribute in entryPointAssembly.GetCustomAttributes())
-            {
-                Type attributeType = attribute.GetType();
-
-                if (attributeType.Name == "SettingsAttribute")
-                {
-                    // Read the properties of the "SettingsAttribute":
-                    generateJavaScriptDuringBuild = GetPropertyValue<bool>(attributeType, attribute, "SettingsAttribute", "GenerateJavaScriptDuringBuild");
-                }
-            }
-        }
-
-        static T GetPropertyValue<T>(Type attributeType, Attribute attribute, string attributeName, string propertyName)
-        {
-            PropertyInfo propertyInfo = attributeType.GetProperty(propertyName);
-
-            if (propertyInfo == null)
-                throw new Exception(string.Format("Could not find the property '{1}' of the attribute '{0}'. Please contact support.", attributeName, propertyName));
-
-            object value = propertyInfo.GetValue(attribute);
-
-            if (value == null)
-                throw new Exception(string.Format("The value of the property '{1}' of the attribute '{0}' is null. Please contact support.", attributeName, propertyName));
-
-            if (typeof(T) == typeof(string))
-            {
-                string valueAsString = value.ToString();
-
-                if (string.IsNullOrWhiteSpace(valueAsString))
-                    throw new Exception(string.Format("The value of the property '{1}' of the attribute '{0}' is empty or whitespace. Please contact support.", attributeName, propertyName));
-
-                return (T)(object)valueAsString;
-            }
-            else
-            {
-                T castedValue;
-                try
-                {
-                    castedValue = (T)value;
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(string.Format("The value of the property '{1}' of the attribute '{0}' is not a valid {2}. Please contact support.", attributeName, propertyName, typeof(T).FullName));
-                }
-                return castedValue;
-            }
         }
     }
 }

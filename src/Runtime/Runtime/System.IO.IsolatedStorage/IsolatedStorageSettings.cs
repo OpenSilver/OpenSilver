@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,30 +11,14 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using JSIL.Meta;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using OpenSilver;
 
 namespace System.IO.IsolatedStorage
 {
-    //Note: we remove the interfaces because they are useless for now.
-    //
-    // Exceptions:
-    //   System.ArgumentNullException:
-    //     key is null. This exception is thrown when you attempt to reference an instance
-    //     of the class by using an indexer and the variable you pass in for the key
-    //     value is null.
-
     /// <summary>
     /// Provides a System.Collections.Generic.Dictionary&lt;TKey,TValue&gt; that stores
     /// key-value pairs in isolated storage.
@@ -50,72 +33,14 @@ namespace System.IO.IsolatedStorage
     /// string myString = IsolatedStorageSettings.ApplicationSettings.TryGetValue("someKey", out value);
     /// </code>
     /// </example>
-    public sealed partial class IsolatedStorageSettings : IEnumerable, IEnumerable<KeyValuePair<string, object>> // : IDictionary<string, object>, ICollection<KeyValuePair<string, object>>, IDictionary, ICollection
+    public sealed partial class IsolatedStorageSettings : IEnumerable, IEnumerable<KeyValuePair<string, object>>
     {
         string _fullApplicationName = null;
 
-#if !BRIDGE
-        [JSReplacement("true")]
-#else
-        [Template("true")]
-#endif
-        static bool IsRunningInJavascript() //must be static to work properly
-        {
-            return false;
-        }
-
-#if !BRIDGE
-        [JSReplacement("undefined")]
-#else
-        [Template("undefined")]
-#endif
-        static dynamic GetUndefined() { return null; } //must be static to work properly
-
-        //[JSIL.Meta.JSReplacement("window.localStorage")]
         dynamic GetLocalStorage()
         {
-#if !OPENSILVER
-            if (IsRunningInJavascript())
-            {
-#if !BRIDGE
-                dynamic localStorage = JSIL.Verbatim.Expression(@"
-function(){
-    return window.localStorage;
-}()
-");
-#else
-                object localStorage = Script.Write<object>(@"
-(function(){
-    return window.localStorage;
-}());
-");
-#endif
-                if (localStorage == null || localStorage == GetUndefined())
-                {
-#if !BRIDGE
-                    JSIL.Verbatim.Expression(@"
-if(window.IE_VERSION && document.location.protocol === ""file:"") {
-    JSIL.RuntimeError(""The local storage - used to persist data - is not available on Internet Explorer or Edge when running the website from the local file system (ie. the URL starts with 'c:\' or 'file:///'). To solve the problem, please run the website from a web server instead (ie. the URL must start with 'http://' or 'https://') or test the local storage using a different browser."")
-}");
-                    return null;
-#else
-                    throw new Exception("The local storage - used to persist data - is not available on Internet Explorer or Edge when running the website from the local file system (ie. the URL starts with 'c:\' or 'file:///'). To solve the problem, please run the website from a web server instead (ie. the URL must start with 'http://' or 'https://') or test the local storage using a different browser.");
-#endif
-                }
-                else
-                {
-                    return localStorage;
-                }
-            }
-            else
-            { 
-#endif
-            //Note: The whole part in the #if !OPENSILVER above only serves to throw an exception when in IE or Edge if we are on a local file system (ie url starts with c:\ or similar). It should be useless in OpenSilver and can most definitely be simplified in Bridge.
             return Interop.ExecuteJavaScript("window.localStorage");
-#if !OPENSILVER
         } 
-#endif
-    }
 
         string GetKeysFirstPart()
         {
@@ -246,12 +171,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
                 }
                 else
                 {
-#if BRIDGE
-                    return (ICollection)(INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible<string, Object>(IsolatedStorageSettingsForCSharp.Instance).ToList<object>());
-#else
-                    return (ICollection)IsolatedStorageSettingsForCSharp.Instance.Values.ToList<object>();
-#endif
-
+                    return IsolatedStorageSettingsForCSharp.Instance.Values.ToList();
                 }
             }
         }

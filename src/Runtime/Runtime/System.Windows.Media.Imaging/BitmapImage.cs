@@ -120,15 +120,8 @@ namespace System.Windows.Media.Imaging
             get { return (Uri)GetValue(UriSourceProperty); }
             set
             {
-#if !BRIDGE
-                // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
                 string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#else
-                // Get the assembly name of the calling method: //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method that is executed immediately after the one where the URI is defined! Be careful when moving the following line of code.
-                string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
-
-#endif
-                this.INTERNAL_NameOfAssemblyThatSetTheSourceUri = callerAssemblyName;
+                INTERNAL_NameOfAssemblyThatSetTheSourceUri = callerAssemblyName;
                 SetValue(UriSourceProperty, value);
             }
         }

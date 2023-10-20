@@ -111,11 +111,7 @@ namespace System.Windows.Controls
             if (!source._allowIsTransitioningWrite)
             {
                 source.IsTransitioning = (bool)e.OldValue;
-#if OPENSILVER
                 throw new InvalidOperationException(Properties.Resources.TransitiotioningContentControl_IsTransitioningReadOnly);
-#elif BRIDGE
-                throw new InvalidOperationException("IsTransitioning property is read-only.");
-#endif
             }
         }
         #endregion public bool IsTransitioning
@@ -202,13 +198,8 @@ namespace System.Windows.Controls
                     // revert to old value
                     source.SetValue(TransitionProperty, oldTransition);
 
-#if OPENSILVER
                     throw new ArgumentException(
                         string.Format(CultureInfo.CurrentCulture, Properties.Resources.TransitioningContentControl_TransitionNotFound, newTransition));
-#elif BRIDGE
-                    throw new ArgumentException(
-                        string.Format(CultureInfo.CurrentCulture, "Transition '{0}' was not defined.", newTransition));
-#endif
                 }
             }
             else
@@ -304,13 +295,8 @@ namespace System.Windows.Controls
                 // revert to default
                 Transition = DefaultTransitionState;
 
-#if OPENSILVER
                 throw new ArgumentException(
                     string.Format(CultureInfo.CurrentCulture, Properties.Resources.TransitioningContentControl_TransitionNotFound, invalidTransition));
-#elif BRIDGE
-                throw new ArgumentException(
-                    string.Format(CultureInfo.CurrentCulture, "Transition '{0}' was not defined.", invalidTransition));
-#endif
             }
 
             VisualStateManager.GoToState(this, NormalState, false);

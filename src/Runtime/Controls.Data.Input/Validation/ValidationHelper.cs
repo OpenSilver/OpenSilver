@@ -154,25 +154,14 @@ namespace System.Windows.Controls
                         // Loop through each attribute and update the VMD as appropriate
 
                         // RequiredField
-#if NETSTANDARD
                         RequiredAttribute reqAttribute = propertyAttribute as RequiredAttribute;
                         if (reqAttribute != null)
                         {
                             newVMD.IsRequired = true;
                             continue;
                         }
-#else // BRIDGE
-                        Type attrType = propertyAttribute.GetType();
-                        if (attrType.Name == "RequiredAttribute" &&
-                            attrType.Namespace == "System.ComponentModel.DataAnnotations")
-                        {
-                            newVMD.IsRequired = true;
-                            continue;
-                        }
-#endif
 
                         // Display attribute parsing
-#if NETSTANDARD
                         DisplayAttribute displayAttribute = propertyAttribute as DisplayAttribute;
                         if (displayAttribute != null)
                         {
@@ -180,20 +169,6 @@ namespace System.Windows.Controls
                             newVMD.Caption = displayAttribute.GetName();
                             continue;
                         }
-#else // BRIDGE
-                        attrType = propertyAttribute.GetType();
-                        if (attrType.Name == "DisplayAttribute" &&
-                            attrType.Namespace == "System.ComponentModel.DataAnnotations")
-                        {
-                            newVMD.Description = (string)attrType.GetMethod("GetDescription",
-                                                                            BindingFlags.Public | BindingFlags.Instance)
-                                                                 .Invoke(propertyAttribute, new object[0]);
-                            newVMD.Caption = (string)attrType.GetMethod("GetName", 
-                                                                        BindingFlags.Public | BindingFlags.Instance)
-                                                             .Invoke(propertyAttribute, new object[0]);
-                            continue;
-                        }
-#endif
                     }
                     if (newVMD.Caption == null)
                     {

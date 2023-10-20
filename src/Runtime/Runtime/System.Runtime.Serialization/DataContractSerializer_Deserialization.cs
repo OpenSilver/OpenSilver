@@ -135,7 +135,6 @@ namespace System.Runtime.Serialization
             // Create a temporary List<T> in order to add items to it. Later we will convert it to the final type if needed.
             //--------------------------------
 
-#if !BRIDGE
             var methodToCreateNewInstanceOfGenericList = typeof(DataContractSerializer_Deserialization).GetMethod("CreateNewInstanceOfGenericList", BindingFlags.NonPublic | BindingFlags.Static);
             if (methodToCreateNewInstanceOfGenericList == null)
                 throw new Exception("Cannot find the private static method named 'CreateNewInstanceOfGenericList'.");
@@ -147,22 +146,6 @@ namespace System.Runtime.Serialization
             // collection that is inside the List<T> implementation in JSIL as of July 14, 2017, thus
             // resulting in an exception when calling the Add method (reference: CSHTML5 tickets #623 and
             // #648).
-
-#else
-            // TODOBRIDGE: verify if the two code are similar
-            Type[] arg = { itemsType };
-            object list;
-
-            if (Interop.IsRunningInTheSimulator)
-            {
-                list = INTERNAL_Simulator.SimulatorProxy.MakeInstanceOfGenericType(typeof(List<>), arg);
-            }
-            else
-            {
-                list = Activator.CreateInstance(typeof(List<>).MakeGenericType(arg));
-            }
-#endif
-
 
             // Get a reference to the "Add" method of the generic list that we just created:
             var listAddMethod = list.GetType().GetMethod("Add");
@@ -251,12 +234,7 @@ namespace System.Runtime.Serialization
                 try
                 {
                     //todo: check if the type inherits from Dictionary here and if so, we do nothing here and it will be handled later.
-#if !BRIDGE
                     object result1 = Activator.CreateInstance(resultType, args: new object[] { list });
-#else
-                    object result1 = Activator.CreateInstance(resultType, arguments: new object[] { list });
-#endif
-
 
                     //we check if the elements have correctly been added to the result. If they have, we return the result, otherwise, we try to add the elements through a Add method.
                     //result1 is an IEnumerable<> or an Array
@@ -383,18 +361,7 @@ namespace System.Runtime.Serialization
                     foreach (var item in (IList)list)
                     {
                         dynamic dynamicItem = item;// using a dynamic here since it it much simpler but if it causes issues, we should use reflection to get Key and Value.
-#if BRIDGE
-                        if (Interop.IsRunningInTheSimulator)
-                        {
-                            addMethod.Invoke(result2, new object[] { dynamicItem.Key, dynamicItem.Value });
-                        }
-                        else
-                        {
-                            addMethod.Invoke(result2, new object[] { dynamicItem.key, dynamicItem.value });
-                        }
-#else
                         addMethod.Invoke(result2, new object[] { dynamicItem.Key, dynamicItem.Value });
-#endif
                     }
                 }
 
@@ -617,17 +584,7 @@ namespace System.Runtime.Serialization
                                         {
                                             string[] splittedElements = attributeValue.Split(' ');
 
-#if !BRIDGE
                                             List<int> listint = splittedElements.Select(Int32.Parse).ToList();
-#else
-                                            List<int> listint = new List<int>();
-
-                                            foreach (string str in splittedElements)
-                                            {
-                                                listint.Add(Int32.Parse(str));
-                                            }
-#endif
-
 
                                             DataContractSerializer_Helpers.SetMemberValue(resultInstance, memberInformation, listint);
                                             membersForWhichWeSuccessfullSetTheValue.Add(memberInformation.Name);

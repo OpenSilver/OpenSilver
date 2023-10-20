@@ -64,7 +64,6 @@ namespace DotNetForHtml5.Core
         /// </summary>
         public static Func<bool> WebControlDispatcherCheckAccess { get; internal set; }
 
-#if CSHTML5NETSTANDARD
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler
         {
             get => WebAssemblyExecutionHandler;
@@ -88,16 +87,15 @@ namespace DotNetForHtml5.Core
                 
                 WebAssemblyExecutionHandler = jsRuntime;
             }
-        } // Intended to be injected when the app is initialized.
+        }
 
         internal static IWebAssemblyExecutionHandler WebAssemblyExecutionHandler
         {
             get;
             set;
         }
-#endif
 
-        static dynamic dynamicJavaScriptExecutionHandler;
+        private static dynamic dynamicJavaScriptExecutionHandler;
 
         public static dynamic DynamicJavaScriptExecutionHandler
         {
@@ -150,22 +148,11 @@ namespace DotNetForHtml5.Core
             }
         }
 
-#if CSHTML5BLAZOR
-        // In OpenSilver Version, we use this work-around to know if we're in the simulator
-        static bool isRunningInTheSimulator_WorkAround = false;
-
         public static bool IsRunningInTheSimulator_WorkAround
         {
-            set // Intended to be setted by the "Emulator" project.
-            {
-                isRunningInTheSimulator_WorkAround = value; 
-            }
-            get 
-            { 
-                return isRunningInTheSimulator_WorkAround; 
-            }
+            get;
+            set;
         }
-#endif
 
         public static Action<object> SimulatorCallbackSetup
         {

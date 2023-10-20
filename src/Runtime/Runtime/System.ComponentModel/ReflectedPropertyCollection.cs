@@ -31,11 +31,7 @@ namespace System.ComponentModel
         {
             if (properties == null)
             {
-#if NETSTANDARD
                 _properties = Array.Empty<ReflectedPropertyData>();
-#else
-                _properties = EmptyArray<ReflectedPropertyData>.Value;
-#endif
             }
             else
             {
@@ -53,11 +49,7 @@ namespace System.ComponentModel
             
             if (orderedProperties == null)
             {
-#if NETSTANDARD
                 _properties = Array.Empty<ReflectedPropertyData>();
-#else
-                _properties = EmptyArray<ReflectedPropertyData>.Value;
-#endif
             }
             else
             {

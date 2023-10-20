@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if CSHTML5NETSTANDARD
-
 using System;
 using System.ComponentModel;
 using OpenSilver.Internal;
@@ -90,5 +88,3 @@ namespace DotNetForHtml5
             => throw new NotImplementedException();
     }
 }
-
-#endif

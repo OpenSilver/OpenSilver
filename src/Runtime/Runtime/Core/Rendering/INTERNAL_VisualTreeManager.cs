@@ -57,8 +57,6 @@ namespace CSHTML5.Internal
 
                         //Detach Element  
                         DetachVisualChildren(child);
-
-                        INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
                     }
                     else
                     {
@@ -275,33 +273,8 @@ if(nextSibling != undefined) {
                     // Nothing to do: the element is already attached to the specified parent.
                     return; //prevent from useless call to INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE().
                 }
-
-                INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
             }
         }
-
-#if OLD_CODE_TO_OPTIMIZE_SIMULATOR_PERFORMANCE // Obsolete since Beta 13.4 on 2018.01.31 because we now use the Dispatcher instead (cf. the class "INTERNAL_SimulatorExecuteJavaScript")
-
-#if !BRIDGE
-        [JSReplacement("")]
-#else
-        [External]
-#endif
-        static void StartTransactionToOptimizeSimulatorPerformance()
-        {
-            INTERNAL_SimulatorPerformanceOptimizer.StartTransaction();
-        }
-
-#if !BRIDGE
-        [JSReplacement("")]
-#else
-        [External]
-#endif
-        static void EndTransactionToOptimizeSimulatorPerformance()
-        {
-            INTERNAL_SimulatorPerformanceOptimizer.EndTransaction();
-        }
-#endif
 
         static void AttachVisualChild_Private(UIElement child, UIElement parent, int index)
         {
@@ -617,14 +590,6 @@ if(nextSibling != undefined) {
                 Performance.Counter("VisualTreeManager: RaisePropertyChanged for property '" + property.Name + "'", t1);
 #endif
             }
-        }
-
-#if BRIDGE
-        [Bridge.Template("true")]
-#endif
-        static bool IsRunningInJavaScript()
-        {
-            return false;
         }
 
         /// <summary>

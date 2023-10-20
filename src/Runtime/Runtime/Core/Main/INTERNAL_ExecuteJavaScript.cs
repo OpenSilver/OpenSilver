@@ -96,16 +96,10 @@ namespace CSHTML5.Internal
 
             JavaScriptRuntime.AddJavaScript(javaScriptToExecute);
 
-#if OPTIMIZATION_LOG
-            Console.WriteLine("[OPTIMIZATION] Direct execution of code. _isDispatcherPending: " + _isDispatcherPending.ToString());
-#endif
             if (!_isDispatcherPending)
             {
                 _isDispatcherPending = true;
 
-#if OPTIMIZATION_LOG
-                Console.WriteLine("[OPTIMIZATION] Calling setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
-#endif
                 INTERNAL_DispatcherHelpers.QueueAction(ExecutePendingJavaScriptCode);
             }
         }
@@ -127,11 +121,7 @@ namespace CSHTML5.Internal
         {
             string str = _javascriptCallsStore.Get(indexOfCallInList);
 
-#if OPENSILVER
             if (INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround())
-#else
-            if (INTERNAL_InteropImplementation.IsRunningInTheSimulator())
-#endif
             {
                 DotNetForHtml5.Core.INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, str);
             }

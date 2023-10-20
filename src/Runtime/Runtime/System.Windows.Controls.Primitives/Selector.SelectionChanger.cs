@@ -243,27 +243,6 @@ namespace System.Windows.Controls.Primitives
                 }
             }
 
-#if never
-            private void SynchronizeSelectedIndexToSelectedItem()
-            {
-                if (_owner._selectedItems.Count == 0)
-                {
-                    _owner.SelectedIndex = -1;
-                }
-                else
-                {
-                    object selectedItem = _owner.SelectedItem;
-                    object firstSelection = _owner._selectedItems[0];
- 
-                    // This check is only just to slightly improve perf by checking if it's in selected items before doing a reverse lookup
-                    if (selectedItem == null || firstSelection != selectedItem)
-                    {
-                        _owner.SelectedIndex = _owner.Items.IndexOf(firstSelection);
-                    }
-                }
-            }
-#endif
-
             /// <summary>
             /// Queue something to be added to the selection.  Does nothing if the item is already selected.
             /// </summary>

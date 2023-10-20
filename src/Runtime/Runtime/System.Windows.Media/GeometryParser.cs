@@ -581,14 +581,9 @@ namespace System.Windows.Media
                                 new Size(w, h),
                                 rotation,
                                 large,
-#if PBTCOMPILER
-                            sweep,
-#else
-                            sweep ? SweepDirection.Clockwise : SweepDirection.Counterclockwise,
-#endif
-                            IsStroked,
-                                !IsSmoothJoin
-                                );
+                                sweep ? SweepDirection.Clockwise : SweepDirection.Counterclockwise,
+                                IsStroked,
+                                !IsSmoothJoin);
                         }
                         while (this.IsNumber(AllowComma));
 

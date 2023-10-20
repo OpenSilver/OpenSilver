@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CSHTML5.Internal;
 
 public static partial class CSharpXamlForHtml5
@@ -31,11 +19,6 @@ public static partial class CSharpXamlForHtml5
     {
         public static partial class Types
         {
-#if !BRIDGE
-            [JSIgnore]
-#else
-            [External]
-#endif
             public class DynamicDomElementChildrenCollection
             {
                 INTERNAL_HtmlDomElementReference _parentDomElementRef;

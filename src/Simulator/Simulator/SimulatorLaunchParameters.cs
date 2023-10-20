@@ -1,11 +1,7 @@
 ﻿using DotNetForHtml5.EmulatorWithoutJavascript;
 using Microsoft.Web.WebView2.Wpf;
 
-#if OPENSILVER
 namespace OpenSilver.Simulator
-#else
-namespace CSHTML5.Simulator
-#endif
 {
     public class SimulatorLaunchParameters
     {

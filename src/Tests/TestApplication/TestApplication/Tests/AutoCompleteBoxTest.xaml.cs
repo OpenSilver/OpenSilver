@@ -41,34 +41,36 @@ namespace TestApplication.Tests
 
 #if OPENSILVER
             // Virtualizing the ListBox of the ACB dropdown by giving it a custom template
-            AutoCompleteVirtualized.Loaded += (s, e) =>
-            {
-                IList<DependencyObject> acbDescendants = AutoCompleteVirtualized.GetVisualDescendants().ToList();
-                Popup popup = acbDescendants.OfType<Popup>().First();
-
-                IList<DependencyObject> popupDescendants = popup.Child.GetVisualDescendants().ToList();
-                Grid popupGrid = popupDescendants.OfType<Grid>().First();
-                popupGrid.CustomLayout = true;
-                popupGrid.IsAutoHeightOnCustomLayout = true;
-                popupGrid.IsAutoWidthOnCustomLayout = true;
-
-                ListBox listBox = popupDescendants.OfType<ListBox>().First();
-
-                var xamlContext = global::OpenSilver.Internal.Xaml.RuntimeHelpers.Create_XamlContext();
-                var itemsPanelTemplate = new ItemsPanelTemplate();
-                global::OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplateContent(itemsPanelTemplate, xamlContext, CreateItemsPanelTemplate);
-                listBox.ItemsPanel = itemsPanelTemplate;
-            };
+            AutoCompleteVirtualized.Loaded += OnAutoCompleteBoxLoaded;
+#endif
         }
 
-        private FrameworkElement CreateItemsPanelTemplate(FrameworkElement templateOwner_ItemsPanelTemplate,
+#if OPENSILVER
+        private void OnAutoCompleteBoxLoaded(object sender, RoutedEventArgs e)
+        {
+            IList<DependencyObject> acbDescendants = AutoCompleteVirtualized.GetVisualDescendants().ToList();
+            Popup popup = acbDescendants.OfType<Popup>().First();
+
+            IList<DependencyObject> popupDescendants = popup.Child.GetVisualDescendants().ToList();
+            Grid popupGrid = popupDescendants.OfType<Grid>().First();
+            popupGrid.CustomLayout = true;
+            popupGrid.IsAutoHeightOnCustomLayout = true;
+            popupGrid.IsAutoWidthOnCustomLayout = true;
+
+            ListBox listBox = popupDescendants.OfType<ListBox>().First();
+
+            var xamlContext = global::OpenSilver.Internal.Xaml.RuntimeHelpers.Create_XamlContext();
+            var itemsPanelTemplate = new ItemsPanelTemplate();
+            global::OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplateContent(itemsPanelTemplate, xamlContext, CreateItemsPanelTemplate);
+            listBox.ItemsPanel = itemsPanelTemplate;
+        }
+
+        private static FrameworkElement CreateItemsPanelTemplate(FrameworkElement templateOwner_ItemsPanelTemplate,
             XamlContext xamlContext)
         {
             var virtualizingStackPanel = new VirtualizingStackPanel();
             global::OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplatedParent(virtualizingStackPanel, templateOwner_ItemsPanelTemplate);
             return virtualizingStackPanel;
-        }
-#else
         }
 #endif
 

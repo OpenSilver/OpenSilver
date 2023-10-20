@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -18,38 +17,11 @@ using System.Windows;
 
 namespace System
 {
-
-#if BRIDGE
     /// <summary>
     /// Defines a mechanism for retrieving a service object; that is, an object that
     /// provides custom support to other objects.
     /// </summary>
-    public interface IServiceProvider
-    {
-
-        /// <summary>
-        /// Gets the service object of the specified type.
-        /// </summary>
-        /// <param name="serviceType">An object that specifies the type of service object to get.</param>
-        /// <returns>
-        /// A service object of type serviceType. -or- null if there is no service object
-        /// of type serviceType.
-        /// </returns>
-        object GetService(Type serviceType);
-    } 
-#endif
-
-
-
-    /// <summary>
-    /// Defines a mechanism for retrieving a service object; that is, an object that
-    /// provides custom support to other objects.
-    /// </summary>
-#if NETSTANDARD
     public class ServiceProvider : IServiceProvider, IProvideValueTarget
-#else // BRIDGE
-    public class ServiceProvider : IServiceProvider, IProvideValueTarget
-#endif
     {
         /// <summary>
         /// Initialize a new instance of the <see cref="ServiceProvider"/> class.
@@ -64,10 +36,11 @@ namespace System
         /// <summary>
         /// Initialize a new instance of the <see cref="ServiceProvider"/> class.
         /// </summary>
-        public ServiceProvider(object element, DependencyProperty property) : this(element, property, new List<object>(0))
+        public ServiceProvider(object element, DependencyProperty property)
+            : this(element, property, new List<object>(0))
         {
         }
-        
+
         /// <summary>
         /// Gets the service object of the specified type.
         /// </summary>
@@ -78,34 +51,15 @@ namespace System
         /// A service object of type serviceType.-or- null if there is no service object
         /// of type serviceType.
         /// </returns>
-        public object GetService(Type serviceType)
-        {
-            return this;
-        }
+        public object GetService(Type serviceType) => this;
 
-
-        List<Object> _parents;
         /// <summary>
         /// Gets or sets the List of UIElement that are parents of the element.
         /// </summary>
-        public List<Object> Parents
-        {
-            get { return _parents; }
-            private set { _parents = value; }
-        }
+        public List<object> Parents { get; private set; }
 
-        object _targetObject;
-        public object TargetObject
-        {
-            get { return _targetObject; }
-            private set { _targetObject = value; }
-        }
+        public object TargetObject { get; private set; }
 
-        object _targetProperty;
-        public object TargetProperty
-        {
-            get { return _targetProperty; }
-            private set { _targetProperty = value; }
-        }
+        public object TargetProperty { get; private set; }
     }
 }

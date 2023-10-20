@@ -282,14 +282,12 @@ namespace System.Windows.Controls
             TreeViewItem source = d as TreeViewItem;
             bool isExpanded = (bool)e.NewValue;
 
-#if OPENSILVER
             // Notify any automation peers of the expansion change
             TreeViewItemAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(source) as TreeViewItemAutomationPeer;
             if (peer != null)
             {
                 peer.RaiseExpandCollapseAutomationEvent((bool)e.OldValue, isExpanded);
             }
-#endif // OPENSILVER
 
             // Raise the Expanded and Collapsed events
             RoutedEventArgs args = new RoutedEventArgs();
@@ -380,14 +378,12 @@ namespace System.Windows.Controls
 
             source.Select(isSelected);
 
-#if OPENSILVER
             // Notify any automation peers of the selection change
             TreeViewItemAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(source) as TreeViewItemAutomationPeer;
             if (peer != null)
             {
                 peer.RaiseAutomationIsSelectedChanged(isSelected);
             }
-#endif // OPENSILVER
 
             RoutedEventArgs args = new RoutedEventArgs();
             if (isSelected)
@@ -640,7 +636,6 @@ namespace System.Windows.Controls
             Interaction = new InteractionHelper(this);
         }
 
-#if OPENSILVER
         /// <summary>
         /// Returns a
         /// <see cref="TreeViewItemAutomationPeer" />
@@ -656,7 +651,6 @@ namespace System.Windows.Controls
         {
             return new TreeViewItemAutomationPeer(this);
         }
-#endif // OPENSILVER
 
         #region Templating
         /// <summary>

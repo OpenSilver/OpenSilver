@@ -471,13 +471,6 @@ namespace System.Xml
             return xDocument.CreateReader();
         }
 
-#if BRIDGE // this method is replaced by JSIL but not by BRIDGE
-        public override void Dispose()
-        {
-            //throw new NotImplementedException();
-        }
-#endif
-
         public override string Value
         {
             get

@@ -80,7 +80,6 @@ namespace System.ServiceModel
             return task;
         }
 
-#if OPENSILVER
         public static (RETURN_TYPE, Channels.MessageHeaders) CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
@@ -135,7 +134,6 @@ namespace System.ServiceModel
 
             return task;
         }
-#endif
 
         public static RETURN_TYPE CallWebMethod<RETURN_TYPE, INTERFACE_TYPE>(
             string endpointAddress,
@@ -332,7 +330,6 @@ namespace System.ServiceModel
                 soapVersion);
         }
 
-#if OPENSILVER
         public static (object, Channels.MessageHeaders) CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
             string endpointAddress,
             string webMethodName,
@@ -363,7 +360,6 @@ namespace System.ServiceModel
                 requestParameters,
                 soapVersion);
         }
-#endif
 
         public static void CallWebMethod_WithoutReturnValue<INTERFACE_TYPE>(
             string endpointAddress,

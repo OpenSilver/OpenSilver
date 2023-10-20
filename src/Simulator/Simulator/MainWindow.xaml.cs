@@ -49,11 +49,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         internal static MainWindow Instance { get; private set; }
 
-#if OPENSILVER
         public MainWindow(Action appCreationDelegate, Assembly appAssembly, SimulatorLaunchParameters simulatorLaunchParameters)
-#elif BRIDGE
-        public MainWindow()
-#endif
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -63,38 +59,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             InitializeComponent();
             Instance = this;
 
-#if OPENSILVER
             Icon = new BitmapImage(new Uri("pack://application:,,,/OpenSilver.Simulator;component/OpenSilverIcon.ico"));
             Title = "Simulator II - OpenSilver";
-#else
-            Icon = new BitmapImage(new Uri("pack://application:,,,/CSharpXamlForHtml5.Simulator;component/CSHTML5Icon.ico"));
-            Title = "Simulator II - CSHTML5";
-#endif
 
-#if OPENSILVER
             _appCreationDelegate = appCreationDelegate ?? throw new ArgumentNullException(nameof(appCreationDelegate));
             _simulatorLaunchParameters = simulatorLaunchParameters;
             ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out _coreAssembly);
             _entryPointAssembly = appAssembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
-#endif
-
-#if BRIDGE
-            // Load the "TypeForwarding" assembly that allows to redirect the type references from Bridge.dll to Mscorlib.dll:
-            // Note: paths are relative to the current .exe file
-            string pathOfThisVeryAssembly = PathsHelper.GetPathOfThisVeryAssembly();
-            string folderOfThisVeryAssembly = Path.GetDirectoryName(pathOfThisVeryAssembly);
-            string typeForwardingAssemblyPathForDebugging = Path.Combine(folderOfThisVeryAssembly, @"..\..\..\DotNetForHtml5.Bridge.TypeForwarding\bin\Debug\CSharpXamlForHtml5.Bridge.TypeForwarding.dll");
-            string typeForwardingAssemblyPathForPackagedVersion = Path.Combine(folderOfThisVeryAssembly, @"CSharpXamlForHtml5.Bridge.TypeForwarding.dll");
-            if (File.Exists(typeForwardingAssemblyPathForDebugging))
-            {
-                _typeForwardingAssembly = Assembly.LoadFrom(typeForwardingAssemblyPathForDebugging);
-            }
-            else
-            {
-                _typeForwardingAssembly = Assembly.LoadFrom(typeForwardingAssemblyPathForPackagedVersion);
-            }
-#endif
 
             MainWebBrowser = new WebView2
             {
@@ -103,10 +75,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             };
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;
 
-#if OPENSILVER
             CookiesHelper.SetCustomCookies(MainWebBrowser, simulatorLaunchParameters?.CookiesData);
             simulatorLaunchParameters?.BrowserCreatedCallback?.Invoke(MainWebBrowser);
-#endif
 
             //Note: The following line was an attempt to persist the Microsoft login cookies (for use by user applications that required AAD login), but it is no longer necessary because we changed the DotNetBrowser "StorageType" from "MEMORY" to "DISK", so cookies are now automatically persisted.
             //CookiesHelper.LoadMicrosoftCookies(MainWebBrowser, NAME_FOR_STORING_COOKIES);
@@ -156,7 +126,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             }
         }
 
-#if OPENSILVER
         Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             string assemblyLocalName = args.Name.Contains(',') ? args.Name.Substring(0, args.Name.IndexOf(',')) : args.Name;
@@ -220,125 +189,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                     return null;
             }
         }
-#elif BRIDGE
-        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            string assemblyLocalName = args.Name.IndexOf(',') >= 0 ? args.Name.Substring(0, args.Name.IndexOf(',')) : args.Name;
-
-            // Note: this corresponds to the assembly produced by the project 
-            // "DotNetForHtml5.Bridge.TypesThatWillBeForwarded"
-            switch (assemblyLocalName.ToLower())
-            {
-                case "bridge":
-                case "cshtml5.stubs":
-                    return _typeForwardingAssembly;
-
-                default:
-                    if (args.RequestingAssembly != null)
-                    {
-                        string assemblyFileName = $"{assemblyLocalName}.dll";
-                        string invariantFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), assemblyFileName));
-                        string fullPath;
-
-                        if (!File.Exists(invariantFullPath))
-                        {
-                            string cultureName = Thread.CurrentThread.CurrentCulture.Name;
-                            fullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), cultureName, assemblyFileName));
-                        }
-                        else
-                        {
-                            fullPath = invariantFullPath;
-                        }
-
-                        if (File.Exists(fullPath))
-                        {
-                            var assembly = Assembly.LoadFile(fullPath);
-                            return assembly;
-                        }
-                        else
-                            throw new FileNotFoundException($"Assembly {assemblyFileName} not found.\nSearched at:\n{invariantFullPath}\n{fullPath}");
-                    }
-                    return null;
-            }
-        }
-#else // JSIL, Obsolete, remove this
-        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            string assemblyLocalName = args.Name.IndexOf(',') >= 0 ? args.Name.Substring(0, args.Name.IndexOf(',')) : args.Name;
-
-            switch (assemblyLocalName)
-            {
-                case Constants.NAME_OF_CORE_ASSEMBLY:
-                case Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION:
-                    // If specified DLL has absolute path, look in same folder:
-                    string pathOfAssemblyThatContainsEntryPoint;
-                    string candidatePath;
-                    if (ReflectionInUserAssembliesHelper.TryGetPathOfAssemblyThatContainsEntryPoint(out pathOfAssemblyThatContainsEntryPoint))
-                    {
-                        if (pathOfAssemblyThatContainsEntryPoint.Contains("\\"))
-                        {
-                            candidatePath = $"{Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint)}\\{assemblyLocalName}.dll";
-                            return Assembly.LoadFile(candidatePath);
-                        }
-                    }
-                    // Otherwise look in current execution folder:
-                    return Assembly.LoadFile($"{assemblyLocalName}.dll");
-
-                case "CSharpXamlForHtml5.System.dll":
-                case "SLMigration.CSharpXamlForHtml5.System.dll":
-                    return Assembly.GetAssembly(typeof(Queue<>)); // Note: Queue<> is defined in System.dll
-
-                case "CSharpXamlForHtml5.System.Xaml.dll":
-                case "SLMigration.CSharpXamlForHtml5.System.Xaml.dll":
-                    return Assembly.GetAssembly(typeof(XamlException)); // Note: XamlException is defined in System.Xaml.dll
-
-                case "CSharpXamlForHtml5.System.Xml.dll":
-                case "SLMigration.CSharpXamlForHtml5.System.Xml.dll":
-                    return Assembly.GetAssembly(typeof(XmlSerializer)); // Note: XmlSerializer is defined in System.Xml.dll
-
-                case "CSharpXamlForHtml5.System.Runtime.Serialization.dll":
-                case "SLMigration.CSharpXamlForHtml5.System.Runtime.Serialization.dll":
-                    return Assembly.GetAssembly(typeof(DataContractAttribute)); // Note: DataContractAttribute is defined in System.Runtime.Serialization.dll
-
-                case "CSharpXamlForHtml5.System.ServiceModel.dll":
-                case "SLMigration.CSharpXamlForHtml5.System.ServiceModel.dll":
-                    return Assembly.GetAssembly(typeof(EndpointAddress)); // Note: EndpointAddress is defined in System.ServiceModel.dll
-                
-                case "CSharpXamlForHtml5.ToBeReplacedAtRuntime.System.ServiceModel.dll":
-                case "SLMigration.CSharpXamlForHtml5.ToBeReplacedAtRuntime.System.ServiceModel.dll":
-                    return Assembly.GetAssembly(typeof(EndpointAddress)); // Note: EndpointAddress is defined in System.ServiceModel.dll
-
-                default:
-                    if (args.RequestingAssembly != null)
-                    {
-                        string assemblyFileName = $"{assemblyLocalName}.dll";
-                        string invariantFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), assemblyFileName));
-
-                        string fullPath;
-                        if (!File.Exists(invariantFullPath))
-                        {
-                            string cultureName = Thread.CurrentThread.CurrentCulture.Name;
-                            fullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), cultureName, assemblyFileName));
-                        }
-                        else
-                        {
-                            fullPath = invariantFullPath;
-                        }
-
-                        if (File.Exists(fullPath))
-                        {
-                            var assembly = Assembly.LoadFile(fullPath);
-                            return assembly;
-                        }
-                        else
-                        {
-                            throw new FileNotFoundException($"Assembly {assemblyFileName} not found.\nSearched at:\n{invariantFullPath}\n{fullPath}");
-                        }
-                    }
-                    return null;
-            }
-        }
-#endif
 
         async Task InitializeWebViewAsync()
         {
@@ -467,7 +317,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 baseURL = "file:///" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace('\\', '/');
             }
 
-#if OPENSILVER
             if (_simulatorLaunchParameters?.InitParams != null)
             {
                 simulatorRootHtml = simulatorRootHtml.Replace(
@@ -478,7 +327,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             {
                 simulatorRootHtml = simulatorRootHtml.Replace("[PARAM_INITPARAMS_GOES_HERE]", string.Empty);
             }
-#endif
 
             string modifiedHtmlAbsolutePath = Path.Combine(Path.GetDirectoryName(absolutePath), "simulator_root_final.html");
             File.WriteAllText(modifiedHtmlAbsolutePath, simulatorRootHtml);
@@ -614,11 +462,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                     }
                     else
                     {
-#if OPENSILVER
                         const string ROOT_NAME = "opensilver-root";
-#elif BRIDGE
-                        const string ROOT_NAME = "cshtml5-root";
-#endif
                         Debug.WriteLine($"Initialization: {ROOT_NAME} was not ready on first try.");
                     }
                 }
@@ -653,132 +497,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         private bool CheckFeatureValidity(string featureId, string editionName)
         {
-#if false
-            string computerName = System.Environment.MachineName;
-            try
-            {
-                //We get the correponding key (or above):
-                if (featureId != null)
-                {
-                    Guid keyGuid;
-                    DateTime currentVersionReleaseDate = VersionInformation.GetCurrentVersionReleaseDate();
-
-                    if (ActivationHelpers.IsFeatureEnabled(featureId))
-                    {
-
-                        if (Guid.TryParse(RegistryHelpers.GetSetting("Feature_" + featureId, null), out keyGuid))
-                        {
-                            LicensingServiceReference.LicensingServiceClient licensingServiceClient;
-                            //licensingServiceClient = new LicensingServiceReference.LicensingServiceClient("LocalTestBinding_ILicensingService"); //Testing version.
-                            //todo: BEFORE THE RELEASE put the following back and comment the line above.
-                            licensingServiceClient = new LicensingServiceReference.LicensingServiceClient(
-                    new BasicHttpBinding(BasicHttpSecurityMode.Transport),
-                    new EndpointAddress(new Uri(@"https://myaccount.cshtml5.com/LicensingService.svc"))); //Normal version.
-
-                            KeyValidity keyValidity = licensingServiceClient.CheckLicenseValidity(keyGuid, computerName, currentVersionReleaseDate.ToOADate());
-                            //Note: we get an EndpointNotFoundException (which is caught and dealt with a bit lower in the code) if there is no internet.
-
-                            //We refresh the validity date:
-                            if (keyValidity.ValidityLimit != DateTime.MinValue)
-                            {
-                                ValidityHelpers.SetValidityLimit(featureId, keyValidity.ValidityLimit);
-                            }
-                            else
-                            {
-                                ValidityHelpers.RemoveKeyValidity(featureId);
-                            }
-
-                            switch (keyValidity.State) //NOTE: keyValidity is not supposed to be null
-                            {
-                                case KeyState.Valid:
-                                    return true;
-                                case KeyState.Expired:
-                                    //licensingServiceClient.DeactivateKey(keyGuid.ToString());
-                                    bool isDeactivated = licensingServiceClient.DeactivateKey(keyGuid.ToString());
-
-                                    // We remove the key from the registry:
-                                    if (isDeactivated)
-                                    {
-                                        if (ActivationHelpers.IsFeatureEnabled(featureId))
-                                        {
-                                            RegistryHelpers.DeleteSetting("Feature_" + featureId); //remove the key itself
-                                            RegistryHelpers.DeleteSetting("Validity_" + featureId); //remove the validity date for the key
-                                        }
-                                    }
-
-                                    Dispatcher.BeginInvoke((Action)(() =>
-                                    {
-                                        MessageBox.Show("The key for the " + editionName + " is no longer valid and has been deactivated.");
-                                    }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-                                    return false;
-                                case KeyState.AlmostExpired:
-                                    if (!ValidityHelpers.WasTheKeyAlmostExpiredMessageAlreadyDisplayedToday)
-                                    {
-                                        //MessageBox.Show(this, keyValidity.Message);
-                                        Dispatcher.BeginInvoke((Action)(() =>
-                                        {
-                                            MessageBox.Show(keyValidity.Message);
-                                        }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-                                        ValidityHelpers.RememberThatTheKeyAlmostExpiredMessageWasDisplayedToday();
-                                    }
-                                    return true;
-                                default:
-                                    throw new Exception("Invalid Key validity state."); //No idea how we would arrive here.
-                            }
-                        }
-                        else
-                        {
-                            throw new FaultException("The key for the " + editionName + " could not be retrieved. Please try to reactivate the associated key and if it does not fix your issue, please contact us at support@cshtml5.com");
-                            //I don't like the fact that it is a FaultException since it wasn't thrown by the WebService but the behaviour fits.
-                        }
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    throw new Exception("Could not check validity: feature is null");
-                }
-            }
-            catch (Exception ex) // Note: we have only one "catch" because C# does not allow putting multiple exception types in a single block.
-            {
-                if (ex is EndpointNotFoundException || (ex.Message.Contains("LicensingService"))) // Note: this second condition can catch errors obtained for example when Fiddler is running.
-                {
-                    //we could not get the information on the internet so we rely on the registry:
-                    if (!ValidityHelpers.IsTheKeyValid(featureId))
-                    {
-                        Dispatcher.BeginInvoke((Action)(() =>
-                        {
-                            MessageBox.Show("The key for the " + editionName + " is no longer considered valid on this computer and there doesn't seem to be an internet connection to refresh its validity date. If you are currently connected to the internet, please contact us at support@cshtml5.com.");
-                        }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-                        return false;
-                    }
-                    return true; //todo: display something in the Simulator to tell the user that we were unable to connect.
-                }
-                else if (ex is FaultException)
-                {
-                    Dispatcher.BeginInvoke((Action)(() =>
-                    {
-                        MessageBox.Show(ex.Message, "", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-                    return false;
-                }
-                else
-                {
-                    Dispatcher.BeginInvoke((Action)(() =>
-                    {
-                        MessageBox.Show("An error has occurred. Please contact support at: support@cshtml5.com\r\n\r\n-------------------\r\n\r\nError details:\r\n" + ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-                    return false;
-                }
-            }
-#else
             return true;
-#endif
         }
 
         private async void ButtonStats_Click(object sender, RoutedEventArgs e)
@@ -875,11 +594,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         private void ButtonDebugJavaScriptLog_Click(object sender, RoutedEventArgs e)
         {
-#if BRIDGE
-            string destinationFolderName = "TempDebugCshtml5";
-#elif OPENSILVER
             string destinationFolderName = "TempDebugOpenSilver";
-#endif
             string info =
 $@"This feature lets you debug the JavaScript code executed by the Simulator so far, which corresponds to the content of the Interop.ExecuteJavaScript(...) calls as well as the JS/C# interop calls that are specific to the Simulator.
 
@@ -902,11 +617,7 @@ Click OK to continue.";
                     string simulatorExePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     File.Copy(Path.Combine(simulatorExePath, "interop_debug_root.html"), Path.Combine(destinationPath, "index.html"), true);
 
-#if OPENSILVER
                     string simulatorJsCssPath = Path.Combine(simulatorExePath, @"js_css");
-#elif BRIDGE
-                    string simulatorJsCssPath = Path.Combine(simulatorExePath, @"..\..\js_css");
-#endif
 
                     File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.css"), Path.Combine(destinationPath, "cshtml5.css"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.js"), Path.Combine(destinationPath, "cshtml5.js"), true);

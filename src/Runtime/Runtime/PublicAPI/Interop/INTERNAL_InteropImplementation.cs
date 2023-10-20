@@ -166,9 +166,6 @@ namespace CSHTML5
             return result;
         }
 
-#if BRIDGE
-        [Bridge.Template("null")]
-#endif
         internal static INTERNAL_JSObjectReference ExecuteJavaScript_GetJSObject(
             string javascript,
             bool runAsynchronously,
@@ -282,16 +279,6 @@ head.appendChild(script);");
 
         internal static void LoadCssFile(string url, Action callback)
         {
-            // Get the assembly name of the calling method: 
-            // IMPORTANT: the call to the "GetCallingAssembly" method must be done in
-            // the method that is executed immediately after the one where the URI is
-            // defined! Be careful when moving the following line of code.
-#if NETSTANDARD
-            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#elif BRIDGE
-            string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
-#endif
-
             string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url);
 
             string sHtml5Path = GetVariableStringForJS(html5Path);
@@ -331,23 +318,13 @@ img.src = {sHtml5Path};");
             }
         }
 
-#if BRIDGE
-        [Bridge.Template("false")]
-#endif
-        internal static bool IsRunningInTheSimulator()
-        {
-            return true;
-        }
-
-#if OPENSILVER
         // In the OpenSilver Version
         // This is does not reprensent if we are in the simulator but if we're
         // For This purpose use DotNetForHtml5.Core.IsRunningInTheSimulator_WorkAround
         internal static bool IsRunningInTheSimulator_WorkAround()
         {
-            return DotNetForHtml5.Core.INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround;
+            return INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround;
         }
-#endif
     }
 
     internal sealed class SynchronyzedStore<T>

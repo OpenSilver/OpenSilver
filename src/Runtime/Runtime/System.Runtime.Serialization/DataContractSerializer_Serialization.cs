@@ -239,11 +239,7 @@ namespace System.Runtime.Serialization
                     {
                         xElement = new XElement(XNamespace.Get(DataContractSerializer_Helpers.GetDefaultNamespace(itemsType.Namespace, useXmlSerializerFormat)).GetName(elementName), result);
                     }
-#if OPENSILVER
                     xElement.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLNS_NAMESPACE).GetName("i"), DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE));
-#else
-                    xElement.Add(new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLNS_NAMESPACE).GetName("xmlns:i"), DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE));
-#endif
                     return new List<XObject>() { xElement };
                 }
                 else

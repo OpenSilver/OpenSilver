@@ -124,14 +124,12 @@ namespace OpenSilver.Internal.Data
                 return Create(sourceType, targetType, targetToSource);
             }
 
-#if NETSTANDARD
             // special case for converting IListSource to IList
             if (typeof(IListSource).IsAssignableFrom(sourceType) &&
                 targetType.IsAssignableFrom(typeof(IList)))
             {
                 return new ListSourceConverter();
             }
-#endif
 
             // Interfaces are best handled on a per-instance basis.  The type may
             // not implement the interface, but an instance of a derived type may.
@@ -515,8 +513,6 @@ namespace OpenSilver.Internal.Data
         }
     }
 
-#if NETSTANDARD
-
     internal sealed class ListSourceConverter : IValueConverter
     {
         //------------------------------------------------------
@@ -550,8 +546,6 @@ namespace OpenSilver.Internal.Data
             return null;
         }
     }
-
-#endif // NETSTANDARD
 
     internal sealed class InterfaceConverter : IValueConverter
     {

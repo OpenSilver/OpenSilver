@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,27 +11,18 @@
 *  
 \*====================================================================================*/
 
-
 namespace System.Windows.Markup
 {
     /// <summary>
     /// In XAML markup, specifies a null value for a property.
     /// </summary>
-
-    public partial class NullExtension : MarkupExtension
+    public class NullExtension : MarkupExtension
     {
         /// <summary>
-        /// Initializes a new instance of NullExtension.
+        /// Initializes a new instance of <see cref="NullExtension"/>.
         /// </summary>
         public NullExtension() { }
 
-#if BRIDGE
-        public override object ProvideValue(IServiceProvider serviceProvider)
-#else
-        public override object ProvideValue(IServiceProvider serviceProvider)
-#endif
-        {
-            return null;
-        }
+        public override object ProvideValue(IServiceProvider serviceProvider) => null;
     }
 }

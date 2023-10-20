@@ -459,11 +459,7 @@ namespace System.Windows.Controls
 
             return VisualStateManager.GetVisualStateGroups(root)
                 .OfType<VisualStateGroup>()
-#if NETSTANDARD
                 .Where(group => string.CompareOrdinal(groupName, group.Name) == 0)
-#elif BRIDGE
-                .Where(group => string.Compare(groupName, group.Name, StringComparison.Ordinal) == 0)
-#endif
                 .FirstOrDefault();
         }
     }

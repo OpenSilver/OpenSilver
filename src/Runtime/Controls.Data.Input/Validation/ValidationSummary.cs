@@ -694,17 +694,14 @@ namespace System.Windows.Controls
 
         #region Protected Methods
 
-#if OPENSILVER
         /// <summary>
         /// Creates AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
         /// </summary>
         /// <returns>The AutomationPeer associated with this ValidationSummary.</returns>
-        [OpenSilver.NotImplemented]
         protected override AutomationPeer OnCreateAutomationPeer()
         {
             return new ValidationSummaryAutomationPeer(this);
         }
-#endif
 
 #endregion Protected Methods
 
@@ -863,14 +860,12 @@ namespace System.Windows.Controls
                     FocusingInvalidControlEventArgs e = new FocusingInvalidControlEventArgs(vsi, this._currentValidationSummaryItemSource);
                     this.OnFocusingInvalidControl(e);
 
-#if OPENSILVER
                     // Raise the AutomationPeer event
                     ValidationSummaryAutomationPeer peer = ValidationSummaryAutomationPeer.FromElement(this) as ValidationSummaryAutomationPeer;
                     if (peer != null && AutomationPeer.ListenerExists(AutomationEvents.InvokePatternOnInvoked))
                     {
                         peer.RaiseAutomationEvent(AutomationEvents.InvokePatternOnInvoked);
                     }
-#endif
 
                     // Focus the target, which will usually be the current ESI source or the overwritten one
                     if (!e.Handled && e.Target != null && e.Target.Control != null)
@@ -895,11 +890,7 @@ namespace System.Windows.Controls
             if (e != null && e.Error != null && e.Error.ErrorContent != null && inputControl != null)
             {
                 string message = e.Error.ErrorContent.ToString();
-#if NETSTANDARD
                 string key = String.IsNullOrEmpty(inputControl.Name) ? inputControl.GetHashCode().ToString(CultureInfo.InvariantCulture) : inputControl.Name;
-#else
-                string key = String.IsNullOrEmpty(inputControl.Name) ? inputControl.GetHashCode().ToString(null, CultureInfo.InvariantCulture) : inputControl.Name;
-#endif
                 key += message;
                 if (this._validationSummaryItemDictionary.ContainsKey(key))
                 {

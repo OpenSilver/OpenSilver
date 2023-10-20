@@ -19,9 +19,7 @@ using System.Windows;
 
 namespace CSHTML5
 {
-#if OPENSILVER
     [Obsolete("Use OpenSilver.Interop instead.")]
-#endif
     public static class Interop
     {
         /// <summary>
@@ -29,9 +27,6 @@ namespace CSHTML5
         /// </summary>
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <returns>The result, if any, of the JavaScript call.</returns>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScript(string javascript)
         {
             return OpenSilver.Interop.ExecuteJavaScript(javascript);
@@ -43,9 +38,6 @@ namespace CSHTML5
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
         /// <returns>The result, if any, of the JavaScript call.</returns>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScript(string javascript, params object[] variables)
         {
             return OpenSilver.Interop.ExecuteJavaScript(javascript, variables);
@@ -55,9 +47,6 @@ namespace CSHTML5
         /// Allows calling JavaScript code from within C#. The call will be asynchronous when run in the Simulator.
         /// </summary>
         /// <param name="javascript">The JavaScript code to execute.</param>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScriptAsync(string javascript)
         {
             return OpenSilver.Interop.ExecuteJavaScriptAsync(javascript);
@@ -68,9 +57,6 @@ namespace CSHTML5
         /// </summary>
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScriptAsync(string javascript, params object[] variables)
         {
             return OpenSilver.Interop.ExecuteJavaScriptAsync(javascript, variables);
@@ -90,9 +76,6 @@ namespace CSHTML5
         /// </summary>
         /// <param name="value">The value to unbox.</param>
         /// <returns>the unboxed value if the value was boxed, the value itself otherwise.</returns>
-#if BRIDGE
-        [Bridge.Template("({value} == undefined ? {value} : ({value}.v != undefined ? {value}.v : {value}))")]
-#endif
         public static object Unbox(object value)
         {
             return OpenSilver.Interop.Unbox(value);
@@ -172,34 +155,23 @@ namespace CSHTML5
             return OpenSilver.Interop.GetDiv(frameworkElement);
         }
 
-#if CSHTML5BLAZOR
         /// <summary>
         /// Returns True is the app is running in C#, and False otherwise. 
         /// To know if you're in the simulator use IsRunningInTheSimulator_WorkAround.
         /// </summary>
-#else
-        /// <summary>
-        /// Returns True is the app is running in C# inside the Simulator, and False otherwise.
-        /// </summary>
-#endif
         public static bool IsRunningInTheSimulator
         {
             get { return OpenSilver.Interop.IsRunningInTheSimulator; }
         }
 
-#if CSHTML5BLAZOR // For backwards compatibility
        public static bool IsRunningInTheSimulator_WorkAround
        {
            get { return OpenSilver.Interop.IsRunningInTheSimulator_WorkAround; }
        }
-#endif
 
         /// <summary>
         /// Check if the given jsnode is undefined
         /// </summary>
-#if BRIDGE
-        [Bridge.Template("(typeof({jsObject}) === 'undefined')")]
-#endif
         public static bool IsUndefined(object jsObject)
         {
             return OpenSilver.Interop.IsUndefined(jsObject);
@@ -208,9 +180,6 @@ namespace CSHTML5
         /// <summary>
         /// Check if the given jsnode is undefined
         /// </summary>
-#if BRIDGE
-        [Bridge.Template("({jsObject} === null)")]
-#endif
         public static bool IsNull(object jsObject)
         {
             return OpenSilver.Interop.IsNull(jsObject);

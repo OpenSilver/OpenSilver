@@ -190,14 +190,12 @@ namespace System.Windows.Controls
             Expander ctrl = (Expander)d;
             bool isExpanded = (bool)e.NewValue;
 
-#if OPENSILVER
             // Notify any automation peers of the expansion change
             ExpanderAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(ctrl) as ExpanderAutomationPeer;
             if (peer != null)
             {
                 peer.RaiseExpandCollapseAutomationEvent((bool)e.OldValue, isExpanded);
             }
-#endif
 
             if (isExpanded)
             {
@@ -248,7 +246,6 @@ namespace System.Windows.Controls
             Interaction.OnApplyTemplateBase();
         }
 
-#if OPENSILVER
         /// <summary>
         /// Returns a
         /// <see cref="ExpanderAutomationPeer" />
@@ -263,7 +260,6 @@ namespace System.Windows.Controls
         {
             return new ExpanderAutomationPeer(this);
         }
-#endif
 
         /// <summary>
         /// Provides handling for the

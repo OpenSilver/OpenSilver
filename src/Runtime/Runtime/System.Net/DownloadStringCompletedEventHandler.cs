@@ -15,19 +15,7 @@
 //
 //===============================================================================
 
-
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if OPENSILVER
 namespace OpenSilver.Compatibility
-#else
-namespace System.Net
-#endif
 {
     /// <summary>
     /// Represents the method that will handle the System.Net.WebClient.DownloadStringCompleted
@@ -36,5 +24,5 @@ namespace System.Net
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">A System.Net.DownloadStringCompletedEventArgs that contains event data.</param>
     /// <returns></returns>
-    public delegate void DownloadStringCompletedEventHandler(System.Object sender, DownloadStringCompletedEventArgs e);
+    public delegate void DownloadStringCompletedEventHandler(object sender, DownloadStringCompletedEventArgs e);
 }

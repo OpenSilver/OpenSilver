@@ -344,9 +344,6 @@ namespace System.Windows.Data
                 {
                     //Note: we make two calls because "replace" does not work in the DataGrid at the time of writing.
                     CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-#if BRIDGE
-                    this.OnPropertyChanged("Count");
-#endif
                 }
             }
         }
@@ -518,33 +515,11 @@ namespace System.Windows.Data
                 int newPageIndex = VerifyPageIndex(value);
                 if (newPageIndex != _PageIndex) // ChangeOutputColletion can take lot of time, because it refreshes the controls that use this as source
                 {
-#if BRIDGE
-                    OnPageChanging(newPageIndex);
-#endif
                     _PageIndex = newPageIndex;
-#if BRIDGE
-                    OnPropertyChanged("PageIndex");
-#endif
                     OnPageChanged();
-
-#if BRIDGE
-                   
-                    OnPropertyChanged("Count");
-#endif
                 }
             }
         }
-
-#if BRIDGE
-        private void OnPageChanging(int newPageIndex)
-        {
-            _isPageChanging = true;
-            if (PageChanging != null)
-            {
-                PageChanging(this, new PageChangingEventArgs(newPageIndex));
-            }
-        }
-#endif
 
         private void OnPageChanged()
         {
@@ -566,18 +541,8 @@ namespace System.Windows.Data
             {
                 int oldCount = this.Count;
                 _pageSize = value;
-#if BRIDGE
-                OnPropertyChanged("PageSize");
-#endif
                 if (_views.Count != 0)
                     CreatePages();
-#if BRIDGE
-                // if the count has changed
-                if (this.Count != oldCount)
-                {
-                    this.OnPropertyChanged("Count");
-                }
-#endif
             }
         }
 

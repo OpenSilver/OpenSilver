@@ -25,7 +25,6 @@ namespace OpenSilver.Internal
         {
             char numericSeparator = ',';
 
-#if NETSTANDARD
             // Get the NumberFormatInfo out of the provider, if possible
             // If the IFormatProvider doesn't not contain a NumberFormatInfo, then
             // this method returns the current culture's NumberFormatInfo.
@@ -39,7 +38,6 @@ namespace OpenSilver.Internal
             {
                 numericSeparator = ';';
             }
-#endif
 
             return numericSeparator;
         }

@@ -15,34 +15,13 @@
 //
 //===============================================================================
 
-#define USEWPFWEBCLIENT
-
-//extern alias custom;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CSHTML5;
-using DotNetForHtml5.Core;
-using System.Reflection;
-using System.ComponentModel;
-
-#if OPENSILVER
 using System.Net;
-#endif
 
-#if BRIDGE
-using Bridge;
-#endif
-//using custom::System.ComponentModel;
-//using custom::System.Net;
-
-#if OPENSILVER
 namespace OpenSilver.Compatibility
-#else
-namespace System.Net
-#endif
 {
     /// <summary>
     /// Provides common methods for sending data to and receiving data from a resource
@@ -182,21 +161,13 @@ namespace System.Net
         /// <returns>A System.String containing the requested resource.</returns>
         public string DownloadString(Uri address)
         {
-#if OPENSILVER
             if (Interop.IsRunningInTheSimulator_WorkAround)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
                 var netStandardWebClient = new System.Net.WebClient();
                 return netStandardWebClient.DownloadString(address);
             }
-#elif USEWPFWEBCLIENT
-            if (Interop.IsRunningInTheSimulator)
-            {
-                var wcFactory = INTERNAL_Simulator.WebClientFactory;
-                //todo: Encoding
-                return wcFactory.DownloadString(Headers._headers, address);
-            }
-#endif
+            
             if (address == null)
             {
                 throw new ArgumentNullException("The address parameter in DownloadString cannot be null");
@@ -245,7 +216,6 @@ namespace System.Net
         /// </param>
         private void DownloadStringAsync(Uri address, object userToken)
         {
-#if OPENSILVER
             if (Interop.IsRunningInTheSimulator_WorkAround)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
@@ -263,26 +233,8 @@ namespace System.Net
                 netStandardWebClient.DownloadStringAsync(address);
                 return;
             }
-#elif USEWPFWEBCLIENT
-            if (Interop.IsRunningInTheSimulator)
-            {
-                var wcFactory = INTERNAL_Simulator.WebClientFactory;
-                //todo: Encoding
-                Action<object, dynamic> del = (s, e) =>
-                {
-                    OnDownloadStringCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
-                    {
-                        Result = e.Result,
-                        Cancelled = e.Cancelled,
-                        Error = e.Error,
-                        UserState = e.UserState
-                    });
-                };
-                wcFactory.DownloadStringAsync(Headers._headers, del, address, userToken);
-                return;
-            }
-#endif
-                if (address == null)
+
+            if (address == null)
             {
                 throw new ArgumentNullException("The address parameter in DownloadStringAsync cannot be null");
             }
@@ -330,21 +282,12 @@ namespace System.Net
         /// <returns>Returns the resource as <see cref="System.Threading.Tasks.Task{TResult}"/>.</returns>
         public Task<string> DownloadStringTaskAsync(Uri address)
         {
-#if OPENSILVER
             if (Interop.IsRunningInTheSimulator_WorkAround)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
                 var netStandardWebClient = new System.Net.WebClient();
                 return netStandardWebClient.DownloadStringTaskAsync(address);
             }
-#elif USEWPFWEBCLIENT
-            if (Interop.IsRunningInTheSimulator)
-            {
-                var wcFactory = INTERNAL_Simulator.WebClientFactory;
-                //todo: Encoding
-                return wcFactory.DownloadStringTaskAsync(Headers._headers, address);
-            }
-#endif
 
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
@@ -371,31 +314,6 @@ namespace System.Net
                 taskCompletionSource.TrySetException(e.Error);
             }
         }
-
-
-        // TODOBRIDGE: Remove static on the two next method to allow credentials to works properly
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$e.set_Result($xmlHttpRequest.responseText)")]
-#else
-        [Template("{e}.set_Result({xmlHttpRequest}.responseText)")]
-#endif
-        private static void SetDownloadStringCompletedEventArgsResultsInJavascript(DownloadStringCompletedEventArgs e, object xmlHttpRequest)//must be static to work properly
-        {
-            //do nothing
-        }
-
-#if !BRIDGE
-        //todo: IMPORTANT: find a way to manage this kind of things: when the user checks if there was an error while downloading, we want him to be able to know
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.readyState == 4 && $xmlHttpRequest.status == 200")]
-#else
-        [Template("{xmlHttpRequest}.readyState == 4 && {xmlHttpRequest}.status == 200")]
-#endif
-        private static bool INTERNAL_TestIfCompletedStatus(object xmlHttpRequest) //must be static to work properly
-        {
-            return true;
-        }
-
-
 
         // for compilation only, because this file is not included in simulator
         public WebHeaderCollection ResponseHeaders
@@ -521,7 +439,6 @@ namespace System.Net
 
         private string UploadString(Uri address, string method, string data, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler onCompleted, bool isAsync) //todo: see if we should use UploadStringCompletedEventHandler instead
         {
-#if OPENSILVER
             if (Interop.IsRunningInTheSimulator_WorkAround)
             {
                 var netStandardWebClient = new System.Net.WebClient();
@@ -546,32 +463,7 @@ namespace System.Net
                 }
                 
             }
-#elif USEWPFWEBCLIENT
-            if (Interop.IsRunningInTheSimulator)
-            {
-                var wcFactory = INTERNAL_Simulator.WebClientFactory;
-                //todo: Encoding
-                if (isAsync)
-                {
-                    Action<object, dynamic> del = (s, e) =>
-                    {
-                        onCompleted(this, new INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs()
-                        {
-                            Result = e.Result,
-                            Cancelled = e.Cancelled,
-                            Error = e.Error,
-                            UserState = e.UserState
-                        });
-                    };
-                    wcFactory.UploadStringAsync(Headers._headers, del, address, method, data);
-                    return "";
-                }
-                else
-                {
-                    return wcFactory.UploadString(Headers._headers, address, method, data);
-                }
-            }
-#endif
+
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
@@ -726,15 +618,6 @@ namespace System.Net
         /// </returns>
         public Task<string> UploadStringTaskAsync(Uri address, string method, string data)
         {
-#if !OPENSILVER && USEWPFWEBCLIENT
-            if (Interop.IsRunningInTheSimulator)
-            {
-                var wcFactory = INTERNAL_Simulator.WebClientFactory;
-                //todo: Encoding
-                return wcFactory.UploadStringTaskAsync(Headers._headers ,address, method, data);
-            }
-#endif
-
             INTERNAL_WebRequestHelper_JSOnly webRequestHelper = new INTERNAL_WebRequestHelper_JSOnly();
 
             Dictionary<string, string> headers = new Dictionary<string, string>();

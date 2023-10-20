@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
 namespace CSHTML5.Internal.Attributes
@@ -24,8 +22,6 @@ namespace CSHTML5.Internal.Attributes
         {
         }
 
-#if !BRIDGE
         public bool GenerateJavaScriptDuringBuild { get; set; }
-#endif
     }
 }

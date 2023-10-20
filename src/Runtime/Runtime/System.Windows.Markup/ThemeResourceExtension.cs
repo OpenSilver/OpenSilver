@@ -38,82 +38,19 @@ namespace System.Windows.Markup
             ResourceKey = resourceKey;
         }
 
-        //public override object ProvideValue(IServiceProvider serviceProvider)
-        //{
-        //    serviceProvider.GetService();
-        //    var staticResourceExtension = new StaticResourceExtension(ResourceKey);
-
-        //    var resource = staticResourceExtension.ProvideValue(serviceProvider) as INTERNAL_CorrespondingItem;
-
-        //    return resource == null ? "Invalid INTERNAL_CorrespondingItem" : String.Format("My {0} {1}", resource.Value, resource.Title);
-        //}
-
-
-
         /// <summary>
         /// returns an object that is provided as the value of the target property for this StaticResource.
         /// </summary>
         /// <param name="serviceProvider">A service provider helper that can provide services for the StaticResource.</param>
         /// <returns>An object that is provided as the value of the target property for this StaticResource.</returns>
-
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-
-            //BRIDGETODO :
-            //implemente code below
-#if BRIDGE
             if (serviceProvider is ServiceProvider)
             {
                 ServiceProvider serviceProviderAsServiceProvider = (ServiceProvider)serviceProvider;
                 bool isFirst = true;
                 object elementItself = null;
-                foreach (Object parentElement in serviceProviderAsServiceProvider.Parents)
-                {
-                    if (isFirst)
-                    {
-                        elementItself = parentElement;
-                    }
-                    else
-                    {
-                        ResourceDictionary resourceDictionary = null;
-                        if (parentElement is ResourceDictionary)
-                        {
-                            resourceDictionary = (ResourceDictionary)parentElement;
-                        }
-                        else if (parentElement is FrameworkElement parentFE)
-                        {
-                            resourceDictionary = parentFE.HasResources ? parentFE.Resources
-                                                                       : null;
-                        }
-                        if (resourceDictionary != null && resourceDictionary.Contains(ResourceKey))
-                        {
-                            object returnElement = resourceDictionary[ResourceKey];
-                            if (returnElement != elementItself)
-                            {
-                                return returnElement;
-                            }
-                        }
-                    }
-                    isFirst = false;
-                }
-                if (Application.Current.Resources != null && Application.Current.Resources.Contains(ResourceKey))
-                {
-                    return Application.Current.Resources[ResourceKey];
-                }
-                throw new XamlParseException(string.Format("StaticResource resolve failed: cannot find resource named '{0}' (Note: resource names are case sensitive)", ResourceKey));
-            }
-            else
-            {
-                throw new SystemException("StaticResourceExtension.ProvideValue failed: the service provider is not of the expected type. Please contact support.");
-            }
-#else
-
-            if (serviceProvider is ServiceProvider)
-            {
-                ServiceProvider serviceProviderAsServiceProvider = (ServiceProvider)serviceProvider;
-                bool isFirst = true;
-                object elementItself = null;
-                foreach (Object parentElement in serviceProviderAsServiceProvider.Parents)
+                foreach (object parentElement in serviceProviderAsServiceProvider.Parents)
                 {
                     if (isFirst)
                     {
@@ -173,7 +110,6 @@ namespace System.Windows.Markup
             {
                 throw new SystemException("ThemeResourceExtension.ProvideValue failed: the service provider is not of the expected type. Please contact support.");
             }
-#endif
         }
     }
 }

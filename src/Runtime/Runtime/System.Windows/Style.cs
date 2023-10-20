@@ -290,7 +290,6 @@ namespace System.Windows
         {
             // Note: we do not do this verification in CSHTML5 in order to remain compatible
             // with old applications created with prior versions of CSHTML5 (eg. Client_FB).
-#if OPENSILVER
             if (TargetType == null)
             {
                 throw new InvalidOperationException("Must have non-null value for TargetType.");
@@ -303,7 +302,6 @@ namespace System.Windows
                                                     this.TargetType.Name,
                                                     elementType.Name));
             }
-#endif
         }
 
         /// <summary>

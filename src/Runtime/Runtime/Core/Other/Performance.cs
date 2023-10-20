@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,34 +11,20 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
     public static class Performance
     {
-#if !BRIDGE
-        [JSReplacement("performance.now()")]
-#else
-        [Template("performance.now()")]
-#endif
-        public static double now()
-        {
-            return 0;
-        }
+        public static double now() => OpenSilver.Interop.ExecuteJavaScriptDouble("performance.now();");
 
-#if !BRIDGE
-        [JSReplacement(@"document.addToPerformanceCounters($name, $initialTime)")]
-#else
-        [Template("document.addToPerformanceCounters({name}, {initialTime})")]
-#endif
         public static void Counter(string name, double initialTime)
         {
+            string sName = INTERNAL_InteropImplementation.GetVariableStringForJS(name);
+            string sTime = initialTime.ToInvariantString();
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                $"document.addToPerformanceCounters({sName}, {sTime});");
         }
     }
 }

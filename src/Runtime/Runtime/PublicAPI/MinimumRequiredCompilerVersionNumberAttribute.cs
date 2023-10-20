@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,51 +11,38 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
-#if BRIDGE || CSHTML5BLAZOR
 namespace CSHTML5.Internal.Attributes
 {
-#endif
-
-/// <summary>
-/// Specifies the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
-/// </summary>
-[AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
-public sealed class MinimumRequiredCompilerVersionNumberAttribute : Attribute
-{
     /// <summary>
-    /// Initializes a new instance of the MinimumRequiredCompilerVersionNumberAttribute class with the minimum
-    /// version number of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
+    /// Specifies the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
     /// </summary>
-    /// <param name="versionNumber">The minimum version number of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.</param>
-    public MinimumRequiredCompilerVersionNumberAttribute(string versionNumber)
+    [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
+    public sealed class MinimumRequiredCompilerVersionNumberAttribute : Attribute
     {
-        this.VersionNumber = versionNumber;
-    }
-
-    /// <summary>
-    /// The minimum version number of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed
-    /// </summary>
-    public string VersionNumber
-    {
-        get
+        /// <summary>
+        /// Initializes a new instance of the MinimumRequiredCompilerVersionNumberAttribute class with the minimum
+        /// version number of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
+        /// </summary>
+        /// <param name="versionNumber">The minimum version number of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.</param>
+        public MinimumRequiredCompilerVersionNumberAttribute(string versionNumber)
         {
-            return (this.Version != null ? this.Version.ToString() : null);
+            VersionNumber = versionNumber;
         }
-        set
+
+        /// <summary>
+        /// The minimum version number of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed
+        /// </summary>
+        public string VersionNumber
         {
-            this.Version = new Version(value);
+            get => Version?.ToString();
+            set => Version = new Version(value);
         }
+
+        /// <summary>
+        /// The minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed
+        /// </summary>
+        public Version Version { get; private set; }
     }
-
-    /// <summary>
-    /// The minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed
-    /// </summary>
-    public Version Version { get; private set; }
 }
-
-#if BRIDGE || CSHTML5BLAZOR
-}
-#endif

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
-using CSHTML5;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using System.Collections;
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 
 namespace System.Runtime.Serialization
 {
@@ -113,18 +99,7 @@ namespace System.Runtime.Serialization
                 // Check if the type implements "IEnumerable<>":
                 else
                 {
-#if BRIDGE
-                    if (Interop.IsRunningInTheSimulator) //todo: fix me (BadImageFormatException when type is from another assembly)
-                    {
-                        genericEnumerable = INTERNAL_Simulator.SimulatorProxy.GetInterface((object)type, "IEnumerable`1");
-                    }
-                    else
-                    {
-                        genericEnumerable = GetInterface(type, typeof(IEnumerable<>).Name);
-                    }
-#else
                     genericEnumerable = GetInterface(type, typeof(IEnumerable<>).Name);
-#endif
                 }
 
                 // If success, we get the type of the "T" in "IEnumerable<T>":
@@ -170,11 +145,6 @@ namespace System.Runtime.Serialization
             }
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$obj.hasValue")]
-#else
-        [Template("{obj}.hasValue")]
-#endif
         internal static bool CheckIfNullableIsNotNull(object obj)
         {
             return (obj != null);
@@ -208,12 +178,7 @@ namespace System.Runtime.Serialization
                     // Check if the prefix is already used or if it is available for use:
                     XNamespace namespaceOfPrefix = element.GetNamespaceOfPrefix(prefix);
 
-#if CSHTML5NETSTANDARD
                     if (namespaceOfPrefix == null || string.IsNullOrWhiteSpace(namespaceOfPrefix.NamespaceName))
-#else
-                    if (string.IsNullOrWhiteSpace(namespaceOfPrefix.NamespaceName))
-#endif
-
                     {
                         //we found an unused prefix:
                         //we add the prefix definition to the XElement:
@@ -485,11 +450,7 @@ namespace System.Runtime.Serialization
                 PropertyInfo propertyInfo = (PropertyInfo)memberInformation.MemberInfo;
                 if (propertyInfo.CanWrite)
                 {
-#if BRIDGE
-                    propertyInfo.SetValue(instance, memberValue); //Note: in Bridge, keeping null as the third parameter breaks (at least) arrays of strings: the value of the property becomes the first element of the array instead of the array itself.
-#else
                     propertyInfo.SetValue(instance, memberValue, null); 
-#endif
                 }
             }
             else if (memberInformation.MemberInfo is FieldInfo)
@@ -724,18 +685,10 @@ namespace System.Runtime.Serialization
             else
             {
                 BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-#if BRIDGE
-                MethodInfo[] instanceMethods = INTERNAL_BridgeWorkarounds.TypeGetMethods_SimulatorCompatible(objType, bindingFlags);
-                methodIfAny =
-                    instanceMethods
-                    .Where(m => m.GetCustomAttributes(attributeType, false).Length > 0)
-                    .FirstOrDefault();
-#else
                 methodIfAny = objType
                     .GetMethods(bindingFlags)
                     .Where(m => m.GetCustomAttributes(attributeType, false).Length > 0)
                     .FirstOrDefault();
-#endif
                 // We add it to the cache, even if it was not found, to avoid future lookup for performance optimization:
                 methodsCache.Add(objType, methodIfAny);
             }
@@ -749,32 +702,18 @@ namespace System.Runtime.Serialization
 
         internal static string GetTypeNameSafeForSerialization(Type type)
         {
-#if !BRIDGE && !CSHTML5NETSTANDARD
-            bool isRunningUnderJSIL = !CSHTML5.Interop.IsRunningInTheSimulator; //todowasm: fix this when running in WebAssembly
-#else
-            bool isRunningUnderJSIL = false;
-#endif
+            //In case of nested types, replace the '+' with '.'
+            string typeName = MakeGenericTypeReadyForSerialization(type);
+            Type currentType = type;
 
-            if (isRunningUnderJSIL)
+            while (currentType.IsNested)
             {
-                // Workaround for JSIL because JSIL does not handle Type.IsNested and Type.DeclaringType (at least in the case of nested types)
-                return JSIL_Workaround_GetTypeNameSafeForSerialization(type);
+                currentType = currentType.DeclaringType;
+
+                typeName = MakeGenericTypeReadyForSerialization(currentType) + "." + typeName;
             }
-            else
-            {
-                //In case of nested types, replace the '+' with '.'
-                string typeName = MakeGenericTypeReadyForSerialization(type);
-                Type currentType = type;
 
-                while (currentType.IsNested)
-                {
-                    currentType = currentType.DeclaringType;
-
-                    typeName = MakeGenericTypeReadyForSerialization(currentType) + "." + typeName;
-                }
-
-                return typeName;
-            }
+            return typeName;
         }
 
         static string MakeGenericTypeReadyForSerialization(Type type)
@@ -795,12 +734,7 @@ namespace System.Runtime.Serialization
                 //if the type is generic, we remove the "`N" part and put "Of" instead:
                 readableTypeName = typeName.Substring(0, typeName.IndexOf('`')) + "Of";
 
-#if !BRIDGE
                 foreach (Type typeInGenericTypeArguments in type.GenericTypeArguments)
-#else
-                // TODOBRIDGE: verify if the two code are similar
-                foreach (Type typeInGenericTypeArguments in type.GetGenericArguments())
-#endif
                 {
                     if (DataContractSerializer_ValueTypesHandler.TypesToNames.ContainsKey(typeInGenericTypeArguments))
                     {
@@ -847,11 +781,7 @@ namespace System.Runtime.Serialization
                         currentTypeName = currentTypeName.Substring(0, currentTypeName.IndexOf('`')) + "Of"; //to change MyType`N into MyTypeOf (and then add the types)
                         //we add the generic type arguments to the name:
 
-#if !BRIDGE
                         foreach (Type typeInGenericTypeArguments in type.GenericTypeArguments)
-#else
-                        foreach (Type typeInGenericTypeArguments in type.GetGenericArguments())
-#endif
                         {
                             if (DataContractSerializer_ValueTypesHandler.TypesToNames.ContainsKey(typeInGenericTypeArguments))
                             {
@@ -1027,72 +957,6 @@ namespace System.Runtime.Serialization
             return null;
         }
 
-        /*
-        internal static bool TryGetCustomAttribute<ATTRIBUTE_TYPE>(Type typeToLookInto, bool inherit, out ATTRIBUTE_TYPE attribute)
-            where ATTRIBUTE_TYPE : Attribute
-        {
-            foreach (Attribute attr in typeToLookInto.GetCustomAttributes(typeof(ATTRIBUTE_TYPE), inherit))
-            {
-                if (attr is ATTRIBUTE_TYPE)
-                {
-                    attribute = (ATTRIBUTE_TYPE)attr;
-                    return true;
-                }
-            }
-            attribute = null;
-            return false;
-        }
-        */
-
-        internal static bool DoesTypeHaveConstructorWithParameter(Type type, Type typeOfTheParameter)
-        {
-
-#if !BRIDGE
-            ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
-#else
-
-            // TODOBRIDGE: verify if the two code are similar (especially constructorInfo.IsPublic && !constructorInfo.IsStatic )
-
-            ConstructorInfo[] constructors = type.GetConstructors();
-
-            List<ConstructorInfo> constructorsList = new List<ConstructorInfo>();
-
-            foreach (ConstructorInfo constructorInfo in constructors)
-            {
-                if (
-#if BRIDGE
-                    INTERNAL_BridgeWorkarounds.ConstructorInfoIsPublic_SimulatorCompatible(constructorInfo)
-#else
-                    constructorInfo.IsPublic
-#endif
-                    &&
-#if BRIDGE
-                    !INTERNAL_BridgeWorkarounds.ConstructorInfoIsStatic_SimulatorCompatible(constructorInfo)
-#else
-                    !constructorInfo.IsStatic
-#endif
-                    )
-                    constructorsList.Add(constructorInfo);
-            }
-
-            constructors = constructorsList.ToArray();
-#endif
-
-                    foreach (ConstructorInfo constructorInfo in constructors)
-            {
-                ParameterInfo[] parameters = constructorInfo.GetParameters();
-                if (parameters.Length == 1)
-                {
-                    ParameterInfo parameterInfo = parameters[0];
-                    if (parameterInfo.ParameterType.IsAssignableFrom(typeOfTheParameter))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
         internal static Type GetInterface(Type type, string name)
         {
             // Note: this method is here because "Type.GetInterface(name)" is not yet
@@ -1126,11 +990,7 @@ namespace System.Runtime.Serialization
                 {
                     shouldSerialize = true;
                     var fieldInfo = (FieldInfo)memberInfo;
-#if BRIDGE
-                    if (INTERNAL_BridgeWorkarounds.FieldInfoIsStatic_SimulatorCompatible(fieldInfo))
-#else
                     if (fieldInfo.IsStatic)
-#endif
                     {
                         shouldSerialize = false;
                     }
@@ -1141,11 +1001,7 @@ namespace System.Runtime.Serialization
 
                             // for some reason, Bridge can't use the NonSerializedAttribute type 
                             // (Bridge.Contract.BridgeTypes.ToJsName : Type System.NonSerializedAttribute is marked as not usable from script  )
-#if !BRIDGE
                             if (attribute is NonSerializedAttribute)
-#else
-                            if (attribute.GetType().Name == "NonSerializedAttribute")
-#endif
                             {
                                 shouldSerialize = false;
                                 break;
@@ -1175,37 +1031,19 @@ namespace System.Runtime.Serialization
                     //we have either no serialization-related attributes on the class or we are using the XmlSerializer.
                     var propertyInfo = (PropertyInfo)memberInfo;
 
-#if !BRIDGE
                     var getter = propertyInfo.GetGetMethod();
                     var setter = propertyInfo.GetSetMethod();
-#else
-                    var getter = propertyInfo.GetMethod;
-                    var setter = propertyInfo.SetMethod;
-#endif
 
                     shouldSerialize =
                         getter != null // When "GetGetMethod" is not null, it means that the Getter exists, and it is public.
-#if BRIDGE
-                        && !INTERNAL_BridgeWorkarounds.MethodInfoIsStatic_SimulatorCompatible(getter)
-#else
                         && !getter.IsStatic
-#endif
                         && setter != null // When "GetSetMethod" is not null, it means that the Setter exists, and it is public.
-#if BRIDGE
-                        && !INTERNAL_BridgeWorkarounds.MethodInfoIsStatic_SimulatorCompatible(setter);
-#else
                         && !setter.IsStatic;
-#endif
                 }
                 else if (memberInfo is FieldInfo)
                 {
                     var fieldInfo = (FieldInfo)memberInfo;
-                    shouldSerialize =
-#if BRIDGE
-                        INTERNAL_BridgeWorkarounds.FieldInfoIsPublic_SimulatorCompatible(fieldInfo) && !INTERNAL_BridgeWorkarounds.FieldInfoIsStatic_SimulatorCompatible(fieldInfo);
-#else
-                        fieldInfo.IsPublic && !fieldInfo.IsStatic;
-#endif
+                    shouldSerialize = fieldInfo.IsPublic && !fieldInfo.IsStatic;
                 }
                 else
                     throw new Exception("Unsupported member type.");
@@ -1281,27 +1119,7 @@ namespace System.Runtime.Serialization
 
         static bool IsNullOrUndefined(object obj)
         {
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (Interop.IsRunningInTheSimulator)
-#endif
-            {
-                if (obj == null)
-                    return true;
-#if CSHTML5NETSTANDARD
-                return false;
-#else
-                if (!(obj is JSValue))
-                    return false;
-                JSValue value = ((JSValue)obj);
-                return value.IsNull() || value.IsUndefined();
-#endif
-            }
-            else
-            {
-                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", obj));
-            }
+            return obj is null;
         }
 
 #endregion

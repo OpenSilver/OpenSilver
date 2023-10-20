@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,31 +11,14 @@
 *  
 \*====================================================================================*/
 
-
 using System.ComponentModel;
 using OpenSilver.Internal;
 
 namespace System.Collections.Generic
 {
-#if BRIDGE
-    //[Obsolete]
-    public class HashSet2<T> : HashSet<T>
-    {
-        public HashSet2() : base()
-        {
-        }
-
-        public HashSet2(IEnumerable<T> source) : base(source)
-        {
-        }
-    }
-#else
     [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Collections.Generic.HashSet instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class HashSet2<T> : ICollection<T>, IEnumerable<T>
-#if UNIMPLEMENTED_MEMBERS
-        , ISet2<T>
-#endif
     {
         private Dictionary<T, object> _dictionary = new Dictionary<T,object>();
 
@@ -131,64 +113,5 @@ namespace System.Collections.Generic
                 _dictionary.Remove(element);
             }
         }
-
-#if UNIMPLEMENTED_MEMBERS
-        bool ISet2<T>.Add(T item)
-        {
-            throw new NotImplementedException();
-        }
-        
-        public void UnionWith(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void IntersectWith(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExceptWith(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SymmetricExceptWith(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsSubsetOf(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsSupersetOf(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsProperSupersetOf(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsProperSubsetOf(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Overlaps(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool SetEquals(IEnumerable<T> other)
-        {
-            throw new NotImplementedException();
-        }
-#endif
     }
-
-#endif
 }

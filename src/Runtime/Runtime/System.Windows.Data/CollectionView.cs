@@ -315,11 +315,6 @@ namespace System.Windows.Data
         /// </summary>
         public virtual IDisposable DeferRefresh()
         {
-#if false
-            if (AllowsCrossThreadChanges)
-                VerifyAccess();
-#endif
-
             IEditableCollectionView ecv = this as IEditableCollectionView;
             if (ecv != null && (ecv.IsAddingNew || ecv.IsEditingItem))
                 throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "DeferRefresh"));
@@ -518,11 +513,6 @@ namespace System.Windows.Data
 
         internal void RefreshInternal()
         {
-#if false
-            if (AllowsCrossThreadChanges)
-                VerifyAccess();
-#endif
-
             RefreshOverride();
 
             SetFlag(CollectionViewFlags.NeedsRefresh, false);
@@ -1061,10 +1051,6 @@ namespace System.Windows.Data
             {
                 if (!AllowsCrossThreadChanges)
                 {
-#if false
-                    if (!CheckAccess())
-                        throw new NotSupportedException("This type of CollectionView does not support changes to its SourceCollection from a thread different from the Dispatcher thread.");
-#endif
                     ProcessCollectionChanged(args);
                 }
             }
@@ -1143,11 +1129,6 @@ namespace System.Windows.Data
         // and throw if that is the case.
         internal void VerifyRefreshNotDeferred()
         {
-#if false
-            if (AllowsCrossThreadChanges)
-                VerifyAccess();
-#endif
-
             // If the Refresh is being deferred to change filtering or sorting of the
             // data by this CollectionView, then CollectionView will not reflect the correct
             // state of the underlying data.
@@ -1158,12 +1139,7 @@ namespace System.Windows.Data
 
         internal void InvalidateEnumerableWrapper()
         {
-#if NETSTANDARD
             IndexedEnumerable wrapper = (IndexedEnumerable)Interlocked.Exchange(ref _enumerableWrapper, null);
-#else // BRIDGE
-            IndexedEnumerable wrapper = _enumerableWrapper;
-            _enumerableWrapper = null;
-#endif
             if (wrapper != null)
             {
                 wrapper.Invalidate();
@@ -1171,8 +1147,6 @@ namespace System.Windows.Data
         }
 
 #if WPF
-
-#if NETSTANDARD
         internal ReadOnlyCollection<ItemPropertyInfo> GetItemProperties()
         {
             IEnumerable collection = SourceCollection;
@@ -1237,62 +1211,6 @@ namespace System.Windows.Data
             // return the result as a read-only collection
             return new ReadOnlyCollection<ItemPropertyInfo>(list);
         }
-#else
-        internal ReadOnlyCollection<ItemPropertyInfo> GetItemProperties()
-        {
-            IEnumerable collection = SourceCollection;
-            if (collection == null)
-                return null;
-
-            IEnumerable properties = null;
-
-            Type itemType;
-            object item;
-
-            if ((itemType = GetItemType(false)) != null)
-            {
-                // If we know the item type, use its properties.
-                properties = itemType.GetProperties();
-            }
-            else if ((item = GetRepresentativeItem()) != null)
-            {
-                // If we have a representative item, use its properties.
-                // It's cheaper to use the item type, but we cannot do that
-                // when all we know is a representative item.  If the item
-                // has synthetic properties (via ICustomTypeDescriptor or
-                // TypeDescriptorProvider), they don't show up on the type -
-                // only on the item.
-                ICustomTypeProvider ictp = item as ICustomTypeProvider;
-                if (ictp == null)
-                {
-                    properties = item.GetType().GetProperties();
-                }
-                else
-                {
-                    properties = ictp.GetCustomType().GetProperties();
-                }
-            }
-
-            if (properties == null)
-                return null;
-
-            // convert the properties to ItemPropertyInfo
-            List<ItemPropertyInfo> list = new List<ItemPropertyInfo>();
-            foreach (object property in properties)
-            {
-                PropertyInfo pi;
-
-                if ((pi = property as PropertyInfo) != null)
-                {
-                    list.Add(new ItemPropertyInfo(pi.Name, pi.PropertyType, pi));
-                }
-            }
-
-            // return the result as a read-only collection
-            return new ReadOnlyCollection<ItemPropertyInfo>(list);
-        }
-#endif
-
 #endif // WPF
 
         internal Type GetItemType(bool useRepresentativeItem)
@@ -1529,14 +1447,7 @@ namespace System.Windows.Data
                 if (_enumerableWrapper == null)
                 {
                     IndexedEnumerable newWrapper = new IndexedEnumerable(SourceCollection, new Predicate<object>(this.PassesFilter));
-#if NETSTANDARD
                     Interlocked.CompareExchange(ref _enumerableWrapper, newWrapper, null);
-#else // BRIDGE
-                    if (_enumerableWrapper == null)
-                    {
-                        _enumerableWrapper = newWrapper;
-                    }
-#endif
                 }
 
                 return _enumerableWrapper;
@@ -1729,9 +1640,7 @@ namespace System.Windows.Data
                     _collectionView = null;
                 }
 
-#if NETSTANDARD
                 GC.SuppressFinalize(this);
-#endif
             }
 
             private CollectionView _collectionView;
@@ -1753,9 +1662,7 @@ namespace System.Windows.Data
             public void Dispose()
             {
                 _entered = false;
-#if NETSTANDARD
                 GC.SuppressFinalize(this);
-#endif
             }
 
             public bool Busy { get { return _entered; } }

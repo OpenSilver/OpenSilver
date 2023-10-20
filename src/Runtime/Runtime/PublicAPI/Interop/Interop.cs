@@ -334,9 +334,6 @@ namespace OpenSilver
         /// </summary>
         /// <param name="value">The value to unbox.</param>
         /// <returns>the unboxed value if the value was boxed, the value itself otherwise.</returns>
-#if BRIDGE
-        [Bridge.Template("({value} == undefined ? {value} : ({value}.v != undefined ? {value}.v : {value}))")]
-#endif
         public static object Unbox(object value)
         {
             return value;
@@ -353,11 +350,7 @@ namespace OpenSilver
             //IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
             //that is executed immediately after the one where the URI is defined! Be careful
             //when moving the following line of code.
-#if NETSTANDARD
             string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#elif BRIDGE
-            string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
-#endif
 
             var t = new TaskCompletionSource<object>();
             CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFile(
@@ -378,11 +371,7 @@ namespace OpenSilver
                 // IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
                 // that is executed immediately after the one where the URI is defined! Be careful
                 // when moving the following line of code.
-#if NETSTANDARD
                 string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#elif BRIDGE
-                string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
-#endif
 
                 var t = new TaskCompletionSource<object>();
                 CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFile(resourceFile.Url, callerAssemblyName,
@@ -414,11 +403,7 @@ namespace OpenSilver
             // IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
             // that is executed immediately after the one where the URI is defined! Be careful
             // when moving the following line of code.
-#if NETSTANDARD
             string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#else
-            string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
-#endif
             List<string> urlsAsList = (urls is List<string> ? (List<string>)urls : new List<string>(urls));
             CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFiles(urlsAsList, callerAssemblyName, callback, callbackOnError);
         }
@@ -429,11 +414,7 @@ namespace OpenSilver
             // IMPORTANT: the call to the "GetCallingAssembly" method must be done in the method
             // that is executed immediately after the one where the URI is defined! Be careful
             // when moving the following line of code.
-#if NETSTANDARD
             string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-#elif BRIDGE
-            string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
-#endif
             List<string> urlsAsList = new List<string>();
             foreach (var resourceFile in resourceFiles)
             {
@@ -516,61 +497,29 @@ namespace OpenSilver
             return element.INTERNAL_OuterDomElement;
         }
 
-#if CSHTML5BLAZOR
         /// <summary>
         /// Returns True is the app is running in C#, and False otherwise. 
         /// To know if you're in the simulator use IsRunningInTheSimulator_WorkAround.
         /// </summary>
-#else
-        /// <summary>
-        /// Returns True is the app is running in C# inside the Simulator, and False otherwise.
-        /// </summary>
-#endif
-        public static bool IsRunningInTheSimulator
-        {
-            get
-            {
-#if OPENSILVER
-                return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
-#elif BRIDGE
-                return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator();
-#endif
-            }
-        }
-
-#if CSHTML5BLAZOR
-        // For backwards compatibility
+        public static bool IsRunningInTheSimulator =>
+            CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
 
         /// <summary>
         /// Returns True is the app is running inside the Simulator, and False otherwise.
         /// </summary>
-        public static bool IsRunningInTheSimulator_WorkAround
-        {
-            get
-            {
-                return IsRunningInTheSimulator;
-            }
-        }
-#endif
-
+        public static bool IsRunningInTheSimulator_WorkAround => IsRunningInTheSimulator;
 
         /// <summary>
         /// Check if the given jsnode is undefined
         /// </summary>
-#if BRIDGE
-        [Bridge.Template("(typeof({jsObject}) === 'undefined')")]
-#endif
         public static bool IsUndefined(object jsObject)
         {
-            return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsUndefined();
+            return ((INTERNAL_JSObjectReference)jsObject).IsUndefined();
         }
 
         /// <summary>
         /// Check if the given jsnode is undefined
         /// </summary>
-#if BRIDGE
-        [Bridge.Template("({jsObject} === null)")]
-#endif
         public static bool IsNull(object jsObject)
         {
             return ((CSHTML5.Types.INTERNAL_JSObjectReference)jsObject).IsNull();

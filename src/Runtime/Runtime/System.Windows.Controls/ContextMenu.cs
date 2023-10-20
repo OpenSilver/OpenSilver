@@ -380,12 +380,10 @@ namespace System.Windows.Controls
                 SetBinding(DataContextProperty, new Binding("DataContext") { Source = dataContextSource });
             }
 
-#if OPENSILVER
             if (Owner is FrameworkElement fe)
             {
                 fe.OnContextMenuOpening(position.X, position.Y);
             }
-#endif
 
             _popup.IsOpen = true;
             Focus();

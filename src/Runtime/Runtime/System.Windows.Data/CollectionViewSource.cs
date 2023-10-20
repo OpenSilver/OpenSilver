@@ -452,10 +452,6 @@ namespace System.Windows.Data
             if (view == null || _deferLevel > 0)
                 return;
 
-#if false // no live shaping
-            ICollectionViewLiveShaping liveView = view as ICollectionViewLiveShaping;
-#endif // no live shaping
-
             using (view.DeferRefresh())
             {
                 int i, n;
@@ -507,80 +503,6 @@ namespace System.Windows.Data
                 }
                 else if (GroupDescriptions.Count > 0)
                     throw new InvalidOperationException(string.Format("'{0}' view does not support grouping.", view));
-
-#if false // no live shaping
-                // Live shaping
-                if (liveView != null)
-                {
-                    ObservableCollection<string> properties;
-
-                    // sorting
-                    if (liveView.CanChangeLiveSorting)
-                    {
-                        liveView.IsLiveSorting = IsLiveSortingRequested;
-                        properties = liveView.LiveSortingProperties;
-                        properties.Clear();
-
-                        if (IsLiveSortingRequested)
-                        {
-                            foreach (string s in LiveSortingProperties)
-                            {
-                                properties.Add(s);
-                            }
-                        }
-                    }
-
-                    CanChangeLiveSorting = liveView.CanChangeLiveSorting;
-                    IsLiveSorting = liveView.IsLiveSorting;
-
-                    // filtering
-                    if (liveView.CanChangeLiveFiltering)
-                    {
-                        liveView.IsLiveFiltering = IsLiveFilteringRequested;
-                        properties = liveView.LiveFilteringProperties;
-                        properties.Clear();
-
-                        if (IsLiveFilteringRequested)
-                        {
-                            foreach (string s in LiveFilteringProperties)
-                            {
-                                properties.Add(s);
-                            }
-                        }
-                    }
-
-                    CanChangeLiveFiltering = liveView.CanChangeLiveFiltering;
-                    IsLiveFiltering = liveView.IsLiveFiltering;
-
-                    // grouping
-                    if (liveView.CanChangeLiveGrouping)
-                    {
-                        liveView.IsLiveGrouping = IsLiveGroupingRequested;
-                        properties = liveView.LiveGroupingProperties;
-                        properties.Clear();
-
-                        if (IsLiveGroupingRequested)
-                        {
-                            foreach (string s in LiveGroupingProperties)
-                            {
-                                properties.Add(s);
-                            }
-                        }
-                    }
-
-                    CanChangeLiveGrouping = liveView.CanChangeLiveGrouping;
-                    IsLiveGrouping = liveView.IsLiveGrouping;
-                }
-                else
-                {
-                    CanChangeLiveSorting = false;
-                    IsLiveSorting = null;
-                    CanChangeLiveFiltering = false;
-                    IsLiveFiltering = null;
-                    CanChangeLiveGrouping = false;
-                    IsLiveGrouping = null;
-                }
-#endif // no live shaping
             }
         }
 
@@ -666,9 +588,7 @@ namespace System.Windows.Data
                     _target = null;
                     target.EndDefer();
                 }
-#if NETSTANDARD
                 GC.SuppressFinalize(this);
-#endif
             }
 
             private CollectionViewSource _target;
@@ -683,11 +603,7 @@ namespace System.Windows.Data
         {
             public FilterStub(CollectionViewSource parent)
             {
-#if NETSTANDARD
                 _parent = new WeakReference(parent);
-#else // BRIDGE
-                _parent = parent;
-#endif
                 _filterWrapper = new Predicate<object>(WrapFilter);
             }
 
@@ -698,11 +614,7 @@ namespace System.Windows.Data
 
             bool WrapFilter(object item)
             {
-#if NETSTANDARD
                 CollectionViewSource parent = (CollectionViewSource)_parent.Target;
-#else // BRIDGE
-                CollectionViewSource parent = _parent;
-#endif
                 if (parent != null)
                 {
                     return parent.WrapFilter(item);
@@ -713,11 +625,7 @@ namespace System.Windows.Data
                 }
             }
 
-#if NETSTANDARD
             WeakReference _parent;
-#else // BRIDGE
-            CollectionViewSource _parent;
-#endif
             Predicate<object> _filterWrapper;
         }
 

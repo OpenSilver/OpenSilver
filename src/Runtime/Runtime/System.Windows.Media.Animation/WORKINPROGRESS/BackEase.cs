@@ -44,7 +44,6 @@
 
         }
 
-#if OPENSILVER
         //
         // Summary:
         //     Provides the logic portion of the easing function that you can override to produce
@@ -62,6 +61,5 @@
         {
             return default(double);
         }
-#endif
     }
 }

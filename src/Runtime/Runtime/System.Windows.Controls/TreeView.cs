@@ -370,7 +370,6 @@ namespace System.Windows.Controls
             Interaction = new InteractionHelper(this);
         }
 
-#if OPENSILVER
         /// <summary>
         /// Returns a
         /// <see cref="TreeViewAutomationPeer" />
@@ -385,7 +384,6 @@ namespace System.Windows.Controls
         {
             return new TreeViewAutomationPeer(this);
         }
-#endif
 
         /// <summary>
         /// Builds the visual tree for the
@@ -1133,7 +1131,6 @@ namespace System.Windows.Controls
             // Notify when the selection changes
             if (raiseSelectionChanged)
             {
-#if OPENSILVER
                 if (SelectedContainer != null && AutomationPeer.ListenerExists(AutomationEvents.SelectionItemPatternOnElementSelected))
                 {
                     AutomationPeer peer = FrameworkElementAutomationPeer.CreatePeerForElement(SelectedContainer);
@@ -1150,7 +1147,6 @@ namespace System.Windows.Controls
                         peer.RaiseAutomationEvent(AutomationEvents.SelectionItemPatternOnElementRemovedFromSelection);
                     }
                 }
-#endif // OPENSILVER
 
                 OnSelectedItemChanged(new RoutedPropertyChangedEventArgs<object>(oldValue, newValue));
             }

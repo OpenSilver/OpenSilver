@@ -28,19 +28,16 @@ namespace System.Linq
 
         public GroupedEnumerable(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
         {
-#if !BRIDGE
             if (source == null) throw new ArgumentNullException("source");
             if (keySelector == null) throw new ArgumentNullException("keySelector");
             if (elementSelector == null) throw new ArgumentNullException("elementSelector");
 
 
             FillGroups(source, keySelector, elementSelector, comparer);
-#endif
         }
 
         private void FillGroups(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
         {
-#if !BRIDGE
             foreach (TSource sourceElement in source)
             {
                 TElement element = elementSelector(sourceElement);
@@ -52,7 +49,6 @@ namespace System.Linq
                 var v = groups[key];
                 v.Add(element);
             }
-#endif
         }
 
         public IEnumerator<IGrouping<TKey, TElement>> GetEnumerator()

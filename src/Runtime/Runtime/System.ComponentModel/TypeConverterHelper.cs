@@ -705,7 +705,6 @@ namespace System.ComponentModel
                 return base.GetCreateInstanceSupported(context);
             }
 
-#if NETSTANDARD
             /// <summary>
             /// Gets a collection of properties for the type of array specified by the value
             /// parameter using the specified context and attributes.
@@ -720,7 +719,6 @@ namespace System.ComponentModel
 
                 return base.GetProperties(context, value, attributes);
             }
-#endif
 
             /// <summary>
             /// Gets a value indicating whether this object supports properties using the specified context.

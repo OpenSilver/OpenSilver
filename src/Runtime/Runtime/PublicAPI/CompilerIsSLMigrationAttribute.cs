@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,36 +11,29 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
-#if BRIDGE || CSHTML5BLAZOR
 namespace CSHTML5.Internal.Attributes
 {
-#endif
-
-/// <summary>
-/// Specifies whether the project was compiled in the "SLMigration" mode.
-/// </summary>
-[AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
-public sealed class CompilerIsSLMigrationAttribute : Attribute
-{
     /// <summary>
-    /// Initializes a new instance of the CompilerIsSLMigrationAttribute class with a
-    /// boolean specifying whether the project was compiled in the "SLMigration" mode.
+    /// Specifies whether the project was compiled in the "SLMigration" mode.
     /// </summary>
-    /// <param name="isSLMigration">A boolean that is true if the project compiled in the "SLMigration" mode, and false otherwise.</param>
-    public CompilerIsSLMigrationAttribute(bool isSLMigration)
+    [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
+    public sealed class CompilerIsSLMigrationAttribute : Attribute
     {
-        this.IsSLMigration = isSLMigration;
+        /// <summary>
+        /// Initializes a new instance of the CompilerIsSLMigrationAttribute class with a
+        /// boolean specifying whether the project was compiled in the "SLMigration" mode.
+        /// </summary>
+        /// <param name="isSLMigration">A boolean that is true if the project compiled in the "SLMigration" mode, and false otherwise.</param>
+        public CompilerIsSLMigrationAttribute(bool isSLMigration)
+        {
+            IsSLMigration = isSLMigration;
+        }
+
+        /// <summary>
+        /// Gets a boolean that is true if the project compiled in the "SLMigration" mode, and false otherwise.
+        /// </summary>
+        public bool IsSLMigration { get; private set; }
     }
-
-    /// <summary>
-    /// Gets a boolean that is true if the project compiled in the "SLMigration" mode, and false otherwise.
-    /// </summary>
-    public bool IsSLMigration { get; private set; }
 }
-
-#if BRIDGE || CSHTML5BLAZOR
-}
-#endif

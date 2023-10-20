@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-#if BRIDGE
-using Bridge;
-#else
-using JSIL.Meta;
-#endif
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSHTML5.Internal
 {
@@ -119,22 +109,14 @@ namespace CSHTML5.Internal
             // A C# event handler is removed
             //------------------------------
 
-#if !BRIDGE
-            //_handlers.Remove(value);
             HackToRemoveDelegateFromListOfDelegates(_handlers, value); // Note: we call this method because "_handlers.Remove(value)" does not work when translated to JavaScript due to the fact that the delegate "value" is not found in the list of handlers due to the fact that the comparison between 2 delegates in JSIL does not work properly.
             HackToRemoveDelegateFromListOfDelegates(_handlersForHandledEventsToo, value); // Note: we call this method because "_handlers.Remove(value)" does not work when translated to JavaScript due to the fact that the delegate "value" is not found in the list of handlers due to the fact that the comparison between 2 delegates in JSIL does not work properly.
-#else
-            _handlers.Remove(value); //Now we are using Bridge, so we don't need the hack anymore
-            _handlersForHandledEventsToo.Remove(value); //Now we are using Bridge, so we don't need the hack anymore
-#endif
 
             // Stop listening to DOM events if there is are remaining C# event handler attached:
             if (_handlers.Count == 0 && _handlersForHandledEventsToo.Count == 0)
                 StopListeningToDomEvents();
         }
 
-#if !BRIDGE
-        //todo: test this method thoroughly
         void HackToRemoveDelegateFromListOfDelegates(List<EVENT_HANDLER> list, EVENT_HANDLER delegateToRemove)
         {
             // Read comment on the line where this method is called.
@@ -148,15 +130,11 @@ namespace CSHTML5.Internal
                 }
             }
         }
-#endif
 
-#if !BRIDGE
-        [JSReplacement("($delegate1.__method__ == $delegate2.__method__)")] //todo: compare __object__ too to prevent wrong results?
         bool HackToCompareTwoDelegates(EVENT_HANDLER delegate1, EVENT_HANDLER delegate2)
         {
             return (delegate1.Equals(delegate2));
         }
-#endif
 
         /// <summary>
         /// Raises the event

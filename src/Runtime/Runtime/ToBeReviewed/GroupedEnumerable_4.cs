@@ -44,7 +44,6 @@ namespace System.Linq
 
         private void FillGroups(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
         {
-#if !BRIDGE
             foreach (TSource sourceElement in source)
             {
                 TElement element = elementSelector(sourceElement);
@@ -56,7 +55,6 @@ namespace System.Linq
                 var v = groups[key];
                 v.Add(element);
             }
-#endif
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

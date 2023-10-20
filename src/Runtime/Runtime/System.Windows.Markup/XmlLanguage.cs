@@ -257,11 +257,7 @@ namespace System.Windows.Markup
                 }
             }
 
-#if OPENSILVER
             return tag.ToLowerInvariant();
-#else
-            return tag.ToLower();
-#endif
         }
     }
 }

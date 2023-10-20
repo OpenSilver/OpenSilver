@@ -652,11 +652,7 @@ namespace System.Windows.Data
                 Type itemType = GetItemType(true);
                 if (itemType != null)
                 {
-#if NETSTANDARD
                     _itemConstructor = itemType.GetConstructor(Type.EmptyTypes);
-#else // BRIDGE
-                    _itemConstructor = itemType.GetConstructor(TypeExtensions.EmptyTypes);
-#endif
                     _isItemConstructorValid = true;
                 }
             }
@@ -710,10 +706,6 @@ namespace System.Windows.Data
 
         object AddNewCommon(object newItem)
         {
-#if false
-            ProcessPendingChanges();    // bring the shadow list up to date
-#endif
-
             _newItemIndex = -2; // this is a signal that the next Add event comes from AddNew
             int index = SourceList.Add(newItem);
 
@@ -917,9 +909,6 @@ namespace System.Windows.Data
             // remove the new item from the underlying collection.  Normally the
             // collection will raise a Remove event, which we'll handle by calling
             // EndNew to leave AddNew mode.
-#if false
-            ProcessPendingChanges();
-#endif
             SourceList.RemoveAt(_newItemIndex);
 
             // if the collection doesn't raise events, do the work explicitly on its behalf
@@ -1043,10 +1032,6 @@ namespace System.Windows.Data
         {
             if (item == CollectionView.NewItemPlaceholder)
                 throw new InvalidOperationException("Removing the NewItem placeholder is not allowed.");
-
-#if false
-            ProcessPendingChanges();
-#endif
 
             // the pending changes may have moved (or even removed) the
             // item.   Verify the index.
@@ -1176,10 +1161,6 @@ namespace System.Windows.Data
                 }
                 if (isInView)
                 {
-#if false // no live shaping
-                    LiveShapingList lsList = InternalList as LiveShapingList;
-                    LiveShapingItem lsi = (lsList == null) ? null : lsList.ItemAt(lsList.IndexOf(editItem));
-#endif // no live shaping
                     AddItemToGroups(editItem);
                 }
                 return;
@@ -1334,235 +1315,6 @@ namespace System.Windows.Data
 
 #endregion IEditableCollectionView
 
-#region ICollectionViewLiveShaping
-
-#if false // no live shaping
-
-        ///<summary>
-        /// Gets a value that indicates whether this view supports turning live sorting on or off.
-        ///</summary>
-        public bool CanChangeLiveSorting
-        { get { return true; } }
-
-        ///<summary>
-        /// Gets a value that indicates whether this view supports turning live filtering on or off.
-        ///</summary>
-        public bool CanChangeLiveFiltering
-        { get { return true; } }
-
-        ///<summary>
-        /// Gets a value that indicates whether this view supports turning live grouping on or off.
-        ///</summary>
-        public bool CanChangeLiveGrouping
-        { get { return true; } }
-
-
-        ///<summary>
-        /// Gets or sets a value that indicates whether live sorting is enabled.
-        /// The value may be null if the view does not know whether live sorting is enabled.
-        /// Calling the setter when CanChangeLiveSorting is false will throw an
-        /// InvalidOperationException.
-        ///</summary
-        public bool? IsLiveSorting
-        {
-            get { return _isLiveSorting; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-
-                if (value != _isLiveSorting)
-                {
-                    _isLiveSorting = value;
-                    RebuildLocalArray();
-
-                    OnPropertyChanged("IsLiveSorting");
-                }
-            }
-        }
-
-        ///<summary>
-        /// Gets or sets a value that indicates whether live filtering is enabled.
-        /// The value may be null if the view does not know whether live filtering is enabled.
-        /// Calling the setter when CanChangeLiveFiltering is false will throw an
-        /// InvalidOperationException.
-        ///</summary>
-        public bool? IsLiveFiltering
-        {
-            get { return _isLiveFiltering; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-
-                if (value != _isLiveFiltering)
-                {
-                    _isLiveFiltering = value;
-                    RebuildLocalArray();
-
-                    OnPropertyChanged("IsLiveFiltering");
-                }
-            }
-        }
-
-        ///<summary>
-        /// Gets or sets a value that indicates whether live grouping is enabled.
-        /// The value may be null if the view does not know whether live grouping is enabled.
-        /// Calling the setter when CanChangeLiveGrouping is false will throw an
-        /// InvalidOperationException.
-        ///</summary>
-        public bool? IsLiveGrouping
-        {
-            get { return _isLiveGrouping; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-
-                if (value != _isLiveGrouping)
-                {
-                    _isLiveGrouping = value;
-                    RebuildLocalArray();
-
-                    OnPropertyChanged("IsLiveGrouping");
-                }
-            }
-        }
-
-        bool IsLiveShaping
-        {
-            get { return (IsLiveSorting == true) || (IsLiveFiltering == true) || (IsLiveGrouping == true); }
-        }
-
-        ///<summary>
-        /// Gets a collection of strings describing the properties that
-        /// trigger a live-sorting recalculation.
-        /// The strings use the same format as SortDescription.PropertyName.
-        ///</summary>
-        ///<notes>
-        /// When the underlying view implements ICollectionViewLiveShaping,
-        /// this collection is used to set the underlying view's LiveSortingProperties.
-        /// When this collection is empty, the view will use the PropertyName strings
-        /// from its SortDescriptions.
-        ///</notes>
-        public ObservableCollection<string> LiveSortingProperties
-        {
-            get
-            {
-                if (_liveSortingProperties == null)
-                {
-                    _liveSortingProperties = new ObservableCollection<string>();
-                    _liveSortingProperties.CollectionChanged += new NotifyCollectionChangedEventHandler(OnLivePropertyListChanged);
-                }
-                return _liveSortingProperties;
-            }
-        }
-
-        ///<summary>
-        /// Gets a collection of strings describing the properties that
-        /// trigger a live-filtering recalculation.
-        /// The strings use the same format as SortDescription.PropertyName.
-        ///</summary>
-        ///<notes>
-        /// When the underlying view implements ICollectionViewLiveShaping,
-        /// this collection is used to set the underlying view's LiveFilteringProperties.
-        ///</notes>
-        public ObservableCollection<string> LiveFilteringProperties
-        {
-            get
-            {
-                if (_liveFilteringProperties == null)
-                {
-                    _liveFilteringProperties = new ObservableCollection<string>();
-                    _liveFilteringProperties.CollectionChanged += new NotifyCollectionChangedEventHandler(OnLivePropertyListChanged);
-                }
-                return _liveFilteringProperties;
-            }
-        }
-
-        ///<summary>
-        /// Gets a collection of strings describing the properties that
-        /// trigger a live-grouping recalculation.
-        /// The strings use the same format as PropertyGroupDescription.PropertyName.
-        ///</summary>
-        ///<notes>
-        /// When the underlying view implements ICollectionViewLiveShaping,
-        /// this collection is used to set the underlying view's LiveGroupingProperties.
-        ///</notes>
-        public ObservableCollection<string> LiveGroupingProperties
-        {
-            get
-            {
-                if (_liveGroupingProperties == null)
-                {
-                    _liveGroupingProperties = new ObservableCollection<string>();
-                    _liveGroupingProperties.CollectionChanged += new NotifyCollectionChangedEventHandler(OnLivePropertyListChanged);
-                }
-                return _liveGroupingProperties;
-            }
-        }
-
-        void OnLivePropertyListChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (IsLiveShaping)
-            {
-                RebuildLocalArray();
-            }
-        }
-
-#if LiveShapingInstrumentation
-
-        public void ResetComparisons()
-        {
-            LiveShapingList lsList = InternalList as LiveShapingList;
-            if (lsList != null)
-            {
-                lsList.ResetComparisons();
-            }
-        }
- 
-        public void ResetCopies()
-        {
-            LiveShapingList lsList = InternalList as LiveShapingList;
-            if (lsList != null)
-            {
-                lsList.ResetCopies();
-            }
-        }
- 
-        public void ResetAverageCopy()
-        {
-            LiveShapingList lsList = InternalList as LiveShapingList;
-            if (lsList != null)
-            {
-                lsList.ResetAverageCopy();
-            }
-        }
- 
-        public int GetComparisons()
-        {
-            LiveShapingList lsList = InternalList as LiveShapingList;
-            return (lsList != null) ? lsList.GetComparisons() : 0;
-        }
- 
-        public int GetCopies()
-        {
-            LiveShapingList lsList = InternalList as LiveShapingList;
-            return (lsList != null) ? lsList.GetCopies() : 0;
-        }
- 
-        public double GetAverageCopy()
-        {
-            LiveShapingList lsList = InternalList as LiveShapingList;
-            return (lsList != null) ? lsList.GetAverageCopy() : 0.0;
-        }
- 
-#endif // LiveShapingInstrumentation
-
-#endif // no live shaping
-
-#endregion ICollectionViewLiveShaping
-
 #if WPF
 
 #region IItemProperties
@@ -1589,50 +1341,6 @@ namespace System.Windows.Data
         //
         //------------------------------------------------------
 #region Protected Methods
-
-#if false
-        protected override void OnAllowsCrossThreadChangesChanged()
-        {
-            if (AllowsCrossThreadChanges)
-            {
-                BindingOperations.AccessCollection(SourceCollection,
-                    () =>
-                    {
-                        lock (SyncRoot)
-                        {
-                            ClearPendingChanges();
-                            ShadowCollection = new List<object>((ICollection)SourceCollection);
-
-                            if (!UsesLocalArray)
-                            {
-                                _internalList = ShadowCollection;
-                            }
-                        }
-                    },
-                    false);
-            }
-            else
-            {
-                ShadowCollection = null;
-                if (!UsesLocalArray)
-                {
-                    _internalList = SourceList;
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Obsolete.   Retained for compatibility.
-        ///     Use OnAllowsCrossThreadChangesChanged instead.
-        /// </summary>
-        /// <param name="args">
-        ///     The NotifyCollectionChangedEventArgs that is added to the change log
-        /// </param>
-        [Obsolete("Replaced by OnAllowsCrossThreadChangesChanged")]
-        protected override void OnBeginChangeLogging(NotifyCollectionChangedEventArgs args)
-        {
-        }
-#endif
 
         /// <summary>
         /// Handle CollectionChange events
@@ -1853,11 +1561,6 @@ namespace System.Windows.Data
             object oldItem = (args.OldItems != null && args.OldItems.Count > 0) ? args.OldItems[0] : null;
             object newItem = (args.NewItems != null && args.NewItems.Count > 0) ? args.NewItems[0] : null;
 
-#if false // no live shaping
-            LiveShapingList lsList = InternalList as LiveShapingList;
-            LiveShapingItem lsi;
-#endif // no live shaping
-
             // in the case of a replace that has a new adjustedPosition
             // (likely caused by sorting), the only way to effectively communicate
             // this change is through raising Remove followed by Insert.
@@ -1870,12 +1573,6 @@ namespace System.Windows.Data
                     // for live filtering
                     if (adjustedNewIndex == -2)
                     {
-#if false // no live shaping
-                        if (lsList != null && IsLiveFiltering == true)
-                        {
-                            lsList.AddFilteredItem(newItem);
-                        }
-#endif // no live shaping
                         return;
                     }
 
@@ -1895,9 +1592,6 @@ namespace System.Windows.Data
                     }
                     else
                     {
-#if false // no live shaping
-                        lsi = (lsList == null || isSpecialItem) ? null : lsList.ItemAt(adjustedNewIndex - delta);
-#endif // no live shaping
                         AddItemToGroups(newItem);
                     }
 
@@ -1908,12 +1602,6 @@ namespace System.Windows.Data
                     // live filtering
                     if (adjustedOldIndex == -2)
                     {
-#if false // no live shaping
-                        if (lsList != null && IsLiveFiltering == true)
-                        {
-                            lsList.RemoveFilteredItem(oldItem);
-                        }
-#endif // no live shaping
                         return;
                     }
 
@@ -1923,13 +1611,7 @@ namespace System.Windows.Data
                     {
                         int localOldIndex = adjustedOldIndex - delta;
 
-                        if (localOldIndex < InternalList.Count &&
-#if false // no live shaping
-                            ItemsControl.EqualsEx(ItemFrom(InternalList[localOldIndex]), oldItem)
-#else
-                            ItemsControl.EqualsEx(InternalList[localOldIndex], oldItem)
-#endif // no live shaping
-                            )
+                        if (localOldIndex < InternalList.Count && ItemsControl.EqualsEx(InternalList[localOldIndex], oldItem))
                         {
                             InternalList.RemoveAt(localOldIndex);
                         }
@@ -1952,12 +1634,6 @@ namespace System.Windows.Data
                     // the live filtering list
                     if (adjustedOldIndex == -2)
                     {
-#if false // no live shaping
-                        if (lsList != null && IsLiveFiltering == true)
-                        {
-                            lsList.ReplaceFilteredItem(oldItem, newItem);
-                        }
-#endif // no live shaping
                         return;
                     }
 
@@ -1974,9 +1650,6 @@ namespace System.Windows.Data
                     }
                     else
                     {
-#if false // no live shaping
-                        lsi = (lsList == null) ? null : lsList.ItemAt(adjustedNewIndex - delta);
-#endif // no live shaping
                         RemoveItemFromGroups(oldItem);
                         AddItemToGroups(newItem);
                     }
@@ -1988,11 +1661,7 @@ namespace System.Windows.Data
 
                     bool simpleMove = ItemsControl.EqualsEx(oldItem, newItem);
 
-#if false // no live shaping
-                    if (UsesLocalArray && (lsList == null || !lsList.IsRestoringLiveSorting))
-#else
                     if (UsesLocalArray)
-#endif // no live shaping
                     {
                         int localOldIndex = adjustedOldIndex - delta;
                         int localNewIndex = adjustedNewIndex - delta;
@@ -2051,9 +1720,6 @@ namespace System.Windows.Data
                     }
                     else
                     {
-#if false // no live shaping
-                        lsi = (lsList == null) ? null : lsList.ItemAt(adjustedNewIndex);
-#endif // no live shaping
                         if (simpleMove)
                         {
                             // simple move
@@ -2288,11 +1954,7 @@ namespace System.Windows.Data
         /// </summary>
         protected bool UsesLocalArray
         {
-#if false // no live shaping
-            get { return ActiveComparer != null || ActiveFilter != null || (IsGrouping && IsLiveGrouping == true); }
-#else
             get { return ActiveComparer != null || ActiveFilter != null; }
-#endif // // no live shaping
         }
 
         /// <summary>
@@ -2450,22 +2112,7 @@ namespace System.Windows.Data
                 CollectionView view = lazyGetCollectionView();
                 Debug.Assert(view != null, "lazyGetCollectionView should not return null");
 
-#if false
-                if (view.SourceCollection != null)
-                {
-                    IComparer xmlComparer = SystemXmlHelper.PrepareXmlComparer(view.SourceCollection, sort, view.Culture);
-                    if (xmlComparer != null)
-                    {
-                        return xmlComparer;
-                    }
-                }
-#endif
-
-#if false // WPF
-                return new SortFieldComparer(sort, view.Culture);
-#else // Silverlight toolkit implementation
                 return new SortFieldComparer(view);
-#endif
             }
 
             return null;
@@ -2560,15 +2207,6 @@ namespace System.Windows.Data
         {
             PrepareShaping();
 
-#if false // no live shaping
-            LiveShapingList lsList = _internalList as LiveShapingList;
-            if (lsList != null)
-            {
-                lsList.LiveShapingDirty -= new EventHandler(OnLiveShapingDirty);
-                lsList.Clear();
-            }
-#endif // no live shaping
-
             IList list = AllowsCrossThreadChanges ? ShadowCollection : (SourceCollection as IList);
 
             if (!UsesLocalArray)
@@ -2580,13 +2218,7 @@ namespace System.Windows.Data
             {
                 // otherwise use a private copy - either a simple list or a LiveShapingList
                 int size = list.Count;
-#if false // no live shaping
-                IList localList = IsLiveShaping ? (IList)(new LiveShapingList(this, GetLiveShapingFlags(), ActiveComparer))
-                                                : (IList)(new List<object>(size));
-                lsList = localList as LiveShapingList;
-#else
                 IList localList = new List<object>(size);
-#endif // no live shaping
 
                 // filter the collection's array into the local array
                 for (int k = 0; k < size; ++k)
@@ -2599,12 +2231,6 @@ namespace System.Windows.Data
                     {
                         localList.Add(item);
                     }
-#if false // no live shaping
-                    else if (IsLiveFiltering == true)
-                    {
-                        lsList.AddFilteredItem(item);
-                    }
-#endif // no live shaping
                 }
 
                 // sort the local array
@@ -2613,37 +2239,10 @@ namespace System.Windows.Data
                     localList.Sort(ActiveComparer);
                 }
 
-#if false // no live shaping
-                if (lsList != null)
-                {
-                    lsList.LiveShapingDirty += new EventHandler(OnLiveShapingDirty);
-                }
-#endif // no live shaping
-
                 _internalList = localList;
             }
 
             PrepareGroups();
-        }
-
-#if false // no live shaping
-        void OnLiveShapingDirty(object sender, EventArgs e)
-        {
-            IsLiveShapingDirty = true;
-        }
-#endif // no live shaping
-
-        // rebuild the local array, called when a live-shaping property changes
-        void RebuildLocalArray()
-        {
-            if (IsRefreshDeferred)
-            {
-                RefreshOrDefer();
-            }
-            else
-            {
-                PrepareLocalArray();
-            }
         }
 
         private void MoveCurrencyOffDeletedElement(int oldCurrentPosition)
@@ -2991,25 +2590,13 @@ namespace System.Windows.Data
                 }
             }
 
-#if false // no live shaping
-            bool isLiveGrouping = (IsLiveGrouping == true);
-            LiveShapingList lsList = InternalList as LiveShapingList;
-#endif // no live shaping
-
             for (int k = 0, n = InternalList.Count; k < n; ++k)
             {
                 object item = InternalList[k];
-#if false // no live shaping
-                LiveShapingItem lsi = (lsList != null) ? lsList.ItemAt(k) : null;
-#endif // no live shaping
 
                 if (!IsAddingNew || !ItemsControl.EqualsEx(_newItem, item))
                 {
-#if false // no live shaping
-                    _group.AddToSubgroups(item, lsi, true /*loading*/);
-#else
                     _group.AddToSubgroups(item, true /*loading*/);
-#endif // no live shaping
                 }
             }
 
@@ -3059,34 +2646,6 @@ namespace System.Windows.Data
         }
 
         // An item was inserted into the collection.  Update the groups.
-#if false // no live shaping
-        void AddItemToGroups(object item, LiveShapingItem lsi)
-        {
-            if (IsAddingNew && item == _newItem)
-            {
-                int index;
-                switch (NewItemPlaceholderPosition)
-                {
-                    case NewItemPlaceholderPosition.None:
-                    default:
-                        index = _group.Items.Count;
-                        break;
-                    case NewItemPlaceholderPosition.AtBeginning:
-                        index = 1;
-                        break;
-                    case NewItemPlaceholderPosition.AtEnd:
-                        index = _group.Items.Count - 1;
-                        break;
-                }
-
-                _group.InsertSpecialItem(index, item, false /*loading*/);
-            }
-            else
-            {
-                _group.AddToSubgroups(item, lsi, false /*loading*/);
-            }
-        }
-#else
         void AddItemToGroups(object item)
         {
             if (IsAddingNew && item == _newItem)
@@ -3113,7 +2672,6 @@ namespace System.Windows.Data
                 _group.AddToSubgroups(item, false /*loading*/);
             }
         }
-#endif // no live shaping
 
         // An item was removed from the collection.  Update the groups.
         void RemoveItemFromGroups(object item)
@@ -3126,223 +2684,12 @@ namespace System.Windows.Data
         }
 
         // An item has moved.  Update the groups
-#if false // no live shaping
-        void MoveItemWithinGroups(object item, LiveShapingItem lsi, int oldIndex, int newIndex)
-        {
-            _group.MoveWithinSubgroups(item, lsi, InternalList, oldIndex, newIndex);
-        }
-#else
         void MoveItemWithinGroups(object item, int oldIndex, int newIndex)
         {
             _group.MoveWithinSubgroups(item, InternalList, oldIndex, newIndex);
         }
-#endif // no live shaping
 
 #endregion Grouping
-
-#region Live Shaping
-
-#if false // no live shaping
-
-        const double LiveSortingDensityThreshold = 0.8;
-
-        LiveShapingFlags GetLiveShapingFlags()
-        {
-            LiveShapingFlags result = 0;
-
-            if (IsLiveSorting == true)
-                result = result | LiveShapingFlags.Sorting;
-            if (IsLiveFiltering == true)
-                result = result | LiveShapingFlags.Filtering;
-            if (IsLiveGrouping == true)
-                result = result | LiveShapingFlags.Grouping;
-
-            return result;
-        }
-
-        internal void RestoreLiveShaping()
-        {
-            LiveShapingList list = InternalList as LiveShapingList;
-            if (list == null)
-                return;
-
-            int oldIndex, newIndex;
-
-            // restore sorting
-            if (ActiveComparer != null)
-            {
-                double dirtyDensity = ((double)list.SortDirtyItems.Count) / (list.Count + 1);
-                if (dirtyDensity < LiveSortingDensityThreshold)
-                {
-                    // when few elements are dirty, restore them one-by-one
-                    foreach (LiveShapingItem lsi in list.SortDirtyItems)
-                    {
-                        if (!lsi.IsSortDirty || lsi.IsDeleted || !lsi.ForwardChanges)
-                            continue;
-
-                        lsi.IsSortDirty = false;
-                        lsi.IsSortPendingClean = false;
-                        list.FindPosition(lsi, out oldIndex, out newIndex);
-
-                        if (oldIndex != newIndex)
-                        {
-                            if (oldIndex < newIndex)
-                                newIndex -= 1;
-
-                            ProcessLiveShapingCollectionChange(
-                                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move,
-                                                                        lsi.Item, oldIndex, newIndex),
-                                oldIndex, newIndex);
-
-                            Debug.Assert(list.VerifyLiveSorting(lsi), "live sorting failed");
-                        }
-                    }
-                }
-                else
-                {
-                    // when most elements are dirty, do a full InsertionSort
-                    list.RestoreLiveSortingByInsertionSort(ProcessLiveShapingCollectionChange);
-                }
-
-                Debug.Assert(list.VerifyLiveSorting(null), "live sorting not resotred");
-            }
-
-            list.SortDirtyItems.Clear();
-
-            // restore filtering
-            if (ActiveFilter != null)
-            {
-                foreach (LiveShapingItem lsi in list.FilterDirtyItems)
-                {
-                    if (!lsi.IsFilterDirty || !lsi.ForwardChanges)
-                        continue;
-
-                    object item = lsi.Item;
-                    bool oldFailsFilter = lsi.FailsFilter;
-                    bool newFailsFilter = !PassesFilter(item);
-                    int index;
-
-                    if (oldFailsFilter != newFailsFilter)
-                    {
-                        if (newFailsFilter)
-                        {
-                            // remove item from the main list
-                            index = list.IndexOf(lsi);
-                            ProcessLiveShapingCollectionChange(
-                                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
-                                                                        item, index),
-                                index, -1);
-
-                            // add it to the filtered list
-                            list.AddFilteredItem(lsi);
-                        }
-                        else
-                        {
-                            // remove item from the filtered list
-                            list.RemoveFilteredItem(lsi);
-
-                            // find where it belongs in the main list
-                            if (ActiveComparer != null)
-                            {
-                                // if there's a sort order, do a binary search
-                                index = list.Search(0, list.Count, item);
-                                if (index < 0)
-                                    index = ~index;
-                            }
-                            else
-                            {
-                                // otherwise, do it the hard way
-                                // First find its index in the source list, starting at
-                                // the position of the previous duplicate
-                                IList ilFull = (AllowsCrossThreadChanges ? ShadowCollection : SourceCollection) as IList;
-                                for (index = lsi.GetAndClearStartingIndex(); index < ilFull.Count; ++index)
-                                {
-                                    if (ItemsControl.EqualsEx(item, ilFull[index]))
-                                        break;
-                                }
-
-                                // record the index, for use by the next duplicate
-                                list.SetStartingIndexForFilteredItem(item, index + 1);
-
-                                // now do a linear search in the partial list
-                                index = MatchingSearch(item, index, ilFull, list);
-                            }
-
-                            ProcessLiveShapingCollectionChange(
-                                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
-                                                                        item, index),
-                                -1, index);
-                        }
-                    }
-
-                    lsi.IsFilterDirty = false;
-                }
-            }
-
-            list.FilterDirtyItems.Clear();
-
-            // restore grouping
-            if (IsGrouping)
-            {
-                List<AbandonedGroupItem> deleteList = new List<AbandonedGroupItem>();
-                foreach (LiveShapingItem lsi in list.GroupDirtyItems)
-                {
-                    if (!lsi.IsGroupDirty || lsi.IsDeleted || !lsi.ForwardChanges)
-                        continue;
-
-                    _group.RestoreGrouping(lsi, deleteList);
-
-                    lsi.IsGroupDirty = false;
-                }
-
-                _group.DeleteAbandonedGroupItems(deleteList);
-            }
-
-            list.GroupDirtyItems.Clear();
-
-
-            IsLiveShapingDirty = false;
-        }
-
-        // changes from the LiveShaping list need indices adjusted for NewItemPlaceholder
-        void ProcessLiveShapingCollectionChange(NotifyCollectionChangedEventArgs args, int oldIndex, int newIndex)
-        {
-            if (!IsGrouping && (NewItemPlaceholderPosition == NewItemPlaceholderPosition.AtBeginning))
-            {
-                if (oldIndex >= 0)
-                    ++oldIndex;
-                if (newIndex >= 0)
-                    ++newIndex;
-            }
-
-            ProcessCollectionChangedWithAdjustedIndex(args, oldIndex, newIndex);
-        }
-
-        internal bool IsLiveShapingDirty
-        {
-            get { return _isLiveShapingDirty; }
-            set
-            {
-                if (value == _isLiveShapingDirty)
-                    return;
-
-                _isLiveShapingDirty = value;
-                if (value)
-                {
-                    Dispatcher.BeginInvoke(DispatcherPriority.DataBind, (Action)RestoreLiveShaping);
-                }
-            }
-        }
-
-        object ItemFrom(object o)
-        {
-            LiveShapingItem lsi = o as LiveShapingItem;
-            return (lsi == null) ? o : lsi.Item;
-        }
-
-#endif // no live shaping
-
-#endregion Live Shaping
 
         /// <summary>
         /// Helper to raise a PropertyChanged event  />).
@@ -3409,15 +2756,6 @@ namespace System.Windows.Data
         private bool _isItemConstructorValid;
         private ConstructorInfo _itemConstructor;
         private List<Action> _deferredActions;
-#if false // no live shaping
-        private ObservableCollection<string> _liveSortingProperties;
-        private ObservableCollection<string> _liveFilteringProperties;
-        private ObservableCollection<string> _liveGroupingProperties;
-        bool? _isLiveSorting = false;
-        bool? _isLiveFiltering = false;
-        bool? _isLiveGrouping = false;
-        bool _isLiveShapingDirty;
-#endif // no live shaping
         bool _isRemoving;
 
         private const int _unknownIndex = -1;

@@ -664,9 +664,7 @@ namespace OpenSilver.Internal.Data
                     _parent = null;
                 }
 
-#if NETSTANDARD
                 GC.SuppressFinalize(this);
-#endif
             }
 
             EnumerableCollectionView _parent;

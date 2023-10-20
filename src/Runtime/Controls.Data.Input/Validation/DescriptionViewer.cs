@@ -385,17 +385,14 @@ namespace System.Windows.Controls
             this.ParseTargetValidState();
         }
 
-#if OPENSILVER
         /// <summary>
         /// Creates AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
         /// </summary>
         /// <returns>The AutomationPeer associated with this DescriptionViewer.</returns>
-        [OpenSilver.NotImplemented]
         protected override AutomationPeer OnCreateAutomationPeer()
         {
             return new DescriptionViewerAutomationPeer(this);
         }
-#endif
 
         /// <summary>
         /// Perform initialization code

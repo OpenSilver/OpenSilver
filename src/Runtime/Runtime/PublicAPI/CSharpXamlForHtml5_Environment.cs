@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using CSHTML5.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 public static partial class CSharpXamlForHtml5
 {
     /// <summary>
@@ -31,17 +21,6 @@ public static partial class CSharpXamlForHtml5
         /// <summary>
         /// Gets a boolean saying if we are currently running in Javascript.
         /// </summary>
-        public static bool IsRunningInJavaScript
-        {
-            get
-            {
-#if CSHTML5BLAZOR
-                return false;
-#else
-                return !INTERNAL_InteropImplementation.IsRunningInTheSimulator();
-#endif
-            }
-        }
+        public static bool IsRunningInJavaScript => false;
     }
-
 }

@@ -61,9 +61,6 @@ namespace CSHTML5.Internal
             get { return _handler; }
         }
 
-#if BRIDGE
-        [Bridge.External]
-#endif
         private void OnEventImpl(object jsEventArg)
         {
             if (this._eventHandler != null)

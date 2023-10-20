@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,36 +11,29 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
-#if BRIDGE || CSHTML5BLAZOR
 namespace CSHTML5.Internal.Attributes
 {
-#endif
-
-/// <summary>
-/// Specifies the friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
-/// </summary>
-[AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
-public sealed class MinimumRequiredCompilerVersionFriendlyNameAttribute : Attribute
-{
     /// <summary>
-    /// Initializes a new instance of the MinimumRequiredCompilerVersionFriendlyNameAttribute class with the
-    /// friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
+    /// Specifies the friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
     /// </summary>
-    /// <param name="versionFriendlyName">The friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.</param>
-    public MinimumRequiredCompilerVersionFriendlyNameAttribute(string versionFriendlyName)
+    [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
+    public sealed class MinimumRequiredCompilerVersionFriendlyNameAttribute : Attribute
     {
-        this.VersionFriendlyName = versionFriendlyName;
+        /// <summary>
+        /// Initializes a new instance of the MinimumRequiredCompilerVersionFriendlyNameAttribute class with the
+        /// friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.
+        /// </summary>
+        /// <param name="versionFriendlyName">The friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed.</param>
+        public MinimumRequiredCompilerVersionFriendlyNameAttribute(string versionFriendlyName)
+        {
+            VersionFriendlyName = versionFriendlyName;
+        }
+
+        /// <summary>
+        /// The friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed
+        /// </summary>
+        public string VersionFriendlyName { get; private set; }
     }
-
-    /// <summary>
-    /// The friendly name of the minimum version of the C#/XAML for HTML5 compiler that is required to process the assembly being attributed
-    /// </summary>
-    public string VersionFriendlyName { get; private set; }
 }
-
-#if BRIDGE || CSHTML5BLAZOR
-}
-#endif

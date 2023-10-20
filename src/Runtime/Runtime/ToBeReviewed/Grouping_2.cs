@@ -22,8 +22,6 @@ using System.Threading.Tasks;
 
 namespace System.Linq
 {
-    //We exclude this class when we use Bridge, because it is already used by it (and it creates conflict with CSHTML5)
-#if !BRIDGE
     public class Grouping<TKey, TElement> : IGrouping<TKey, TElement>, IEnumerable<TElement>
     {
         Collection<TElement> elements;
@@ -55,5 +53,4 @@ namespace System.Linq
             return elements.GetEnumerator();
         }
     }
-#endif
 }
