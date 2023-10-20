@@ -1,8 +1,0 @@
-﻿<Window x:Class="DotNetForHtml5.LocalServer.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CSHTML5 - Local Web Server" SizeToContent="WidthAndHeight" Background="Black">
-    <Border x:Name="MainContainer">
-        
-    </Border>
-</Window>

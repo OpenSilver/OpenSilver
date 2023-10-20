@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,14 @@
 *  
 \*====================================================================================*/
 
-
+using OpenSilver.Internal;
 using System;
-using System.Runtime.CompilerServices;
+using System.ComponentModel;
 
 namespace JSIL
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Verbatim
     {
         public static dynamic Expression(string javascript)

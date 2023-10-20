@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Runtime\System.Windows.Controls\DataPager\WeakEventListener.cs" Link="WeakEventListener.cs" />
+    <Compile Include="..\Controls.Data\WeakEventListener.cs" Link="WeakEventListener.cs" />
     <Compile Include="..\Runtime\System.Windows.Controls\Toolkit\CollectionHelpers.cs" Link="Extensions\CollectionHelpers.cs" />
     <Compile Include="..\Runtime\System.Windows.Controls\Toolkit\EnumerableExtensions.cs" Link="Extensions\EnumerableExtensions.cs" />
     <Compile Include="AggregatedObservableCollection.cs" />

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,14 @@
 *  
 \*====================================================================================*/
 
-
 using System;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace JSIL.Meta
 {
+	[Obsolete(Helper.ObsoleteMemberMessage)]
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	[AttributeUsage(AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Interface)]
 	public class JSIgnoreAttribute : Attribute
 	{
