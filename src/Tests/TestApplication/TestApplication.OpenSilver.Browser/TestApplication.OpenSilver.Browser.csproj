@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <NoXamlPreprocessor>True</NoXamlPreprocessor>
-    <OpenSilverType>4</OpenSilverType>
+    <OpenSilverType>5</OpenSilverType>
   </PropertyGroup>
 
   <ItemGroup>
