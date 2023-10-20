@@ -29,7 +29,7 @@ namespace TypeScriptDefinitionsSupport
         {
             get
             {
-                return Convert.ToInt32(Interop.ExecuteJavaScript("$0.length", this.UnderlyingJSInstance));
+                return Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("$0.length", this.UnderlyingJSInstance));
             }
         }
 
@@ -42,7 +42,7 @@ namespace TypeScriptDefinitionsSupport
                 if (index < 0 || index >= this.Count)
                     throw new ArgumentOutOfRangeException();
 
-                object value = Interop.ExecuteJavaScript("$0[$1]", this.UnderlyingJSInstance, index);
+                object value = OpenSilver.Interop.ExecuteJavaScript("$0[$1]", this.UnderlyingJSInstance, index);
                 if (typeof(IJSObject).IsAssignableFrom(typeof(T)))
                 {
                     IJSObject o = (IJSObject)(object)Activator.CreateInstance<T>();
@@ -80,7 +80,7 @@ namespace TypeScriptDefinitionsSupport
                 //    _value = value;
                 //else
                 //    throw new Exception("The generic type parameter '" + typeof(T).Name + "' is not a built-in type or a JSObject.");
-                Interop.ExecuteJavaScriptAsync("$0[$1] = $2", this.UnderlyingJSInstance, index, _value);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("$0[$1] = $2", this.UnderlyingJSInstance, index, _value);
             }
         }
 
@@ -103,12 +103,12 @@ namespace TypeScriptDefinitionsSupport
             //else
             //    throw new Exception("The generic type parameter '" + typeof(T).Name + "' is not a built-in type or a JSObject.");
 
-            Interop.ExecuteJavaScriptAsync("$0.push($1)", this.UnderlyingJSInstance, value);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.push($1)", this.UnderlyingJSInstance, value);
         }
 
         public void Clear()
         {
-            Interop.ExecuteJavaScriptAsync("$0.splice(0, $0.length)", this.UnderlyingJSInstance);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.splice(0, $0.length)", this.UnderlyingJSInstance);
         }
 
         public bool Contains(T item)
@@ -130,7 +130,7 @@ namespace TypeScriptDefinitionsSupport
             //else
             //    throw new Exception("The generic type parameter '" + typeof(T).Name + "' is not a built-in type or a JSObject.");
 
-            int index = Convert.ToInt32(Interop.ExecuteJavaScript("$0.indexOf($1)", this.UnderlyingJSInstance, value));
+            int index = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("$0.indexOf($1)", this.UnderlyingJSInstance, value));
 
             // If the element is not found by indexOf, -1 is returned
             return index != -1;
@@ -157,7 +157,7 @@ namespace TypeScriptDefinitionsSupport
             {
                 for (int i = 0; i < this.Count; i++)
                 {
-                    object value = Interop.ExecuteJavaScript("$0[$1]", this.UnderlyingJSInstance, i);
+                    object value = OpenSilver.Interop.ExecuteJavaScript("$0[$1]", this.UnderlyingJSInstance, i);
                     IJSObject o = (IJSObject)(object)Activator.CreateInstance<T>();
                     o.UnderlyingJSInstance = value;
                     yield return (T)(object)o;
@@ -168,7 +168,7 @@ namespace TypeScriptDefinitionsSupport
             {
                 for (int i = 0; i < this.Count; i++)
                 {
-                    object value = Interop.ExecuteJavaScript("$0[$1]", this.UnderlyingJSInstance, i);
+                    object value = OpenSilver.Interop.ExecuteJavaScript("$0[$1]", this.UnderlyingJSInstance, i);
                     yield return JSObject.Helper_ConvertTo<T>(value);
                 }
             }
@@ -204,7 +204,7 @@ namespace TypeScriptDefinitionsSupport
             //else
             //    throw new Exception("The generic type parameter '" + typeof(T).Name + "' is not a built-in type or a JSObject.");
 
-            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.indexOf($1)", this.UnderlyingJSInstance, value));
+            return Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("$0.indexOf($1)", this.UnderlyingJSInstance, value));
         }
 
         public void Insert(int index, T item)
@@ -236,7 +236,7 @@ namespace TypeScriptDefinitionsSupport
             //else
             //    throw new Exception("The generic type parameter '" + typeof(T).Name + "' is not a built-in type or a JSObject.");
 
-            Interop.ExecuteJavaScriptAsync("$0.splice($1, 0, $2)", this.UnderlyingJSInstance, index, value);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.splice($1, 0, $2)", this.UnderlyingJSInstance, index, value);
         }
 
         public bool Remove(T item)
@@ -258,10 +258,10 @@ namespace TypeScriptDefinitionsSupport
             //else
             //    throw new Exception("The generic type parameter '" + typeof(T).Name + "' is not a built-in type or a JSObject.");
 
-            int index = Convert.ToInt32(Interop.ExecuteJavaScript("$0.indexOf($1)", this.UnderlyingJSInstance, value));
+            int index = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("$0.indexOf($1)", this.UnderlyingJSInstance, value));
 
             if (index != -1)
-                Interop.ExecuteJavaScriptAsync("$0.splice($1, 1)", this.UnderlyingJSInstance, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.splice($1, 1)", this.UnderlyingJSInstance, index);
 
             return index != -1;
         }
@@ -271,7 +271,7 @@ namespace TypeScriptDefinitionsSupport
             if (index < 0 || index >= this.Count)
                 throw new ArgumentOutOfRangeException();
 
-            Interop.ExecuteJavaScriptAsync("$0.splice($1, 1)", this.UnderlyingJSInstance, index);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.splice($1, 1)", this.UnderlyingJSInstance, index);
         }
 
         public JSArray()

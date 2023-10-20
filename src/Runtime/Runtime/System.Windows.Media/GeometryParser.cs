@@ -1102,10 +1102,6 @@ namespace System.Windows.Media
         private static bool s_defaultValueForPathFigureIsFilled;
         private static Point s_defaultValueForPathFigureStartPoint;
 
-        // This code assumes that sub-classes of PathSegment don't override the default value for these properties
-        private static bool s_defaultValueForPathSegmentIsStroked;
-        private static bool s_defaultValueForPathSegmentIsSmoothJoin;
-
         private static bool s_defaultValueForArcSegmentIsLargeArc;
         private static SweepDirection s_defaultValueForArcSegmentSweepDirection;
         private static double s_defaultValueForArcSegmentRotationAngle;

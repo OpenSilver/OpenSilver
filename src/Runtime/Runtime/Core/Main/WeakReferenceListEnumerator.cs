@@ -32,7 +32,6 @@ namespace OpenSilver.Internal
             {
                 if (null == _StrongReference)
                 {
-#pragma warning suppress 6503
                     throw new InvalidOperationException("No current object to return.");
                 }
                 return _StrongReference;

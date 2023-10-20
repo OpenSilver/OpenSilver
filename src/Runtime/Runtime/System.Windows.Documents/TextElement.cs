@@ -67,7 +67,7 @@ namespace System.Windows.Documents
             => domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateTextElementDomElementAndAppendIt(parentRef, this);
 
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CharacterSpacingProperty = 
+        public new static readonly DependencyProperty CharacterSpacingProperty = 
             DependencyProperty.Register(
                 nameof(CharacterSpacing), 
                 typeof(int), 
@@ -75,7 +75,7 @@ namespace System.Windows.Documents
                 null);
 
         [OpenSilver.NotImplemented]
-        public int CharacterSpacing
+        public new int CharacterSpacing
         {
             get { return (int)GetValue(CharacterSpacingProperty); }
             set { SetValue(CharacterSpacingProperty, value); }

@@ -719,7 +719,9 @@ namespace System.Windows.Controls
         /// Indicates whether the control should not proceed with selecting all
         /// text.
         /// </summary>
+#pragma warning disable CS0414
         private bool _isIgnoreSelectionOfAllText;
+#pragma warning restore CS0414
 
         /// <summary>
         /// BackingField for AllowHintContentChange.

@@ -144,6 +144,11 @@ namespace TypeScriptDefinitionsSupport
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public static bool Helper_IsBuiltInType<T>()
         {
             return typeof(T) == typeof(Int32) ||

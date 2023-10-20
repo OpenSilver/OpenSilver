@@ -946,7 +946,7 @@ namespace System.Windows.Controls
         /// Creates the automation peer.
         /// </summary>
         /// <returns>An AutomationPeer for this instance.</returns>
-        protected abstract TimePickerPopupAutomationPeer CreateAutomationPeer();
+        protected new abstract TimePickerPopupAutomationPeer CreateAutomationPeer();
 #endregion
     }
 }

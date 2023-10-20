@@ -174,25 +174,25 @@ namespace CSHTML5.Internal
                 {
                     object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
 
-                    object movedChild = CSHTML5.Interop.ExecuteJavaScript(
+                    object movedChild = OpenSilver.Interop.ExecuteJavaScript(
                         "$0.children[$1]",
                         domElementWhereToPlaceChildStuff,
                         oldIndex);
 
 
-                    if (!Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == $1", movedChild, domElementToMove)))
+                    if (!Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0 == $1", movedChild, domElementToMove)))
                     {
                         throw new InvalidOperationException(string.Format("index '{0}' does match index of the element about to be moved.", oldIndex));
                     }
 
-                    object nextSibling = CSHTML5.Interop.ExecuteJavaScript(
+                    object nextSibling = OpenSilver.Interop.ExecuteJavaScript(
                         "$0.children[$1]",
                         domElementWhereToPlaceChildStuff,
                         newIndex);
 
                     if (nextSibling != null)
                     {
-                        CSHTML5.Interop.ExecuteJavaScript(
+                        OpenSilver.Interop.ExecuteJavaScript(
                             "$0.insertBefore($1, $2)",
                             domElementWhereToPlaceChildStuff,
                             domElementToMove,
@@ -200,7 +200,7 @@ namespace CSHTML5.Internal
                     }
                     else
                     {
-                        CSHTML5.Interop.ExecuteJavaScript(
+                        OpenSilver.Interop.ExecuteJavaScript(
                             "$0.appendChild($1)",
                             domElementWhereToPlaceChildStuff,
                             domElementToMove);
@@ -222,7 +222,7 @@ namespace CSHTML5.Internal
                 {
                     object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
                     //todo: see if there is a way to know the index of the domElement in its parent without looping through the list (where we find i in the js below).
-                    Interop.ExecuteJavaScript(@"
+                    OpenSilver.Interop.ExecuteJavaScript(@"
 var actualIndex = $1;
 var i = 0;
 while (i < actualIndex && $0.children[i]!=$2) { 

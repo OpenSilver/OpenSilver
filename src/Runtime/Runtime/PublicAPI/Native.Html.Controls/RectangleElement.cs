@@ -98,8 +98,8 @@ namespace CSHTML5.Native.Html.Controls
             {
                 currentDrawingStyle = this.ApplyStyle(currentDrawingStyle, jsContext2d);
                 //Interop.ExecuteJavaScript("$0.fillStyle = $1", jsContext2d, this.fillStyle);
-                Interop.ExecuteJavaScriptAsync("$0.fillRect($1, $2, $3, $4)", jsContext2d, this.X + xParent, this.Y + yParent, this.Width, this.Height);
-                Interop.ExecuteJavaScriptAsync("$0.strokeRect($1, $2, $3, $4)", jsContext2d, this.X + xParent, this.Y + yParent, this.Width, this.Height);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.fillRect($1, $2, $3, $4)", jsContext2d, this.X + xParent, this.Y + yParent, this.Width, this.Height);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.strokeRect($1, $2, $3, $4)", jsContext2d, this.X + xParent, this.Y + yParent, this.Width, this.Height);
             }
 
             return currentDrawingStyle;

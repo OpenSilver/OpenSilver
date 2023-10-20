@@ -324,7 +324,8 @@ namespace System.Windows.Controls.Primitives
 
         /// <summary> 
         /// Called when the IsEnabled property changes.
-        /// </summary> 
+        /// </summary>
+        /// <param name="sender"></param> 
         /// <param name="e">Property changed args</param>
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {

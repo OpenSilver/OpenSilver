@@ -708,7 +708,6 @@ parentElement.appendChild(child);";
             int i;
             int len = s.Length;
             StringBuilder sb = StringBuilderFactory.Get();
-            string t;
 
             for (i = 0; i < len; i += 1)
             {

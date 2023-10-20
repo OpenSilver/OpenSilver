@@ -651,9 +651,9 @@ namespace System.Windows.Controls
                     if (run.Margin != null)
                         format.Add("margin", run.Margin.ToString());
                     if (run.Background is SolidColorBrush background)
-                        format.Add("background", background.ConvertToCSSValue());
+                        format.Add("background", background.INTERNAL_ToHtmlString());
                     if (run.Foreground is SolidColorBrush foreground)
-                        format.Add("color", foreground.ConvertToCSSValue());
+                        format.Add("color", foreground.INTERNAL_ToHtmlString());
                     _textViewHost.View.SetText(run.Text, format);
                     break;
 

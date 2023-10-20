@@ -1,18 +1,9 @@
-using System;
-
 namespace System.Windows
 {
 	[OpenSilver.NotImplemented]
-	public static partial class SystemParameters
+	public static class SystemParameters
 	{
-		private static int _wheelScrollLines;
 		[OpenSilver.NotImplemented]
-		public static int WheelScrollLines
-		{
-			get
-			{
-				return _wheelScrollLines;
-			}
-		}
+		public static int WheelScrollLines { get; }
 	}
 }

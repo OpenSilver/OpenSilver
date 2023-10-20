@@ -305,7 +305,7 @@
         /// <summary>
         /// Returns the value of the Typography.Capitals attached
         /// property for a specified dependency object.
-
+        /// </summary>
         public static int GetAnnotationAlternates(DependencyObject element)
         {
             return (int)GetTypographyValue(element, AnnotationAlternatesProperty);

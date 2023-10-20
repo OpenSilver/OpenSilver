@@ -22,7 +22,7 @@ namespace TypeScriptDefinitionsSupport
     {
         public void then(Action onFulfilled, Action<object> onRejected)
         {
-            Interop.ExecuteJavaScriptAsync("$0.then($1, $2)", UnderlyingJSInstance, onFulfilled, onRejected);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.then($1, $2)", UnderlyingJSInstance, onFulfilled, onRejected);
         }
     }
 
@@ -30,7 +30,7 @@ namespace TypeScriptDefinitionsSupport
     {
         public void then(Action<T> onFulfilled, Action<object> onRejected)
         {
-            Interop.ExecuteJavaScriptAsync("$0.then($1, $2)", UnderlyingJSInstance, onFulfilled, onRejected);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.then($1, $2)", UnderlyingJSInstance, onFulfilled, onRejected);
         }
     }
 }

@@ -68,7 +68,7 @@ namespace System.Windows.Media.Animation
 
         // This guid is used to specifically target a particular call to the animation. It prevents the callback which should be called when velocity's animation end 
         // to be called when the callback is called from a previous call to the animation. This could happen when the animation was started quickly multiples times in a row. 
-        private Guid _animationID;
+        private Guid _animationID = Guid.Empty;
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
@@ -320,7 +320,6 @@ namespace System.Windows.Media.Animation
                     //we make a specific name for this animation:
                     string specificGroupName = animationInstanceSpecificName;
 
-                    bool cssEquivalentExists = false;
                     if (propertyMetadata.GetCSSEquivalent != null)
                     {
                         CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);
@@ -338,7 +337,6 @@ namespace System.Windows.Media.Animation
                                 }
                                 if (cssEquivalent.DomElement != null)
                                 {
-                                    cssEquivalentExists = true;
                                     string sDomElement = INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
                                     AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                                 }
@@ -353,7 +351,6 @@ namespace System.Windows.Media.Animation
                         {
                             if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
                             {
-                                cssEquivalentExists = true;
                                 string sDomElement = INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
                                 AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                             }

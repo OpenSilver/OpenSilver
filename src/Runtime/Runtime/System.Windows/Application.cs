@@ -353,7 +353,7 @@ namespace System.Windows
             uris.Add(uriAsString + ".g.js");
             if (uriResource.OriginalString.ToLower() == "ms-appx://app.config")
             {
-                CSHTML5.Interop.LoadJavaScriptFilesAsync(
+                OpenSilver.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
@@ -363,7 +363,7 @@ namespace System.Windows
             }
             else if (uriResource.OriginalString.ToLower() == "ms-appx://servicereferences.clientconfig")
             {
-                CSHTML5.Interop.LoadJavaScriptFilesAsync(
+                OpenSilver.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {
@@ -373,7 +373,7 @@ namespace System.Windows
             }
             else
             {
-                CSHTML5.Interop.LoadJavaScriptFilesAsync(
+                OpenSilver.Interop.LoadJavaScriptFilesAsync(
                     uris,
                     (Action)(() =>
                     {

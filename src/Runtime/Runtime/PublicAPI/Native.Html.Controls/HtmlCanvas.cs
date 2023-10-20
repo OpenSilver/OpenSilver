@@ -181,6 +181,8 @@ namespace CSHTML5.Native.Html.Controls
         /// Return the path to the topmost element that is under the pointer
         /// </summary>
         /// <param name="canvas">The container of the elements</param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         /// <returns>The path to the topmost element that is under the pointer</returns>
         static internal Stack<HtmlCanvasElement> GetPointedElements(HtmlCanvas canvas, double x, double y)
         {
@@ -316,9 +318,9 @@ namespace CSHTML5.Native.Html.Controls
 
             // Use the div2 as the js canvas object
             this._jsCanvas = div1;
-            this._jsContext2d = Interop.ExecuteJavaScriptAsync("$0.getContext('2d')", this._jsCanvas);
+            this._jsContext2d = OpenSilver.Interop.ExecuteJavaScriptAsync("$0.getContext('2d')", this._jsCanvas);
 
-            Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this._jsCanvas);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this._jsCanvas);
 
             return div1;
         }
@@ -330,8 +332,8 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (this.IsLoaded)
             {
-                Interop.ExecuteJavaScriptAsync("$0.width = $0.scrollWidth", this._jsCanvas);
-                Interop.ExecuteJavaScriptAsync("$0.height = $0.scrollHeight", this._jsCanvas);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.width = $0.scrollWidth", this._jsCanvas);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.height = $0.scrollHeight", this._jsCanvas);
                 foreach (HtmlCanvasElement elem in this.Children)
                 {
                     this._currentDrawingStyle = elem.Draw(this._currentDrawingStyle, this._jsContext2d);

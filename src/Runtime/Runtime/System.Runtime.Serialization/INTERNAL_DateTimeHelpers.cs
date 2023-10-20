@@ -116,7 +116,7 @@ internal static class INTERNAL_DateTimeHelpers
         */
 
         // it looks like that:<DateTime>2015-02-23T16:54:17.273+01:00</DateTime> (only the part inside the tags)
-        int year, month, day, hour, minute, second, tickOrMillisecond, timezoneHour, timezoneMinute;
+        int year, month, day, hour, minute, second, timezoneHour, timezoneMinute;
         DateTime dt;
         DateTimeKind kind = DateTimeKind.Unspecified;
         string[] split = dateTimeAsString.Split('T');

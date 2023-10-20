@@ -331,7 +331,7 @@ namespace System.Windows
         [OpenSilver.NotImplemented]
         public bool IsActive { get; private set; }
         [OpenSilver.NotImplemented]
-        public bool IsVisible { get; private set; }
+        public new bool IsVisible { get; private set; }
 
         [OpenSilver.NotImplemented]
         public WindowStyle WindowStyle { get; set; }

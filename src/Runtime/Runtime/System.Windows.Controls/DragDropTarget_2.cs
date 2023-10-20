@@ -662,6 +662,7 @@ namespace System.Windows.Controls
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="itemContainerUnderPointer">The ListBoxItem or other container that is being moved. If there is no container, it is the item directly.</param>
+        /// <param name="allowDropElementUnderPointer"></param>
         /// <returns>Null if no DragDropTarget is under the pointer, else it returns the DragDropTarget under it (the first Parent found)</returns>
         static DragDropTarget<TItemsControlType, TItemContainerType> GetDragDropTargetUnderPointer(double x, double y, out TItemContainerType itemContainerUnderPointer, out UIElement allowDropElementUnderPointer)
         {

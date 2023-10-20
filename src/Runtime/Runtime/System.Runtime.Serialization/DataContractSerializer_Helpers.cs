@@ -769,7 +769,7 @@ namespace System.Runtime.Serialization
                 string currentTypeFullName = type.FullName;
 
                 //we get the assembly (directly in JS because it is probably more efficient that way) from the type:
-                object assembly = CSHTML5.Interop.ExecuteJavaScript("$0.Assembly", type); //Note: we will not update this as we go through the declaring types since there is no way it is a different assembly.
+                object assembly = OpenSilver.Interop.ExecuteJavaScript("$0.Assembly", type); //Note: we will not update this as we go through the declaring types since there is no way it is a different assembly.
                 string separatorToAdd = "";
                 while (!string.IsNullOrWhiteSpace(currentTypeFullName))
                 {
@@ -817,7 +817,7 @@ namespace System.Runtime.Serialization
                     {
                         break;
                     }
-                    currentType = CSHTML5.Interop.ExecuteJavaScript("$0.GetType($1)", assembly, currentTypeFullName);
+                    currentType = OpenSilver.Interop.ExecuteJavaScript("$0.GetType($1)", assembly, currentTypeFullName);
                     separatorToAdd = ".";
                 }
             }

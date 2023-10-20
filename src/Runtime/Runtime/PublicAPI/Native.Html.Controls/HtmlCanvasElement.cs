@@ -411,7 +411,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (this._isStyleOverrided)
             {
-                Interop.ExecuteJavaScriptAsync(@"
+                OpenSilver.Interop.ExecuteJavaScriptAsync(@"
 $0.fillStyle = $1;
 $0.strokeStyle = $2;
 $0.shadowColor = $3;
@@ -432,7 +432,7 @@ $0.lineWidth = $9", jsContext2d,
                       this.LineWidth);
 
                 // Note: the following is done on a separate line because of a limitation of JSIL where $10 is understood as $1 followed by a 0.
-                Interop.ExecuteJavaScriptAsync(@"
+                OpenSilver.Interop.ExecuteJavaScriptAsync(@"
 $0.miterLimit = $1", jsContext2d,
                       this.MiterLimit);
 

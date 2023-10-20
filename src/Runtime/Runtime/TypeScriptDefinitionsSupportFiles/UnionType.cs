@@ -24,7 +24,7 @@ namespace TypeScriptDefinitionsSupport
 
         public bool instanceof(string type)
         {
-            return Convert.ToBoolean(Interop.ExecuteJavaScript("$0 instanceof $1", this.UnderlyingJSInstance, type));
+            return Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0 instanceof $1", this.UnderlyingJSInstance, type));
         }
 
         public T CreateInstance<T>()

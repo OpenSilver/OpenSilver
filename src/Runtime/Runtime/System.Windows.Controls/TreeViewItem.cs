@@ -166,7 +166,7 @@ namespace System.Windows.Controls
         /// True if this <see cref="TreeViewItem" />
         /// contains items; otherwise, false. The default is false.
         /// </value>
-        public bool HasItems
+        public new bool HasItems
         {
             get { return (bool)GetValue(HasItemsProperty); }
             private set

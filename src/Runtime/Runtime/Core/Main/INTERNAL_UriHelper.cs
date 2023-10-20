@@ -86,7 +86,7 @@ namespace CSHTML5.Internal
                 // Add the above relative path to the beginning of the path:
                 html5Path = outputResourcesPath + html5Path;
 
-                if (Interop.IsRunningInTheSimulator_WorkAround) // Checks that we are in the Simulator as opposed to running in WebAssembly.
+                if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround) // Checks that we are in the Simulator as opposed to running in WebAssembly.
                 {
                     // Support running in the simulator:
                     html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
@@ -137,7 +137,7 @@ namespace CSHTML5.Internal
                 // Add the above relative path to the beginning of the path:
                 html5Path = outputResourcesPath + html5Path;
 
-                if (Interop.IsRunningInTheSimulator_WorkAround)
+                if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
                 {
                     html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
                 }
@@ -166,7 +166,7 @@ namespace CSHTML5.Internal
                 // Combine the path:
                 string html5Path = outputResourcesPath + assemblyName + "/" + relativeFolderAndFileName.ToLower();
 
-                if (Interop.IsRunningInTheSimulator_WorkAround)
+                if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
                 {
                     html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
                 }

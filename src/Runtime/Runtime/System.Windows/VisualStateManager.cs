@@ -31,10 +31,10 @@ namespace System.Windows
     public class VisualStateManager : DependencyObject
     {
         /// <summary>
-        ///     Transitions a control's state.
+        /// Transitions a control's state.
         /// </summary>
         /// <param name="control">The control who's state is changing.</param>
-        /// <param name="stateGroupsRoot">The element to get the VSG & customer VSM from.</param>
+        /// <param name="stateGroupsRoot">The element to get the VSG &amp; customer VSM from.</param>
         /// <param name="stateName">The new state that the control is in.</param>
         /// <param name="useTransitions">Whether to use transition animations.</param>
         /// <returns>true if the state changed successfully, false otherwise.</returns>

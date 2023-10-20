@@ -108,7 +108,7 @@ namespace CSHTML5.Native.Html.Controls
                     || this._lastDrawnWidth != this.Width
                     || this._lastDrawnHeight != this.Height)
                 {
-                    Interop.ExecuteJavaScriptAsync(@"
+                    OpenSilver.Interop.ExecuteJavaScriptAsync(@"
 $0.width = $1;
 $0.height = $2;
 $0.src = $3",
@@ -121,7 +121,7 @@ $0.src = $3",
                     this._lastDrawnHeight = this.Height;
                 }
 
-                Interop.ExecuteJavaScriptAsync("$0.drawImage($1, $2, $3)", jsContext2d, this._jsImage, this.X + xParent, this.Y + yParent);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.drawImage($1, $2, $3)", jsContext2d, this._jsImage, this.X + xParent, this.Y + yParent);
             }
 
             return currentDrawingStyle;

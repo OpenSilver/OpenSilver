@@ -31,18 +31,18 @@ namespace CSHTML5.Internal
         {
             string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(newProxy.Handler);
             if (domElementRef is INTERNAL_HtmlDomElementReference)
-                Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
             else
-                Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe({INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe({INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
         }
 
         internal static void DetachEvent(string eventName, object domElementRef, HtmlEventProxy proxy, Action<object> originalEventHandler)
         {
             string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(proxy.Handler);
             if (domElementRef is INTERNAL_HtmlDomElementReference)
-                Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
             else
-                Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe({INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe({INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
         }
 
 

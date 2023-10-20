@@ -646,7 +646,6 @@ namespace OpenSilver.Internal.Data
         IEnumerator _trackingEnumerator;
         int _ignoreEventsLevel;
         bool _pollForChanges;
-        bool _warningHasBeenRaised;
 
         class IgnoreViewEventsHelper : IDisposable
         {

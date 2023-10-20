@@ -274,7 +274,13 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             {
                 if (value is SolidColorBrush brush)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'color',$3)", flushQueue: false, _quill, start, length, brush.ConvertToCSSValue());
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(
+                        "$0.formatText($1,$2,'color',$3)",
+                        flushQueue: false,
+                        _quill,
+                        start,
+                        length,
+                        brush.INTERNAL_ToHtmlString());
                 }
             }
             else if (prop == Block.LineHeightProperty)

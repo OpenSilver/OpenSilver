@@ -404,7 +404,6 @@ namespace System.Windows.Media.Animation
                 //we make a specific name for this animation:
                 string specificGroupName = animationInstanceSpecificName;
 
-                bool cssEquivalentExists = false;
                 if (propertyMetadata.GetCSSEquivalent != null)
                 {
                     CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);
@@ -422,7 +421,6 @@ namespace System.Windows.Media.Animation
                             }
                             if (cssEquivalent.DomElement != null)
                             {
-                                cssEquivalentExists = true;
                                 string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
                                 AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                             }
@@ -437,7 +435,6 @@ namespace System.Windows.Media.Animation
                     {
                         if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
                         {
-                            cssEquivalentExists = true;
                             string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
                             AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                         }

@@ -157,10 +157,6 @@ namespace OpenSilver.Controls
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// BackingField for ActualFormat.
-        /// </summary>
-        private ITimeFormat _actualFormat;
 #endregion public ITimeFormat Format
 
 #region public TimePickerPopup Popup
@@ -238,10 +234,6 @@ namespace OpenSilver.Controls
         {
         }
 
-        /// <summary>
-        /// BackingField for InstantiatedPopupFromTemplate.
-        /// </summary>
-        private TimePickerPopup _instantiatedPopupFromTemplate;
 #endregion public TimePickerPopupTemplate PopupTemplate
 
 #region public PopupTimeSelectionMode PopupTimeSelectionMode

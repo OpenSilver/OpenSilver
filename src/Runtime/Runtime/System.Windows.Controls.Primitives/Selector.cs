@@ -896,7 +896,6 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         /// <param name="container"></param>
         /// <param name="selected"></param>
-        /// <param name="e"></param>
         /// <returns></returns>
         internal void NotifyIsSelectedChanged(FrameworkElement container, bool selected)
         {
