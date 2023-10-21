@@ -55,5 +55,5 @@ CALL :copyDll Compiler Mono.Cecil.Rocks
 EXIT /B 0
 :copyDll
 del "%compilerDIR%\tools\%~2.dll" 1>NUL 2>NUL
-copy "%sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll" "%compilerDIR%\tools"
+copy "%sourceBase%\%~1\bin\%config%\net461\%~2.dll" "%compilerDIR%\tools"
 EXIT /B 0

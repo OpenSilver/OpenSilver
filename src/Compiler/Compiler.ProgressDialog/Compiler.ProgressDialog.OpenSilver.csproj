@@ -4,7 +4,6 @@
     <TargetFramework>net461</TargetFramework>
     <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <AssemblyName>OpenSilver.Compiler.ProgressDialog</AssemblyName>
     <RootNamespace>DotNetForHtml5.Compiler.ProgressDialog</RootNamespace>
   </PropertyGroup>

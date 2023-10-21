@@ -1,8 +1,4 @@
 <Project>
-	<PropertyGroup>
-		<BaseIntermediateOutputPath>obj\OpenSilver</BaseIntermediateOutputPath>
-	</PropertyGroup>
-	<!-- We do this that way because otherwise the <BaseIntermediateOutputPath> directive will not work. This is a bug with .NET Standard 2.0 -->
 	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
 	<PropertyGroup>
@@ -10,7 +6,6 @@
 		<AssemblyName>OpenSilver</AssemblyName>
     <AssemblyVersion>2.0.1</AssemblyVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>$(NoWarn);CS1591;CS0067</NoWarn>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems>

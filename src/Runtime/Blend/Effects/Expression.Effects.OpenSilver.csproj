@@ -5,7 +5,6 @@
     <AssemblyName>OpenSilver.Expression.Effects</AssemblyName>
     <RootNamespace>Microsoft.Expression.Media.Effects</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <DefineTrace>true</DefineTrace>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>

@@ -6,7 +6,6 @@
     <RootNamespace>System.Windows.Interactivity</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <DefineTrace>true</DefineTrace>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>

@@ -4,7 +4,6 @@
     <TargetFramework>net461</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <AssemblyName>OpenSilver.Compiler</AssemblyName>
     <RootNamespace>OpenSilver.Compiler</RootNamespace>
     <DefineTrace>true</DefineTrace>

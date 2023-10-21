@@ -5,7 +5,6 @@
     <UseWPF>true</UseWPF>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <AssemblyName>OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
     <RootNamespace>DotNetForHtml5.Compiler.TypeScriptDefToCSharp</RootNamespace>
   </PropertyGroup>

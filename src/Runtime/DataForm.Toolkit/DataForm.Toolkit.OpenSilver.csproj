@@ -8,8 +8,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyName>OpenSilver.Controls.Data.DataForm.Toolkit</AssemblyName>
     <RootNamespace>System.Windows.Controls</RootNamespace>
-    <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DefineTrace>true</DefineTrace>
   </PropertyGroup>
