@@ -60,14 +60,7 @@ namespace System.Windows.Interop
         /// </summary>
         public bool IsFullScreen
         {
-            get
-            {
-                return OpenSilver.Interop.ExecuteJavaScriptBoolean(
-@"(function() {
- if (window.IE_VERSION) return (window.screenTop == 0);
- else return (window.innerHeight == screen.height);
-}())");
-            }
+            get => OpenSilver.Interop.ExecuteJavaScriptBoolean("window.innerHeight == screen.height");
             set
             {
                 if (value)

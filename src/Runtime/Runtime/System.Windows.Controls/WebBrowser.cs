@@ -66,7 +66,7 @@ namespace System.Windows.Controls
             else if (_htmlString != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"srcDoc.set({sIFrame}, {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)})");
+                    $"{sIFrame}.srcdoc = {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)};");
             }
             else
             {
@@ -143,7 +143,7 @@ namespace System.Windows.Controls
                 if (_htmlString != null)
                 {
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                        $"srcDoc.set({sIFrame}, {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)})");
+                        $"{sIFrame}.srcdoc = {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)};");
                 }
                 else
                 {
