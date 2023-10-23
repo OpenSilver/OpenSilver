@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
 using System.Windows;
 
 namespace OpenSilver.Internal;

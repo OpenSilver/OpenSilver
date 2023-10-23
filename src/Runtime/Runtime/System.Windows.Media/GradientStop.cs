@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Markup;
 using OpenSilver.Internal;
@@ -24,55 +23,55 @@ namespace System.Windows.Media
     [ContentProperty(nameof(Color))]
     public sealed class GradientStop : DependencyObject
     {
-        internal Brush INTERNAL_ParentBrush;
+        /// <summary>
+        /// Identifies the <see cref="Color"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ColorProperty =
+            DependencyProperty.Register(
+                nameof(Color),
+                typeof(Color),
+                typeof(GradientStop),
+                new PropertyMetadata(Colors.Transparent, OnPropertyChanged));
 
-        // Returns:
-        //     The color of the gradient stop. The default is Transparent.
         /// <summary>
         /// Gets or sets the color of the gradient stop.
         /// </summary>
+        /// <returns>
+        /// The color of the gradient stop. The default is <see cref="Colors.Transparent"/>.
+        /// </returns>
         public Color Color
         {
-            get { return (Color)GetValue(ColorProperty); }
-            set { SetValue(ColorProperty, value); }
+            get => (Color)GetValue(ColorProperty);
+            set => SetValue(ColorProperty, value);
         }
-        /// <summary>
-        /// Identifies the Color dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ColorProperty =
-            DependencyProperty.Register("Color", typeof(Color), typeof(GradientStop), new PropertyMetadata(Color.FromArgb(0, 0, 0, 0))
-            {
-                GetCSSEquivalents = static (instance) =>
-                {
-                    GradientStop gradientStop = (GradientStop)instance;
-                    Brush brush = gradientStop.INTERNAL_ParentBrush;
-                    if (brush != null)
-                    {
-                        ValueToHtmlConverter ConvertValueToHtml(CSSEquivalent cssEquivalent) => (inst, value) => brush;
 
-                        return Brush.MergeCSSEquivalentsOfTheParentsProperties(brush, ConvertValueToHtml);
-                    }
-                    else
-                    {
-                        // this may happen if the color property is set before the GradientStop has been added to the GradientStopCollection/GradientBrush. 
-                        return new List<CSSEquivalent>();
-                    }
-                }
-            });
+        /// <summary>
+        /// Identifies the <see cref="Offset"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OffsetProperty =
+            DependencyProperty.Register(
+                nameof(Offset),
+                typeof(double),
+                typeof(GradientStop),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
         /// <summary>
         /// Gets the location of the gradient stop within the gradient vector.
         /// </summary>
         public double Offset
         {
-            get { return (double)GetValue(OffsetProperty); }
-            set { SetValue(OffsetProperty, value); }
+            get => (double)GetValue(OffsetProperty);
+            set => SetValue(OffsetProperty, value);
         }
-        /// <summary>
-        /// Identifies the Offset dependency property.
-        /// </summary>
-        public static readonly DependencyProperty OffsetProperty =
-            DependencyProperty.Register("Offset", typeof(double), typeof(GradientStop), new PropertyMetadata(0d));
+
+        private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((GradientStop)d).RaiseChanged();
+        }
+
+        internal event EventHandler Changed;
+
+        private void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
         public object Clone() => new GradientStop { Color = Color, Offset = Offset };
 

@@ -11,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -23,27 +21,31 @@ using OpenSilver.Internal;
 namespace System.Windows
 {
     /// <summary>
-    /// Contains mutually exclusive VisualState objects and VisualTransition objects
-    /// that are used to go from one state to another.
+    /// Contains mutually exclusive <see cref="VisualState"/> objects and <see cref="VisualTransition"/> 
+    /// objects that are used to go from one state to another.
     /// </summary>
     [ContentProperty(nameof(States))]
     public sealed class VisualStateGroup : DependencyObject
     {
         private Collection<VisualState> _states;
+        private Collection<VisualTransition> _transitions;
 
         /// <summary>
-        /// Gets the most recently set VisualState from a successful call to the GoToState
-        /// method.
+        /// Gets the most recently set <see cref="VisualState"/> from a successful call to the 
+        /// <see cref="VisualStateManager.GoToState(Control, string, bool)"/> method.
         /// </summary>
-        public VisualState CurrentState
-        {
-            get;
-            internal set;
-        }
+        /// <returns>
+        /// The most recently set <see cref="VisualState"/> from a successful call to the
+        /// <see cref="VisualStateManager.GoToState(Control, string, bool)"/> method.
+        /// </returns>
+        public VisualState CurrentState { get; internal set; }
 
         /// <summary>
-        /// Gets the name of the VisualStateGroup.
+        /// Gets the name of the <see cref="VisualStateGroup"/>.
         /// </summary>
+        /// <returns>
+        /// The name of the <see cref="VisualStateGroup"/>.
+        /// </returns>
         public string Name
         {
             get => (string)GetValue(FrameworkElement.NameProperty);
@@ -52,38 +54,21 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Gets the collection of mutually exclusive VisualState objects.
+        /// Gets the collection of mutually exclusive <see cref="VisualState"/> objects.
         /// </summary>
-        public IList States
-        {
-            get 
-            {
-                if (this._states == null)
-                {
-                    this._states = new Collection<VisualState>(new VisualStatesCollection(this));
-                }
-                return this._states; 
-            } 
-        } 
-
-        private IList _transitions;
+        /// <returns>
+        /// The collection of mutually exclusive <see cref="VisualState"/> objects.
+        /// </returns>
+        public IList States => _states ??= new Collection<VisualState>(new VisualStatesCollection(this));
 
         /// <summary>
-        /// Gets the collection of VisualTransition objects.
+        /// Gets the collection of <see cref="VisualTransition"/> objects.
         /// </summary>
+        /// <returns>
+        /// The collection of <see cref="VisualTransition"/> objects.
+        /// </returns>
         [OpenSilver.NotImplemented]
-        public IList Transitions
-        {
-            get
-            {
-                if(this._transitions == null)
-                {
-                    this._transitions = new List<VisualTransition>();
-                }
-
-                return this._transitions;
-            }
-        }
+        public IList Transitions => _transitions ??= new Collection<VisualTransition>(new VisualTransitionsCollection(this));
 
         internal VisualState GetState(string stateName)
         {
@@ -101,27 +86,21 @@ namespace System.Windows
 
         internal void RaiseCurrentStateChanging(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
         {
-            if (CurrentStateChanging != null)
-            {
-                CurrentStateChanging(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
-            }
+            CurrentStateChanging?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
         }
 
         internal void RaiseCurrentStateChanged(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
         {
-            if (CurrentStateChanged != null)
-            {
-                CurrentStateChanged(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
-            }
+            CurrentStateChanged?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
         }
 
         /// <summary>
-        ///     Raised when transition begins
+        /// Occurs after a control transitions into a different state.
         /// </summary>
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanged;
 
         /// <summary>
-        ///     Raised when transition ends and new state storyboard begins.
+        /// Occurs when a control begins transitioning into a different state.
         /// </summary>
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanging;
     }

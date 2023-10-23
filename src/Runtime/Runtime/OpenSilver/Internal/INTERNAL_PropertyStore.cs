@@ -12,12 +12,8 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using CSHTML5.Internal;
 
 namespace OpenSilver.Internal;
 
@@ -238,12 +234,6 @@ internal static class INTERNAL_PropertyStore
         PropertyMetadata metadata,
         object value)
     {
-        if (value == DependencyProperty.UnsetValue)
-        {
-            ClearAnimatedValue(storage, d, dp, metadata);
-            return;
-        }
-
         ValidateValue(dp, value, false);
 
         EffectiveValueEntry oldEntry = storage.Entry;
@@ -801,12 +791,11 @@ internal static class INTERNAL_PropertyStore
 
         storage.Entry = newEntry;
 
-        bool valueChanged = storage.INTERNAL_IsVisualValueDirty || !Equals(dp, oldValue, newValue);
+        bool valueChanged = !Equals(dp, oldValue, newValue);
         if (valueChanged)
         {
             // Raise the PropertyChanged event
             OnPropertyChanged(d, dp, metadata, oldValue, newValue, operationType);
-            storage.INTERNAL_IsVisualValueDirty = false;
         }
 
         return valueChanged;
@@ -847,46 +836,11 @@ internal static class INTERNAL_PropertyStore
         OperationType operationType)
     {
         //---------------------
-        // Ensure tha the value knows in which properties it is used (this is useful for example so that a SolidColorBrush knows in which properties it is used):
-        //---------------------
-
-        if (oldValue is IHasAccessToPropertiesWhereItIsUsed2 hasAccessToProperties)
-        {
-            var key = new WeakDependencyObjectWrapper(d);
-            var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
-            if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
-            {
-                val.Remove(dp);
-                // Remove key from dictionary if no properties left
-                if (val.Count == 0)
-                {
-                    propertiesWhereUsed.Remove(key);
-                }
-            }
-        }
-
-        if ((hasAccessToProperties = newValue as IHasAccessToPropertiesWhereItIsUsed2) != null)
-        {
-            var key = new WeakDependencyObjectWrapper(d);
-            var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
-            if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
-            {
-                val.Add(dp);
-            }
-            else
-            {
-                propertiesWhereUsed.Add(key, new HashSet<DependencyProperty>() { dp });
-            }
-        }
-
-        //---------------------
         // If the element is in the Visual Tree, update the DOM:
         //---------------------
 
         if (metadata != null)
         {
-            ApplyCssChanges(oldValue, newValue, metadata, d); // Note: this we need to call regardless of whether the element is in the visual tree. In fact, for example, the SolidColorBrush.Color property can be used by multiple UIElements, some of which may be in the visual tree and others not.
-            
             if (d is IInternalUIElement uiElement && uiElement.IsLoaded)
             {
                 // Note: this we call only if the element is in the visual tree.
@@ -919,115 +873,6 @@ internal static class INTERNAL_PropertyStore
         {
             throw new ArgumentException(
                 $"'{value}' is not a valid value for property '{dp.Name}'.");
-        }
-    }
-
-    internal static void DirtyVisualValue(INTERNAL_PropertyStorage storage)
-    {
-        storage.INTERNAL_IsVisualValueDirty = true;
-    }
-
-    internal static void ApplyCssChanges(object oldValue, object newValue, PropertyMetadata typeMetadata, DependencyObject sender)
-    {
-        if (typeMetadata.GetCSSEquivalent != null)
-        {
-            CSSEquivalent cssEquivalent = typeMetadata.GetCSSEquivalent(sender);
-            if (cssEquivalent != null)
-            {
-                ApplyPropertyChanged(sender, typeMetadata, cssEquivalent, oldValue, newValue);
-            }
-        }
-
-        if (typeMetadata.GetCSSEquivalents != null)
-        {
-            List<CSSEquivalent> cssEquivalents = typeMetadata.GetCSSEquivalents(sender);
-            if (cssEquivalents != null)
-            {
-                foreach (CSSEquivalent cssEquivalent in cssEquivalents)
-                {
-                    ApplyPropertyChanged(sender, typeMetadata, cssEquivalent, oldValue, newValue);
-                }
-            }
-        }
-    }
-
-    private static void ApplyPropertyChanged(
-        DependencyObject sender,
-        PropertyMetadata metadata,
-        CSSEquivalent cssEquivalent,
-        object oldValue,
-        object newValue)
-    {
-        //if (cssEquivalent.ApplyWhenControlHasTemplate) //Note: this is to handle the case of a Control with a ControlTemplate (some properties must not be applied on the control itself)
-
-        if (cssEquivalent.Name != null && cssEquivalent.Name.Count > 0 || cssEquivalent.CallbackMethod != null)
-        {
-            UIElement uiElement = cssEquivalent.UIElement ?? (sender as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
-
-            bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
-
-            if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
-            {
-                if (cssEquivalent.CallbackMethod != null)// && cssEquivalent.UIElement != null) //Note: I don't see when the commented part of this test could be false so I'm commenting it and we'll put it back if needed.
-                {
-
-                    //PropertyInfo propertyInfo = uiElement.GetType().GetProperty(cssEquivalent.DependencyProperty.Name);
-
-                    //Type propertyType = propertyInfo.PropertyType;
-                    //var castedValue = DynamicCast(newValue, propertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
-                    //uiElement.SetVisualStateValue(cssEquivalent.DependencyProperty, castedValue);
-
-                    cssEquivalent.CallbackMethod(
-                        cssEquivalent.UIElement,
-                        new DependencyPropertyChangedEventArgs(oldValue, newValue, cssEquivalent.DependencyProperty, metadata));
-                }
-                else
-                {
-                    if (cssEquivalent.DomElement == null && uiElement != null)
-                    {
-                        cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
-                    }
-                    if (cssEquivalent.DomElement != null)
-                    {
-                        cssEquivalent.Value ??= static (finalInstance, value) => { return value ?? ""; }; // Default value
-
-                        object cssValue = cssEquivalent.Value(sender, newValue);
-
-                        if (!(cssValue is Dictionary<string, object>))
-                        {
-                            if (cssEquivalent.OnlyUseVelocity)
-                            {
-                                INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                            }
-                            else
-                            {
-                                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                            }
-                        }
-                        else
-                        {
-                            //Note: currently, only Color needs to set multiple values when using Velocity (which is why cssValue is a Dictionary), which is why it has a special treatment.
-                            //todo: if more types arrive here, find a way to have a more generic way of handling it ?
-                            if (newValue is Color)
-                            {
-                                Color newColor = (Color)newValue;
-                                if (cssEquivalent.OnlyUseVelocity)
-                                {
-                                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlStringForVelocity());
-                                }
-                                else
-                                {
-                                    INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlString(1d));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
         }
     }
 }

@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Windows.Shapes;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 using OpenSilver.Internal.Media.Animation;
 
 namespace System.Windows.Media

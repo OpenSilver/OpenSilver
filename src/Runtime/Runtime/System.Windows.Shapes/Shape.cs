@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
 using System.Linq;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Shapes
 {
@@ -49,24 +50,9 @@ namespace System.Windows.Shapes
                 nameof(Fill),
                 typeof(Brush),
                 typeof(Shape),
-                new PropertyMetadata((object)null)
+                new PropertyMetadata(null, OnFillChanged)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        Shape shape = (Shape)d;
-                        if (shape._fillBrush is not null)
-                        {
-                            shape._fillBrush.DestroyBrush(shape);
-                            shape._fillBrush = null;
-                            shape.RemoveSvgAttribute("fill");
-                        }
-
-                        if (newValue is Brush brush && brush.GetSvgElement() is ISvgBrush svgBrush)
-                        {
-                            shape._fillBrush = svgBrush;
-                            shape.SetSvgAttribute("fill", svgBrush.GetBrush(shape));
-                        }
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetFill((Shape)d, (Brush)newValue),
                 });
 
         /// <summary>
@@ -81,6 +67,51 @@ namespace System.Windows.Shapes
         {
             get => (Brush)GetValue(FillProperty);
             set => SetValue(FillProperty, value);
+        }
+
+        private static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var shape = (Shape)d;
+
+            if (shape._fillChangedListener != null)
+            {
+                shape._fillChangedListener.Detach();
+                shape._fillChangedListener = null;
+            }
+
+            if (e.NewValue is Brush newBrush)
+            {
+                shape._fillChangedListener = new(shape, newBrush)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnFillChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newBrush.Changed += shape._fillChangedListener.OnEvent;
+            }
+        }
+
+        private void OnFillChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                SetFill(this, (Brush)sender);
+            }
+        }
+
+        private static void SetFill(Shape shape, Brush fill)
+        {
+            if (shape._fillBrush is not null)
+            {
+                shape._fillBrush.DestroyBrush(shape);
+                shape._fillBrush = null;
+                shape.RemoveSvgAttribute("fill");
+            }
+
+            if (fill is Brush brush && brush.GetSvgElement() is ISvgBrush svgBrush)
+            {
+                shape._fillBrush = svgBrush;
+                shape.SetSvgAttribute("fill", svgBrush.GetBrush(shape));
+            }
         }
 
         /// <summary>
@@ -117,24 +148,9 @@ namespace System.Windows.Shapes
                 nameof(Stroke),
                 typeof(Brush),
                 typeof(Shape),
-                new PropertyMetadata((object)null)
+                new PropertyMetadata(null, OnStrokeChanged)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        Shape shape = (Shape)d;
-                        if (shape._strokeBrush is not null)
-                        {
-                            shape._strokeBrush.DestroyBrush(shape);
-                            shape._strokeBrush = null;
-                            shape.RemoveSvgAttribute("stroke");
-                        }
-
-                        if (newValue is Brush brush && brush.GetSvgElement() is ISvgBrush svgBrush)
-                        {
-                            shape._strokeBrush = svgBrush;
-                            shape.SetSvgAttribute("stroke", svgBrush.GetBrush(shape));
-                        }
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetStroke((Shape)d, (Brush)newValue),
                 });
 
         /// <summary>
@@ -149,6 +165,51 @@ namespace System.Windows.Shapes
         {
             get => (Brush)GetValue(StrokeProperty);
             set => SetValue(StrokeProperty, value);
+        }
+
+        private static void OnStrokeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var shape = (Shape)d;
+
+            if (shape._strokeChangedListener != null)
+            {
+                shape._strokeChangedListener.Detach();
+                shape._strokeChangedListener = null;
+            }
+
+            if (e.NewValue is Brush newBrush)
+            {
+                shape._strokeChangedListener = new(shape, newBrush)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnStrokeChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newBrush.Changed += shape._strokeChangedListener.OnEvent;
+            }
+        }
+
+        private void OnStrokeChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                SetStroke(this, (Brush)sender);
+            }
+        }
+
+        private static void SetStroke(Shape shape, Brush stroke)
+        {
+            if (shape._strokeBrush is not null)
+            {
+                shape._strokeBrush.DestroyBrush(shape);
+                shape._strokeBrush = null;
+                shape.RemoveSvgAttribute("stroke");
+            }
+
+            if (stroke is Brush brush && brush.GetSvgElement() is ISvgBrush svgBrush)
+            {
+                shape._strokeBrush = svgBrush;
+                shape.SetSvgAttribute("stroke", svgBrush.GetBrush(shape));
+            }
         }
 
         /// <summary>
@@ -723,6 +784,8 @@ namespace System.Windows.Shapes
 
         private ISvgBrush _fillBrush;
         private ISvgBrush _strokeBrush;
+        private WeakEventListener<Shape, Brush, EventArgs> _fillChangedListener;
+        private WeakEventListener<Shape, Brush, EventArgs> _strokeChangedListener;
 
         private struct SVGRect
         {

@@ -13,38 +13,37 @@
 
 using System.Diagnostics;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents a collection of <see cref="Timeline"/> objects.
+/// </summary>
+public sealed class TimelineCollection : PresentationFrameworkCollection<Timeline>
 {
     /// <summary>
-    /// Represents a collection of <see cref="Timeline"/> objects.
+    /// Initializes a new instance of the <see cref="TimelineCollection"/> class.
     /// </summary>
-    public sealed class TimelineCollection : PresentationFrameworkCollection<Timeline>
+    public TimelineCollection()
+        : base(false)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TimelineCollection"/> class.
-        /// </summary>
-        public TimelineCollection()
-            : base(false)
-        {
-        }
-
-        internal TimelineCollection(Storyboard owner)
-            : base(false)
-        {
-            Debug.Assert(owner != null);
-            owner.ProvideSelfAsInheritanceContext(this, null);
-        }
-
-        internal override void AddOverride(Timeline value) => AddDependencyObjectInternal(value);
-
-        internal override void ClearOverride() => ClearDependencyObjectInternal();
-
-        internal override Timeline GetItemOverride(int index) => GetItemInternal(index);
-
-        internal override void InsertOverride(int index, Timeline value) => InsertDependencyObjectInternal(index, value);
-
-        internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
-
-        internal override void SetItemOverride(int index, Timeline value) => SetItemDependencyObjectInternal(index, value);
     }
+
+    internal TimelineCollection(Storyboard owner)
+        : base(false)
+    {
+        Debug.Assert(owner != null);
+        owner.ProvideSelfAsInheritanceContext(this, null);
+    }
+
+    internal override void AddOverride(Timeline value) => AddDependencyObjectInternal(value);
+
+    internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+    internal override Timeline GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void InsertOverride(int index, Timeline value) => InsertDependencyObjectInternal(index, value);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+    internal override void SetItemOverride(int index, Timeline value) => SetItemDependencyObjectInternal(index, value);
 }

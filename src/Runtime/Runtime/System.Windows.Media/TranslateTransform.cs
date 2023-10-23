@@ -11,9 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using CSHTML5.Internal;
-
 namespace System.Windows.Media
 {
     /// <summary>
@@ -21,151 +18,50 @@ namespace System.Windows.Media
     /// </summary>
     public sealed class TranslateTransform : Transform
     {
-        double _appliedCssX;
-        double _appliedCssY;
-        object _domElementToWhichTheCssXWasApplied;
-        object _domElementToWhichTheCssYWasApplied;
+        /// <summary>
+        /// Identifies the <see cref="X"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty XProperty =
+            DependencyProperty.Register(
+                nameof(X),
+                typeof(double),
+                typeof(TranslateTransform),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance to translate along the x-axis.
         /// </summary>
+        /// <returns>
+        /// The distance to translate (move) an object along the x-axis, in pixels. This
+        /// property is read/write. The default is 0.
+        /// </returns>
         public double X
         {
-            get { return (double)GetValue(XProperty); }
-            set { SetValue(XProperty, value); }
+            get => (double)GetValue(XProperty);
+            set => SetValue(XProperty, value);
         }
 
         /// <summary>
-        /// Identifies the X dependency property
+        /// Identifies the <see cref="Y"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty XProperty =
+        public static readonly DependencyProperty YProperty =
             DependencyProperty.Register(
-                nameof(X), 
-                typeof(double), 
-                typeof(TranslateTransform), 
-                new PropertyMetadata(0d, OnXChanged)
-                {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        var target = ((TranslateTransform)instance).INTERNAL_parent;
-                        if (target != null)
-                        {
-                            return new CSSEquivalent()
-                            {
-                                DomElement = target.INTERNAL_OuterDomElement,
-                                Value = (inst, value) =>
-                                {
-                                    return value + "px";
-                                },
-                                Name = new List<string> { "translateX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                                UIElement = target,
-                                ApplyAlsoWhenThereIsAControlTemplate = true,
-                                OnlyUseVelocity = true
-                            };
-                        }
-                        return null;
-                    }
-                });
-
-        private static void OnXChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((TranslateTransform)d).RaiseTransformChanged();
-        }
+                nameof(Y),
+                typeof(double),
+                typeof(TranslateTransform),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the distance to translate (move) an object along the y-axis.
         /// </summary>
+        /// <returns>
+        /// The distance to translate (move) an object along the y-axis, in pixels.
+        /// The default is 0.
+        /// </returns>
         public double Y
         {
-            get { return (double)GetValue(YProperty); }
-            set { SetValue(YProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the Y dependency property
-        /// </summary>
-        public static readonly DependencyProperty YProperty =
-            DependencyProperty.Register(
-                nameof(Y), 
-                typeof(double), 
-                typeof(TranslateTransform), 
-                new PropertyMetadata(0d, OnYChanged)
-                {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        var target = ((TranslateTransform)instance).INTERNAL_parent;
-                        if (target != null)
-                        {
-                            return new CSSEquivalent()
-                            {
-                                DomElement = target.INTERNAL_OuterDomElement,
-                                Value = (inst, value) =>
-                                {
-                                    return value + "px";
-                                },
-                                Name = new List<string> { "translateY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                                UIElement = target,
-                                ApplyAlsoWhenThereIsAControlTemplate = true,
-                                OnlyUseVelocity = true
-                            };
-                        }
-                        return null;
-                    }
-                });
-
-        private static void OnYChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((TranslateTransform)d).RaiseTransformChanged();
-        }
-
-        private void ApplyCSSChanges(double x, double y)
-        {
-            CSSEquivalent translateXcssEquivalent = XProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
-            if (translateXcssEquivalent != null)
-            {
-                object domElementX = translateXcssEquivalent.DomElement;
-                if ((x != _appliedCssX) || 
-                    (_domElementToWhichTheCssXWasApplied != null && domElementX != _domElementToWhichTheCssXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
-                {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
-                        domElementX, 
-                        translateXcssEquivalent.Name, 
-                        translateXcssEquivalent.Value(this, x));
-                    _appliedCssX = x;
-                    _domElementToWhichTheCssXWasApplied = domElementX;
-                }
-            }
-
-            CSSEquivalent translateYcssEquivalent = YProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
-            if (translateYcssEquivalent != null)
-            {
-                object domElementY = translateYcssEquivalent.DomElement;
-                if ((y != _appliedCssY) || 
-                    (_domElementToWhichTheCssYWasApplied != null && domElementY != _domElementToWhichTheCssYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
-                {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
-                        translateYcssEquivalent.DomElement, 
-                        translateYcssEquivalent.Name, 
-                        translateYcssEquivalent.Value(this, y));
-                    _appliedCssY = x;
-                    _domElementToWhichTheCssYWasApplied = domElementY;
-                }
-            }
-        }
-
-        internal override void INTERNAL_ApplyTransform()
-        {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(this.X, this.Y);
-            }
-        }
-
-        internal override void INTERNAL_UnapplyTransform()
-        {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(0, 0);
-            }
+            get => (double)GetValue(YProperty);
+            set => SetValue(YProperty, value);
         }
 
         internal override Matrix ValueInternal
@@ -173,9 +69,7 @@ namespace System.Windows.Media
             get
             {
                 Matrix matrix = Matrix.Identity;
-
                 matrix.Translate(X, Y);
-
                 return matrix;
             }
         }

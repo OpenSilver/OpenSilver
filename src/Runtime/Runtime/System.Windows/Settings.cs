@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.ComponentModel;
 using System.Net;
 using System.Windows;
@@ -21,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media.Animation;
 
 namespace System
 {
@@ -177,6 +175,28 @@ namespace System
         public bool IsRunningOutOfBrowser { get; set; }
 
         /// <summary>
+        /// Gets a value that indicates whether the Silverlight plug-in allows hosted content
+        /// or its runtime to access the HTML DOM.
+        /// </summary>
+        /// <returns>
+        /// true if hosted content can access the browser DOM; otherwise, false.
+        /// </returns>
+        public bool EnableHTMLAccess => _enableHTMLAccess.Value;
+
+        /// <summary>
+        /// Gets or sets the maximum number of frames to render per second.
+        /// </summary>
+        /// <returns>
+        /// An integer value that specifies the maximum number of frames to render per second.
+        /// The default value is 60.
+        /// </returns>
+        public int MaxFrameRate
+        {
+            get => AnimationManager.Current.FrameRate;
+            set => AnimationManager.Current.FrameRate = value;
+        }
+
+        /// <summary>
         /// Gets or sets a value that indicates whether the Silverlight plug-in will resize
         /// its content based on the current browser zoom setting.
         /// </summary>
@@ -221,15 +241,6 @@ namespace System
         public bool EnableGPUAcceleration { get; }
 
         /// <summary>
-        /// Gets a value that indicates whether the Silverlight plug-in allows hosted content
-        /// or its runtime to access the HTML DOM.
-        /// </summary>
-        /// <returns>
-        /// true if hosted content can access the browser DOM; otherwise, false.
-        /// </returns>
-        public bool EnableHTMLAccess => _enableHTMLAccess.Value;
-
-        /// <summary>
         /// Gets or sets a value that indicates whether to show the areas of the Silverlight
         /// plug-in that are being redrawn each frame.
         /// </summary>
@@ -239,15 +250,5 @@ namespace System
         /// </returns>
         [OpenSilver.NotImplemented]
         public bool EnableRedrawRegions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum number of frames to render per second.
-        /// </summary>
-        /// <returns>
-        /// An integer value that specifies the maximum number of frames to render per second.
-        /// The default value is 60.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public int MaxFrameRate { get; set; }
     }
 }

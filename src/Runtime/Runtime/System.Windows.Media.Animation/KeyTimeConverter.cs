@@ -14,92 +14,96 @@
 using System.ComponentModel;
 using System.Globalization;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// 
+/// </summary>
+internal sealed class KeyTimeConverter : TypeConverter
 {
+    /// <summary>
+    /// Returns whether or not this class can convert from a given type
+    /// to an instance of a KeyTime.
+    /// </summary>
+    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+    {
+        return sourceType == typeof(string);
+    }
+
+    /// <summary>
+    /// Returns whether or not this class can convert from an instance of a
+    /// KeyTime to a given type.
+    /// </summary>
+    public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+    {
+        return destinationType == typeof(string);
+    }
+
     /// <summary>
     /// 
     /// </summary>
-    internal sealed class KeyTimeConverter : TypeConverter
+    public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
     {
-        /// <summary>
-        /// Returns whether or not this class can convert from a given type
-        /// to an instance of a KeyTime.
-        /// </summary>
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        if (value is string stringValue)
         {
-            return sourceType == typeof(string);
-        }
+            stringValue = stringValue.Trim();
 
-        /// <summary>
-        /// Returns whether or not this class can convert from an instance of a
-        /// KeyTime to a given type.
-        /// </summary>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            return destinationType == typeof(string);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-        {
-            if (value is string stringValue)
+            if (stringValue == "Uniform")
             {
-                stringValue = stringValue.Trim();
-
-                if (stringValue == "Uniform" || stringValue == "Paced")
-                {
-                    throw new NotSupportedException(
-                        $"The '{typeof(KeyTime)}.{stringValue}' property is not supported yet."
-                    );
-                }
-                else if (stringValue.Length > 0 &&
-                         stringValue[stringValue.Length - 1] == '%')
-                {
-                    throw new NotSupportedException(
-                        $"Percentage values for '{typeof(KeyTime)}' are not supported yet."
-                    );
-                }
-                else
-                {
-                    TimeSpan timeSpanValue = (TimeSpan)TypeConverterHelper.GetConverter(
-                        typeof(TimeSpan)).ConvertFrom(
-                            context,
-                            culture,
-                            stringValue);
-
-                    return KeyTime.FromTimeSpan(timeSpanValue);
-                }
+                return KeyTime.Uniform;
             }
+            else if (stringValue == "Paced")
+            {
+                throw new NotSupportedException(
+                    $"The '{typeof(KeyTime)}.{stringValue}' property is not supported yet.");
+            }
+            else if (stringValue.Length > 0 &&
+                     stringValue[stringValue.Length - 1] == '%')
+            {
+                throw new NotSupportedException(
+                    $"Percentage values for '{typeof(KeyTime)}' are not supported yet.");
+            }
+            else
+            {
+                TimeSpan timeSpanValue = (TimeSpan)TypeConverterHelper.GetConverter(
+                    typeof(TimeSpan)).ConvertFrom(
+                        context,
+                        culture,
+                        stringValue);
 
-            throw GetConvertFromException(value);
+                return KeyTime.FromTimeSpan(timeSpanValue);
+            }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        throw GetConvertFromException(value);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+    {
+        if (destinationType == null)
         {
-            if (destinationType == null)
-            {
-                throw new ArgumentNullException(nameof(destinationType));
-            }
-
-            if (destinationType == typeof(string))
-            {
-                if (value is KeyTime keyTime)
-                {
-                    return TypeConverterHelper.GetConverter(
-                        typeof(TimeSpan)).ConvertTo(
-                            context,
-                            culture,
-                            keyTime.TimeSpan,
-                            destinationType);
-                }
-            }
-
-            throw GetConvertToException(value, destinationType);
+            throw new ArgumentNullException(nameof(destinationType));
         }
+
+        if (destinationType == typeof(string))
+        {
+            if (value is KeyTime keyTime)
+            {
+                switch (keyTime.Type)
+                {
+                    case KeyTimeType.Uniform:
+                        return "Uniform";
+
+                    case KeyTimeType.TimeSpan:
+                        return TypeConverterHelper.GetConverter(typeof(TimeSpan))
+                            .ConvertTo(context, culture, keyTime.TimeSpan, destinationType);
+                };
+            }
+        }
+
+        throw GetConvertToException(value, destinationType);
     }
 }

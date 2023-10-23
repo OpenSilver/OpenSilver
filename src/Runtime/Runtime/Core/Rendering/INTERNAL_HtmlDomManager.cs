@@ -317,24 +317,6 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
-        internal static void SetDomElementStylePropertyUsingVelocity(object domElement, List<string> cssPropertyNames, object cssValue)
-        {
-            if (cssPropertyNames != null && cssPropertyNames.Count != 0)
-            {
-                if (domElement != null)
-                {
-                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
-                    string sCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                        $"document.velocityHelpers.setDomStyle({sElement}, '{string.Join(",", cssPropertyNames)}', {sCssValue});");
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
-            }
-        }
-
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
         public static void RemoveDomElementAttribute(object domElementRef, string attributeName, bool forceSimulatorExecuteImmediately = false)
         {

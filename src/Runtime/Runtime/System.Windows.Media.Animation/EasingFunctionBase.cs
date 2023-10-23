@@ -11,60 +11,76 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
+namespace System.Windows.Media.Animation;
 
-namespace System.Windows.Media.Animation
+/// <summary>
+/// Provides the base class for all the easing functions. You can create your own
+/// custom easing functions by inheriting from this class.
+/// </summary>
+public abstract class EasingFunctionBase : DependencyObject, IEasingFunction
 {
     /// <summary>
-    /// Provides the base class for all the easing functions.
+    /// Initializes a new instance of the <see cref="EasingFunctionBase" /> class.
     /// </summary>
-    public abstract partial class EasingFunctionBase : DependencyObject, IEasingFunction
+    protected EasingFunctionBase() { }
+
+    /// <summary>
+    /// Identifies the <see cref="EasingMode"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty EasingModeProperty =
+        DependencyProperty.Register(
+            nameof(EasingMode),
+            typeof(EasingMode),
+            typeof(EasingFunctionBase),
+            new PropertyMetadata(EasingMode.EaseOut));
+
+    /// <summary>
+    /// Gets or sets a value that specifies how the animation interpolates.
+    /// </summary>
+    public EasingMode EasingMode
     {
-        /// <summary>
-        /// Gets or sets a value that specifies how the animation interpolates.
-        /// </summary>
-        public EasingMode EasingMode
-        {
-            get { return (EasingMode)GetValue(EasingModeProperty); }
-            set { SetValue(EasingModeProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the EasingMode dependency property.
-        /// </summary>
-        public static readonly DependencyProperty EasingModeProperty =
-            DependencyProperty.Register("EasingMode", typeof(EasingMode), typeof(EasingFunctionBase), new PropertyMetadata(EasingMode.EaseOut));
-
-        ///// <summary>
-        ///// Transforms normalized time to control the pace of an animation.
-        ///// </summary>
-        ///// <param name="normalizedTime">Normalized time (progress) of the animation.</param>
-        ///// <returns>A double that represents the transformed progress.</returns>
-        //public double Ease(double normalizedTime);
-
-        internal virtual string GetFunctionAsString()
-        {
-            return "linear";
-        }
-
-        internal protected string GetEasingModeAsString()
-        {
-            switch (EasingMode)
-            {
-                case EasingMode.EaseOut:
-                    return "easeOut";
-                case EasingMode.EaseIn:
-                    return "easeIn";
-                case EasingMode.EaseInOut:
-                    return "easeInOut";
-                default:
-                    return "easeOut";
-            }
-        }
-
-        /// <summary>
-        /// Returns a Dictionary of the values to add in the options section of the Velocity Call. Implemented in inheriting classes that define their own easing function (see ExponentialEase)
-        /// </summary>
-        /// <returns></returns>
-        internal virtual Dictionary<string, object> GetAdditionalOptionsForVelocityCall() { return null; }
+        get => (EasingMode)GetValue(EasingModeProperty);
+        set => SetValue(EasingModeProperty, value);
     }
+
+    /// <summary>
+    /// Transforms normalized time to control the pace of an animation.
+    /// </summary>
+    /// <param name="normalizedTime">
+    /// Normalized time (progress) of the animation.
+    /// </param>
+    /// <returns>
+    /// A double that represents the transformed progress.
+    /// </returns>
+    public double Ease(double normalizedTime)
+    {
+        switch (EasingMode)
+        {
+            case EasingMode.EaseIn:
+                return EaseInCore(normalizedTime);
+
+            case EasingMode.EaseOut:
+                // EaseOut is the same as EaseIn, except time is reversed & the result is flipped.
+                return 1.0 - EaseInCore(1.0 - normalizedTime);
+
+            case EasingMode.EaseInOut:
+            default:
+                // EaseInOut is a combination of EaseIn & EaseOut fit to the 0-1, 0-1 range.
+                return (normalizedTime < 0.5) ?
+                    EaseInCore(normalizedTime * 2.0) * 0.5 :
+                    (1.0 - EaseInCore((1.0 - normalizedTime) * 2.0)) * 0.5 + 0.5;
+        }
+    }
+
+    /// <summary>
+    /// Provides the logic portion of the easing function that you can override to produce
+    /// the <see cref="EasingMode.EaseIn"/> mode of the custom easing function.
+    /// </summary>
+    /// <param name="normalizedTime">
+    /// Normalized time (progress) of the animation.
+    /// </param>
+    /// <returns>
+    /// A double that represents the transformed progress.
+    /// </returns>
+    protected abstract double EaseInCore(double normalizedTime);
 }

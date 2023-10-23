@@ -36,6 +36,7 @@ namespace System.Windows.Controls
     {
         private UIElementCollection _uiElementCollection;
         private ItemContainerGenerator _itemContainerGenerator;
+        private WeakEventListener<Panel, Brush, EventArgs> _backgroundChangedListener;
 
         /// <summary> 
         /// Returns enumerator to logical children.
@@ -247,15 +248,6 @@ namespace System.Windows.Controls
         #endregion Children Management
 
         /// <summary>
-        /// Gets or sets a Brush that is used to fill the panel.
-        /// </summary>
-        public Brush Background
-        {
-            get { return (Brush)GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
-        }
-
-        /// <summary>
         /// Identifies the <see cref="Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
@@ -265,13 +257,25 @@ namespace System.Windows.Controls
                 typeof(Panel),
                 new PropertyMetadata(null, OnBackgroundChanged)
                 {
-                    MethodToUpdateDom2 = (d, oldValue, newValue) =>
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var panel = (Panel)d;
                         _ = RenderBackgroundAsync(panel, (Brush)newValue);
                         SetPointerEvents(panel);
                     },
                 });
+
+        /// <summary>
+        /// Gets or sets a <see cref="Brush"/> that is used to fill the panel.
+        /// </summary>
+        /// <returns>
+        /// The brush used to fill the panel. The default is null.
+        /// </returns>
+        public Brush Background
+        {
+            get => (Brush)GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
+        }
 
         private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -281,23 +285,47 @@ namespace System.Windows.Controls
             {
                 panel.SizeChanged += OnSizeChanged;
             }
+
+            if (panel._backgroundChangedListener != null)
+            {
+                panel._backgroundChangedListener.Detach();
+                panel._backgroundChangedListener = null;
+            }
+
+            if (e.NewValue is Brush newBrush)
+            {
+                panel._backgroundChangedListener = new(panel, newBrush)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnBackgroundChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newBrush.Changed += panel._backgroundChangedListener.OnEvent;
+            }
+        }
+
+        private void OnBackgroundChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                _ = RenderBackgroundAsync(this, (Brush)sender);
+            }
         }
 
         private static void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Panel p = (Panel)sender;
-            _ = RenderBackgroundAsync(p, p.Background);
+            var p = (Panel)sender;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(p))
+            {
+                _ = RenderBackgroundAsync(p, p.Background);
+            }
         }
 
         internal static async Task RenderBackgroundAsync(UIElement uie, Brush brush)
         {
             Debug.Assert(uie != null);
-
-            if (uie.INTERNAL_OuterDomElement is not null)
-            {
-                string background = brush is not null ? await brush.GetDataStringAsync(uie) : string.Empty;
-                INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uie).background = background;
-            }
+            
+            string background = brush is not null ? await brush.GetDataStringAsync(uie) : string.Empty;
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement).background = background;
         }
 
         /// <summary>

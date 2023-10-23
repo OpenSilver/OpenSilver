@@ -65,6 +65,13 @@ namespace System.Windows.Media.Animation.Tests
         }
 
         [TestMethod]
+        public void ConvertFrom_String_Should_Return_KeyTime_Uniform()
+        {
+            Converter.ConvertFrom("Uniform").Should().Be(KeyTime.Uniform);
+            Converter.ConvertFrom("  Uniform   ").Should().Be(KeyTime.Uniform);
+        }
+
+        [TestMethod]
         public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
             Assert.ThrowsException<NotSupportedException>(
@@ -77,14 +84,6 @@ namespace System.Windows.Media.Animation.Tests
         {
             Assert.ThrowsException<NotSupportedException>(
                 () => Converter.ConvertFrom(true)
-            );
-        }
-
-        [TestMethod]
-        public void ConvertFrom_Uniform_Should_Throw_NotSupportedException()
-        {
-            Assert.ThrowsException<NotSupportedException>(
-                () => Converter.ConvertFrom("Uniform")
             );
         }
 

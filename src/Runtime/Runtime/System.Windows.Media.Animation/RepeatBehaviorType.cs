@@ -11,29 +11,31 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+using System.ComponentModel;
+
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Specifies the repeat mode that a <see cref="RepeatBehavior"/>
+/// raw value represents.
+/// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
+public enum RepeatBehaviorType
 {
     /// <summary>
-    /// Specifies the repeat mode that a <see cref="RepeatBehavior"/>
-    /// raw value represents.
+    /// The <see cref="RepeatBehavior"/> represents a case where
+    /// the timeline should repeat for a fixed number of complete runs.
     /// </summary>
-    public enum RepeatBehaviorType
-    {
-        /// <summary>
-        /// The <see cref="RepeatBehavior"/> represents a case where
-        /// the timeline should repeat for a fixed number of complete runs.
-        /// </summary>
-        Count = 0,
-        /// <summary>
-        /// The <see cref="RepeatBehavior"/>  represents a case where
-        /// the timeline should repeat for a time duration, which might result in an
-        /// animation terminating part way through.
-        /// </summary>
-        Duration = 1,
-        /// <summary>
-        /// The <see cref="RepeatBehavior"/> represents a case where
-        /// the timeline should repeat indefinitely.
-        /// </summary>
-        Forever = 2,
-    }
+    Count = 0,
+    /// <summary>
+    /// The <see cref="RepeatBehavior"/>  represents a case where
+    /// the timeline should repeat for a time duration, which might result in an
+    /// animation terminating part way through.
+    /// </summary>
+    Duration = 1,
+    /// <summary>
+    /// The <see cref="RepeatBehavior"/> represents a case where
+    /// the timeline should repeat indefinitely.
+    /// </summary>
+    Forever = 2,
 }

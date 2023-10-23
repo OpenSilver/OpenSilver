@@ -12,55 +12,42 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using OpenSilver.Internal.Media.Animation;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents a collection of <see cref="ColorKeyFrame" /> objects 
+/// that can be individually accessed by index. 
+/// </summary>
+public sealed class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>, IKeyFrameCollection<Color>
 {
     /// <summary>
-    /// Represents a collection of <see cref="ColorKeyFrame" /> objects 
-    /// that can be individually accessed by index. 
+    /// Initializes a new instance of the <see cref="ColorKeyFrameCollection"/> class.
     /// </summary>
-    public sealed class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
+    public ColorKeyFrameCollection()
+        : base(false)
     {
-        public ColorKeyFrameCollection()
-            : base(false)
-        {
-        }
-
-        internal ColorKeyFrameCollection(ColorAnimationUsingKeyFrames owner)
-            : base(false)
-        {
-            Debug.Assert(owner != null);
-            owner.ProvideSelfAsInheritanceContext(this, null);
-        }
-
-        internal override void AddOverride(ColorKeyFrame keyFrame)
-        {
-            this.AddDependencyObjectInternal(keyFrame);
-        }
-
-        internal override void ClearOverride()
-        {
-            this.ClearDependencyObjectInternal();
-        }
-
-        internal override void InsertOverride(int index, ColorKeyFrame keyFrame)
-        {
-            this.InsertDependencyObjectInternal(index, keyFrame);
-        }
-
-        internal override void RemoveAtOverride(int index)
-        {
-            this.RemoveAtDependencyObjectInternal(index);
-        }
-
-        internal override ColorKeyFrame GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
-
-        internal override void SetItemOverride(int index, ColorKeyFrame keyFrame)
-        {
-            this.SetItemDependencyObjectInternal(index, keyFrame);
-        }
     }
+
+    internal ColorKeyFrameCollection(ColorAnimationUsingKeyFrames owner)
+        : base(false)
+    {
+        Debug.Assert(owner is not null);
+        owner.ProvideSelfAsInheritanceContext(this, null);
+    }
+
+    internal override void AddOverride(ColorKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
+
+    internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+    internal override void InsertOverride(int index, ColorKeyFrame keyFrame) => InsertDependencyObjectInternal(index, keyFrame);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+    internal override ColorKeyFrame GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void SetItemOverride(int index, ColorKeyFrame keyFrame) => SetItemDependencyObjectInternal(index, keyFrame);
+
+    IKeyFrame<Color> IKeyFrameCollection<Color>.this[int index] => GetItemInternal(index);
 }

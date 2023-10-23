@@ -11,23 +11,15 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents an easing function that creates an animation that accelerates and/or
+/// decelerates using the formula f(t) = t3.
+/// </summary>
+public sealed class CubicEase : EasingFunctionBase
 {
-    /// <summary>
-    /// Represents an easing function that creates an animation that accelerates
-    /// and/or decelerates using the formula f(t) = t3.
-    /// </summary>
-    public sealed partial class CubicEase : EasingFunctionBase
-    {
-        const string FUNCTION_TYPE_STRING = "Cubic";
-
-        //// Summary:
-        ////     Initializes a new instance of the CubicEase class.
-        //public CubicEase();
-
-        internal override string GetFunctionAsString()
-        {
-            return GetEasingModeAsString() + FUNCTION_TYPE_STRING;
-        }
-    }
+    /// <inheritdoc />
+    protected override double EaseInCore(double normalizedTime) =>
+        normalizedTime * normalizedTime * normalizedTime;
 }

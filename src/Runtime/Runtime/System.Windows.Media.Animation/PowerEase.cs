@@ -11,38 +11,44 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents an easing function that creates an animation that accelerates and/or
+/// decelerates using the formula f(t) = tp where p is equal to the <see cref="Power"/>
+/// property.
+/// </summary>
+public class PowerEase : EasingFunctionBase
 {
     /// <summary>
-    ///     This class implements an easing function that gives a polynomial curve of arbitrary degree.
-    ///     If the curve you desire is cubic, quadratic, quartic, or quintic it is better to use the 
-    ///     specialized easing functions.
+    /// Identifies the <see cref="Power"/> dependency property.
     /// </summary>
-    public class PowerEase : EasingFunctionBase
+    public static readonly DependencyProperty PowerProperty =
+        DependencyProperty.Register(
+            nameof(Power),
+            typeof(double),
+            typeof(PowerEase),
+            new PropertyMetadata(2.0));
+
+    /// <summary>
+    /// Gets or sets the exponential power of the animation interpolation. For example,
+    /// a value of 7 creates an animation interpolation curve that follows the formula
+    /// f(t) = t7.
+    /// </summary>
+    /// <returns>
+    /// The exponential power of the animation interpolation. This value must be greater
+    /// or equal to 0. The default is 2.
+    /// </returns>
+    public double Power
     {
-        /// <summary>
-        /// Power Property
-        /// </summary>
-        public static readonly DependencyProperty PowerProperty =
-            DependencyProperty.Register(
-                nameof(Power),
-                typeof(double),
-                typeof(PowerEase),
-                new PropertyMetadata(2.0));
+        get => (double)GetValue(PowerProperty);
+        set => SetValue(PowerProperty, value);
+    }
 
-        /// <summary>
-        /// Specifies the power for the polynomial equation.
-        /// </summary>
-        public double Power
-        {
-            get => (double)GetValue(PowerProperty);
-            set => SetValue(PowerProperty, value);
-        }
-
-        protected override double EaseInCore(double normalizedTime)
-        {
-            double power = Math.Max(0.0, Power);
-            return Math.Pow(normalizedTime, power);
-        }
+    /// <inheritdoc />
+    protected override double EaseInCore(double normalizedTime)
+    {
+        double power = Math.Max(0.0, Power);
+        return Math.Pow(normalizedTime, power);
     }
 }

@@ -621,7 +621,6 @@ Click OK to continue.";
 
                     File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.css"), Path.Combine(destinationPath, "cshtml5.css"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.js"), Path.Combine(destinationPath, "cshtml5.js"), true);
-                    File.Copy(Path.Combine(simulatorJsCssPath, "velocity.js"), Path.Combine(destinationPath, "velocity.js"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.css"), Path.Combine(destinationPath, "flatpickr.css"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.js"), Path.Combine(destinationPath, "flatpickr.js"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "ResizeObserver.js"), Path.Combine(destinationPath, "ResizeObserver.js"), true);

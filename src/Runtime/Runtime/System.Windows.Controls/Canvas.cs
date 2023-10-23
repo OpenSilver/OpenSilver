@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -43,59 +44,55 @@ namespace System.Windows.Controls
     /// </example>
     public partial class Canvas : Panel
     {
+        internal static int MaxZIndex { get; private set; }
+
         /// <summary>
         /// Identifies the Canvas.Left attached property.
         /// </summary>
         public static readonly DependencyProperty LeftProperty =
             DependencyProperty.RegisterAttached(
-                "Left", 
-                typeof(double), 
+                "Left",
+                typeof(double),
                 typeof(UIElement),
-                new FrameworkPropertyMetadata(0d, OnPositioningChanged)
-                {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        var uielement = instance as UIElement;
-                        if (uielement != null && uielement.INTERNAL_VisualParent is Canvas)
-                        {
-                            return new CSSEquivalent
-                            {
-                                Value = (inst, value) => value.ToInvariantString() + "px",
-                                Name = new List<string> { "left" },
-                                DomElement = uielement.INTERNAL_OuterDomElement,
-                                ApplyAlsoWhenThereIsAControlTemplate = true
-                            };
-                        }
-                        return null;
-                    }
-                });
+                new FrameworkPropertyMetadata(0.0, OnPositioningChanged));
+
+        /// <summary>
+        /// Sets the value of the Canvas.Left XAML attached property for a target element.
+        /// </summary>
+        /// <param name="element">The object to which the property value is written.</param>
+        /// <param name="value">The value to set.</param>
+        public static void SetLeft(UIElement element, double value) => element.SetValue(LeftProperty, value);
+
+        /// <summary>
+        /// Gets the value of the Canvas.Left XAML attached property for the target element.
+        /// </summary>
+        /// <param name="element">The object from which the property value is read.</param>
+        /// <returns>The Canvas.Left XAML attached property value of the specified object.</returns>
+        public static double GetLeft(UIElement element) => (double)element.GetValue(LeftProperty);
 
         /// <summary>
         /// Identifies the Canvas.Top attached property.
         /// </summary>
         public static readonly DependencyProperty TopProperty =
             DependencyProperty.RegisterAttached(
-                "Top", 
-                typeof(double), 
+                "Top",
+                typeof(double),
                 typeof(UIElement),
-                new FrameworkPropertyMetadata(0d, OnPositioningChanged)
-                {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        var uielement = instance as UIElement;
-                        if (uielement != null && uielement.INTERNAL_VisualParent is Canvas)
-                        {
-                            return new CSSEquivalent
-                            {
-                                Value = (inst, value) => value.ToInvariantString() + "px",
-                                Name = new List<string> { "top" },
-                                DomElement = uielement.INTERNAL_OuterDomElement,
-                                ApplyAlsoWhenThereIsAControlTemplate = true
-                            };
-                        }
-                        return null;
-                    }
-                });
+                new FrameworkPropertyMetadata(0d, OnPositioningChanged));
+
+        /// <summary>
+        /// Sets the value of the Canvas.Top XAML attached property for a target element.
+        /// </summary>
+        /// <param name="element">The object to which the property value is written.</param>
+        /// <param name="value">The value to set.</param>
+        public static void SetTop(UIElement element, double value) => element.SetValue(TopProperty, value);
+
+        /// <summary>
+        /// Gets the value of the Canvas.Top XAML attached property for the target element.
+        /// </summary>
+        /// <param name="element">The object from which the property value is read.</param>
+        /// <returns>The Canvas.Top XAML attached property value of the specified object.</returns>
+        public static double GetTop(UIElement element) => (double)element.GetValue(TopProperty);
 
         private static void OnPositioningChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -111,86 +108,38 @@ namespace System.Windows.Controls
         /// </summary>
         public static readonly DependencyProperty ZIndexProperty =
             DependencyProperty.RegisterAttached(
-                "ZIndex", 
-                typeof(int), 
-                typeof(UIElement), 
-                new PropertyMetadata(0, ZIndex_Changed)
+                "ZIndex",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(0, OnZIndexChanged)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Value = (inst, value) => value.ToInvariantString(),
-                        Name = new List<string> { "zIndex" },
-                        DomElement = ((UIElement)instance).INTERNAL_OuterDomElement,
-                        ApplyAlsoWhenThereIsAControlTemplate = true
-                    }
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetZIndexNative((UIElement)d, (int)newValue),
                 });
-
-        internal static int MaxZIndex = 0;
-        private static void ZIndex_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            int zindex = (int)e.NewValue;
-            if (zindex > MaxZIndex)
-                MaxZIndex = zindex;
-        }
-
-        /// <summary>
-        /// Sets the value of the Canvas.Left XAML attached property for a target element.
-        /// </summary>
-        /// <param name="element">The object to which the property value is written.</param>
-        /// <param name="value">The value to set.</param>
-        public static void SetLeft(UIElement element, double value)
-        {
-            element.SetValue(LeftProperty, value);
-        }
-
-        /// <summary>
-        /// Gets the value of the Canvas.Left XAML attached property for the target element.
-        /// </summary>
-        /// <param name="element">The object from which the property value is read.</param>
-        /// <returns>The Canvas.Left XAML attached property value of the specified object.</returns>
-        public static double GetLeft(UIElement element)
-        {
-            return (double)element.GetValue(LeftProperty);
-        }
-
-        /// <summary>
-        /// Sets the value of the Canvas.Top XAML attached property for a target element.
-        /// </summary>
-        /// <param name="element">The object to which the property value is written.</param>
-        /// <param name="value">The value to set.</param>
-        public static void SetTop(UIElement element, double value)
-        {
-            element.SetValue(TopProperty, value);
-        }
-
-        /// <summary>
-        /// Gets the value of the Canvas.Top XAML attached property for the target element.
-        /// </summary>
-        /// <param name="element">The object from which the property value is read.</param>
-        /// <returns>The Canvas.Top XAML attached property value of the specified object.</returns>
-        public static double GetTop(UIElement element)
-        {
-            return (double)element.GetValue(TopProperty);
-        }
 
         /// <summary>
         /// Sets the value of the Canvas.ZIndex XAML attached property for a target element.
         /// </summary>
         /// <param name="element">The object to which the property value is written.</param>
         /// <param name="value">The value to set.</param>
-        public static void SetZIndex(UIElement element, int value)
-        {
-            element.SetValue(ZIndexProperty, value);
-        }
+        public static void SetZIndex(UIElement element, int value) => element.SetValue(ZIndexProperty, value);
 
         /// <summary>
         /// Gets the value of the Canvas.ZIndex XAML attached property for the target element.
         /// </summary>
         /// <param name="element">The object from which the property value is read.</param>
         /// <returns>The Canvas.ZIndex XAML attached property value of the specified object.</returns>
-        public static int GetZIndex(UIElement element)
+        public static int GetZIndex(UIElement element) => (int)element.GetValue(ZIndexProperty);
+
+        private static void OnZIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            return (int)element.GetValue(ZIndexProperty);
+            MaxZIndex = Math.Max(MaxZIndex, (int)e.NewValue);
+        }
+
+        private static void SetZIndexNative(UIElement uie, int value)
+        {
+            Debug.Assert(uie is not null);
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+            style.zIndex = value.ToInvariantString();
         }
 
         protected override Size MeasureOverride(Size availableSize)

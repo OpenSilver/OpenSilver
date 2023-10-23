@@ -11,16 +11,20 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+using System.ComponentModel;
+using OpenSilver.Internal;
+
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents a visual behavior that occurs when a control is affected by a
+/// predefined action or state change. These may be applied to individual elements
+/// using the Transitions property, or applied to the children of a Panel using
+/// the ChildrenTransitions property.
+/// </summary>
+[Obsolete(Helper.ObsoleteMemberMessage)]
+[EditorBrowsable(EditorBrowsableState.Never)]
+public class Transition : DependencyObject
 {
-    /// <summary>
-    /// Represents a visual behavior that occurs when a control is affected by a
-    /// predefined action or state change. These may be applied to individual elements
-    /// using the Transitions property, or applied to the children of a Panel using
-    /// the ChildrenTransitions property.
-    /// </summary>
-    public class Transition : DependencyObject
-    {
-    }
 }
 

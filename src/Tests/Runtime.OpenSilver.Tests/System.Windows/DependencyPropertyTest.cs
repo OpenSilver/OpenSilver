@@ -200,8 +200,6 @@ public partial class DependencyPropertyTest
             {
                 MethodToUpdateDom = UpdateDom,
                 MethodToUpdateDom2 = UpdateDom2,
-                GetCSSEquivalent = GetCSSEquivalent,
-                GetCSSEquivalents = GetCSSEquivalents,
             });
 
         Assert.AreEqual(dp.DefaultMetadata.DefaultValue, 42d);
@@ -209,15 +207,11 @@ public partial class DependencyPropertyTest
         Assert.IsNull(dp.DefaultMetadata.CoerceValueCallback);
         Assert.IsNull(dp.DefaultMetadata.MethodToUpdateDom);
         Assert.IsNull(dp.DefaultMetadata.MethodToUpdateDom2);
-        Assert.IsNull(dp.DefaultMetadata.GetCSSEquivalent);
-        Assert.IsNull(dp.DefaultMetadata.GetCSSEquivalents);
 
         static void OnChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
         static object Coerce(DependencyObject d, object baseValue) => baseValue;
         static void UpdateDom(DependencyObject d, object value) { }
         static void UpdateDom2(DependencyObject d, object oldValue, object newValue) { }
-        static CSSEquivalent GetCSSEquivalent(DependencyObject d) => null;
-        static List<CSSEquivalent> GetCSSEquivalents(DependencyObject d) => null;
     }
     
     [TestMethod]

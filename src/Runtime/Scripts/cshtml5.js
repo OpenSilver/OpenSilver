@@ -1057,50 +1057,64 @@ document.htmlPresenterHelpers = (function () {
     };
 })();
 
-document.velocityHelpers = (function () {
-    const cache = {};
+document.createAnimationManager = function (callback) {
+    if (document.animationManager) return;
 
-    function addToCache(element, key) {
-        const id = element.id;
-        if (id in cache && !cache[id].includes(key)) {
-            cache[id].push(key);
-        } else {
-            cache[id] = [element, key];
+    let _frameDelay = 1 / 60;
+    let _isRunning = false;
+    let _frameRequestId = null;
+    let _previousTimeStamp = 0;
+
+    function scheduleAnimationFrame() {
+        if (!_isRunning || _frameRequestId !== null) return;
+
+        _frameRequestId = window.requestAnimationFrame(onFrame);
+    };
+
+    function onFrame(timeStamp) {
+        _frameRequestId = null;
+
+        if (skipFrame(timeStamp)) {
+            scheduleAnimationFrame();
+            return;
+        }
+
+        _previousTimeStamp = timeStamp;
+        try {
+            callback();
+        } finally {
+            scheduleAnimationFrame();
         }
     };
 
-    function cleanupCache() {
-        const keys = Object.keys(cache);
-        keys.forEach((key) => {
-            const el = document.getElementById(key);
-            if (el === null) {
-                Velocity.Utilities.removeData(cache[key][0], cache[key].slice(1));
-                Velocity.Utilities.removeData(cache[key][0], ['velocity']);
-                delete cache[key];
-            }
-        });
+    function skipFrame(timeStamp) {
+        const elapsed = timeStamp - _previousTimeStamp;
+        return elapsed < _frameDelay;
     };
 
-    setInterval(() => { cleanupCache(); }, 10000);
-
-    return {
-        setDomStyle: function (element, properties, value) {
-            const obj = {};
-            for (const property of properties.split(',')) {
-                obj[property] = value;
+    document.animationManager = {
+        resume: function () {
+            if (!_isRunning) {
+                _isRunning = true;
+                scheduleAnimationFrame();
             }
-
-            Velocity(element, obj, { duration: 1, queue: false });
-            addToCache(element, 'velocity');
         },
-
-        animate: function (element, fromToValues, options, groupName) {
-            Velocity(element, fromToValues, options);
-            Velocity.Utilities.dequeue(element, groupName);
-            addToCache(element, `${groupName}queue`);
+        pause: function () {
+            _isRunning = false;
+            if (_frameRequestId) {
+                window.cancelAnimationFrame(_frameRequestId);
+                _frameRequestId = null;
+            }
+        },
+        setFrameRate: function (frameRate) {
+            if (frameRate <= 0) {
+                _frameDelay = 0;
+            } else {
+                _frameDelay = 1000 / frameRate;
+            }
         },
     };
-})();
+};
 
 document.browserService = (function () {
     const JSTYPE = {

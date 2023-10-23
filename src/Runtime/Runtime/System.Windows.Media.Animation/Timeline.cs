@@ -11,347 +11,194 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
+using OpenSilver.Internal.Media.Animation;
 using OpenSilver.Internal;
-using System.Windows.Controls;
-using System.Windows.Threading;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Defines a segment of time.
+/// </summary>
+public abstract partial class Timeline : DependencyObject
 {
     /// <summary>
-    /// Defines a segment of time.
+    /// Initializes a new instance of the <see cref="Timeline"/> class.
     /// </summary>
-    public abstract class Timeline : DependencyObject
+    protected Timeline() { }
+
+    /// <summary>
+    /// Occurs when the <see cref="Storyboard"/> object has completed playing.
+    /// </summary>
+    public event EventHandler Completed;
+
+    internal void RaiseCompleted() => Completed?.Invoke(this, EventArgs.Empty);
+
+    /// <summary>
+    /// Identifies the <see cref="AutoReverse"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty AutoReverseProperty =
+        DependencyProperty.Register(
+            nameof(AutoReverse),
+            typeof(bool),
+            typeof(Timeline),
+            null);
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the timeline plays in reverse after
+    /// it completes a forward iteration.
+    /// </summary>
+    /// <returns>
+    /// true if the timeline plays in reverse at the end of each iteration; otherwise,
+    /// false. The default value is false.
+    /// </returns>
+    [OpenSilver.NotImplemented]
+    public bool AutoReverse
     {
-        internal INameResolver NameResolver { get; set; }
-
-        // Returns:
-        //     The timeline's simple duration: the amount of time this timeline takes to
-        //     complete a single forward iteration. The default value is a Duration that
-        //     evaluates as Automatic.
-        /// <summary>
-        /// Gets or sets the length of time for which this timeline plays, not counting
-        /// repetitions.
-        /// </summary>
-        public Duration Duration
-        {
-            get { return (Duration)GetValue(DurationProperty); }
-            set { SetValue(DurationProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the Duration dependency property.
-        /// </summary>
-        public static readonly DependencyProperty DurationProperty =
-            DependencyProperty.Register("Duration", typeof(Duration), typeof(Timeline), new PropertyMetadata(Duration.Automatic));
-
-
-
-        // Returns:
-        //     An iteration Count that specifies the number of times the timeline should
-        //     play, a TimeSpan value that specifies the total length of this timeline's
-        //     active period, or the special value Forever, which specifies that the timeline
-        //     should repeat indefinitely. The default value is a RepeatBehavior with a
-        //     Count value of 1, which indicates that the timeline plays once.
-        /// <summary>
-        /// Gets or sets the repeating behavior of this timeline.
-        /// </summary>
-        public RepeatBehavior RepeatBehavior
-        {
-            get { return (RepeatBehavior)GetValue(RepeatBehaviorProperty); }
-            set { SetValue(RepeatBehaviorProperty, value); }
-        }
-        //Note: In WPF, repeatBehavior seems to do nothing if not set on the Storyboard (so basically, setting it on a DoubleAnimation for example is useless).
-        //      I don't know why this is in Timeline instead of Storyboard then.
-
-        /// <summary>
-        /// Identifies the RepeatBehavior dependency property.
-        /// </summary>
-        public static readonly DependencyProperty RepeatBehaviorProperty =
-            DependencyProperty.Register("RepeatBehavior", typeof(RepeatBehavior), typeof(Timeline), new PropertyMetadata(new RepeatBehavior(1)));
-
-
-        // Returns:
-        //     The time at which this System.Windows.Media.Animation.Timeline should begin,
-        //     relative to its parent's System.Windows.Media.Animation.Timeline.BeginTime.
-        //     If this timeline is a root timeline, the time is relative to its interactive
-        //     begin time (the moment at which the timeline was triggered). This value may
-        //     be positive, negative, or null; a null value means the timeline never plays.
-        //     The default value is zero.
-        /// <summary>
-        /// Gets or sets the time at which this System.Windows.Media.Animation.Timeline
-        /// should begin.
-        /// </summary>
-        public TimeSpan? BeginTime
-        {
-            get { return (TimeSpan?)GetValue(BeginTimeProperty); }
-            set { SetValue(BeginTimeProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the BeginTime dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BeginTimeProperty =
-            DependencyProperty.Register("BeginTime", typeof(TimeSpan?), typeof(Timeline), new PropertyMetadata(new TimeSpan()));
-
-        /// <summary>
-        /// Occurs when this timeline has completely finished playing: it will no longer
-        /// enter its active period.
-        /// </summary>
-        public event EventHandler Completed;
-        internal void INTERNAL_RaiseCompletedEvent()
-        {
-            if (Completed != null)
-                Completed(this, new EventArgs());
-        }
-
-        internal HashSet<Guid> CompletedGuids = new HashSet<Guid>();
-        internal void INTERNAL_RaiseCompletedEvent(Guid guid)
-        {
-            if (CompletedGuids == null)
-            {
-                CompletedGuids = new HashSet<Guid>();
-            }
-            if (!CompletedGuids.Contains(guid))
-            {
-                CompletedGuids.Add(guid);
-            }
-            if (Completed != null)
-                Completed(this, new EventArgs());
-        }
-
-        internal virtual void Stop(IterationParameters parameters, bool revertToFormerValue = false)
-        {
-            _animationTimer.Stop();
-            if (_beginTimeTimer != null)
-            {
-                _beginTimeTimer.Stop();
-            }
-        }
-
-        /// <summary>
-        /// Removes the value set for the VisualState on the specified frameworkElement.
-        /// </summary>
-        /// <param name="frameworkElement"></param>
-        internal void UnApply(FrameworkElement frameworkElement)
-        {
-            if (frameworkElement is Control)
-            {
-                GetTargetElementAndPropertyInfo(_parameters, out DependencyObject target, out PropertyPath propertyPath);
-                if (target != null && propertyPath != null)
-                {
-                    AnimationHelpers.ApplyValue(target, propertyPath, DependencyProperty.UnsetValue);
-                }
-            }
-        }
-
-        internal void GetTargetElementAndPropertyInfo(
-            IterationParameters parameters,
-            out DependencyObject target,
-            out PropertyPath propertyPath)
-        {
-            propertyPath = null;
-            target = null;
-
-            if (parameters != null && parameters.TimelineMappings.TryGetValue(this, out (DependencyObject, PropertyPath) info))
-            {
-                propertyPath = info.Item2;
-                target = propertyPath.GetFinalItem(info.Item1);
-            }
-        }
-
-        //Stuff added for loops purposes:
-
-        //How loops work:
-        //  The Timeline calls IterateOnce the first time, which starts the timer that handles the duration of the animation if any, and starts the animation.
-        //  When the animation is over or the timer ticks, we call OnIterationCompleted which checks if there should be one more loop.
-        //      In any case, we stop the current animation and if we loop, we call IterateOnce, otherwise, we raise the completed event.
-        //  If the Timeline is a Storyboard, IterateOnce also calls InitializeIteration which sets (initializes) the amount of loops we should do on itself and every Timeline in its children.
-
-        ///
-        //Note: the Guid below is used to make a different name for each animation in velocity. That way, a storyboard with looping animations will be able to
-        //      stop the animations separately when they finish their loop (otherwise, the first animation to finish will stop all the animations in velocity and the other
-        //      animations won't be able to loop since velocity will never call the animation completed for them).
-        internal readonly string animationInstanceSpecificName = Guid.NewGuid().ToString(); //this will allow us to stop a specific animation from whithin a Storyboard with multiple animations
-
-        //Note on BeginTime:
-        //  It delays the first loop so we added a method (StartFirstIteration) before calling IterateOnce where it was fit.
-        //  Ultimately, we might start the timers for the whole tree of animations at once and add each animation's delay to their parents' delays, which will allow us to handle negative delays.
-        DispatcherTimer _beginTimeTimer;
-        /// <summary>
-        /// Starts the first iteration of this timeline, while managing the BeginTime property.
-        /// </summary>
-        /// <param name="parameters">the parameters required for the iteration</param>
-        /// <param name="isLastLoop">A boolean that says if it is the last loop</param>
-        /// <param name="parentDelay">The Delay due to the BeginTime of the parent Timeline</param>
-        internal void StartFirstIteration(IterationParameters parameters,  bool isLastLoop, TimeSpan? parentDelay)
-        {
-            if (BeginTime != null)
-            {
-                if (BeginTime.Value.TotalMilliseconds > 0)
-                {
-                    _beginTimeTimer = new DispatcherTimer(); //this line is to avoid having more than one callback on the tick (we cannot use "_beginTimeTimer.Tick -= XXX" since we use a anonymous method).
-                    _beginTimeTimer.Interval = BeginTime.Value;
-
-                    //Note: anonymous method since it allows us to use simply parameters and isLastLoop.
-                    _beginTimeTimer.Tick += (sender, args) =>
-                    {
-                        _beginTimeTimer.Stop();
-                        IterateOnce(parameters, isLastLoop);
-                    };
-                    _beginTimeTimer.Start();
-                }
-                else
-                {
-                    IterateOnce(parameters, isLastLoop);
-                }
-            }
-        }
-
-        // Animation timer should not prevent the element from being collected by the garbage collector.
-        // Therefore, the WeakEventListener pattern is used here.
-        // The most important use case: Storyboards with RepeatBehavior property set to "Forever".
-        private WeakEventListener<Timeline, DispatcherTimer, object> _animationTimerTickListener;
-        private WeakEventListener<Timeline, DispatcherTimer, object> AnimationTimerTickListener
-        {
-            get
-            {
-                return _animationTimerTickListener ??= new(this, _animationTimer)
-                {
-                    OnEventAction = static (instance, sender, args) =>
-                    {
-                        instance._animationTimer_Tick(sender, args);
-                    },
-                    OnDetachAction = static (listener, source) =>
-                    {
-                        source.Tick -= listener.OnEvent;
-                        source.Stop();
-                    }
-                };
-            }
-        }
-
-        internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
-        {
-            _parameters = parameters;
-            var duration = ResolveDuration();
-            if (duration.HasTimeSpan && duration.TimeSpan.TotalMilliseconds > 0)
-            {
-                _animationTimer.Interval = duration.TimeSpan;
-                _animationTimer.Tick -= AnimationTimerTickListener.OnEvent;
-                _animationTimer.Tick += AnimationTimerTickListener.OnEvent;
-                _isAnimationDurationReached = false;
-                _animationTimer.Start();
-                return;
-            }
-
-            _isAnimationDurationReached = true;
-        }
-
-
-        double remainingIterations = double.NaN;
-
-        internal void InitializeIteration()
-        {
-            if (RepeatBehavior == null)
-            {
-                remainingIterations = 1;
-            }
-            else if (RepeatBehavior != RepeatBehavior.Forever)
-            {
-                remainingIterations = RepeatBehavior.Count;
-            }
-            else
-            {
-                remainingIterations = double.PositiveInfinity;
-            }
-        }
-
-        DispatcherTimer _animationTimer = new DispatcherTimer();
-        internal void OnIterationCompleted(IterationParameters parameters)
-        {
-            if (_isAnimationDurationReached) //the default duration is Automatic, which currently has a TimeSpan of 0 ms (which is considered here to be no timespan).
-            {
-                --remainingIterations;
-                if (remainingIterations <= 0)
-                {
-                    Stop(parameters, revertToFormerValue: false);
-                    INTERNAL_RaiseCompletedEvent();
-                }
-                else
-                {
-                    if (this is Storyboard storyboard)
-                    {
-                        storyboard.Stop();
-                    }
-                    else
-                    {
-                        Stop(parameters, revertToFormerValue: true);
-                    }
-
-                    IterateOnce(parameters, isLastLoop: remainingIterations == 1);
-                }
-            }
-        }
-
-        bool _isAnimationDurationReached = false;
-        internal IterationParameters _parameters;
-        void _animationTimer_Tick(object sender, object e)
-        {
-            _animationTimer.Tick -= AnimationTimerTickListener.OnEvent;
-            _animationTimer.Stop();
-            _isAnimationDurationReached = true;
-            OnIterationCompleted(_parameters);
-        }
-
-        /// <summary>
-        /// Implemented by the class author to provide a custom natural Duration
-        /// in the case that the Duration property is set to Automatic.  If the author
-        /// cannot determine the Duration, this method should return Automatic.
-        /// </summary>
-        /// <returns>
-        /// A Duration quantity representing the natural duration.
-        /// </returns>
-        protected virtual Duration GetNaturalDurationCore()
-        {
-            return Duration.Automatic;
-        }
-
-        internal Duration ResolveDuration()
-        {
-            Duration duration = Duration;
-            if (duration == Duration.Automatic)
-            {
-                return GetNaturalDurationCore();
-            }
-
-            return duration;
-        }
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
-
-        [OpenSilver.NotImplemented]
-        public double SpeedRatio
-        {
-            get { return (double)this.GetValue(Timeline.SpeedRatioProperty); }
-            set { this.SetValue(Timeline.SpeedRatioProperty, value); }
-        }
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty AutoReverseProperty = DependencyProperty.Register("AutoReverse", typeof(bool), typeof(Timeline), null);
-        [OpenSilver.NotImplemented]
-        public bool AutoReverse
-        {
-            get { return (bool)this.GetValue(AutoReverseProperty); }
-            set { this.SetValue(AutoReverseProperty, value); }
-        }
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty FillBehaviorProperty = DependencyProperty.Register("FillBehavior", typeof(FillBehavior), typeof(Timeline), null);
-        [OpenSilver.NotImplemented]
-        public FillBehavior FillBehavior
-        {
-            get { return (FillBehavior)this.GetValue(FillBehaviorProperty); }
-            set { this.SetValue(FillBehaviorProperty, value); }
-        }
+        get => (bool)GetValue(AutoReverseProperty);
+        set => SetValue(AutoReverseProperty, value);
     }
+
+    /// <summary>
+    /// Identifies the <see cref="BeginTime"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty BeginTimeProperty =
+        DependencyProperty.Register(
+            nameof(BeginTime),
+            typeof(TimeSpan?),
+            typeof(Timeline),
+            new PropertyMetadata(TimeSpan.Zero));
+
+    /// <summary>
+    /// Gets or sets the time at which this <see cref="Timeline"/> should begin.
+    /// </summary>
+    /// <returns>
+    /// The start time of the time line. The default value is zero.
+    /// </returns>
+    public TimeSpan? BeginTime
+    {
+        get => (TimeSpan?)GetValue(BeginTimeProperty);
+        set => SetValue(BeginTimeProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="Duration"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty DurationProperty =
+        DependencyProperty.Register(
+            nameof(Duration),
+            typeof(Duration),
+            typeof(Timeline),
+            new PropertyMetadata(Duration.Automatic));
+
+    /// <summary>
+    /// Gets or sets the length of time for which this timeline plays, not counting repetitions.
+    /// </summary>
+    /// <returns>
+    /// The timeline's simple duration: the amount of time this timeline takes to complete
+    /// a single forward iteration. The default value is <see cref="Duration.Automatic"/>.
+    /// </returns>
+    public Duration Duration
+    {
+        get => (Duration)GetValue(DurationProperty);
+        set => SetValue(DurationProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="FillBehavior"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty FillBehaviorProperty =
+        DependencyProperty.Register(
+            nameof(FillBehavior),
+            typeof(FillBehavior),
+            typeof(Timeline),
+            null);
+
+    /// <summary>
+    /// Gets or sets a value that specifies how the animation behaves after it reaches
+    /// the end of its active period.
+    /// </summary>
+    /// <returns>
+    /// A value that specifies how the timeline behaves after it reaches the end of its
+    /// active period but its parent is inside its active or fill period. The default
+    /// value is <see cref="FillBehavior.HoldEnd"/>.
+    /// </returns>
+    [OpenSilver.NotImplemented]
+    public FillBehavior FillBehavior
+    {
+        get => (FillBehavior)GetValue(FillBehaviorProperty);
+        set => SetValue(FillBehaviorProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="RepeatBehavior"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty RepeatBehaviorProperty =
+        DependencyProperty.Register(
+            nameof(RepeatBehavior),
+            typeof(RepeatBehavior),
+            typeof(Timeline),
+            new PropertyMetadata(new RepeatBehavior(1)));
+
+    /// <summary>
+    /// Gets or sets the repeating behavior of this timeline.
+    /// </summary>
+    /// <returns>
+    /// An iteration <see cref="RepeatBehavior.Count"/> that specifies the number of 
+    /// times the timeline should play, a <see cref="TimeSpan"/> value that specifies
+    /// the total length of this timeline's active period, or the special value 
+    /// <see cref="RepeatBehavior.Forever"/>, which specifies that the timeline should 
+    /// repeat indefinitely. The default value is a <see cref="RepeatBehavior"/> with 
+    /// a <see cref="RepeatBehavior.Count"/> of 1, which indicates that the timeline 
+    /// plays once.
+    /// </returns>
+    public RepeatBehavior RepeatBehavior
+    {
+        get => (RepeatBehavior)GetValue(RepeatBehaviorProperty);
+        set => SetValue(RepeatBehaviorProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies for the <see cref="SpeedRatio"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty SpeedRatioProperty =
+        DependencyProperty.Register(
+            nameof(SpeedRatio),
+            typeof(double),
+            typeof(Timeline),
+            new PropertyMetadata(1d));
+
+    /// <summary>
+    /// Gets or sets the rate, relative to its parent, at which time progresses for this
+    /// <see cref="Timeline"/>.
+    /// </summary>
+    /// <returns>
+    /// A finite value greater than 0 that specifies the rate at which time progresses
+    /// for this timeline, relative to the speed of the timeline's parent. If this timeline
+    /// is a root timeline, specifies the default timeline speed. The value is expressed
+    /// as a factor where 1 represents normal speed, 2 is double speed, 0.5 is half speed,
+    /// and so on. The default value is 1.
+    /// </returns>
+    [OpenSilver.NotImplemented]
+    public double SpeedRatio
+    {
+        get => (double)GetValue(SpeedRatioProperty);
+        set => SetValue(SpeedRatioProperty, value);
+    }
+
+    /// <summary>
+    /// Implemented by the class author to provide a custom natural Duration
+    /// in the case that the Duration property is set to Automatic.  If the author
+    /// cannot determine the Duration, this method should return Automatic.
+    /// </summary>
+    /// <returns>
+    /// A Duration quantity representing the natural duration.
+    /// </returns>
+    protected virtual Duration GetNaturalDurationCore() => Duration.Automatic;
+
+    internal INameResolver NameResolver { get; set; }
+
+    internal virtual TimelineClock CreateClock(bool isRoot) => null;
 }

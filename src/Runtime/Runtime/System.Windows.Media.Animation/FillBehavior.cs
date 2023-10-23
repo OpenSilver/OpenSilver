@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,32 +11,23 @@
 *  
 \*====================================================================================*/
 
+namespace System.Windows.Media.Animation;
 
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+/// <summary>
+/// Specifies how a <see cref="Timeline"/> behaves when it is outside its active period 
+/// but its parent is inside its active or hold period.
+/// </summary>
+public enum FillBehavior
+{
+    /// <summary>
+    /// After it reaches the end of its active period, the timeline holds its progress
+    /// until the end of its parent's active and hold periods.
+    /// </summary>
+    HoldEnd = 0,
 
-//namespace Windows.UI.Xaml.Media.Animation
-//{
-//    /// <summary>
-//    /// Specifies how a Timeline behaves when it is outside its active period but
-//    /// its parent is inside its active or hold period.
-//    /// </summary>
-//    public enum FillBehavior
-//    {
-        
-//        /// <summary>
-//        /// After it reaches the end of its active period, the timeline holds its progress
-//        /// until the end of its parent's active and hold periods.
-//        /// </summary>
-//        HoldEnd = 0,
-        
-//        /// <summary>
-//        /// The timeline stops if it is outside its active period while its parent is
-//        /// inside its active period.
-//        /// </summary>
-//        Stop = 1,
-//    }
-//}
+    /// <summary>
+    /// The timeline stops if it is outside its active period while its parent is inside
+    /// its active period.
+    /// </summary>
+    Stop = 1,
+}

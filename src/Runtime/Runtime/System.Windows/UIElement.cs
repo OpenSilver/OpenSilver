@@ -268,8 +268,6 @@ namespace System.Windows
         internal object INTERNAL_InnerDomElement { get; set; } // This is used to add visual children to the DOM (optionally wrapped into additional code, c.f. "INTERNAL_VisualChildInformation")
         internal string INTERNAL_HtmlRepresentation { get; set; } // This can be used instead of overriding the "CreateDomElement" method to specify the appearance of the control.
         internal Dictionary<UIElement, INTERNAL_VisualChildInformation> INTERNAL_VisualChildrenInformation { get; set; } //todo-performance: verify that JavaScript output is a performant dictionary too, otherwise change structure.
-        internal bool INTERNAL_RenderTransformOriginHasBeenApplied = false; // This is useful to ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS.
-        //Note: the two following fields are only used in the PointerRoutedEventArgs class to determine how many clicks have been made on this UIElement in a short amount of time.
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
         internal bool _isLoaded;
 
@@ -598,113 +596,112 @@ namespace System.Windows
 
         private WeakEventListener<UIElement, Effect, EventArgs> _effectChangedListener;
 
-#endregion
+        #endregion
 
 
-#region RenderTransform and RenderTransformOrigin
-
-        /// <summary>
-        /// Gets or sets transform information that affects the rendering position of
-        /// a UIElement.
-        /// </summary>
-        public Transform RenderTransform
-        {
-            get { return (Transform)GetValue(RenderTransformProperty) ?? new MatrixTransform(); }
-            set { SetValue(RenderTransformProperty, value); }
-        }
+        #region RenderTransform and RenderTransformOrigin
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.RenderTransform"/> dependency 
-        /// property.
+        /// Identifies the <see cref="RenderTransform"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty RenderTransformProperty =
             DependencyProperty.Register(
                 nameof(RenderTransform),
                 typeof(Transform),
                 typeof(UIElement),
-                new PropertyMetadata(null, RenderTransform_Changed)
+                new PropertyMetadata(null, OnRenderTransformChanged)
                 {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var uie = (UIElement)d;
+                        SetTransform(uie, (Transform)newValue);
+                        SetTransformOrigin(uie, uie.RenderTransformOrigin);
+                    }
                 });
 
-        private static void RenderTransform_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets transform information that affects the rendering position of a <see cref="UIElement"/>.
+        /// </summary>
+        /// <returns>
+        /// Describes the specifics of the desired render transform. The default value is null.
+        /// </returns>
+        public Transform RenderTransform
         {
-            var uiElement = (UIElement)d;
-            Transform newValue = (Transform)e.NewValue;
-            if (e.OldValue != null)
+            get => (Transform)GetValue(RenderTransformProperty) ?? new MatrixTransform();
+            set => SetValue(RenderTransformProperty, value);
+        }
+
+        private static void OnRenderTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            UIElement uie = (UIElement)d;
+
+            if (uie._renderTransformChangedListener != null)
             {
-                ((Transform)e.OldValue).INTERNAL_UnapplyTransform();
-                ((Transform)e.OldValue).INTERNAL_parent = null;
+                uie._renderTransformChangedListener.Detach();
+                uie._renderTransformChangedListener = null;
             }
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
+
+            if (e.NewValue is Transform newTransform)
             {
-                if (newValue != null)
+                uie._renderTransformChangedListener = new(uie, newTransform)
                 {
-                    newValue.INTERNAL_parent = uiElement;
-                    newValue.INTERNAL_ApplyTransform();
-
-                    // Ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS:
-                    if (!uiElement.INTERNAL_RenderTransformOriginHasBeenApplied)
-                        ApplyRenderTransformOrigin(uiElement, new Point(0d, 0d));
-                }
-                else
-                {
-                    var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
-
-                    try
-                    {
-                        domStyle.transform = "";
-                    }
-                    catch
-                    {
-                    }
-                }
+                    OnEventAction = static (instance, sender, args) => instance.OnRenderTransformChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newTransform.Changed += uie._renderTransformChangedListener.OnEvent;
             }
         }
 
-
-        public Point RenderTransformOrigin
+        private void OnRenderTransformChanged(object sender, EventArgs e)
         {
-            get { return (Point)GetValue(RenderTransformOriginProperty); }
-            set { SetValue(RenderTransformOriginProperty, value); }
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                SetTransform(this, (Transform)sender);
+            }
         }
+
+        private WeakEventListener<UIElement, Transform, EventArgs> _renderTransformChangedListener;
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.RenderTransformOrigin"/>
-        /// dependency property.
+        /// Identifies the <see cref="RenderTransformOrigin"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty RenderTransformOriginProperty =
             DependencyProperty.Register(
                 nameof(RenderTransformOrigin),
                 typeof(Point),
                 typeof(UIElement),
-                new PropertyMetadata(new Point(0d, 0d), RenderTransformOrigin_Changed)
+                new PropertyMetadata(new Point(0, 0))
                 {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetTransformOrigin((UIElement)d, (Point)newValue),
                 });
 
-        private static void RenderTransformOrigin_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the origin point of any possible render transform declared by
+        /// <see cref="RenderTransform"/>, relative to the bounds of the <see cref="UIElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The origin point of the render transform. The default value is a point with value 0,0.
+        /// </returns>
+        public Point RenderTransformOrigin
         {
-            var uiElement = (UIElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-            {
-                ApplyRenderTransformOrigin(uiElement, (Point)e.NewValue);
-            }
+            get => (Point)GetValue(RenderTransformOriginProperty);
+            set => SetValue(RenderTransformOriginProperty, value);
         }
 
-        private static void ApplyRenderTransformOrigin(UIElement uiElement, Point newValue)
+        private static void SetTransform(UIElement uie, Transform transform)
         {
-            var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uiElement);
-            string transformOriginValue = $"{(newValue.X * 100).ToString(CultureInfo.InvariantCulture)}% {(newValue.Y * 100).ToString(CultureInfo.InvariantCulture)}%";
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+            style.transform = transform switch
+            {
+                Transform when !transform.IsIdentity => MatrixTransform.MatrixToHtmlString(transform.ValueInternal),
+                _ => string.Empty,
+            };
+        }
 
-            try
-            {
-                domStyle.transformOrigin = transformOriginValue;
-            }
-            catch
-            {
-            }
-            uiElement.INTERNAL_RenderTransformOriginHasBeenApplied = true;
+        private static void SetTransformOrigin(UIElement uie, Point origin)
+        {
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+            style.transformOrigin = $"{(origin.X * 100).ToInvariantString()}% {(origin.Y * 100).ToInvariantString()}%";
         }
 
 #endregion
@@ -954,34 +951,35 @@ namespace System.Windows
 
         /// <summary>
         /// Gets or sets the degree of the object's opacity.
+        /// </summary>
+        /// <returns>
         /// A value between 0 and 1.0 that declares the opacity factor, with 1.0 meaning
         /// full opacity and 0 meaning transparent. The default value is 1.0.
-        /// </summary>
+        /// </returns>
         public double Opacity
         {
-            get { return (double)GetValue(OpacityProperty); }
-            set { SetValue(OpacityProperty, value); }
+            get => (double)GetValue(OpacityProperty);
+            set => SetValue(OpacityProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.Opacity"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Opacity"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty OpacityProperty =
             DependencyProperty.Register(
-                nameof(Opacity), 
-                typeof(double), 
-                typeof(UIElement), 
+                nameof(Opacity),
+                typeof(double),
+                typeof(UIElement),
                 new PropertyMetadata(1.0)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most.
-                        Value = (inst, value) => (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString(),
-                        Name = new List<string> { "opacity" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true,
-                    }
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetOpacity((UIElement)d, (double)newValue),
                 });
+
+        private static void SetOpacity(UIElement uie, double opacity)
+        {
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+            style.opacity = Math.Round(opacity, 3).ToInvariantString();
+        }
 
 #endregion
 

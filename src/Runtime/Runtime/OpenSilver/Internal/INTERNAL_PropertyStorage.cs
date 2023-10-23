@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Windows;
+using OpenSilver.Internal.Media.Animation;
 
 namespace OpenSilver.Internal;
 
@@ -30,12 +31,7 @@ internal sealed class INTERNAL_PropertyStorage
 
     internal EffectiveValueEntry Entry { get; set; }
 
-    /// <summary>
-    /// This value should always be false, except when the value as seen in the Visual tree does not match the value in C#. It happens during animations that use Velocity.
-    /// If it is set to true, it means that the next time the property's value value is set, we will have to force it to go through the Property changed callbacks so we can be sure the visuals fit the C# value.
-    /// Note: In Silverlight, these animations update the C# value throughout the animation, but we do not do that to reduce the impact on performance.
-    /// </summary>
-    internal bool INTERNAL_IsVisualValueDirty;
+    internal TimelineClock.ClockHandle ClockHandle { get; set; }
 
     internal object LocalValue { get; set; }
 

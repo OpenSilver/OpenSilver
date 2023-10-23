@@ -334,11 +334,12 @@ namespace System.ComponentModel
         /// </summary>
         private static Dictionary<Type, TypeConverter> GetCoreTypeConverters()
         {
-            return new Dictionary<Type, TypeConverter>(27)
+            return new Dictionary<Type, TypeConverter>(28)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(KeyTime)] = new KeyTimeConverter(),
                 [typeof(RepeatBehavior)] = new RepeatBehaviorConverter(),
+                [typeof(KeySpline)] = new KeySplineConverter(),
                 [typeof(Brush)] = new BrushConverter(),
                 [typeof(SolidColorBrush)] = new BrushConverter(),
                 [typeof(Color)] = new ColorConverter(),

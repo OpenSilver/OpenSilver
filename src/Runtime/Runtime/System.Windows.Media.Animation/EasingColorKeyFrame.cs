@@ -11,38 +11,56 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+using OpenSilver.Internal.Media.Animation;
+
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// A class that enables you to associate easing functions with a 
+/// <see cref="ColorAnimationUsingKeyFrames"/> key frame animation.
+/// </summary>
+public sealed class EasingColorKeyFrame : ColorKeyFrame
 {
     /// <summary>
-    /// A class that enables you to associate easing functions with a 
-    /// <see cref="ColorAnimationUsingKeyFrames"/> key frame animation.
+    /// Initializes a new instance of the <see cref="EasingColorKeyFrame"/> class.
     /// </summary>
-    public sealed class EasingColorKeyFrame : ColorKeyFrame
+    public EasingColorKeyFrame() { }
+
+    /// <summary>
+    /// Identifies the <see cref="EasingFunction"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty EasingFunctionProperty =
+        DependencyProperty.Register(
+            nameof(EasingFunction),
+            typeof(IEasingFunction),
+            typeof(EasingColorKeyFrame),
+            new PropertyMetadata((object)null));
+
+    /// <summary>
+    /// Gets or sets the easing function that is applied to the key frame.
+    /// </summary>
+    /// <returns>
+    /// The easing function that is applied to the key frame.
+    /// </returns>
+    public IEasingFunction EasingFunction
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EasingColorKeyFrame"/> class.
-        /// </summary>
-        public EasingColorKeyFrame()
+        get => (IEasingFunction)GetValue(EasingFunctionProperty);
+        set => SetValue(EasingFunctionProperty, value);
+    }
+
+    /// <inheritdoc />
+    internal override Color InterpolateValueCore(Color baseValue, double keyFrameProgress)
+    {
+        if (EasingFunction is IEasingFunction easingFunction)
         {
+            keyFrameProgress = easingFunction.Ease(keyFrameProgress);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="EasingColorKeyFrame.EasingFunction"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty EasingFunctionProperty =
-            DependencyProperty.Register(
-                "EasingFunction",
-                typeof(IEasingFunction),
-                typeof(EasingColorKeyFrame),
-                new PropertyMetadata((object)null));
-
-        /// <summary>
-        /// Gets or sets the easing function that is applied to the key frame.
-        /// </summary>
-        public IEasingFunction EasingFunction
+        return keyFrameProgress switch
         {
-            get { return (IEasingFunction)this.GetValue(EasingFunctionProperty); }
-            set { this.SetValue(EasingFunctionProperty, value); }
-        }
+            0.0 => baseValue,
+            1.0 => Value,
+            _ => AnimatedTypeHelpers.InterpolateColor(baseValue, Value, keyFrameProgress)
+        };
     }
 }

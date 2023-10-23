@@ -11,20 +11,17 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
-{
-    public interface IKeyFrame
-    {
-        /// <summary>
-        /// The key time associated with the key frame.
-        /// </summary>
-        /// <value></value>
-        KeyTime KeyTime { get; set; }
+namespace System.Windows.Media.Animation;
 
-        /// <summary>
-        /// The value associated with the key frame.
-        /// </summary>
-        /// <value></value>
-        object Value { get; set; }
-    }
+public interface IKeyFrame
+{
+    /// <summary>
+    /// The key time associated with the key frame.
+    /// </summary>
+    KeyTime KeyTime { get; set; }
+
+    /// <summary>
+    /// The value associated with the key frame.
+    /// </summary>
+    object Value { get; set; }
 }

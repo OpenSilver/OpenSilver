@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Markup;
@@ -27,6 +28,8 @@ namespace System.Windows.Media
     [ContentProperty(nameof(GradientStops))]
     public class GradientBrush : Brush
     {
+        private WeakEventListener<GradientBrush, GradientStopCollection, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GradientBrush"/> class.
         /// </summary>
@@ -59,7 +62,7 @@ namespace System.Windows.Media
                         {
                             GradientBrush gb = (GradientBrush)d;
                             var collection = new GradientStopCollection();
-                            collection.SetParentBrush(gb);
+                            gb.OnGradientStopsChanged(null, collection);
                             return collection;
                         }),
                     OnGradientStopsChanged,
@@ -81,14 +84,33 @@ namespace System.Windows.Media
 
         private static void OnGradientStopsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            GradientBrush gradientBrush = (GradientBrush)d;
-            if (null != e.OldValue)
+            GradientBrush brush = (GradientBrush)d;
+            brush.OnGradientStopsChanged((GradientStopCollection)e.OldValue, (GradientStopCollection)e.NewValue);
+            brush.RaiseBrushChanged();
+        }
+
+        private void OnGradientStopCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaiseBrushChanged();
+
+        private void OnGradientStopsChanged(GradientStopCollection oldStops, GradientStopCollection newStops)
+        {
+            oldStops?.SetOwner(null);
+
+            if (_collectionChangedListener != null)
             {
-                ((GradientStopCollection)e.OldValue).SetParentBrush(null);
+                _collectionChangedListener.Detach();
+                _collectionChangedListener = null;
             }
-            if (null != e.NewValue)
+
+            if (newStops is not null)
             {
-                ((GradientStopCollection)e.NewValue).SetParentBrush(gradientBrush);
+                newStops.SetOwner(this);
+
+                _collectionChangedListener = new(this, newStops)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnGradientStopCollectionChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                };
+                newStops.CollectionChanged += _collectionChangedListener.OnEvent;
             }
         }
 

@@ -48,11 +48,12 @@ namespace OpenSilver.Compiler
         //
         private static Dictionary<string, Func<string, string>> GetSupportedCoreTypes()
         {
-            return new Dictionary<string, Func<string, string>>(27)
+            return new Dictionary<string, Func<string, string>>(28)
             {
                 ["system.windows.input.cursor"] = (s => CoreTypesHelper.ConvertToCursor(s, "global::System.Windows.Input.Cursor", "global::System.Windows.Input.Cursors")),
                 ["system.windows.media.animation.keytime"] = (s => CoreTypesHelper.ConvertToKeyTime(s, "global::System.Windows.Media.Animation.KeyTime")),
                 ["system.windows.media.animation.repeatbehavior"] = (s => CoreTypesHelper.ConvertToRepeatBehavior(s, "global::System.Windows.Media.Animation.RepeatBehavior")),
+                ["system.windows.media.animation.keyspline"] = (s => CoreTypesHelper.ConvertToKeySpline(s, "global::System.Windows.Media.Animation.KeySpline", "global::System.Windows.Point")),
                 ["system.windows.media.brush"] = (s => CoreTypesHelper.ConvertToBrush(s, "global::System.Windows.Media.SolidColorBrush", "global::System.Windows.Media.Color")),
                 ["system.windows.media.solidcolorbrush"] = (s => CoreTypesHelper.ConvertToBrush(s, "global::System.Windows.Media.SolidColorBrush", "global::System.Windows.Media.Color")),
                 ["system.windows.media.color"] = (s => CoreTypesHelper.ConvertToColor(s, "global::System.Windows.Media.Color")),
@@ -105,7 +106,7 @@ namespace OpenSilver.Compiler
         {
             string stringValue = source.Trim();
 
-            if (stringValue == "Uniform" || stringValue == "Paced")
+            if (stringValue == "Paced")
             {
                 throw new XamlParseException(
                     $"The '{destinationType}.{stringValue}' property is not supported yet."
@@ -118,9 +119,13 @@ namespace OpenSilver.Compiler
                     $"Percentage values for '{destinationType}' are not supported yet."
                 );
             }
+            else if (stringValue == "Uniform")
+            {
+                return $"{destinationType}.Uniform";
+            }
             else
             {
-                return SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan");
+                return $"{destinationType}.FromTimeSpan({SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan")})";
             }
         }
 
@@ -143,6 +148,22 @@ namespace OpenSilver.Compiler
             }
 
             return SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan");
+        }
+
+        internal static string ConvertToKeySpline(string source, string destinationType, string pointTypeName)
+        {
+            if (string.IsNullOrEmpty(source))
+            {
+                return $"new {destinationType}()";
+            }
+
+            string[] split = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (split.Length == 4)
+            {
+                return $"new {destinationType} {{ ControlPoint1 = new {pointTypeName}({split[0]}, {split[1]}), ControlPoint2 = new {pointTypeName}({split[2]}, {split[3]}), }}";
+            }
+
+            throw GetConvertException(source, destinationType);
         }
 
         internal static string ConvertToBrush(string source, string destinationType, string colorTypeName)

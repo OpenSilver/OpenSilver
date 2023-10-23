@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -391,8 +390,6 @@ namespace System.Windows
 
             _coerceValueCallback ??= baseMetadata.CoerceValueCallback;
             
-            GetCSSEquivalent ??= baseMetadata.GetCSSEquivalent;
-            GetCSSEquivalents ??= baseMetadata.GetCSSEquivalents;
             _methodToUpdateDom ??= baseMetadata.MethodToUpdateDom;
             _methodToUpdateDom2 ??= baseMetadata.MethodToUpdateDom2;
         }
@@ -595,8 +592,6 @@ namespace System.Windows
         private WhenToCallPropertyChangedEnum _whenToCallProperty;
         private MethodToUpdateDom _methodToUpdateDom;
         private MethodToUpdateDom2 _methodToUpdateDom2;
-        internal CSSEquivalentGetter GetCSSEquivalent;
-        internal CSSEquivalentsGetter GetCSSEquivalents;
     }
 
     /// <summary>
@@ -608,8 +603,6 @@ namespace System.Windows
     /// </summary>
     internal delegate object GetReadOnlyValueCallback(DependencyObject d);
 
-    internal delegate CSSEquivalent CSSEquivalentGetter(DependencyObject d);
-    internal delegate List<CSSEquivalent> CSSEquivalentsGetter(DependencyObject d);
     public delegate void MethodToUpdateDom(DependencyObject d, object newValue);
     internal delegate void MethodToUpdateDom2(DependencyObject d, object oldValue, object newValue);
 }

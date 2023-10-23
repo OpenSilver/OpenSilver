@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -42,7 +39,7 @@ namespace System.Windows
         {
             if (stateName == null)
             {
-                throw new ArgumentNullException("stateName");
+                throw new ArgumentNullException(nameof(stateName));
             }
 
             if (stateGroupsRoot == null)
@@ -56,7 +53,7 @@ namespace System.Windows
             VisualStateGroup group = null;
             if (groups != null)
             {
-                VisualStateManager.TryGetState(groups, stateName, out group, out state);
+                TryGetState(groups, stateName, out group, out state);
             }
 
             // Look for a custom VSM, and call it if it was found, regardless of whether the state was found or not.
@@ -85,18 +82,23 @@ namespace System.Windows
         /// The state to transition to.
         /// </param>
         /// <param name="useTransitions">
-        /// True to use a VisualTransition to transition between states; otherwise,
-        /// false.
+        /// True to use a <see cref="VisualTransition"/> to transition between states;
+        /// otherwise, false.
         /// </param>
         /// <returns>
-        /// True if the control successfully transitioned to the new state; otherwise,
-        /// false.
+        /// true if the control successfully transitioned to the new state; otherwise, false.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// control is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// stateName is null.
+        /// </exception>
         public static bool GoToState(Control control, string stateName, bool useTransitions)
         {
             if (control == null)
             {
-                throw new ArgumentNullException("control");
+                throw new ArgumentNullException(nameof(control));
             }
 
             FrameworkElement stateGroupsRoot = control.StateGroupsRoot;
@@ -116,22 +118,51 @@ namespace System.Windows
         {
             if (stateGroupsRoot == null)
             {
-                throw new ArgumentNullException("stateGroupsRoot");
+                throw new ArgumentNullException(nameof(stateGroupsRoot));
             }
 
             return GoToStateCommon(null, stateGroupsRoot, stateName, useTransitions);
         }
 
         /// <summary>
-        ///     Allows subclasses to override the GoToState logic.
+        /// Transitions a control between states.
         /// </summary>
-        protected virtual bool GoToStateCore(Control control, FrameworkElement templateRoot, string stateName, VisualStateGroup group, VisualState state, bool useTransitions)
+        /// <param name="control">
+        /// The control to transition between states.
+        /// </param>
+        /// <param name="templateRoot">
+        /// The root element of the control's <see cref="ControlTemplate"/>.
+        /// </param>
+        /// <param name="stateName">
+        /// The name of the state to transition to.
+        /// </param>
+        /// <param name="group">
+        /// The <see cref="VisualStateGroup"/> that the state belongs to.
+        /// </param>
+        /// <param name="state">
+        /// The representation of the state to transition to.
+        /// </param>
+        /// <param name="useTransitions">
+        /// true to use a <see cref="VisualTransition"/> to transition between states; otherwise, false.
+        /// </param>
+        /// <returns>
+        /// true if the control successfully transitioned to the new state; otherwise, false.
+        /// </returns>
+        protected virtual bool GoToStateCore(Control control,
+            FrameworkElement templateRoot,
+            string stateName,
+            VisualStateGroup group,
+            VisualState state,
+            bool useTransitions)
         {
             return GoToStateInternal(control, templateRoot, group, state, useTransitions);
         }
 
         #region CustomVisualStateManager
 
+        /// <summary>
+        /// Identifies the VisualStateManager.CustomVisualStateManager dependency property.
+        /// </summary>
         public static readonly DependencyProperty CustomVisualStateManagerProperty =
              DependencyProperty.RegisterAttached(
                  "CustomVisualStateManager",
@@ -139,24 +170,48 @@ namespace System.Windows
                  typeof(VisualStateManager),
                  null);
 
+        /// <summary>
+        /// Gets the value of the VisualStateManager.CustomVisualStateManager attached property.
+        /// </summary>
+        /// <param name="obj">
+        /// The element from which to get the VisualStateManager.CustomVisualStateManager.
+        /// </param>
+        /// <returns>
+        /// The <see cref="VisualStateManager"/> that transitions between the states of a control.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// obj is null.
+        /// </exception>
         public static VisualStateManager GetCustomVisualStateManager(FrameworkElement obj)
         {
             if (obj == null)
             {
-                throw new ArgumentNullException("obj");
+                throw new ArgumentNullException(nameof(obj));
             }
 
-            return obj.GetValue(VisualStateManager.CustomVisualStateManagerProperty) as VisualStateManager;
+            return (VisualStateManager)obj.GetValue(CustomVisualStateManagerProperty);
         }
 
+        /// <summary>
+        /// Sets the value of the VisualStateManager.CustomVisualStateManager attached property.
+        /// </summary>
+        /// <param name="obj">
+        /// The object on which to set the property.
+        /// </param>
+        /// <param name="value">
+        /// The <see cref="VisualStateManager"/> that transitions between the states of a control.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// obj is null.
+        /// </exception>
         public static void SetCustomVisualStateManager(FrameworkElement obj, VisualStateManager value)
         {
             if (obj == null)
             {
-                throw new ArgumentNullException("obj");
+                throw new ArgumentNullException(nameof(obj));
             }
 
-            obj.SetValue(VisualStateManager.CustomVisualStateManagerProperty, value);
+            obj.SetValue(CustomVisualStateManagerProperty, value);
         }
 
         #endregion CustomVisualStateManager
@@ -187,21 +242,23 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Gets the VisualStateManager.VisualStateGroups attached property.
+        /// Gets the value of the VisualStateManager.VisualStateGroups attached property.
         /// </summary>
         /// <param name="obj">
-        /// The element to get the VisualStateManager.VisualStateGroups attached
-        /// property from.
+        /// The element from which to get the VisualStateManager.VisualStateGroups.
         /// </param>
         /// <returns>
         /// The collection of <see cref="VisualStateGroup"/> objects that is associated
         /// with the specified object.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// obj is null.
+        /// </exception>
         public static IList GetVisualStateGroups(FrameworkElement obj)
         {
             if (obj == null)
             {
-                throw new ArgumentNullException("obj");
+                throw new ArgumentNullException(nameof(obj));
             }
 
             IList value = (IList)obj.GetValue(VisualStateGroupsProperty);
@@ -237,16 +294,20 @@ namespace System.Windows
             return false;
         }
 
-        private static bool GoToStateInternal(Control control, FrameworkElement stateGroupsRoot, VisualStateGroup group, VisualState state, bool useTransitions)
+        private static bool GoToStateInternal(Control control,
+            FrameworkElement stateGroupsRoot,
+            VisualStateGroup group,
+            VisualState state,
+            bool useTransitions)
         {
             if (stateGroupsRoot == null)
             {
-                throw new ArgumentNullException("stateGroupsRoot");
+                throw new ArgumentNullException(nameof(stateGroupsRoot));
             }
 
             if (state == null)
             {
-                throw new ArgumentNullException("state");
+                throw new ArgumentNullException(nameof(state));
             }
 
             if (group == null)
@@ -262,38 +323,8 @@ namespace System.Windows
                     return true;
                 }
 
-                // todo: see if this should be possible or if there should be a default State.
-                if (lastState != null)
-                {
-                    lastState.StopStoryBoard(control);
-                }
-
-                // Note: when a property is set for the first time through a Storyboard, we need
-                // to replace the value with a copy so that the other elements with the same Style 
-                // are not affected (example: PointerOver on one button must not change the 
-                // Background of another with the same Style)
-
-                // we apply the new state
-                Dictionary<Tuple<string, string>, Timeline> newPropertiesChanged = state.ApplyStoryboard(stateGroupsRoot, useTransitions);
-
-                // we remove the former state if any
-                if (lastState != null)
-                {
-                    // if the former VisualState changed properties that are not set in the new 
-                    // VisualState, we remove the value it put on it.
-                    var formerPropertiesChanged = lastState.GetPropertiesChangedByStoryboard();
-                    if (formerPropertiesChanged != null)
-                    {
-                        foreach (Tuple<string, string> formerProp in formerPropertiesChanged.Keys)
-                        {
-                            if (newPropertiesChanged == null || !newPropertiesChanged.ContainsKey(formerProp))
-                            {
-                                formerPropertiesChanged[formerProp].UnApply(control);
-                            }
-                        }
-                        lastState.Storyboard.IsUnApplied = true;
-                    }
-                }
+                state.Storyboard?.Begin(stateGroupsRoot, true);
+                lastState?.Storyboard?.Stop();
 
                 // remember the current state
                 group.CurrentState = state;
@@ -310,21 +341,40 @@ namespace System.Windows
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="VisualStateGroup.CurrentStateChanging"/> event on the specified 
+        /// <see cref="VisualStateGroup"/>.
+        /// </summary>
+        /// <param name="stateGroup">
+        /// The object on which the <see cref="VisualStateGroup.CurrentStateChanging"/> event.
+        /// </param>
+        /// <param name="oldState">
+        /// The state that the control is transitioning from.
+        /// </param>
+        /// <param name="newState">
+        /// The state that the control is transitioning to.
+        /// </param>
+        /// <param name="control">
+        /// The control that is transitioning states.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// stateGroup is null or newState is null or control is null.
+        /// </exception>
         protected void RaiseCurrentStateChanging(VisualStateGroup stateGroup, VisualState oldState, VisualState newState, Control control)
         {
             if (stateGroup == null)
             {
-                throw new ArgumentNullException("stateGroup");
+                throw new ArgumentNullException(nameof(stateGroup));
             }
 
             if (newState == null)
             {
-                throw new ArgumentNullException("newState");
+                throw new ArgumentNullException(nameof(newState));
             }
 
             if (control == null)
             {
-                throw new ArgumentNullException("control");
+                throw new ArgumentNullException(nameof(control));
             }
 
             FrameworkElement stateGroupsRoot = control.StateGroupsRoot;
@@ -336,21 +386,40 @@ namespace System.Windows
             stateGroup.RaiseCurrentStateChanging(stateGroupsRoot, oldState, newState, control);
         }
 
+        /// <summary>
+        /// Raises the <see cref="VisualStateGroup.CurrentStateChanged"/> event on the specified
+        /// <see cref="VisualStateGroup"/>.
+        /// </summary>
+        /// <param name="stateGroup">
+        /// The object on which the <see cref="VisualStateGroup.CurrentStateChanging"/> event.
+        /// </param>
+        /// <param name="oldState">
+        /// The state that the control transitioned from.
+        /// </param>
+        /// <param name="newState">
+        /// The state that the control transitioned to.
+        /// </param>
+        /// <param name="control">
+        /// The control that transitioned states.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// stateGroup is null or newState is null or control is null.
+        /// </exception>
         protected void RaiseCurrentStateChanged(VisualStateGroup stateGroup, VisualState oldState, VisualState newState, Control control)
         {
             if (stateGroup == null)
             {
-                throw new ArgumentNullException("stateGroup");
+                throw new ArgumentNullException(nameof(stateGroup));
             }
 
             if (newState == null)
             {
-                throw new ArgumentNullException("newState");
+                throw new ArgumentNullException(nameof(newState));
             }
 
             if (control == null)
             {
-                throw new ArgumentNullException("control");
+                throw new ArgumentNullException(nameof(control));
             }
 
             FrameworkElement stateGroupsRoot = control.StateGroupsRoot;

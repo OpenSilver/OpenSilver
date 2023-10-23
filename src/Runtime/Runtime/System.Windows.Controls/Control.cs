@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
 using System.Windows.Input;
 using System.ComponentModel;
 using System.Windows.Media;
@@ -211,47 +210,79 @@ namespace System.Windows.Controls
         //-----------------------
 
         /// <summary>
-        /// Gets or sets a brush that describes the foreground color.
-        /// </summary>
-        public Brush Foreground
-        {
-            get { return (Brush)GetValue(ForegroundProperty); }
-            set { SetValue(ForegroundProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Control.Foreground"/> dependency property.
+        /// Identifies the <see cref="Foreground"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ForegroundProperty =
             DependencyProperty.Register(
-                nameof(Foreground), 
-                typeof(Brush), 
-                typeof(Control), 
-                new PropertyMetadata(new SolidColorBrush(Colors.Black))
+                nameof(Foreground),
+                typeof(Brush),
+                typeof(Control),
+                new PropertyMetadata(new SolidColorBrush(Colors.Black), OnForegroundChanged)
                 {
-                    MethodToUpdateDom2 = UpdateDomOnForegroundChanged,
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetForeground((Control)d, (Brush)newValue),
                 });
 
-        private static void UpdateDomOnForegroundChanged(DependencyObject d, object oldValue, object newValue)
+        /// <summary>
+        /// Gets or sets a brush that describes the foreground color.
+        /// </summary>
+        /// <returns>
+        /// The brush that paints the foreground of the control. The default value 
+        /// is <see cref="Colors.Black"/>.
+        /// </returns>
+        public Brush Foreground
+        {
+            get => (Brush)GetValue(ForegroundProperty);
+            set => SetValue(ForegroundProperty, value);
+        }
+
+        private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (Control)d;
-            var cssStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
-            switch (newValue)
+
+            if (control._foregroundChangedListener != null)
+            {
+                control._foregroundChangedListener.Detach();
+                control._foregroundChangedListener = null;
+            }
+
+            if (e.NewValue is Brush newBrush)
+            {
+                control._foregroundChangedListener = new(control, newBrush)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newBrush.Changed += control._foregroundChangedListener.OnEvent;
+            }
+        }
+
+        private void OnForegroundChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                SetForeground(this, (Brush)sender);
+            }
+        }
+
+        private static void SetForeground(Control c, Brush foreground)
+        {
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(c.INTERNAL_OuterDomElement);
+            switch (foreground)
             {
                 case SolidColorBrush solid:
-                    cssStyle.color = solid.INTERNAL_ToHtmlString();
+                    style.color = solid.INTERNAL_ToHtmlString();
                     break;
-
                 case null:
-                    cssStyle.color = string.Empty;
+                    style.color = string.Empty;
                     break;
-
                 default:
                     // GradientBrush, ImageBrush and custom brushes are not supported.
                     // Keep using old brush.
                     break;
             }
         }
+
+        private WeakEventListener<Control, Brush, EventArgs> _foregroundChangedListener;
 
         //-----------------------
         // FONTFAMILY
@@ -279,10 +310,13 @@ namespace System.Windows.Controls
         /// <summary>
         /// Gets or sets the size of the text in this control.
         /// </summary>
+        /// <returns>
+        /// The size of the text in the <see cref="Control"/>. The default is 11 (in pixels).
+        /// </returns>
         public double FontSize
         {
-            get { return (double)GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
+            get => (double)GetValue(FontSizeProperty);
+            set => SetValue(FontSizeProperty, value);
         }
 
         /// <summary>
@@ -291,20 +325,16 @@ namespace System.Windows.Controls
         public static readonly DependencyProperty FontSizeProperty =
             TextElementProperties.FontSizeProperty.AddOwner(
                 typeof(Control),
-                new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits)
+                new FrameworkPropertyMetadata(11.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Value = (inst, value) =>
-                        {
-                            // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 
-                            // decimals at the most.
-                            return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString() + "px";
-                        },
-                        Name = new List<string> { "fontSize" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetFontSize((Control)d, (double)newValue),
                 });
+
+        private static void SetFontSize(Control c, double fontSize)
+        {
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(c.INTERNAL_OuterDomElement);
+            style.fontSize = $"{Math.Round(fontSize, 3).ToInvariantString()}px";
+        }
 
         //-----------------------
         // TEXTDECORATION

@@ -67,13 +67,13 @@ namespace System.Windows.Media
         private void SubscribeToChangedEvent(Transform transform)
         {
             Debug.Assert(transform is not null);
-            transform.Changed += new EventHandler(TransformChanged);
+            transform.Changed += TransformChanged;
         }
 
         private void UnsubscribeToChangedEvent(Transform transform)
         {
             Debug.Assert(transform is not null);
-            transform.Changed -= new EventHandler(TransformChanged);
+            transform.Changed -= TransformChanged;
         }
 
         private void TransformChanged(object sender, EventArgs e)

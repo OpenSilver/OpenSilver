@@ -11,40 +11,101 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+using OpenSilver.Internal.Media.Animation;
+
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Defines an animation segment with its own target value and interpolation method
+/// for an <see cref="ObjectAnimationUsingKeyFrames"/>.
+/// </summary>
+public abstract class ObjectKeyFrame : DependencyObject, IKeyFrame<object>
 {
     /// <summary>
-    /// Defines an animation segment with its own target value and interpolation
-    /// method for an ObjectAnimationUsingKeyFrames.
+    /// Identifies the <see cref="KeyTime"/> dependency property.
     /// </summary>
-    public class ObjectKeyFrame : DependencyObject, IKeyFrame
-    {
-        /// <summary>
-        /// Gets or sets the time at which the key frame's target Value should be reached.
-        /// </summary>
-        public KeyTime KeyTime
-        {
-            get { return (KeyTime)GetValue(KeyTimeProperty); }
-            set { SetValue(KeyTimeProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the KeyTime dependency property.
-        /// </summary>
-        public static readonly DependencyProperty KeyTimeProperty =
-            DependencyProperty.Register("KeyTime", typeof(KeyTime), typeof(ObjectKeyFrame), new PropertyMetadata(new KeyTime(new TimeSpan())));
+    public static readonly DependencyProperty KeyTimeProperty =
+        DependencyProperty.Register(
+            nameof(KeyTime),
+            typeof(KeyTime),
+            typeof(ObjectKeyFrame),
+            new PropertyMetadata(KeyTime.Uniform));
 
-        /// <summary>
-        /// Gets or sets the key frame's target value.
-        /// </summary>
-        public object Value
-        {
-            get { return (object)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the Value dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(object), typeof(ObjectKeyFrame), new PropertyMetadata(null));
+    /// <summary>
+    /// Gets or sets the time at which the key frame's target <see cref="Value"/>
+    /// should be reached.
+    /// </summary>
+    /// <returns>
+    /// The time at which the key frame's current value should be equal to its <see cref="Value"/>
+    /// property. The default is null.
+    /// </returns>
+    public KeyTime KeyTime
+    {
+        get => (KeyTime)GetValue(KeyTimeProperty);
+        set => SetValue(KeyTimeProperty, value);
     }
+
+    /// <summary>
+    /// Identifies the <see cref="Value"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ValueProperty =
+        DependencyProperty.Register(
+            nameof(Value),
+            typeof(object),
+            typeof(ObjectKeyFrame),
+            null);
+
+    /// <summary>
+    /// Gets or sets the key frame's target value.
+    /// </summary>
+    /// <returns>
+    /// The key frame's target value, which is the value of this key frame at its specified
+    /// <see cref="KeyTime"/>. The default is null.
+    /// </returns>
+    public object Value
+    {
+        get => GetValue(ValueProperty);
+        set => SetValue(ValueProperty, value);
+    }
+
+    /// <summary>
+    /// Returns the interpolated value of a specific key frame at the progress increment provided.
+    /// </summary>
+    /// <param name="baseValue">
+    /// The value to animate from.
+    /// </param>
+    /// <param name="keyFrameProgress">
+    /// A value between 0.0 and 1.0, inclusive, that specifies the percentage of time that has 
+    /// elapsed for this key frame.
+    /// </param>
+    /// <returns>
+    /// The output value of this key frame given the specified base value and progress.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
+    /// </exception>
+    object IKeyFrame<object>.InterpolateValue(object baseValue, double keyFrameProgress)
+    {
+        if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(keyFrameProgress));
+        }
+
+        return InterpolateValueCore(baseValue, keyFrameProgress);
+    }
+
+    /// <summary>
+    /// Calculates the value of a key frame at the progress increment provided.
+    /// </summary>
+    /// <param name="baseValue">
+    /// The value to animate from; typically the value of the previous key frame.
+    /// </param>
+    /// <param name="keyFrameProgress">
+    /// A value between 0.0 and 1.0, inclusive, that specifies the percentage of time 
+    /// that has elapsed for this key frame.
+    /// </param>
+    /// <returns>
+    /// The output value of this key frame given the specified base value and progress.
+    /// </returns>
+    internal virtual object InterpolateValueCore(object baseValue, double keyFrameProgress) => baseValue;
 }

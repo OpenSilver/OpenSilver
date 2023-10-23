@@ -13,14 +13,12 @@
 
 using System.Collections.Specialized;
 using System.Windows.Markup;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows.Media
 {
     /// <summary>
-    /// Represents a composite <see cref="Transform"/> composed of other <see cref="Transform"/>
-    /// objects.
+    /// Represents a composite <see cref="Transform"/> composed of other <see cref="Transform"/> objects.
     /// </summary>
     [ContentProperty(nameof(Children))]
     public sealed class TransformGroup : Transform
@@ -28,34 +26,13 @@ namespace System.Windows.Media
         private WeakEventListener<TransformGroup, TransformCollection, NotifyCollectionChangedEventArgs> _collectionChangedListener;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransformGroup"/> class.
-        /// </summary>
-        public TransformGroup()
-        {
-            Changed += (o, e) => INTERNAL_ApplyTransform();
-        }
-
-        /// <summary>
-        /// Gets or sets the collection of child <see cref="Transform"/> objects.
-        /// </summary>
-        /// <returns>
-        /// The collection of child <see cref="Transform"/> objects. The default is
-        /// an empty collection.
-        /// </returns>
-        public TransformCollection Children
-        {
-            get { return (TransformCollection)GetValue(ChildrenProperty); }
-            set { SetValue(ChildrenProperty, value); }
-        }
-
-        /// <summary>
         /// Identifies the <see cref="Children"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ChildrenProperty =
             DependencyProperty.Register(
-                nameof(Children), 
-                typeof(TransformCollection), 
-                typeof(TransformGroup), 
+                nameof(Children),
+                typeof(TransformCollection),
+                typeof(TransformGroup),
                 new PropertyMetadata(
                     new PFCDefaultValueFactory<Transform>(
                         static () => new TransformCollection(),
@@ -69,9 +46,24 @@ namespace System.Windows.Media
                     OnChildrenChanged,
                     CoerceChildren));
 
+        /// <summary>
+        /// Gets or sets the collection of child <see cref="Transform"/> objects.
+        /// </summary>
+        /// <returns>
+        /// The collection of child <see cref="Transform"/> objects. The default is
+        /// an empty collection.
+        /// </returns>
+        public TransformCollection Children
+        {
+            get => (TransformCollection)GetValue(ChildrenProperty);
+            set => SetValue(ChildrenProperty, value);
+        }
+
         private static void OnChildrenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((TransformGroup)d).OnChildrenChanged((TransformCollection)e.OldValue, (TransformCollection)e.NewValue);
+            TransformGroup tg = (TransformGroup)d;
+            tg.OnChildrenChanged((TransformCollection)e.OldValue, (TransformCollection)e.NewValue);
+            tg.RaiseTransformChanged();
         }
 
         private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaiseTransformChanged();
@@ -153,34 +145,6 @@ namespace System.Windows.Media
                 }
 
                 return true;
-            }
-        }
-
-        private void ApplyCSSChanges(Matrix m)
-        {
-            UIElement target = INTERNAL_parent;
-            if (target is not null)
-            {
-                INTERNAL_HtmlDomManager.SetCSSStyleProperty(
-                    target.INTERNAL_OuterDomElement,
-                    "transform",
-                    MatrixTransform.MatrixToHtmlString(m));
-            }
-        }
-
-        internal override void INTERNAL_ApplyTransform()
-        {
-            if (INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(INTERNAL_parent))
-            {
-                ApplyCSSChanges(ValueInternal);
-            }
-        }
-
-        internal override void INTERNAL_UnapplyTransform()
-        {
-            if (INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(INTERNAL_parent))
-            {
-                ApplyCSSChanges(Matrix.Identity);
             }
         }
     }

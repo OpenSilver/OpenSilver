@@ -11,24 +11,26 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 using OpenSilver.Internal;
 
 namespace System.Windows.Media
 {
     /// <summary>
-    /// Provides generalized transformation support for objects, such as points and
-    /// rectangles.
+    /// Provides generalized transformation support for objects, such as points and rectangles.
     /// </summary>
     public abstract class GeneralTransform : DependencyObject
     {
-        internal UIElement INTERNAL_parent;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="GeneralTransform"/> class.
+        /// Transforms the specified point and returns the result.
         /// </summary>
-        protected GeneralTransform()
-        {
-        }
+        /// <param name="point">
+        /// The point to transform.
+        /// </param>
+        /// <returns>
+        /// The result of transforming point.
+        /// </returns>
+        public Point TransformPoint(Point point) => Transform(point);
 
         /// <summary>
         /// Transforms the specified point and returns the result.
@@ -39,31 +41,22 @@ namespace System.Windows.Media
         /// <returns>
         /// The result of transforming point.
         /// </returns>
-        public Point TransformPoint(Point point)
-        {
-            return Transform(point);
-        }
-
-        /// <summary>
-        /// Transforms the specified point and returns the result.
-        /// </summary>
-        /// <param name="point">The point to transform.</param>
-        /// <returns>The result of transforming point.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// The transform did not succeed.
+        /// </exception>
         public Point Transform(Point point)
         {
-            Point transformedPoint;
-
-            if (!TryTransform(point, out transformedPoint))
+            if (!TryTransform(point, out Point transformedPoint))
             {
-                throw new InvalidOperationException("Could not transform");
+                throw new InvalidOperationException("The transform is not defined for the point.");
             }
 
             return transformedPoint;
         }
 
         /// <summary>
-        /// Attempts to transform the specified point and returns a value that indicates
-        /// whether the transformation was successful.
+        /// When overridden in a derived class, attempts to transform the specified point
+        /// and returns a value that indicates whether the transformation was successful.
         /// </summary>
         /// <param name="inPoint">
         /// The point to transform.
@@ -72,37 +65,32 @@ namespace System.Windows.Media
         /// The result of transforming inPoint.
         /// </param>
         /// <returns>
-        /// True if inPoint was transformed; otherwise, false.
+        /// true if inPoint was transformed; otherwise, false.
         /// </returns>
         public abstract bool TryTransform(Point inPoint, out Point outPoint);
 
         /// <summary>
         /// When overridden in a derived class, transforms the specified bounding box and
-        /// returns an axis-aligned bounding box that is exactly large enough to contain
-        /// it.
+        /// returns an axis-aligned bounding box that is exactly large enough to contain it.
         /// </summary>
         /// <param name="rect">
         /// The bounding box to transform.
         /// </param>
         /// <returns>
-        /// The smallest axis-aligned bounding box possible that contains the transformed
-        /// rect.
+        /// The smallest axis-aligned bounding box possible that contains the transformed rect.
         /// </returns>
         public abstract Rect TransformBounds(Rect rect);
 
         /// <summary>
-        /// Gets the inverse transformation of this <see cref="GeneralTransform"/>,
-        /// if possible.
+        /// Gets the inverse transformation of this <see cref="GeneralTransform"/>, if possible.
         /// </summary>
         /// <returns>
         /// An inverse of this instance, if possible; otherwise null.
         /// </returns>
         public abstract GeneralTransform Inverse { get; }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage + " Use TryTransform() instead.", true)]
-        protected virtual Point INTERNAL_TransformPoint(Point point)
-        {
-            throw new NotImplementedException();
-        }
+        protected virtual Point INTERNAL_TransformPoint(Point point) => throw new NotImplementedException();
     }
 }

@@ -11,9 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using CSHTML5.Internal;
-
 namespace System.Windows.Media
 {
     /// <summary>
@@ -22,88 +19,70 @@ namespace System.Windows.Media
     /// </summary>
     public sealed class RotateTransform : Transform
     {
-        double _appliedCssAngle;
-        object _domElementToWhichTheCssWasApplied;
+        /// <summary>
+        /// Identifies the <see cref="Angle"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AngleProperty =
+            DependencyProperty.Register(
+                nameof(Angle),
+                typeof(double),
+                typeof(RotateTransform),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the angle, in degrees, of clockwise rotation.
         /// </summary>
+        /// <returns>
+        /// The angle, in degrees, of clockwise rotation. The default is 0.
+        /// </returns>
         public double Angle
         {
-            get { return (double)GetValue(AngleProperty); }
-            set { SetValue(AngleProperty, value); }
+            get => (double)GetValue(AngleProperty);
+            set => SetValue(AngleProperty, value);
         }
 
         /// <summary>
-        /// Identifies the Angle dependency property.
+        /// Identifies the <see cref="CenterX"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty AngleProperty =
+        public static readonly DependencyProperty CenterXProperty =
             DependencyProperty.Register(
-                nameof(Angle), 
-                typeof(double), 
-                typeof(RotateTransform), 
-                new PropertyMetadata(0d, OnAngleChanged)
-                {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        var target = ((RotateTransform)instance).INTERNAL_parent;
-                        if (target != null)
-                        {
-                            return new CSSEquivalent()
-                            {
-                                DomElement = target.INTERNAL_OuterDomElement,
-                                Value = (inst, value) =>
-                                {
-                                    return value + "deg";
-                                },
-                                Name = new List<string> { "rotateZ" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                                UIElement = target,
-                                ApplyAlsoWhenThereIsAControlTemplate = true,
-                                OnlyUseVelocity = true
-                            };
-                        }
-                        return null;
-                    }
-                });
+                nameof(CenterX),
+                typeof(double),
+                typeof(RotateTransform),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
-        private static void OnAngleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the x-coordinate of the rotation center point.
+        /// </summary>
+        /// <returns>
+        /// The x-coordinate of the center of rotation. The default is 0.
+        /// </returns>
+        public double CenterX
         {
-            ((RotateTransform)d).RaiseTransformChanged();
+            get => (double)GetValue(CenterXProperty);
+            set => SetValue(CenterXProperty, value);
         }
 
-        private void ApplyCSSChanges(double angle)
-        {
-            CSSEquivalent anglecssEquivalent = AngleProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
-            if (anglecssEquivalent != null)
-            {
-                object domElement = anglecssEquivalent.DomElement;
-                if (angle != _appliedCssAngle || (_domElementToWhichTheCssWasApplied != null && 
-                    domElement != _domElementToWhichTheCssWasApplied)) // Optimization to avoid setting the transform if the value is 0 or if it is the same as the last time.
-                {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
-                        anglecssEquivalent.DomElement, 
-                        anglecssEquivalent.Name, 
-                        anglecssEquivalent.Value(this, angle));
-                    _appliedCssAngle = angle;
-                    _domElementToWhichTheCssWasApplied = domElement;
-                }
-            }
-        }
+        /// <summary>
+        /// Identifies the <see cref="CenterY"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CenterYProperty =
+            DependencyProperty.Register(
+                nameof(CenterY),
+                typeof(double),
+                typeof(RotateTransform),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
-        internal override void INTERNAL_ApplyTransform()
+        /// <summary>
+        /// Gets or sets the y-coordinate of the rotation center point.
+        /// </summary>
+        /// <returns>
+        /// The y-coordinate of the center of rotation. The default is 0.
+        /// </returns>
+        public double CenterY
         {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(this.Angle);
-            }
-        }
-
-        internal override void INTERNAL_UnapplyTransform()
-        {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(0);
-            }
+            get => (double)GetValue(CenterYProperty);
+            set => SetValue(CenterYProperty, value);
         }
 
         internal override Matrix ValueInternal
@@ -117,43 +96,5 @@ namespace System.Windows.Media
         }
 
         internal override bool IsIdentity => Angle == 0;
-
-        /// <summary>
-        /// Gets or sets the x-coordinate of the rotation center point.
-        /// The default is 0.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public double CenterX
-        {
-            get => (double)GetValue(CenterXProperty);
-            set => SetValue(CenterXProperty, value);
-        }
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CenterXProperty = 
-            DependencyProperty.Register(
-                nameof(CenterX), 
-                typeof(double), 
-                typeof(RotateTransform), 
-                new PropertyMetadata(0.0));
-
-        /// <summary>
-        /// Gets or sets the y-coordinate of the rotation center point.
-        /// The default is 0.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public double CenterY
-        {
-            get => (double)GetValue(CenterYProperty);
-            set => SetValue(CenterYProperty, value);
-        }
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CenterYProperty = 
-            DependencyProperty.Register(
-                nameof(CenterY), 
-                typeof(double), 
-                typeof(RotateTransform), 
-                new PropertyMetadata(0.0));
     }
 }

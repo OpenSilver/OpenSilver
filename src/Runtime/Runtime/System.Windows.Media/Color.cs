@@ -360,11 +360,6 @@ namespace System.Windows.Media
             }
         }
 
-        internal string INTERNAL_ToHtmlStringForVelocity()
-        {
-            return $"#{R.ToInvariantString("X2")}{G.ToInvariantString("X2")}{B.ToInvariantString("X2")}";
-        }
-
         internal string INTERNAL_ToHtmlString(double opacity)
         {
             return $"rgba({R.ToInvariantString()}, {G.ToInvariantString()}, {B.ToInvariantString()}, {(opacity * A / 255d).ToInvariantString()})";

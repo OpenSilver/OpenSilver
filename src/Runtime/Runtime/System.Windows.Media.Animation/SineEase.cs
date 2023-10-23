@@ -11,19 +11,15 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
-{
-    /// <summary>
-    /// Represents an easing function that creates an animation that accelerates
-    /// and/or decelerates using a sine formula.
-    /// </summary>
-    public sealed partial class SineEase : EasingFunctionBase
-    {
-        const string FUNCTION_TYPE_STRING = "Sine";
+namespace System.Windows.Media.Animation;
 
-        internal override string GetFunctionAsString()
-        {
-            return GetEasingModeAsString() + FUNCTION_TYPE_STRING;
-        }
-    }
+/// <summary>
+/// Represents an easing function that creates an animation that accelerates and/or
+/// decelerates using a sine formula.
+/// </summary>
+public sealed class SineEase : EasingFunctionBase
+{
+    /// <inheritdoc />
+    protected override double EaseInCore(double normalizedTime) =>
+        1.0 - Math.Sin(Math.PI * 0.5 * (1 - normalizedTime));
 }

@@ -11,287 +11,119 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Controls;
+using OpenSilver.Internal.Media.Animation;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+
+/// <summary>
+/// Animates the value of a System.Double property between two target values using
+/// linear interpolation over a specified <see cref="Timeline.Duration"/>.
+/// </summary>
+public class DoubleAnimation : AnimationTimeline, IFromByToAnimation<double>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DoubleAnimation"/> class.
+    /// </summary>
+    public DoubleAnimation() { }
 
     /// <summary>
-    /// Animates the value of a Double property between two target values using linear
-    /// interpolation over a specified Duration.
+    /// Identifies the <see cref="By"/> dependency property.
     /// </summary>
-    public class DoubleAnimation : AnimationTimeline
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty ByProperty =
+        DependencyProperty.Register(
+            nameof(By),
+            typeof(double?),
+            typeof(DoubleAnimation),
+            new PropertyMetadata((object)null));
+
+    /// <summary>
+    /// Gets or sets the total amount by which the animation changes its starting value.
+    /// </summary>
+    /// <returns>
+    /// The total amount by which the animation changes its starting value. The default
+    /// is null.
+    /// </returns>
+    [OpenSilver.NotImplemented]
+    public double? By
     {
-        public IEasingFunction EasingFunction
-        {
-            get { return (EasingFunctionBase)GetValue(EasingFunctionProperty); }
-            set { SetValue(EasingFunctionProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the EasingFunction dependency property.
-        /// </summary>
-        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(IEasingFunction), typeof(DoubleAnimation), new PropertyMetadata(null));
-
-        /// <summary>
-        /// Gets or sets the animation's starting value.
-        /// </summary>
-        public double? From
-        {
-            get { return (double?)GetValue(FromProperty); }
-            set { SetValue(FromProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the From dependency property.
-        /// </summary>
-        public static readonly DependencyProperty FromProperty =
-            DependencyProperty.Register("From", typeof(double?), typeof(DoubleAnimation), new PropertyMetadata(null));
-
-
-
-        // Returns:
-        //     The ending value of the animation. The default is null. If you are programming
-        //     using C# or Visual Basic, the type of this property is projected as double?
-        //     (a nullable double).
-        /// <summary>
-        /// Gets or sets the animation's ending value.
-        /// </summary>
-        public double? To
-        {
-            get { return (double?)GetValue(ToProperty); }
-            set { SetValue(ToProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the To dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ToProperty =
-            DependencyProperty.Register("To", typeof(double?), typeof(DoubleAnimation), new PropertyMetadata(null));
-
-        // This guid is used to specifically target a particular call to the animation. It prevents the callback which should be called when velocity's animation end 
-        // to be called when the callback is called from a previous call to the animation. This could happen when the animation was started quickly multiples times in a row. 
-        private Guid _animationID;
-
-        internal override void Apply(IterationParameters parameters, bool isLastLoop)
-        {
-            double? from = From;
-            double? to = To;
-            if (!from.HasValue && !to.HasValue)
-            {
-                return;
-            }
-
-            Duration duration = ResolveDuration();
-            if (IsZeroDuration(duration))
-            {
-                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, to ?? from.Value);
-                OnIterationCompleted(parameters);
-                return;
-            }
-
-            if (from.HasValue)
-            {
-                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, from.Value);
-            }
-
-            if (to.HasValue)
-            {
-                // - Get the propertyMetadata from the property
-                PropertyMetadata propertyMetadata = _propDp.GetMetadata(_propertyContainer.DependencyObjectType);
-
-                //we make a specific name for this animation:
-                string specificGroupName = animationInstanceSpecificName;
-
-                _animationID = Guid.NewGuid();
-
-                bool cssEquivalentExists = false;
-                if (propertyMetadata.GetCSSEquivalent != null)
-                {
-                    CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);
-                    if (cssEquivalent != null)
-                    {
-                        cssEquivalentExists = true;
-                        StartAnimation(_propertyContainer,
-                            cssEquivalent,
-                            from,
-                            to.Value,
-                            duration,
-                            (EasingFunctionBase)EasingFunction,
-                            specificGroupName,
-                            _propDp,
-                            GetAnimationCompletedCallback(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID));
-                    }
-                }
-                //todo: use GetCSSEquivalent instead (?)
-                if (propertyMetadata.GetCSSEquivalents != null)
-                {
-                    List<CSSEquivalent> cssEquivalents = propertyMetadata.GetCSSEquivalents(_propertyContainer);
-                    foreach (CSSEquivalent equivalent in cssEquivalents)
-                    {
-                        cssEquivalentExists = true;
-                        StartAnimation(_propertyContainer,
-                            equivalent,
-                            from,
-                            to.Value,
-                            duration,
-                            (EasingFunctionBase)EasingFunction,
-                            specificGroupName,
-                            _propDp,
-                            GetAnimationCompletedCallback(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID));
-                    }
-                }
-
-                if (!cssEquivalentExists)
-                {
-                    OnAnimationCompleted(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID);
-                }
-            }
-        }
-        
-        private void OnAnimationCompleted(IterationParameters parameters,
-            bool isLastLoop,
-            object value,
-            DependencyObject target,
-            PropertyPath propertyPath,
-            Guid callBackGuid)
-        {
-            if (!_isUnapplied)
-            {
-                if (isLastLoop && _animationID == callBackGuid)
-                {
-                    AnimationHelpers.ApplyValue(target, propertyPath, value);
-                }
-                OnIterationCompleted(parameters);
-            }
-        }
-
-        private Action GetAnimationCompletedCallback(IterationParameters parameters,
-            bool isLastLoop,
-            object value,
-            DependencyObject target,
-            PropertyPath propertyPath,
-            Guid callBackGuid)
-        {
-            return () => OnAnimationCompleted(parameters, isLastLoop, value, target, propertyPath, callBackGuid);
-        }
-
-        private void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
-        {
-            if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
-            {
-                UIElement uiElement = cssEquivalent.UIElement ?? (target as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
-
-                bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
-
-                if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
-                {
-                    if (cssEquivalent.DomElement == null && uiElement != null)
-                    {
-                        cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
-                    }
-                    if (cssEquivalent.DomElement != null)
-                    {
-                        if (cssEquivalent.Value == null)
-                        {
-                            cssEquivalent.Value = (finalInstance, value) => { return value ?? ""; }; // Default value
-                        }
-                        object cssValue = cssEquivalent.Value(target, to);
-
-                        string sCssValue = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
-                        string fromToValues;
-                        if (!from.HasValue)
-                        {
-                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"\"{name}\":{sCssValue}")) + "}";
-                        }
-                        else
-                        {
-                            string sFrom = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(from);
-                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"\"{name}\":[{sCssValue},{sFrom}]")) + "}";
-                        }
-
-                        AnimationHelpers.CallVelocity(
-                            this,
-                            cssEquivalent.DomElement,
-                            Duration,
-                            easingFunction,
-                            visualStateGroupName,
-                            callbackForWhenfinished,
-                            fromToValues);
-                        target.DirtyVisualValue(dependencyProperty);
-                    }
-                    else
-                    {
-                        callbackForWhenfinished?.Invoke();
-                    }
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
-            }
-        }
-
-        internal override void StopAnimation()
-        {
-            if (_isInitialized)
-            {
-                //todo: find out why we put the test on target and put it back? (I removed it because id kept ScaleTransform from working properly)
-                if (To != null)// && target is FrameworkElement) //todo: "To" can never be "null", fix this.
-                {
-                    // - Get the propertyMetadata from the property
-                    PropertyMetadata propertyMetadata = _propDp.GetMetadata(_propertyContainer.DependencyObjectType);
-
-                    //we make a specific name for this animation:
-                    string specificGroupName = animationInstanceSpecificName;
-
-                    // - Get the cssPropertyName from the PropertyMetadata
-                    if (propertyMetadata.GetCSSEquivalent != null)
-                    {
-                        CSSEquivalent cssEquivalent = propertyMetadata.GetCSSEquivalent(_propertyContainer);
-                        if (cssEquivalent != null)
-                        {
-                            UIElement uiElement = cssEquivalent.UIElement ?? (_propertyContainer as UIElement); // If no UIElement is specified, we assume that the property is intended to be applied to the instance on which the PropertyChanged has occurred.
-
-                            bool hasTemplate = (uiElement is Control) && ((Control)uiElement).HasTemplate;
-
-                            if (!hasTemplate || cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate)
-                            {
-                                if (cssEquivalent.DomElement == null && uiElement != null)
-                                {
-                                    cssEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement; // Default value
-                                }
-                                if (cssEquivalent.DomElement != null)
-                                {
-                                    string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
-                                    AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
-                                }
-                            }
-                        }
-                    }
-                    if (propertyMetadata.GetCSSEquivalents != null)
-                    {
-                        List<CSSEquivalent> cssEquivalents = propertyMetadata.GetCSSEquivalents(_propertyContainer);
-                        foreach (CSSEquivalent equivalent in cssEquivalents)
-                        {
-                            if (equivalent.DomElement != null)
-                            {
-                                string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
-                                AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty ByProperty = DependencyProperty.Register("By", typeof(double?), typeof(DoubleAnimation), null);
-        [OpenSilver.NotImplemented]
-        public double? By
-        {
-            get { return (double?)this.GetValue(ByProperty); }
-            set { this.SetValue(ByProperty, value); }
-        }
+        get => (double?)GetValue(ByProperty);
+        set => SetValue(ByProperty, value);
     }
+
+    /// <summary>
+    /// Identifies the <see cref="EasingFunction"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty EasingFunctionProperty =
+        DependencyProperty.Register(
+            nameof(EasingFunction),
+            typeof(IEasingFunction),
+            typeof(DoubleAnimation),
+            new PropertyMetadata((object)null));
+
+    /// <summary>
+    /// Gets or sets the easing function applied to this animation.
+    /// </summary>
+    /// <returns>
+    /// The easing function applied to this animation.
+    /// </returns>
+    public IEasingFunction EasingFunction
+    {
+        get => (IEasingFunction)GetValue(EasingFunctionProperty);
+        set => SetValue(EasingFunctionProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="From"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty FromProperty =
+        DependencyProperty.Register(
+            nameof(From),
+            typeof(double?),
+            typeof(DoubleAnimation),
+            new PropertyMetadata((object)null));
+
+    /// <summary>
+    /// Gets or sets the animation's starting value.
+    /// </summary>
+    /// <returns>
+    /// The starting value of the animation. The default is null.
+    /// </returns>
+    public double? From
+    {
+        get => (double?)GetValue(FromProperty);
+        set => SetValue(FromProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="To"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ToProperty =
+        DependencyProperty.Register(
+            nameof(To),
+            typeof(double?),
+            typeof(DoubleAnimation),
+            new PropertyMetadata((object)null));
+
+    /// <summary>
+    /// Gets or sets the animation's ending value.
+    /// </summary>
+    /// <returns>
+    /// The ending value of the animation. The default is null.
+    /// </returns>
+    public double? To
+    {
+        get => (double?)GetValue(ToProperty);
+        set => SetValue(ToProperty, value);
+    }
+
+    internal sealed override TimelineClock CreateClock(bool isRoot) =>
+        new AnimationClock<double>(
+            this,
+            isRoot,
+            new FromToByAnimator<double>(this));
+
+    double IFromByToAnimation<double>.InterpolateValue(double from, double to, double progress) =>
+        AnimatedTypeHelpers.InterpolateDouble(from, to, progress);
 }

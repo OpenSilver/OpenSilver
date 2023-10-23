@@ -12,14 +12,16 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents a collection of Transition objects.
+/// </summary>
+[Obsolete(Helper.ObsoleteMemberMessage)]
+[EditorBrowsable(EditorBrowsableState.Never)]
+public sealed class TransitionCollection : List<Transition>
 {
-    /// <summary>
-    /// Represents a collection of Transition objects.
-    /// </summary>
-    public sealed class TransitionCollection : List<Transition>
-    {
-    }
 }
-

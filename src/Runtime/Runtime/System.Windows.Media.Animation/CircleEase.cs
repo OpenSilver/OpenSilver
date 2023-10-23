@@ -11,23 +11,18 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents an easing function that creates an animation that accelerates and/or
+/// decelerates using a circular function.
+/// </summary>
+public sealed class CircleEase : EasingFunctionBase
 {
-    /// <summary>
-    /// Represents an easing function that creates an animation that accelerates
-    /// and/or decelerates using a circular function.
-    /// </summary>
-    public sealed partial class CircleEase : EasingFunctionBase
+    /// <inheritdoc />
+    protected override double EaseInCore(double normalizedTime)
     {
-        const string FUNCTION_TYPE_STRING = "Circ";
-
-        //// Summary:
-        ////     Initializes a new instance of the CircleEase class.
-        //public CircleEase();
-
-        internal override string GetFunctionAsString()
-        {
-            return GetEasingModeAsString() + FUNCTION_TYPE_STRING;
-        }
+        normalizedTime = Math.Max(0.0, Math.Min(1.0, normalizedTime));
+        return 1.0 - Math.Sqrt(1.0 - normalizedTime * normalizedTime);
     }
 }

@@ -11,74 +11,83 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
+
 namespace System.Windows.Media
 {
     /// <summary>
-    /// Represents a collection of GradientStop objects that can be individually
-    /// accessed by index.
+    /// Represents a collection of <see cref="GradientStop"/> objects that can be individually accessed by index.
     /// </summary>
     public sealed class GradientStopCollection : PresentationFrameworkCollection<GradientStop>
     {
-        private Brush _parentBrush;
+        private WeakReference<GradientBrush> _ownerWeakRef;
 
-        public GradientStopCollection() : base(false)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GradientStopCollection"/> class.
+        /// </summary>
+        public GradientStopCollection()
+            : base(true)
         {
-        }
-
-        internal void SetParentBrush(Brush brush)
-        {
-            if (this._parentBrush != brush)
-            {
-                this._parentBrush = brush;
-                foreach (GradientStop gs in this)
-                {
-                    gs.INTERNAL_ParentBrush = brush;
-                }
-            }
         }
 
         internal override void AddOverride(GradientStop gradientStop)
         {
-            this.AddDependencyObjectInternal(gradientStop);
-            gradientStop.INTERNAL_ParentBrush = this._parentBrush;
+            SubscribeToChangedEvent(gradientStop);
+            AddDependencyObjectInternal(gradientStop);
         }
 
         internal override void ClearOverride()
         {
-            if (this._parentBrush != null)
+            foreach (GradientStop gs in this)
             {
-                foreach (GradientStop gs in this)
-                {
-                    gs.INTERNAL_ParentBrush = null;
-                }
+                UnsubscribeToChangedEvent(gs);
             }
 
-            this.ClearDependencyObjectInternal();
+            ClearDependencyObjectInternal();
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.GetItemInternal(index).INTERNAL_ParentBrush = null;
-            this.RemoveAtDependencyObjectInternal(index);
+            UnsubscribeToChangedEvent(this[index]);
+            RemoveAtDependencyObjectInternal(index);
         }
 
         internal override void InsertOverride(int index, GradientStop gradientStop)
         {
-            gradientStop.INTERNAL_ParentBrush = this._parentBrush;
-            this.InsertDependencyObjectInternal(index, gradientStop);
+            SubscribeToChangedEvent(gradientStop);
+            InsertDependencyObjectInternal(index, gradientStop);
         }
 
-        internal override GradientStop GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override GradientStop GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, GradientStop gradientStop)
         {
-            GradientStop oldItem = this.GetItemInternal(index);
-            oldItem.INTERNAL_ParentBrush = null;
-            gradientStop.INTERNAL_ParentBrush = this._parentBrush;
-            this.SetItemDependencyObjectInternal(index, gradientStop);
+            UnsubscribeToChangedEvent(this[index]);
+            SubscribeToChangedEvent(gradientStop);
+            SetItemDependencyObjectInternal(index, gradientStop);
+        }
+
+        internal void SetOwner(GradientBrush owner) =>
+            _ownerWeakRef = owner is null ? null : new WeakReference<GradientBrush>(owner);
+
+        private void SubscribeToChangedEvent(GradientStop gradientStop)
+        {
+            Debug.Assert(gradientStop is not null);
+            gradientStop.Changed += GradientStopChanged;
+        }
+
+        private void UnsubscribeToChangedEvent(GradientStop gradientStop)
+        {
+            Debug.Assert(gradientStop is not null);
+            gradientStop.Changed -= GradientStopChanged;
+        }
+
+        private void GradientStopChanged(object sender, EventArgs e)
+        {
+            if (_ownerWeakRef.TryGetTarget(out GradientBrush owner))
+            {
+                owner.RaiseBrushChanged();
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,33 +11,25 @@
 *  
 \*====================================================================================*/
 
+namespace System.Windows.Media.Animation;
 
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+/// <summary>
+/// Describes the potential states of an animation.
+/// </summary>
+public enum ClockState
+{
+    /// <summary>
+    /// The current animation changes in direct relation to that of its parent.
+    /// </summary>
+    Active = 0,
 
-//namespace Windows.UI.Xaml.Media.Animation
-//{
-//    /// <summary>
-//    /// Describes the potential states of an animation.
-//    /// </summary>
-//    public enum ClockState
-//    {
-//        /// <summary>
-//        /// The current animation changes in direct relation to the animation of its
-//        /// parent.
-//        /// </summary>
-//        Active = 0,
-//        /// <summary>
-//        /// The animation continues and does not change in relation to the animation
-//        /// of its parent.
-//        /// </summary>
-//        Filling = 1,
-//        /// <summary>
-//        /// The animation is stopped.
-//        /// </summary>
-//        Stopped = 2,
-//    }
-//}
+    /// <summary>
+    /// The animation continues and does not change in relation to that of its parent.
+    /// </summary>
+    Filling = 1,
+
+    /// <summary>
+    /// The animation is stopped.
+    /// </summary>
+    Stopped = 2,
+}

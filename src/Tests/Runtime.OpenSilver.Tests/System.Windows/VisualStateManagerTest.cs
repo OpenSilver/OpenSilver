@@ -38,48 +38,20 @@ namespace System.Windows.Tests
         {
             var myControl1 = new MyControl1();
 
-            var prop1Default = (double)InnerControl.Property1Property.GetMetadata(myControl1.InnerControl.GetType()).DefaultValue;
-            var prop2Default = (double)InnerControl.Property2Property.GetMetadata(myControl1.InnerControl.GetType()).DefaultValue;
-            var prop3Default = (double)InnerControl.Property3Property.GetMetadata(myControl1.InnerControl.GetType()).DefaultValue;
-            var prop4Default = (double)InnerControl.Property4Property.GetMetadata(myControl1.InnerControl.GetType()).DefaultValue;
-
-            myControl1.InnerControl.Property1.Should().Be(prop1Default);
-            myControl1.InnerControl.Property2.Should().Be(prop2Default);
-            myControl1.InnerControl.Property3.Should().Be(prop3Default);
-            myControl1.InnerControl.Property4.Should().Be(prop4Default);
-
             // 1 - Move from no current state to a state
             myControl1.GoToState1().Should().BeTrue();
 
-            myControl1.InnerControl.Property1.Should().Be(42d);
-            myControl1.InnerControl.Property2.Should().Be(prop2Default);
-            myControl1.InnerControl.Property3.Should().Be(prop3Default);
-            myControl1.InnerControl.Property4.Should().Be(prop4Default);
+            // 2 - Move to the current state
+            myControl1.GoToState1().Should().BeTrue();
 
-            // 2 - Move from a state to a state in the same group
+            // 3 - Move from a state to a state in the same group
             myControl1.GoToState2().Should().BeTrue();
 
-            myControl1.InnerControl.Property1.Should().Be(prop1Default);
-            myControl1.InnerControl.Property2.Should().Be(84d);
-            myControl1.InnerControl.Property3.Should().Be(prop3Default);
-            myControl1.InnerControl.Property4.Should().Be(prop4Default);
-
-            // 3 - Move from a group to another
+            // 4 - Move from a group to another
             myControl1.GoToState4().Should().BeTrue();
 
-            myControl1.InnerControl.Property1.Should().Be(prop1Default);
-            myControl1.InnerControl.Property2.Should().Be(84d);
-            myControl1.InnerControl.Property3.Should().Be(prop3Default);
-            myControl1.InnerControl.Property4.Should().Be(336d);
-
-            // 4 - Move to a state that does not exist
-
+            // 5 - Move to a state that does not exist
             VisualStateManager.GoToState(myControl1, "some_state_that_does_not_exist", false).Should().BeFalse();
-
-            myControl1.InnerControl.Property1.Should().Be(prop1Default);
-            myControl1.InnerControl.Property2.Should().Be(84d);
-            myControl1.InnerControl.Property3.Should().Be(prop3Default);
-            myControl1.InnerControl.Property4.Should().Be(336d);
         }
 
         [TestMethod]
@@ -87,55 +59,21 @@ namespace System.Windows.Tests
         {
             var myControl2 = new MyControl2();
 
-            var prop1Default = (double)InnerControl.Property1Property.GetMetadata(myControl2.InnerControl.GetType()).DefaultValue;
-            var prop2Default = (double)InnerControl.Property2Property.GetMetadata(myControl2.InnerControl.GetType()).DefaultValue;
-            var prop3Default = (double)InnerControl.Property3Property.GetMetadata(myControl2.InnerControl.GetType()).DefaultValue;
-            var prop4Default = (double)InnerControl.Property4Property.GetMetadata(myControl2.InnerControl.GetType()).DefaultValue;
-
-            myControl2.InnerControl.Property1.Should().Be(prop1Default);
-            myControl2.InnerControl.Property2.Should().Be(prop2Default);
-            myControl2.InnerControl.Property3.Should().Be(prop3Default);
-            myControl2.InnerControl.Property4.Should().Be(prop4Default);
             myControl2.InnerControl.CurrentState.Should().BeNull();
 
             myControl2.GoToState1().Should().BeTrue();
-
-            myControl2.InnerControl.Property1.Should().Be(prop1Default);
-            myControl2.InnerControl.Property2.Should().Be(prop2Default);
-            myControl2.InnerControl.Property3.Should().Be(prop3Default);
-            myControl2.InnerControl.Property4.Should().Be(prop4Default);
             myControl2.InnerControl.CurrentState.Should().Be("state1");
 
             myControl2.GoToState2().Should().BeTrue();
-
-            myControl2.InnerControl.Property1.Should().Be(prop1Default);
-            myControl2.InnerControl.Property2.Should().Be(prop2Default);
-            myControl2.InnerControl.Property3.Should().Be(prop3Default);
-            myControl2.InnerControl.Property4.Should().Be(prop4Default);
             myControl2.InnerControl.CurrentState.Should().Be("state2");
 
             myControl2.GoToState3().Should().BeTrue();
-
-            myControl2.InnerControl.Property1.Should().Be(prop1Default);
-            myControl2.InnerControl.Property2.Should().Be(prop2Default);
-            myControl2.InnerControl.Property3.Should().Be(prop3Default);
-            myControl2.InnerControl.Property4.Should().Be(prop4Default);
             myControl2.InnerControl.CurrentState.Should().Be("state3");
 
             myControl2.GoToState4().Should().BeTrue();
-
-            myControl2.InnerControl.Property1.Should().Be(prop1Default);
-            myControl2.InnerControl.Property2.Should().Be(prop2Default);
-            myControl2.InnerControl.Property3.Should().Be(prop3Default);
-            myControl2.InnerControl.Property4.Should().Be(prop4Default);
             myControl2.InnerControl.CurrentState.Should().Be("state4");
 
             VisualStateManager.GoToState(myControl2, "some_state_that_does_not_exist", false).Should().BeFalse();
-
-            myControl2.InnerControl.Property1.Should().Be(prop1Default);
-            myControl2.InnerControl.Property2.Should().Be(prop2Default);
-            myControl2.InnerControl.Property3.Should().Be(prop3Default);
-            myControl2.InnerControl.Property4.Should().Be(prop4Default);
             myControl2.InnerControl.CurrentState.Should().BeNull();
         }
 

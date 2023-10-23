@@ -11,9 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using CSHTML5.Internal;
-
 namespace System.Windows.Media
 {
     /// <summary>
@@ -21,152 +18,94 @@ namespace System.Windows.Media
     /// </summary>
     public sealed class ScaleTransform : Transform
     {
-        double _appliedCssScaleX = 1d;
-        double _appliedCssScaleY = 1d;
-        object _domElementToWhichTheCssScaleXWasApplied;
-        object _domElementToWhichTheCssScaleYWasApplied;
+        /// <summary>
+        /// Identifies the <see cref="ScaleX"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ScaleXProperty =
+            DependencyProperty.Register(
+                nameof(ScaleX),
+                typeof(double),
+                typeof(ScaleTransform),
+                new PropertyMetadata(1.0, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the x-axis scale factor.
         /// </summary>
+        /// <returns>
+        /// The scale factor along the x-axis. The default is 1.
+        /// </returns>
         public double ScaleX
         {
-            get { return (double)GetValue(ScaleXProperty); }
-            set { SetValue(ScaleXProperty, value); }
+            get => (double)GetValue(ScaleXProperty);
+            set => SetValue(ScaleXProperty, value);
         }
 
         /// <summary>
-        /// Identifies the ScaleX dependency property.
+        /// Identifies the <see cref="ScaleY"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ScaleXProperty =
+        public static readonly DependencyProperty ScaleYProperty =
             DependencyProperty.Register(
-                nameof(ScaleX), 
-                typeof(double), 
-                typeof(ScaleTransform), 
-                new PropertyMetadata(1d, OnScaleXChanged)
-                {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        var target = ((ScaleTransform)instance).INTERNAL_parent;
-                        if (target != null)
-                        {
-                            return new CSSEquivalent()
-                            {
-                                DomElement = target.INTERNAL_OuterDomElement,
-                                Value = (inst, value) =>
-                                {
-                                    return value;
-                                },
-                                Name = new List<string> { "scaleX" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                                UIElement = target,
-                                ApplyAlsoWhenThereIsAControlTemplate = true,
-                                OnlyUseVelocity = true
-                            };
-                        }
-                        return null;
-                    }
-                });
-
-        private static void OnScaleXChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((ScaleTransform)d).RaiseTransformChanged();
-        }
+                nameof(ScaleY),
+                typeof(double),
+                typeof(ScaleTransform),
+                new PropertyMetadata(1.0, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the y-axis scale factor.
         /// </summary>
+        /// <returns>
+        /// The scale factor along the y-axis. The default is 1.
+        /// </returns>
         public double ScaleY
         {
-            get { return (double)GetValue(ScaleYProperty); }
-            set { SetValue(ScaleYProperty, value); }
+            get => (double)GetValue(ScaleYProperty);
+            set => SetValue(ScaleYProperty, value);
         }
 
         /// <summary>
-        /// Identifies the ScaleY dependency property.
+        /// Identifies the <see cref="CenterX"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ScaleYProperty =
+        public static readonly DependencyProperty CenterXProperty =
             DependencyProperty.Register(
-                nameof(ScaleY), 
-                typeof(double), 
-                typeof(ScaleTransform), 
-                new PropertyMetadata(1d, OnScaleYChanged)
-                {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        var target = ((ScaleTransform)instance).INTERNAL_parent;
-                        if (target != null)
-                        {
-                            return new CSSEquivalent()
-                            {
-                                DomElement = target.INTERNAL_OuterDomElement,
-                                Value = (inst, value) =>
-                                    {
-                                        return value;
-                                    },
-                                Name = new List<string> { "scaleY" }, //Note: the css use would be: transform = "scaleX(2)" but the velocity call must use: scaleX : 2
-                                UIElement = target,
-                                ApplyAlsoWhenThereIsAControlTemplate = true,
-                                OnlyUseVelocity = true
-                            };
-                        }
-                        return null;
-                    }
-                });
+                nameof(CenterX),
+                typeof(double),
+                typeof(ScaleTransform),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
-        private static void OnScaleYChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the x-coordinate of the center point of this <see cref="ScaleTransform"/>.
+        /// </summary>
+        /// <returns>
+        /// The x-coordinate of the center point of this <see cref="ScaleTransform"/>.
+        /// The default is 0.
+        /// </returns>
+        public double CenterX
         {
-            ((ScaleTransform)d).RaiseTransformChanged();
+            get => (double)GetValue(CenterXProperty);
+            set => SetValue(CenterXProperty, value);
         }
 
-        private void ApplyCSSChanges(double scaleX, double scaleY)
-        {
-            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
-            if (scaleXcssEquivalent != null)
-            {
-                object domElementX = scaleXcssEquivalent.DomElement;
-                if (scaleX != _appliedCssScaleX || (_domElementToWhichTheCssScaleXWasApplied != null && 
-                    domElementX != _domElementToWhichTheCssScaleXWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
-                {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
-                        scaleXcssEquivalent.DomElement, 
-                        scaleXcssEquivalent.Name, 
-                        scaleXcssEquivalent.Value(this, scaleX));
-                    _appliedCssScaleX = scaleX;
-                    _domElementToWhichTheCssScaleXWasApplied = domElementX;
-                }
-            }
+        /// <summary>
+        /// Identifies the <see cref="CenterY"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CenterYProperty =
+            DependencyProperty.Register(
+                nameof(CenterY),
+                typeof(double),
+                typeof(ScaleTransform),
+                new PropertyMetadata(0.0, OnPropertyChanged));
 
-            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
-            if (scaleYcssEquivalent != null)
-            {
-                object domElementY = scaleYcssEquivalent.DomElement;
-                if ((scaleY != _appliedCssScaleY) || 
-                    (_domElementToWhichTheCssScaleYWasApplied != null && domElementY != _domElementToWhichTheCssScaleYWasApplied)) // Optimization to avoid setting the transform if the value is (0,0) or if it is the same as the last time.
-                {
-                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
-                        scaleYcssEquivalent.DomElement, 
-                        scaleYcssEquivalent.Name, 
-                        scaleYcssEquivalent.Value(this, scaleY));
-                    _appliedCssScaleY = scaleY;
-                    _domElementToWhichTheCssScaleYWasApplied = domElementY;
-                }
-            }
-        }
-
-        internal override void INTERNAL_ApplyTransform()
+        /// <summary>
+        /// Gets or sets the y-coordinate of the center point of this <see cref="ScaleTransform"/>.
+        /// </summary>
+        /// <returns>
+        /// The y-coordinate of the center point of this <see cref="ScaleTransform"/>.
+        /// The default is 0.
+        /// </returns>
+        public double CenterY
         {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(this.ScaleX, this.ScaleY);
-            }
-        }
-
-        internal override void INTERNAL_UnapplyTransform()
-        {
-            if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
-            {
-                ApplyCSSChanges(1, 1);
-            }
+            get => (double)GetValue(CenterYProperty);
+            set => SetValue(CenterYProperty, value);
         }
 
         internal override Matrix ValueInternal
@@ -180,49 +119,5 @@ namespace System.Windows.Media
         }
 
         internal override bool IsIdentity => ScaleX == 1 && ScaleY == 1;
-
-        /// <summary>
-        /// Identifies the <see cref="ScaleTransform.CenterX"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CenterXProperty = 
-            DependencyProperty.Register(
-                nameof(CenterX), 
-                typeof(double), 
-                typeof(ScaleTransform), 
-                new PropertyMetadata(0.0));
-
-        /// <summary>
-        /// Gets or sets the x-coordinate of the center point of this <see cref="ScaleTransform"/>.
-        /// The default is 0.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public double CenterX
-        {
-            get { return (double)this.GetValue(CenterXProperty); }
-            set { this.SetValue(CenterXProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="ScaleTransform.CenterY"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CenterYProperty = 
-            DependencyProperty.Register(
-                nameof(CenterY), 
-                typeof(double), 
-                typeof(ScaleTransform),
-                new PropertyMetadata(0.0));
-
-        /// <summary>
-        /// Gets or sets the y-coordinate of the center point of this <see cref="ScaleTransform"/>.
-        /// The default is 0.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public double CenterY
-        {
-            get { return (double)this.GetValue(CenterYProperty); }
-            set { this.SetValue(CenterYProperty, value); }
-        }
     }
 }

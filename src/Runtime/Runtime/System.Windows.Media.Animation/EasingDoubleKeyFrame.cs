@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,32 +11,51 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+using OpenSilver.Internal.Media.Animation;
+
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Defines a property that enables you to associate an easing function with a 
+/// <see cref="DoubleAnimationUsingKeyFrames"/> key-frame animation.
+/// </summary>
+public sealed class EasingDoubleKeyFrame : DoubleKeyFrame
 {
-    public sealed class EasingDoubleKeyFrame : DoubleKeyFrame
+    /// <summary>
+    /// Identifies the <see cref="EasingFunction"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty EasingFunctionProperty =
+        DependencyProperty.Register(
+            nameof(EasingFunction),
+            typeof(IEasingFunction),
+            typeof(EasingDoubleKeyFrame),
+            null);
+
+    /// <summary>
+    /// Gets or sets the easing function that is applied to the key frame.
+    /// </summary>
+    /// <returns>
+    /// The easing function that is applied to the key frame.
+    /// </returns>
+    public IEasingFunction EasingFunction
     {
-        public static readonly DependencyProperty EasingFunctionProperty = 
-            DependencyProperty.Register(
-                "EasingFunction",
-                typeof(EasingFunctionBase),
-                typeof(EasingDoubleKeyFrame),
-                new PropertyMetadata(null));
+        get => (IEasingFunction)GetValue(EasingFunctionProperty);
+        set => SetValue(EasingFunctionProperty, value);
+    }
 
-        public IEasingFunction EasingFunction
+    /// <inheritdoc />
+    internal override double InterpolateValueCore(double baseValue, double keyFrameProgress)
+    {
+        if (EasingFunction is IEasingFunction easingFunction)
         {
-            get
-            {
-                return (IEasingFunction)GetValue(EasingFunctionProperty);
-            }
-            set
-            {
-                SetValue(EasingFunctionProperty, value);
-            }
+            keyFrameProgress = easingFunction.Ease(keyFrameProgress);
         }
 
-        internal override EasingFunctionBase INTERNAL_GetEasingFunction()
+        return keyFrameProgress switch
         {
-            return (EasingFunctionBase)EasingFunction;
-        }
+            0.0 => baseValue,
+            1.0 => Value,
+            _ => AnimatedTypeHelpers.InterpolateDouble(baseValue, Value, keyFrameProgress)
+        };
     }
 }

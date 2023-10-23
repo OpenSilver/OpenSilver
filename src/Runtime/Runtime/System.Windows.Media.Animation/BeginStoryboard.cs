@@ -13,48 +13,43 @@
 
 using System.Windows.Markup;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// A trigger action that begins a <see cref="Animation.Storyboard"/> and
+/// distributes its animations to their targeted objects and properties.
+/// </summary>
+[ContentProperty(nameof(Storyboard))]
+public sealed class BeginStoryboard : TriggerAction
 {
     /// <summary>
-    /// A trigger action that begins a <see cref="Animation.Storyboard"/> and
-    /// distributes its animations to their targeted objects and properties.
+    /// Initializes a new instance of the <see cref="BeginStoryboard"/> class.
     /// </summary>
-    [ContentProperty(nameof(Storyboard))]
-    public sealed class BeginStoryboard : TriggerAction
+    public BeginStoryboard() { }
+
+    /// <summary>
+    /// Identifies the <see cref="Storyboard"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty StoryboardProperty =
+        DependencyProperty.Register(
+            nameof(Storyboard),
+            typeof(Storyboard),
+            typeof(BeginStoryboard),
+            null);
+
+    /// <summary>
+    /// Gets or sets the <see cref="Animation.Storyboard"/> that this <see cref="BeginStoryboard"/>
+    /// starts.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="Animation.Storyboard"/> that the <see cref="BeginStoryboard"/>
+    /// starts. The default is null.
+    /// </returns>
+    public Storyboard Storyboard
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BeginStoryboard"/>
-        /// class.
-        /// </summary>
-        public BeginStoryboard() { }
-
-        /// <summary>
-        /// Identifies the <see cref="Storyboard"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty StoryboardProperty =
-            DependencyProperty.Register(
-                nameof(Storyboard),
-                typeof(Storyboard),
-                typeof(BeginStoryboard),
-                null);
-
-        /// <summary>
-        /// Gets or sets the <see cref="Animation.Storyboard"/> that this <see cref="BeginStoryboard"/>
-        /// starts.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Animation.Storyboard"/> that the <see cref="BeginStoryboard"/>
-        /// starts. The default is null.
-        /// </returns>
-        public Storyboard Storyboard
-        {
-            get { return (Storyboard)GetValue(StoryboardProperty); }
-            set { SetValue(StoryboardProperty, value); }
-        }
-
-        internal override void Invoke(IFrameworkElement fe)
-        {
-            Storyboard?.Begin();
-        }
+        get => (Storyboard)GetValue(StoryboardProperty);
+        set => SetValue(StoryboardProperty, value);
     }
+
+    internal override void Invoke(IFrameworkElement fe) => Storyboard?.Begin();
 }

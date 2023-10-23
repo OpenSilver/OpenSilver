@@ -12,51 +12,42 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using OpenSilver.Internal.Media.Animation;
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Represents a collection of <see cref="DoubleKeyFrame"/> objects that can 
+/// be individually accessed by index.
+/// </summary>
+public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>, IKeyFrameCollection<double>
 {
-    public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DoubleKeyFrameCollection"/> class.
+    /// </summary>
+    public DoubleKeyFrameCollection()
+        : base(false)
     {
-        public DoubleKeyFrameCollection()
-            : base(false)
-        {
-        }
-
-        internal DoubleKeyFrameCollection(DoubleAnimationUsingKeyFrames owner)
-            : base(false)
-        {
-            Debug.Assert(owner != null);
-            owner.ProvideSelfAsInheritanceContext(this, null);
-        }
-
-        internal override void AddOverride(DoubleKeyFrame keyFrame)
-        {
-            this.AddDependencyObjectInternal(keyFrame);
-        }
-
-        internal override void ClearOverride()
-        {
-            this.ClearDependencyObjectInternal();
-        }
-
-        internal override void InsertOverride(int index, DoubleKeyFrame keyFrame)
-        {
-            this.InsertDependencyObjectInternal(index, keyFrame);
-        }
-
-        internal override void RemoveAtOverride(int index)
-        {
-            this.RemoveAtDependencyObjectInternal(index);
-        }
-
-        internal override DoubleKeyFrame GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
-
-        internal override void SetItemOverride(int index, DoubleKeyFrame keyFrame)
-        {
-            this.SetItemDependencyObjectInternal(index, keyFrame);
-        }
     }
+
+    internal DoubleKeyFrameCollection(DoubleAnimationUsingKeyFrames owner)
+        : base(false)
+    {
+        Debug.Assert(owner is not null);
+        owner.ProvideSelfAsInheritanceContext(this, null);
+    }
+
+    internal override void AddOverride(DoubleKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
+
+    internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+    internal override void InsertOverride(int index, DoubleKeyFrame keyFrame) => InsertDependencyObjectInternal(index, keyFrame);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+    internal override DoubleKeyFrame GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void SetItemOverride(int index, DoubleKeyFrame keyFrame) => SetItemDependencyObjectInternal(index, keyFrame);
+
+    IKeyFrame<double> IKeyFrameCollection<double>.this[int index] => GetItemInternal(index);
 }

@@ -11,13 +11,19 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
+namespace System.Windows.Media.Animation;
+
+/// <summary>
+/// Animates from the <see cref="object"/> value of the previous key frame to its own 
+/// <see cref="ObjectKeyFrame.Value"/> using discrete values.
+/// </summary>
+public sealed class DiscreteObjectKeyFrame : ObjectKeyFrame
 {
-    /// <summary>
-    /// Animates from the Object value of the previous key frame to its own Value
-    /// using discrete values.
-    /// </summary>
-    public sealed class DiscreteObjectKeyFrame : ObjectKeyFrame
-    {
-    }
+    /// <inheritdoc />
+    internal override object InterpolateValueCore(object baseValue, double keyFrameProgress) =>
+        keyFrameProgress switch
+        {
+            < 1.0 => baseValue,
+            _ => Value
+        };
 }

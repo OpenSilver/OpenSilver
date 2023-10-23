@@ -11,23 +11,24 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Threading;
 using System.Windows.Data;
-using CSHTML5.Internal;
+using System.Windows.Media;
+using System.Windows.Threading;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
-using System.ComponentModel;
+using OpenSilver.Internal.Media.Animation;
 
 namespace System.Windows
 {
     /// <summary>
-    /// Represents an object that participates in the dependency property system. DependencyObject
-    /// is the immediate base class of many important UI-related classes, such as
-    /// UIElement, Geometry, FrameworkTemplate, Style, and ResourceDictionary.
+    /// Represents an object that participates in the Silverlight dependency property
+    /// system. <see cref="DependencyObject"/> is the immediate base class of several
+    /// other important Silverlight classes, such as <see cref="UIElement"/>, <see cref="Geometry"/>,
+    /// <see cref="FrameworkTemplate"/>, <see cref="Style"/>, and <see cref="ResourceDictionary"/>.
     /// </summary>
     public class DependencyObject : IInternalDependencyObject
     {
@@ -267,27 +268,32 @@ namespace System.Windows
         internal DependencyObjectType DependencyObjectType
             => _dType ??= DependencyObjectType.FromSystemTypeInternal(GetType());
 
-        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DependencyObject"/> class.
+        /// </summary>
         public DependencyObject()
         {
             CanBeInheritanceContext = true;
             INTERNAL_PropertyStorageDictionary = new(DependencyPropertyComparer.Default);
             INTERNAL_AllInheritedProperties = new(DependencyPropertyComparer.Default);
         }
-        #endregion
 
         object IInternalDependencyObject.GetValue(DependencyProperty dp) => GetValue(dp);
 
         void IInternalDependencyObject.SetValue(DependencyProperty dp, object value) => SetValue(dp, value);
 
         /// <summary>
-        /// Returns the current effective value of a dependency property from a DependencyObject.
+        /// Returns the current effective value of a dependency property from a <see cref="DependencyObject"/>.
         /// </summary>
         /// <param name="dependencyProperty">
-        /// The DependencyProperty identifier of the property for which to retrieve the
-        /// value.
+        /// The <see cref="DependencyProperty"/> identifier of the property to retrieve the value for.
         /// </param>
-        /// <returns>Returns the current effective value.</returns>
+        /// <returns>
+        /// Returns the current effective value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// dependencyProperty is null.
+        /// </exception>
         public object GetValue(DependencyProperty dependencyProperty)
         {
             if (dependencyProperty == null)
@@ -333,6 +339,7 @@ namespace System.Windows
         /// </summary>
         /// <param name="dependencyProperty">The identifier of the dependency property to set.</param>
         /// <param name="value">The new local value.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage + " Use SetCurrentValue instead.")]
         public void SetLocalValue(DependencyProperty dependencyProperty, object value)
         {
@@ -344,6 +351,21 @@ namespace System.Windows
             SetCurrentValue(dependencyProperty, value);
         }
 
+        /// <summary>
+        /// Sets the value of a dependency property without changing its value source.
+        /// </summary>
+        /// <param name="dp">
+        /// The identifier of the dependency property to set.
+        /// </param>
+        /// <param name="value">
+        /// The new local value.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// dp is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// value was not the correct type as registered for the dp property.
+        /// </exception>
         public void SetCurrentValue(DependencyProperty dp, object value)
         {
             if (dp == null)
@@ -366,6 +388,7 @@ namespace System.Windows
                 value);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue instead.")]
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
@@ -376,12 +399,12 @@ namespace System.Windows
         /// Returns the local value of a dependency property, if a local value is set.
         /// </summary>
         /// <param name="dp">
-        /// The DependencyProperty identifier of the property for which to retrieve the
+        /// The <see cref="DependencyProperty"/> identifier of the property for which to retrieve the
         /// local value.
         /// </param>
         /// <returns>
-        /// Returns the local value, or returns the sentinel value UnsetValue if no local
-        /// value is set.
+        /// Returns the local value, or returns the sentinel value <see cref="DependencyProperty.UnsetValue"/>
+        /// if no local value is set.
         /// </returns>
         public object ReadLocalValue(DependencyProperty dp)
         {
@@ -451,28 +474,69 @@ namespace System.Windows
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object GetAnimationValue(DependencyProperty dependencyProperty) => GetValue(dependencyProperty);
 
-        internal void SetAnimatedValue(DependencyProperty dp, object value)
+        internal void RefreshAnimation(DependencyProperty dp, AnimationClock clock)
         {
-            if (dp == null)
-            {
-                throw new ArgumentNullException(nameof(dp));
-            }
+            Debug.Assert(dp is not null);
+            Debug.Assert(clock is not null);
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            INTERNAL_PropertyStore.TryGetStorage(this,
-                dp,
-                metadata,
-                true,
-                out INTERNAL_PropertyStorage storage);
-
-            INTERNAL_PropertyStore.SetAnimatedValue(storage,
-                this,
-                dp,
-                metadata,
-                value);
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, metadata, false, out INTERNAL_PropertyStorage storage))
+            {
+                if (storage.ClockHandle == clock.Handle)
+                {
+                    INTERNAL_PropertyStore.SetAnimatedValue(storage,
+                        this,
+                        dp,
+                        metadata,
+                        clock.GetCurrentValue());
+                }
+            }
         }
 
+        internal void AttachAnimationClock(DependencyProperty dp, AnimationClock clock)
+        {
+            Debug.Assert(dp is not null);
+            Debug.Assert(clock is not null);
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            INTERNAL_PropertyStore.TryGetStorage(this, dp, metadata, true, out INTERNAL_PropertyStorage storage);
+            storage.ClockHandle = clock.Handle;
+        }
+
+        internal void DetachAnimationClock(DependencyProperty dp, AnimationClock clock)
+        {
+            Debug.Assert(dp is not null);
+            Debug.Assert(clock is not null);
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, metadata, false, out INTERNAL_PropertyStorage storage))
+            {
+                if (storage.ClockHandle == clock.Handle)
+                {
+                    storage.ClockHandle = null;
+                    INTERNAL_PropertyStore.ClearAnimatedValue(storage, this, dp, metadata);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the local value of a dependency property on a <see cref="DependencyObject"/>.
+        /// </summary>
+        /// <param name="dp">
+        /// The identifier of the dependency property to set.
+        /// </param>
+        /// <param name="value">
+        /// The new local value.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// dp is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// value was not the correct type as registered for the dp property.
+        /// </exception>
         public void SetValue(DependencyProperty dp, object value)
         {
             if (dp == null)
@@ -572,24 +636,6 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Sets a value that states that the visuals do not reflect the value of the Dependency in C#, so the visuals should be updated even if the value doesn't change the next time it is set.
-        /// </summary>
-        /// <param name="dp">The DependencyProperty that needs its visual's equivalents refreshed.</param>
-        internal void DirtyVisualValue(DependencyProperty dp)
-        {
-            Debug.Assert(dp != null);
-
-            if (INTERNAL_PropertyStore.TryGetStorage(this,
-                dp,
-                dp.GetMetadata(DependencyObjectType),
-                true,
-                out INTERNAL_PropertyStorage storage))
-            {
-                INTERNAL_PropertyStore.DirtyVisualValue(storage);
-            }
-        }
-
-        /// <summary>
         /// Sets the inherited value of a dependency property on a DependencyObject. Do not use this method.
         /// </summary>
         /// <param name="dp">The identifier of the dependency property to set.</param>
@@ -620,12 +666,24 @@ namespace System.Windows
         /// Refreshes the value of the given DependencyProperty on this DependencyObject so that it fits the coercion that should be applied on it.
         /// </summary>
         /// <param name="dependencyProperty">The dependencyProperty whose value we want to refresh.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue.")]
         public void Coerce(DependencyProperty dependencyProperty)
         {
             CoerceValue(dependencyProperty);
         }
 
+        /// <summary>
+        /// Coerces the value of the specified dependency property. This is accomplished by invoking
+        /// any <see cref="CoerceValueCallback"/> function specified in property metadata for the 
+        /// dependency property as it exists on the calling <see cref="DependencyObject"/>.
+        /// </summary>
+        /// <param name="dp">
+        /// The identifier for the dependency property to coerce.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// dp is null.
+        /// </exception>
         public void CoerceValue(DependencyProperty dp)
         {
             if (dp == null)
@@ -697,8 +755,11 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Gets the CoreDispatcher that this object is associated with.
+        /// Gets the <see cref="Threading.Dispatcher"/> this object is associated with.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Threading.Dispatcher"/> this object is associated with.
+        /// </returns>
         public Dispatcher Dispatcher => Dispatcher.CurrentDispatcher;
 
 
@@ -715,7 +776,7 @@ namespace System.Windows
                 metadata,
                 true,
                 out INTERNAL_PropertyStorage storage);
-
+            
             INTERNAL_PropertyStore.RefreshExpressionCommon(storage,
                 this,
                 dp,
@@ -738,8 +799,11 @@ namespace System.Windows
         #endregion
 
         /// <summary>
-        /// Clears the local value of a property
+        /// Clears the local value of a dependency property.
         /// </summary>
+        /// <param name="dp">
+        /// The <see cref="DependencyProperty"/> identifier of the property to clear the value for.
+        /// </param>
         public void ClearValue(DependencyProperty dp)
         {
             if (dp == null)
@@ -770,6 +834,12 @@ namespace System.Windows
             }
         }
 
+        /// <summary>
+        /// Determines whether the calling thread has access to this object.
+        /// </summary>
+        /// <returns>
+        /// true if the calling thread has access to this object; otherwise, false.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public bool CheckAccess()
         {

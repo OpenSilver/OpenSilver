@@ -44,13 +44,18 @@ namespace System.Windows
         #region Height property
 
         /// <summary>
-        /// Gets or sets the suggested height of a FrameworkElement.
+        /// Gets or sets the suggested height of a <see cref="FrameworkElement"/>.
         /// </summary>
+        /// <returns>
+        /// The height, in pixels, of the object. The default is <see cref="double.NaN"/>. Except
+        /// for the special <see cref="double.NaN"/> value, this value must be equal to or greater
+        /// than 0.
+        /// </returns>
         [TypeConverter(typeof(LengthConverter))]
         public double Height
         {
-            get { return (double)GetValue(HeightProperty); }
-            set { SetValue(HeightProperty, value); }
+            get => (double)GetValue(HeightProperty);
+            set => SetValue(HeightProperty, value);
         }
 
         /// <summary>
@@ -61,22 +66,7 @@ namespace System.Windows
                 nameof(Height),
                 typeof(double),
                 typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(
-                    double.NaN,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Value = (inst, value) => (value is double) ?
-                            !double.IsNaN((double)value) ? ((double)value).ToInvariantString() + "px" : "auto" :
-                            throw new InvalidOperationException(
-                                string.Format("Error when trying to set FrameworkElement.Height: expected double, got '{0}'.",
-                                    value.GetType().FullName)),
-                        UIElement = (UIElement)instance,
-                        Name = new List<string> { "height" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true
-                    }
-                },
+                new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure),
                 IsWidthHeightValid);
 
         #endregion
@@ -85,13 +75,18 @@ namespace System.Windows
         #region Width property
 
         /// <summary>
-        /// Gets or sets the width of a FrameworkElement.
+        /// Gets or sets the width of a <see cref="FrameworkElement"/>.
         /// </summary>
+        /// <returns>
+        /// The width of the object, in pixels. The default is <see cref="double.NaN"/>. Except
+        /// for the special <see cref="double.NaN"/> value, this value must be equal to or greater
+        /// than 0.
+        /// </returns>
         [TypeConverter(typeof(LengthConverter))]
         public double Width
         {
-            get { return (double)GetValue(WidthProperty); }
-            set { SetValue(WidthProperty, value); }
+            get => (double)GetValue(WidthProperty);
+            set => SetValue(WidthProperty, value);
         }
 
         /// <summary>
@@ -102,22 +97,7 @@ namespace System.Windows
                 nameof(Width),
                 typeof(double),
                 typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(
-                    double.NaN,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Value = (inst, value) => (value is double) ?
-                            !double.IsNaN((double)value) ? ((double)value).ToInvariantString() + "px" : "auto" :
-                            throw new InvalidOperationException(
-                                string.Format("Error when trying to set FrameworkElement.Width: expected double, got '{0}'.",
-                                    value.GetType().FullName)),
-                        UIElement = (UIElement)instance,
-                        Name = new List<string> { "width" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true
-                    }
-                },
+                new FrameworkPropertyMetadata(double.NaN,FrameworkPropertyMetadataOptions.AffectsMeasure),
                 IsWidthHeightValid);
 
         #endregion

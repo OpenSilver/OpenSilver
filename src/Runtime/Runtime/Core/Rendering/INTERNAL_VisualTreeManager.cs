@@ -13,12 +13,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -403,9 +400,6 @@ if(nextSibling != undefined) {
 
             UIElement.SetPointerEvents(child);
 
-            // Reset the flag that tells if we have already applied the RenderTransformOrigin (this is useful to ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS):
-            child.INTERNAL_RenderTransformOriginHasBeenApplied = false;
-
             //--------------------------------------------------------
             // HANDLE EVENTS:
             //--------------------------------------------------------
@@ -519,21 +513,6 @@ if(nextSibling != undefined) {
                     INTERNAL_PropertyStorage storage = propertiesAndTheirStorage.Value;
                     object value = null;
                     bool valueWasRetrieved = false;
-
-                    //--------------------------------------------------
-                    // Call "Apply CSS", which uses "GetCSSEquivalent/s"
-                    //--------------------------------------------------
-
-                    if (propertyMetadata.GetCSSEquivalent != null || propertyMetadata.GetCSSEquivalents != null)
-                    {
-                        if (!valueWasRetrieved)
-                        {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
-                            valueWasRetrieved = true;
-                        }
-
-                        INTERNAL_PropertyStore.ApplyCssChanges(value, value, propertyMetadata, dependencyObject);
-                    }
 
                     //--------------------------------------------------
                     // Call "MethodToUpdateDom"

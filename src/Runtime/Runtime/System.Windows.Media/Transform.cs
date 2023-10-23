@@ -20,9 +20,9 @@ namespace System.Windows.Media
     {
         internal Transform() { }
 
-        ///<summary>
+        /// <summary>
         /// Return the current transformation value.
-        ///</summary>
+        /// </summary>
         internal abstract Matrix ValueInternal { get; }
 
         ///<summary>
@@ -53,6 +53,16 @@ namespace System.Windows.Media
             return true;
         }
 
+        /// <summary>
+        /// Transforms the specified bounding box and returns an axis-aligned bounding box
+        /// that is exactly large enough to contain it.
+        /// </summary>
+        /// <param name="rect">
+        /// The bounding box to transform.
+        /// </param>
+        /// <returns>
+        /// The smallest axis-aligned bounding box that can contain the transformed rect.
+        /// </returns>
         public override Rect TransformBounds(Rect rect)
         {
             Matrix matrix = ValueInternal;
@@ -93,15 +103,13 @@ namespace System.Windows.Media
             return new MatrixTransform(matrix);
         }
 
-        // Must be implemented by the concrete class:
-        internal abstract void INTERNAL_ApplyTransform();
-        internal abstract void INTERNAL_UnapplyTransform();
-
         internal event EventHandler Changed;
 
-        internal void RaiseTransformChanged()
+        internal void RaiseTransformChanged() => Changed?.Invoke(this, EventArgs.Empty);
+
+        internal static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Changed?.Invoke(this, EventArgs.Empty);
+            ((Transform)d).RaiseTransformChanged();
         }
     }
 }

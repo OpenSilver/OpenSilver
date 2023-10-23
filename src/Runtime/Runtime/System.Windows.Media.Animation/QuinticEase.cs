@@ -11,19 +11,15 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Media.Animation
-{
-    /// <summary>
-    /// Represents an easing function that creates an animation that accelerates
-    /// and/or decelerates using the formula f(t) = t5.
-    /// </summary>
-    public sealed partial class QuinticEase : EasingFunctionBase
-    {
-        const string FUNCTION_TYPE_STRING = "Quint";
+namespace System.Windows.Media.Animation;
 
-        internal override string GetFunctionAsString()
-        {
-            return GetEasingModeAsString() + FUNCTION_TYPE_STRING;
-        }
-    }
+/// <summary>
+/// Represents an easing function that creates an animation that accelerates
+/// and/or decelerates using the formula f(t) = t5.
+/// </summary>
+public sealed class QuinticEase : EasingFunctionBase
+{
+    /// <inheritdoc />
+    protected override double EaseInCore(double normalizedTime) =>
+        normalizedTime * normalizedTime * normalizedTime * normalizedTime * normalizedTime;
 }
