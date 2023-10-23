@@ -426,8 +426,33 @@ namespace System.Windows.Controls
                 // Children of this panel should not have their logical parent reset
                 EnsureEmptyChildren(/* logicalParent = */ null);
 
-                GenerateChildren();
+                int chunkSize = ProgressiveRenderingChunkSize;
+                int childrenCount = GetChildrenCount();
+                var enableProgressiveRendering = chunkSize > 0 && childrenCount > chunkSize;
+                if (enableProgressiveRendering)
+                {
+                    this.ProgressivelyGenerateChildren();
+                }
+                else
+                {
+                    GenerateChildren();
+                }
             }
+        }
+
+        private int GetChildrenCount()
+        {
+            int childrenCount = Children.Count;
+            if (IsItemsHost)
+            {
+                var itemsControl = ItemsControl.GetItemsOwner(this);
+                if (itemsControl != null)
+                {
+                    childrenCount = itemsControl.Items.Count;
+                }
+            }
+
+            return childrenCount;
         }
 
         private void ClearChildren()
@@ -471,6 +496,51 @@ namespace System.Windows.Controls
                 }
             }
         }
+
+        private async void ProgressivelyGenerateChildren()
+        {
+            int chunkSize = ProgressiveRenderingChunkSize;
+            int from = 0;
+            int to = chunkSize; // here, chunksize can go further than the amount of elements because of the test on generator.GenerateNext != null
+
+            IItemContainerGenerator generator = (IItemContainerGenerator)_itemContainerGenerator;
+            if (generator != null)
+            {
+                using (generator.StartAt(new GeneratorPosition(-1, 0), GeneratorDirection.Forward, true))
+                {
+
+                    while (true)
+                    {
+                        await Task.Delay(1);
+                        if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                        {
+                            //this can happen if the Panel is detached during the delay.
+                            break;
+                        }
+                        UIElement child = null;
+                        bool isNewlyRealized;
+                        for (int i = from; i < to; ++i)
+                        {
+                            if((child = generator.GenerateNext(out isNewlyRealized) as UIElement) != null)
+                            {
+                                _uiElementCollection.Add(child);
+                                generator.PrepareItemContainer(child);
+                            }
+                        }
+
+                        if (child == null)
+                        {
+                            break;
+                        }
+
+                        from = to;
+                        to += chunkSize;
+                    }
+                }
+            }
+        }
+
+
 
         private void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
@@ -606,7 +676,17 @@ namespace System.Windows.Controls
         private void ResetChildren()
         {
             EnsureEmptyChildren(null);
-            GenerateChildren();
+            int chunkSize = ProgressiveRenderingChunkSize;
+            int childrenCount = GetChildrenCount();
+            var enableProgressiveRendering = chunkSize > 0 && childrenCount > chunkSize;
+            if (enableProgressiveRendering)
+            {
+                this.ProgressivelyGenerateChildren();
+            }
+            else
+            {
+                GenerateChildren();
+            }
         }
 
         internal UIElementCollection InternalChildren
