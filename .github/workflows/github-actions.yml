@@ -37,9 +37,9 @@ jobs:
           msbuild src/Compiler/Compiler.ResourcesExtractor/Compiler.ResourcesExtractor.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore;
       - name: Copy Compiler Assemblies
         run: |
-          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
-          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil*dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
-          cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
+          cp src/Compiler/Compiler/bin/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
+          cp src/Compiler/Compiler/bin/Release/net461/Mono.Cecil*dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
+          cp src/Compiler/Compiler.ResourcesExtractor/bin/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
       - name: Copy Targets
         run: |
           cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
