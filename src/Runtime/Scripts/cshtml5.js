@@ -732,6 +732,7 @@ document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflo
             let text = elToMeasure.value.length == 0 ? emptyVal : elToMeasure.value;
             // if the text ends with a new line, we need to add one more or it will not be measured
             if (text.endsWith('\n')) text += '\n';
+            if (text.startsWith('<')) text = "&lt;" + text.substring(1);
             element.innerHTML = text;
         } else {
             element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
