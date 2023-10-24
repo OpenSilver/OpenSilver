@@ -31,6 +31,8 @@ namespace CSHTML5.Native.Html.Controls
         {
             object outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
             _jsDiv = domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", outerDiv, this);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"{INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv)}.attachShadow({{ mode:'open' }});");
             return outerDiv;
         }
 
@@ -83,9 +85,9 @@ namespace CSHTML5.Native.Html.Controls
                     if (_jsDiv is not null)
                     {
                         string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
-                        if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.hasChildNodes()"))
+                        if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.shadowRoot && {sDiv}.shadowRoot.hasChildNodes()"))
                         {
-                            return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.firstChild");
+                            return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.shadowRoot.firstChild");
                         }
                     }
                 }
@@ -108,7 +110,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
             string sContent = INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlContent ?? string.Empty);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.innerHTML = {sContent}");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.shadowRoot.innerHTML = {sContent};");
             InvalidateMeasure();
         }
 
