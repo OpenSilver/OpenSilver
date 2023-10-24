@@ -108,7 +108,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
             string sContent = INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlContent ?? string.Empty);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.innerHTML = {sContent}");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.attachShadow({{mode:'open'}}).innerHTML = {sContent}");
             InvalidateMeasure();
         }
 
