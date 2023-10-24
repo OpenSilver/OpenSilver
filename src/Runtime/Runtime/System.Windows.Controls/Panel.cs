@@ -426,33 +426,8 @@ namespace System.Windows.Controls
                 // Children of this panel should not have their logical parent reset
                 EnsureEmptyChildren(/* logicalParent = */ null);
 
-                int chunkSize = ProgressiveRenderingChunkSize;
-                int childrenCount = GetChildrenCount();
-                var enableProgressiveRendering = chunkSize > 0 && childrenCount > chunkSize;
-                if (enableProgressiveRendering)
-                {
-                    this.ProgressivelyGenerateChildren();
-                }
-                else
-                {
-                    GenerateChildren();
-                }
+                GenerateChildren();
             }
-        }
-
-        private int GetChildrenCount()
-        {
-            int childrenCount = Children.Count;
-            if (IsItemsHost)
-            {
-                var itemsControl = ItemsControl.GetItemsOwner(this);
-                if (itemsControl != null)
-                {
-                    childrenCount = itemsControl.Items.Count;
-                }
-            }
-
-            return childrenCount;
         }
 
         private void ClearChildren()
@@ -481,34 +456,47 @@ namespace System.Windows.Controls
             // code responds harmlessly.
             //Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while being asked to generate children.");
 
-            IItemContainerGenerator generator = (IItemContainerGenerator)_itemContainerGenerator;
+            ItemContainerGenerator generator = _itemContainerGenerator;
             if (generator != null)
             {
-                using (generator.StartAt(new GeneratorPosition(-1, 0), GeneratorDirection.Forward, true))
+                int chunkSize = ProgressiveRenderingChunkSize;
+                if (chunkSize > 0 && chunkSize < _itemContainerGenerator.ItemsInternal.Count)
                 {
-                    UIElement child;
-                    bool isNewlyRealized;
-                    while ((child = generator.GenerateNext(out isNewlyRealized) as UIElement) != null)
-                    {
-                        _uiElementCollection.Add(child);
-                        generator.PrepareItemContainer(child);
-                    }
+                    GenerateChildrenAsync();
+                }
+                else
+                {
+                    GenerateChildrenSync();
                 }
             }
         }
 
-        private async void ProgressivelyGenerateChildren()
+        private void GenerateChildrenSync()
         {
-            int chunkSize = ProgressiveRenderingChunkSize;
-            int from = 0;
-            int to = chunkSize; // here, chunksize can go further than the amount of elements because of the test on generator.GenerateNext != null
+            IItemContainerGenerator generator = _itemContainerGenerator;
+            using (generator.StartAt(new GeneratorPosition(-1, 0), GeneratorDirection.Forward, true))
+            {
+                while (generator.GenerateNext(out _) is UIElement child)
+                {
+                    _uiElementCollection.Add(child);
+                    generator.PrepareItemContainer(child);
+                }
+            }
+        }
 
-            IItemContainerGenerator generator = (IItemContainerGenerator)_itemContainerGenerator;
+        private async void GenerateChildrenAsync()
+        {
+            IItemContainerGenerator generator = _itemContainerGenerator;
             if (generator != null)
             {
+                int chunkSize = ProgressiveRenderingChunkSize;
+                int from = 0;
+                // here, chunksize can go further than the amount of elements because of the
+                // test on generator.GenerateNext != null
+                int to = chunkSize;
+
                 using (generator.StartAt(new GeneratorPosition(-1, 0), GeneratorDirection.Forward, true))
                 {
-
                     while (true)
                     {
                         await Task.Delay(1);
@@ -517,18 +505,22 @@ namespace System.Windows.Controls
                             //this can happen if the Panel is detached during the delay.
                             break;
                         }
-                        UIElement child = null;
-                        bool isNewlyRealized;
+
+                        bool done = false;
+
                         for (int i = from; i < to; ++i)
                         {
-                            if((child = generator.GenerateNext(out isNewlyRealized) as UIElement) != null)
+                            if (generator.GenerateNext(out _) is not UIElement child)
                             {
-                                _uiElementCollection.Add(child);
-                                generator.PrepareItemContainer(child);
+                                done = true;
+                                break;
                             }
+
+                            _uiElementCollection.Add(child);
+                            generator.PrepareItemContainer(child);
                         }
 
-                        if (child == null)
+                        if (done)
                         {
                             break;
                         }
@@ -539,8 +531,6 @@ namespace System.Windows.Controls
                 }
             }
         }
-
-
 
         private void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
@@ -676,17 +666,7 @@ namespace System.Windows.Controls
         private void ResetChildren()
         {
             EnsureEmptyChildren(null);
-            int chunkSize = ProgressiveRenderingChunkSize;
-            int childrenCount = GetChildrenCount();
-            var enableProgressiveRendering = chunkSize > 0 && childrenCount > chunkSize;
-            if (enableProgressiveRendering)
-            {
-                this.ProgressivelyGenerateChildren();
-            }
-            else
-            {
-                GenerateChildren();
-            }
+            GenerateChildren();
         }
 
         internal UIElementCollection InternalChildren
