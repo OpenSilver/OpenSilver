@@ -154,6 +154,11 @@ namespace System.Windows.Controls
             }
         }
 
+        internal void SetTextPropertyNoCallBack()
+        {
+            SetTextPropertyNoCallBack(Inlines.TextContainer.Text);
+        }
+
         /// <summary>
         /// Identifies the <see cref="Padding"/> dependency property.
         /// </summary>
