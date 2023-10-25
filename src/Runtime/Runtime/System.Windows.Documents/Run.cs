@@ -55,7 +55,7 @@ namespace System.Windows.Documents
             switch (run.GetLayoutParent())
             {
                 case TextBlock tb:
-                    tb.SetTextPropertyNoCallBack();
+                    tb.OnTextContentChanged();
                     break;
 
                 case FrameworkElement fe:

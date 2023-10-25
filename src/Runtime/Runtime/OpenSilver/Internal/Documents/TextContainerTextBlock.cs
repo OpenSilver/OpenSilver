@@ -52,7 +52,7 @@ internal sealed class TextContainerTextBlock : TextContainer<TextBlock>
 
     public override void EndChange()
     {
-        Parent.SetTextPropertyNoCallBack(Text);
+        Parent.OnTextContentChanged();
     }
 
     protected override void OnTextAddedOverride(TextElement textElement)
