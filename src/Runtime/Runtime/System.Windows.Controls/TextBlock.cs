@@ -144,12 +144,12 @@ namespace System.Windows.Controls
             }
         }
 
-        internal void SetTextPropertyNoCallBack(string text)
+        internal void OnTextContentChanged()
         {
             if (!_isTextChanging)
             {
                 _isTextChanging = true;
-                SetCurrentValue(TextProperty, text);
+                SetCurrentValue(TextProperty, Inlines.TextContainer.Text);
                 _isTextChanging = false;
             }
         }
