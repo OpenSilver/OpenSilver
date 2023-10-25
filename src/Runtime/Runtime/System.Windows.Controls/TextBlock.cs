@@ -143,7 +143,7 @@ namespace System.Windows.Controls
                 textBlock._isTextChanging = false;
             }
         }
-        
+
         internal void OnTextContentChanged()
         {
             if (!_isTextChanging)
