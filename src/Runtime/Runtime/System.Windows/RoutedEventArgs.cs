@@ -97,5 +97,21 @@ namespace System.Windows
         }
 
         internal object UIEventArg { get; set; }
+
+        internal bool Cancellable { get; set; } = true;
+
+        internal void PreventDefault()
+        {
+            if (!Cancellable)
+            {
+                return;
+            }
+
+            if (UIEventArg != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(UIEventArg)}.preventDefault();");
+            }
+        }
     }
 }

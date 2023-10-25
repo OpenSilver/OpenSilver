@@ -602,6 +602,11 @@ internal sealed class InputManager
             e.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
 
             mouseTarget.RaiseEvent(e);
+
+            if (e.Handled)
+            {
+                e.PreventDefault();
+            }
         }
     }
 
@@ -653,7 +658,7 @@ internal sealed class InputManager
 
         KeyboardNavigation.Current.ProcessInput(e);
 
-        if (e.Handled && e.Cancellable)
+        if (e.Handled)
         {
             e.PreventDefault();
         }

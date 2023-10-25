@@ -43,15 +43,10 @@ namespace System.Windows.Input
         /// if <see cref="Handled"/> is set to true. The default is true.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public bool Cancellable { get; set; } = true;
-
-        internal void PreventDefault()
+        public new bool Cancellable
         {
-            if (UIEventArg != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"{INTERNAL_InteropImplementation.GetVariableStringForJS(UIEventArg)}.preventDefault();");
-            }
+            get => base.Cancellable;
+            set => base.Cancellable = value;
         }
 
         // Returns:
