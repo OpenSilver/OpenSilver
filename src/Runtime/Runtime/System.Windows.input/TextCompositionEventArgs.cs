@@ -57,6 +57,6 @@ namespace System.Windows.Input
 		/// </returns>
 		public TextComposition TextComposition { get; internal set; }
 
-        internal bool PreventDefault { get; set; }
+        internal bool Cancel { get; set; }
     }
 }
