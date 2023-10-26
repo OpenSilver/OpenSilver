@@ -370,6 +370,8 @@ namespace System.Windows.Controls
             if (invalidate && ScrollOwner != null)
                 ScrollOwner.InvalidateScrollInfo();
 
+            measured.Width = Math.Min(measured.Width, constraint.Width);
+            measured.Height = Math.Min(measured.Height, constraint.Height);
             return measured;
         }
 
@@ -424,12 +426,7 @@ namespace System.Windows.Controls
                 }
             }
 
-            if (Orientation == Orientation.Vertical)
-                arranged.Height = Math.Max(arranged.Height, arrangeSize.Height);
-            else
-                arranged.Width = Math.Max(arranged.Width, arrangeSize.Width);
-
-            return arranged;
+            return arrangeSize;
         }
 
         /// <summary>
