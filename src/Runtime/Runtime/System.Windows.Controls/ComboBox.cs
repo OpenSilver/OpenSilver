@@ -215,8 +215,7 @@ namespace System.Windows.Controls
                 _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
             }
 
-            UpdatePresenter();
-            UpdateVisualStates();
+            Dispatcher.BeginInvoke(() => SyncToDropdownState());
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -587,47 +586,42 @@ namespace System.Windows.Controls
                 nameof(IsDropDownOpen),
                 typeof(bool),
                 typeof(ComboBox),
-                new PropertyMetadata(false, OnIsDropDownOpenChanged, CoerceIsDropDownOpen));
+                new PropertyMetadata(false, (d,e) => ((ComboBox)d)?.SyncToDropdownState(), CoerceIsDropDownOpen));
 
-        private static void OnIsDropDownOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void SyncToDropdownState()
         {
-            var comboBox = (ComboBox)d;
-            bool isDropDownOpen = (bool)e.NewValue;
-            if (isDropDownOpen)
+            if (IsDropDownOpen)
             {
                 //-----------------------------
                 // Show the Popup
                 //-----------------------------
 
                 // Show the popup:
-                if (comboBox._popup != null)
+                if (this._popup != null)
                 {
-                    // add removed
-
-                    comboBox._popup.IsOpen = true;
-
-                    // Make sure the Width of the popup is at least the same as the popup
-                    if (comboBox._popup.Child is FrameworkElement child)
+                    if (this._popup != null && this._popup.Child is FrameworkElement child)
                     {
-                        child.MinWidth = comboBox._popup.ActualWidth;
+                        child.MinWidth = this._popup.ActualWidth;
                     }
+
+                    this._popup.IsOpen = true;
                 }
 
                 // Ensure that the toggle button is checked:
-                if (comboBox._dropDownToggle != null
-                    && comboBox._dropDownToggle.IsChecked == false)
+                if (this._dropDownToggle != null
+                    && this._dropDownToggle.IsChecked == false)
                 {
-                    comboBox._dropDownToggle.IsChecked = true;
+                    this._dropDownToggle.IsChecked = true;
                 }
 
-                comboBox.UpdatePresenter();
+                this.UpdatePresenter();
 
                 // Raise the Opened event:
-                comboBox.OnDropDownOpened(EventArgs.Empty);
+                this.OnDropDownOpened(EventArgs.Empty);
 
-                if (FocusManager.HasFocus(comboBox, false))
+                if (FocusManager.HasFocus(this, false))
                 {
-                    comboBox.ScrollTo(comboBox.SelectedIndex);
+                    this.ScrollTo(this.SelectedIndex);
                 }
             }
             else
@@ -636,32 +630,32 @@ namespace System.Windows.Controls
                 // Hide the Popup
                 //-----------------------------
 
-                bool hasFocus = FocusManager.HasFocus(comboBox, true);
+                bool hasFocus = FocusManager.HasFocus(this, true);
 
                 // Close the popup:
-                if (comboBox._popup != null)
+                if (this._popup != null)
                 {
-                    comboBox._popup.IsOpen = false;
+                    this._popup.IsOpen = false;
                 }
 
                 // Ensure that the toggle button is unchecked:
-                if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
+                if (this._dropDownToggle != null && this._dropDownToggle.IsChecked == true)
                 {
-                    comboBox._dropDownToggle.IsChecked = false;
+                    this._dropDownToggle.IsChecked = false;
                 }
 
-                comboBox.UpdatePresenter();
+                this.UpdatePresenter();
 
                 // Raise the Closed event:
-                comboBox.OnDropDownClosed(EventArgs.Empty);
+                this.OnDropDownClosed(EventArgs.Empty);
 
                 if (hasFocus)
                 {
-                    comboBox.ScrollTo(-1);
+                    this.ScrollTo(-1);
                 }
             }
 
-            comboBox.UpdateVisualStates();
+            this.UpdateVisualStates();
         }
 
         private static object CoerceIsDropDownOpen(DependencyObject d, object value)
