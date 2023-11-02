@@ -11,8 +11,11 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Media;
+using System.Windows.Threading;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Media.Animation;
@@ -21,23 +24,41 @@ internal sealed class AnimationManager
 {
     private const int DefaultFrameRate = 60;
 
-    private readonly JavaScriptCallback _handler;
+    private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly ClockCollection _rootClocks = new();
     private readonly Queue<(TimelineClock Clock, bool Add)> _pendingRequests = new();
 
+    private EventHandler _requestAnimationFrame;
     private bool _isRunning;
     private bool _isProcessingFrame;
     private int _frameRate = 60;
 
     private AnimationManager()
     {
-        _handler = JavaScriptCallback.Create(OnRequestAnimationFrameNative, true);
-        string sHandler = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_handler);
+        var jsCallback = JavaScriptCallback.Create(OnRequestAnimationFrameNative, true);
+        string sHandler = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsCallback);
         Interop.ExecuteJavaScriptVoid($"document.createAnimationManager({sHandler});");
         SetFrameRate(DefaultFrameRate);
     }
 
     public static AnimationManager Current { get; } = new AnimationManager();
+
+    internal event EventHandler RequestAnimationFrame
+    {
+        add
+        {
+            _requestAnimationFrame += value;
+            if (_requestAnimationFrame is not null)
+            {
+                Resume();
+            }
+        }
+        remove
+        {
+            _requestAnimationFrame -= value;
+            TryPause();
+        }
+    }
 
     internal int FrameRate
     {
@@ -65,10 +86,7 @@ internal sealed class AnimationManager
         else
         {
             RemoveClock(clock);
-            if (_rootClocks.Count == 0)
-            {
-                Pause();
-            }
+            TryPause();
         }
     }
 
@@ -97,8 +115,18 @@ internal sealed class AnimationManager
 
     private void RemoveClock(TimelineClock clock) => _rootClocks.Remove(clock);
 
+    private void TryPause()
+    {
+        if (_requestAnimationFrame is null && _rootClocks.Count == 0)
+        {
+            Pause();
+        }
+    }
+
     private void OnRequestAnimationFrameNative()
     {
+        _requestAnimationFrame?.Invoke(Dispatcher.CurrentDispatcher, new RenderingEventArgs(_clock.Elapsed));
+
         _isProcessingFrame = true;
         try
         {
@@ -113,11 +141,7 @@ internal sealed class AnimationManager
             
             _rootClocks.Purge();
             ProcessPendingRequests();
-
-            if (_rootClocks.Count == 0)
-            {
-                Pause();
-            }
+            TryPause();
         }
     }
 

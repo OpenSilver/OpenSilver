@@ -330,6 +330,7 @@
 		<Compile Include="System.Windows.Media.Animation\EasingPointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
+		<Compile Include="System.Windows.Media\RenderingEventArgs.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Media\ColorConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\DiscreteColorKeyFrame.cs" />
@@ -611,7 +612,7 @@
 		<Compile Include="System.Windows.Markup\XamlReader.cs" />
 		<Compile Include="System.Windows.Media\AlignmentX.cs" />
 		<Compile Include="System.Windows.Media\AlignmentY.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\CompositionTarget.cs" />
+		<Compile Include="System.Windows.Media\CompositionTarget.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\Fonts.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\GlyphTypeface.cs" />
 		<Compile Include="System.Windows.Media\ImageBrush.cs" />
