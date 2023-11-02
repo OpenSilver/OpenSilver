@@ -35,7 +35,7 @@ namespace OpenSilver.Compiler
 
         public static string Process(string xaml)
         {
-            return global::System.Text.RegularExpressions.Regex.Replace(xaml, @"(?:(<native:HtmlPresenter[^>]*?\/>)|(<[^<:>\/]+:HtmlPresenter[\s\S]*?>)([\s\S]+?)(<\/[^<:>\/]+:HtmlPresenter>))",
+            return global::System.Text.RegularExpressions.Regex.Replace(xaml, @"(?:(<native:HtmlPresenter[^>]*?\/>)|(<[^<:>\/]+:HtmlPresenter[\s\S]*?>)([\s\S]*?)(<\/[^<:>\/]+:HtmlPresenter>))",
                 new global::System.Text.RegularExpressions.MatchEvaluator((global::System.Text.RegularExpressions.Match match) =>
                 {
                     if (match.Groups.Count >= 3 && !string.IsNullOrEmpty(match.Groups[4].Value))
