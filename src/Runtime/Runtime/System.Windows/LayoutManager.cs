@@ -72,8 +72,6 @@ namespace System.Windows
                 return;
             }
 
-            UIRenderer.ProcessRenderQueue();
-
             int cnt = 0;
             bool gotException = true;
             UIElement currentElement = null;
@@ -154,6 +152,7 @@ namespace System.Windows
                 _isUpdating = false;
                 _layoutRequestPosted = false;
                 _isInUpdateLayout = false;
+                UIRenderer.ProcessRenderQueue();
 
                 if (gotException)
                 {
@@ -699,8 +698,6 @@ namespace System.Windows
                 var node = _disposeQueue.Dequeue();
                 INTERNAL_HtmlDomManager.RemoveNodeNative(node);
             }
-
-            _disposeQueue.Clear();
         }
     }
 }
