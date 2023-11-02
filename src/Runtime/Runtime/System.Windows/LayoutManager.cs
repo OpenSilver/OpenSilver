@@ -155,6 +155,8 @@ namespace System.Windows
                 _layoutRequestPosted = false;
                 _isInUpdateLayout = false;
 
+                UIRenderer.ProcessRenderQueue();
+
                 if (gotException)
                 {
                     //set indicator
@@ -699,8 +701,6 @@ namespace System.Windows
                 var node = _disposeQueue.Dequeue();
                 INTERNAL_HtmlDomManager.RemoveNodeNative(node);
             }
-
-            _disposeQueue.Clear();
         }
     }
 }
