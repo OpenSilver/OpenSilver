@@ -800,7 +800,7 @@ namespace System.Windows.Controls
 
                 if (this.IsDropDownOpen)
                 {
-                    OpenDropDown();
+                    Dispatcher.BeginInvoke(() => OpenDropDown());                    
                 }
             }
 
