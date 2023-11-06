@@ -668,22 +668,28 @@ namespace System.Windows.Controls
         {
             if ((bool)value)
             {
-                ComboBox cb = (ComboBox)d;
+                var cb = (ComboBox)d;
                 if (!cb.IsLoaded)
                 {
-                    cb.Loaded += new RoutedEventHandler(OpenOnLoad);
+                    cb.Loaded += OpenOnLoad;
                     return false;
                 }
             }
 
             return value;
         }
-        
+
         private static void OpenOnLoad(object sender, RoutedEventArgs e)
         {
             var cb = (ComboBox)sender;
-            cb.Loaded -= new RoutedEventHandler(OpenOnLoad);
-            cb.Dispatcher.BeginInvoke(() => cb.CoerceValue(IsDropDownOpenProperty));
+            cb.Loaded -= OpenOnLoad;
+            cb.LayoutUpdated += cb.OnLayoutUpdated;
+        }
+
+        private void OnLayoutUpdated(object sender, EventArgs e)
+        {
+            LayoutUpdated -= OnLayoutUpdated;
+            CoerceValue(IsDropDownOpenProperty);
         }
 
         private void ScrollTo(int index)
