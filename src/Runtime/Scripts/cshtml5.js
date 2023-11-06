@@ -528,6 +528,8 @@ document.createInputManager = function (callback) {
             });
 
             root.addEventListener('wheel', function (e) {
+                // Zoom in/out request, takes priority over opensilver
+                if (e.ctrlKey) return;
                 e.isHandled = true;
                 const target = _mouseCapture || e.target;
                 callback(getClosestElementId(target), EVENTS.WHEEL, e);
