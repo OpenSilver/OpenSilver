@@ -416,7 +416,7 @@ namespace System.Windows.Controls
             nameof(IsDropDownOpen),
             typeof(bool),
             typeof(DatePicker),
-            new PropertyMetadata(false, OnIsDropDownOpenChanged));
+            new PropertyMetadata(false, OnIsDropDownOpenChanged, CoerceIsDropDownOpen));
 
         /// <summary>
         /// IsDropDownOpenProperty property changed handler.
@@ -451,6 +451,34 @@ namespace System.Windows.Controls
                     }
                 }
             }
+        }
+
+        private static object CoerceIsDropDownOpen(DependencyObject d, object value)
+        {
+            if ((bool)value)
+            {
+                var dp = (DatePicker)d;
+                if (!dp.IsLoaded)
+                {
+                    dp.Loaded += OpenOnLoad;
+                    return false;
+                }
+            }
+
+            return value;
+        }
+
+        private static void OpenOnLoad(object sender, RoutedEventArgs e)
+        {
+            var dp = (DatePicker)sender;
+            dp.Loaded -= OpenOnLoad;
+            dp.LayoutUpdated += dp.OnLayoutUpdated;
+        }
+
+        private void OnLayoutUpdated(object sender, EventArgs e)
+        {
+            LayoutUpdated -= OnLayoutUpdated;
+            CoerceValue(IsDropDownOpenProperty);
         }
         #endregion IsDropDownOpen
 
@@ -797,11 +825,6 @@ namespace System.Windows.Controls
 
                 _popUp.Child = this._outsideCanvas;
                 _root = GetTemplateChild(ElementRoot) as FrameworkElement;
-
-                if (this.IsDropDownOpen)
-                {
-                    OpenDropDown();
-                }
             }
 
             if (_dropDownButton != null)
