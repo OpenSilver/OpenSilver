@@ -39,10 +39,6 @@ namespace System.Windows.Controls
         // the native DOM element in case of native combo box for example.
         private ItemContainerGenerator _itemContainerGenerator;
 
-        // ItemsPresenter retrieve from this control's Template
-        // in which items will be rendered.
-        internal ItemsPresenter _itemsPresenter;
-
         private ItemCollection _items;
 
         #endregion Data
@@ -415,29 +411,6 @@ namespace System.Windows.Controls
         {
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            // We update the ItemsPanel only if there is no ControlTemplate.
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            if (!this.HasTemplate && this.TemplateChild == null)
-            {
-                // If we have no template we have to create an ItemPresenter
-                // manually and attach it to this control.
-                // This can happen for instance if a class derive from
-                // ItemsControl and specify a DefaultStyleKey and the associated
-                // default style does not contain a Setter for the Template
-                // property.                
-                // We need to set this ItemsPresenter so that if we move from 
-                // no template to a template, the "manually generated" template
-                // will be detached as expected.
-                // Note: this is a Silverlight specific behavior.
-                // In WPF the content of the ItemsControl would simply not be
-                // displayed in this scenario.
-                this.TemplateChild = new ItemsPresenter();
-            }
-        }
-
         #endregion Protected Methods
 
         #region Internal Properties
@@ -462,11 +435,7 @@ namespace System.Windows.Controls
             }
         }
 
-        internal ItemsPresenter ItemsPresenter
-        {
-            get { return this._itemsPresenter; }
-            set { this._itemsPresenter = value; }
-        }
+        internal override FrameworkTemplate TemplateInternal => base.TemplateInternal ?? DefaultTemplate;
 
         internal Panel ItemsHost { get; set; }
 
@@ -474,6 +443,16 @@ namespace System.Windows.Controls
         {
             get { return this._items != null && this._items.CountInternal > 0; }
         }
+
+        private static ControlTemplate DefaultTemplate { get; } =
+            new ControlTemplate
+            {
+                TargetType = typeof(ItemsControl),
+                Template = new TemplateContent(
+                    new XamlContext(),
+                    static (owner, context) => new ItemsPresenter { TemplatedParent = owner.AsDependencyObject() }
+                ),
+            };
 
         #endregion Internal Properties
 

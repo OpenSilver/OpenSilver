@@ -15,6 +15,7 @@ using System.Collections;
 using System.Windows.Markup;
 using System.Windows.Data;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal.Xaml.Context;
 
 namespace System.Windows.Controls
 {
@@ -152,9 +153,13 @@ namespace System.Windows.Controls
             }
         }
 
-#endregion Internal Properties
+        internal override FrameworkTemplate TemplateInternal => base.TemplateInternal ?? DefaultTemplate;
 
-#region Internal Methods
+        private static FrameworkTemplate DefaultTemplate { get; } = new UseContentTemplate();
+
+        #endregion Internal Properties
+
+        #region Internal Methods
 
         /// <summary>
         /// Prepare to display the item.
@@ -202,29 +207,41 @@ namespace System.Windows.Controls
 
         #endregion Internal Methods
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        private sealed class UseContentTemplate : FrameworkTemplate
         {
-            base.INTERNAL_OnAttachedToVisualTree();
+            private readonly TemplateContent _defaultTemplate =
+                new TemplateContent(
+                    new XamlContext(),
+                    static (owner, context) =>
+                    {
+                        var grid = new Grid { TemplatedParent = owner.AsDependencyObject() };
+                        var tb = new TextBlock { TemplatedParent = owner.AsDependencyObject() };
+                        tb.SetBinding(TextBlock.TextProperty, new Binding());
+                        grid.Children.Add(tb);
+                        return grid;
+                    });
 
-            if (!this.HasTemplate && this.TemplateChild == null)
+            public UseContentTemplate()
             {
-                // If we have no template we have to create a ContentPresenter
-                // manually and attach it to this control.
-                // This can happen for instance if a class derive from
-                // ContentControl and specify a DefaultStyleKey and the associated
-                // default style does not contain a Setter for the Template
-                // property, or if we are not able to find a style for the
-                // given key.
-                // We need to set this ContentPresenter so that if we move from 
-                // no template to a template, the "manually generated" template
-                // will be detached as expected.
-                // Note: this is a Silverlight specific behavior.
-                // In WPF the content of the ContentControl would simply not be
-                // displayed in this scenario.
-                ContentPresenter presenter = new ContentPresenter();
-                BindingOperations.SetBinding(presenter, ContentPresenter.ContentTemplateProperty, new Binding("ContentTemplate") { Source = this });
-                BindingOperations.SetBinding(presenter, ContentPresenter.ContentProperty, new Binding("Content") { Source = this });
-                this.TemplateChild = presenter;
+                Seal();
+            }
+
+            internal override bool BuildVisualTree(IInternalFrameworkElement container)
+            {
+                var cc = (ContentControl)container;
+                object content = cc.Content;
+                if (content is FrameworkElement fe)
+                {
+                    container.TemplateChild = fe;
+                    return true;
+                }
+                else if (content is not null && (content is not string s || s.Length > 0))
+                {
+                    container.TemplateChild = _defaultTemplate.LoadContent(cc);
+                    return true;
+                }
+
+                return false;
             }
         }
     }
