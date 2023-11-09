@@ -442,6 +442,100 @@ namespace System.Windows
             }
         }
 
+        #region IsEnabled
+
+        /// <summary>
+        /// Fetches the value that IsEnabled should be coerced to.
+        /// </summary>
+        /// <remarks>
+        /// This method is virtual is so that controls derived from UIElement
+        /// can combine additional requirements into the coersion logic.
+        /// It is important for anyone overriding this property to also
+        /// call CoerceValue when any of their dependencies change.
+        /// </remarks>
+        internal virtual bool IsEnabledCore => true;
+
+        /// <summary>
+        /// Identifies the <see cref="IsEnabled"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsEnabledProperty =
+            DependencyProperty.Register(
+                nameof(IsEnabled),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new PropertyMetadata(true, OnIsEnabledChanged, CoerceIsEnabled)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var fe = (FrameworkElement)d;
+                        SetPointerEvents(fe);
+                        fe.ManageIsEnabled((bool)newValue);
+                    },
+                });
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user can interact with the control.
+        /// </summary>
+        /// <returns>
+        /// true if the user can interact with the control; otherwise, false.
+        /// </returns>
+        public bool IsEnabled
+        {
+            get => (bool)GetValue(IsEnabledProperty);
+            set => SetValue(IsEnabledProperty, value);
+        }
+
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var fe = (FrameworkElement)d;
+            fe.IsEnabledChanged?.Invoke(fe, e);
+            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
+        }
+
+        private static object CoerceIsEnabled(DependencyObject d, object baseValue)
+        {
+            var uie = (UIElement)d;
+
+            // We must be false if our parent is false, but we can be
+            // either true or false if our parent is true.
+            //
+            // Another way of saying this is that we can only be true
+            // if our parent is true, but we can always be false.
+            if ((bool)baseValue)
+            {
+                // Our parent can constrain us.  We can be plugged into either
+                // a "visual" or "content" tree.  If we are plugged into a
+                // "content" tree, the visual tree is just considered a
+                // visual representation, and is normally composed of raw
+                // visuals, not UIElements, so we prefer the content tree.
+                //
+                // The content tree uses the "logical" links.  But not all
+                // "logical" links lead to a content tree.
+                //
+                DependencyObject parent = VisualTreeHelper.GetParent(uie);
+                if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
+                {
+                    return BooleanBoxes.Box(uie.IsEnabledCore);
+                }
+                else
+                {
+                    return BooleanBoxes.FalseBox;
+                }
+            }
+            else
+            {
+                return BooleanBoxes.FalseBox;
+            }
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="IsEnabled"/> property changes.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsEnabledChanged;
+
+        protected internal virtual void ManageIsEnabled(bool isEnabled) { }
+
+        #endregion
 
         #region Effect
 
@@ -966,32 +1060,16 @@ namespace System.Windows
 
 #region pointer-events
 
-        internal static bool EnablePointerEventsBase(UIElement uie)
-        {
-            return (bool)uie.GetValue(FrameworkElement.IsEnabledProperty) &&
-                   uie.IsHitTestVisible;
-        }
+        internal static bool EnablePointerEventsBase(UIElement uie) =>
+            (bool)uie.GetValue(IsEnabledProperty) && uie.IsHitTestVisible;
 
         /// <summary>
         /// Fetches the value that pointer-events (css) should be coerced to.
         /// </summary>
-        internal virtual bool EnablePointerEventsCore
-        {
-            get
-            {
-                return false;
-            }
-        }
+        internal virtual bool EnablePointerEventsCore => false;
 
-        internal bool EnablePointerEvents
-        {
-            get
-            {
-                return this.EnablePointerEventsCore &&
-                       EnablePointerEventsBase(this);
-            }
-        }
-
+        internal bool EnablePointerEvents => EnablePointerEventsCore && EnablePointerEventsBase(this);
+        
         internal virtual void SetPointerEventsImpl() =>
             INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement)
                 .pointerEvents = EnablePointerEvents ? "auto" : "none";
@@ -1172,7 +1250,7 @@ namespace System.Windows
 
             if (ancestor is not UIElement)
             {
-                throw new ArgumentException($"ancestor must be a UIElement.");
+                throw new ArgumentException("ancestor must be a UIElement.");
             }
 
             // Walk up the parent chain of the descendant until we run out
@@ -1195,9 +1273,9 @@ namespace System.Windows
 
         internal static void SynchronizeForceInheritProperties(UIElement uie, DependencyObject parent)
         {
-            if (!(bool)parent.GetValue(FrameworkElement.IsEnabledProperty))
+            if (!(bool)parent.GetValue(IsEnabledProperty))
             {
-                uie.CoerceValue(FrameworkElement.IsEnabledProperty);
+                uie.CoerceValue(IsEnabledProperty);
             }
 
             if (!(bool)parent.GetValue(IsHitTestVisibleProperty))

@@ -637,127 +637,22 @@ namespace System.Windows
 
         #endregion
 
-        #region IsEnabled
-
-        /// <summary>
-        ///     Fetches the value that IsEnabled should be coerced to.
-        /// </summary>
-        /// <remarks>
-        ///     This method is virtual is so that controls derived from UIElement
-        ///     can combine additional requirements into the coersion logic.
-        ///     <P/>
-        ///     It is important for anyone overriding this property to also
-        ///     call CoerceValue when any of their dependencies change.
-        /// </remarks>
-        internal virtual bool IsEnabledCore
+        protected internal override void ManageIsEnabled(bool isEnabled)
         {
-            get
-            {
-                // ButtonBase.IsEnabledCore: CanExecute
-                return true;
-            }
-        }
+            base.ManageIsEnabled(isEnabled);
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the user can interact with the control.
-        /// </summary>
-        public bool IsEnabled
-        {
-            get { return (bool)GetValue(IsEnabledProperty); }
-            set { SetValue(IsEnabledProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="FrameworkElement.IsEnabled"/> dependency
-        /// property.
-        /// </summary>
-        public static readonly DependencyProperty IsEnabledProperty =
-            DependencyProperty.Register(
-                nameof(IsEnabled),
-                typeof(bool),
-                typeof(FrameworkElement),
-                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabled)
-                {
-                    MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
-                });
-
-        private static void IsEnabled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-            if (fe.IsEnabledChanged != null)
-            {
-                fe.IsEnabledChanged(fe, e);
-            }
-            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
-        }
-
-        private static object CoerceIsEnabled(DependencyObject d, object baseValue)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-
-            if (!(baseValue is bool)) //todo: this is a temporary workaround to avoid an invalid cast exception. Fix this by investigating why sometimes baseValue is not a bool, such as a Binding (eg. Client_GD).
-                return true;
-
-            // We must be false if our parent is false, but we can be
-            // either true or false if our parent is true.
-            //
-            // Another way of saying this is that we can only be true
-            // if our parent is true, but we can always be false.
-            if ((bool)baseValue)
-            {
-                // Our parent can constrain us.  We can be plugged into either
-                // a "visual" or "content" tree.  If we are plugged into a
-                // "content" tree, the visual tree is just considered a
-                // visual representation, and is normally composed of raw
-                // visuals, not UIElements, so we prefer the content tree.
-                //
-                // The content tree uses the "logical" links.  But not all
-                // "logical" links lead to a content tree.
-                //
-                DependencyObject parent = fe.Parent ?? VisualTreeHelper.GetParent(fe);
-                if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
-                {
-                    return fe.IsEnabledCore;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Occurs when the IsEnabled property changes.
-        /// </summary>
-        public event DependencyPropertyChangedEventHandler IsEnabledChanged;
-
-        private static void IsEnabled_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var element = (FrameworkElement)d;
-            SetPointerEvents(element);
-            element.ManageIsEnabled((bool)newValue);
-        }
-
-        protected internal virtual void ManageIsEnabled(bool isEnabled)
-        {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 if (isEnabled)
                 {
-                    INTERNAL_HtmlDomManager.RemoveDomElementAttribute(INTERNAL_OuterDomElement, "disabled", forceSimulatorExecuteImmediately: true);
+                    INTERNAL_HtmlDomManager.RemoveAttribute(INTERNAL_OuterDomElement, "disabled");
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, "disabled", "true");
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, "disabled", string.Empty);
                 }
             }
         }
-
-        #endregion
 
         #region Names handling
 
