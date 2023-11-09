@@ -141,6 +141,8 @@ namespace CSHTML5.Internal
         public string flexShrink { set { SetStylePropertyValue("flexShrink", value); } }
         public string flexBasis { set { SetStylePropertyValue("flexBasis", value); } }
         public string userSelect { set { SetStylePropertyValue("userSelect", value); } }
+        public string webkitLineClamp { set { SetStylePropertyValue("webkitLineClamp", value); } }
+        public string webkitBoxOrient { set { SetStylePropertyValue("webkitBoxOrient", value); } }
 
         internal void setProperty(string propertyName, string value) =>
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(

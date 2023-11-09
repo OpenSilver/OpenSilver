@@ -435,6 +435,28 @@ namespace System.Windows.Controls
                 Math.Max(0, availableSize.Width - paddingWidth),
                 string.Empty);
 
+            if (TextWrapping == TextWrapping.Wrap && TextTrimming != TextTrimming.None && (textSize.Height + paddingHeight) > availableSize.Height)
+            {
+                if (_noWrapSize.Height > 0)
+                {
+                    var lines = (int)(availableSize.Height / _noWrapSize.Height);
+                    var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement);
+
+                    /*
+                     * Browser Compatibility: Chrome 6+, Edge 17+, FireFox 68+
+                     * https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-line-clamp#browser_compatibility
+                     * 
+                     * Limitation: line clamp set on TextBlock rather than child Runs so that remaining text is not hidden,
+                     * so that TextBlock need to set correct Height to hide the remaining characters
+                     */
+                    style.display = "-webkit-box";
+                    style.webkitBoxOrient = "vertical";
+                    style.webkitLineClamp = lines.ToString();
+
+                    return new Size(textSize.Width + paddingWidth, availableSize.Height);
+                }
+            }
+
             return new Size(textSize.Width + paddingWidth, textSize.Height + paddingHeight);
         }
 
