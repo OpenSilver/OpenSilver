@@ -385,10 +385,14 @@ namespace System.Windows.Navigation
                     throw new InvalidOperationException(Resource.PageResourceContentLoader_InvalidComponentSyntax);
                 }
                 assemblyPartSource = pagePathAndNameParts[0];
+                if (assemblyPartSource.StartsWith("/"))
+                {
+                    assemblyPartSource = assemblyPartSource.Substring(1);
+                }
                 pagePathAndNameWithoutAssembly = pagePathAndNameParts[1];
             }
 
-            if (String.IsNullOrEmpty(assemblyPartSource))
+            if (string.IsNullOrEmpty(assemblyPartSource))
             {
                 return false;
             }
