@@ -1006,6 +1006,57 @@ document.textboxHelpers = (function () {
     };
 })();
 
+document.htmlPresenterHelpers = (function () {
+    return {
+        createView: function (id, contentId, parentId) {
+            const view = document.createLayoutElement('div', id, parentId, -1);
+            if (view) {
+                const content = document.createElement('div');
+                content.setAttribute('id', contentId);
+                content.attachShadow({ mode: 'open' });
+                view.appendChild(content);
+            }
+        },
+        onKeyDownNative: function (view, e) {
+            if (!view || !e) return false;
+
+            switch (e.key) {
+                case 'ArrowLeft':
+                    return view.scrollLeft > 0;
+                case 'ArrowRight':
+                    return view.scrollLeft < (view.scrollWidth - view.clientWidth);
+                case 'ArrowUp':
+                case 'PageUp':
+                case 'Home':
+                    return view.scrollTop > 0;
+                case 'ArrowDown':
+                case 'PageDown':
+                case 'End':
+                    return view.scrollTop < (view.scrollHeight - view.clientHeight);
+            }
+
+            return false;
+        },
+        onWheelNative: function (view, e) {
+            if (!view || !e || e.deltaY === 0) return false;
+
+            if (e.deltaY > 0) {
+                if (e.shiftKey) {
+                    return view.scrollLeft < (view.scrollWidth - view.clientWidth);
+                } else {
+                    return view.scrollTop < (view.scrollHeight - view.clientHeight);
+                }
+            } else {
+                if (e.shiftKey) {
+                    return view.scrollLeft > 0;
+                } else {
+                    return view.scrollTop > 0;
+                }
+            }
+        },
+    };
+})();
+
 document.velocityHelpers = (function () {
     const cache = {};
 

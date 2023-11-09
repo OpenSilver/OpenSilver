@@ -25,6 +25,7 @@ using System.Windows.Documents;
 using System.Windows.Shapes;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
+using HtmlPresenter = CSHTML5.Native.Html.Controls.HtmlPresenter;
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
 {
@@ -542,6 +543,26 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 $"document.createSvgElement('{uid}', '{tagName}', '{parent.UniqueIdentifier}');");
 
             return new INTERNAL_HtmlDomElementReference(uid, parent);
+        }
+
+        internal static (INTERNAL_HtmlDomElementReference PresenterElement, INTERNAL_HtmlDomElementReference ContentElement)
+            CreateHtmlPresenterElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, HtmlPresenter htmlPresenter)
+        {
+            Debug.Assert(parent is not null);
+            Debug.Assert(htmlPresenter is not null);
+
+            string id = NewId();
+            string contentId = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"document.htmlPresenterHelpers.createView('{id}', '{contentId}', '{parent.UniqueIdentifier}');");
+
+            AddToGlobalStore(id, htmlPresenter);
+
+            var presenter = new INTERNAL_HtmlDomElementReference(id, parent);
+            var content = new INTERNAL_HtmlDomElementReference(contentId, presenter);
+
+            return (presenter, content);
         }
 
         internal static INTERNAL_HtmlDomElementReference CreateTextBoxViewDomElementAndAppendIt(

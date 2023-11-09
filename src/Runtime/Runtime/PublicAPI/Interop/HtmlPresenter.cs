@@ -11,8 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
+using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -22,58 +25,82 @@ namespace CSHTML5.Native.Html.Controls
     public class HtmlPresenter : FrameworkElement
     {
         private object _jsDiv;
-        private string _htmlContent;
         private ResizeObserverAdapter _resizeObserver;
 
-        internal sealed override bool EnablePointerEventsCore => true;
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            object outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
-            _jsDiv = domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", outerDiv, this);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"{INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv)}.attachShadow({{ mode:'open' }});");
-            return outerDiv;
-        }
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            _resizeObserver = new ResizeObserverAdapter();
-            _resizeObserver.Observe(_jsDiv, OnHtmlContentResized);
-
-            ApplyHtmlContent();
-        }
-
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            base.INTERNAL_OnDetachedFromVisualTree();
-
-            if (_resizeObserver is not null)
-            {
-                _resizeObserver.Unobserve(_jsDiv);
-                _resizeObserver = null;
-            }
-
-            _jsDiv = null;
-        }
-
-        protected override Size MeasureOverride(Size availableSize) => MeasureArrangeHelper();
-
-        protected override Size ArrangeOverride(Size finalSize) => MeasureArrangeHelper();
-
+        /// <summary>
+        /// Identifies the <see cref="Html"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty HtmlProperty =
+            DependencyProperty.Register(
+                nameof(Html),
+                typeof(string),
+                typeof(HtmlPresenter),
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var htmlPresenter = (HtmlPresenter)d;
+                        string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(htmlPresenter._jsDiv);
+                        string sContent = INTERNAL_InteropImplementation.GetVariableStringForJS((string)newValue ?? string.Empty);
+                        OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.shadowRoot.innerHTML = {sContent};");
+                    },
+                });
+        
+        /// <summary>
+        /// Gets or sets the content of the <see cref="HtmlPresenter" />.
+        /// </summary>
+        /// <returns>
+        /// The html content of the <see cref="HtmlPresenter" />.
+        /// </returns>
         public string Html
         {
-            get => _htmlContent;
-            set
-            {
-                _htmlContent = value;
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            get => (string)GetValue(HtmlProperty);
+            set => SetValue(HtmlProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ScrollMode" /> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ScrollModeProperty =
+            DependencyProperty.Register(
+                nameof(ScrollMode),
+                typeof(ScrollMode),
+                typeof(HtmlPresenter),
+                new FrameworkPropertyMetadata(ScrollMode.Auto)
                 {
-                    ApplyHtmlContent();
-                }
-            }
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetScrollMode((HtmlPresenter)d, (ScrollMode)newValue),
+                },
+                IsValidScrollMode);
+
+        private static void SetScrollMode(HtmlPresenter htmlPresenter, ScrollMode mode)
+        {
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(htmlPresenter.INTERNAL_OuterDomElement);
+            style.overflow = mode switch
+            {
+                ScrollMode.Enabled => "scroll",
+                ScrollMode.Auto => "auto",
+                _ => "hidden",
+            };
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates how the <see cref="HtmlPresenter"/> interacts with
+        /// its overflowing content.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.Windows.Controls.ScrollMode" /> value that indicates how the overflowing
+        /// content is displayed. The default value is <see cref="ScrollMode.Auto" />.
+        /// </returns>
+        public ScrollMode ScrollMode
+        {
+            get => (ScrollMode)GetValue(ScrollModeProperty);
+            set => SetValue(ScrollModeProperty, value);
+        }
+
+        private static bool IsValidScrollMode(object value)
+        {
+            ScrollMode mode = (ScrollMode)value;
+            return mode == ScrollMode.Disabled || mode == ScrollMode.Enabled || mode == ScrollMode.Auto;
         }
 
         public object DomElement
@@ -96,23 +123,82 @@ namespace CSHTML5.Native.Html.Controls
             }
         }
 
-        private Size MeasureArrangeHelper()
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            (var outerDiv, _jsDiv) = INTERNAL_HtmlDomManager.CreateHtmlPresenterElementAndAppendIt(
+                (INTERNAL_HtmlDomElementReference)parentRef, this);
+
+            domElementWhereToPlaceChildren = _jsDiv;
+            return outerDiv;
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+
+            _resizeObserver = new ResizeObserverAdapter();
+            _resizeObserver.Observe(_jsDiv, OnHtmlContentResized);
+
+            SetScrollMode(this, ScrollMode);
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            base.INTERNAL_OnDetachedFromVisualTree();
+
+            if (_resizeObserver is not null)
+            {
+                _resizeObserver.Unobserve(_jsDiv);
+                _resizeObserver = null;
+            }
+
+            _jsDiv = null;
+        }
+
+        /// <inheritdoc />
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            base.OnMouseWheel(e);
+
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            string sArgs = INTERNAL_InteropImplementation.GetVariableStringForJS(e.UIEventArg);
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onWheelNative({sElement}, {sArgs})"))
+            {
+                e.Handled = true;
+                e.Cancellable = false;
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            string sArgs = INTERNAL_InteropImplementation.GetVariableStringForJS(e.UIEventArg);
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onKeyDownNative({sElement}, {sArgs})"))
+            {
+                e.Handled = true;
+                e.Cancellable = false;
+            }
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                return INTERNAL_HtmlDomManager.GetBoundingClientSize(_jsDiv);
+                Size size = INTERNAL_HtmlDomManager.GetBoundingClientSize(_jsDiv);
+                return new Size(Math.Min(availableSize.Width, size.Width), Math.Min(availableSize.Height, size.Height));
             }
 
             return new Size();
         }
 
-        private void ApplyHtmlContent()
-        {
-            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
-            string sContent = INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlContent ?? string.Empty);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.shadowRoot.innerHTML = {sContent};");
-            InvalidateMeasure();
-        }
+        protected override Size ArrangeOverride(Size finalSize) => finalSize;
+
+        internal sealed override bool EnablePointerEventsCore => true;
+
+        internal sealed override void AddEventListeners() => InputManager.Current.AddEventListeners(this, true);
 
         private void OnHtmlContentResized(Size size) => InvalidateMeasure();
     }
