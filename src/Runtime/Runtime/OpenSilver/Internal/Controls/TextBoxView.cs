@@ -306,6 +306,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
     var maxLength = element_InsideEventHandler.getAttribute(""maxlength"");
     var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
 
+    if (maxLength == null) maxLength = 0;
     if (e.keyCode == 13)
     {{
         if(acceptsReturn != ""true"")
