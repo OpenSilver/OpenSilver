@@ -510,6 +510,11 @@ namespace OpenSilver
         public static bool IsRunningInTheSimulator_WorkAround => IsRunningInTheSimulator;
 
         /// <summary>
+        /// Returns True if the app is running inside the Xaml Designer, and False otherwise.
+        /// </summary>
+        public static bool IsRunningInTheXamlDesigner { get; private set; }
+
+        /// <summary>
         /// Check if the given jsnode is undefined
         /// </summary>
         public static bool IsUndefined(object jsObject)
