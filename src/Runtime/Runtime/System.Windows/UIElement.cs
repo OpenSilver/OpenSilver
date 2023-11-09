@@ -462,14 +462,14 @@ namespace System.Windows
             DependencyProperty.Register(
                 nameof(IsEnabled),
                 typeof(bool),
-                typeof(FrameworkElement),
+                typeof(UIElement),
                 new PropertyMetadata(true, OnIsEnabledChanged, CoerceIsEnabled)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        var fe = (FrameworkElement)d;
-                        SetPointerEvents(fe);
-                        fe.ManageIsEnabled((bool)newValue);
+                        var uie = (UIElement)d;
+                        SetPointerEvents(uie);
+                        uie.ManageIsEnabled((bool)newValue);
                     },
                 });
 
@@ -487,9 +487,9 @@ namespace System.Windows
 
         private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var fe = (FrameworkElement)d;
-            fe.IsEnabledChanged?.Invoke(fe, e);
-            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
+            var uie = (UIElement)d;
+            uie.IsEnabledChanged?.Invoke(uie, e);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
         }
 
         private static object CoerceIsEnabled(DependencyObject d, object baseValue)
