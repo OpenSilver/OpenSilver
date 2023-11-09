@@ -28,11 +28,10 @@
 		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
 		<Compile Include="Core\Events\DOMEventManager.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
-		<Compile Include="Core\Main\DescendentsWalker.cs" />
-		<Compile Include="Core\Main\DescendentsWalkerBase.cs" />
+		<Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
 		<Compile Include="Core\Main\EffectiveValueEntry.cs" />
 		<Compile Include="Core\Main\EmptyEnumerator.cs" />
-		<Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
+		<Compile Include="OpenSilver\Internal\InheritablePropertyChangeInfo.cs" />
 		<Compile Include="OpenSilver\Controls\DatePicker\Calendar.cs" />
 		<Compile Include="OpenSilver\Controls\DatePicker\Calendar.NotImplemented.cs" />
 		<Compile Include="OpenSilver\Controls\DatePicker\DatePicker.cs" />
@@ -58,7 +57,6 @@
 		<Compile Include="OpenSilver\Internal\Media\Animation\ICloneOnAnimation.cs" />
 		<Compile Include="OpenSilver\Internal\NamedObject.cs" />
 		<Compile Include="OpenSilver\Internal\ValidateValueCallback.cs" />
-		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
 		<Compile Include="Diagnostics\DebugInfo.cs" />

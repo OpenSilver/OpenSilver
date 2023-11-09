@@ -83,15 +83,11 @@ public partial class FrameworkElement : IInternalFrameworkElement
 
     void IInternalFrameworkElement.AddLogicalChild(object child) => AddLogicalChild(child);
 
-    DependencyObject IInternalFrameworkElement.AsDependencyObject() => this;
-
     void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent) => ChangeLogicalParent(newParent);
 
     object IInternalFrameworkElement.FindName(string name) => FindName(name);
 
     void IInternalFrameworkElement.LoadResources() => LoadResources();
-
-    void IInternalFrameworkElement.OnInheritedPropertyChanged(InheritablePropertyChangeInfo info) => OnInheritedPropertyChanged(this, info);
 
     void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();
 

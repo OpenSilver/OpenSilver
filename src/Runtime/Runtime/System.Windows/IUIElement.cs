@@ -44,4 +44,6 @@ internal interface IInternalUIElement : IUIElement, IInternalDependencyObject
     void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo);
 
     void RemoveHandler(RoutedEvent routedEvent, Delegate handler);
+
+    DependencyObject AsDependencyObject();
 }

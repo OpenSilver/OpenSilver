@@ -1,4 +1,16 @@
-﻿using System;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System.Diagnostics;
 using System.Windows.Media;
 using CSHTML5.Internal;
@@ -7,34 +19,35 @@ using OpenSilver.Internal;
 namespace System.Windows
 {
     /// <summary>
-    ///     This is a static helper class that has methods
-    ///     that use the DescendentsWalker to do tree walks.
+    /// This is a static helper class that has methods
+    /// that use the DescendentsWalker to do tree walks.
     /// </summary>
     internal static class TreeWalkHelper
     {
-        #region InheritablePropertyChange
-
-        internal static void InvalidateOnInheritablePropertyChange(IInternalFrameworkElement fe, InheritablePropertyChangeInfo info, bool skipStartNode)
+        internal static void InvalidateOnInheritablePropertyChange(
+            IInternalUIElement uie,
+            InheritablePropertyChangeInfo info,
+            bool skipStartNode)
         {
-            if (HasChildren(fe))
+            if (HasChildren(uie))
             {
-                DescendentsWalker<InheritablePropertyChangeInfo> walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
+                var walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
                     TreeWalkPriority.LogicalTree, InheritablePropertyChangeDelegate, info);
 
-                walker.StartWalk(fe.AsDependencyObject(), skipStartNode);
+                walker.StartWalk(uie.AsDependencyObject(), skipStartNode);
             }
             else if (!skipStartNode)
             {
                 // Degenerate case when the current node is a leaf node and has no children.
                 // If the current node needs a notification, do so now.
                 bool visitedViaVisualTree = false;
-                OnInheritablePropertyChanged(fe.AsDependencyObject(), info, visitedViaVisualTree);
+                OnInheritablePropertyChanged(uie.AsDependencyObject(), info, visitedViaVisualTree);
             }
         }
 
         /// <summary>
-        ///     Callback on visiting each node in the descendency
-        ///     during an inheritable property change
+        /// Callback on visiting each node in the descendency
+        /// during an inheritable property change
         /// </summary>
         private static bool OnInheritablePropertyChanged(
             DependencyObject d,
@@ -99,34 +112,25 @@ namespace System.Windows
         }
 
         /// <summary>
-        ///     Determine if the current DependencyObject is a candidate for
-        ///     producing inheritable values
+        /// Determine if the current DependencyObject is a candidate for
+        /// producing inheritable values
         /// </summary>
         internal static bool IsInheritanceNode(PropertyMetadata metadata)
         {
             return metadata is not null && metadata.Inherits;
         }
 
-        #endregion InheritablePropertyChange
-
-        #region PrivateMethods
-
         /// <summary>
-        ///     Says if the current FE has visual or logical children
+        /// Says if the current FE has visual or logical children
         /// </summary>
-        internal static bool HasChildren(IInternalFrameworkElement fe)
+        internal static bool HasChildren(IInternalUIElement uie)
         {
             // See if we have logical or visual children, in which case this is a real tree invalidation.
-            return fe != null && (fe.HasLogicalChildren || fe.HasVisualChildren);
+            return uie != null && (uie.HasVisualChildren ||
+                (uie is IInternalFrameworkElement fe && fe.HasLogicalChildren));
         }
 
-        #endregion PrivateMethods
-
-        #region StaticData
-
-        private static VisitedCallback<InheritablePropertyChangeInfo> InheritablePropertyChangeDelegate
+        private static readonly VisitedCallback<InheritablePropertyChangeInfo> InheritablePropertyChangeDelegate
             = new VisitedCallback<InheritablePropertyChangeInfo>(OnInheritablePropertyChanged);
-
-        #endregion StaticData
     }
 }

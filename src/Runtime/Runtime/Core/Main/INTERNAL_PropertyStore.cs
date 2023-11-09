@@ -177,7 +177,7 @@ namespace CSHTML5.Internal
                 coerceWithCurrentValue, // coerceWithCurrentValue
                 false, // coerceValue
                 false, // clearValue
-                true); // propagateChanges
+                OperationType.Unknown); // propagateChanges
         }
 
         internal static void RefreshExpressionCommon(INTERNAL_PropertyStorage storage,
@@ -199,7 +199,7 @@ namespace CSHTML5.Internal
                 false, // coerceWithCurrentValue
                 false, // coerceValue
                 false, // clearValue
-                true); // propagateChanges
+                OperationType.Unknown); // propagateChanges
         }
 
         internal static void ClearValueCommon(INTERNAL_PropertyStorage storage,
@@ -226,7 +226,7 @@ namespace CSHTML5.Internal
                 false, // coerceWithCurrentValue
                 false, // coerceValue
                 true, // clearValue
-                true); // propagateChanges
+                OperationType.Unknown); // propagateChanges
         }
 
         internal static void CoerceValueCommon(INTERNAL_PropertyStorage storage,
@@ -255,7 +255,7 @@ namespace CSHTML5.Internal
                 false, // coerceWithCurrentValue
                 true, // coerceValue
                 false, // clearValue
-                true); // propagateChanges
+                OperationType.Unknown); // propagateChanges
         }
 
         internal static object GetEffectiveValue(EffectiveValueEntry entry)
@@ -305,7 +305,7 @@ namespace CSHTML5.Internal
                 false, // coerceWithCurrentValue
                 false, // coerceValue
                 clearValue, // clearValue
-                true); // propagateChanges
+                OperationType.Unknown); // propagateChanges
         }
 
         #endregion
@@ -362,7 +362,7 @@ namespace CSHTML5.Internal
             bool coerceWithCurrentValue,
             bool coerceValue,
             bool clearValue,
-            bool propagateChanges)
+            OperationType operationType)
         {
             Debug.Assert((coerceWithCurrentValue == coerceValue && !coerceValue) || coerceValue != coerceWithCurrentValue);
 
@@ -542,26 +542,7 @@ namespace CSHTML5.Internal
             if (valueChanged = (storage.INTERNAL_IsVisualValueDirty || !Equals(dp, oldValue, computedValue)))
             {
                 // Raise the PropertyChanged event
-                OnPropertyChanged(depObj, dp, metadata, oldValue, computedValue);
-
-                // Propagate to children if property is inherited
-                if (metadata.Inherits)
-                {
-                    if (depObj is IInternalFrameworkElement rootElement)
-                    {
-                        InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo(rootElement.AsDependencyObject(),
-                            dp,
-                            oldValue, oldBaseValueSource,
-                            computedValue, newValueSource);
-
-                        if (propagateChanges)
-                        {
-                            TreeWalkHelper.InvalidateOnInheritablePropertyChange(rootElement, info, true);
-                        }
-
-                        rootElement.OnInheritedPropertyChanged(info);
-                    }
-                }
+                OnPropertyChanged(depObj, dp, metadata, oldValue, computedValue, operationType);
                 storage.INTERNAL_IsVisualValueDirty = false;
             }
 
@@ -634,7 +615,8 @@ namespace CSHTML5.Internal
             DependencyProperty dp,
             PropertyMetadata metadata,
             object oldValue,
-            object newValue)
+            object newValue,
+            OperationType operationType)
         {
             //---------------------
             // Ensure tha the value knows in which properties it is used (this is useful for example so that a SolidColorBrush knows in which properties it is used):
@@ -689,7 +671,7 @@ namespace CSHTML5.Internal
             // Call the PropertyChangedCallback if any:
             //---------------------
 
-            depObj.NotifyPropertyChange(new DependencyPropertyChangedEventArgs(oldValue, newValue, dp, metadata));
+            depObj.NotifyPropertyChange(new DependencyPropertyChangedEventArgs(oldValue, newValue, dp, metadata, operationType));
         }
 
         private static bool Equals(DependencyProperty dp, object obj1, object obj2)
@@ -708,7 +690,7 @@ namespace CSHTML5.Internal
             DependencyProperty dp,
             PropertyMetadata metadata,
             object newValue,
-            bool recursively)
+            bool propagateChanges)
         {
             storage.InheritedValue = newValue;
 
@@ -721,7 +703,7 @@ namespace CSHTML5.Internal
                 false, // coerceWithCurrentValue
                 false, // coerceValue
                 newValue == DependencyProperty.UnsetValue, // clearValue
-                recursively); // propagateChanges
+                propagateChanges ? OperationType.Unknown : OperationType.Inherit); // propagateChanges
         }
 
         internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage,
@@ -747,7 +729,7 @@ namespace CSHTML5.Internal
                 false, // coerceWithCurrentValue
                 false, // coerceValue
                 newValue == DependencyProperty.UnsetValue, // clearValue
-                true); // propagateChanges
+                OperationType.Unknown); // propagateChanges
         }
 
         internal static void SetThemeStyleValue(INTERNAL_PropertyStorage storage,
@@ -773,7 +755,7 @@ namespace CSHTML5.Internal
                 false, // coerceWithCurrentValue
                 false, // coerceValue
                 newValue == DependencyProperty.UnsetValue, // clearValue
-                true); // propagateChanges
+                OperationType.Unknown); // propagateChanges
         }
 
         private static void ValidateValue(DependencyProperty dp, object value)

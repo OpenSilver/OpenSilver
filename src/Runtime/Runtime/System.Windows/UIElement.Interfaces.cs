@@ -52,4 +52,6 @@ public partial class UIElement : IInternalUIElement
     DependencyObject IInternalUIElement.GetVisualChild(int index) => GetVisualChild(index);
 
     void IInternalUIElement.OnVisualParentChanged(DependencyObject oldParent) => OnVisualParentChanged(oldParent);
+
+    DependencyObject IInternalUIElement.AsDependencyObject() => this;
 }

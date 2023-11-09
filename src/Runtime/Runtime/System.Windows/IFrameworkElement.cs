@@ -52,8 +52,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     object FindName(string name);
 
-    void OnInheritedPropertyChanged(InheritablePropertyChangeInfo info);
-
     void AddLogicalChild(object child);
 
     void RemoveLogicalChild(object child);
@@ -67,6 +65,4 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
     void RaiseLoadedEvent();
 
     void RaiseUnloadedEvent();
-
-    DependencyObject AsDependencyObject();
 }

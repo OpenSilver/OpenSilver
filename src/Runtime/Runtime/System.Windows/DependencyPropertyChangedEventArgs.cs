@@ -11,13 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows
 {
     /// <summary>
-    /// Provides data for a PropertyChangedCallback implementation.
+    /// Provides data for a <see cref="PropertyChangedCallback"/> implementation.
     /// </summary>
     public sealed class DependencyPropertyChangedEventArgs : IDependencyPropertyChangedEventArgs
     {
@@ -31,6 +30,21 @@ namespace System.Windows
             NewValue = newValue;
             Property = property;
             Metadata = metadata;
+            OperationType = OperationType.Unknown;
+        }
+
+        internal DependencyPropertyChangedEventArgs(
+            object oldValue,
+            object newValue,
+            DependencyProperty property,
+            PropertyMetadata metadata,
+            OperationType operationType)
+        {
+            OldValue = oldValue;
+            NewValue = newValue;
+            Property = property;
+            Metadata = metadata;
+            OperationType = operationType;
         }
 
         public DependencyPropertyChangedEventArgs() { }
@@ -38,21 +52,38 @@ namespace System.Windows
         /// <summary>
         /// Gets the value of the property before the change.
         /// </summary>
+        /// <returns>
+        /// The property value before the change.
+        /// </returns>
         public object OldValue { get; }
 
         /// <summary>
         /// Gets the value of the property after the change.
         /// </summary>
+        /// <returns>
+        /// The property value after the change.
+        /// </returns>
         public object NewValue { get; }
 
         /// <summary>
         /// Gets the identifier for the dependency property where the value change occurred.
         /// </summary>
+        /// <returns>
+        /// The identifier field of the dependency property where the value change occurred.
+        /// </returns>
         public DependencyProperty Property { get; }
 
         /// <summary>
         /// Metadata for the property
         /// </summary>
         internal PropertyMetadata Metadata { get; }
+
+        internal OperationType OperationType { get; }
+    }
+
+    internal enum OperationType : byte
+    {
+        Unknown = 0,
+        Inherit = 1,
     }
 }

@@ -687,7 +687,33 @@ namespace System.Windows
                 metadata);
         }
 
-        internal void ResetInheritedProperties()
+        internal static void InvalidateInheritedProperties(DependencyObject d, DependencyObject newParent)
+        {
+            if (newParent == null)
+            {
+                d.ResetInheritedProperties();
+            }
+            else
+            {
+                foreach (var kvp in newParent.INTERNAL_AllInheritedProperties.ToArray())
+                {
+                    DependencyProperty dp = kvp.Key;
+                    INTERNAL_PropertyStorage storage = kvp.Value;
+
+                    PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
+                    if (TreeWalkHelper.IsInheritanceNode(metadata))
+                    {
+                        d.SetInheritedValue(
+                            dp,
+                            metadata,
+                            INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
+                            true);
+                    }
+                }
+            }
+        }
+
+        private void ResetInheritedProperties()
         {
             foreach (var kvp in INTERNAL_AllInheritedProperties.ToArray())
             {

@@ -254,32 +254,6 @@ namespace System.Windows
             InvalidateInheritedProperties(this, parent);
         }
 
-        internal static void InvalidateInheritedProperties(FrameworkElement fe, DependencyObject newParent)
-        {
-            if (newParent == null)
-            {
-                fe.ResetInheritedProperties();
-            }
-            else
-            {
-                foreach (var kvp in newParent.INTERNAL_AllInheritedProperties.ToArray())
-                {
-                    DependencyProperty dp = kvp.Key;
-                    INTERNAL_PropertyStorage storage = kvp.Value;
-
-                    PropertyMetadata metadata = dp.GetMetadata(fe.DependencyObjectType);
-                    if (TreeWalkHelper.IsInheritanceNode(metadata))
-                    {
-                        fe.SetInheritedValue(
-                            dp,
-                            metadata,
-                            INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
-                            true);
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Returns enumerator to logical children
         /// </summary>
@@ -990,6 +964,22 @@ namespace System.Windows
                 {
                     InvalidateParentArrange();
                 }
+            }
+
+            if (e.Metadata.Inherits)
+            {
+                var info = new InheritablePropertyChangeInfo(
+                    this,
+                    e.Property,
+                    e.OldValue,
+                    e.NewValue);
+
+                if (e.OperationType != OperationType.Inherit)
+                {
+                    TreeWalkHelper.InvalidateOnInheritablePropertyChange(this, info, true);
+                }
+
+                OnInheritedPropertyChanged(this, info);
             }
         }
 
