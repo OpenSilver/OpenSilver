@@ -916,11 +916,11 @@ parentElement.appendChild(child);";
                 Rect clipRect = clip.Value;
                 string clipLeft = Math.Round(clipRect.Left, 2).ToInvariantString();
                 string clipTop = Math.Round(clipRect.Top, 2).ToInvariantString();
-                string clipWidth = Math.Round(clipRect.Width, 2).ToInvariantString();
-                string clipHeight = Math.Round(clipRect.Height, 2).ToInvariantString();
+                string clipRight = Math.Round(clipRect.Right, 2).ToInvariantString();
+                string clipBottom = Math.Round(clipRect.Bottom, 2).ToInvariantString();
 
                 javaScriptCodeToExecute =
-                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipWidth},{clipHeight});";
+                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom});";
             }
             else
             {

@@ -692,7 +692,7 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
     window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
 };
 
-document.setVisualBounds = function (id, left, top, width, height, clip, clipLeft, clipTop, clipWidth, clipHeight) {
+document.setVisualBounds = function (id, left, top, width, height, clip, clipLeft, clipTop, clipRight, clipBottom) {
     const element = document.getElementById(id);
     if (element) {
         element.style.left = left + 'px';
@@ -701,7 +701,7 @@ document.setVisualBounds = function (id, left, top, width, height, clip, clipLef
         element.style.height = height + 'px';
         element.style.position = 'absolute';
         if (clip) {
-            element.style.clipPath = `polygon(${clipLeft}px ${clipTop}px, ${clipWidth}px ${clipTop}px, ${clipWidth}px ${clipHeight}px, ${clipLeft}px ${clipHeight}px)`;
+            element.style.clipPath = `polygon(${clipLeft}px ${clipTop}px, ${clipRight}px ${clipTop}px, ${clipRight}px ${clipBottom}px, ${clipLeft}px ${clipBottom}px)`;
         } else {
             element.style.clipPath = '';
         }
