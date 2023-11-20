@@ -343,5 +343,6 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
         private const string IComponentConnectorClass = "global::OpenSilver.Internal.Xaml.IComponentConnector";
         private const string XamlContextClass = "global::OpenSilver.Internal.Xaml.Context.XamlContext";
         private const string IMarkupExtensionClass = "global::System.Xaml.IMarkupExtension<object>";
+        private const string XamlDesignerBridgeClass = "global::OpenSilver.Internal.Xaml.XamlDesignerBridge";
     }
 }

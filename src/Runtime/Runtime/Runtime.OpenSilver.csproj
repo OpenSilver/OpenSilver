@@ -107,6 +107,7 @@
 		<Compile Include="OpenSilver\Internal\Xaml\IComponentConnector.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\IXamlComponentLoader.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\ServiceProviderContext.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\XamlDesignerBridge.cs" />
 		<Compile Include="OpenSilver\IO\MemoryFileInfo.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
 		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverAssemblyAttribute.cs" />
