@@ -528,7 +528,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
                             valueWasRetrieved = true;
                         }
 
@@ -542,7 +542,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
                             valueWasRetrieved = true;
                         }
 
@@ -554,7 +554,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
                             valueWasRetrieved = true;
                         }
 
@@ -575,7 +575,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
                             valueWasRetrieved = true;
                         }
 

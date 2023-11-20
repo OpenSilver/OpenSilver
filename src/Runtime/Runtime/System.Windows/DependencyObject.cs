@@ -314,7 +314,7 @@ namespace System.Windows
                 false,
                 out INTERNAL_PropertyStorage storage))
             {
-                return INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
+                return INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
             }
 
             if (!dependencyProperty.IsDefaultValueChanged &&
@@ -666,7 +666,7 @@ namespace System.Windows
                         d.SetInheritedValue(
                             dp,
                             metadata,
-                            INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
+                            INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved),
                             true);
                     }
                 }
@@ -785,10 +785,34 @@ namespace System.Windows
             return accessAllowed;
         }
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Returns any base value established for a Silverlight dependency property, which
+        /// would apply in cases where an animation is not active.
+        /// </summary>
+        /// <param name="dp">
+        /// The identifier for the desired dependency property.
+        /// </param>
+        /// <returns>
+        /// The returned base value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// dp is null.
+        /// </exception>
         public object GetAnimationBaseValue(DependencyProperty dp)
         {
-            return default(object);
+            if (dp is null)
+            {
+                throw new ArgumentNullException(nameof(dp));
+            }
+
+            PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, metadata, false, out INTERNAL_PropertyStorage storage))
+            {
+                return INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.AnimationBaseValue);
+            }
+
+            return metadata.GetDefaultValue(this, dp);
         }
 
         internal void InvalidateDependents(DependencyPropertyChangedEventArgs args)

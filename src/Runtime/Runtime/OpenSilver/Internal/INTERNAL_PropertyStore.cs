@@ -568,7 +568,7 @@ internal static class INTERNAL_PropertyStore
         var newEntry = new EffectiveValueEntry(oldEntry);
 
         // Coerce to current value
-        object baseValue = GetCoercionBaseValue(oldEntry);
+        object baseValue = GetEffectiveValue(oldEntry, RequestFlags.CoercionBaseValue);
         ProcessCoerceValue(d,
             dp,
             metadata,
@@ -644,32 +644,37 @@ internal static class INTERNAL_PropertyStore
             OperationType.Unknown);
     }
 
-    internal static object GetEffectiveValue(EffectiveValueEntry entry)
+    internal static object GetEffectiveValue(EffectiveValueEntry entry, RequestFlags requests)
     {
         if (entry.HasModifiers)
         {
-            if (entry.IsCoercedWithCurrentValue || entry.IsCoerced)
+            ModifiedValue mv = entry.ModifiedValue;
+
+            // Note that the modified values have an order of precedence
+            // 1. Coerced Value (including Current value)
+            // 2. Animated Value
+            // 3. Expression Value
+            // Also note that we support any arbitrary combinations of these
+            // modifiers and will yet the precedence metioned above.
+            if (entry.IsCoerced && ((requests & RequestFlags.CoercionBaseValue) == 0 || entry.IsCoercedWithCurrentValue))
             {
-                return entry.ModifiedValue.CoercedValue;
+                return mv.CoercedValue;
             }
-            else if (entry.IsAnimatedOverLocal && entry.IsAnimated)
+
+            if (entry.IsAnimatedOverLocal && entry.IsAnimated && (requests & RequestFlags.AnimationBaseValue) == 0)
             {
-                return entry.ModifiedValue.AnimatedValue;
+                return mv.AnimatedValue;
             }
-            else if (entry.IsExpression)
+
+            if (entry.IsExpression)
             {
-                return entry.ModifiedValue.ExpressionValue;
+                return mv.ExpressionValue;
             }
-            else
-            {
-                Debug.Assert(!entry.IsAnimatedOverLocal && entry.IsAnimated);
-                return entry.ModifiedValue.BaseValue;
-            }
+
+            return mv.BaseValue;
         }
-        else
-        {
-            return entry.Value;
-        }
+
+        return entry.Value;
     }
 
     private static EffectiveValueEntry EvaluateEffectiveValue(
@@ -758,13 +763,13 @@ internal static class INTERNAL_PropertyStore
         bool clearValue,
         OperationType operationType)
     {
-        object oldValue = GetEffectiveValue(oldEntry);
+        object oldValue = GetEffectiveValue(oldEntry, RequestFlags.FullyResolved);
 
         // Coerce Value
         // We don't want to coerce the value if it's being reset to the property's default value
         if (metadata.CoerceValueCallback != null && !(clearValue && newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default))
         {
-            object baseValue = GetCoercionBaseValue(newEntry);
+            object baseValue = GetEffectiveValue(newEntry, RequestFlags.CoercionBaseValue);
             ProcessCoerceValue(d,
                 dp,
                 metadata,
@@ -775,7 +780,7 @@ internal static class INTERNAL_PropertyStore
                 false);
         }
 
-        object newValue = GetEffectiveValue(newEntry);
+        object newValue = GetEffectiveValue(newEntry, RequestFlags.FullyResolved);
 
         // Reset old value inheritance context
         if (oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
@@ -831,49 +836,6 @@ internal static class INTERNAL_PropertyStore
 
             newEntry.SetCoercedValue(coercedValue, coerceWithCurrentValue);
         }
-    }
-
-    private static object GetCoercionBaseValue(EffectiveValueEntry entry)
-    {
-        object baseValue;
-        if (!entry.HasModifiers)
-        {
-            baseValue = entry.Value;
-        }
-        else if (entry.IsCoerced)
-        {
-            if (entry.IsCoercedWithCurrentValue)
-            {
-                baseValue = entry.ModifiedValue.CoercedValue;
-            }
-            else if (entry.IsAnimatedOverLocal && entry.IsAnimated)
-            {
-                baseValue = entry.ModifiedValue.AnimatedValue;
-            }
-            else if (entry.IsExpression)
-            {
-                baseValue = entry.ModifiedValue.ExpressionValue;
-            }
-            else
-            {
-                // Only modifier is Coerced
-                baseValue = entry.ModifiedValue.BaseValue;
-            }
-        }
-        else if (entry.IsAnimatedOverLocal && entry.IsAnimated)
-        {
-            baseValue = entry.ModifiedValue.AnimatedValue;
-        }
-        else if (entry.IsExpression)
-        {
-            baseValue = entry.ModifiedValue.ExpressionValue;
-        }
-        else
-        {
-            Debug.Assert(!entry.IsAnimatedOverLocal && entry.IsAnimated);
-            baseValue = entry.ModifiedValue.BaseValue;
-        }
-        return baseValue;
     }
 
     private static void OnPropertyChanged(
@@ -1068,4 +1030,11 @@ internal static class INTERNAL_PropertyStore
             throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
         }
     }
+}
+
+internal enum RequestFlags
+{
+    FullyResolved = 0x00,
+    AnimationBaseValue = 0x01,
+    CoercionBaseValue = 0x02,
 }
