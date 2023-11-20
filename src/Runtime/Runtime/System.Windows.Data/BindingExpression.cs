@@ -1154,7 +1154,7 @@ namespace System.Windows.Data
 
             bool oldIsUpdating = IsUpdatingValue;
             IsUpdatingValue = true;
-            Target.ApplyExpression(TargetProperty, this, ParentBinding._isInStyle);
+            Target.ApplyExpression(TargetProperty, this);
             IsUpdatingValue = oldIsUpdating;
         }
     }

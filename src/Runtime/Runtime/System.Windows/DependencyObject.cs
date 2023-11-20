@@ -20,6 +20,7 @@ using System.Windows.Data;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
+using System.ComponentModel;
 
 namespace System.Windows
 {
@@ -28,7 +29,7 @@ namespace System.Windows
     /// is the immediate base class of many important UI-related classes, such as
     /// UIElement, Geometry, FrameworkTemplate, Style, and ResourceDictionary.
     /// </summary>
-    public partial class DependencyObject : IInternalDependencyObject
+    public class DependencyObject : IInternalDependencyObject
     {
         #region Inheritance Context
 
@@ -358,12 +359,11 @@ namespace System.Windows
                 true,
                 out INTERNAL_PropertyStorage storage);
             
-            INTERNAL_PropertyStore.SetValueCommon(storage,
+            INTERNAL_PropertyStore.SetCurrentValueCommon(storage,
                 this,
                 dp,
                 metadata,
-                value,
-                true);
+                value);
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue instead.")]
@@ -433,82 +433,44 @@ namespace System.Windows
                 storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default;
         }
 
-        public object GetVisualStateValue(DependencyProperty dependencyProperty)
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object GetVisualStateValue(DependencyProperty dependencyProperty) => GetValue(dependencyProperty);
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void SetVisualStateValue(DependencyProperty dependencyProperty, object value) =>
+            SetValue(dependencyProperty, value);
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void SetAnimationValue(DependencyProperty dependencyProperty, object value) =>
+            SetValue(dependencyProperty, value);
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object GetAnimationValue(DependencyProperty dependencyProperty) => GetValue(dependencyProperty);
+
+        internal void SetAnimatedValue(DependencyProperty dp, object value)
         {
-            if (dependencyProperty == null)
+            if (dp == null)
             {
-                throw new ArgumentNullException(nameof(dependencyProperty));
+                throw new ArgumentNullException(nameof(dp));
             }
 
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, null, false, out INTERNAL_PropertyStorage storage))
-            {
-                return storage.AnimatedValue;
-            }
-
-            return dependencyProperty.GetDefaultValue(this);
-        }
-
-        public void SetVisualStateValue(DependencyProperty dependencyProperty, object value)
-        {
-            if (dependencyProperty == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyProperty));
-            }
-
-            PropertyMetadata metadata = SetupPropertyChange(dependencyProperty);
+            PropertyMetadata metadata = SetupPropertyChange(dp);
 
             INTERNAL_PropertyStore.TryGetStorage(this,
-                dependencyProperty,
-                metadata,
-                true,
-                out INTERNAL_PropertyStorage storage);
-            
-            INTERNAL_PropertyStore.SetAnimationValue(storage,
-                this,
-                dependencyProperty,
-                metadata,
-                value);
-        }
-
-        public void SetAnimationValue(DependencyProperty dependencyProperty, object value)
-        {
-            if (dependencyProperty == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyProperty));
-            }
-
-            PropertyMetadata metadata = SetupPropertyChange(dependencyProperty);
-
-            INTERNAL_PropertyStore.TryGetStorage(this,
-                dependencyProperty,
+                dp,
                 metadata,
                 true,
                 out INTERNAL_PropertyStorage storage);
 
-            INTERNAL_PropertyStore.SetAnimationValue(storage,
+            INTERNAL_PropertyStore.SetAnimatedValue(storage,
                 this,
-                dependencyProperty,
+                dp,
                 metadata,
                 value);
-        }
-
-        public object GetAnimationValue(DependencyProperty dependencyProperty)
-        {
-            if (dependencyProperty == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyProperty));
-            }
-
-            if (INTERNAL_PropertyStore.TryGetStorage(this,
-                dependencyProperty,
-                null,
-                false,
-                out INTERNAL_PropertyStorage storage))
-            {
-                return storage.AnimatedValue;
-            }
-
-            return dependencyProperty.GetDefaultValue(this);
         }
 
         public void SetValue(DependencyProperty dp, object value)
@@ -530,8 +492,7 @@ namespace System.Windows
                 this,
                 dp,
                 metadata,
-                value,
-                false);
+                value);
         }
 
         internal void SetValue(DependencyPropertyKey key, object value)
@@ -553,8 +514,7 @@ namespace System.Windows
                 this,
                 dp,
                 metadata,
-                value,
-                false);
+                value);
         }
 
         internal virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -744,7 +704,7 @@ namespace System.Windows
 
         #region Binding related elements
 
-        internal void ApplyExpression(DependencyProperty dp, Expression expression, bool isInStyle)
+        internal void ApplyExpression(DependencyProperty dp, Expression expression)
         {
             Debug.Assert(dp != null);
 
@@ -755,13 +715,12 @@ namespace System.Windows
                 metadata,
                 true,
                 out INTERNAL_PropertyStorage storage);
-            
+
             INTERNAL_PropertyStore.RefreshExpressionCommon(storage,
                 this,
                 dp,
                 metadata,
-                expression,
-                isInStyle); // Set LocalStyle if Binding is from style.
+                expression);
         }
 
         /// <exclude/>

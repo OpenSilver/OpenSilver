@@ -87,7 +87,7 @@ namespace System.Windows
 
         private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
-            _target.ApplyExpression(_targetProperty, this, false);
+            _target.ApplyExpression(_targetProperty, this);
         }
 
         private bool ValidateValue(ref object value, DependencyProperty targetProperty)

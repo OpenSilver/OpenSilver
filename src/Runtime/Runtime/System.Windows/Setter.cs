@@ -148,8 +148,8 @@ namespace System.Windows
                             _value = new SolidColorBrush(color);
                         break;
 
-                    case Binding binding:
-                        binding._isInStyle = true;
+                    case Binding:
+                        // Bindings are allowed on setters, it will later be transformed into a BindingExpression
                         break;
 
                     default:

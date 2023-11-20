@@ -91,7 +91,7 @@ queue:""{visualStateGroupName}""
 
         internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value)
         {
-            target.SetAnimationValue(propertyPath.GetFinalProperty(target), value);
+            target.SetAnimatedValue(propertyPath.GetFinalProperty(target), value);
         }
     }
 }

@@ -29,8 +29,8 @@
 		<Compile Include="Core\Events\DOMEventManager.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
 		<Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
-		<Compile Include="Core\Main\EffectiveValueEntry.cs" />
-		<Compile Include="Core\Main\EmptyEnumerator.cs" />
+		<Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\EmptyEnumerator.cs" />
 		<Compile Include="OpenSilver\Internal\InheritablePropertyChangeInfo.cs" />
 		<Compile Include="OpenSilver\Controls\DatePicker\Calendar.cs" />
 		<Compile Include="OpenSilver\Controls\DatePicker\Calendar.NotImplemented.cs" />
@@ -62,6 +62,8 @@
 		<Compile Include="Diagnostics\DebugInfo.cs" />
 		<Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
 		<Compile Include="OpenSilver\DumpHelper.cs" />
+		<Compile Include="OpenSilver\Internal\INTERNAL_PropertyStorage.cs" />
+		<Compile Include="OpenSilver\Internal\INTERNAL_PropertyStore.cs" />
 		<Compile Include="OpenSilver\Internal\Clipboard.cs" />
 		<Compile Include="OpenSilver\Internal\CriticalExceptions.cs" />
 		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
@@ -616,8 +618,6 @@
 		<Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
 		<Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
-		<Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
-		<Compile Include="Core\Main\INTERNAL_PropertyStore.cs" />
 		<Compile Include="Core\Main\INTERNAL_Simulator.cs" />
 		<Compile Include="Core\Main\INTERNAL_ExecuteJavaScript.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />

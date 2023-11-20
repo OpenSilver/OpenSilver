@@ -23,6 +23,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using OpenSilver;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {

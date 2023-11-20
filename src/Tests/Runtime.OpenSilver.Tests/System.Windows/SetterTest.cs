@@ -130,30 +130,6 @@ namespace System.Windows.Tests
             Assert.ThrowsException<ArgumentException>(() => setter.Seal());
         }
 
-        [TestMethod]
-        public void Setter_Seal_When_Value_Is_Binding_And_Property_Type_Is_Object()
-        {
-            var setter = new Setter(FrameworkElement.TagProperty, new Binding());
-            
-            (setter.Value as Binding)._isInStyle.Should().BeFalse();
-
-            setter.Seal();
-
-            (setter.Value as Binding)._isInStyle.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public void Setter_Seal_When_Value_Is_Binding_And_Property_Type_Is_Not_Object()
-        {
-            var setter = new Setter(Panel.BackgroundProperty, new Binding("BorderBrush"));
-
-            (setter.Value as Binding)._isInStyle.Should().BeFalse();
-
-            setter.Seal();
-
-            (setter.Value as Binding)._isInStyle.Should().BeTrue();
-        } 
-
         #endregion Seal
     }
 }

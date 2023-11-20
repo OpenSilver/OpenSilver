@@ -66,10 +66,9 @@ namespace System.Windows.Data
     /// MyTextBox.DataContext = myPlanet;
     /// </code>
     /// </example>
-    [ContentProperty("Path")]
-    public partial class Binding : BindingBase
+    [ContentProperty(nameof(Path))]
+    public class Binding : BindingBase
     {
-        internal bool _isInStyle;
         private IValueConverter _converter;
         private CultureInfo _culture;
         private object _converterParameter;
@@ -129,7 +128,6 @@ namespace System.Windows.Data
                 TargetNullValue = original.TargetNullValue;
                 StringFormat = original.StringFormat;
 
-                _isInStyle = original._isInStyle;
                 _converter = original._converter;
                 _culture = original._culture;
                 _converterParameter = original._converterParameter;
