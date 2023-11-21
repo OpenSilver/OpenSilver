@@ -458,7 +458,8 @@ namespace OpenSilver.Compiler
 
                 if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IUIElement", element.Name.NamespaceName, element.Name.LocalName))
                 {
-                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUniqueNameOrThisKeyword}, \"{element.Attribute(GeneratingPathInXaml.PathInXamlAttribute)?.Value ?? ""}\");");
+                    string xamlPath = element.Attribute(GeneratingPathInXaml.PathInXamlAttribute)?.Value ?? string.Empty;
+                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUniqueNameOrThisKeyword}, \"{xamlPath}\");");
                     parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetFilePath({elementUniqueNameOrThisKeyword}, @\"{_sourceFile}\");");
                 }
 

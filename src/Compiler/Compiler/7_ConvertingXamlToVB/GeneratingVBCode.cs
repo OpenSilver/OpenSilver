@@ -364,5 +364,6 @@ End Namespace
         private const string IComponentConnectorClass = "Global.OpenSilver.Internal.Xaml.IComponentConnector";
         private const string XamlContextClass = "Global.OpenSilver.Internal.Xaml.Context.XamlContext";
         private const string IMarkupExtensionClass = "Global.System.Xaml.IMarkupExtension(Of Object)";
+        private const string XamlDesignerBridgeClass = "Global.OpenSilver.Internal.Xaml.XamlDesignerBridge";
     }
 }
