@@ -31,6 +31,7 @@
     <Compile Include="1_ConvertingXaml\CoreTypesHelper.cs" />
     <Compile Include="1_ConvertingXaml\FixingPropertiesOrder.cs" />
     <Compile Include="1_ConvertingXaml\GeneratingCode.cs" />
+    <Compile Include="1_ConvertingXaml\GeneratingPathInXaml.cs" />
     <Compile Include="1_ConvertingXaml\GeneratingUniqueNames.cs" />
     <Compile Include="1_ConvertingXaml\GettingInformationAboutAXamlType.cs" />
     <Compile Include="1_ConvertingXaml\IMetadata.cs" />

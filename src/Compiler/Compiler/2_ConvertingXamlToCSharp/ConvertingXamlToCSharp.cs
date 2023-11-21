@@ -40,6 +40,12 @@ namespace OpenSilver.Compiler
             // Parse the XML:
             XDocument doc = XDocument.Parse(xaml, LoadOptions.SetLineInfo);
 
+            if (!isFirstPass)
+            {
+                // Generate paths for XAML elements before any manipulations:
+                GeneratingPathInXaml.ProcessDocument(doc);
+            }
+
             // Process the "TextBlock" and "Span" nodes in order to surround direct text content with "<Run>" tags:
             ProcessingTextBlockNodes.Process(doc, reflectionOnSeparateAppDomain);
 

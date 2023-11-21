@@ -456,6 +456,13 @@ namespace OpenSilver.Compiler
                     parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword});");
                 }
 
+                if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IUIElement", element.Name.NamespaceName, element.Name.LocalName))
+                {
+                    string xamlPath = element.Attribute(GeneratingPathInXaml.PathInXamlAttribute)?.Value ?? string.Empty;
+                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUniqueNameOrThisKeyword}, \"{xamlPath}\");");
+                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetFilePath({elementUniqueNameOrThisKeyword}, @\"{_sourceFile}\");");
+                }
+
                 // Add the attributes:
                 foreach (XAttribute attribute in element.Attributes())
                 {
@@ -466,7 +473,7 @@ namespace OpenSilver.Compiler
                     string attributeValue = attribute.Value;
                     string attributeLocalName = attribute.Name.LocalName;
 
-                    // Skip the attributes "GeneratingUniqueNames.UniqueNameAttribute" and "InitializedFromStringAttribute":
+                    // Skip the utility attributes:
                     if (!IsReservedAttribute(attributeLocalName)
                         && !attribute.IsNamespaceDeclaration)
                     {
@@ -1817,13 +1824,9 @@ else
 
             private static bool IsReservedAttribute(string attributeName)
             {
-                if (attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
-                    attributeName == InsertingImplicitNodes.InitializedFromStringAttribute)
-                {
-                    return true;
-                }
-
-                return false;
+                return attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
+                       attributeName == InsertingImplicitNodes.InitializedFromStringAttribute ||
+                       attributeName == GeneratingPathInXaml.PathInXamlAttribute;
             }
 
             private static string EscapeString(string stringValue)
