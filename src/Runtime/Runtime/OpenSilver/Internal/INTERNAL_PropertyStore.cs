@@ -568,7 +568,7 @@ internal static class INTERNAL_PropertyStore
         var newEntry = new EffectiveValueEntry(oldEntry);
 
         // Coerce to current value
-        object baseValue = GetEffectiveValue(oldEntry, RequestFlags.CoercionBaseValue);
+        object baseValue = GetEffectiveValue(newEntry, RequestFlags.CoercionBaseValue);
         ProcessCoerceValue(d,
             dp,
             metadata,
