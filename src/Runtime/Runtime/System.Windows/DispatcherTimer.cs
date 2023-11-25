@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,130 +11,109 @@
 *  
 \*====================================================================================*/
 
-using System;
-using DotNetForHtml5.Core;
+using System.Diagnostics;
 using System.Threading;
+using DotNetForHtml5.Core;
 
 namespace System.Windows.Threading
 {
     /// <summary>
-    /// Provides a timer that is integrated into the Dispatcher queue, which is processed
-    /// at a specified interval of time and at a specified priority.  One scenario
-    /// for this is to run code on the UI thread.
+    /// A timer that is integrated into the <see cref="Dispatcher"/> queue, which is 
+    /// processed at a specified interval of time and at a specified priority.
     /// </summary>
-    /// <example>
-    /// Here is how you can create and use a DispatcherTimer:
-    /// <code lang="C#">
-    /// DispatcherTimer _dispatcherTimer;
-    /// </code>
-    /// <code lang="C#">
-    /// //We create a new instance of DispatcherTimer:
-    /// _dispatcherTimer = new Dispatchertimer();
-    /// //we set the time between each tick of the DispatcherTimer to 100 milliseconds:
-    /// timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
-    /// _dispatcherTimer.Tick += DispatcherTimer_Tick;
-    /// _dispatcherTimer.Start();
-    /// </code>
-    /// <code lang="C#">
-    /// void DispatcherTimer_Tick(object sender, object e)
-    /// {
-    ///     //Some code to execute at each Tick of the DispatcherTimer.
-    /// }
-    /// </code>
-    /// When you want to stop the DispatcherTimer, you can use the following code:
-    /// <code lang="C#">
-    ///     _dispatcherTimer.Stop();
-    /// </code>
-    /// </example>
     public class DispatcherTimer
     {
         private Timer _timer;
+        private TimeSpan _interval;
 
         /// <summary>
-        /// Initializes a new instance of the DispatcherTimer class.
+        /// Initializes a new instance of the <see cref="DispatcherTimer"/> class.
         /// </summary>
         public DispatcherTimer() { }
 
-        private TimeSpan _interval;
         /// <summary>
         /// Gets or sets the amount of time between timer ticks.
         /// </summary>
+        /// <returns>
+        /// The amount of time between ticks. The default is <see cref="TimeSpan.Zero"/>.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The specified value when setting this property represents a negative time interval.
+        /// </exception>
         public TimeSpan Interval
         {
             get => _interval;
             set
             {
+                if (value.TotalMilliseconds < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value));
+                }
+
                 _interval = value;
 
-                // Restart the timer if the Interval has been modified while the timer was running:
-                if (_timer == null) return;
-                Stop();
-                Start();
+                if (_timer is not null)
+                {
+                    UpdateTimer();
+                }
             }
         }
 
         /// <summary>
         /// Gets a value that indicates whether the timer is running.
         /// </summary>
-        public bool IsEnabled => _timer != null;
+        public bool IsEnabled => _timer is not null;
 
         /// <summary>
         /// Occurs when the timer interval has elapsed.
         /// </summary>
         public event EventHandler Tick;
-        
+
         /// <summary>
         /// Raises the Tick event.
         /// </summary>
-        protected void OnTick()
-        {
-            if (_timer == null) { return; }
-
-            Tick?.Invoke(this, EventArgs.Empty);
-        }
+        protected void OnTick() => Tick?.Invoke(this, EventArgs.Empty);
 
         /// <summary>
-        /// Starts the DispatcherTimer.
+        /// Starts the <see cref="DispatcherTimer"/>.
         /// </summary>
-        public void Start()
-        {
-            if (_timer != null) return;
-            var intervalInMilliseconds = (long)_interval.TotalMilliseconds;
-            if (intervalInMilliseconds == 0)
-                intervalInMilliseconds = 1; // Note: this appears to be the default behavior of other XAML platforms.
-
-            _timer = new Timer(
-                delegate
-                {
-                    if (INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround)
-                    {
-                        INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(() =>
-                        {
-                            //It is important to do this check on the UI thread
-                            if (_timer == null)
-                            {
-                                return;
-                            }
-                            OnTick();
-                        });
-                        return;
-                    }
-
-                    OnTick();
-                },
-                null,
-                intervalInMilliseconds,
-                intervalInMilliseconds);
-        }
+        public void Start() => _timer ??= new Timer(OnTimerTick, this, _interval, _interval);
 
         /// <summary>
-        /// Stops the DispatcherTimer.
+        /// Stops the <see cref="DispatcherTimer"/>.
         /// </summary>
         public void Stop()
         {
-            if (_timer == null) return;
-            _timer.Dispose();
-            _timer = null;
+            if (_timer is not null)
+            {
+                _timer.Dispose();
+                _timer = null;
+            }
+        }
+
+        private void UpdateTimer()
+        {
+            Debug.Assert(_timer is not null);
+            _timer.Change(_interval, _interval);
+        }
+
+        private static void OnTimerTick(object state)
+        {
+            var timer = (DispatcherTimer)state;
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(() =>
+                {
+                    if (timer.IsEnabled)
+                    {
+                        timer.OnTick();
+                    }
+                });
+            }
+            else
+            {
+                timer.OnTick();
+            }
         }
     }
 }
