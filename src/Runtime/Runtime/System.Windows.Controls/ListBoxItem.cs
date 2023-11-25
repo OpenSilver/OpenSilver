@@ -20,18 +20,18 @@ namespace System.Windows.Controls
     /// <summary>
     /// Represents a selectable item in a <see cref="ListBox"/>.
     /// </summary>
-    [TemplateVisualState(Name = "SelectedUnfocused", GroupName = "SelectionStates")]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateSelectedUnfocused, GroupName = VisualStates.GroupSelection)]
+    [TemplateVisualState(Name = VisualStates.StateUnselected, GroupName = VisualStates.GroupSelection)]
+    [TemplateVisualState(Name = VisualStates.StateSelected, GroupName = VisualStates.GroupSelection)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
     [TemplateVisualState(Name = "BeforeUnloaded", GroupName = "LayoutStates")]
-    [TemplateVisualState(Name = "Normal", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "MouseOver", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "Disabled", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "Unselected", GroupName = "SelectionStates")]
-    [TemplateVisualState(Name = "Selected", GroupName = "SelectionStates")]
-    [TemplateVisualState(Name = "Unfocused", GroupName = "FocusStates")]
-    [TemplateVisualState(Name = "Focused", GroupName = "FocusStates")]
     [TemplateVisualState(Name = "BeforeLoaded", GroupName = "LayoutStates")]
     [TemplateVisualState(Name = "AfterLoaded", GroupName = "LayoutStates")]
-    public partial class ListBoxItem : SelectorItem
+    public class ListBoxItem : SelectorItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBoxItem"/> class.
@@ -162,14 +162,14 @@ namespace System.Windows.Controls
             // Change to the correct state in the Selection group
             if (IsSelected)
             {
-                if (IsFocused)
+                if (ParentSelector != null && Selector.GetIsSelectionActive(ParentSelector))
                 {
-                    VisualStateManager.GoToState(this, VisualStates.StateSelected, false);                    
+                    VisualStateManager.GoToState(this, VisualStates.StateSelected, false);
                 }
                 else
                 {
                     VisualStates.GoToState(this, false, VisualStates.StateSelectedUnfocused, VisualStates.StateSelected);
-                }               
+                }
             }
             else
             {

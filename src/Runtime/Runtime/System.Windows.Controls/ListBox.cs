@@ -25,14 +25,23 @@ namespace System.Windows.Controls
     /// <summary>
     /// Contains a list of selectable items.
     /// </summary>
-    [TemplatePart(Name = "ScrollViewer", Type = typeof(ScrollViewer))]
-    [TemplateVisualState(Name = "InvalidFocused", GroupName = "ValidationStates")]
-    [TemplateVisualState(Name = "InvalidUnfocused", GroupName = "ValidationStates")]
-    [TemplateVisualState(Name = "Valid", GroupName = "ValidationStates")]
+    [TemplatePart(Name = ScrollViewerTemplateName, Type = typeof(ScrollViewer))]
+    [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
     public partial class ListBox : Selector
     {
+        private const string ScrollViewerTemplateName = "ScrollViewer";
+
         private ScrollViewer _scrollHost;
         private ItemInfo _anchorItem;
+
+        static ListBox()
+        {
+            IsSelectionActivePropertyKey.OverrideMetadata(
+                typeof(ListBox),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBox"/> class.
@@ -104,11 +113,33 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="ItemContainerStyle"/> dependency
-        /// property.
+        /// Identifies the <see cref="ItemContainerStyle"/> dependency property.
         /// </summary>
         public static readonly new DependencyProperty ItemContainerStyleProperty =
             ItemsControl.ItemContainerStyleProperty;
+
+        /// <summary>
+        /// Identifies the IsSelectionActive dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsSelectionActiveProperty =
+            IsSelectionActivePropertyKey.DependencyProperty;
+
+        private static void OnIsSelectionActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var listbox = (ListBox)d;
+            foreach (ItemInfo item in listbox.SelectedItemsInternal)
+            {
+                if (item.Index < 0)
+                {
+                    continue;
+                }
+
+                if (listbox.ItemContainerGenerator.ContainerFromIndex(item.Index) is ListBoxItem listboxItem)
+                {
+                    listboxItem.UpdateVisualStates();
+                }
+            }
+        }
 
         /// <summary>
         /// Causes the object to scroll into view.
@@ -139,7 +170,7 @@ namespace System.Windows.Controls
         public override void OnApplyTemplate()
         {
             // _scrollHost must be set before calling base
-            _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
+            _scrollHost = GetTemplateChild(ScrollViewerTemplateName) as ScrollViewer;
 
             base.OnApplyTemplate();
         }
@@ -263,6 +294,20 @@ namespace System.Windows.Controls
                     e.Handled = true;
                 }
             }
+        }
+
+        /// <inheritdoc />
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            SetValue(IsSelectionActivePropertyKey, false);
+        }
+
+        /// <inheritdoc />
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+            SetValue(IsSelectionActivePropertyKey, true);
         }
 
         /// <summary>

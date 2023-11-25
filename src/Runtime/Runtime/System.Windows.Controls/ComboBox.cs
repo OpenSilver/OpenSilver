@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -24,11 +23,11 @@ namespace System.Windows.Controls
     /// Represents a selection control that combines a non-editable text box and a drop-down
     /// containing a list box that allows users to select an item from a list.
     /// </summary>
-    [TemplatePart(Name = "ContentPresenter", Type = typeof(ContentPresenter))]
-    [TemplatePart(Name = "Popup", Type = typeof(Popup))]
-    [TemplatePart(Name = "ContentPresenterBorder", Type = typeof(FrameworkElement))]
-    [TemplatePart(Name = "DropDownToggle", Type = typeof(ToggleButton))]
-    [TemplatePart(Name = "ScrollViewer", Type = typeof(ScrollViewer))]
+    [TemplatePart(Name = ContentPresenterTemplateName, Type = typeof(ContentPresenter))]
+    [TemplatePart(Name = PopupTemplateName, Type = typeof(Popup))]
+    [TemplatePart(Name = ContentPresenterBorderTemplateName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = DropDownToggleTemplateName, Type = typeof(ToggleButton))]
+    [TemplatePart(Name = ScrollViewerTemplateName, Type = typeof(ScrollViewer))]
     [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
     [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
     [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
@@ -40,6 +39,11 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = FocusedDropDownState, GroupName = VisualStates.GroupFocus)]
     public class ComboBox : Selector
     {
+        private const string ContentPresenterTemplateName = "ContentPresenter";
+        private const string ContentPresenterBorderTemplateName = "ContentPresenterBorder";
+        private const string PopupTemplateName = "Popup";
+        private const string DropDownToggleTemplateName = "DropDownToggle";
+        private const string ScrollViewerTemplateName = "ScrollViewer";
         private const string FocusedDropDownState = "FocusedDropDown";
 
         private Popup _popup;
@@ -49,13 +53,19 @@ namespace System.Windows.Controls
         private FrameworkElement _emptyContent;
         private ScrollViewer _scrollHost;
         private bool _isMouseOver;
-        private bool _isFocused;
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
         {
             get { return false; }
             set { }
+        }
+
+        static ComboBox()
+        {
+            IsSelectionActivePropertyKey.OverrideMetadata(
+                typeof(ComboBox),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
         }
 
         /// <summary>
@@ -164,15 +174,17 @@ namespace System.Windows.Controls
                     fe.SizeChanged -= new SizeChangedEventHandler(OnPopupChildSizeChanged);
                 _popupChild.KeyDown -= new KeyEventHandler(OnPopupKeyDown);
                 _popupChild.TextInput -= new TextCompositionEventHandler(OnPopupTextInput);
+                _popupChild.GotFocus -= new RoutedEventHandler(OnPopupGotFocus);
+                _popupChild.LostFocus -= new RoutedEventHandler(OnPopupLostFocus);
                 _popupChild = null;
             }
 
             // _scrollHost must be set before calling base
-            _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
+            _scrollHost = GetTemplateChild(ScrollViewerTemplateName) as ScrollViewer;
 
             base.OnApplyTemplate();
 
-            _popup = GetTemplateChild("Popup") as Popup;
+            _popup = GetTemplateChild(PopupTemplateName) as Popup;
 
             //this will enable virtualization in combo box without templating the whole style
             if (_popup != null)
@@ -195,10 +207,12 @@ namespace System.Windows.Controls
                         fe.SizeChanged += new SizeChangedEventHandler(OnPopupChildSizeChanged);
                     _popupChild.KeyDown += new KeyEventHandler(OnPopupKeyDown);
                     _popupChild.TextInput += new TextCompositionEventHandler(OnPopupTextInput);
+                    _popupChild.GotFocus += new RoutedEventHandler(OnPopupGotFocus);
+                    _popupChild.LostFocus += new RoutedEventHandler(OnPopupLostFocus);
                 }
             }
 
-            _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
+            _contentPresenter = GetTemplateChild(ContentPresenterTemplateName) as ContentPresenter;
             if (_contentPresenter != null)
             {
                 if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
@@ -209,7 +223,7 @@ namespace System.Windows.Controls
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
             }
 
-            _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
+            _dropDownToggle = GetTemplateChild(DropDownToggleTemplateName) as ToggleButton;
             if (_dropDownToggle != null)
             {
                 _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
@@ -431,8 +445,7 @@ namespace System.Windows.Controls
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
-            _isFocused = true;
-            UpdateVisualStates();
+            SetValue(IsSelectionActivePropertyKey, true);
         }
 
         /// <summary>
@@ -444,8 +457,7 @@ namespace System.Windows.Controls
         protected override void OnLostFocus(RoutedEventArgs e)
         {
             base.OnLostFocus(e);
-            _isFocused = false;
-            UpdateVisualStates();
+            SetValue(IsSelectionActivePropertyKey, FocusManager.HasFocus(this, true));
         }
 
         /// <inheritdoc />
@@ -535,6 +547,10 @@ namespace System.Windows.Controls
         private void OnPopupTextInput(object sender, TextCompositionEventArgs e) => OnTextInput(e);
 
         private void OnPopupChildSizeChanged(object sender, SizeChangedEventArgs e) => _popup?.Reposition();
+
+        private void OnPopupGotFocus(object sender, RoutedEventArgs e) => SetValue(IsSelectionActivePropertyKey, true);
+        
+        private void OnPopupLostFocus(object sender, RoutedEventArgs e) => SetValue(IsSelectionActivePropertyKey, false);
 
         private void OnDropDownToggleClick(object sender, RoutedEventArgs e)
         {
@@ -716,10 +732,14 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the MaxDropDownHeight dependency property.
+        /// Identifies the <see cref="MaxDropDownHeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxDropDownHeightProperty =
-            DependencyProperty.Register("MaxDropDownHeight", typeof(double), typeof(ComboBox), new PropertyMetadata(200d));
+            DependencyProperty.Register(
+                nameof(MaxDropDownHeight),
+                typeof(double),
+                typeof(ComboBox),
+                new PropertyMetadata(200d));
 
         private void OnOutsideClick(object sender, OutsideClickEventArgs e)
         {
@@ -738,7 +758,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="ComboBox.SelectionBoxItem"/> dependency property.
+        /// Identifies the <see cref="SelectionBoxItem"/> dependency property.
         /// </summary>
         private static readonly DependencyProperty SelectionBoxItemProperty =
             DependencyProperty.Register(
@@ -757,7 +777,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="ComboBox.SelectionBoxItemTemplate"/> dependency property.
+        /// Identifies the <see cref="SelectionBoxItemTemplate"/> dependency property.
         /// </summary>
         private static readonly DependencyProperty SelectionBoxItemTemplateProperty =
             DependencyProperty.Register(
@@ -776,7 +796,18 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="ComboBox.IsSelectionBoxHighlighted"/> dependency property.
+        /// Identifies the IsSelectionActive attached property.
+        /// </summary>
+        public static readonly DependencyProperty IsSelectionActiveProperty =
+            IsSelectionActivePropertyKey.DependencyProperty;
+
+        private static void OnIsSelectionActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ComboBox)d).UpdateVisualStates();
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="IsSelectionBoxHighlighted"/> dependency property.
         /// </summary>
         private static readonly DependencyProperty IsSelectionBoxHighlightedProperty =
             DependencyProperty.Register(
@@ -810,17 +841,17 @@ namespace System.Windows.Controls
                 VisualStateManager.GoToState(this, VisualStates.StateNormal, false);
             }
 
-            if (IsDropDownOpen)
+            if (!GetIsSelectionActive(this))
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
+            }
+            else if (IsDropDownOpen)
             {
                 VisualStateManager.GoToState(this, FocusedDropDownState, false);
             }
-            else if (_isFocused)
-            {
-                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
-            }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
             }
         }
     }

@@ -45,6 +45,9 @@ namespace System.Windows.Controls.Primitives
         // to avoid putting SelectedItems "in use" but we can't really expose this externally.
         private readonly InternalSelectedItemsStorage _selectedItems = new InternalSelectedItemsStorage(1, MatchExplicitEqualityComparer);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Selector"/> class.
+        /// </summary>
         public Selector()
         {
             ItemContainerGenerator.StatusChanged += new EventHandler(OnGeneratorStatusChanged);
@@ -1352,6 +1355,36 @@ namespace System.Windows.Controls.Primitives
                     }
                 }
             }
+        }
+
+        internal static readonly DependencyPropertyKey IsSelectionActivePropertyKey =
+            DependencyProperty.RegisterAttachedReadOnly(
+                "IsSelectionActive",
+                typeof(bool),
+                typeof(Selector),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Gets a value that indicates whether the specified <see cref="Selector"/>
+        /// has the focus.
+        /// </summary>
+        /// <param name="element">
+        /// The <see cref="Selector"/> to evaluate.
+        /// </param>
+        /// <returns>
+        /// true to indicate that the <see cref="Selector"/> has the focus; otherwise, false.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static bool GetIsSelectionActive(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (bool)element.GetValue(IsSelectionActivePropertyKey.DependencyProperty);
         }
 
         private class ChangeInfo

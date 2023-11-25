@@ -92,6 +92,10 @@ namespace System.Windows.Controls
         /// Selected inactive state of the Selection state group.
         /// </summary>
         public const string StateSelectedInactive = "SelectedInactive";
+
+        /// <summary>
+        /// Selected and unfocused state
+        /// </summary>
         public const string StateSelectedUnfocused = "SelectedUnfocused";
         #endregion GroupSelection
 

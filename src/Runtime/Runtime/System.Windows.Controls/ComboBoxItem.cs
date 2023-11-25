@@ -20,11 +20,6 @@ namespace System.Windows.Controls
     /// </summary>
     public class ComboBoxItem : ListBoxItem
     {
-        public ComboBoxItem()
-        {
-            this.DefaultStyleKey = typeof(ComboBoxItem);
-        }
-
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             e.Handled = true;
