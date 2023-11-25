@@ -754,6 +754,13 @@ namespace System.Windows
             }
         }
 
+        /// <summary>
+        /// Called before the <see cref="LostMouseCapture"/> event occurs to provide
+        /// handling for the event in a derived class without attaching a delegate.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
         protected virtual void OnLostMouseCapture(MouseEventArgs e) { }
 
         #endregion

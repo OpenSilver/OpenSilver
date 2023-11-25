@@ -18,88 +18,139 @@ using System.Windows.Threading;
 namespace System.Windows.Controls.Primitives
 {
     /// <summary>
-    /// Represents a control that raises its Click event repeatedly from the time it is pressed until it is released.
+    /// Represents a control that raises its <see cref="ButtonBase.Click"/> event repeatedly 
+    /// from the time it is pressed until it is released.
     /// </summary>
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StatePressed, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
     public class RepeatButton : ButtonBase
     {
         private DispatcherTimer _timer;
 
         static RepeatButton()
         {
-            //DefaultStyleKeyProperty.OverrideMetadata(typeof(RepeatButton), new FrameworkPropertyMetadata(typeof(RepeatButton)));
             ClickModeProperty.OverrideMetadata(typeof(RepeatButton), new PropertyMetadata(ClickMode.Press));
         }
 
         /// <summary>
-        /// Initializes a new instance of the RepeatButton class.
+        /// Initializes a new instance of the <see cref="RepeatButton"/> class.
         /// </summary>
         public RepeatButton()
         {
             DefaultStyleKey = typeof(RepeatButton);
         }
 
-#region Dependencies and Events
+        /// <summary>
+        /// Identifies the <see cref="Delay"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty DelayProperty =
+            DependencyProperty.Register(
+                nameof(Delay),
+                typeof(int),
+                typeof(RepeatButton),
+                new PropertyMetadata(500),
+                IsDelayValid);
 
         /// <summary>
-        /// Gets or sets the time, in milliseconds, the RepeatButton
-        /// waits when it is pressed before it starts repeating the click action.
-        /// The default is 250.
+        /// Gets or sets the time, in milliseconds, the <see cref="RepeatButton"/> waits when 
+        /// it is pressed before it starts repeating the click action.
         /// </summary>
-        public static readonly DependencyProperty DelayProperty
-            = DependencyProperty.Register("Delay",
-            typeof(int),
-            typeof(RepeatButton),
-            new PropertyMetadata(250));
-
-        /// <summary>
-        /// Gets or sets the time, in milliseconds, the RepeatButton
-        /// waits when it is pressed before it starts repeating the click action.
-        /// The default is 250.
-        /// </summary>
+        /// <returns>
+        /// The time, in milliseconds, the <see cref="RepeatButton"/>
+        /// waits when it is pressed before it starts repeating the click action. The default
+        /// is 500.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <see cref="Delay"/> is set to a value less than 0.
+        /// </exception>
         public int Delay
         {
-            get
-            {
-                return (int)GetValue(DelayProperty);
-            }
-            set
-            {
-                SetValue(DelayProperty, value);
-            }
+            get => (int)GetValue(DelayProperty);
+            set => SetValue(DelayProperty, value);
         }
 
-        /// <summary>
-        /// Gets or sets the time, in milliseconds, between repetitions of the click
-        /// action, as soon as repeating starts. The default is 250.
-        /// </summary>
-        public static readonly DependencyProperty IntervalProperty
-            = DependencyProperty.Register("Interval",
-            typeof(int),
-            typeof(RepeatButton),
-            new PropertyMetadata(250));
+        private static bool IsDelayValid(object value) => (int)value >= 0;
 
         /// <summary>
-        /// Gets or sets the time, in milliseconds, between repetitions of the click
-        /// action, as soon as repeating starts. The default is 250.
+        /// Identifies the <see cref="Interval"/> dependency property.
         /// </summary>
+        public static readonly DependencyProperty IntervalProperty =
+            DependencyProperty.Register(
+                nameof(Interval),
+                typeof(int),
+                typeof(RepeatButton),
+                new PropertyMetadata(33),
+                IsIntervalValid);
+
+        /// <summary>
+        /// Gets or sets the time, in milliseconds, between repetitions of the click action,
+        /// as soon as repeating starts.
+        /// </summary>
+        /// <returns>
+        /// The time, in milliseconds, between repetitions of the click action, as soon as
+        /// repeating starts. The default is 33.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <see cref="Interval"/> is set to a value less than 0.
+        /// </exception>
         public int Interval
         {
-            get
-            {
-                return (int)GetValue(IntervalProperty);
-            }
-            set
-            {
-                SetValue(IntervalProperty, value);
-            }
+            get => (int)GetValue(IntervalProperty);
+            set => SetValue(IntervalProperty, value);
         }
 
-        #endregion Dependencies and Events
+        private static bool IsIntervalValid(object value) => (int)value > 0;
 
+        /// <inheritdoc />
         protected override AutomationPeer OnCreateAutomationPeer()
             => new RepeatButtonAutomationPeer(this);
 
-        #region Private helpers
+        /// <inheritdoc />
+        protected override void OnClick()
+        {
+            if (AutomationPeer.ListenerExists(AutomationEvents.InvokePatternOnInvoked))
+            {
+                if (FrameworkElementAutomationPeer.CreatePeerForElement(this) is AutomationPeer peer)
+                {
+                    peer.RaiseAutomationEvent(AutomationEvents.InvokePatternOnInvoked);
+                }
+            }
+
+            base.OnClick();
+        }
+
+        /// <inheritdoc />
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseLeftButtonDown(e);
+
+            if (IsPressed && ClickMode != ClickMode.Hover)
+            {
+                StartTimer();
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseLeftButtonUp(e);
+
+            if (ClickMode != ClickMode.Hover)
+            {
+                StopTimer();
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void OnLostMouseCapture(MouseEventArgs e)
+        {
+            base.OnLostMouseCapture(e);
+            StopTimer();
+        }
 
         private void StartTimer()
         {
@@ -109,90 +160,28 @@ namespace System.Windows.Controls.Primitives
                 _timer.Tick += OnTimeout;
             }
             else if (_timer.IsEnabled)
+            {
                 return;
+            }
 
             _timer.Interval = TimeSpan.FromMilliseconds(Delay);
             _timer.Start();
         }
 
-        private void StopTimer()
-        {
-            if (_timer != null)
-            {
-                _timer.Stop();
-            }
-        }
+        private void StopTimer() => _timer?.Stop();
 
         private void OnTimeout(object sender, EventArgs e)
         {
             TimeSpan interval = TimeSpan.FromMilliseconds(Interval);
             if (_timer.Interval != interval)
+            {
                 _timer.Interval = interval;
+            }
 
             if (IsPressed)
             {
                 OnClick();
             }
         }
-
-#endregion Private helpers
-
-#region Override methods
-
-        /// <summary>
-        /// Raises InvokedAutomationEvent and call the base method to raise the Click event
-        /// </summary>
-        /// <ExternalAPI/>
-        protected override void OnClick()
-        {
-            base.OnClick();
-        }
-
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
-        {
-            //if (IsPressed && ClickMode != ClickMode.Hover)
-            //{
-            StartTimer();
-            //}
-
-            //--------------------------------------------------------------------------
-            // Note: it is important that the code below ("base.OnPointerPressed")is executed AFTER the code above, otherwise
-            // it will not work properly. In fact, you can reproduce the issue in case of inverted order by creating two
-            // NumericUpDown controls, and using the following code-behind:
-            // private void Numeric2_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
-            // {
-            //     if (Numeric1.Value + Numeric2.Value > 1)
-            //     {
-            //         Numeric2.Value = 0;
-            //         MessageBox.Show("Exceeded");
-            //     }
-            // }
-            // You will then notice that there is an infinite number of message boxes.
-            //--------------------------------------------------------------------------
-
-            base.OnMouseLeftButtonDown(eventArgs);
-        }
-
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs eventArgs)
-        {
-            base.OnMouseLeftButtonUp(eventArgs);
-
-            //if (ClickMode != ClickMode.Hover)
-            //{
-                StopTimer();
-            //}
-        }
-
-        /// <summary>
-        ///     Called when this element loses mouse capture.
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnLostMouseCapture(MouseEventArgs e)
-        {
-            base.OnLostMouseCapture(e);
-            StopTimer();
-        }
-
-#endregion
     }
 }
