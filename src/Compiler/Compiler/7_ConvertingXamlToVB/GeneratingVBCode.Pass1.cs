@@ -116,8 +116,7 @@ namespace OpenSilver.Compiler
                                                                resultingFieldsForNamedElements,
                                                                className,
                                                                namespaceDeclaration,
-                                                               baseType,
-                                                               addApplicationEntryPoint: false);
+                                                               baseType);
 
                     string componentTypeFullName = GetFullTypeName(namespaceName, className);
 

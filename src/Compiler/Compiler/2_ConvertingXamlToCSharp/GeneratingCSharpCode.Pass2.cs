@@ -277,8 +277,7 @@ namespace OpenSilver.Compiler
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
                                                                namespaceStringIfAny,
-                                                               baseType,
-                                                               addApplicationEntryPoint: false);
+                                                               baseType);
 
                     string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
 

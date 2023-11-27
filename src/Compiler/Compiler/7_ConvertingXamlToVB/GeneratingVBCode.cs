@@ -157,18 +157,8 @@ namespace OpenSilver.Compiler
             List<string> fieldsForNamedElements,
             string className,
             string namespaceStringIfAny,
-            string baseType,
-            bool addApplicationEntryPoint)
+            string baseType)
         {
-            string applicationEntryPointIfAny = string.Empty;
-            if (addApplicationEntryPoint)
-            {
-                applicationEntryPointIfAny = $@"
-Public Shared Fuction Main()
-    New {className}();
-End Function";
-            }
-
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
             string classCodeFilled = $@"
@@ -185,8 +175,6 @@ Partial Public Class {className}
 {initializeComponentMethod}
 
 {connectMethod}
-
-{applicationEntryPointIfAny}
 
 End Class
 ";

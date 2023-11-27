@@ -284,8 +284,7 @@ End Sub
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
                                                                namespaceDeclaration,
-                                                               baseType,
-                                                               addApplicationEntryPoint: false);
+                                                               baseType);
 
                     string componentTypeFullName = GetFullTypeName(namespaceName, className);
 
