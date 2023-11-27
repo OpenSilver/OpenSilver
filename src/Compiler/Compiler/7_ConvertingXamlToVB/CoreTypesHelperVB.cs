@@ -393,15 +393,21 @@ namespace OpenSilver.Compiler
                 throw GetConvertException(source, destinationType);
             }
 
+            if (split.Length == 0)
+            {
+                return $"New {destinationType}()";
+            }
+
             var sb = new StringBuilder();
 
-            sb.Append($"New {destinationType}()");
+            sb.Append($"New {destinationType}() From ");
             sb.Append("{");
 
-            for (int i = 0; i < split.Length; i += 2)
+            sb.Append(ConvertPointHelper(split[0], split[1], pointTypeFullName));
+            for (int i = 2; i < split.Length; i += 2)
             {
-                sb.Append(ConvertPointHelper(split[i], split[i + 1], pointTypeFullName))
-                  .Append(", ");
+                sb.Append(", ")
+                  .Append(ConvertPointHelper(split[i], split[i + 1], pointTypeFullName));
             }
 
             sb.Append("}");
