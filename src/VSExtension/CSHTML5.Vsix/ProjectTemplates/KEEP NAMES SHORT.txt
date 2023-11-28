@@ -1,3 +1,0 @@
-Make sure to keep the names short otherwise end-users may get "path is too long" error when creating a new project with the template.
-
-Also make sure that the ZIP files do not contain any files that have long names (same reason).
