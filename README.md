@@ -54,7 +54,6 @@ If you are compiling using the Command Prompt, please double-check that you are 
 
 If you still encounter any issues, please contact the OpenSilver team at: https://opensilver.net/contact.aspx
 
+# VSIX for OpenSilver
 
-
-
-
+If you're looking to build the VSIX extension for OpenSilver, instructions and the necessary source code are available in our dedicated repository - [OpenSilver.VSIX](https://github.com/OpenSilver/OpenSilver.VSIX).
