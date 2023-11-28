@@ -1,38 +1,56 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
     /// <summary>
-    /// Represents a selectable item in a
-    /// <see cref="T:System.Windows.Controls.TabControl" />.
+    /// Represents a selectable item in a <see cref="TabControl" />.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
+    [TemplatePart(Name = ElementTemplateTopSelectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateBottomSelectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateLeftSelectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateRightSelectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateTopUnselectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateBottomUnselectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateLeftUnselectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateRightUnselectedName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementHeaderTopSelectedName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = ElementHeaderBottomSelectedName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = ElementHeaderLeftSelectedName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = ElementHeaderRightSelectedName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = ElementHeaderTopUnselectedName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = ElementHeaderBottomUnselectedName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = ElementHeaderLeftUnselectedName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = ElementHeaderRightUnselectedName, Type = typeof(ContentControl))]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateUnselected, GroupName = VisualStates.GroupSelection)]
+    [TemplateVisualState(Name = VisualStates.StateSelected, GroupName = VisualStates.GroupSelection)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
     public class TabItem : ContentControl
     {
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.TabItem" /> class.
+        /// Initializes a new instance of the <see cref="TabItem" /> class.
         /// </summary>
         public TabItem()
             : base()
         {
-            MouseLeftButtonDown += OnMouseLeftButtonDown;
-            MouseEnter += OnMouseEnter;
-            MouseLeave += OnMouseLeave;
+            MouseLeftButtonDown += new MouseButtonEventHandler(OnMouseLeftButtonDown);
+            MouseEnter += new MouseEventHandler(OnMouseEnter);
+            MouseLeave += new MouseEventHandler(OnMouseLeave);
             GotFocus += delegate { IsFocused = true; };
             LostFocus += delegate { IsFocused = false; };
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
@@ -40,8 +58,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Builds the visual tree for the
-        /// <see cref="T:System.Windows.Controls.TabItem" /> when a new template
+        /// Builds the visual tree for the <see cref="TabItem" /> when a new template
         /// is applied.
         /// </summary>
         public override void OnApplyTemplate()
@@ -49,14 +66,30 @@ namespace System.Windows.Controls
             base.OnApplyTemplate();
 
             // Clear previous content from old ContentControl
-            ContentControl cc = GetElementHeader();
+            ContentControl cc = GetContentControl(IsSelected, TabStripPlacement);
             if (cc != null)
             {
                 cc.Content = null;
             }
 
             // Get the parts
-            GetElements();
+            ElementTemplateTopSelected = GetTemplateChild(ElementTemplateTopSelectedName) as FrameworkElement;
+            ElementTemplateBottomSelected = GetTemplateChild(ElementTemplateBottomSelectedName) as FrameworkElement;
+            ElementTemplateLeftSelected = GetTemplateChild(ElementTemplateLeftSelectedName) as FrameworkElement;
+            ElementTemplateRightSelected = GetTemplateChild(ElementTemplateRightSelectedName) as FrameworkElement;
+            ElementTemplateTopUnselected = GetTemplateChild(ElementTemplateTopUnselectedName) as FrameworkElement;
+            ElementTemplateBottomUnselected = GetTemplateChild(ElementTemplateBottomUnselectedName) as FrameworkElement;
+            ElementTemplateLeftUnselected = GetTemplateChild(ElementTemplateLeftUnselectedName) as FrameworkElement;
+            ElementTemplateRightUnselected = GetTemplateChild(ElementTemplateRightUnselectedName) as FrameworkElement;
+
+            ElementHeaderTopSelected = GetTemplateChild(ElementHeaderTopSelectedName) as ContentControl;
+            ElementHeaderBottomSelected = GetTemplateChild(ElementHeaderBottomSelectedName) as ContentControl;
+            ElementHeaderLeftSelected = GetTemplateChild(ElementHeaderLeftSelectedName) as ContentControl;
+            ElementHeaderRightSelected = GetTemplateChild(ElementHeaderRightSelectedName) as ContentControl;
+            ElementHeaderTopUnselected = GetTemplateChild(ElementHeaderTopUnselectedName) as ContentControl;
+            ElementHeaderBottomUnselected = GetTemplateChild(ElementHeaderBottomUnselectedName) as ContentControl;
+            ElementHeaderLeftUnselected = GetTemplateChild(ElementHeaderLeftUnselectedName) as ContentControl;
+            ElementHeaderRightUnselected = GetTemplateChild(ElementHeaderRightUnselectedName) as ContentControl;
 
             // Load Header
             UpdateHeaderVisuals();
@@ -65,14 +98,22 @@ namespace System.Windows.Controls
             ChangeVisualState(false);
         }
 
-#region Header
         /// <summary>
-        /// Gets or sets the header of the
-        /// <see cref="T:System.Windows.Controls.TabItem" />.
+        /// Creates and returns an <see cref="AutomationPeer" /> for this <see cref="TabItem" />.
+        /// </summary>
+        /// <returns>
+        /// An automation peer for this <see cref="TabItem" />.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new TabItemAutomationPeer(this);
+        }
+
+        /// <summary>
+        /// Gets or sets the header of the <see cref="TabItem" />.
         /// </summary>
         /// <value>
-        /// The current header of the
-        /// <see cref="T:System.Windows.Controls.TabItem" />.
+        /// The current header of the <see cref="TabItem" />.
         /// </value>
         public object Header
         {
@@ -81,21 +122,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the
-        /// <see cref="P:System.Windows.Controls.TabItem.Header" />
-        /// dependency property.
+        /// Identifies the <see cref="Header" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the
-        /// <see cref="P:System.Windows.Controls.TabItem.Header" />
-        /// dependency property.
+        /// The identifier for the <see cref="Header" /> dependency property.
         /// </value>
         public static readonly DependencyProperty HeaderProperty =
             DependencyProperty.Register(
-                "Header",
+                nameof(Header),
                 typeof(object),
                 typeof(TabItem),
-                new PropertyMetadata(null, OnHeaderChanged));
+                new PropertyMetadata(OnHeaderChanged));
 
         /// <summary>
         /// Header property changed handler.
@@ -111,19 +148,13 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Called when the
-        /// <see cref="P:System.Windows.Controls.TabItem.Header" /> property
-        /// changes.
+        /// Called when the <see cref="Header" /> property changes.
         /// </summary>
         /// <param name="oldHeader">
-        /// The previous value of the
-        /// <see cref="P:System.Windows.Controls.TabItem.Header" />
-        /// property.
+        /// The previous value of the <see cref="Header" /> property.
         /// </param>
         /// <param name="newHeader">
-        /// The new value of the
-        /// <see cref="P:System.Windows.Controls.TabItem.Header" />
-        /// property.
+        /// The new value of the <see cref="Header" /> property.
         /// </param>
         protected virtual void OnHeaderChanged(object oldHeader, object newHeader)
         {
@@ -135,23 +166,19 @@ namespace System.Windows.Controls
         /// </summary>
         private void UpdateHeaderVisuals()
         {
-            ContentControl header = GetElementHeader();
+            ContentControl header = GetContentControl(IsSelected, TabStripPlacement);
             if (header != null)
             {
-                header.ContentTemplate = this.HeaderTemplate;
                 header.Content = this.Header;
+                header.ContentTemplate = this.HeaderTemplate;
             }
         }
-#endregion Header
 
-#region HasHeader
         /// <summary>
-        /// Gets a value indicating whether the
-        /// <see cref="T:System.Windows.Controls.TabItem" /> has a header.
+        /// Gets a value indicating whether the <see cref="TabItem" /> has a header.
         /// </summary>
         /// <value>
-        /// True if <see cref="P:System.Windows.Controls.TabItem.Header" /> is
-        /// not null; otherwise, false.
+        /// True if <see cref="Header" /> is not null; otherwise, false.
         /// </value>
         public bool HasHeader
         {
@@ -160,31 +187,25 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the
-        /// <see cref="P:System.Windows.Controls.TabItem.HasHeader" />
-        /// dependency property.
+        /// Identifies the <see cref="HasHeader" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the
-        /// <see cref="P:System.Windows.Controls.TabItem.HasHeader" />
-        /// dependency property.
+        /// The identifier for the <see cref="HasHeader" /> dependency property.
         /// </value>
         public static readonly DependencyProperty HasHeaderProperty =
             DependencyProperty.Register(
-                "HasHeader",
+                nameof(HasHeader),
                 typeof(bool),
                 typeof(TabItem),
-                new PropertyMetadata(false));
-#endregion HasHeader
+                null);
 
-#region HeaderTemplate
         /// <summary>
         /// Gets or sets the template that is used to display the content of the
-        /// <see cref="T:System.Windows.Controls.TabItem" /> header.
+        /// <see cref="TabItem" /> header.
         /// </summary>
         /// <value>
-        /// The current template that is used to display
-        /// <see cref="T:System.Windows.Controls.TabItem" /> header content.
+        /// The current template that is used to display <see cref="TabItem" /> 
+        /// header content.
         /// </value>
         public DataTemplate HeaderTemplate
         {
@@ -193,21 +214,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the
-        /// <see cref="P:System.Windows.Controls.TabItem.HeaderTemplate" />
-        /// dependency property.
+        /// Identifies the <see cref="HeaderTemplate" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the
-        /// <see cref="P:System.Windows.Controls.TabItem.HeaderTemplate" />
-        /// dependency property.
+        /// The identifier for the <see cref="HeaderTemplate" /> dependency property.
         /// </value>
         public static readonly DependencyProperty HeaderTemplateProperty =
             DependencyProperty.Register(
-                "HeaderTemplate",
+                nameof(HeaderTemplate),
                 typeof(DataTemplate),
                 typeof(TabItem),
-                new PropertyMetadata(null, OnHeaderTemplateChanged));
+                new PropertyMetadata(OnHeaderTemplateChanged));
 
         /// <summary>
         /// HeaderTemplate property changed handler.
@@ -221,35 +238,24 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Called when the
-        /// <see cref="P:System.Windows.Controls.TabItem.HeaderTemplate" />
-        /// property changes.
+        /// Called when the <see cref="HeaderTemplate" /> property changes.
         /// </summary>
         /// <param name="oldHeaderTemplate">
-        /// The previous value of the
-        /// <see cref="P:System.Windows.Controls.TabItem.HeaderTemplate" />
-        /// property.
+        /// The previous value of the <see cref="HeaderTemplate" /> property.
         /// </param>
         /// <param name="newHeaderTemplate">
-        /// The new value of the
-        /// <see cref="P:System.Windows.Controls.TabItem.HeaderTemplate" />
-        /// property.
+        /// The new value of the <see cref="HeaderTemplate" /> property.
         /// </param>
         protected virtual void OnHeaderTemplateChanged(DataTemplate oldHeaderTemplate, DataTemplate newHeaderTemplate)
         {
             UpdateHeaderVisuals();
         }
-#endregion HeaderTemplate
 
-#region IsSelected
         /// <summary>
-        /// Gets or sets a value indicating whether the
-        /// <see cref="T:System.Windows.Controls.TabItem" /> is currently
-        /// selected.
+        /// Gets or sets a value indicating whether the <see cref="TabItem" /> is currently selected.
         /// </summary>
         /// <value>
-        /// True if the <see cref="T:System.Windows.Controls.TabItem" /> is
-        /// selected; otherwise, false.
+        /// True if the <see cref="TabItem" /> is selected; otherwise, false.
         /// </value>
         public bool IsSelected
         {
@@ -258,21 +264,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the
-        /// <see cref="P:System.Windows.Controls.TabItem.IsSelected" />
-        /// dependency property.
+        /// Identifies the <see cref="IsSelected" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the
-        /// <see cref="P:System.Windows.Controls.TabItem.IsSelected" />
-        /// dependency property.
+        /// The identifier for the <see cref="IsSelected" /> dependency property.
         /// </value>
         public static readonly DependencyProperty IsSelectedProperty =
             DependencyProperty.Register(
-                "IsSelected",
+                nameof(IsSelected),
                 typeof(bool),
                 typeof(TabItem),
-                new PropertyMetadata(false, OnIsSelectedChanged));
+                new PropertyMetadata(OnIsSelectedChanged));
 
         /// <summary>
         /// IsSelected changed handler.
@@ -282,7 +284,7 @@ namespace System.Windows.Controls
         private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             TabItem tabItem = d as TabItem;
-            //Debug.Assert(tabItem != null, "TabItem should not be null!");
+            Debug.Assert(tabItem != null, "TabItem should not be null!");
 
             bool isSelected = (bool)e.NewValue;
 
@@ -296,35 +298,82 @@ namespace System.Windows.Controls
             {
                 tabItem.OnUnselected(args);
             }
+
+            // fire the IsSelectedChanged event for automation
+            if (AutomationPeer.ListenerExists(AutomationEvents.SelectionItemPatternOnElementSelected))
+            {
+                TabControl parentSelector = tabItem.TabControlParent;
+                if (parentSelector != null)
+                {
+                    TabItemAutomationPeer tabItemPeer = GetTabItemAutomationPeer(tabItem);
+                    if (tabItemPeer != null)
+                    {
+                        tabItemPeer.RaiseAutomationIsSelectedChanged(isSelected);
+                    }
+                }
+            }
+
+            tabItem.IsTabStop = isSelected;
+            tabItem.UpdateVisualState();
         }
 
         /// <summary>
-        /// Called to indicate that the
-        /// <see cref="P:System.Windows.Controls.TabItem.IsSelected" /> property
-        /// has changed to true.
+        /// We use this function to get the TabItemAutomationPeer associated
+        /// with the TabItem.
+        /// </summary>
+        /// <param name="item">
+        /// TabItem that we are seeking to find the AutomationPeer for.
+        /// </param>
+        /// <returns>
+        /// The TabItemAutomationPeer for the specified TabItem.
+        /// </returns>
+        internal static TabItemAutomationPeer GetTabItemAutomationPeer(TabItem item)
+        {
+            TabControlAutomationPeer tabControlPeer = TabControlAutomationPeer.FromElement(item.TabControlParent) as TabControlAutomationPeer;
+
+            if (tabControlPeer == null)
+            {
+                tabControlPeer = TabControlAutomationPeer.CreatePeerForElement(item.TabControlParent) as TabControlAutomationPeer;
+            }
+
+            if (tabControlPeer != null)
+            {
+                List<AutomationPeer> children = tabControlPeer.GetChildren();
+                if (children != null)
+                {
+                    foreach (AutomationPeer peer in children)
+                    {
+                        TabItemAutomationPeer tabItemPeer = peer as TabItemAutomationPeer;
+                        if (tabItemPeer != null && tabItemPeer.Owner == item)
+                        {
+                            return tabItemPeer;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Called to indicate that the <see cref="IsSelected" /> property has changed to true.
         /// </summary>
         /// <param name="e">
-        /// A <see cref="T:System.Windows.RoutedEventArgs" /> that contains the
-        /// event data.
+        /// A <see cref="RoutedEventArgs" /> that contains the event data.
         /// </param>
         protected virtual void OnSelected(RoutedEventArgs e)
         {
-            if (TabControlParent != null && TabControlParent.SelectedItem != this)
+            if (TabControlParent != null)
             {
                 TabControlParent.SelectedItem = this;
-                UpdateTabItemVisuals();
             }
-
         }
 
         /// <summary>
-        /// Called to indicate that the
-        /// <see cref="P:System.Windows.Controls.TabItem.IsSelected" /> property
-        /// has changed to false.
+        /// Called to indicate that the <see cref="IsSelected" /> property has changed to false.
         /// </summary>
         /// <param name="e">
-        /// A <see cref="T:System.Windows.RoutedEventArgs" /> that contains the
-        /// event data.
+        /// A <see cref="RoutedEventArgs" /> that contains the event data.
         /// </param>
         protected virtual void OnUnselected(RoutedEventArgs e)
         {
@@ -332,19 +381,27 @@ namespace System.Windows.Controls
             {
                 TabControlParent.SelectedIndex = -1;
             }
-            UpdateTabItemVisuals();
         }
-#endregion IsSelected
+
+        /// <summary>
+        /// Gets the location of the tab strip relative to the <see cref="TabItem" /> content.
+        /// </summary>
+        /// <value>
+        /// The location of the tab strip relative to the <see cref="TabItem" /> content.
+        /// </value>
+        public Dock TabStripPlacement
+        {
+            get { return ((TabControlParent == null) ? Dock.Top : TabControlParent.TabStripPlacement); }
+        }
 
         /// <summary>
         /// This method is invoked when the Content property changes.
         /// </summary>
         /// <param name="oldContent">
-        /// The previous <see cref="T:System.Windows.Controls.TabItem" />
-        /// content.
+        /// The previous <see cref="TabItem" /> content.
         /// </param>
         /// <param name="newContent">
-        /// The new <see cref="T:System.Windows.Controls.TabItem" /> content.
+        /// The new <see cref="TabItem" /> content.
         /// </param>
         protected override void OnContentChanged(object oldContent, object newContent)
         {
@@ -363,6 +420,51 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// This is the method that responds to the KeyDown event.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="KeyEventArgs" /> that contains the event data.
+        /// </param>
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (e.Handled)
+            {
+                return;
+            }
+
+            // Some keys (e.g. Left/Right) need to be translated in RightToLeft mode
+            Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, e.Key);
+
+            TabItem nextTabItem = null;
+
+            int direction = 0;
+            int startIndex = TabControlParent.Items.IndexOf(this);
+            switch (invariantKey)
+            {
+                case Key.Right:
+                case Key.Down:
+                    direction = 1;
+                    break;
+                case Key.Left:
+                case Key.Up:
+                    direction = -1;
+                    break;
+                default:
+                    return;
+            }
+
+            nextTabItem = TabControlParent.FindNextTabItem(startIndex, direction);
+
+            if (nextTabItem != null && nextTabItem != TabControlParent.SelectedItem)
+            {
+                e.Handled = true;
+                TabControlParent.SelectedItem = nextTabItem;
+                nextTabItem.Focus();
+            }
+        }
+
+        /// <summary>
         /// Called when the IsEnabled property changes.
         /// </summary>
         /// <param name="sender">
@@ -371,9 +473,9 @@ namespace System.Windows.Controls
         /// <param name="e">Property changed args.</param>
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            //Debug.Assert(e.NewValue is bool, "New value should be a Boolean!");
+            Debug.Assert(e.NewValue is bool, "New value should be a Boolean!");
             bool isEnabled = (bool)e.NewValue;
-            ContentControl header =  GetElementHeader();
+            ContentControl header = GetContentControl(IsSelected, TabStripPlacement);
             if (header != null)
             {
                 if (!isEnabled)
@@ -385,7 +487,6 @@ namespace System.Windows.Controls
             }
         }
 
-#region IsFocused
         /// <summary>
         /// Gets a value indicating whether this element has logical focus.
         /// </summary>
@@ -396,21 +497,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the
-        /// <see cref="P:System.Windows.Controls.TabItem.IsFocused" />
-        /// dependency property.
+        /// Identifies the <see cref="IsFocused" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the
-        /// <see cref="P:System.Windows.Controls.TabItem.IsFocused" />
-        /// dependency property.
+        /// The identifier for the <see cref="IsFocused" /> dependency property.
         /// </value>
         public static readonly DependencyProperty IsFocusedProperty =
             DependencyProperty.Register(
-                "IsFocused",
+                nameof(IsFocused),
                 typeof(bool),
                 typeof(TabItem),
-                new PropertyMetadata(false, OnIsFocusedPropertyChanged));
+                new PropertyMetadata(OnIsFocusedPropertyChanged));
 
         /// <summary>
         /// IsFocusedProperty property changed handler.
@@ -420,7 +517,7 @@ namespace System.Windows.Controls
         private static void OnIsFocusedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             TabItem ti = d as TabItem;
-            //Debug.Assert(ti != null, "TabItem should not be null!");
+            Debug.Assert(ti != null, "TabItem should not be null!");
 
             ti.OnIsFocusChanged(e);
         }
@@ -429,15 +526,12 @@ namespace System.Windows.Controls
         /// Called when the IsFocused property changes.
         /// </summary>
         /// <param name="e">
-        /// A <see cref="T:System.Windows.DependencyPropertyChangedEventArgs" />
-        /// that contains the event data.
+        /// A <see cref="DependencyPropertyChangedEventArgs" /> that contains the event data.
         /// </param>
-        //[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "e", Justification = "Compat with WPF.")]
         protected virtual void OnIsFocusChanged(DependencyPropertyChangedEventArgs e)
         {
             UpdateVisualState();
         }
-#endregion IsFocused
 
         /// <summary>
         /// Change to the correct visual state for the TabItem.
@@ -501,7 +595,7 @@ namespace System.Windows.Controls
         private void UpdateTabItemVisuals()
         {
             // update the template that is displayed
-            FrameworkElement currentTemplate = GetElementTemplate();
+            FrameworkElement currentTemplate = GetTemplate(IsSelected, TabStripPlacement);
 
             if (_previousTemplate != null && _previousTemplate != currentTemplate)
             {
@@ -514,7 +608,7 @@ namespace System.Windows.Controls
             }
 
             // update the ContentControl's header
-            ContentControl currentHeader = GetElementHeader();
+            ContentControl currentHeader = GetContentControl(IsSelected, TabStripPlacement);
 
             if (_previousHeader != null && _previousHeader != currentHeader)
             {
@@ -555,9 +649,8 @@ namespace System.Windows.Controls
         {
             if (IsEnabled && TabControlParent != null && !IsSelected && !e.Handled)
             {
-                //IsTabStop = true;
-                //todo: we will probably need the next line?
-                //e.Handled = Focus();
+                IsTabStop = true;
+                e.Handled = Focus();
                 TabControlParent.SelectedIndex = TabControlParent.Items.IndexOf(this);
             }
         }
@@ -582,7 +675,7 @@ namespace System.Windows.Controls
                 // Once the TabControl is added to the visual tree, the
                 // TabItem's parent becomes the TabPanel, so we now have to step
                 // up the visual tree to find the owning TabControl.
-                DependencyObject obj = this;
+                DependencyObject obj = this as DependencyObject;
                 while (obj != null)
                 {
                     TabControl tc = obj as TabControl;
@@ -590,84 +683,55 @@ namespace System.Windows.Controls
                     {
                         return tc;
                     }
-                    obj = VisualTreeHelper.GetParent(obj);
+                    obj = VisualTreeHelper.GetParent(obj) as DependencyObject;
                 }
                 return null;
             }
         }
 
-        private ContentControl GetElementHeader()
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="isSelected">Inherited code: Requires comment 1.</param>
+        /// <param name="tabPlacement">Inherited code: Requires comment 2.</param>
+        /// <returns>Inherited code: Requires comment 3.</returns>
+        internal FrameworkElement GetTemplate(bool isSelected, Dock tabPlacement)
         {
-            if (TabControlParent != null)
+            switch (tabPlacement)
             {
-                if (TabControlParent.TabStripPlacement == Dock.Top)
-                {
-                    return IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected;
-                }
-                else if (TabControlParent.TabStripPlacement == Dock.Bottom)
-                {
-                    return IsSelected ? ElementHeaderBottomSelected : ElementHeaderBottomUnselected;
-                }
-                else if (TabControlParent.TabStripPlacement == Dock.Left)
-                {
-                    return IsSelected ? ElementHeaderLeftSelected : ElementHeaderLeftUnselected;
-                }
-                else if (TabControlParent.TabStripPlacement == Dock.Right)
-                {
-                    return IsSelected ? ElementHeaderRightSelected : ElementHeaderRightUnselected;
-                }
+                case Dock.Top:
+                    return isSelected ? ElementTemplateTopSelected : ElementTemplateTopUnselected;
+                case Dock.Bottom:
+                    return isSelected ? ElementTemplateBottomSelected : ElementTemplateBottomUnselected;
+                case Dock.Left:
+                    return isSelected ? ElementTemplateLeftSelected : ElementTemplateLeftUnselected;
+                case Dock.Right:
+                    return isSelected ? ElementTemplateRightSelected : ElementTemplateRightUnselected;
             }
-            return IsSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected;
+            return null;
         }
 
-        private FrameworkElement GetElementTemplate()
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="isSelected">Inherited code: Requires comment 1.</param>
+        /// <param name="tabPlacement">Inherited code: Requires comment 2.</param>
+        /// <returns>Inherited code: Requires comment 3.</returns>
+        internal ContentControl GetContentControl(bool isSelected, Dock tabPlacement)
         {
-            if (TabControlParent != null)
+            switch (tabPlacement)
             {
-                if (TabControlParent.TabStripPlacement == Dock.Top)
-                {
-                    return IsSelected ? ElementTemplateTopSelected : ElementTemplateTopUnselected;
-                }
-                else if (TabControlParent.TabStripPlacement == Dock.Bottom)
-                {
-                    return IsSelected ? ElementTemplateBottomSelected : ElementTemplateBottomUnselected;
-                }
-                else if (TabControlParent.TabStripPlacement == Dock.Left)
-                {
-                    return IsSelected ? ElementTemplateLeftSelected : ElementTemplateLeftUnselected;
-                }
-                else if (TabControlParent.TabStripPlacement == Dock.Right)
-                {
-                    return IsSelected ? ElementTemplateRightSelected : ElementTemplateRightUnselected;
-                }
+                case Dock.Top:
+                    return isSelected ? ElementHeaderTopSelected : ElementHeaderTopUnselected;
+                case Dock.Bottom:
+                    return isSelected ? ElementHeaderBottomSelected : ElementHeaderBottomUnselected;
+                case Dock.Left:
+                    return isSelected ? ElementHeaderLeftSelected : ElementHeaderLeftUnselected;
+                case Dock.Right:
+                    return isSelected ? ElementHeaderRightSelected : ElementHeaderRightUnselected;
             }
-            return IsSelected ? ElementTemplateTopSelected : ElementTemplateTopUnselected;
+            return null;
         }
-
-        private void GetElements()
-        {
-            ElementTemplateTopSelected = GetTemplateChild(ElementTemplateTopSelectedName) as FrameworkElement;
-            ElementTemplateTopUnselected = GetTemplateChild(ElementTemplateTopUnselectedName) as FrameworkElement;
-            ElementHeaderTopSelected = GetTemplateChild(ElementHeaderTopSelectedName) as ContentControl;
-            ElementHeaderTopUnselected = GetTemplateChild(ElementHeaderTopUnselectedName) as ContentControl;
-
-            ElementTemplateBottomSelected = GetTemplateChild(ElementTemplateBottomSelectedName) as FrameworkElement;
-            ElementTemplateBottomUnselected = GetTemplateChild(ElementTemplateBottomUnselectedName) as FrameworkElement;
-            ElementHeaderBottomSelected = GetTemplateChild(ElementHeaderBottomSelectedName) as ContentControl;
-            ElementHeaderBottomUnselected = GetTemplateChild(ElementHeaderBottomUnselectedName) as ContentControl;
-
-            ElementTemplateLeftSelected = GetTemplateChild(ElementTemplateLeftSelectedName) as FrameworkElement;
-            ElementTemplateLeftUnselected = GetTemplateChild(ElementTemplateLeftUnselectedName) as FrameworkElement;
-            ElementHeaderLeftSelected = GetTemplateChild(ElementHeaderLeftSelectedName) as ContentControl;
-            ElementHeaderLeftUnselected = GetTemplateChild(ElementHeaderLeftUnselectedName) as ContentControl;
-
-            ElementTemplateRightSelected = GetTemplateChild(ElementTemplateRightSelectedName) as FrameworkElement;
-            ElementTemplateRightUnselected = GetTemplateChild(ElementTemplateRightUnselectedName) as FrameworkElement;
-            ElementHeaderRightSelected = GetTemplateChild(ElementHeaderRightSelectedName) as ContentControl;
-            ElementHeaderRightUnselected = GetTemplateChild(ElementHeaderRightUnselectedName) as ContentControl;
-        }
-
-        #region Top
 
         /// <summary>
         /// Gets or sets the TabStripPlacement Top Selected template.
@@ -680,6 +744,36 @@ namespace System.Windows.Controls
         internal const string ElementTemplateTopSelectedName = "TemplateTopSelected";
 
         /// <summary>
+        /// Gets or sets the TabStripPlacement Bottom Selected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateBottomSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateBottomSelectedName = "TemplateBottomSelected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Left Selected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateLeftSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateLeftSelectedName = "TemplateLeftSelected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Right Selected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateRightSelected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateRightSelectedName = "TemplateRightSelected";
+
+        /// <summary>
         /// Gets or sets the TabStripPlacement Top Unselected template.
         /// </summary>
         internal FrameworkElement ElementTemplateTopUnselected { get; set; }
@@ -688,6 +782,36 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementTemplateTopUnselectedName = "TemplateTopUnselected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Bottom Unselected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateBottomUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateBottomUnselectedName = "TemplateBottomUnselected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Left Unselected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateLeftUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateLeftUnselectedName = "TemplateLeftUnselected";
+
+        /// <summary>
+        /// Gets or sets the TabStripPlacement Right Unselected template.
+        /// </summary>
+        internal FrameworkElement ElementTemplateRightUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTemplateRightUnselectedName = "TemplateRightUnselected";
 
         /// <summary>
         /// Gets or sets the Header of the TabStripPlacement Top Selected
@@ -701,41 +825,6 @@ namespace System.Windows.Controls
         internal const string ElementHeaderTopSelectedName = "HeaderTopSelected";
 
         /// <summary>
-        /// Gets or sets the Header of the TabStripPlacement Top Unselected
-        /// template.
-        /// </summary>
-        internal ContentControl ElementHeaderTopUnselected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementHeaderTopUnselectedName = "HeaderTopUnselected";
-
-        #endregion
-
-        #region Bottom
-
-        /// <summary>
-        /// Gets or sets the TabStripPlacement Bottom Selected template.
-        /// </summary>
-        internal FrameworkElement ElementTemplateBottomSelected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementTemplateBottomSelectedName = "TemplateBottomSelected";
-
-        /// <summary>
-        /// Gets or sets the TabStripPlacement Bottom Unselected template.
-        /// </summary>
-        internal FrameworkElement ElementTemplateBottomUnselected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementTemplateBottomUnselectedName = "TemplateBottomUnselected";
-
-        /// <summary>
         /// Gets or sets the Header of the TabStripPlacement Bottom Selected
         /// template.
         /// </summary>
@@ -745,41 +834,6 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementHeaderBottomSelectedName = "HeaderBottomSelected";
-
-        /// <summary>
-        /// Gets or sets the Header of the TabStripPlacement Bottom Unselected
-        /// template.
-        /// </summary>
-        internal ContentControl ElementHeaderBottomUnselected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementHeaderBottomUnselectedName = "HeaderBottomUnselected";
-
-        #endregion
-
-        #region Left
-
-        /// <summary>
-        /// Gets or sets the TabStripPlacement Left Selected template.
-        /// </summary>
-        internal FrameworkElement ElementTemplateLeftSelected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementTemplateLeftSelectedName = "TemplateLeftSelected";
-
-        /// <summary>
-        /// Gets or sets the TabStripPlacement Left Unselected template.
-        /// </summary>
-        internal FrameworkElement ElementTemplateLeftUnselected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementTemplateLeftUnselectedName = "TemplateLeftUnselected";
 
         /// <summary>
         /// Gets or sets the Header of the TabStripPlacement Left Selected
@@ -793,41 +847,6 @@ namespace System.Windows.Controls
         internal const string ElementHeaderLeftSelectedName = "HeaderLeftSelected";
 
         /// <summary>
-        /// Gets or sets the Header of the TabStripPlacement Left Unselected
-        /// template.
-        /// </summary>
-        internal ContentControl ElementHeaderLeftUnselected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementHeaderLeftUnselectedName = "HeaderLeftUnselected";
-
-        #endregion
-
-        #region Right
-
-        /// <summary>
-        /// Gets or sets the TabStripPlacement Right Selected template.
-        /// </summary>
-        internal FrameworkElement ElementTemplateRightSelected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementTemplateRightSelectedName = "TemplateRightSelected";
-
-        /// <summary>
-        /// Gets or sets the TabStripPlacement Right Unselected template.
-        /// </summary>
-        internal FrameworkElement ElementTemplateRightUnselected { get; set; }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        internal const string ElementTemplateRightUnselectedName = "TemplateRightUnselected";
-
-        /// <summary>
         /// Gets or sets the Header of the TabStripPlacement Right Selected
         /// template.
         /// </summary>
@@ -837,6 +856,39 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementHeaderRightSelectedName = "HeaderRightSelected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Top Unselected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderTopUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderTopUnselectedName = "HeaderTopUnselected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Bottom Unselected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderBottomUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderBottomUnselectedName = "HeaderBottomUnselected";
+
+        /// <summary>
+        /// Gets or sets the Header of the TabStripPlacement Left Unselected
+        /// template.
+        /// </summary>
+        internal ContentControl ElementHeaderLeftUnselected { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementHeaderLeftUnselectedName = "HeaderLeftUnselected";
 
         /// <summary>
         /// Gets or sets the Header of the TabStripPlacement Right Unselected
@@ -849,12 +901,10 @@ namespace System.Windows.Controls
         /// </summary>
         internal const string ElementHeaderRightUnselectedName = "HeaderRightUnselected";
 
-        #endregion
-
         /// <summary>
         /// Gets or sets a value indicating whether Inherited code: Requires comment.
         /// </summary>
-        private bool _isMouseOver { get; set; }
+        private bool _isMouseOver;
 
         /// <summary>
         /// Inherited code: Requires comment.
@@ -866,63 +916,55 @@ namespace System.Windows.Controls
         /// </summary>
         private ContentControl _previousHeader;
 
-
-#region Properties added by the CSHTML5 team to make styling of tab controls easier
-
-        /// <summary>
-        /// Gets or sets the bakground color of the selected INTERNAL_CorrespondingItem.
-        /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush SelectedBackground
         {
             get { return (Brush)GetValue(SelectedBackgroundProperty); }
             set { SetValue(SelectedBackgroundProperty, value); }
         }
-        /// <summary>
-        /// Identifies the SelectedBackground dependency property
-        /// </summary>
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty SelectedBackgroundProperty =
             DependencyProperty.Register(
-                "SelectedBackground", 
-                typeof(Brush), 
-                typeof(TabItem), 
+                nameof(SelectedBackground),
+                typeof(Brush),
+                typeof(TabItem),
                 new PropertyMetadata(new SolidColorBrush(Colors.White)));
 
-        /// <summary>
-        /// Gets or sets the foreground color of the selected INTERNAL_CorrespondingItem.
-        /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush SelectedForeground
         {
             get { return (Brush)GetValue(SelectedForegroundProperty); }
             set { SetValue(SelectedForegroundProperty, value); }
         }
-        /// <summary>
-        /// Identifies the SelectedForeground dependency property
-        /// </summary>
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty SelectedForegroundProperty =
             DependencyProperty.Register(
-                "SelectedForeground", 
-                typeof(Brush), 
-                typeof(TabItem), 
+                nameof(SelectedForeground),
+                typeof(Brush),
+                typeof(TabItem),
                 new PropertyMetadata(new SolidColorBrush(Colors.Black)));
 
-        /// <summary>
-        /// Gets or sets the accent color of the selected INTERNAL_CorrespondingItem.
-        /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush SelectedAccent
         {
             get { return (Brush)GetValue(SelectedAccentProperty); }
             set { SetValue(SelectedAccentProperty, value); }
         }
-        /// <summary>
-        /// Identifies the SelectedAccent dependency property
-        /// </summary>
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty SelectedAccentProperty =
             DependencyProperty.Register(
-                "SelectedAccent", 
-                typeof(Brush), 
-                typeof(TabItem), 
+                nameof(SelectedAccent),
+                typeof(Brush),
+                typeof(TabItem),
                 new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
-
-#endregion
     }
 }

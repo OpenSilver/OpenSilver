@@ -166,6 +166,8 @@
 		<Compile Include="System.Windows.Automation.Peers\SelectorAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\SelectorItemAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\SliderAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\TabControlAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\TabItemAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ThumbAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\UpDownBaseAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation\AutomationIdentifierConstants.cs" />

@@ -1,18 +1,13 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Globalization;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
@@ -22,111 +17,141 @@ namespace System.Windows.Controls
     /// Represents a control that contains multiple items that share the same
     /// space on the screen.
     /// </summary>
-    public class TabControl : ItemsControl //todo: would it not be better to inherit from Selector?
+    /// <remarks>
+    /// TabControl allows a developer to arrange visual content in a compacted
+    /// and organized form.  The real-world analog of the control might be a
+    /// tabbed notebook, in which visual content is displayed in discreet pages
+    /// which are accessed by selecting the appropriate tab.  Each tab/page is
+    /// encapsulated by a TabItem, the generated item of TabControl.  A TabItem
+    /// has a Header property which corresponds to the content in the tab button
+    /// and a Content property which corresponds to the content in the tab page.
+    /// This control is useful for minimizing screen space usage while allowing
+    /// an application to expose a large amount of data.  The user navigates
+    /// through TabItems by clicking on a tab button using the mouse or by using
+    /// the keyboard.
+    /// </remarks>
+    /// <QualityBand>Mature</QualityBand>
+    [TemplatePart(Name = ElementTemplateTopName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateBottomName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateLeftName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTemplateRightName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementTabPanelTopName, Type = typeof(TabPanel))]
+    [TemplatePart(Name = ElementTabPanelBottomName, Type = typeof(TabPanel))]
+    [TemplatePart(Name = ElementTabPanelLeftName, Type = typeof(TabPanel))]
+    [TemplatePart(Name = ElementTabPanelRightName, Type = typeof(TabPanel))]
+    [TemplatePart(Name = ElementContentTopName, Type = typeof(ContentPresenter))]
+    [TemplatePart(Name = ElementContentBottomName, Type = typeof(ContentPresenter))]
+    [TemplatePart(Name = ElementContentLeftName, Type = typeof(ContentPresenter))]
+    [TemplatePart(Name = ElementContentRightName, Type = typeof(ContentPresenter))]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    public class TabControl : ItemsControl
     {
         /// <summary>
-        /// Initializes a new instance of the
-        /// TabControl class.
+        /// Initializes a new instance of the <see cref="TabControl" /> class.
         /// </summary>
         public TabControl()
         {
             SelectedIndex = -1;
-            KeyDown += delegate (object sender, KeyEventArgs e) { /*OnKeyDown(e);*/ };
+            KeyDown += delegate (object sender, KeyEventArgs e) { OnKeyDown(e); };
             SelectionChanged += delegate (object sender, SelectionChangedEventArgs e) { OnSelectionChanged(e); };
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
             DefaultStyleKey = typeof(TabControl);
         }
 
         /// <summary>
-        /// Builds the visual tree for the TabControl when a new template is applied.
+        /// Builds the visual tree for the <see cref="TabControl" /> when a new template 
+        /// is applied.
         /// </summary>
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
             // if previous items exist, we want to clear
-            TabPanel panel = GetElementTabPanel();
-            if (panel != null)
+            if (ElementTabPanelTop != null)
             {
-                panel.Children.Clear();
+                ElementTabPanelTop.Children.Clear();
+            }
+            if (ElementTabPanelBottom != null)
+            {
+                ElementTabPanelBottom.Children.Clear();
+            }
+            if (ElementTabPanelLeft != null)
+            {
+                ElementTabPanelLeft.Children.Clear();
+            }
+            if (ElementTabPanelRight != null)
+            {
+                ElementTabPanelRight.Children.Clear();
             }
 
             // also clear the content if it is set to a ContentPresenter
-            ContentPresenter contentHost = GetElementContent();
+            ContentPresenter contentHost = GetContentHost(TabStripPlacement);
             if (contentHost != null)
             {
                 contentHost.Content = null;
             }
 
             // Get the parts
-            GetElements();
+            ElementTemplateTop = GetTemplateChild(ElementTemplateTopName) as FrameworkElement;
+            ElementTemplateBottom = GetTemplateChild(ElementTemplateBottomName) as FrameworkElement;
+            ElementTemplateLeft = GetTemplateChild(ElementTemplateLeftName) as FrameworkElement;
+            ElementTemplateRight = GetTemplateChild(ElementTemplateRightName) as FrameworkElement;
+
+            ElementTabPanelTop = GetTemplateChild(ElementTabPanelTopName) as TabPanel;
+            ElementTabPanelBottom = GetTemplateChild(ElementTabPanelBottomName) as TabPanel;
+            ElementTabPanelLeft = GetTemplateChild(ElementTabPanelLeftName) as TabPanel;
+            ElementTabPanelRight = GetTemplateChild(ElementTabPanelRightName) as TabPanel;
+
+            ElementContentTop = GetTemplateChild(ElementContentTopName) as ContentPresenter;
+            ElementContentBottom = GetTemplateChild(ElementContentBottomName) as ContentPresenter;
+            ElementContentLeft = GetTemplateChild(ElementContentLeftName) as ContentPresenter;
+            ElementContentRight = GetTemplateChild(ElementContentRightName) as ContentPresenter;
 
             foreach (object item in Items)
             {
                 TabItem tabItem = item as TabItem;
                 if (tabItem == null)
                 {
-                    throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Unable to cast object of type '{0}' to type 'System.Windows.Controls.TabItem'.",
+                            item.GetType().ToString()));
                 }
                 AddToTabPanel(tabItem);
             }
-            if (this.SelectedIndex < 0)
-            {
-                this.SelectedIndex = 0;
-            }
-            else //(SelectedIndex >= 0)
+            if (SelectedIndex >= 0)
             {
                 UpdateSelectedContent(SelectedContent);
             }
 
-            UpdateTabPanelLayout();
+            UpdateTabPanelLayout(TabStripPlacement, TabStripPlacement);
             ChangeVisualState(false);
         }
 
-        public Dock TabStripPlacement
-        {
-            get { return (Dock)GetValue(TabStripPlacementProperty); }
-            set { SetValue(TabStripPlacementProperty, value); }
-        }
-
-        public static readonly DependencyProperty TabStripPlacementProperty =
-            DependencyProperty.Register(
-                "TabStripPlacement",
-                typeof(Dock),
-                typeof(TabControl),
-                new PropertyMetadata(Dock.Top, OnTabStripPlacementPropertyChanged));
-
-        private static void OnTabStripPlacementPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            TabControl tc = (TabControl)d;
-            if (tc == null)
-            {
-                throw new ArgumentException(string.Format("TabControl should not be null!"));
-            }
-            tc.UpdateTabPanelLayout();
-
-            foreach (object o in tc.Items)
-            {
-                TabItem tabItem = o as TabItem;
-                if (tabItem != null)
-                {
-                    tabItem.UpdateVisualState();
-                }
-            }
-        }
-
-        #region SelectedItem
         /// <summary>
-        /// Gets or sets the currently selected TabItem.
+        /// Returns  <see cref="TabControlAutomationPeer" /> for use by the Silverlight 
+        /// automation infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TabControlAutomationPeer" /> for the <see cref="TabControl" /> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new TabControlAutomationPeer(this);
+        }
+
+        /// <summary>
+        /// Gets or sets the currently selected <see cref="TabItem" />.
         /// </summary>
         /// <value>
-        /// The currently selected
-        /// TabItem, or null if a
-        /// TabItem is not selected.
+        /// The currently selected <see cref="TabItem" />, or null if a <see cref="TabItem" /> 
+        /// is not selected.
         /// </value>
         public object SelectedItem
         {
-            get { return (object)GetValue(SelectedItemProperty); }
+            get { return GetValue(SelectedItemProperty); }
             set
             {
                 if (value == null || Items.Contains(value))
@@ -137,17 +162,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the TabControl.SelectedItem dependency property.
+        /// Identifies the <see cref="SelectedItem" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the TabControl.SelectedItem dependency property.
+        /// The identifier for the <see cref="SelectedItem" /> dependency property.
         /// </value>
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(
-                "SelectedItem",
+                nameof(SelectedItem),
                 typeof(object),
                 typeof(TabControl),
-                new PropertyMetadata(null, OnSelectedItemChanged));
+                new PropertyMetadata(OnSelectedItemChanged));
 
         /// <summary>
         /// SelectedItem property changed handler.
@@ -173,18 +198,15 @@ namespace System.Windows.Controls
             {
                 tc.SelectedIndex = index;
                 tc.SelectItem(oldItem, tabItem);
-                if (tabItem != null)
-                    tabItem.UpdateVisualState();
             }
         }
-#endregion SelectedItem
 
-#region SelectedIndex
         /// <summary>
-        /// Gets or sets the index of the currently selected TabItem.
+        /// Gets or sets the index of the currently selected <see cref="TabItem" />.
         /// </summary>
         /// <value>
-        /// The index of the currently selected TabItem, or -1 if a TabItem is not selected.
+        /// The index of the currently selected <see cref="TabItem" />, or -1 if a
+        /// <see cref="TabItem" /> is not selected.
         /// </value>
         public int SelectedIndex
         {
@@ -193,17 +215,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the TabControl.SelectedIndex dependency property.
+        /// Identifies the <see cref="SelectedIndex" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the TabControl.SelectedIndex dependency property.
+        /// The identifier for the <see cref="SelectedIndex" /> dependency property.
         /// </value>
         public static readonly DependencyProperty SelectedIndexProperty =
             DependencyProperty.Register(
-                "SelectedIndex",
+                nameof(SelectedIndex),
                 typeof(int),
                 typeof(TabControl),
-                new PropertyMetadata(-1, OnSelectedIndexChanged));
+                new PropertyMetadata(OnSelectedIndexChanged));
 
         /// <summary>
         /// SelectedIndex property changed handler.
@@ -219,7 +241,11 @@ namespace System.Windows.Controls
 
             if (newIndex < -1)
             {
-                throw new ArgumentException(string.Format("'{0}' is not a valid value for property 'SelectedIndex'", newIndex.ToString()));
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "'{0}' is not a valid value for property 'SelectedIndex'",
+                        newIndex.ToString(CultureInfo.CurrentCulture)));
             }
 
             // Coercion Workaround
@@ -257,7 +283,7 @@ namespace System.Windows.Controls
         {
             if (newItem == null)
             {
-                ContentPresenter contentHost = GetElementContent();
+                ContentPresenter contentHost = GetContentHost(TabStripPlacement);
                 if (contentHost != null)
                 {
                     contentHost.Content = null;
@@ -270,7 +296,11 @@ namespace System.Windows.Controls
                 TabItem tabItem = item as TabItem;
                 if (tabItem == null)
                 {
-                    throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Unable to cast object of type '{0}' to type 'System.Windows.Controls.TabItem'.",
+                            item.GetType().ToString()));
                 }
                 if (tabItem != newItem && tabItem.IsSelected)
                 {
@@ -283,24 +313,40 @@ namespace System.Windows.Controls
                 }
             }
 
+            // Notify automation peers of selection change
+            if (newItem != null && AutomationPeer.ListenerExists(AutomationEvents.SelectionItemPatternOnElementSelected))
+            {
+                AutomationPeer peer = FrameworkElementAutomationPeer.CreatePeerForElement(newItem);
+                if (peer != null)
+                {
+                    peer.RaiseAutomationEvent(AutomationEvents.SelectionItemPatternOnElementSelected);
+                }
+            }
+            if (oldItem != null && AutomationPeer.ListenerExists(AutomationEvents.SelectionItemPatternOnElementRemovedFromSelection))
+            {
+                AutomationPeer peer = FrameworkElementAutomationPeer.CreatePeerForElement(oldItem);
+                if (peer != null)
+                {
+                    peer.RaiseAutomationEvent(AutomationEvents.SelectionItemPatternOnElementRemovedFromSelection);
+                }
+            }
+
             // Fire SelectionChanged Event
             SelectionChangedEventHandler handler = SelectionChanged;
             if (handler != null)
             {
                 SelectionChangedEventArgs args = new SelectionChangedEventArgs(
-                     (oldItem == null ? new List<TabItem> { } : new List<TabItem> { oldItem }),
-                     (newItem == null ? new List<TabItem> { } : new List<TabItem> { newItem }));
+                    (oldItem == null ? new List<TabItem> { } : new List<TabItem> { oldItem }),
+                    (newItem == null ? new List<TabItem> { } : new List<TabItem> { newItem }));
                 handler(this, args);
             }
         }
-#endregion SelectedIndex
 
-#region SelectedContent
         /// <summary>
-        /// Gets the content of the currently selected TabItem.
+        /// Gets the content of the currently selected <see cref="TabItem" />.
         /// </summary>
         /// <value>
-        /// The content of the currently selected TabItem. The default is null.
+        /// The content of the currently selected <see cref="TabItem" />. The default is null.
         /// </value>
         public object SelectedContent
         {
@@ -309,17 +355,17 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the TabControl.SelectedContent dependency property.
+        /// Identifies the <see cref="SelectedContent" /> dependency property.
         /// </summary>
         /// <value>
-        /// The identifier for the TabControl.SelectedContent dependency property.
+        /// The identifier for the <see cref="SelectedContent" /> dependency property.
         /// </value>
         public static readonly DependencyProperty SelectedContentProperty =
             DependencyProperty.Register(
-                "SelectedContent",
+                nameof(SelectedContent),
                 typeof(object),
                 typeof(TabControl),
-                new PropertyMetadata(null, OnSelectedContentChanged));
+                new PropertyMetadata(OnSelectedContentChanged));
 
         /// <summary>
         /// SelectedContent property changed handler.
@@ -332,7 +378,56 @@ namespace System.Windows.Controls
 
             tc.UpdateSelectedContent(e.NewValue);
         }
-#endregion SelectedContent
+
+        /// <summary>
+        /// Gets or sets how <see cref="TabItem" /> headers align relative to the
+        /// <see cref="TabItem" /> content.
+        /// </summary>
+        /// <value>
+        /// The alignment of <see cref="TabItem" /> headers relative to the
+        /// <see cref="TabItem" /> content. The default is <see cref="Dock.Top" />.
+        /// </value>
+        public Dock TabStripPlacement
+        {
+            get { return (Dock)GetValue(TabStripPlacementProperty); }
+            set { SetValue(TabStripPlacementProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TabStripPlacement" /> dependency property.
+        /// </summary>
+        /// <value>
+        /// The identifier for the <see cref="TabStripPlacement" /> dependency property.
+        /// </value>
+        public static readonly DependencyProperty TabStripPlacementProperty =
+            DependencyProperty.Register(
+                nameof(TabStripPlacement),
+                typeof(Dock),
+                typeof(TabControl),
+                new PropertyMetadata(Dock.Top, OnTabStripPlacementPropertyChanged));
+
+        /// <summary>
+        /// TabStripPlacement property changed handler.
+        /// </summary>
+        /// <param name="d">
+        /// TabControl that changed its TabStripPlacement.
+        /// </param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
+        private static void OnTabStripPlacementPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TabControl tc = (TabControl)d;
+            Debug.Assert(tc != null, "TabControl should not be null!");
+            tc.UpdateTabPanelLayout((Dock)e.OldValue, (Dock)e.NewValue);
+
+            foreach (object o in tc.Items)
+            {
+                TabItem tabItem = o as TabItem;
+                if (tabItem != null)
+                {
+                    tabItem.UpdateVisualState();
+                }
+            }
+        }
 
         /// <summary>
         /// Called when the IsEnabled property changes.
@@ -351,27 +446,51 @@ namespace System.Windows.Controls
         /// being displayed, and show the template for the TabStripPlacement
         /// that is currently selected.
         /// </summary>
-        private void UpdateTabPanelLayout()
+        /// <param name="oldValue">Inherited code: Requires comment.</param>
+        /// <param name="newValue">Inherited code: Requires comment 1.</param>
+        private void UpdateTabPanelLayout(Dock oldValue, Dock newValue)
         {
-            FrameworkElement newTemplate = GetElementTemplate();
-            TabPanel newPanel = GetElementTabPanel();
-            ContentPresenter newContentHost = GetElementContent();
+            FrameworkElement oldTemplate = GetTemplate(oldValue);
+            FrameworkElement newTemplate = GetTemplate(newValue);
+            TabPanel oldPanel = GetTabPanel(oldValue);
+            TabPanel newPanel = GetTabPanel(newValue);
+            ContentPresenter oldContentHost = GetContentHost(oldValue);
+            ContentPresenter newContentHost = GetContentHost(newValue);
 
-            if (newPanel != null)
+            if (oldValue != newValue)
             {
-                foreach (object item in Items)
+                if (oldTemplate != null)
                 {
-                    TabItem tabItem = item as TabItem;
-                    if (tabItem == null)
-                    {
-                        throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
-                    }
-                    AddToTabPanel(tabItem);
+                    oldTemplate.Visibility = Visibility.Collapsed;
                 }
-            }
-            if (newContentHost != null)
-            {
-                newContentHost.Content = SelectedContent;
+                if (oldPanel != null)
+                {
+                    oldPanel.Children.Clear();
+                }
+                if (newPanel != null)
+                {
+                    foreach (object item in Items)
+                    {
+                        TabItem tabItem = item as TabItem;
+                        if (tabItem == null)
+                        {
+                            throw new ArgumentException(
+                                string.Format(
+                                    CultureInfo.InvariantCulture,
+                                    "Unable to cast object of type '{0}' to type 'System.Windows.Controls.TabItem'.",
+                                    item.GetType().ToString()));
+                        }
+                        AddToTabPanel(tabItem);
+                    }
+                }
+                if (oldContentHost != null)
+                {
+                    oldContentHost.Content = null;
+                }
+                if (newContentHost != null)
+                {
+                    newContentHost.Content = SelectedContent;
+                }
             }
             if (newTemplate != null)
             {
@@ -412,6 +531,8 @@ namespace System.Windows.Controls
         /// <param name="e">Data used by the event.</param>
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
+            base.OnItemsChanged(e);
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -421,7 +542,11 @@ namespace System.Windows.Controls
                         TabItem tabItem = o as TabItem;
                         if (tabItem == null)
                         {
-                            throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", o.GetType().ToString(), typeof(TabItem)));
+                            throw new ArgumentException(
+                                string.Format(
+                                    CultureInfo.InvariantCulture,
+                                    "Unable to cast object of type '{0}' to type 'System.Windows.Controls.TabItem'.",
+                                    o.GetType().ToString()));
                         }
                         int index = Items.IndexOf(tabItem);
                         InsertIntoTabPanel(index, tabItem);
@@ -454,7 +579,11 @@ namespace System.Windows.Controls
                             TabItem tabItem = item as TabItem;
                             if (tabItem == null)
                             {
-                                throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
+                                throw new ArgumentException(
+                                    string.Format(
+                                        CultureInfo.InvariantCulture,
+                                        "Unable to cast object of type '{0}' to type 'System.Windows.Controls.TabItem'.",
+                                        item.GetType().ToString()));
                             }
 
                             if (tabItem.IsSelected)
@@ -513,7 +642,11 @@ namespace System.Windows.Controls
                         TabItem tabItem = item as TabItem;
                         if (tabItem == null)
                         {
-                            throw new ArgumentException(string.Format("Unable to cast object of type '{0}' to type '{1}'.", item.GetType().ToString(), typeof(TabItem)));
+                            throw new ArgumentException(
+                                string.Format(
+                                    CultureInfo.InvariantCulture,
+                                    "Unable to cast object of type '{0}' to type 'System.Windows.Controls.TabItem'.",
+                                    item.GetType().ToString()));
                         }
                         AddToTabPanel(tabItem);
                         if (tabItem.IsSelected)
@@ -533,16 +666,15 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Occurs when the selected
-        /// TabItem changes.
+        /// Occurs when the selected <see cref="TabItem" /> changes.
         /// </summary>
         public event SelectionChangedEventHandler SelectionChanged;
 
         /// <summary>
-        /// Raises the TabControl.SelectionChanged event.
+        /// Raises the <see cref="SelectionChanged" /> event.
         /// </summary>
         /// <param name="args">
-        /// Provides data for the TabControl.SelectionChanged event.
+        /// Provides data for the <see cref="SelectionChanged" /> event.
         /// </param>
         protected virtual void OnSelectionChanged(SelectionChangedEventArgs args)
         {
@@ -595,7 +727,7 @@ namespace System.Windows.Controls
         /// <returns>Inherited code: Requires comment 3.</returns>
         internal TabItem FindNextTabItem(int startIndex, int direction)
         {
-            //Debug.Assert(direction != 0, "The direction should not be zero!");
+            Debug.Assert(direction != 0, "The direction should not be zero!");
             TabItem nextTabItem = null;
 
             int index = startIndex;
@@ -647,7 +779,7 @@ namespace System.Windows.Controls
             TabItem tabItem = SelectedItem as TabItem;
             if (tabItem != null)
             {
-                ContentPresenter contentHost = GetElementContent();
+                ContentPresenter contentHost = GetContentHost(TabStripPlacement);
                 if (contentHost != null)
                 {
                     contentHost.HorizontalAlignment = tabItem.HorizontalContentAlignment;
@@ -664,7 +796,7 @@ namespace System.Windows.Controls
         /// <param name="tabItem">Inherited code: Requires comment 1.</param>
         private void AddToTabPanel(TabItem tabItem)
         {
-            TabPanel panel = GetElementTabPanel();
+            TabPanel panel = GetTabPanel(TabStripPlacement);
             if (panel != null && !panel.Children.Contains(tabItem))
             {
                 panel.Children.Add(tabItem);
@@ -678,7 +810,7 @@ namespace System.Windows.Controls
         /// <param name="tabItem">Inherited code: Requires comment 2.</param>
         private void InsertIntoTabPanel(int index, TabItem tabItem)
         {
-            TabPanel panel = GetElementTabPanel();
+            TabPanel panel = GetTabPanel(TabStripPlacement);
             if (panel != null && !panel.Children.Contains(tabItem))
             {
                 panel.Children.Insert(index, tabItem);
@@ -691,7 +823,7 @@ namespace System.Windows.Controls
         /// <param name="tabItem">Inherited code: Requires comment 1.</param>
         private void RemoveFromTabPanel(TabItem tabItem)
         {
-            TabPanel panel = GetElementTabPanel();
+            TabPanel panel = GetTabPanel(TabStripPlacement);
             if (panel != null && panel.Children.Contains(tabItem))
             {
                 panel.Children.Remove(tabItem);
@@ -703,16 +835,21 @@ namespace System.Windows.Controls
         /// </summary>
         private void ClearTabPanel()
         {
-            TabPanel panel = GetElementTabPanel();
+            TabPanel panel = GetTabPanel(TabStripPlacement);
             if (panel != null)
             {
                 panel.Children.Clear();
             }
         }
 
-        private TabPanel GetElementTabPanel()
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="tabPlacement">Inherited code: Requires comment 1.</param>
+        /// <returns>Inherited code: Requires comment 2.</returns>
+        internal TabPanel GetTabPanel(Dock tabPlacement)
         {
-            switch (TabStripPlacement)
+            switch (tabPlacement)
             {
                 case Dock.Top:
                     return ElementTabPanelTop;
@@ -722,31 +859,18 @@ namespace System.Windows.Controls
                     return ElementTabPanelLeft;
                 case Dock.Right:
                     return ElementTabPanelRight;
-                default:
-                    return ElementTabPanelTop;
             }
+            return null;
         }
 
-        private ContentPresenter GetElementContent()
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="tabPlacement">Inherited code: Requires comment 1.</param>
+        /// <returns>Inherited code: Requires comment 2.</returns>
+        internal FrameworkElement GetTemplate(Dock tabPlacement)
         {
-            switch (TabStripPlacement)
-            {
-                case Dock.Top:
-                    return ElementContentTop;
-                case Dock.Bottom:
-                    return ElementContentBottom;
-                case Dock.Left:
-                    return ElementContentLeft;
-                case Dock.Right:
-                    return ElementContentRight;
-                default:
-                    return ElementContentTop;
-            }
-        }
-
-        private FrameworkElement GetElementTemplate()
-        {
-            switch (TabStripPlacement)
+            switch (tabPlacement)
             {
                 case Dock.Top:
                     return ElementTemplateTop;
@@ -756,47 +880,30 @@ namespace System.Windows.Controls
                     return ElementTemplateLeft;
                 case Dock.Right:
                     return ElementTemplateRight;
-                default:
-                    return ElementTemplateTop;
             }
+            return null;
         }
 
-        private void GetElements()
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        /// <param name="tabPlacement">Inherited code: Requires comment 1.</param>
+        /// <returns>Inherited code: Requires comment 2.</returns>
+        internal ContentPresenter GetContentHost(Dock tabPlacement)
         {
-            ElementTemplateTop = GetTemplateChild(ElementTemplateTopName) as FrameworkElement;
-            ElementTabPanelTop = GetTemplateChild(ElementTabPanelTopName) as TabPanel;
-            ElementContentTop = GetTemplateChild(ElementContentTopName) as ContentPresenter;
-            if (ElementTabPanelTop != null)
+            switch (tabPlacement)
             {
-                ElementTabPanelTop.Orientation = Orientation.Horizontal;
+                case Dock.Top:
+                    return ElementContentTop;
+                case Dock.Bottom:
+                    return ElementContentBottom;
+                case Dock.Left:
+                    return ElementContentLeft;
+                case Dock.Right:
+                    return ElementContentRight;
             }
-
-            ElementTemplateBottom = GetTemplateChild(ElementTemplateBottomName) as FrameworkElement;
-            ElementTabPanelBottom = GetTemplateChild(ElementTabPanelBottomName) as TabPanel;
-            ElementContentBottom = GetTemplateChild(ElementContentBottomName) as ContentPresenter;
-            if (ElementTabPanelBottom != null)
-            {
-                ElementTabPanelBottom.Orientation = Orientation.Horizontal;
-            }
-
-            ElementTemplateLeft = GetTemplateChild(ElementTemplateLeftName) as FrameworkElement;
-            ElementTabPanelLeft = GetTemplateChild(ElementTabPanelLeftName) as TabPanel;
-            ElementContentLeft = GetTemplateChild(ElementContentLeftName) as ContentPresenter;
-            if (ElementTabPanelLeft != null)
-            {
-                ElementTabPanelLeft.Orientation = Orientation.Vertical;
-            }
-
-            ElementTemplateRight = GetTemplateChild(ElementTemplateRightName) as FrameworkElement;
-            ElementTabPanelRight = GetTemplateChild(ElementTabPanelRightName) as TabPanel;
-            ElementContentRight = GetTemplateChild(ElementContentRightName) as ContentPresenter;
-            if (ElementTabPanelRight != null)
-            {
-                ElementTabPanelRight.Orientation = Orientation.Vertical;
-            }
+            return null;
         }
-
-        #region TopPlacement
 
         /// <summary>
         /// Gets or sets the TabStripPlacement Top template.
@@ -804,33 +911,9 @@ namespace System.Windows.Controls
         internal FrameworkElement ElementTemplateTop { get; set; }
 
         /// <summary>
-        /// The name of Top template.
+        /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementTemplateTopName = "TemplateTop";
-
-        /// <summary>
-        /// Gets or sets the TabPanel of the TabStripPlacement Top template.
-        /// </summary>
-        internal TabPanel ElementTabPanelTop { get; set; }
-
-        /// <summary>
-        /// The name of TabPanel Top template.
-        /// </summary>
-        internal const string ElementTabPanelTopName = "TabPanelTop";
-
-        /// <summary>
-        /// Gets or sets the ContentHost of the TabStripPlacement Top template.
-        /// </summary>
-        internal ContentPresenter ElementContentTop { get; set; }
-
-        /// <summary>
-        /// The name of Top ContentHost.
-        /// </summary>
-        internal const string ElementContentTopName = "ContentTop";
-
-        #endregion
-
-        #region BottomPlacement
 
         /// <summary>
         /// Gets or sets the TabStripPlacement Bottom template.
@@ -838,33 +921,9 @@ namespace System.Windows.Controls
         internal FrameworkElement ElementTemplateBottom { get; set; }
 
         /// <summary>
-        /// The name of Bottom template.
+        /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementTemplateBottomName = "TemplateBottom";
-
-        /// <summary>
-        /// Gets or sets the TabPanel of the TabStripPlacement Bottom template.
-        /// </summary>
-        internal TabPanel ElementTabPanelBottom { get; set; }
-
-        /// <summary>
-        /// The name of TabPanel Bottom template.
-        /// </summary>
-        internal const string ElementTabPanelBottomName = "TabPanelBottom";
-
-        /// <summary>
-        /// Gets or sets the ContentHost of the TabStripPlacement Bottom template.
-        /// </summary>
-        internal ContentPresenter ElementContentBottom { get; set; }
-
-        /// <summary>
-        /// The name of Bottom ContentHost.
-        /// </summary>
-        internal const string ElementContentBottomName = "ContentBottom";
-
-        #endregion
-
-        #region LeftPlacement
 
         /// <summary>
         /// Gets or sets the TabStripPlacement Left template.
@@ -872,33 +931,9 @@ namespace System.Windows.Controls
         internal FrameworkElement ElementTemplateLeft { get; set; }
 
         /// <summary>
-        /// The name of Left template.
+        /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementTemplateLeftName = "TemplateLeft";
-
-        /// <summary>
-        /// Gets or sets the TabPanel of the TabStripPlacement Left template.
-        /// </summary>
-        internal TabPanel ElementTabPanelLeft { get; set; }
-
-        /// <summary>
-        /// The name of TabPanel Left template.
-        /// </summary>
-        internal const string ElementTabPanelLeftName = "TabPanelLeft";
-
-        /// <summary>
-        /// Gets or sets the ContentHost of the TabStripPlacement Left template.
-        /// </summary>
-        internal ContentPresenter ElementContentLeft { get; set; }
-
-        /// <summary>
-        /// The name of Left ContentHost.
-        /// </summary>
-        internal const string ElementContentLeftName = "ContentLeft";
-
-        #endregion
-
-        #region RightPlacement
 
         /// <summary>
         /// Gets or sets the TabStripPlacement Right template.
@@ -906,9 +941,39 @@ namespace System.Windows.Controls
         internal FrameworkElement ElementTemplateRight { get; set; }
 
         /// <summary>
-        /// The name of Right template.
+        /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementTemplateRightName = "TemplateRight";
+
+        /// <summary>
+        /// Gets or sets the TabPanel of the TabStripPlacement Top template.
+        /// </summary>
+        internal TabPanel ElementTabPanelTop { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTabPanelTopName = "TabPanelTop";
+
+        /// <summary>
+        /// Gets or sets the TabPanel of the TabStripPlacement Bottom template.
+        /// </summary>
+        internal TabPanel ElementTabPanelBottom { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTabPanelBottomName = "TabPanelBottom";
+
+        /// <summary>
+        /// Gets or sets the TabPanel of the TabStripPlacement Left template.
+        /// </summary>
+        internal TabPanel ElementTabPanelLeft { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementTabPanelLeftName = "TabPanelLeft";
 
         /// <summary>
         /// Gets or sets the TabPanel of the TabStripPlacement Right template.
@@ -916,21 +981,51 @@ namespace System.Windows.Controls
         internal TabPanel ElementTabPanelRight { get; set; }
 
         /// <summary>
-        /// The name of TabPanel Right template.
+        /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementTabPanelRightName = "TabPanelRight";
 
         /// <summary>
-        /// Gets or sets the ContentHost of the TabStripPlacement Right template.
+        /// Gets or sets the ContentHost of the TabStripPlacement Top template.
+        /// </summary>
+        internal ContentPresenter ElementContentTop { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementContentTopName = "ContentTop";
+
+        /// <summary>
+        /// Gets or sets the ContentHost of the TabStripPlacement Bottom
+        /// template.
+        /// </summary>
+        internal ContentPresenter ElementContentBottom { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementContentBottomName = "ContentBottom";
+
+        /// <summary>
+        /// Gets or sets the ContentHost of the TabStripPlacement Left template.
+        /// </summary>
+        internal ContentPresenter ElementContentLeft { get; set; }
+
+        /// <summary>
+        /// Inherited code: Requires comment.
+        /// </summary>
+        internal const string ElementContentLeftName = "ContentLeft";
+
+        /// <summary>
+        /// Gets or sets the ContentHost of the TabStripPlacement Right
+        /// template.
         /// </summary>
         internal ContentPresenter ElementContentRight { get; set; }
 
         /// <summary>
-        /// The name of Right ContentHost.
+        /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementContentRightName = "ContentRight";
-
-        #endregion
 
         /// <summary>
         /// Inherited code: Requires comment.
