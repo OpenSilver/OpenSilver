@@ -92,12 +92,16 @@ namespace System.Windows.Controls
         {
             this._items = new ItemCollection(this);
 
+            // ItemInfos must get adjusted before the generator's change handler is called,
+            // so that any new ItemInfos arising from the generator don't get adjusted by mistake
+            this._items.CollectionChanged += new NotifyCollectionChangedEventHandler(this.OnItemCollectionChanged1);
+
             // the generator must attach its collection change handler before
             // the control itself, so that the generator is up-to-date by the
             // time the control tries to use it
             this._itemContainerGenerator = new ItemContainerGenerator(this);
 
-            this._items.CollectionChanged += this.OnItemCollectionChanged;
+            this._items.CollectionChanged += new NotifyCollectionChangedEventHandler(this.OnItemCollectionChanged2);
         }
 
         #endregion Public Properties
@@ -706,12 +710,15 @@ namespace System.Windows.Controls
             return IsItemItsOwnContainerOverride(item);
         }
 
-        private void OnItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnItemCollectionChanged1(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.AdjustItemInfoOverride(e);
+        }
+
+        private void OnItemCollectionChanged2(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.ManageCollectionChanged(e);
-
-            this.AdjustItemInfoOverride(e);
-
+            
             this.OnItemsChanged(e);
         }
 
