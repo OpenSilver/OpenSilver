@@ -95,6 +95,14 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static TypeConverter GetTypeConverter(Type forType)
+        {
+            Debug.Assert(forType is not null);
+
+            return TypeConverterHelper.GetConverter(forType);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
             Debug.Assert(dependencyObject is IFrameworkElement);

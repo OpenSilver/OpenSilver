@@ -4,8 +4,8 @@
 
 using System.ComponentModel;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using OpenSilver.Internal.Xaml;
 
 namespace Microsoft.Expression.Interactivity
 {
@@ -47,10 +47,9 @@ namespace Microsoft.Expression.Interactivity
 			return shouldEat;
 		}
 
-		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Activator.CreateInstance could be calling user code which we don't want to bring us down.")]
 		internal static TypeConverter GetTypeConverter(Type type)
 		{
-			return TypeDescriptor.GetConverter(type);
+			return RuntimeHelpers.GetTypeConverter(type);
 		}
 	}
 }
