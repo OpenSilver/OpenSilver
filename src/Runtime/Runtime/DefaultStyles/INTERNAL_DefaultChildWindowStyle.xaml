@@ -217,41 +217,77 @@
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="WindowStates">
                                 <VisualState x:Name="Open">
-                                    <Storyboard BeginTime="00:00:00.1">
-                                        <DoubleAnimation BeginTime="0"
-                                                         Storyboard.TargetName="Overlay"
-                                                         Storyboard.TargetProperty="Opacity"
-                                                         Duration="0"
-                                                         To="1" />
-                                        <DoubleAnimation BeginTime="0"
-                                                         Storyboard.TargetName="ContentRoot"
-                                                         Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleX"
-                                                         Duration="0"
-                                                         To="1" />
-                                        <DoubleAnimation BeginTime="0"
-                                                         Storyboard.TargetName="ContentRoot"
-                                                         Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleY"
-                                                         Duration="0"
-                                                         To="1" />
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="0"
+                                                                       Storyboard.TargetName="Overlay"
+                                                                       Storyboard.TargetProperty="Opacity">
+                                            <EasingDoubleKeyFrame KeyTime="0"
+                                                                  Value="0" />
+                                            <EasingDoubleKeyFrame KeyTime="00:00:00.3"
+                                                                  Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="0"
+                                                                       Storyboard.TargetName="ContentRoot"
+                                                                       Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleX">
+                                            <SplineDoubleKeyFrame KeyTime="0"
+                                                                  Value="0" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.25"
+                                                                  Value="0" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.4"
+                                                                  Value="1" />
+                                            <SplineDoubleKeyFrame KeySpline="0,0,0.5,1"
+                                                                  KeyTime="00:00:00.45"
+                                                                  Value="1.05" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.55"
+                                                                  Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="0"
+                                                                       Storyboard.TargetName="ContentRoot"
+                                                                       Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleY">
+                                            <SplineDoubleKeyFrame KeyTime="0"
+                                                                  Value="0" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.25"
+                                                                  Value="0" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.4"
+                                                                  Value="1" />
+                                            <SplineDoubleKeyFrame KeySpline="0,0,0.5,1"
+                                                                  KeyTime="00:00:00.45"
+                                                                  Value="1.05" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.55"
+                                                                  Value="1" />
+                                        </DoubleAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Closed">
                                     <Storyboard>
-                                        <DoubleAnimation BeginTime="0"
-                                                         Storyboard.TargetName="Overlay"
-                                                         Storyboard.TargetProperty="Opacity"
-                                                         Duration="0"
-                                                         To="0" />
-                                        <DoubleAnimation BeginTime="0"
-                                                         Storyboard.TargetName="ContentRoot"
-                                                         Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleX"
-                                                         Duration="0"
-                                                         To="0" />
-                                        <DoubleAnimation BeginTime="0"
-                                                         Storyboard.TargetName="ContentRoot"
-                                                         Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleY"
-                                                         Duration="0"
-                                                         To="0" />
+                                        <DoubleAnimationUsingKeyFrames BeginTime="0"
+                                                                       Storyboard.TargetName="Overlay"
+                                                                       Storyboard.TargetProperty="Opacity">
+                                            <EasingDoubleKeyFrame KeyTime="0"
+                                                                  Value="1" />
+                                            <EasingDoubleKeyFrame KeyTime="00:00:00.3"
+                                                                  Value="0" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="0"
+                                                                       Storyboard.TargetName="ContentRoot"
+                                                                       Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleX">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.2"
+                                                                  Value="1" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.25"
+                                                                  Value="1.05" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.45"
+                                                                  Value="0" />
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="0"
+                                                                       Storyboard.TargetName="ContentRoot"
+                                                                       Storyboard.TargetProperty="(RenderTransform).(Children)[0].ScaleY">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.2"
+                                                                  Value="1" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.25"
+                                                                  Value="1.05" />
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.45"
+                                                                  Value="0" />
+                                        </DoubleAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
