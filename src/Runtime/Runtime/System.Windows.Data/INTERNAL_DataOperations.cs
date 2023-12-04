@@ -13,9 +13,11 @@
 
 using System.Collections;
 using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System.Windows.Data
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
     internal partial class INTERNAL_Operations
     {
         public INTERNAL_Operations(INTERNAL_PagedCollectionView collectionViewer)

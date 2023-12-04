@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows.Data
 {
@@ -27,6 +28,8 @@ namespace System.Windows.Data
     /// <remarks>
     /// <p>the order of the operations is: Filtering, Sorting, Grouping</p>
     /// </remarks>
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class INTERNAL_PagedCollectionView : IEnumerable, INotifyCollectionChanged, IPagedCollectionView, INotifyPropertyChanged
     {
         // the child views

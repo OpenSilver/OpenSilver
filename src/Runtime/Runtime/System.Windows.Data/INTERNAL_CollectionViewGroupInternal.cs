@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using OpenSilver.Internal;
 
 namespace System.Windows.Data
 {
@@ -22,6 +23,7 @@ namespace System.Windows.Data
     /// The class that creates a tree results based on the operations requested by a PagedCollectionView.
     /// This is the class that can filter, sort and group (not paged, because pages are handled PagedCollectionView).
     /// </summary>
+    [Obsolete(Helper.ObsoleteMemberMessage)]
     internal partial class INTERNAL_CollectionViewGroupInternal //: INotifyPropertyChanged
     {
         // Parent has lower priority on sort and other operations
