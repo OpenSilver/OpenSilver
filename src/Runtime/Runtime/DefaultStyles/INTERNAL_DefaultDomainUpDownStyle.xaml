@@ -1,0 +1,164 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="DomainUpDown">
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="Height"
+                Value="22" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="IsTabStop"
+                Value="False" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="0.5,1"
+                                     StartPoint="0.5,0">
+                    <GradientStop Color="#FFA3AEB9"
+                                  Offset="0" />
+                    <GradientStop Color="#FF8399A9"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF718597"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF617584"
+                                  Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DomainUpDown">
+                    <Grid x:Name="RootElement">
+                        <VisualStateManager.VisualStateGroups>
+                            <!-- common states -->
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Pressed" />
+                                <VisualState x:Name="MouseOver">
+                                    <!-- composite controls will visualize mouseover state -->
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <!-- composite controls will visualize disabled state -->
+                                </VisualState>
+                            </VisualStateGroup>
+                            <!-- focus states -->
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused">
+                                    <!-- composite controls will gain focus and visualize it -->
+                                </VisualState>
+                                <VisualState x:Name="Unfocused">
+                                    <!-- composite controls will gain focus and visualize it -->
+                                </VisualState>
+                            </VisualStateGroup>
+                            <!-- interaction mode states -->
+                            <VisualStateGroup x:Name="InteractionModeStates">
+                                <VisualState x:Name="Edit">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0"
+                                                         Storyboard.TargetName="Text"
+                                                         Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                         To="1" />
+                                        <DoubleAnimation Duration="0"
+                                                         Storyboard.TargetName="Visualization"
+                                                         Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                         To="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Display" />
+                            </VisualStateGroup>
+                            <!-- input valid states -->
+                            <VisualStateGroup x:Name="DomainStates">
+                                <VisualState x:Name="ValidDomain">
+                                </VisualState>
+                                <VisualState x:Name="InvalidDomain">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorVisualElement"
+                                                                       Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="Visible" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <!-- the actual control -->
+                        <ButtonSpinner x:Name="Spinner"
+                                       Background="{TemplateBinding Background}"
+                                       BorderBrush="{TemplateBinding BorderBrush}"
+                                       BorderThickness="{TemplateBinding BorderThickness}"
+                                       Padding="{TemplateBinding Padding}"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       HorizontalContentAlignment="Stretch"
+                                       VerticalContentAlignment="Stretch"
+                                       Style="{TemplateBinding SpinnerStyle}"
+                                       IsTabStop="False"
+                                       TabIndex="3">
+                            <Grid>
+                                <ContentControl x:Name="Visualization"
+                                                Margin="0"
+                                                Padding="0"
+                                                Opacity="1"
+                                                IsTabStop="False"
+                                                IsHitTestVisible="False"
+                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                Content="{TemplateBinding Value}"
+                                                ContentTemplate="{TemplateBinding ItemTemplate}"
+                                                FontFamily="{TemplateBinding FontFamily}"
+                                                FontSize="{TemplateBinding FontSize}"
+                                                FontStretch="{TemplateBinding FontStretch}"
+                                                Foreground="{TemplateBinding Foreground}" />
+                                <TextBox x:Name="Text"
+                                         Opacity="0"
+                                         Margin="0"
+                                         Padding="0"
+                                         IsTabStop="True"
+                                         Background="Red"
+                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                         BorderThickness="0"
+                                         FontFamily="{TemplateBinding FontFamily}"
+                                         FontSize="{TemplateBinding FontSize}"
+                                         FontStretch="{TemplateBinding FontStretch}"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         AcceptsReturn="False"
+                                         IsHitTestVisible="False"
+                                         TextWrapping="NoWrap">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="TextBox">
+                                                        <ScrollViewer x:Name="ContentElement"
+                                                                      Padding="0"
+                                                                      BorderThickness="0" />
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </Grid>
+                        </ButtonSpinner>
+                        <Border x:Name="ErrorVisualElement"
+                                CornerRadius="1"
+                                Visibility="Collapsed"
+                                Margin="-2"
+                                IsHitTestVisible="False"
+                                BorderBrush="Red"
+                                BorderThickness="2" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

@@ -34,5 +34,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_ContextMenuStyles.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyles.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDomainUpDownStyle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

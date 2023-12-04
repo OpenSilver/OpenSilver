@@ -152,6 +152,7 @@
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\CSHTML5_DuplexClientBase.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ChildWindowAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ComboBoxAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\DomainUpDownAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\HyperlinkButtonAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ImageAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ListBoxAutomationPeer.cs" />
@@ -205,6 +206,7 @@
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\Clipper.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LinearClipper.cs" />
+		<Compile Include="System.Windows.Controls\BindingSourceEvaluator.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\DragDecorator.cs" />
@@ -219,6 +221,7 @@
 		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.TestHook.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitterAutomationPeer.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\PreviewControl.cs" />
+		<Compile Include="System.Windows.Controls\InvalidInputAction.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\ListBoxDragDropTarget.cs" />
@@ -258,10 +261,10 @@
 		<Compile Include="System.Windows.Controls\TimeTypeConverter.cs" />
 		<Compile Include="System.Windows.Controls\TimeUpDown.cs" />
 		<Compile Include="System.Windows.Controls\TypeConverters.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DomainUpDown.cs" />
+		<Compile Include="System.Windows.Controls\DomainUpDown.cs" />
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
+		<Compile Include="System.Windows.Controls\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Documents\TextElementProperties.cs" />
 		<Compile Include="System.Windows.input\KeyboardNavigation.cs" />
 		<Compile Include="System.Windows.input\TraversalRequest.cs" />
@@ -1245,6 +1248,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultDatePickerStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultDomainUpDownStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
 	</ItemGroup>
