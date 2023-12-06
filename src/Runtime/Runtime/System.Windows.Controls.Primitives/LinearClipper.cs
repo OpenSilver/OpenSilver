@@ -1,15 +1,7 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System.Windows.Media;
 
@@ -18,10 +10,10 @@ namespace System.Windows.Controls.Primitives
     /// <summary>
     /// Clips the content of the control in a given direction.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    /// <QualityBand>Preview</QualityBand>
     public class LinearClipper : Clipper
     {
-#region public ExpandDirection ExpandDirection
+        #region public ExpandDirection ExpandDirection
         /// <summary>
         /// Gets or sets the clipped edge.
         /// </summary>
@@ -63,7 +55,7 @@ namespace System.Windows.Controls.Primitives
         {
             ClipContent();
         }
-#endregion public ExpandDirection ExpandDirection
+        #endregion public ExpandDirection ExpandDirection
 
         /// <summary>
         /// Updates the clip geometry.
@@ -72,25 +64,25 @@ namespace System.Windows.Controls.Primitives
         {
             if (ExpandDirection == ExpandDirection.Right)
             {
-                double width = RenderSize.Width * RatioVisible;
-                Clip = new RectangleGeometry { Rect = new Rect(0, 0, width, RenderSize.Height) };
+                double width = this.RenderSize.Width * RatioVisible;
+                this.Clip = new RectangleGeometry { Rect = new Rect(0, 0, width, this.RenderSize.Height) };
             }
             else if (ExpandDirection == ExpandDirection.Left)
             {
-                double width = RenderSize.Width * RatioVisible;
-                double rightSide = RenderSize.Width - width;
-                Clip = new RectangleGeometry { Rect = new Rect(rightSide, 0, width, RenderSize.Height) };
+                double width = this.RenderSize.Width * RatioVisible;
+                double rightSide = this.RenderSize.Width - width;
+                this.Clip = new RectangleGeometry { Rect = new Rect(rightSide, 0, width, this.RenderSize.Height) };
             }
             else if (ExpandDirection == ExpandDirection.Up)
             {
-                double height = RenderSize.Height * RatioVisible;
-                double bottom = RenderSize.Height - height;
-                Clip = new RectangleGeometry { Rect = new Rect(0, bottom, RenderSize.Width, height) };
+                double height = this.RenderSize.Height * RatioVisible;
+                double bottom = this.RenderSize.Height - height;
+                this.Clip = new RectangleGeometry { Rect = new Rect(0, bottom, this.RenderSize.Width, height) };
             }
             else if (ExpandDirection == ExpandDirection.Down)
             {
-                double height = RenderSize.Height * RatioVisible;
-                Clip = new RectangleGeometry { Rect = new Rect(0, 0, RenderSize.Width, height) };
+                double height = this.RenderSize.Height * RatioVisible;
+                this.Clip = new RectangleGeometry { Rect = new Rect(0, 0, this.RenderSize.Width, height) };
             }
         }
     }

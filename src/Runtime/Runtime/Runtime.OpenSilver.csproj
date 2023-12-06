@@ -163,6 +163,8 @@
 		<Compile Include="System.Windows.Automation.Peers\PasswordBoxAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\PopupRootAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ProgressBarAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\RatingAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\RatingItemAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\RepeatButtonAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\SelectorAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\SelectorItemAutomationPeer.cs" />
@@ -204,12 +206,13 @@
 		<Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.Navigation.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
-		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\Clipper.cs" />
-		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LinearClipper.cs" />
+		<Compile Include="System.Windows.Controls.Primitives\Clipper.cs" />
+		<Compile Include="System.Windows.Controls.Primitives\LinearClipper.cs" />
 		<Compile Include="System.Windows.Controls\BindingSourceEvaluator.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\DragDecorator.cs" />
+		<Compile Include="System.Windows.Controls\EnumerableFunctions.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\DragValidator.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.DefinitionAbstraction.cs" />
@@ -225,6 +228,8 @@
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\ListBoxDragDropTarget.cs" />
+		<Compile Include="System.Windows.Controls\NullableConverter.cs" />
+		<Compile Include="System.Windows.Controls\RatingSelectionMode.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBlock.NotImplemented.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
@@ -277,8 +282,8 @@
 		<Compile Include="OpenSilver\Internal\Media\FontFace.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RatingItem.cs" />
+		<Compile Include="System.Windows.Controls\Rating.cs" />
+		<Compile Include="System.Windows.Controls\RatingItem.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewExtensions.cs" />
 		<Compile Include="System.ComponentModel\ReflectedPropertyCollection.cs" />
@@ -1251,6 +1256,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultDomainUpDownStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultRatingStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
 	</ItemGroup>

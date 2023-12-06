@@ -35,5 +35,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyles.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDomainUpDownStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRatingStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

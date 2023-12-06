@@ -1,25 +1,17 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 namespace System.Windows.Controls.Primitives
 {
     /// <summary>
     /// Clips a ratio of its content.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    /// <QualityBand>Preview</QualityBand>
     public abstract class Clipper : ContentControl
     {
-#region public double RatioVisible
+        #region public double RatioVisible
         /// <summary>
         /// Gets or sets the percentage of the item visible.
         /// </summary>
@@ -67,23 +59,23 @@ namespace System.Windows.Controls.Primitives
             {
                 if (newValue < 0.0)
                 {
-                    RatioVisible = 0.0;
+                    this.RatioVisible = 0.0;
                 }
                 else if (newValue > 1.0)
                 {
-                    RatioVisible = 1.0;
+                    this.RatioVisible = 1.0;
                 }
             }
         }
 
-#endregion public double RatioVisible
+        #endregion public double RatioVisible
 
         /// <summary>
         /// Initializes a new instance of the Clipper class.
         /// </summary>
         protected Clipper()
         {
-            SizeChanged += delegate { ClipContent(); };
+            this.SizeChanged += delegate { ClipContent(); };
         }
 
         /// <summary>
