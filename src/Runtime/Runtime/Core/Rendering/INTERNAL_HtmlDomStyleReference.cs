@@ -131,6 +131,7 @@ namespace CSHTML5.Internal
         public string gridArea { set { SetStylePropertyValue("gridArea", value); } }
         public string visibility { set { SetStylePropertyValue("visibility", value); } }
         public string clip { set { SetStylePropertyValue("clip", value); } }
+        public string clipPath { set { SetStylePropertyValue("clipPath", value); } }
         public string overflowWrap { set { SetStylePropertyValue("overflowWrap", value); } }
         public string alignItems { set { SetStylePropertyValue("alignItems", value); } }
         public string justifyContent { set { SetStylePropertyValue("justifyContent", value); } }

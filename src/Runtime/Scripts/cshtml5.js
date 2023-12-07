@@ -701,9 +701,9 @@ document.setVisualBounds = function (id, left, top, width, height, clip, clipLef
         element.style.height = height + 'px';
         element.style.position = 'absolute';
         if (clip) {
-            element.style.clipPath = `polygon(${clipLeft}px ${clipTop}px, ${clipRight}px ${clipTop}px, ${clipRight}px ${clipBottom}px, ${clipLeft}px ${clipBottom}px)`;
+            element.style.clip = `rect(${clipTop}px ${clipRight}px ${clipBottom}px ${clipLeft}px)`;
         } else {
-            element.style.clipPath = '';
+            element.style.clip = '';
         }
         element.classList.remove('uielement-unarranged');
     }

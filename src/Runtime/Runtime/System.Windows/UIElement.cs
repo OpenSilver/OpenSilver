@@ -386,17 +386,11 @@ namespace System.Windows
             Debug.Assert(uie is not null);
 
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
-            switch (geometry)
+            style.clipPath = geometry switch
             {
-                case RectangleGeometry rectGeometry:
-                    Rect rect = rectGeometry.Rect;
-                    style.clip = $"rect({rect.Top.ToInvariantString()}px, {rect.Right.ToInvariantString()}px, {rect.Bottom.ToInvariantString()}px, {rect.Left.ToInvariantString()}px)";
-                    break;
-
-                default:
-                    style.clip = string.Empty;
-                    break;
-            }
+                Geometry => $"path(\"{geometry.ToPathData(CultureInfo.InvariantCulture)}\")",
+                _ => string.Empty,
+            };
         }
 
         private WeakEventListener<UIElement, Geometry, GeometryInvalidatedEventsArgs> _clipGeometryListener;
