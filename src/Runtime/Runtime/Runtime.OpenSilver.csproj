@@ -35,11 +35,6 @@
 		<Compile Include="OpenSilver\Internal\INTERNAL_PropertyStore.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\EmptyEnumerator.cs" />
 		<Compile Include="OpenSilver\Internal\InheritablePropertyChangeInfo.cs" />
-		<Compile Include="OpenSilver\Controls\DatePicker\Calendar.cs" />
-		<Compile Include="OpenSilver\Controls\DatePicker\Calendar.NotImplemented.cs" />
-		<Compile Include="OpenSilver\Controls\DatePicker\DatePicker.cs" />
-		<Compile Include="OpenSilver\Controls\DatePicker\DatePicker.NotImplemented.cs" />
-		<Compile Include="OpenSilver\Controls\DatePicker\SelectedDatesCollection.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBox.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerParagraph.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBlock.cs" />
@@ -479,8 +474,6 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\TextSearch.cs" />
-		<Compile Include="OpenSilver\Controls\TimePicker.NotImplemented.cs" />
-		<Compile Include="OpenSilver\Controls\TimePickerPopup.cs" />
 		<Compile Include="System.Windows.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="System.Windows.Data\CollectionView.cs" />
 		<Compile Include="System.Windows.Data\ListCollectionView.cs" />
@@ -817,7 +810,6 @@
 		<Compile Include="System.Windows.Controls\CheckBox.cs" />
 		<Compile Include="System.Windows.Controls\ChildWindow.cs" />
 		<Compile Include="System.Windows.Controls\ClickMode.cs" />
-		<Compile Include="OpenSilver\Controls\Clock.cs" />
 		<Compile Include="System.Windows.Controls\ColumnDefinition.cs" />
 		<Compile Include="System.Windows.Controls\ColumnDefinitionCollection.cs" />
 		<Compile Include="System.Windows.Controls\ComboBox.cs" />
@@ -844,8 +836,6 @@
 		<Compile Include="System.Windows.Controls\HyperlinkButton.cs" />
 		<Compile Include="System.Windows.Controls\Image.cs" />
 		<Compile Include="System.Windows.Controls\INavigate.cs" />
-		<Compile Include="System.Windows.Controls\INTERNAL_CalendarOrClockBase.cs" />
-		<Compile Include="System.Windows.Controls\INTERNAL_DateTimePickerBase.cs" />
 		<Compile Include="System.Windows.Controls\ItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\ItemContainerGenerator.cs" />
 		<Compile Include="System.Windows.Controls\ItemDragEventArgs.cs" />
@@ -883,7 +873,6 @@
 		<Compile Include="System.Windows.Controls\TextBox.cs" />
 		<Compile Include="System.Windows.Controls\TextChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\TextChangedEventHandler.cs" />
-		<Compile Include="OpenSilver\Controls\TimePicker.cs" />
 		<Compile Include="System.Windows.Controls\Toolkit\CollectionHelpers.cs" />
 		<Compile Include="System.Windows.Controls\Toolkit\EnumerableExtensions.cs" />
 		<Compile Include="System.Windows.Controls\Toolkit\ItemsControlExtensions.cs" />
@@ -1191,10 +1180,6 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultTimePickerStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultToolTipStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
@@ -1256,9 +1241,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultDatePickerStyles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultDatePickerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultDomainUpDownStyle.xaml">

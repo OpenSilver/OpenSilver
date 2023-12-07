@@ -19,7 +19,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTextBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultThumbStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTimePickerStyles.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTimePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToolTipStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultViewboxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRepeatButtonStyle.xaml" />
@@ -33,7 +32,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRichTextBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_ContextMenuStyles.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyles.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDomainUpDownStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRatingStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
