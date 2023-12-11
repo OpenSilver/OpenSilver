@@ -281,6 +281,13 @@ namespace System.Windows
             set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
         }
 
+        // Indicates if this instance has a style set by a generator
+        internal bool IsStyleSetFromGenerator
+        {
+            get { return ReadInternalFlag(InternalFlags.IsStyleSetFromGenerator); }
+            set { WriteInternalFlag(InternalFlags.IsStyleSetFromGenerator, value); }
+        }
+
         // Note: this is used to be able to tell whether the style applied on 
         // the FrameworkElement is an ImplicitStyle, which means that it must 
         // be removed from the element when it is detached from the visual tree.

@@ -132,8 +132,8 @@ namespace System.Windows.Controls
         /// </value>
         public new Style ItemContainerStyle
         {
-            get { return GetValue(ItemContainerStyleProperty) as Style; }
-            set { SetValue(ItemContainerStyleProperty, value); }
+            get { return base.ItemContainerStyle; }
+            set { base.ItemContainerStyle = value; }
         }
 
         /// <summary>
@@ -146,32 +146,8 @@ namespace System.Windows.Controls
         /// <see cref="HeaderedItemsControl.ItemContainerStyle" />
         /// dependency property.
         /// </value>
-        public new static readonly DependencyProperty ItemContainerStyleProperty =
-            DependencyProperty.Register(
-                "ItemContainerStyle",
-                typeof(Style),
-                typeof(HeaderedItemsControl),
-                new PropertyMetadata(null, OnItemContainerStylePropertyChanged));
-
-        /// <summary>
-        /// ItemContainerStyleProperty property changed handler.
-        /// </summary>
-        /// <param name="d">
-        /// HeaderedItemsControl that changed its ItemContainerStyle.
-        /// </param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnItemContainerStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            HeaderedItemsControl source = d as HeaderedItemsControl;
-            Style value = e.NewValue as Style;
-            source.ItemsControlHelper.UpdateItemContainerStyle(value);
-        }
+        public new static readonly DependencyProperty ItemContainerStyleProperty = ItemsControl.ItemContainerStyleProperty;
         #endregion public Style ItemContainerStyle
-
-        /// <summary>
-        /// Gets the ItemsControlHelper that is associated with this control.
-        /// </summary>
-        internal ItemsControlHelper ItemsControlHelper { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the
@@ -180,7 +156,6 @@ namespace System.Windows.Controls
         public HeaderedItemsControl()
         {
             DefaultStyleKey = typeof(HeaderedItemsControl);
-            ItemsControlHelper = new ItemsControlHelper(this);
         }
 
         /// <summary>
@@ -219,17 +194,6 @@ namespace System.Windows.Controls
         /// </param>
         protected virtual void OnHeaderTemplateChanged(DataTemplate oldHeaderTemplate, DataTemplate newHeaderTemplate)
         {
-        }
-
-        /// <summary>
-        /// Builds the visual tree for the
-        /// <see cref="HeaderedItemsControl" /> when a
-        /// new template is applied.
-        /// </summary>
-        public override void OnApplyTemplate()
-        {
-            ItemsControlHelper.OnApplyTemplate();
-            base.OnApplyTemplate();
         }
 
         /// <summary>

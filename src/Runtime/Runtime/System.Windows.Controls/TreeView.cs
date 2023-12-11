@@ -268,8 +268,8 @@ namespace System.Windows.Controls
         /// </value>
         public new Style ItemContainerStyle
         {
-            get { return GetValue(ItemContainerStyleProperty) as Style; }
-            set { SetValue(ItemContainerStyleProperty, value); }
+            get { return base.ItemContainerStyle; }
+            set { base.ItemContainerStyle = value; }
         }
 
         /// <summary>
@@ -282,26 +282,7 @@ namespace System.Windows.Controls
         /// <see cref="TreeView.ItemContainerStyle" />
         /// dependency property.
         /// </value>
-        public new static readonly DependencyProperty ItemContainerStyleProperty =
-            DependencyProperty.Register(
-                "ItemContainerStyle",
-                typeof(Style),
-                typeof(TreeView),
-                new PropertyMetadata(null, OnItemContainerStylePropertyChanged));
-
-        /// <summary>
-        /// ItemContainerStyleProperty property changed handler.
-        /// </summary>
-        /// <param name="d">
-        /// TreeView that changed its ItemContainerStyle.
-        /// </param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnItemContainerStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            TreeView source = d as TreeView;
-            Style value = e.NewValue as Style;
-            source.ItemsControlHelper.UpdateItemContainerStyle(value);
-        }
+        public new static readonly DependencyProperty ItemContainerStyleProperty = ItemsControl.ItemContainerStyleProperty;
         #endregion public Style ItemContainerStyle
 
         /// <summary>

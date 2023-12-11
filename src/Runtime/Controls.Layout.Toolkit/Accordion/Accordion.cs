@@ -629,33 +629,14 @@ namespace System.Windows.Controls
         /// </summary>
         public new Style ItemContainerStyle
         {
-            get { return GetValue(ItemContainerStyleProperty) as Style; }
-            set { SetValue(ItemContainerStyleProperty, value); }
+            get { return base.ItemContainerStyle; }
+            set { base.ItemContainerStyle = value; }
         }
 
         /// <summary>
         /// Identifies the ItemContainerStyle dependency property.
         /// </summary>
-        public new static readonly DependencyProperty ItemContainerStyleProperty =
-            DependencyProperty.Register(
-                "ItemContainerStyle",
-                typeof(Style),
-                typeof(Accordion),
-                new PropertyMetadata(null, OnItemContainerStylePropertyChanged));
-
-        /// <summary>
-        /// ItemContainerStyleProperty property changed handler.
-        /// </summary>
-        /// <param name="d">
-        /// TreeView that changed its ItemContainerStyle.
-        /// </param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnItemContainerStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Accordion source = (Accordion)d;
-            Style value = e.NewValue as Style;
-            source.ItemsControlHelper.UpdateItemContainerStyle(value);
-        }
+        public new static readonly DependencyProperty ItemContainerStyleProperty = ItemsControl.ItemContainerStyleProperty;
         #endregion public Style ItemContainerStyle
 
         #region public Style AccordionButtonStyle

@@ -685,7 +685,17 @@ namespace System.Windows.Controls
 
         private void ApplyItemContainerStyle(DependencyObject container, object item)
         {
-            FrameworkElement feContainer = container as FrameworkElement;
+            if (container is not FrameworkElement feContainer)
+            {
+                return;
+            }
+
+            // don't overwrite a locally-defined style
+            if (!feContainer.IsStyleSetFromGenerator &&
+                feContainer.ReadLocalValue(StyleProperty) != DependencyProperty.UnsetValue)
+            {
+                return;
+            }
 
             // Control's ItemContainerStyle has first stab
             Style style = ItemContainerStyle;
@@ -695,10 +705,19 @@ namespace System.Windows.Controls
             {
                 // verify style is appropriate before applying it
                 if (!style.TargetType.IsInstanceOfType(container))
-                    throw new InvalidOperationException(string.Format("A style intended for type '{0}' cannot be applied to type '{1}'.", style.TargetType.Name, container.GetType().Name));
+                {
+                    throw new InvalidOperationException(
+                        $"A style intended for type '{style.TargetType.Name}' cannot be applied to type '{container.GetType().Name}'.");
+                }
 
                 feContainer.Style = style;
-                //feContainer.IsStyleSetFromGenerator = true;
+                feContainer.IsStyleSetFromGenerator = true;
+            }
+            else
+            {
+                // if Style was formerly set from ItemContainerStyle, clear it
+                feContainer.IsStyleSetFromGenerator = false;
+                feContainer.ClearValue(StyleProperty);
             }
         }
 

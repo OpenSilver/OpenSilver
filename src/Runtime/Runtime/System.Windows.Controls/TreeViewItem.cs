@@ -660,8 +660,6 @@ namespace System.Windows.Controls
         /// </summary>
         public override void OnApplyTemplate()
         {
-            ItemsControlHelper.OnApplyTemplate();
-
             // Get the template parts
             ExpanderButton = GetTemplateChild(ExpanderButtonName) as ToggleButton;
             HeaderElement = GetTemplateChild(HeaderName) as FrameworkElement;

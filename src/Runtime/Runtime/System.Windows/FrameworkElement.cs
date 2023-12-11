@@ -1164,7 +1164,7 @@ namespace System.Windows
         //InitPending = 0x00010000,
 
         //IsResourceParentValid = 0x00020000,
-        // free bit                     0x00040000,
+        IsStyleSetFromGenerator = 0x00040000, // free bit
 
         // This flag is set to true when this FrameworkElement is in the middle
         //  of an invalidation storm caused by InvalidateTree for ancestor change,
