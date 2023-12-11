@@ -466,7 +466,7 @@ if(nextSibling != undefined) {
         }
         public static bool IsElementInVisualTree(UIElement element) => element.IsConnectedToLiveTree && !element.IsUnloading;
 
-        internal static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(DependencyObject dependencyObject)
+        internal static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(UIElement uie)
         {
             //--------------------------------------------------------------
             // RAISE "PROPERTYCHANGED" FOR ALL THE PROPERTIES THAT HAVE 
@@ -490,7 +490,7 @@ if(nextSibling != undefined) {
             // we exclude properties where source is set to default because
             // it means they have been set at some point, and unset afterward,
             // so we should not call the PropertyChanged callback.
-            var list = dependencyObject.INTERNAL_PropertyStorageDictionary
+            var list = uie.INTERNAL_PropertyStorageDictionary
                 .Where(s => s.Value.Entry.BaseValueSourceInternal > BaseValueSourceInternal.Default)
                 .ToList();
 #if PERFSTAT
@@ -506,7 +506,7 @@ if(nextSibling != undefined) {
                 var t1 = Performance.now();
 #endif
 
-                PropertyMetadata propertyMetadata = property.GetMetadata(dependencyObject.DependencyObjectType);
+                PropertyMetadata propertyMetadata = property.GetMetadata(uie.DependencyObjectType);
 
                 if (propertyMetadata != null)
                 {
@@ -526,7 +526,7 @@ if(nextSibling != undefined) {
                         }
 
                         // Call the "Method to update DOM"
-                        propertyMetadata.MethodToUpdateDom(dependencyObject, value);
+                        propertyMetadata.MethodToUpdateDom(uie, value);
                     }
 
                     if (propertyMetadata.MethodToUpdateDom2 != null)
@@ -540,7 +540,7 @@ if(nextSibling != undefined) {
                         // DependencyProperty.UnsetValue for the old value signify that
                         // the old value should be ignored.
                         propertyMetadata.MethodToUpdateDom2(
-                            dependencyObject,
+                            uie,
                             DependencyProperty.UnsetValue,
                             value);
                     }
@@ -560,15 +560,18 @@ if(nextSibling != undefined) {
 
                         // Raise the "PropertyChanged" event
                         propertyMetadata.PropertyChangedCallback(
-                            dependencyObject,
+                            uie,
                             new DependencyPropertyChangedEventArgs(value, value, property, propertyMetadata));
                     }
                 }
 
-
 #if PERFSTAT
                 Performance.Counter("VisualTreeManager: RaisePropertyChanged for property '" + property.Name + "'", t1);
 #endif
+
+                // Silverlight creates a new stacking context for each element, so we need to make sure that
+                // the css z-index value is not 'auto'.
+                Canvas.SetZIndexNative(uie, Canvas.GetZIndex(uie));
             }
         }
 

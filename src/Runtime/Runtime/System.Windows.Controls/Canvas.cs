@@ -13,6 +13,7 @@
 
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
@@ -135,11 +136,14 @@ namespace System.Windows.Controls
             MaxZIndex = Math.Max(MaxZIndex, (int)e.NewValue);
         }
 
-        private static void SetZIndexNative(UIElement uie, int value)
+        internal static void SetZIndexNative(UIElement uie, int value)
         {
             Debug.Assert(uie is not null);
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
-            style.zIndex = value.ToInvariantString();
+            if (uie is not TextElement)
+            {
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+                style.zIndex = value.ToInvariantString();
+            }
         }
 
         protected override Size MeasureOverride(Size availableSize)
