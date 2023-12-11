@@ -173,5 +173,12 @@ namespace System.Windows.Controls.Primitives
                 content.UpdateLayout();
             }
         }
+
+        internal void PutPopupInFront()
+        {
+            string parentDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_ParentWindow.INTERNAL_RootDomElement);
+            string popupDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{parentDiv}.appendChild({popupDiv});");
+        }
     }
 }

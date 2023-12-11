@@ -308,7 +308,24 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Cannot change IsModal when ChildWindow is open.");
             }
 
-            cw.UpdateIsModalVisualState();
+            if ((bool)e.NewValue)
+            {
+                cw.GotFocus -= new RoutedEventHandler(cw.OnGotFocus);
+            }
+            else
+            {
+                cw.GotFocus += new RoutedEventHandler(cw.OnGotFocus);
+            }
+
+            cw.UpdateModalState();
+        }
+
+        private void OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.ChildWindowPopup != null && !this.IsModal)
+            {
+                this.ChildWindowPopup.PutPopupInFront();
+            }
         }
 
         /// <summary>
@@ -582,20 +599,22 @@ namespace System.Windows.Controls
             {
                 VisualStateManager.GoToState(this, VSMSTATE_StateOpen, true);
             }
+
+            this.UpdateModalState();
         }
 
         /// <summary>
         /// Change visual state of the ModalStates group.
         /// </summary>
-        private void UpdateIsModalVisualState()
+        private void UpdateModalState()
         {
             if (IsModal)
             {
-                VisualStateManager.GoToState(this, VSMState_StateModal, false);
+                VisualStateManager.GoToState(this, VSMState_StateModal, true);
             }
             else
             {
-                VisualStateManager.GoToState(this, VSMState_StateNotModal, false);
+                VisualStateManager.GoToState(this, VSMState_StateNotModal, true);
             }
         }
 
@@ -1034,7 +1053,6 @@ namespace System.Windows.Controls
                 this.UpdateOverlaySize();
                 this.UpdateRenderTransform();
                 this.ChangeVisualState();
-                this.UpdateIsModalVisualState();
             }
         }
 
@@ -1080,16 +1098,6 @@ namespace System.Windows.Controls
             return new ChildWindowAutomationPeer(this);
         }
 
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-
-            if (!this.IsModal && this.ChildWindowPopup != null)
-            {
-                this.ChildWindowPopup.PutPopupInFront();
-            }
-        }
-
         /// <summary>
         /// This method is called every time a <see cref="ChildWindow" /> is displayed.
         /// </summary>
@@ -1101,7 +1109,7 @@ namespace System.Windows.Controls
             if (this.Overlay != null)
             {
                 this.Overlay.Opacity = this.OverlayOpacity;
-                this.Overlay.Background = this.OverlayBrush;
+                this.Overlay.Background = this.IsModal ? this.OverlayBrush : null;
             }
 
             if (!this.Focus())
@@ -1150,7 +1158,10 @@ namespace System.Windows.Controls
         /// <param name="e">Routed event args.</param>
         private void RootVisual_GotFocus(object sender, RoutedEventArgs e)
         {
-            this.Focus();
+            if (this.IsModal)
+            {
+                this.Focus();
+            }
             this.InteractionState = WindowInteractionState.ReadyForUserInteraction;
         }
 

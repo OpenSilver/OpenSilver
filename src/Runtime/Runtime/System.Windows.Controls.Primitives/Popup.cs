@@ -36,7 +36,6 @@ namespace System.Windows.Controls.Primitives
         //      - The reference point is determined by the Placement and placement target. If the PlacementTarget property is not set, the placement target is the popup's parent. If the popup does not have a parent, then it is the top-left corner of the window (In wpf, it is the top-left corner of the screen but we're in a browser so we cannot do that).
         // Therefore, in order to correctly place the Popup, Horizontal and VerticalOffset should only be user-defined, and the only coordinates that should be internally set are those of the reference point.
 
-        private static int _currentZIndex = 0; //This int is to be able to put newly created popups in front of the former ones, as well as allowing to click on a Modal ChildWindow to put it in front of the others.
         private PopupRoot _popupRoot;
 
         // Note: we use a ContentPresenter because we need a container that does not force its child
@@ -613,9 +612,6 @@ namespace System.Windows.Controls.Primitives
                     _controlToWatch = PopupService.PositionsWatcher.AddControlToWatch(target, OnTargetPositionChanged);
                 }
 
-                // Show the popup in front of any potential previously displayed popup:
-                PutPopupInFront();
-
                 // Force layout update to prevent the popup content from briefly appearing in
                 // the top left corner of the screen.
                 UpdateLayout();
@@ -648,15 +644,6 @@ namespace System.Windows.Controls.Primitives
                 if (_controlToWatch != null)
                 {
                     PopupService.PositionsWatcher.RemoveControlToWatch(_controlToWatch);
-                }
-
-                //---------------------
-                // If the popup being closed is the one with the highest zIndex, we decrement it to reduce the chances of reaching the maximum value:
-                //---------------------
-                int closingPopupZIndex = Canvas.GetZIndex(_popupRoot);
-                if (closingPopupZIndex == _currentZIndex)
-                {
-                    --_currentZIndex;
                 }
 
                 //---------------------
@@ -741,19 +728,7 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        internal void PutPopupInFront()
-        {
-            if (Canvas.MaxZIndex > _currentZIndex)
-            {
-                _currentZIndex = Canvas.MaxZIndex;
-            }
-
-            bool needsZIndexChange = _currentZIndex == 0 ? true : (Canvas.GetZIndex(_popupRoot) != _currentZIndex);
-            if (needsZIndexChange)
-            {
-                Canvas.SetZIndex(_popupRoot, ++_currentZIndex);
-            }
-        }
+        internal void PutPopupInFront() => _popupRoot?.PutPopupInFront();
         
         [OpenSilver.NotImplemented]
         public void SetWindow(Window associatedWindow)

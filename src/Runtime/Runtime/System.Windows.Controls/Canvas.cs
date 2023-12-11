@@ -45,8 +45,6 @@ namespace System.Windows.Controls
     /// </example>
     public partial class Canvas : Panel
     {
-        internal static int MaxZIndex { get; private set; }
-
         /// <summary>
         /// Identifies the Canvas.Left attached property.
         /// </summary>
@@ -112,7 +110,7 @@ namespace System.Windows.Controls
                 "ZIndex",
                 typeof(int),
                 typeof(UIElement),
-                new PropertyMetadata(0, OnZIndexChanged)
+                new PropertyMetadata(0)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) => SetZIndexNative((UIElement)d, (int)newValue),
                 });
@@ -130,11 +128,6 @@ namespace System.Windows.Controls
         /// <param name="element">The object from which the property value is read.</param>
         /// <returns>The Canvas.ZIndex XAML attached property value of the specified object.</returns>
         public static int GetZIndex(UIElement element) => (int)element.GetValue(ZIndexProperty);
-
-        private static void OnZIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            MaxZIndex = Math.Max(MaxZIndex, (int)e.NewValue);
-        }
 
         internal static void SetZIndexNative(UIElement uie, int value)
         {
