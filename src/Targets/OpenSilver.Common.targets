@@ -108,6 +108,7 @@
   <PropertyGroup>
     <OutputExtension Condition="'$(Language)' == 'C#'">cs</OutputExtension>
     <OutputExtension Condition="'$(Language)' == 'VB'">vb</OutputExtension>
+    <OutputExtension Condition="'$(Language)' == 'F#'">fs</OutputExtension>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cshtml5OutputRootPath)'==''">
     <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
@@ -254,6 +255,10 @@
     <ItemGroup>
       <Content Include="@(Page)"/>
       <Page Remove="@(Page)"/>
+    </ItemGroup>
+    <ItemGroup>
+      <AllCompileItems Include="@(Compile)" />
+      <Compile Remove="@(AllCompileItems)" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="@(CodeAnalysisDictionary)"/>
@@ -463,6 +468,7 @@
       <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
       <Compile Include="@(ProcessedFiles)" />
       <Compile Include="@(ProcessedFiles2)" />
+      <Compile Include="@(AllCompileItems)" />
     </ItemGroup> 
     
   </Target>
@@ -585,6 +591,10 @@
       <Page Remove="@(Page)"/>
     </ItemGroup>
     <ItemGroup>
+      <AllCompileItems Include="@(Compile)" />
+      <Compile Remove="@(AllCompileItems)" />
+    </ItemGroup>
+    <ItemGroup>
       <Content Include="@(CodeAnalysisDictionary)"/>
       <CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
     </ItemGroup>
@@ -694,6 +704,7 @@
       <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
       <Compile Include="@(ProcessedFiles)" />
       <Compile Include="@(ProcessedFiles2)" />
+      <Compile Include="@(AllCompileItems)" />
     </ItemGroup>
     <Message
       Text="OpenSilver Design-Time Compilation ended"

@@ -197,6 +197,29 @@ namespace OpenSilver.Compiler
                                     + Environment.NewLine
                                     + generatedCode;
                             }
+                            else if (language == SupportedLanguage.FSharp)
+                            {
+                                // Convert XAML to F#:
+                                generatedCode = ConvertingXamlToFS.Convert(
+                                    xaml,
+                                    sourceFile,
+                                    fileNameWithPathRelativeToProjectRoot,
+                                    assemblyNameWithoutExtension,
+                                    rootNamespace,
+                                    reflectionOnSeparateAppDomain,
+                                    isFirstPass: !isSecondPass,
+                                    outputRootPath: outputRootPath,
+                                    outputAppFilesPath: outputAppFilesPath,
+                                    outputLibrariesPath: outputLibrariesPath,
+                                    outputResourcesPath: outputResourcesPath,
+                                    logger: logger);
+
+                                // Add the header that contains the file hash so as to avoid re-processing the file if not needed:
+                                generatedCode = CreateFSHeaderContainingHash(generatedCode, xaml, isSecondPass)
+                                    + Environment.NewLine
+                                    + Environment.NewLine
+                                    + generatedCode;
+                            }
                             else
                             {
                                 logger.WriteMessage($"Unsupported language.");
@@ -333,6 +356,14 @@ namespace OpenSilver.Compiler
             string fileHash = GetHashString(originalXaml);
             string passNumber = (isSecondPass ? "2" : "1");
             string header = string.Format("' <CSHTML5><XamlHash>{0}</XamlHash><PassNumber>{1}</PassNumber><CompilationDate>{2}</CompilationDate></CSHTML5>", fileHash, passNumber, DateTime.Now.ToString());
+
+            return header;
+        }
+        private static string CreateFSHeaderContainingHash(string generatedCode, string originalXaml, bool isSecondPass)
+        {
+            string fileHash = GetHashString(originalXaml);
+            string passNumber = (isSecondPass ? "2" : "1");
+            string header = string.Format("// <CSHTML5><XamlHash>{0}</XamlHash><PassNumber>{1}</PassNumber><CompilationDate>{2}</CompilationDate></CSHTML5>", fileHash, passNumber, DateTime.Now.ToString());
 
             return header;
         }

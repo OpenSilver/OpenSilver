@@ -133,6 +133,17 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void RegisterEventHandler(string handlerName, string eventName, object target, object firstArgument)
+        {
+            var methodInfo = firstArgument.GetType().GetMethod(handlerName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var eventInfo = target.GetType().GetEvent(eventName);
+            Delegate handler = Delegate.CreateDelegate(eventInfo.EventHandlerType,
+                                         firstArgument,
+                                         methodInfo);
+            eventInfo.AddEventHandler(target, handler);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void XamlContext_RegisterName(XamlContext context, string name, object scopedElement)
         {
             Debug.Assert(context != null && context.ExternalNameScope != null);

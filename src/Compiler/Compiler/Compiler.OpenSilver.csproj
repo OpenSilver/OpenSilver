@@ -47,6 +47,15 @@
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass1.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\IMetadataCS.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\ConvertingStringToValueFS.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\ConvertingXamlToFS.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\CoreTypesHelperFS.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.Pass1.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.Pass2.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\IMetadataFS.cs" />
+    <Compile Include="3_ConvertingXamlToFSharp\SystemTypesHelperFS.cs" />
+    <Compile Include="EntryPoints\XamlDesignerAttributesProcessor.cs" />
     <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferencesVB.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssembliesInspectorImpl.cs" />
