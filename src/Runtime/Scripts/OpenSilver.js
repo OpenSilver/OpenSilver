@@ -48,10 +48,8 @@ promises = [];
         }
     });
 }(['libs/cshtml5.css',
-    'libs/flatpickr.css',
     'libs/quill.core.css',
     'libs/cshtml5.js',
-    'libs/flatpickr.js',
     'libs/ResizeObserver.js',
     'libs/quill.min.js',
     'libs/html2canvas.js']));
