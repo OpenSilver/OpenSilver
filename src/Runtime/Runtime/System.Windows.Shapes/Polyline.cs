@@ -25,13 +25,6 @@ namespace System.Windows.Shapes
     {
         private WeakEventListener<Polyline, PointCollection, NotifyCollectionChangedEventArgs> _pointsCollectionChanged;
 
-        static Polyline()
-        {
-            StretchProperty.OverrideMetadata(
-                typeof(Polyline),
-                new FrameworkPropertyMetadata(Stretch.Fill, FrameworkPropertyMetadataOptions.AffectsMeasure));
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Polyline"/> class.
         /// </summary>
