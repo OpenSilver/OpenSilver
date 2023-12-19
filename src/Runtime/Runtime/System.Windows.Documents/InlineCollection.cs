@@ -13,37 +13,38 @@
 
 using System.Collections;
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+/// <summary>
+/// Represents a collection of <see cref="Inline"/> elements.
+/// </summary>
+public class InlineCollection : TextElementCollection<Inline>, IList
 {
-    /// <summary>
-    /// Represents a collection of <see cref="Inline"/> elements.
-    /// </summary>
-    public class InlineCollection : TextElementCollection<Inline>, IList
+    internal InlineCollection(UIElement owner)
+        : base(owner)
     {
-        internal InlineCollection(DependencyObject owner) : base(owner)
+    }
+
+    public void Add(string text)
+    {
+        if (text == null)
         {
+            throw new ArgumentNullException(nameof(text));
         }
 
-        public void Add(string text)
+        Add(new Run { Text = text });
+    }
+
+    int IList.Add(object value)
+    {
+        Inline inline = value switch
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
+            string text => new Run { Text = text ?? string.Empty },
+            Inline i => i,
+            _ => null,
+        };
 
-            Add(new Run { Text = text });
-        }
-
-        internal sealed override int AddImpl(object value)
-        {
-            Inline inline = value switch
-            {
-                string text => new Run { Text = text ?? string.Empty },
-                Inline i => i,
-                _ => null,
-            };
-
-            return base.AddImpl(inline);
-        }
+        Add(inline);
+        return Count;
     }
 }

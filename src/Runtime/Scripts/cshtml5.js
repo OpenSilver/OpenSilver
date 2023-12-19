@@ -739,14 +739,12 @@ document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflo
             element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
         }
 
-        const computedStyle = getComputedStyle(elToMeasure);
-
-        element.style.fontSize = computedStyle.fontSize;
-        element.style.fontWeight = computedStyle.fontWeight;
-        element.style.fontFamily = computedStyle.fontFamily;
-        element.style.fontStyle = computedStyle.fontStyle;
-        element.style.lineHeight = computedStyle.lineHeight;
-        element.style.letterSpacing = computedStyle.letterSpacing;
+        element.style.fontSize = elToMeasure.style.fontSize;
+        element.style.fontWeight = elToMeasure.style.fontWeight;
+        element.style.fontFamily = elToMeasure.style.fontFamily;
+        element.style.fontStyle = elToMeasure.style.fontStyle;
+        element.style.lineHeight = elToMeasure.style.lineHeight;
+        element.style.letterSpacing = elToMeasure.style.letterSpacing;
 
         element.style.whiteSpace = whiteSpace;
         element.style.overflowWrap = overflowWrap;

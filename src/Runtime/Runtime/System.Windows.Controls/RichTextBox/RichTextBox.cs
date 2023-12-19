@@ -40,7 +40,7 @@ namespace System.Windows.Controls
         public RichTextBox()
         {
             DefaultStyleKey = typeof(RichTextBox);
-            Blocks = new BlockCollection(this, false);
+            SetValue(BlocksProperty, new BlockCollection(this));
             _selection = new TextSelection(this);
             IsEnabledChanged += (o, e) => _textViewHost?.View.SetEnable((bool)e.NewValue);
         }
@@ -169,6 +169,13 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         public TextPointer ContentStart { get; }
 
+        private static readonly DependencyProperty BlocksProperty =
+            DependencyProperty.Register(
+                nameof(Blocks),
+                typeof(BlockCollection),
+                typeof(RichTextBox),
+                null);
+
         /// <summary>
         /// Gets the contents of the <see cref="RichTextBox"/>.
         /// </summary>
@@ -176,12 +183,12 @@ namespace System.Windows.Controls
         /// A <see cref="BlockCollection"/> that contains the contents of the
         /// <see cref="RichTextBox"/>.
         /// </returns>
-        public BlockCollection Blocks { get; }        
+        public BlockCollection Blocks => (BlockCollection)GetValue(BlocksProperty);
 
         /// <summary>
         /// Identifies the <see cref="IsReadOnly"/> dependency property.
         /// </summary>
-		public static readonly DependencyProperty IsReadOnlyProperty =
+        public static readonly DependencyProperty IsReadOnlyProperty =
             DependencyProperty.Register(
                 nameof(IsReadOnly),
                 typeof(bool),
@@ -648,10 +655,6 @@ namespace System.Windows.Controls
                         format.Add("bold", run.FontWeight.ToOpenTypeWeight() > 500);
                     if (run.FontStyle == FontStyles.Italic)
                         format.Add("italic", true);
-                    if (run.Margin != null)
-                        format.Add("margin", run.Margin.ToString());
-                    if (run.Background is SolidColorBrush background)
-                        format.Add("background", background.INTERNAL_ToHtmlString());
                     if (run.Foreground is SolidColorBrush foreground)
                         format.Add("color", foreground.INTERNAL_ToHtmlString());
                     _textViewHost.View.SetText(run.Text, format);

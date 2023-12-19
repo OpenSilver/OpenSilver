@@ -43,22 +43,6 @@ namespace System.Windows.Controls
         private FrameworkElement _contentElement;
         private ITextViewHost<PasswordBoxView> _textViewHost;
 
-        static PasswordBox()
-        {
-            CharacterSpacingProperty.OverrideMetadata(
-                typeof(PasswordBox),
-                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var pwb = (PasswordBox)d;
-                        double value = (int)newValue / 1000.0;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(pwb.INTERNAL_OuterDomElement);
-                        style.letterSpacing = $"{value.ToInvariantString()}em";
-                    },
-                });
-        }
-
         public PasswordBox()
         {
             DefaultStyleKey = typeof(PasswordBox);

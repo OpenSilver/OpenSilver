@@ -11,16 +11,15 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+/// <summary>
+/// Represents a collection of <see cref="Block"/> elements.
+/// </summary>
+public sealed class BlockCollection : TextElementCollection<Block>
 {
-	/// <summary>
-	/// Represents a collection of <see cref="Block"/> elements.
-	/// </summary>
-	public sealed class BlockCollection : TextElementCollection<Block>
-	{
-		internal BlockCollection(DependencyObject owner, bool isOwnerParent)
-			: base(owner)
-		{
-		}
-	}
+    internal BlockCollection(UIElement owner)
+        : base(owner)
+    {
+    }
 }

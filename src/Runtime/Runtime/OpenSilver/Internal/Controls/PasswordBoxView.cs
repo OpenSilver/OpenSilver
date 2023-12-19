@@ -14,13 +14,65 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
 internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
 {
+    static PasswordBoxView()
+    {
+        TextElement.CharacterSpacingProperty.AddOwner(
+            typeof(PasswordBoxView),
+            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetCharacterSpacing((int)newValue),
+            });
+
+        TextElement.FontFamilyProperty.AddOwner(
+            typeof(PasswordBoxView),
+            new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetFontFamily((FontFamily)newValue),
+            });
+
+        TextElement.FontSizeProperty.AddOwner(
+            typeof(PasswordBoxView),
+            new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetFontSize((double)newValue),
+            });
+
+        TextElement.FontStyleProperty.AddOwner(
+            typeof(PasswordBoxView),
+            new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetFontStyle((FontStyle)newValue),
+            });
+
+        TextElement.FontWeightProperty.AddOwner(
+           typeof(PasswordBoxView),
+           new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+           {
+               MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetFontWeight((FontWeight)newValue),
+           });
+
+        TextElement.ForegroundProperty.AddOwner(
+            typeof(PasswordBoxView),
+            new FrameworkPropertyMetadata(
+                TextElement.ForegroundProperty.DefaultMetadata.DefaultValue,
+                FrameworkPropertyMetadataOptions.Inherits,
+                OnForegroundChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetForeground((Brush)newValue),
+            });
+    }
+
+    private WeakEventListener<PasswordBoxView, Brush, EventArgs> _foregroundChangedListener;
+
     internal PasswordBoxView(PasswordBox host)
         : base(host)
     {
@@ -123,5 +175,39 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
         }
 
         return string.Empty;
+    }
+
+    private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        UIElementHelpers.InvalidateMeasureOnFontFamilyChanged((PasswordBoxView)d, (FontFamily)e.NewValue);
+    }
+
+    private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var view = (PasswordBoxView)d;
+
+        if (view._foregroundChangedListener != null)
+        {
+            view._foregroundChangedListener.Detach();
+            view._foregroundChangedListener = null;
+        }
+
+        if (e.NewValue is Brush newBrush)
+        {
+            view._foregroundChangedListener = new(view, newBrush)
+            {
+                OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+            };
+            newBrush.Changed += view._foregroundChangedListener.OnEvent;
+        }
+    }
+
+    private void OnForegroundChanged(object sender, EventArgs e)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            this.SetForeground((Brush)sender);
+        }
     }
 }

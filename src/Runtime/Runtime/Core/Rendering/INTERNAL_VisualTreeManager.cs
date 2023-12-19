@@ -442,7 +442,7 @@ if(nextSibling != undefined) {
                 RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
             }
 
-            if (isChildAControl && child is not TextBlock && child is not TextElement)
+            if (isChildAControl)
             {
                 ((Control)child).UpdateSystemFocusVisuals();
             }
@@ -571,7 +571,10 @@ if(nextSibling != undefined) {
 
                 // Silverlight creates a new stacking context for each element, so we need to make sure that
                 // the css z-index value is not 'auto'.
-                Canvas.SetZIndexNative(uie, Canvas.GetZIndex(uie));
+                if (uie is not TextElement)
+                {
+                    uie.SetZIndexNative(Canvas.GetZIndex(uie));
+                }
             }
         }
 

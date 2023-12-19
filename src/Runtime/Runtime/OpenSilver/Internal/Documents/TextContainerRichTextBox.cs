@@ -11,21 +11,24 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
 namespace OpenSilver.Internal.Documents;
 
-internal sealed class TextContainerRichTextBox : TextContainer<RichTextBox>
+internal sealed class TextContainerRichTextBox : ITextContainer
 {
-    public TextContainerRichTextBox(RichTextBox parent)
-        : base(parent)
+    private readonly RichTextBox _rtb;
+
+    public TextContainerRichTextBox(RichTextBox rtb)
     {
+        _rtb = rtb ?? throw new ArgumentNullException(nameof(rtb));
     }
 
-    public override string Text => Parent.GetRawText();
+    public string Text => _rtb.GetRawText();
 
-    protected override void OnTextAddedOverride(TextElement textElement)
+    public void OnTextAdded(TextElement textElement, int index)
     {
         if (textElement is Paragraph paragraph)
         {
@@ -39,7 +42,7 @@ internal sealed class TextContainerRichTextBox : TextContainer<RichTextBox>
                 //TODO: support other Inlines
             }
 
-            Parent.InsertText(text);
+            _rtb.InsertText(text);
         }
         else if (textElement is Section)
         {
@@ -47,8 +50,10 @@ internal sealed class TextContainerRichTextBox : TextContainer<RichTextBox>
         }
     }
 
-    protected override void OnTextRemovedOverride(TextElement textElement)
+    public void OnTextRemoved(TextElement textElement)
     {
         //TODO: implement
     }
+
+    public void OnTextContentChanged() { }
 }

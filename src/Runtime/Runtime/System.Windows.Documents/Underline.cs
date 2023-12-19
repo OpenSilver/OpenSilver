@@ -11,19 +11,19 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+/// <summary>
+/// Provides an inline-level content element that causes content to render with an
+/// underlined text decoration.
+/// </summary>
+public sealed class Underline : Span
 {
     /// <summary>
-    /// Provides an inline-level content element that causes content to render with a bold font weight.
+    /// Initializes a new instance of the <see cref="Underline"/> class.
     /// </summary>
-    public sealed class Underline : Span
+    public Underline()
     {
-        /// <summary>
-        /// Initializes a new instance of the Underline class.
-        /// </summary>
-        public Underline()
-        {
-            TextDecorations = Windows.TextDecorations.Underline;
-        }
+        TextDecorations = Windows.TextDecorations.Underline;
     }
 }

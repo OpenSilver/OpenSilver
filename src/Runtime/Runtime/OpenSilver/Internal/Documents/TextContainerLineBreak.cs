@@ -11,14 +11,23 @@
 *  
 \*====================================================================================*/
 
+using System;
+
 using System.Windows.Documents;
 
 namespace OpenSilver.Internal.Documents;
 
-internal interface ITextContainer
+internal sealed class TextContainerLineBreak : ITextContainer
 {
-    string Text { get; }
-    void OnTextContentChanged();
-    void OnTextAdded(TextElement textElement, int index);
-    void OnTextRemoved(TextElement textElement);
+    private TextContainerLineBreak() { }
+
+    public static TextContainerLineBreak Instance { get; } = new();
+
+    public string Text => "\n";
+
+    public void OnTextContentChanged() => throw new NotSupportedException();
+
+    public void OnTextAdded(TextElement textElement, int index) => throw new NotSupportedException();
+
+    public void OnTextRemoved(TextElement textElement) => throw new NotSupportedException();
 }

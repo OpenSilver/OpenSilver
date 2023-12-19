@@ -11,66 +11,80 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
+namespace System.Windows.Documents;
 
-namespace System.Windows.Documents
+/// <summary>
+/// Provides a base for inline flow content element behavior.
+/// </summary>
+public abstract class Inline : TextElement
 {
     /// <summary>
-    /// Provides a base class for inline text elements, such as Span and Run.
+    /// Initializes a new instance of the <see cref="Inline"/> class.
     /// </summary>
-    public abstract class Inline : TextElement
+    protected Inline() { }
+
+    /// <summary>
+    /// Identifies the <see cref="TextElement.FontSize" /> dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FontSizeProperty = TextElement.FontSizeProperty;
+
+    /// <summary>
+    /// Identifies the <see cref="TextElement.FontFamily" /> dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FontFamilyProperty = TextElement.FontFamilyProperty;
+
+    /// <summary>
+    /// Identifies the <see cref="TextElement.FontWeight" /> dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FontWeightProperty = TextElement.FontWeightProperty;
+
+    /// <summary>
+    /// Identifies the <see cref="TextElement.FontStyle" /> dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FontStyleProperty = TextElement.FontStyleProperty;
+
+    /// <summary>
+    /// Identifies the <see cref="TextElement.FontStretch" /> dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty FontStretchProperty = TextElement.FontStretchProperty;
+
+    /// <summary>
+    /// Identifies the <see cref="TextElement.Foreground" /> dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty ForegroundProperty = TextElement.ForegroundProperty;
+
+    /// <summary>
+    /// Identifies the <see cref="TextElement.Language" /> dependency property.
+    /// </summary>
+    public new static readonly DependencyProperty LanguageProperty = TextElement.LanguageProperty;
+
+    /// <summary>
+    /// Identifies the <see cref="TextDecorations"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty TextDecorationsProperty =
+        DependencyProperty.RegisterAttached(
+            nameof(TextDecorations),
+            typeof(TextDecorationCollection),
+            typeof(Inline),
+            new PropertyMetadata((object)null) { Inherits = true, });
+
+    /// <summary>
+    /// Gets or sets a value that specifies the text decorations that are applied to
+    /// the content in an <see cref="Inline"/> element.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="TextDecorationCollection"/>, or null if no text decorations are
+    /// applied.
+    /// </returns>
+    public TextDecorationCollection TextDecorations
     {
-        internal override bool EnablePointerEventsCore
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        // Defining an implicit conversion from string to Inline allows to
-        // support the following usage: TextBlock1.Inlines.Add("test");
-        public static implicit operator Inline(string s)
-        {
-            return new Run() { Text = s };
-        }
-
-        /// <summary>
-        /// Gets or sets the text decorations (underline, strikethrough...).
-        /// </summary>
-        public new TextDecorationCollection TextDecorations
-        {
-            get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
-            set { SetValue(TextDecorationsProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the TextDecorations dependency property.
-        /// </summary>
-        public new static readonly DependencyProperty TextDecorationsProperty = 
-            DependencyProperty.Register(
-                nameof(TextDecorations), 
-                typeof(TextDecorationCollection), 
-                typeof(Inline), 
-                new PropertyMetadata((object)null) 
-                {
-                    MethodToUpdateDom = static (d, newValue) =>
-                    {
-                        var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((Inline)d).INTERNAL_OuterDomElement);
-                        domStyle.textDecoration = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
-                    },
-                });
-        
-        protected override void OnAfterApplyHorizontalAlignmentAndWidth()
-        {
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
-            style.display = "inline";
-        }
-
-        protected override void OnAfterApplyVerticalAlignmentAndWidth()
-        {
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement);
-            style.display = "inline";
-        }
+        get => (TextDecorationCollection)GetValue(TextDecorationsProperty);
+        set => SetValue(TextDecorationsProperty, value);
     }
+
+    internal override bool EnablePointerEventsCore => true;
+
+    // Defining an implicit conversion from string to Inline allows to
+    // support the following usage: TextBlock1.Inlines.Add("test");
+    public static implicit operator Inline(string s) => new Run() { Text = s };
 }

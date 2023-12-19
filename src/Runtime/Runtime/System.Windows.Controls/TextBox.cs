@@ -16,7 +16,6 @@ using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Input;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
@@ -54,39 +53,6 @@ namespace System.Windows.Controls
         private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
         private ITextViewHost<TextBoxView> _textViewHost;
-
-        static TextBox()
-        {
-            CharacterSpacingProperty.OverrideMetadata(
-                typeof(TextBox),
-                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var tb = (TextBox)d;
-                        double value = (int)newValue / 1000.0;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
-                        style.letterSpacing = $"{value.ToInvariantString()}em";
-                    },
-                });
-
-            FontFamilyProperty.OverrideMetadata(
-                typeof(TextBox),
-                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var tb = (TextBox)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
-                        style.fontFamily = ((FontFamily)newValue).GetFontFace(tb).CssFontName;
-                    },
-                });
-        }
-
-        private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            TextElementProperties.InvalidateMeasureOnFontFamilyChanged((TextBox)d, (FontFamily)e.NewValue);
-        }
 
         public TextBox()
         {
@@ -205,31 +171,45 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="TextAlignment"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TextAlignmentProperty =
+            Block.TextAlignmentProperty.AddOwner(typeof(TextBox));
+
+        /// <summary>
         /// Gets or sets how the text should be aligned in the text box.
         /// </summary>
+        /// <returns>
+        /// One of the <see cref="Windows.TextAlignment"/> enumeration values.
+        /// The default is <see cref="TextAlignment.Left"/>.
+        /// </returns>
         public TextAlignment TextAlignment
         {
-            get { return (TextAlignment)GetValue(TextAlignmentProperty); }
-            set { SetValue(TextAlignmentProperty, value); }
+            get => (TextAlignment)GetValue(TextAlignmentProperty);
+            set => SetValue(TextAlignmentProperty, value);
         }
 
         /// <summary>
-        /// Identifies the TextAlignment dependency property.
+        /// Identifies the <see cref="LineHeight"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextAlignmentProperty =
-            DependencyProperty.Register(
-                nameof(TextAlignment),
-                typeof(TextAlignment),
-                typeof(TextBox),
-                new PropertyMetadata(TextAlignment.Left, OnTextAlignmentChanged));
+        public static readonly DependencyProperty LineHeightProperty =
+            Block.LineHeightProperty.AddOwner(typeof(TextBox));
 
-        private static void OnTextAlignmentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets the height of each line of content.
+        /// </summary>
+        /// <returns>
+        /// The height of each line in pixels. A value of 0 indicates that 
+        /// the line height is determined automatically from the current
+        /// font characteristics. The default is 0.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// <see cref="LineHeight"/> is set to a non-positive value.
+        /// </exception>
+        public double LineHeight
         {
-            var tb = (TextBox)d;
-            if (tb._textViewHost != null)
-            {
-                tb._textViewHost.View.OnTextAlignmentChanged((TextAlignment)e.NewValue);
-            }
+            get => (double)GetValue(LineHeightProperty);
+            set => SetValue(LineHeightProperty, value);
         }
 
         /// <summary>
@@ -486,7 +466,7 @@ namespace System.Windows.Controls
         {
             if (textbox._textViewHost?.View is TextBoxView view)
             {
-                return TextElementProperties.GetBaseLineOffsetNative(view);
+                return view.GetBaseLineOffset();
             }
 
             return 0.0;
@@ -814,9 +794,6 @@ namespace System.Windows.Controls
             get { return (Brush)GetValue(SelectionBackgroundProperty); }
             set { SetValue(SelectionBackgroundProperty, value); }
         }
-
-        [OpenSilver.NotImplemented]
-        public double LineHeight { get; set; }
 
         /// <summary>
         /// Returns a rectangle for the leading edge of the character at the specified index.

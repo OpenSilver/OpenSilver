@@ -14,13 +14,79 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
 internal sealed class TextBoxView : TextViewBase<TextBox>
 {
+    static TextBoxView()
+    {
+        TextElement.CharacterSpacingProperty.AddOwner(
+            typeof(TextBoxView),
+            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetCharacterSpacing((int)newValue),
+            });
+
+        TextElement.FontFamilyProperty.AddOwner(
+            typeof(TextBoxView),
+            new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetFontFamily((FontFamily)newValue),
+            });
+
+        TextElement.FontSizeProperty.AddOwner(
+            typeof(TextBoxView),
+            new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetFontSize((double)newValue),
+            });
+
+        TextElement.FontStyleProperty.AddOwner(
+            typeof(TextBoxView),
+            new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetFontStyle((FontStyle)newValue),
+            });
+
+        TextElement.FontWeightProperty.AddOwner(
+           typeof(TextBoxView),
+           new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+           {
+               MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetFontWeight((FontWeight)newValue),
+           });
+
+        TextElement.ForegroundProperty.AddOwner(
+            typeof(TextBoxView),
+            new FrameworkPropertyMetadata(
+                TextElement.ForegroundProperty.DefaultMetadata.DefaultValue,
+                FrameworkPropertyMetadataOptions.Inherits,
+                OnForegroundChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetForeground((Brush)newValue),
+            });
+
+        Block.LineHeightProperty.AddOwner(
+            typeof(TextBoxView),
+            new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetLineHeight((double)newValue),
+            });
+
+        Block.TextAlignmentProperty.AddOwner(
+            typeof(TextBoxView),
+            new FrameworkPropertyMetadata(TextAlignment.Left, FrameworkPropertyMetadataOptions.Inherits)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetTextAlignment((TextAlignment)newValue),
+            });
+    }
+
+    private WeakEventListener<TextBoxView, Brush, EventArgs> _foregroundChangedListener;
+
     internal TextBoxView(TextBox host)
         : base(host)
     {
@@ -83,32 +149,6 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)InputDiv).UniqueIdentifier}"");
 element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower()}"");");
-        }
-    }
-
-    internal void OnTextAlignmentChanged(TextAlignment alignment)
-    {
-        UpdateTextAlignment(INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this), alignment);
-    }
-
-    private static void UpdateTextAlignment(INTERNAL_HtmlDomStyleReference style, TextAlignment alignment)
-    {
-        switch (alignment)
-        {
-            case TextAlignment.Center:
-                style.textAlign = "center";
-                break;
-            case TextAlignment.Left:
-                style.textAlign = "start";
-                break;
-            case TextAlignment.Right:
-                style.textAlign = "end";
-                break;
-            case TextAlignment.Justify:
-                style.textAlign = "justify";
-                break;
-            default:
-                break;
         }
     }
 
@@ -266,9 +306,6 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         // Apply Host.TextWrapping
         TextBlock.ApplyTextWrapping(contentEditableDivStyle, Host.TextWrapping);
 
-        // Apply Host.TextAlignment
-        UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);
-
         if (Host.IsReadOnly)
         {
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "readonly", "''");
@@ -391,5 +428,39 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
             constraint.Width,
             "M");
+    }
+
+    private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        UIElementHelpers.InvalidateMeasureOnFontFamilyChanged((TextBoxView)d, (FontFamily)e.NewValue);
+    }
+
+    private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var view = (TextBoxView)d;
+
+        if (view._foregroundChangedListener != null)
+        {
+            view._foregroundChangedListener.Detach();
+            view._foregroundChangedListener = null;
+        }
+
+        if (e.NewValue is Brush newBrush)
+        {
+            view._foregroundChangedListener = new(view, newBrush)
+            {
+                OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+            };
+            newBrush.Changed += view._foregroundChangedListener.OnEvent;
+        }
+    }
+
+    private void OnForegroundChanged(object sender, EventArgs e)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            this.SetForeground((Brush)sender);
+        }
     }
 }

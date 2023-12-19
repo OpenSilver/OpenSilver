@@ -12,56 +12,159 @@
 \*====================================================================================*/
 
 using System.Windows.Markup;
-using System.Windows.Controls;
+using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+/// <summary>
+/// Represents a discrete section of formatted or unformatted text.
+/// </summary>
+[ContentProperty(nameof(Text))]
+public sealed class Run : Inline
 {
-    /// <summary>
-    /// Represents a discrete section of formatted or unformatted text.
-    /// </summary>
-    [ContentProperty(nameof(Text))]
-    public sealed class Run : Inline
+    static Run()
     {
-        /// <summary>
-        /// Get or Set the Text property
-        /// </summary>
-        public string Text
+        CharacterSpacingProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetCharacterSpacing((int)newValue),
+            });
+
+        FontFamilyProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontFamily((FontFamily)newValue),
+            });
+
+        FontSizeProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontSize((double)newValue),
+            });
+
+        FontStyleProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontStyle((FontStyle)newValue),
+            });
+
+        FontWeightProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontWeight((FontWeight)newValue),
+            });
+
+        ForegroundProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(
+                ForegroundProperty.DefaultMetadata.DefaultValue,
+                FrameworkPropertyMetadataOptions.Inherits,
+                OnForegroundChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetForeground((Brush)newValue),
+            });
+
+        TextDecorationsProperty.OverrideMetadata(
+            typeof(Run),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetTextDecorations((TextDecorationCollection)newValue),
+            });
+    }
+
+    private WeakEventListener<Run, Brush, EventArgs> _foregroundChangedListener;
+
+    /// <summary>
+    /// Identifies the <see cref="Text"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty TextProperty =
+        DependencyProperty.Register(
+            nameof(Text),
+            typeof(string),
+            typeof(Run),
+            new PropertyMetadata(string.Empty, OnTextChanged, CoerceText)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetInnerText((string)newValue),
+            });
+
+    /// <summary>
+    /// A string that specifies the text contents of the <see cref="Run"/>.
+    /// The default is <see cref="string.Empty"/>.
+    /// </summary>
+    public string Text
+    {
+        get => (string)GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
+
+    private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Run)d).TextContainer.OnTextContentChanged();
+    }
+
+    private static object CoerceText(DependencyObject d, object value)
+    {
+        return (string)value ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="FlowDirection"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(TextElement));
+
+    /// <summary>
+    /// Gets or sets the direction that text and other user interface elements flow within
+    /// the <see cref="Run"/> element that controls their layout.
+    /// </summary>
+    /// <returns>
+    /// The direction that text and other UI elements flow within the <see cref="Run"/>
+    /// element. The default value is <see cref="FlowDirection.LeftToRight"/>.
+    /// </returns>
+    public FlowDirection FlowDirection
+    {
+        get => (FlowDirection)GetValue(FlowDirectionProperty);
+        set => SetValue(FlowDirectionProperty, value);
+    }
+
+    private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        UIElementHelpers.InvalidateMeasureOnFontFamilyChanged((Run)d, (FontFamily)e.NewValue);
+    }
+
+    private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var run = (Run)d;
+
+        if (run._foregroundChangedListener != null)
         {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            run._foregroundChangedListener.Detach();
+            run._foregroundChangedListener = null;
         }
 
-        /// <summary>
-        /// Identifies the Text dependency property.
-        /// </summary>
-        public static readonly DependencyProperty TextProperty = 
-            DependencyProperty.Register(
-                nameof(Text), 
-                typeof(string), 
-                typeof(Run),
-                new PropertyMetadata(string.Empty, OnTextChanged)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        INTERNAL_HtmlDomManager.SetContentString((Run)d, (string)newValue);
-                    },
-                });
-
-        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        if (e.NewValue is Brush newBrush)
         {
-            Run run = (Run)d;
-
-            switch (run.GetLayoutParent())
+            run._foregroundChangedListener = new(run, newBrush)
             {
-                case TextBlock tb:
-                    tb.OnTextContentChanged();
-                    break;
-
-                case FrameworkElement fe:
-                    fe.InvalidateMeasure();
-                    break;
+                OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
             };
+            newBrush.Changed += run._foregroundChangedListener.OnEvent;
+        }
+    }
+
+    private void OnForegroundChanged(object sender, EventArgs e)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+        {
+            this.SetForeground((Brush)sender);
         }
     }
 }

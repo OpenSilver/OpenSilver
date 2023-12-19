@@ -30,15 +30,22 @@ namespace System.Windows.Controls
         /// </summary>
         public RichTextBlock()
         {
-            Blocks = new BlockCollection(this, false);
+            SetValue(BlocksProperty, new BlockCollection(this));
         }
 
         internal sealed override bool EnablePointerEventsCore => true;
 
+        private static readonly DependencyProperty BlocksProperty =
+            DependencyProperty.Register(
+                nameof(Blocks),
+                typeof(BlockCollection),
+                typeof(RichTextBlock),
+                null);
+
         /// <summary>
         /// Gets the contents of the <see cref="RichTextBlock"/>.
         /// </summary>
-        public BlockCollection Blocks { get; }
+        public BlockCollection Blocks => (BlockCollection)GetValue(BlocksProperty);
 
         /// <summary>
         /// Identifies the <see cref="Padding"/> dependency property.
@@ -50,13 +57,7 @@ namespace System.Windows.Controls
                 typeof(RichTextBlock),
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        var padding = (Thickness)newValue;
-                        domStyle.padding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
-                    }
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetPadding((Thickness)newValue),
                 },
                 IsPaddingValid);
 
@@ -83,19 +84,11 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="FontSize"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontSizeProperty =
-            TextElementProperties.FontSizeProperty.AddOwner(
+            TextElement.FontSizeProperty.AddOwner(
                 typeof(RichTextBlock),
                 new FrameworkPropertyMetadata(
                     11d,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.fontSize = $"{((double)newValue).ToInvariantString()}px";
-                    },
-                });
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits));
 
         /// <summary>
         /// Gets or sets the size of the text in this control.
@@ -111,19 +104,11 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="FontWeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontWeightProperty =
-            TextElementProperties.FontWeightProperty.AddOwner(
+            TextElement.FontWeightProperty.AddOwner(
                 typeof(RichTextBlock),
                 new FrameworkPropertyMetadata(
                     FontWeights.Normal,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.fontWeight = ((FontWeight)newValue).ToOpenTypeWeight().ToInvariantString();
-                    },
-                });
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits));
 
         /// <summary>
         /// Gets or sets the thickness of the specified font.
@@ -139,19 +124,11 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="FontStyle"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontStyleProperty =
-            DependencyProperty.Register(
-                nameof(FontStyle),
-                typeof(FontStyle),
+            TextElement.FontStyleProperty.AddOwner(
                 typeof(RichTextBlock),
-                new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.fontStyle = ((FontStyle)newValue).ToString().ToLower();
-                    },
-                });
+                new FrameworkPropertyMetadata(
+                    FontStyles.Normal,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         /// Gets or sets the style in which the text is rendered.
@@ -170,17 +147,9 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="FontFamily"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
-            TextElementProperties.FontFamilyProperty.AddOwner(
+            TextElement.FontFamilyProperty.AddOwner(
                 typeof(RichTextBlock),
-                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.fontFamily = ((FontFamily)newValue).GetFontFace(rtb).CssFontName;
-                    },
-                });
+                new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged));
 
         /// <summary>
         /// Gets or sets the font used to display text in the control.
@@ -194,7 +163,7 @@ namespace System.Windows.Controls
 
         private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TextElementProperties.InvalidateMeasureOnFontFamilyChanged((RichTextBlock)d, (FontFamily)e.NewValue);
+            UIElementHelpers.InvalidateMeasureOnFontFamilyChanged((RichTextBlock)d, (FontFamily)e.NewValue);
         }
 
         /// <summary>
@@ -207,9 +176,7 @@ namespace System.Windows.Controls
                 typeof(RichTextBlock),
                 new FrameworkPropertyMetadata(TextWrapping.Wrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => TextBlock.ApplyTextWrapping(
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((RichTextBlock)d).INTERNAL_OuterDomElement),
-                        (TextWrapping)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetTextWrapping((TextWrapping)newValue),
                 });
 
         /// <summary>
@@ -227,25 +194,9 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="TextAlignment" /> dependency property.
         /// </summary>
         public static readonly DependencyProperty TextAlignmentProperty =
-            DependencyProperty.Register(
-                nameof(TextAlignment),
-                typeof(TextAlignment),
+            Block.TextAlignmentProperty.AddOwner(
                 typeof(RichTextBlock),
-                new PropertyMetadata(TextAlignment.Left)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.textAlign = (TextAlignment)newValue switch
-                        {
-                            TextAlignment.Center => "center",
-                            TextAlignment.Right => "end",
-                            TextAlignment.Justify => "justify",
-                            _ => "start",
-                        };
-                    },
-                });
+                new FrameworkPropertyMetadata(TextAlignment.Left, FrameworkPropertyMetadataOptions.Inherits));
 
         /// <summary>
         /// Gets or sets how the text should be aligned in the <see cref="RichTextBlock"/>.
@@ -270,16 +221,7 @@ namespace System.Windows.Controls
                 typeof(RichTextBlock),
                 new PropertyMetadata(TextTrimming.None)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.textOverflow = (TextTrimming)newValue switch
-                        {
-                            TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "ellipsis",
-                            _ => "clip",
-                        };
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetTextTrimming((TextTrimming)newValue),
                 });
 
         /// <summary>
@@ -306,12 +248,7 @@ namespace System.Windows.Controls
                 typeof(RichTextBlock),
                 new PropertyMetadata(true)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.userSelect = (bool)newValue ? "auto" : "none";
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetTextSelection((bool)newValue),
                 });
 
         /// <summary>
@@ -328,33 +265,11 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="Foreground"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ForegroundProperty =
-            DependencyProperty.Register(
-                nameof(Foreground),
-                typeof(Brush),
+            TextElement.ForegroundProperty.AddOwner(
                 typeof(RichTextBlock),
-                new PropertyMetadata(new SolidColorBrush(Colors.Black))
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(rtb);
-                        switch (newValue)
-                        {
-                            case SolidColorBrush scb:
-                                style.color = scb.INTERNAL_ToHtmlString();
-                                break;
-
-                            case null:
-                                style.color = string.Empty;
-                                break;
-
-                            default:
-                                // GradientBrush, ImageBrush and custom brushes are not supported.
-                                // Keep using old brush.
-                                break;
-                        }
-                    },
-                });
+                new FrameworkPropertyMetadata(
+                    TextElement.ForegroundProperty.DefaultMetadata.DefaultValue,
+                    FrameworkPropertyMetadataOptions.Inherits));
 
         /// <summary>
         /// Gets or sets a brush that describes the foreground color.
@@ -373,20 +288,11 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="CharacterSpacing"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CharacterSpacingProperty =
-            TextElementProperties.CharacterSpacingProperty.AddOwner(
+            TextElement.CharacterSpacingProperty.AddOwner(
                 typeof(RichTextBlock),
                 new FrameworkPropertyMetadata(
                     0,
-                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var rtb = (RichTextBlock)d;
-                        double value = (int)newValue / 1000.0;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(rtb.INTERNAL_OuterDomElement);
-                        style.letterSpacing = $"{value.ToInvariantString()}em";
-                    },
-                });
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
         /// Gets or sets the distance between characters of text in the control measured
@@ -400,6 +306,28 @@ namespace System.Windows.Controls
         {
             get => (int)GetValue(CharacterSpacingProperty);
             set => SetValue(CharacterSpacingProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="LineHeight"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LineHeightProperty =
+            Block.LineHeightProperty.AddOwner(
+                typeof(RichTextBlock),
+                new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+        /// <summary>
+        ///  Gets or sets the height of each line of content.
+        /// </summary>
+        /// <returns>
+        /// The height of each line in pixels. A value of 0 indicates that the line height
+        /// is determined automatically from the current font characteristics. The default
+        /// is 0.
+        /// </returns>
+        public double LineHeight
+        {
+            get => (double)GetValue(LineHeightProperty);
+            set => SetValue(LineHeightProperty, value);
         }
 
         /// <summary>
@@ -417,7 +345,7 @@ namespace System.Windows.Controls
         {
             if (rtb.Blocks.Count > 0)
             {
-                return TextElementProperties.GetBaseLineOffsetNative(rtb);
+                return rtb.GetBaseLineOffset();
             }
 
             return 0.0;
@@ -457,5 +385,17 @@ namespace System.Windows.Controls
         }
 
         protected override Size ArrangeOverride(Size finalSize) => finalSize;
+
+        internal sealed override int VisualChildrenCount => Blocks.Count;
+
+        internal sealed override UIElement GetVisualChild(int index)
+        {
+            if (index < 0 || index >= VisualChildrenCount)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return (Block)Blocks[index];
+        }
     }
 }

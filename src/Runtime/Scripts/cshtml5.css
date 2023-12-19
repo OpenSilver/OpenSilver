@@ -53,6 +53,10 @@ body {
     opacity: 0 !important;
 }
 
+.opensilver-hyperlink {
+    cursor: pointer;
+}
+
 .opensilver-hyperlink:hover {
     color: var(--mouse-over-color, rgb(237, 110, 0)) !important;
     text-decoration: var(--mouse-over-decoration, underline) !important;

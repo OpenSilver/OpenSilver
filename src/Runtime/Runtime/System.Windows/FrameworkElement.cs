@@ -766,22 +766,19 @@ namespace System.Windows
         /// </summary>
         public object DataContext
         {
-            get { return (object)GetValue(DataContextProperty); }
+            get { return GetValue(DataContextProperty); }
             set { SetValue(DataContextProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the <see cref="FrameworkElement.DataContext"/> dependency property.
+        /// Identifies the <see cref="DataContext"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty DataContextProperty = 
             DependencyProperty.Register(
                 nameof(DataContext),
                 typeof(object),
                 typeof(FrameworkElement),
-                new PropertyMetadata(null, OnDataContextPropertyChanged)
-                {
-                    Inherits = true
-                });
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits, OnDataContextPropertyChanged));
 
         private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -790,10 +787,7 @@ namespace System.Windows
 
         private void RaiseDataContextChangedEvent(DependencyPropertyChangedEventArgs e)
         {
-            if (this.DataContextChanged != null)
-            {
-                this.DataContextChanged(this, e);
-            }
+            DataContextChanged?.Invoke(this, e);
         }
 
         /// <summary>Occurs when the data context for this element changes. </summary>
@@ -842,7 +836,7 @@ namespace System.Windows
         /// Identifies the <see cref="FlowDirection"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FlowDirectionProperty =
-            DependencyProperty.Register(
+            DependencyProperty.RegisterAttached(
                 nameof(FlowDirection),
                 typeof(FlowDirection),
                 typeof(FrameworkElement),
@@ -858,18 +852,18 @@ namespace System.Windows
                         const string RTL = "rtl";
                         const string LTR = "ltr";
 
-                        var fe = (FrameworkElement)d;
+                        var uie = (UIElement)d;
                         var direction = (FlowDirection)newValue;
 
-                        if (VisualTreeHelper.GetParent(fe) is FrameworkElement parent
-                            && parent.FlowDirection == direction)
+                        if (VisualTreeHelper.GetParent(uie) is UIElement parent
+                            && (FlowDirection)parent.GetValue(FlowDirectionProperty) == direction)
                         {
-                            INTERNAL_HtmlDomManager.RemoveAttribute(fe.INTERNAL_OuterDomElement, DIR);
+                            INTERNAL_HtmlDomManager.RemoveAttribute(uie.INTERNAL_OuterDomElement, DIR);
                             return;
                         }
 
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                            fe.INTERNAL_OuterDomElement,
+                            uie.INTERNAL_OuterDomElement,
                             DIR,
                             direction == FlowDirection.LeftToRight ? LTR : RTL);
                     },
@@ -892,9 +886,13 @@ namespace System.Windows
 
         private static void OnFlowDirectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var fe = (FrameworkElement)d;
-            // Cache the new value as a bit to optimize accessing the FlowDirection property's CLR accessor
-            fe.IsRightToLeft = ((FlowDirection)e.NewValue) == FlowDirection.RightToLeft;
+            // Check that d is a FrameworkElement since the property inherits and this can be called
+            // on non-FEs.
+            if (d is FrameworkElement fe)
+            {
+                // Cache the new value as a bit to optimize accessing the FlowDirection property's CLR accessor
+                fe.IsRightToLeft = ((FlowDirection)e.NewValue) == FlowDirection.RightToLeft;
+            }
         }
 
         private static object CoerceFlowDirection(DependencyObject d, object baseValue)

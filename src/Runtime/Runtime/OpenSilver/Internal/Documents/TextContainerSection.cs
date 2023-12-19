@@ -11,45 +11,39 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Linq;
 using System.Windows.Documents;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Documents;
 
-internal sealed class TextContainerSection : TextContainer<Section>
+internal sealed class TextContainerSection : ITextContainer
 {
-    public TextContainerSection(Section parent)
-        : base(parent)
+    private readonly Section _section;
+
+    public TextContainerSection(Section section)
     {
+        _section = section ?? throw new ArgumentNullException(nameof(section));
     }
 
-    public override string Text
-    {
-        get
-        {
-            string text = "";
-            foreach (var block in Parent.Blocks)
-            {
-                text += block.GetContainerText() + "\\n";
-            }
+    public string Text => string.Join("\n", _section.Blocks.Select(b => b.TextContainer.Text));
 
-            return text;
+    public void OnTextAdded(TextElement textElement, int index)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_section))
+        {
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, _section, index);
         }
     }
 
-    protected override void OnTextAddedOverride(TextElement textElement)
+    public void OnTextRemoved(TextElement textElement)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(Parent))
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_section))
         {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, Parent);
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, _section);
         }
     }
 
-    protected override void OnTextRemovedOverride(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(Parent))
-        {
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, Parent);
-        }
-    }
+    public void OnTextContentChanged() { }
 }

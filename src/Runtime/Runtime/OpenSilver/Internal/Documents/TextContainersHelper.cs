@@ -19,17 +19,27 @@ namespace OpenSilver.Internal.Documents;
 
 internal static class TextContainersHelper
 {
-    public static ITextContainer FromOwner(DependencyObject parent)
-    {
-        return parent switch
+    public static ITextContainer Create(DependencyObject d) =>
+        d switch
         {
             TextBlock textBlock => new TextContainerTextBlock(textBlock),
+            Run run => new TextContainerRun(run),
             Span span => new TextContainerSpan(span),
+            LineBreak => TextContainerLineBreak.Instance,
             RichTextBlock richTextBlock => new TextContainerRichTextBlock(richTextBlock),
             Paragraph paragraph => new TextContainerParagraph(paragraph),
             Section section => new TextContainerSection(section),
             RichTextBox richTextBox => new TextContainerRichTextBox(richTextBox),
             _ => null,
         };
-    }
+
+    public static ITextContainer Get(DependencyObject d) =>
+        d switch
+        {
+            TextElement textElement => textElement.TextContainer,
+            TextBlock textBlock => textBlock.Inlines.TextContainer,
+            RichTextBlock richTextBlock => richTextBlock.Blocks.TextContainer,
+            RichTextBox richTextBox => richTextBox.Blocks.TextContainer,
+            _ => null,
+        };
 }

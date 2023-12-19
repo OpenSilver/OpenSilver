@@ -11,19 +11,19 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+/// <summary>
+/// Provides an inline-level flow content element that causes content to render with
+/// an italic font style.
+/// </summary>
+public sealed class Italic : Span
 {
     /// <summary>
-    /// Provides an inline-level content element that causes content to render with a bold font weight.
+    /// Initializes a new instance of the <see cref="Italic"/> class.
     /// </summary>
-    public sealed class Italic : Span
+    public Italic()
     {
-        /// <summary>
-        /// Initializes a new instance of the Italic class.
-        /// </summary>
-        public Italic()
-        {
-            FontStyle = FontStyles.Italic;
-        }
+        FontStyle = FontStyles.Italic;
     }
 }

@@ -13,11 +13,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Media;
@@ -124,15 +121,7 @@ internal sealed class FontFace
                     continue;
                 }
 
-                switch (uie)
-                {
-                    case TextBlock tb:
-                        tb.InvalidateCacheAndMeasure();
-                        break;
-                    default:
-                        uie.InvalidateMeasure();
-                        break;
-                }
+                UIElementHelpers.InvalidateMeasure(uie);
             }
         }
 

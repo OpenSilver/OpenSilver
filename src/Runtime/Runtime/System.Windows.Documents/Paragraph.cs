@@ -13,44 +13,56 @@
 
 using System.Windows.Markup;
 using CSHTML5.Internal;
-using OpenSilver.Internal.Documents;
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+/// <summary>
+/// Provides a block-level content element that is used to group content into a paragraph.
+/// </summary>
+[ContentProperty(nameof(Inlines))]
+public sealed class Paragraph : Block
 {
     /// <summary>
-    /// Provides a block-level content element that is used to group content into a paragraph.
+    /// Initializes a new instance of the <see cref="Paragraph"/> class.
     /// </summary>
-    [ContentProperty(nameof(Inlines))]
-    public sealed class Paragraph : Block
+    public Paragraph()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Paragraph"/> class.
-        /// </summary>
-        public Paragraph()
+        SetValue(InlinesProperty, new InlineCollection(this));
+    }
+
+    internal override string TagName => "section";
+
+    private static readonly DependencyProperty InlinesProperty =
+        DependencyProperty.Register(
+            nameof(Inlines),
+            typeof(InlineCollection),
+            typeof(Paragraph),
+            null);
+
+    /// <summary>
+    /// Gets an <see cref="InlineCollection"/> containing the top-level <see cref="Inline"/>
+    /// elements that include the contents of the <see cref="Paragraph"/>.
+    /// </summary>
+    public InlineCollection Inlines => (InlineCollection)GetValue(InlinesProperty);
+
+    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    {
+        base.INTERNAL_OnAttachedToVisualTree();
+        foreach (var inline in Inlines)
         {
-            Inlines = new InlineCollection(this);
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(inline, this);
+        }
+    }
+
+    internal sealed override int VisualChildrenCount => Inlines.Count;
+
+    internal sealed override UIElement GetVisualChild(int index)
+    {
+        if (index >= VisualChildrenCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        internal override string TagName => "section";
-
-        /// <summary>
-        /// Gets an <see cref="InlineCollection"/> containing the top-level <see cref="Inline"/>
-        /// elements that include the contents of the <see cref="Paragraph"/>.
-        /// </summary>
-        public InlineCollection Inlines { get; }
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-            foreach (var inline in Inlines)
-            {
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(inline, this);
-            }
-        }
-
-        internal override string GetContainerText()
-        {
-            return new TextContainerParagraph(this).Text;
-        }
+        return Inlines[index];
     }
 }

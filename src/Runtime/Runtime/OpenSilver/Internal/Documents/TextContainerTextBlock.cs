@@ -12,62 +12,39 @@
 \*====================================================================================*/
 
 using System;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Documents;
 
-internal sealed class TextContainerTextBlock : TextContainer<TextBlock>
+internal sealed class TextContainerTextBlock : ITextContainer
 {
-    internal TextContainerTextBlock(TextBlock parent)
-        : base(parent)
+    private readonly TextBlock _textblock;
+
+    internal TextContainerTextBlock(TextBlock tb)
     {
+        _textblock = tb ?? throw new ArgumentNullException(nameof(tb));
     }
 
-    public override string Text
+    public string Text => string.Join(string.Empty, _textblock.Inlines.Select(i => i.TextContainer.Text));
+
+    public void OnTextContentChanged() => _textblock.OnTextContentChanged();
+
+    public void OnTextAdded(TextElement textElement, int index)
     {
-        get
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_textblock))
         {
-            string text = string.Empty;
-            foreach (Inline inline in Parent.Inlines)
-            {
-                if (inline is Run)
-                {
-                    text += ((Run)inline).Text;
-                }
-                else if (inline is Span)
-                {
-                    text += new TextContainerSpan(((Span)inline)).Text;
-                }
-                else
-                {
-                    //do nothing
-                    //note: should we throw an exception ?
-                }
-            }
-            return text;
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, _textblock, index);
         }
     }
 
-    public override void EndChange()
+    public void OnTextRemoved(TextElement textElement)
     {
-        Parent.OnTextContentChanged();
-    }
-
-    protected override void OnTextAddedOverride(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(Parent))
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(_textblock))
         {
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(textElement, Parent);
-        }
-    }
-
-    protected override void OnTextRemovedOverride(TextElement textElement)
-    {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(Parent))
-        {
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, Parent);
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(textElement, _textblock);
         }
     }
 }

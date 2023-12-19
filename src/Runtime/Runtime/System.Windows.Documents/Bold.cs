@@ -11,19 +11,19 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Documents
+namespace System.Windows.Documents;
+
+/// <summary>
+/// Provides an inline-level content element that causes content to render with a
+/// bold font weight.
+/// </summary>
+public sealed class Bold : Span
 {
     /// <summary>
-    /// Provides an inline-level content element that causes content to render with a bold font weight.
+    /// Initializes a new instance of the <see cref="Bold"/> class.
     /// </summary>
-    public sealed class Bold : Span
+    public Bold()
     {
-        /// <summary>
-        /// Initializes a new instance of the Bold class.
-        /// </summary>
-        public Bold()
-        {
-            FontWeight = FontWeights.Bold;
-        }
+        FontWeight = FontWeights.Bold;
     }
 }

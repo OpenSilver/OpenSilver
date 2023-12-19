@@ -112,7 +112,7 @@ namespace System.Windows.Controls
                 typeof(UIElement),
                 new PropertyMetadata(0)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetZIndexNative((UIElement)d, (int)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetZIndexNative((int)newValue),
                 });
 
         /// <summary>
@@ -128,16 +128,6 @@ namespace System.Windows.Controls
         /// <param name="element">The object from which the property value is read.</param>
         /// <returns>The Canvas.ZIndex XAML attached property value of the specified object.</returns>
         public static int GetZIndex(UIElement element) => (int)element.GetValue(ZIndexProperty);
-
-        internal static void SetZIndexNative(UIElement uie, int value)
-        {
-            Debug.Assert(uie is not null);
-            if (uie is not TextElement)
-            {
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
-                style.zIndex = value.ToInvariantString();
-            }
-        }
 
         protected override Size MeasureOverride(Size availableSize)
         {

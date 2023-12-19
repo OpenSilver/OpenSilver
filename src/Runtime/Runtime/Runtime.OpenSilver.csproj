@@ -35,9 +35,11 @@
 		<Compile Include="OpenSilver\Internal\INTERNAL_PropertyStore.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\EmptyEnumerator.cs" />
 		<Compile Include="OpenSilver\Internal\InheritablePropertyChangeInfo.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerLineBreak.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBox.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerParagraph.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBlock.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerRun.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerSection.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainer.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainersHelper.cs" />
@@ -65,6 +67,7 @@
 		<Compile Include="OpenSilver\Internal\Media\Animation\TimelineClock.cs" />
 		<Compile Include="OpenSilver\Internal\Media\ISvgBrush.cs" />
 		<Compile Include="OpenSilver\Internal\NamedObject.cs" />
+		<Compile Include="OpenSilver\Internal\UIElementHelpers.cs" />
 		<Compile Include="OpenSilver\Internal\ValidateValueCallback.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
@@ -278,7 +281,6 @@
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\ObservableObjectCollection.cs" />
-		<Compile Include="System.Windows.Documents\TextElementProperties.cs" />
 		<Compile Include="System.Windows.input\KeyboardNavigation.cs" />
 		<Compile Include="System.Windows.input\TraversalRequest.cs" />
 		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
@@ -482,7 +484,7 @@
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\LogicalDirection.cs" />
 		<Compile Include="System.Windows.Documents\Paragraph.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Section.cs" />
+		<Compile Include="System.Windows.Documents\Section.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\TextPointer.cs" />
 		<Compile Include="System.Windows.Documents\TextSelection.cs" />
 		<Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />

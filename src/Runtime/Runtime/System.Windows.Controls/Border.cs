@@ -170,7 +170,7 @@ namespace System.Windows.Controls
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var border = (Border)d;
-                        _ = Panel.RenderBackgroundAsync(border, (Brush)newValue);
+                        _ = border.SetBackgroundAsync((Brush)newValue);
                         SetPointerEvents(border);
                     },
                 });
@@ -217,7 +217,7 @@ namespace System.Windows.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                _ = Panel.RenderBackgroundAsync(this, (Brush)sender);
+                _ = this.SetBackgroundAsync((Brush)sender);
             }
         }
 
@@ -226,7 +226,7 @@ namespace System.Windows.Controls
             var b = (Border)sender;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(b))
             {
-                _ = Panel.RenderBackgroundAsync(b, b.Background);
+                _ = b.SetBackgroundAsync(b.Background);
             }
         }
 

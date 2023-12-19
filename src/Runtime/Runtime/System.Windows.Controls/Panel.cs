@@ -260,7 +260,7 @@ namespace System.Windows.Controls
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var panel = (Panel)d;
-                        _ = RenderBackgroundAsync(panel, (Brush)newValue);
+                        _ = panel.SetBackgroundAsync((Brush)newValue);
                         SetPointerEvents(panel);
                     },
                 });
@@ -307,7 +307,7 @@ namespace System.Windows.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                _ = RenderBackgroundAsync(this, (Brush)sender);
+                _ = this.SetBackgroundAsync((Brush)sender);
             }
         }
 
@@ -316,16 +316,8 @@ namespace System.Windows.Controls
             var p = (Panel)sender;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(p))
             {
-                _ = RenderBackgroundAsync(p, p.Background);
+                _ = p.SetBackgroundAsync(p.Background);
             }
-        }
-
-        internal static async Task RenderBackgroundAsync(UIElement uie, Brush brush)
-        {
-            Debug.Assert(uie != null);
-            
-            string background = brush is not null ? await brush.GetDataStringAsync(uie) : string.Empty;
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement).background = background;
         }
 
         /// <summary>

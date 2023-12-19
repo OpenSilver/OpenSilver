@@ -614,8 +614,8 @@ namespace System.Windows
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var uie = (UIElement)d;
-                        SetTransform(uie, (Transform)newValue);
-                        SetTransformOrigin(uie, uie.RenderTransformOrigin);
+                        uie.SetTransform((Transform)newValue);
+                        uie.SetTransformOrigin(uie.RenderTransformOrigin);
                     }
                 });
 
@@ -656,7 +656,7 @@ namespace System.Windows
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                SetTransform(this, (Transform)sender);
+                this.SetTransform((Transform)sender);
             }
         }
 
@@ -672,7 +672,7 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(new Point(0, 0))
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetTransformOrigin((UIElement)d, (Point)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetTransformOrigin((Point)newValue),
                 });
 
         /// <summary>
@@ -686,22 +686,6 @@ namespace System.Windows
         {
             get => (Point)GetValue(RenderTransformOriginProperty);
             set => SetValue(RenderTransformOriginProperty, value);
-        }
-
-        private static void SetTransform(UIElement uie, Transform transform)
-        {
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
-            style.transform = transform switch
-            {
-                Transform when !transform.IsIdentity => MatrixTransform.MatrixToHtmlString(transform.ValueInternal),
-                _ => string.Empty,
-            };
-        }
-
-        private static void SetTransformOrigin(UIElement uie, Point origin)
-        {
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
-            style.transformOrigin = $"{(origin.X * 100).ToInvariantString()}% {(origin.Y * 100).ToInvariantString()}%";
         }
 
 #endregion
@@ -972,14 +956,8 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(1.0)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetOpacity((UIElement)d, (double)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetOpacity((double)newValue),
                 });
-
-        private static void SetOpacity(UIElement uie, double opacity)
-        {
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
-            style.opacity = Math.Round(opacity, 3).ToInvariantString();
-        }
 
 #endregion
 
@@ -1089,8 +1067,7 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.AllowDrop"/> dependency 
-        /// property.
+        /// Identifies the <see cref="AllowDrop"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty AllowDropProperty =
             DependencyProperty.Register(
@@ -1256,10 +1233,6 @@ namespace System.Windows
 
             return current == ancestor;
         }
-
-        //internal virtual void INTERNAL_Render()
-        //{
-        //}
 
         #region ForceInherit property support
 
