@@ -107,8 +107,13 @@ namespace OpenSilver.Internal
 
                 string sText = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(text);
 
-                Interop.ExecuteJavaScriptVoid(
-                    $"navigator.clipboard.writeText({sText}).then(() => {sCallback}(true), () => {sCallback}(false));",
+                // As Mozilla Firefox doesn't support navigator.clipboard.readText, it saves to latestPaste_Firefox when writeText
+                Interop.ExecuteJavaScriptVoid(@$"
+navigator.clipboard.writeText({sText}).then(() => {{
+    if (!navigator.clipboard.readText)
+        this.latestPaste_Firefox = {sText}
+    {sCallback}(true);
+}}, () => {sCallback}(false));",
                     false);
 
                 return tcs.Task;
@@ -134,10 +139,15 @@ namespace OpenSilver.Internal
                         }
                     }));
 
-                Interop.ExecuteJavaScriptVoid(
-                    $"navigator.clipboard.readText().then(text => {sCallback}(text, true), () => {sCallback}('', false));",
+                Interop.ExecuteJavaScriptVoid(@$"
+if (navigator.clipboard.readText)
+    navigator.clipboard.readText().then(text => {sCallback}(text, true), () => {sCallback}('', false));
+else
+    setTimeout(() => {{
+        {sCallback}(this.latestPaste_Firefox ? this.latestPaste_Firefox : '', true)
+    }}, 0)
+",
                     false);
-
                 return tcs.Task;
             }
 
@@ -151,8 +161,15 @@ namespace OpenSilver.Internal
                 string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
                     JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<bool>(b => tcs.SetResult(b)));
 
-                Interop.ExecuteJavaScriptVoid(
-                    $"navigator.clipboard.readText().then(text => {sCallback}(!!text), () => {sCallback}(false));",
+                // As Mozilla Firefox doesn't support navigator.clipboard.readText, it saves to latestPaste_Firefox when writeText
+                Interop.ExecuteJavaScriptVoid($@"
+if (navigator.clipboard.readText)
+    navigator.clipboard.readText().then(text => {sCallback}(!!text), () => {sCallback}(false));
+else
+    setTimeout(() => {{
+        {sCallback}(!!this.latestPaste_Firefox)
+    }}, 0);
+",
                     false);
 
                 return tcs.Task;
