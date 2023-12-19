@@ -709,7 +709,18 @@ namespace System.Windows
         {
             if (newParent == null)
             {
-                d.ResetInheritedProperties();
+                foreach (var kvp in d.INTERNAL_AllInheritedProperties.ToArray())
+                {
+                    DependencyProperty dp = kvp.Key;
+                    INTERNAL_PropertyStorage storage = kvp.Value;
+
+                    INTERNAL_PropertyStore.SetInheritedValue(storage,
+                        d,
+                        dp,
+                        dp.GetMetadata(d.DependencyObjectType),
+                        DependencyProperty.UnsetValue,
+                        false); // recursively
+                }
             }
             else
             {
@@ -727,29 +738,6 @@ namespace System.Windows
                             INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved),
                             true);
                     }
-                }
-            }
-        }
-
-        private void ResetInheritedProperties()
-        {
-            foreach (var kvp in INTERNAL_AllInheritedProperties.ToArray())
-            {
-                DependencyProperty dp = kvp.Key;
-                INTERNAL_PropertyStorage storage = kvp.Value;
-                
-                INTERNAL_PropertyStore.SetInheritedValue(storage,
-                    this,
-                    dp,
-                    dp.GetMetadata(DependencyObjectType),
-                    DependencyProperty.UnsetValue,
-                    false); // recursively
-
-                if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default)
-                {
-                    // Remove storage if the effective value is the default value.
-                    INTERNAL_AllInheritedProperties.Remove(dp);
-                    INTERNAL_PropertyStorageDictionary.Remove(dp);
                 }
             }
         }

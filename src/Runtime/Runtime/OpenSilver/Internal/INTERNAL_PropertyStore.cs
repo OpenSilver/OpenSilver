@@ -789,7 +789,14 @@ internal static class INTERNAL_PropertyStore
             d.ProvideSelfAsInheritanceContext(newValue, null);
         }
 
-        storage.Entry = newEntry;
+        if (newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
+        {
+            RemoveStorage(d, dp, metadata);
+        }
+        else
+        {
+            storage.Entry = newEntry;
+        }
 
         bool valueChanged = !Equals(dp, oldValue, newValue);
         if (valueChanged)
@@ -824,6 +831,15 @@ internal static class INTERNAL_PropertyStore
             }
 
             newEntry.SetCoercedValue(coercedValue, coerceWithCurrentValue);
+        }
+    }
+
+    private static void RemoveStorage(DependencyObject d, DependencyProperty dp, PropertyMetadata metadata)
+    {
+        d.INTERNAL_PropertyStorageDictionary.Remove(dp);
+        if (metadata != null && metadata.Inherits)
+        {
+            d.INTERNAL_AllInheritedProperties.Remove(dp);
         }
     }
 
