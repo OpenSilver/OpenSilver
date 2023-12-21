@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,20 +11,18 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System
 {
     /// <summary>
     /// Indicates that a class can be serialized. This class cannot be inherited.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use System.SerializableAttribute instead.")]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
-    public sealed partial class Serializable2Attribute : Attribute
+    public sealed class Serializable2Attribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the System.SerializableAttribute class.

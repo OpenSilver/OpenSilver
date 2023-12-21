@@ -92,17 +92,13 @@ namespace System.Runtime.Serialization
             {
                 this._knownTypes = new List<Type>(knownTypes);
             }
-            if (KnownTypesHelper._additionalKnownTypes != null)
+            if (this._knownTypes == null)
             {
-                if (this._knownTypes == null)
-                {
-                    this._knownTypes = new List<Type>(KnownTypesHelper._additionalKnownTypes);
-                }
-                else
-                {
-                    this._knownTypes.AddRange(KnownTypesHelper._additionalKnownTypes);
-                }
-
+                this._knownTypes = new List<Type>(KnownTypesHelper.KnownTypes);
+            }
+            else
+            {
+                this._knownTypes.AddRange(KnownTypesHelper.KnownTypes);
             }
             if (this._useXmlSerializerFormat = useXmlSerializerFormat)
             {

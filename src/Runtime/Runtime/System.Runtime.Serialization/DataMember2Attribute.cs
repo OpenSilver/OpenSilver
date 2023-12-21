@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System.Runtime.Serialization
 {
@@ -25,8 +20,10 @@ namespace System.Runtime.Serialization
     /// When applied to the member of a type, specifies that the member is part of
     /// a data contract and is serializable by the DataContractSerializer.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Runtime.Serialization.DataMemberAttribute instead.")]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    public sealed partial class DataMember2Attribute : Attribute
+    public sealed class DataMember2Attribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the DataMemberAttribute

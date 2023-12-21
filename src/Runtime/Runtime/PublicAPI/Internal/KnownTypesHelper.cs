@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,17 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace CSHTML5.Internal
 {
     public static class KnownTypesHelper
     {
-        internal static HashSet<Type> _additionalKnownTypes = new HashSet<Type>();
+        private static readonly HashSet<Type> _additionalKnownTypes = new();
 
-        public static void AddKnownType(Type knownType)
-        {
-            if (!_additionalKnownTypes.Contains(knownType))
-                _additionalKnownTypes.Add(knownType);
-        }
+        public static void AddKnownType(Type knownType) => _additionalKnownTypes.Add(knownType);
+
+        internal static IEnumerable<Type> KnownTypes => _additionalKnownTypes;
     }
 }

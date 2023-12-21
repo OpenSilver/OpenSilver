@@ -30,6 +30,7 @@ using System.Windows;
 using CSHTML5.Internal;
 using static System.ServiceModel.INTERNAL_WebMethodsCaller;
 using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer_CSHTML5Ver;
+using System.Globalization;
 
 namespace System.ServiceModel
 {
@@ -419,6 +420,9 @@ namespace System.ServiceModel
         /// </summary>
         public partial class WebMethodsCaller
         {
+            private const string XMLSCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance"; // Usually associated to the "xsi:" prefix.
+            private const string DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE = "http://schemas.datacontract.org/2004/07/";
+
             string _addressOfService;
 
             INTERNAL_WebRequestHelper_JSOnly _webRequestHelper_JSVersion = new INTERNAL_WebRequestHelper_JSOnly();
@@ -1247,9 +1251,7 @@ namespace System.ServiceModel
                                 new XElement(XNamespace.Get(interfaceTypeNamespace)
                                                        .GetName(parameterInfos[i].Name));
                             XAttribute attribute =
-                                new XAttribute(XNamespace.Get(DataContractSerializer_Helpers.XMLSCHEMA_NAMESPACE)
-                                                         .GetName("nil"),
-                                               "true");
+                                new XAttribute(XNamespace.Get(XMLSCHEMA_NAMESPACE).GetName("nil"), "true");
                             paramNameElement.Add(attribute);
                             methodNameElement.Add(paramNameElement);
                         }
@@ -1398,7 +1400,7 @@ namespace System.ServiceModel
                             {
                                 bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
                                     attr.Namespace == name.NamespaceName :
-                                    DataContractSerializer_Helpers.GetDefaultNamespace(type.Namespace, useXmlSerializerFormat) == name.NamespaceName;
+                                    GetDefaultNamespace(type.Namespace, useXmlSerializerFormat) == name.NamespaceName;
 
                                 if (namespaceMatch)
                                     return type;
@@ -1649,7 +1651,7 @@ namespace System.ServiceModel
                         if (typeToDeserialize.GetCustomAttribute<MessageContractAttribute>() != null)
                         {
                             // DataContractSerializer needs correct namespace instead of http://tempuri.org/
-                            XNamespace ns = DataContractSerializer_Helpers.GetDefaultNamespace(typeToDeserialize.Namespace, false);
+                            XNamespace ns = GetDefaultNamespace(typeToDeserialize.Namespace, false);
                             xElement.Name = ns + xElement.Name.LocalName;
                             xElement.Attributes("xmlns").Remove();
                             foreach (var childElement in xElement.Elements())
@@ -1718,7 +1720,7 @@ namespace System.ServiceModel
                         else if (requestResponseType == typeof(char) || requestResponseType == typeof(char?))
                             requestResponse = (char)(int.Parse(responseAsString)); //todo: support encodings
                         else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
-                            requestResponse = INTERNAL_DateTimeHelpers.ToDateTime(responseAsString); //todo: ensure this is the culture-invariant parsing!
+                            requestResponse = DateTime.Parse(responseAsString, CultureInfo.InvariantCulture);
                         else if (requestResponseType.IsEnum)
                             requestResponse = Enum.Parse(requestResponseType, responseAsString);
                         else if (requestResponseType == typeof(void))
@@ -1754,6 +1756,13 @@ namespace System.ServiceModel
                 }
             }
 
+            private static string GetDefaultNamespace(string typeNamespace, bool useXmlSerializerFormat)
+            {
+                if (useXmlSerializerFormat)
+                    return null;
+                else
+                    return DATACONTRACTSERIALIZER_OBJECT_DEFAULT_NAMESPACE + typeNamespace;
+            }
         }
 
         #region work in progress
