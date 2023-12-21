@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,45 +12,36 @@
 *  
 \*====================================================================================*/
 
-
+extern alias opensilver;
 
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Windows.Controls;
 using System.Windows;
 using System.Collections;
 using DotNetForHtml5.EmulatorWithoutJavascript;
 using System.Globalization;
+using UIElement = opensilver::System.Windows.UIElement;
 
 namespace OpenSilver.Simulator.XamlInspection
 {
     internal static class XamlInspectionHelper
     {
-        private static MethodInfo _GetUIElementFromDomElement;
-        private static MethodInfo _OpenSilverExecuteJavaScript;
-        private static MethodInfo _GetVisualParent;
-        private static Dictionary<object, TreeNode> _XamlSourcePathNodes;
+        private static Dictionary<UIElement, TreeNode> _XamlSourcePathNodes;
 
         public static bool TryInitializeTreeView(TreeView treeView)
         {
-            _XamlSourcePathNodes = new Dictionary<object, TreeNode>();
-            IEnumerable treeRootElements = GetVisualTreeRootElements();
-            if (treeRootElements != null)
+            _XamlSourcePathNodes = new Dictionary<UIElement, TreeNode>();
+            treeView.Items.Clear();
+            
+            foreach (UIElement treeRootElement in GetVisualTreeRootElements().OfType<UIElement>())
             {
-                treeView.Items.Clear();
-
-                foreach (object treeRootElement in treeRootElements)
-                {
-                    treeView.Items.Add(RecursivelyAddElementsToTree(treeRootElement, false, null, 6, true));
-                }
-
-                return true;
+                treeView.Items.Add(RecursivelyAddElementsToTree(treeRootElement, false, null, 6, true));
             }
-            else
-                return false;
+
+            return true;
         }
 
-        public static TreeNode RecursivelyAddElementsToTree(dynamic uiElement, bool alreadyInsertedANodeForXamlSourcePath, TreeNode parentNode, int maxTreeLevel, bool includeEntryElement)
+        public static TreeNode RecursivelyAddElementsToTree(UIElement uiElement, bool alreadyInsertedANodeForXamlSourcePath, TreeNode parentNode, int maxTreeLevel, bool includeEntryElement)
         {
             // If the element is a XAML root element (that is, if its "XamlSourcePath" property has been filled), we add a node to the tree that tells us in which XAML file the element is defined:
             string xamlSourcePathOrNull = alreadyInsertedANodeForXamlSourcePath ? null : GetXamlSourcePathOrNullFromElement(uiElement); ;
@@ -90,7 +80,7 @@ namespace OpenSilver.Simulator.XamlInspection
                 {
                     treeNode = new TreeNode()
                     {
-                        Element = (object)uiElement,
+                        Element = uiElement,
                         Title = GetTitleFromElement(uiElement),
                         Name = GetNameOrNullFromElement(uiElement),
                         Children = new ObservableCollection<TreeNode>(),
@@ -103,32 +93,27 @@ namespace OpenSilver.Simulator.XamlInspection
                 }
                 treeNode.AreChildrenLoaded = true;
                 // Handle the children recursively:
-                if (uiElement.VisualChildrenInformation is IDictionary visualChildrenInformation)
+                if (uiElement.VisualChildrenInformation != null)
                 {
                     if (currMaxLevel > 0 || maxTreeLevel == -1)
                     {
                         if (maxTreeLevel != -1) currMaxLevel--;
-                        foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "VisualChildInformation" in the "Core" assembly.
+                        foreach (UIElement child in uiElement.VisualChildrenInformation.Keys)
                         {
-                            var childElement = item;
-                            if (childElement != null)
-                            {
-                                if (treeNode.Title == "Window" && (GetTitleFromElement(childElement) == "TextBlock" || GetTitleFromElement(childElement) == "TextBox"))
-                                    return treeNode;
+                            if (treeNode.Title == "Window" && (GetTitleFromElement(child) == "TextBlock" || GetTitleFromElement(child) == "TextBox"))
+                                return treeNode;
 
-                                TreeNode childNode;
+                            TreeNode childNode;
 
-                                if (_XamlSourcePathNodes.ContainsKey(childElement))
-                                    childNode = (_XamlSourcePathNodes[childElement] as TreeNode).Children.SingleOrDefault(nd => nd.Element == childElement);
-                                else
-                                    childNode = treeNode.Children.SingleOrDefault(nd => nd.Element == childElement);
+                            if (_XamlSourcePathNodes.ContainsKey(child))
+                                childNode = _XamlSourcePathNodes[child].Children.SingleOrDefault(nd => nd.Element == child);
+                            else
+                                childNode = treeNode.Children.SingleOrDefault(nd => nd.Element == child);
 
-                                if (childNode == null)
-                                    treeNode.Children.Add(RecursivelyAddElementsToTree(childElement, isNodeForXamlSourcePath, treeNode, currMaxLevel, true));
-                                else
-                                    RecursivelyAddElementsToTree(childElement, isNodeForXamlSourcePath, childNode, currMaxLevel, false);
-
-                            }
+                            if (childNode == null)
+                                treeNode.Children.Add(RecursivelyAddElementsToTree(child, isNodeForXamlSourcePath, treeNode, currMaxLevel, true));
+                            else
+                                RecursivelyAddElementsToTree(child, isNodeForXamlSourcePath, childNode, currMaxLevel, false);
                         }
                     }
                     else
@@ -138,7 +123,7 @@ namespace OpenSilver.Simulator.XamlInspection
             return treeNode;
         }
 
-        public static TreeNode AddElementBranchToTree(List<dynamic> elementBranch, TreeNode parentNode)
+        public static TreeNode AddElementBranchToTree(List<UIElement> elementBranch, TreeNode parentNode)
         {
             //elementBranch arg is a branch starting from lowest leaf and going up
 
@@ -151,28 +136,27 @@ namespace OpenSilver.Simulator.XamlInspection
                 parentNode.AreChildrenLoaded = true;
                 var parentElement = elementBranch[i];
 
-                if (parentElement.VisualChildrenInformation is IDictionary visualChildrenInformation)
+                if (parentElement.VisualChildrenInformation != null)
                 {
-                    foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "VisualChildInformation" in the "Core" assembly.
+                    foreach (UIElement child in parentElement.VisualChildrenInformation.Keys)
                     {
-                        var childElement = item;
-                        if (childElement != null)
+                        var treeNode = new TreeNode()
                         {
-                            var treeNode = new TreeNode()
-                            {
-                                Element = (object)childElement,
-                                Title = GetTitleFromElement(childElement),
-                                Name = GetNameOrNullFromElement(childElement),
-                                Children = new ObservableCollection<TreeNode>(),
-                                Parent = parentNode,
-                                AreChildrenLoaded = childElement.VisualChildrenInformation == null || 
-                                    (childElement.VisualChildrenInformation is IDictionary children && children.Count == 0)
-                            };
-                            parentNode.Children.Add(treeNode);
-                            if (childElement.Equals(elementBranch[i - 1]))
-                                leafNode = treeNode;
-                            if (i == 1 && childElement.Equals(elementBranch[0]))
-                                lastLeafNode = treeNode;
+                            Element = child,
+                            Title = GetTitleFromElement(child),
+                            Name = GetNameOrNullFromElement(child),
+                            Children = new ObservableCollection<TreeNode>(),
+                            Parent = parentNode,
+                            AreChildrenLoaded = child.VisualChildrenInformation == null || child.VisualChildrenInformation.Count == 0,
+                        };
+                        parentNode.Children.Add(treeNode);
+                        if (child == elementBranch[i - 1])
+                        {
+                            leafNode = treeNode;
+                        }
+                        if (i == 1 && child == elementBranch[0])
+                        {
+                            lastLeafNode = treeNode;
                         }
                     }
                     parentNode = leafNode;
@@ -204,178 +188,55 @@ namespace OpenSilver.Simulator.XamlInspection
             }
         }
 
-        static string GetTitleFromElement(dynamic uiElement)
+        private static string GetTitleFromElement(UIElement uiElement)
         {
             if (uiElement != null)
             {
-                var type = uiElement.GetType();
-                if (type is Type)
-                {
-                    return ((Type)type).Name;
-                }
-                else
-                    return "[UNKNOWN ELEMENT]";
+                return uiElement.GetType().Name;
             }
             else
+            {
                 return "[UNKNOWN ELEMENT]";
+            }
         }
 
-        static string GetNameOrNullFromElement(dynamic uiElement)
+        private static string GetNameOrNullFromElement(UIElement uiElement)
         {
             if (uiElement != null)
             {
-                var type = uiElement.GetType();
-                if (type is Type)
-                {
-                    var propertyInfo = ((Type)type).GetProperty("Name");
-                    if (propertyInfo != null)
-                        return propertyInfo.GetValue(uiElement);
-                    else
-                        return null;
-                }
-                else
-                    return null;
+                return (string)uiElement.GetValue(opensilver::System.Windows.FrameworkElement.NameProperty);
             }
             else
+            {
                 return null;
+            }
         }
 
-        static string GetXamlSourcePathOrNullFromElement(dynamic uiElement)
+        private static string GetXamlSourcePathOrNullFromElement(UIElement uiElement)
         {
-            const string xamlSourcePathMemberName = "XamlSourcePath";
             if (uiElement != null)
             {
-                var type = uiElement.GetType();
-                if (type is Type)
-                {
-                    var propertyInfo = ((Type)type).GetProperty(xamlSourcePathMemberName);
-                    if (propertyInfo != null)
-                    {
-                        return propertyInfo.GetValue(uiElement);
-                    }
-                    else
-                    {
-                        var fieldInfo = ((Type)type).GetField(xamlSourcePathMemberName);
-                        if (fieldInfo != null)
-                        {
-                            return fieldInfo.GetValue(uiElement);
-                        }
-                        else
-                            return null;
-                    }
-                }
-                else
-                    return null;
+                return uiElement.XamlSourcePath;
             }
             else
+            {
                 return null;
+            }
         }
 
-        static IEnumerable GetVisualTreeRootElements()
+        private static IEnumerable GetVisualTreeRootElements()
         {
-            // Find the "Core" assembly among the loaded assemblies:
-            //Assembly coreAssembly =
-            //    (from a in AppDomain.CurrentDomain.GetAssemblies()
-            //     where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
-            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
-            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
-            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
-            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
-            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR
-            //     select a).FirstOrDefault();
-            if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
-            {
-                // Find the type "PopupsManager" in Core:
-                Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "DotNetForHtml5.Core" && type.Name == "PopupsManager") select type).FirstOrDefault();
-                if (manager != null)
-                {
-                    // Call the "GetAllRootUIElements" method:
-                    var methodInfo = manager.GetMethod("GetAllRootUIElements", BindingFlags.Public | BindingFlags.Static);
-                    if (methodInfo != null)
-                    {
-                        var rootElements = methodInfo.Invoke(null, null);
-                        if (rootElements is IEnumerable)
-                        {
-                            return (IEnumerable)rootElements;
-                        }
-                        else
-                            return null;
-                    }
-                    else
-                        return null;
-                }
-                else
-                    return null;
-            }
-            else
-                return null;
+            return opensilver::DotNetForHtml5.Core.PopupsManager.GetAllRootUIElements();
         }
 
-        static object GetVisualParent(object uiElement)
+        private static UIElement GetVisualParent(UIElement uiElement)
         {
-            if (_GetVisualParent == null)
-            {
-                // Find the "Core" assembly among the loaded assemblies:
-                //Assembly coreAssembly =
-                //    (from a in AppDomain.CurrentDomain.GetAssemblies()
-                //     where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
-                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR
-                //     select a).FirstOrDefault();
-
-                if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
-                {
-                    var visualTreeHelperType = coreAssembly.GetType("System.Windows.Media.VisualTreeHelper");
-                    _GetVisualParent = visualTreeHelperType
-                        .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                        .Where(method =>
-                        {
-                            if (method.Name == "GetParent")
-                            {
-                                var parameters = method.GetParameters();
-                                if (parameters.Length == 1 &&
-                                    parameters[0].ParameterType.Name == nameof(DependencyObject))
-                                {
-                                    return true;
-                                }
-                            }
-
-                            return false;
-                        })
-                        .Single();
-                }
-            }
-            return _GetVisualParent.Invoke(null, new object[] { uiElement });
+            return opensilver::System.Windows.Media.VisualTreeHelper.GetParent(uiElement) as UIElement;
         }
 
-        public static object GetVisualElementAtPoint(Point coordinates)
+        public static UIElement GetVisualElementAtPoint(Point coordinates)
         {
-            if (_OpenSilverExecuteJavaScript == null)
-            {
-                if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
-                {
-                    Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "OpenSilver" && type.Name == "Interop") select type).FirstOrDefault();
-                    _OpenSilverExecuteJavaScript = manager.GetMethod(
-                        "ExecuteJavaScript",
-                        new Type[] { typeof(string) });
-                }
-            }
-
-            if (_GetUIElementFromDomElement == null)
-            {
-                if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
-                {
-                    Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "CSHTML5.Internal" && type.Name == "INTERNAL_HtmlDomManager") select type).FirstOrDefault();
-                    _GetUIElementFromDomElement = manager.GetMethod("GetUIElementFromDomElement_UsedBySimulatorToo", BindingFlags.NonPublic | BindingFlags.Static);
-                }
-            }
-
-            if (_OpenSilverExecuteJavaScript != null && _GetUIElementFromDomElement != null)
-            {
-                string js = $@"
+            string js = $@"
 (function(){{
     var domElementsAtCoordinates = document.elementsFromPoint({coordinates.X.ToString(CultureInfo.InvariantCulture)}, {coordinates.Y.ToString(CultureInfo.InvariantCulture)});
     if (!domElementsAtCoordinates || domElementsAtCoordinates.length == 0)
@@ -392,22 +253,18 @@ namespace OpenSilver.Simulator.XamlInspection
         return domElementsAtCoordinates.length > 1 ? domElementsAtCoordinates[1] : null;
     }}
     return firstItem;
-}}())
-                ";
-                var domRef = _OpenSilverExecuteJavaScript.Invoke(null, new string[] { js }); 
-                var element = _GetUIElementFromDomElement.Invoke(null, new object[] { domRef });
-                if (domRef is IDisposable disposable) disposable.Dispose();
-                return element;
-            }
-
-            return null;
+}}())";
+            IDisposable domRef = opensilver::OpenSilver.Interop.ExecuteJavaScript(js);
+            UIElement element = opensilver::CSHTML5.Internal.INTERNAL_HtmlDomManager.GetUIElementFromDomElement_UsedBySimulatorToo(domRef);
+            domRef?.Dispose();
+            return element;
         }
 
-        public static void HighlightElementUsingJS(object uiElement, int highlightClr)
+        public static void HighlightElementUsingJS(UIElement uiElement, int highlightClr)
         {
             if (uiElement != null)
             {
-                string uniqueIdentifier = (((dynamic)uiElement).OuterDiv).UniqueIdentifier.ToString();
+                string uniqueIdentifier = ((opensilver::CSHTML5.Internal.INTERNAL_HtmlDomElementReference)uiElement.OuterDiv).UniqueIdentifier;
                 uniqueIdentifier = uniqueIdentifier != null ? $"'{uniqueIdentifier}'" : "null";
                 SimulatorProxy.OpenSilverRuntimeDispatcher.BeginInvoke(() =>
                 {
@@ -433,7 +290,7 @@ namespace OpenSilver.Simulator.XamlInspection
             });
         }
 
-        private static async Task<object> GetElementAtPoint(int x, int y)
+        private static async Task<UIElement> GetElementAtPoint(int x, int y)
         {
             var element = await SimulatorProxy.OpenSilverRuntimeDispatcher.InvokeAsync(() =>
             {
@@ -445,13 +302,13 @@ namespace OpenSilver.Simulator.XamlInspection
 
         public static async void HighlightElementAtPoint(int x, int y)
         {
-            XamlInspectionHelper.HighlightElementUsingJS(await GetElementAtPoint(x, y), 1);
+            HighlightElementUsingJS(await GetElementAtPoint(x, y), 1);
         }
 
         public static async void SelectElementAtPoint(int x, int y)
         {
-            var element = await GetElementAtPoint(x, y);
-            XamlInspectionHelper.HighlightElementUsingJS(element, 2);
+            UIElement element = await GetElementAtPoint(x, y);
+            HighlightElementUsingJS(element, 2);
 
             if (element != null)
             {
@@ -461,8 +318,7 @@ namespace OpenSilver.Simulator.XamlInspection
 
                 if (elementNode == null)
                 {
-                    var elementTreeBranch = new List<dynamic>();
-                    elementTreeBranch.Add(element);
+                    var elementTreeBranch = new List<UIElement> { element };
                     var firstLoadedNode = elementNode;
                     while (firstLoadedNode == null)
                     {
@@ -471,7 +327,7 @@ namespace OpenSilver.Simulator.XamlInspection
                         firstLoadedNode = MainWindow.Instance.XamlInspectionTreeViewInstance.FindElementNode(parentElement, rootNode);
                         element = parentElement;
                     }
-                    elementNode = XamlInspectionHelper.AddElementBranchToTree(elementTreeBranch, firstLoadedNode);
+                    elementNode = AddElementBranchToTree(elementTreeBranch, firstLoadedNode);
                 }
 
                 MainWindow.Instance.XamlInspectionTreeViewInstance.SelectTreeItem(elementNode);

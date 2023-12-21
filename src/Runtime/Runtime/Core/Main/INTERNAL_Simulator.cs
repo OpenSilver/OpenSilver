@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,10 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotNetForHtml5.Core
 {
@@ -44,11 +38,19 @@ namespace DotNetForHtml5.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static Func<object, object> ConvertBrowserResult { get; set; }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Windows.Clipboard instead.")]
+        public static dynamic ClipboardHandler { internal get; set; }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic DynamicJavaScriptExecutionHandler { internal get; set; }
+
         // BeginInvoke of the WebControl's Dispatcher
         public static Action<Action> WebControlDispatcherBeginInvoke
         {
-            set;
             internal get;
+            set;
         }
         // internal static dynamic WebControlDispatcherBeginInvoke => webControl;
 
@@ -89,64 +91,13 @@ namespace DotNetForHtml5.Core
             }
         }
 
-        internal static IWebAssemblyExecutionHandler WebAssemblyExecutionHandler
-        {
-            get;
-            set;
-        }
+        internal static IWebAssemblyExecutionHandler WebAssemblyExecutionHandler { get; private set; }
 
-        private static dynamic dynamicJavaScriptExecutionHandler;
+        public static dynamic WebClientFactory { get; set; }
 
-        public static dynamic DynamicJavaScriptExecutionHandler
-        {
-            internal get => dynamicJavaScriptExecutionHandler;
-            set // Intended to be called by the "Emulator" project to inject the JavaScriptExecutionHandler.
-            {
-                dynamicJavaScriptExecutionHandler = value;
-                if (dynamicJavaScriptExecutionHandler is not null)
-                {
-                    WebAssemblyExecutionHandler = new SimulatorDynamicJSRuntime(value);
-                    ExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator(WebAssemblyExecutionHandler);
-                }
-                else
-                {
-                    WebAssemblyExecutionHandler = null;
-                }
-            }
-        }
+        internal static IAsyncClipboard AsyncClipboard { get; set; }
 
-        static private dynamic webClientFactory;
-        public static dynamic WebClientFactory
-        {
-            get { return webClientFactory; }
-            set { webClientFactory = value; }
-        }
-
-        static dynamic clipboardHandler;
-        public static dynamic ClipboardHandler
-        {
-            set // Intended to be called by the "Emulator" project to inject the ClipboardHandler.
-            {
-                clipboardHandler = value;
-            }
-            internal get
-            {
-                return clipboardHandler;
-            }
-        }
-
-        static dynamic simulatorProxy;
-        public static dynamic SimulatorProxy
-        {
-            set // Intended to be called by the "Emulator" project to inject the SimulatorProxy.
-            {
-                simulatorProxy = value;
-            }
-            internal get
-            {
-                return simulatorProxy;
-            }
-        }
+        public static dynamic SimulatorProxy { internal get; set; }
 
         public static bool IsRunningInTheSimulator_WorkAround
         {

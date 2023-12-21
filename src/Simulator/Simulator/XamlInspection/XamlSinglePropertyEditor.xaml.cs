@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,24 +12,13 @@
 *  
 \*====================================================================================*/
 
+extern alias opensilver;
 
-
-using DotNetForHtml5.EmulatorWithoutJavascript;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace OpenSilver.Simulator.XamlInspection
 {
@@ -39,11 +27,11 @@ namespace OpenSilver.Simulator.XamlInspection
     /// </summary>
     public partial class XamlSinglePropertyEditor : UserControl
     {
-        PropertyInfo _propertyInfo;
-        object _targetElement;
-        bool _isInitializing;
-        bool _isChangingTextProgrammatically;
-        bool _isReadOnly;
+        private PropertyInfo _propertyInfo;
+        private object _targetElement;
+        private bool _isInitializing;
+        private bool _isChangingTextProgrammatically;
+        private bool _isReadOnly;
 
         public bool IsReadOnly
         {
@@ -126,7 +114,7 @@ namespace OpenSilver.Simulator.XamlInspection
             }
         }
 
-        void SetPropertyValueStyle(bool isConvertibleFromString)
+        private void SetPropertyValueStyle(bool isConvertibleFromString)
         {
             this.PropertyValueTextBox.IsReadOnly = IsReadOnly || !isConvertibleFromString;
 
@@ -164,7 +152,7 @@ namespace OpenSilver.Simulator.XamlInspection
             }
         }
 
-        void ApplyChange()
+        private void ApplyChange()
         {
             // Attempt to set the property value:
             if (!IsReadOnly)
@@ -182,67 +170,47 @@ namespace OpenSilver.Simulator.XamlInspection
             Refresh();
         }
 
-        bool IsItPossibleToConvertFromString(Type typeToWhichWeWouldLikeToConvert)
+        private static bool IsItPossibleToConvertFromString(Type type)
         {
-            // If it is a string or an Enum, we can convert from string, otherwise, we need to look for a converter in the Core assembly:
-            if (typeToWhichWeWouldLikeToConvert == typeof(string)
-                || typeToWhichWeWouldLikeToConvert.IsEnum)
-            {
-                return true;
-            }
-            else
-            {
-                // Get a reference to the "TypeFromStringConverters" class in the Core assembly:
-                Assembly coreAssembly;
-                Type typeFromStringConverter;
-                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "TypeFromStringConverters", out typeFromStringConverter, out coreAssembly);
+            // If it is a string or an Enum, we can convert from string,
+            // otherwise, we need to look for a converter in the Core assembly:
 
-                // Call the "CanTypeBeConverted" method:
-                MethodInfo canTypeBeConvertedMethod = typeFromStringConverter.GetMethod("CanTypeBeConverted");
-                bool canTypeBeConverted = (bool)canTypeBeConvertedMethod.Invoke(null, new object[] { typeToWhichWeWouldLikeToConvert });
-
-                return canTypeBeConverted;
-            }
+            return type == typeof(string) ||
+                   type.IsEnum ||
+                   opensilver::DotNetForHtml5.Core.TypeFromStringConverters.CanTypeBeConverted(type);
         }
 
-        object ConvertFromString(string valueAsString, Type targetType)
+        private static object ConvertFromString(string str, Type type)
         {
             // If it is a string or an Enum, convert directly, otherwise call the appropriate converter from the Core assembly:
-            if (targetType == typeof(string))
+            if (type == typeof(string))
             {
-                return valueAsString;
+                return str;
             }
-            else if (targetType.IsEnum)
+            else if (type.IsEnum)
             {
-                return Enum.Parse(targetType, valueAsString);
+                return Enum.Parse(type, str);
             }
             else
             {
-                // Get a reference to the "TypeFromStringConverters" class in the Core assembly:
-                Type typeFromStringConverter;
-                Assembly coreAssembly;
-                ReflectionInUserAssembliesHelper.TryGetTypeInCoreAssembly("DotNetForHtml5.Core", null, "TypeFromStringConverters", out typeFromStringConverter, out coreAssembly);
-
-                // Call the "ConvertFromInvariantString" method:
-                MethodInfo convertFromInvariantStringMethod = typeFromStringConverter.GetMethod("ConvertFromInvariantString");
-                object convertedValue = convertFromInvariantStringMethod.Invoke(null, new object[] { targetType, valueAsString });
-
-                return convertedValue;
+                return opensilver::DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(type, str);
             }
         }
 
-        string ConvertToString(object value)
+        private static string ConvertToString(object value)
         {
             if (value == null)
             {
                 return "";
             }
-            else if (value is double && double.IsNaN((double)value))
+            else if (value is double d && double.IsNaN(d))
             {
                 return "Auto";
             }
             else
+            {
                 return value.ToString();
+            }
         }
     }
 }

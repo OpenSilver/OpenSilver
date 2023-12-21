@@ -13,7 +13,6 @@
 
 using System;
 using System.ComponentModel;
-using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using OpenSilver.Internal;
 
@@ -32,7 +31,6 @@ namespace DotNetForHtml5
         public static void Initialize(IJavaScriptExecutionHandler executionHandler)
         {
             INTERNAL_Simulator.JavaScriptExecutionHandler = executionHandler;
-            EmulatorWithoutJavascript.StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(typeof(System.Windows.Controls.Button).Assembly);
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.Initialize(IWebAssemblyExecutionHandler) instead.")]

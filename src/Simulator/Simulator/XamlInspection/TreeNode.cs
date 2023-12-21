@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,10 +12,11 @@
 *  
 \*====================================================================================*/
 
-
+extern alias opensilver;
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using UIElement = opensilver::System.Windows.UIElement;
 
 namespace OpenSilver.Simulator.XamlInspection
 {
@@ -56,8 +56,8 @@ namespace OpenSilver.Simulator.XamlInspection
             }
         }
 
-        private object _element;
-        public object Element
+        private UIElement _element;
+        public UIElement Element
         {
             get { return _element; }
             set

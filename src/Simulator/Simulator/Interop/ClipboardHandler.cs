@@ -13,27 +13,28 @@
 *  
 \*====================================================================================*/
 
-
+extern alias opensilver;
 
 using System.Windows;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
-    public class ClipboardHandler
+    public class ClipboardHandler : opensilver::OpenSilver.Internal.IAsyncClipboard
     {
-        public void SetText(string text)
+        public void SetText(string text) => Clipboard.SetText(text);
+
+        public Task SetTextAsync(string text)
         {
-            Clipboard.SetText(text);
+            SetText(text);
+            return Task.CompletedTask;
         }
 
-        public string GetText()
-        {
-            return Clipboard.GetText();
-        }
+        public string GetText() => Clipboard.GetText();
 
-        public bool ContainsText()
-        {
-            return Clipboard.ContainsText();
-        }
+        public Task<string> GetTextAsync() => Task.FromResult(GetText());
+        
+        public bool ContainsText() => Clipboard.ContainsText();
+
+        public Task<bool> ContainsTextAsync() => Task.FromResult(ContainsText());
     }
 }

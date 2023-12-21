@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,146 +12,63 @@
 *  
 \*====================================================================================*/
 
+extern alias opensilver;
 
 using Microsoft.Web.WebView2.Wpf;
-using System.Reflection;
-using System.Windows;
 using System.Windows.Threading;
+using INTERNAL_Simulator = opensilver::DotNetForHtml5.Core.INTERNAL_Simulator;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
-    static class InteropHelpers
+    internal static class InteropHelpers
     {
-        internal static void InjectIsRunningInTheSimulator_WorkAround(Assembly coreAssembly)
+        internal static void InjectIsRunningInTheSimulator_WorkAround()
         {
-            InjectPropertyValue("IsRunningInTheSimulator_WorkAround", true, coreAssembly);
+            INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround = true;
         }
 
-        internal static void InjectWebControlDispatcher(WebView2 webControl, Assembly coreAssembly)
+        internal static void InjectWebControlDispatcher(WebView2 webControl)
         {
-            InjectPropertyValue("WebControlDispatcherBeginInvoke",
-                new Action<Action>((method) => webControl.Dispatcher.BeginInvoke(method)), coreAssembly);
-
-            InjectPropertyValue("WebControlDispatcherInvoke",
-                new Action<Action, TimeSpan>((method, timeout) => webControl.Dispatcher.Invoke(method, timeout)), coreAssembly);
-
-            InjectPropertyValue("WebControlDispatcherCheckAccess",
-                new Func<bool>(() => webControl.Dispatcher.CheckAccess()), coreAssembly);
+            INTERNAL_Simulator.WebControlDispatcherBeginInvoke = (method) => webControl.Dispatcher.BeginInvoke(method);
+            INTERNAL_Simulator.WebControlDispatcherInvoke = (method, timeout) => webControl.Dispatcher.Invoke(method, timeout);
+            INTERNAL_Simulator.WebControlDispatcherCheckAccess = () => webControl.Dispatcher.CheckAccess();
         }
 
-        internal static void InjectJavaScriptExecutionHandler(dynamic javaScriptExecutionHandler, Assembly coreAssembly)
+        internal static void InjectJavaScriptExecutionHandler(opensilver::DotNetForHtml5.IJavaScriptExecutionHandler javaScriptExecutionHandler)
         {
-            InjectPropertyValue("DynamicJavaScriptExecutionHandler", javaScriptExecutionHandler, coreAssembly);
+            INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler;
         }
 
-        internal static void InjectWebClientFactory(Assembly coreAssembly)
+        internal static void InjectWebClientFactory()
         {
-            InjectPropertyValue("WebClientFactory", new WebClientFactory(), coreAssembly);
+            INTERNAL_Simulator.WebClientFactory = new WebClientFactory();
         }
 
-        internal static void InjectClipboardHandler(Assembly coreAssembly)
+        internal static void InjectClipboardHandler()
         {
-            InjectPropertyValue("ClipboardHandler", new ClipboardHandler(), coreAssembly);
+            INTERNAL_Simulator.AsyncClipboard = new ClipboardHandler();
         }
 
-        internal static void InjectSimulatorProxy(SimulatorProxy simulatorProxy, Assembly coreAssembly)
+        internal static void InjectSimulatorProxy(SimulatorProxy simulatorProxy)
         {
-            InjectPropertyValue("SimulatorProxy", simulatorProxy, coreAssembly);
+            INTERNAL_Simulator.SimulatorProxy = simulatorProxy;
         }
 
-        internal static void InjectSimulatorCallbackSetup(Action<object> callbackSetup, Assembly coreAssembly)
+        internal static void InjectSimulatorCallbackSetup(Action<object> callbackSetup)
         {
-            InjectPropertyValue("SimulatorCallbackSetup", callbackSetup, coreAssembly);
+            INTERNAL_Simulator.SimulatorCallbackSetup = callbackSetup;
         }
 
-        internal static void InjectOpenSilverRuntimeDispatcher(Dispatcher dispatcher, Assembly coreAssembly)
+        internal static void InjectOpenSilverRuntimeDispatcher(Dispatcher dispatcher)
         {
-            InjectPropertyValue("OpenSilverDispatcherBeginInvoke",
-                new Action<Action>((method) => dispatcher.BeginInvoke(method)), coreAssembly);
-
-            InjectPropertyValue("OpenSilverDispatcherInvoke",
-                new Action<Action, TimeSpan>((method, timeout) => dispatcher.Invoke(method, timeout)), coreAssembly);
-
-            InjectPropertyValue("OpenSilverDispatcherCheckAccess",
-                new Func<bool>(() => dispatcher.CheckAccess()), coreAssembly);
+            INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke = (method) => dispatcher.BeginInvoke(method);
+            INTERNAL_Simulator.OpenSilverDispatcherInvoke = (method, timeout) => dispatcher.Invoke(method, timeout);
+            INTERNAL_Simulator.OpenSilverDispatcherCheckAccess = () => dispatcher.CheckAccess();
         }
 
-        internal static dynamic GetPropertyValue(string propertyName, Assembly coreAssembly)
+        internal static void InjectCodeToDisplayTheMessageBox(Func<string, string, bool, bool> codeToShowTheMessageBoxWithTitleAndButtons)
         {
-            var typeInCoreAssembly = coreAssembly.GetType("DotNetForHtml5.Core.INTERNAL_Simulator");
-            if (typeInCoreAssembly != null)
-            {
-                PropertyInfo staticProperty = typeInCoreAssembly.GetProperty(propertyName);
-                if (staticProperty != null)
-                {
-                    return staticProperty.GetValue(null);
-                }
-                else
-                {
-                    MessageBox.Show("ERROR: Could not find the public static property \"" + propertyName + "\" in the type \"INTERNAL_Simulator\" in the core assembly.");
-                    return null;
-                }
-            }
-            else
-            {
-                MessageBox.Show("ERROR: Could not find the type \"INTERNAL_Simulator\" in the core assembly.");
-                return null;
-            }
-        }
-
-        static void InjectPropertyValue(string propertyName, object propertyValue, Assembly coreAssembly)
-        {
-            Type typeInCoreAssembly = coreAssembly.GetType("DotNetForHtml5.Core.INTERNAL_Simulator");
-            if (typeInCoreAssembly == null)
-            {
-                MessageBox.Show("ERROR: Could not find the type \"INTERNAL_Simulator\" in the core assembly.");
-                return;
-            }
-
-            PropertyInfo staticProperty = typeInCoreAssembly.GetProperty(propertyName);
-            if (staticProperty == null)
-            {
-                MessageBox.Show("ERROR: Could not find the public static property \"" + propertyName + "\" in the type \"INTERNAL_Simulator\" in the core assembly.");
-                return;
-            }
-
-            staticProperty.SetValue(null, propertyValue);
-        }
-
-        internal static void InjectCodeToDisplayTheMessageBox(
-            Func<string, string, bool, bool> codeToShowTheMessageBoxWithTitleAndButtons,
-            Assembly coreAssembly)
-        {
-            Type type = coreAssembly.GetType("Windows.UI.Xaml.MessageBox");
-            if (type == null)
-            {
-                type = coreAssembly.GetType("System.Windows.MessageBox"); // For "SL Migration" projects.
-            }
-            if (type != null)
-            {
-                PropertyInfo staticProperty = type.GetProperty("INTERNAL_CodeToShowTheMessageBoxWithTitleAndButtons");
-                if (staticProperty != null)
-                {
-                    staticProperty.SetValue(null, codeToShowTheMessageBoxWithTitleAndButtons);
-                }
-                else
-                {
-                    MessageBox.Show("ERROR: Could not find the public static property \"INTERNAL_CodeToShowTheMessageBoxWithTitleAndButtons\" in the type \"MessageBox\" in the core assembly.");
-                }
-            }
-            else
-            {
-                MessageBox.Show("ERROR: Could not find the type \"MessageBox\" in the core assembly.");
-            }
-        }
-
-        internal static void RaiseReloadedEvent(Assembly coreAssembly)
-        {
-            var type = coreAssembly.GetType("Windows.UI.Xaml.Application");
-            if (type == null)
-                type = coreAssembly.GetType("System.Windows.Application");
-            var method = type.GetMethod("INTERNAL_RaiseReloadedEvent", BindingFlags.Static | BindingFlags.Public);
-            method.Invoke(null, null);
+            opensilver::System.Windows.MessageBox.INTERNAL_CodeToShowTheMessageBoxWithTitleAndButtons = codeToShowTheMessageBoxWithTitleAndButtons;
         }
     }
 }

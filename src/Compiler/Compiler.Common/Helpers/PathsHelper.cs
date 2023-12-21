@@ -161,6 +161,8 @@ namespace OpenSilver
         /// "/AssemblyName;component/Folder/FileName.extension"
         /// </summary>
         /// <param name="uri"></param>
+        /// <param name="pathOfTheXamlFileWhereTheUriIsDeclared"></param>
+        /// <param name="assemblyName"></param>
         /// <returns></returns>
         public static string ConvertToAbsolutePathWithComponentSyntax(string uri, string pathOfTheXamlFileWhereTheUriIsDeclared, string assemblyName)
         {

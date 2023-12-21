@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.ServiceModel;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -37,8 +36,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         string _outputRootPath;
         string _outputResourcesPath;
         WebView2 MainWebBrowser;
-        Assembly _coreAssembly;
-        Assembly _typeForwardingAssembly;
         string _browserUserDataDir;
         readonly Thread _openSilverRuntimeThread;
         Dispatcher _openSilverRuntimeDispatcher;
@@ -64,7 +61,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
             _appCreationDelegate = appCreationDelegate ?? throw new ArgumentNullException(nameof(appCreationDelegate));
             _simulatorLaunchParameters = simulatorLaunchParameters;
-            ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out _coreAssembly);
             _entryPointAssembly = appAssembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
 
@@ -88,9 +84,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             CheckBoxCORS.Unchecked += CheckBoxCORS_Unchecked;
 
             LoadDisplaySize();
-
-            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
             // Continue when the window is loaded:
             this.Loaded += MainWindow_Loaded;
@@ -123,70 +116,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             {
                 // Apply the size in pixels to the root <div> inside the html page:
                await ReflectBrowserSizeOnRootElementSizeAsync();
-            }
-        }
-
-        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            string assemblyLocalName = args.Name.Contains(',') ? args.Name.Substring(0, args.Name.IndexOf(',')) : args.Name;
-
-            switch (assemblyLocalName)
-            {
-                //case Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR:
-                case Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR:
-                case "OpenSilver.Controls.Data":
-                case "OpenSilver.Controls.Data.Input":
-                case "OpenSilver.Controls.Data.DataForm.Toolkit":
-                case "OpenSilver.Controls.DataVisualization.Toolkit":
-                case "OpenSilver.Controls.Navigation":
-                case "OpenSilver.Controls.Input":
-                case "OpenSilver.Controls.Layout.Toolkit":
-                case "OpenSilver.Interactivity":
-                case "OpenSilver.Expression.Interactions":
-                case "OpenSilver.Expression.Effects":
-                    // If specified DLL has absolute path, look in same folder:
-                    string pathOfAssemblyThatContainsEntryPoint;
-                    string candidatePath;
-                    if (ReflectionInUserAssembliesHelper.TryGetPathOfAssemblyThatContainsEntryPoint(out pathOfAssemblyThatContainsEntryPoint))
-                    {
-                        if (pathOfAssemblyThatContainsEntryPoint.Contains('\\'))
-                        {
-                            candidatePath = $"{Path.GetDirectoryName(pathOfAssemblyThatContainsEntryPoint)}\\{assemblyLocalName}.dll";
-                            return Assembly.LoadFile(candidatePath);
-                        }
-                    }
-
-                    // Otherwise look in current execution folder:
-                    return Assembly.LoadFile($"{assemblyLocalName}.dll");
-
-                default:
-                    if (args.RequestingAssembly != null)
-                    {
-                        string assemblyFileName = $"{assemblyLocalName}.dll";
-                        string invariantFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), assemblyFileName));
-
-                        string fullPath;
-                        if (!File.Exists(invariantFullPath))
-                        {
-                            string cultureName = Thread.CurrentThread.CurrentCulture.Name;
-                            fullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), cultureName, assemblyFileName));
-                        }
-                        else
-                        {
-                            fullPath = invariantFullPath;
-                        }
-
-                        if (File.Exists(fullPath))
-                        {
-                            var assembly = Assembly.LoadFile(fullPath);
-                            return assembly;
-                        }
-                        else
-                        {
-                            throw new FileNotFoundException($"Assembly {assemblyFileName} not found.\nSearched at:\n{invariantFullPath}\n{fullPath}");
-                        }
-                    }
-                    return null;
             }
         }
 
@@ -652,41 +581,50 @@ Click OK to continue.";
             {
                 // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
 
-                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser, _openSilverRuntimeDispatcher);
+                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
 
-                InteropHelpers.InjectWebControlDispatcher(MainWebBrowser, _coreAssembly);
-                InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
-                InteropHelpers.InjectWebClientFactory(_coreAssembly);
-                InteropHelpers.InjectClipboardHandler(_coreAssembly);
+                InteropHelpers.InjectWebControlDispatcher(MainWebBrowser);
+                InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler);
+                InteropHelpers.InjectWebClientFactory();
+                InteropHelpers.InjectClipboardHandler();
                 InteropHelpers.InjectSimulatorProxy(
-                    new SimulatorProxy(MainWebBrowser, Console, MainWebBrowser.Dispatcher, _openSilverRuntimeDispatcher, _javaScriptExecutionHandler), _coreAssembly);
+                    new SimulatorProxy(MainWebBrowser,
+                        Console,
+                        MainWebBrowser.Dispatcher,
+                        _openSilverRuntimeDispatcher,
+                        _javaScriptExecutionHandler));
 
                 // In the OpenSilver Version, we use this work-around to know if we're in the simulator
-                InteropHelpers.InjectIsRunningInTheSimulator_WorkAround(_coreAssembly);
+                InteropHelpers.InjectIsRunningInTheSimulator_WorkAround();
 
                 // Inject the code to display the message box in the simulator:
                 InteropHelpers.InjectCodeToDisplayTheMessageBox(
                     (message, title, showCancelButton) =>
                     {
-                        if (this.Dispatcher.CheckAccess())
+                        if (Dispatcher.CheckAccess())
                         {
-                            return MessageBox.Show(this, message, title, showCancelButton ? MessageBoxButton.OKCancel : MessageBoxButton.OK) == MessageBoxResult.OK;
+                            return MessageBox.Show(this,
+                                message,
+                                title,
+                                showCancelButton ? MessageBoxButton.OKCancel : MessageBoxButton.OK)
+                            == MessageBoxResult.OK;
                         }
                         else
                         {
-                            return this.Dispatcher.Invoke(() =>
+                            return Dispatcher.Invoke(() =>
                             {
-                                return MessageBox.Show(this, message, title, showCancelButton ? MessageBoxButton.OKCancel : MessageBoxButton.OK) == MessageBoxResult.OK;
+                                return MessageBox.Show(this,
+                                    message,
+                                    title,
+                                    showCancelButton ? MessageBoxButton.OKCancel : MessageBoxButton.OK)
+                                == MessageBoxResult.OK;
                             });
                         }
-                    },
-                    _coreAssembly);
+                    });
 
-                InteropHelpers.InjectSimulatorCallbackSetup(SetupSimulatorHostObject, _coreAssembly);
-                InteropHelpers.InjectOpenSilverRuntimeDispatcher(_openSilverRuntimeDispatcher, _coreAssembly);
+                InteropHelpers.InjectSimulatorCallbackSetup(SetupSimulatorHostObject);
+                InteropHelpers.InjectOpenSilverRuntimeDispatcher(_openSilverRuntimeDispatcher);
 
-                // Ensure the static constructor of all common types is called so that the type converters are initialized:
-                StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(_coreAssembly);
                 return true;
             }
             catch (Exception ex)

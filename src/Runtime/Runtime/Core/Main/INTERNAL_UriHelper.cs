@@ -381,8 +381,8 @@ namespace CSHTML5.Internal
             if (!outputRootPath.EndsWith("\\") && outputRootPath != "")
                 outputRootPath = outputRootPath + '\\';
 
-            string outputAbsolutePath = INTERNAL_Simulator.SimulatorProxy.PathCombine(assemblyLocation, outputRootPath); // Note: previously, when the path was hard-coded, it was: Path.Combine(assemblyLocation, @"Output\");
-            string finalAbsolutePath = INTERNAL_Simulator.SimulatorProxy.PathCombine(outputAbsolutePath, relativePath);
+            string outputAbsolutePath = Path.Combine(assemblyLocation, outputRootPath);
+            string finalAbsolutePath = Path.Combine(outputAbsolutePath, relativePath);
             finalAbsolutePath = @"file:///" + finalAbsolutePath.Replace('\\', '/');
             return finalAbsolutePath;
         }

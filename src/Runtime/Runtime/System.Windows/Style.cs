@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +25,7 @@ namespace System.Windows
     /// </summary>
     [DictionaryKeyProperty(nameof(TargetType))]
     [ContentProperty(nameof(Setters))]
-    public partial class Style : DependencyObject //was sealed but we unsealed it because telerik has xaml files with styles as their roots (and the file we generate from xaml files create a type that inherits the type of the root of the xaml).
+    public class Style : DependencyObject //was sealed but we unsealed it because telerik has xaml files with styles as their roots (and the file we generate from xaml files create a type that inherits the type of the root of the xaml).
     {
         #region Data
 
@@ -47,7 +45,7 @@ namespace System.Windows
         }
 
         // Style tables (includes based-on data)
-        internal Dictionary<DependencyProperty, object> EffectiveValues
+        internal new Dictionary<DependencyProperty, object> EffectiveValues
         {
             get;
             private set;

@@ -18,14 +18,14 @@
         <dependency id="Microsoft.Web.WebView2" version="1.0.1905-prerelease" />
         <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.824" />
         <dependency id="MahApps.Metro" version="2.4.9" />
-        <dependency id="Microsoft.Extensions.ObjectPool" version="7.0.4" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
 
       <group targetFramework="netcoreapp3.1">
         <dependency id="Microsoft.Web.WebView2" version="1.0.1905-prerelease" />
         <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.824" />
         <dependency id="MahApps.Metro" version="2.4.9" />
-        <dependency id="Microsoft.Extensions.ObjectPool" version="7.0.4" />
+        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
     </dependencies>
 

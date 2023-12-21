@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,16 +12,9 @@
 *  
 \*====================================================================================*/
 
+extern alias opensilver;
 
-
-
-
-using DotNetForHtml5.EmulatorWithoutJavascript;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -236,7 +228,7 @@ namespace OpenSilver.Simulator.XamlInspection
             return false;
         }
 
-        public TreeNode FindElementNode(object uiElement, TreeNode node)
+        public TreeNode FindElementNode(opensilver::System.Windows.UIElement uiElement, TreeNode node)
         {
             if (node.Element == uiElement)
                 return node;

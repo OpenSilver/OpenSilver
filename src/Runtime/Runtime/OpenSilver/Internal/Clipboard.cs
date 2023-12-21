@@ -56,28 +56,24 @@ namespace OpenSilver.Internal
         }
 
         private static bool IsWPFClipboardAvailable()
-            => Interop.IsRunningInTheSimulator && INTERNAL_Simulator.ClipboardHandler != null;
+            => Interop.IsRunningInTheSimulator && INTERNAL_Simulator.AsyncClipboard != null;
 
         private static bool IsNavigatorClipboardAvailable()
             => Interop.ExecuteJavaScriptBoolean("!!navigator.clipboard", false);
 
         private class WPFClipboard : IAsyncClipboard
         {
-            public void SetText(string text) => INTERNAL_Simulator.ClipboardHandler.SetText(text);
+            public void SetText(string text) => INTERNAL_Simulator.AsyncClipboard.SetText(text);
 
-            public Task SetTextAsync(string text)
-            {
-                SetText(text);
-                return Task.CompletedTask;
-            }
+            public Task SetTextAsync(string text) => INTERNAL_Simulator.AsyncClipboard.SetTextAsync(text);
 
-            public string GetText() => INTERNAL_Simulator.ClipboardHandler.GetText();
+            public string GetText() => INTERNAL_Simulator.AsyncClipboard.GetText();
 
-            public Task<string> GetTextAsync() => Task.FromResult(GetText());
+            public Task<string> GetTextAsync() => INTERNAL_Simulator.AsyncClipboard.GetTextAsync();
 
-            public bool ContainsText() => INTERNAL_Simulator.ClipboardHandler.ContainsText();
+            public bool ContainsText() => INTERNAL_Simulator.AsyncClipboard.ContainsText();
 
-            public Task<bool> ContainsTextAsync() => Task.FromResult(ContainsText());
+            public Task<bool> ContainsTextAsync() => INTERNAL_Simulator.AsyncClipboard.ContainsTextAsync();
         }
 
         private class NavigatorClipboard : IAsyncClipboard

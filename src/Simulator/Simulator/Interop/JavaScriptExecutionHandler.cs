@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,32 +12,24 @@
 *  
 \*====================================================================================*/
 
+extern alias opensilver;
 
-
-using ControlzEx.Standard;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
-using Microsoft.Xaml.Behaviors.Media;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows;
 using System.Windows.Threading;
-
+using IJavaScriptExecutionHandler = opensilver::DotNetForHtml5.IJavaScriptExecutionHandler;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
-    public class JavaScriptExecutionHandler
+    public class JavaScriptExecutionHandler : IJavaScriptExecutionHandler
     {
         private bool _webControlDisposed = false;
         private readonly WebView2 _webControl;
-        private readonly Dispatcher _execJsDispatcher;
-        private List<string> _fullLogOfExecutedJavaScriptCode = new List<string>();
+        private readonly List<string> _fullLogOfExecutedJavaScriptCode = new();
 
-        public JavaScriptExecutionHandler(WebView2 webControl, Dispatcher execJsDispatcher)
+        public JavaScriptExecutionHandler(WebView2 webControl)
         {
             _webControl = webControl;
-            _execJsDispatcher = execJsDispatcher;
         }
 
         public void MarkWebControlAsDisposed()
@@ -130,13 +121,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 bool taskCompleted = execScriptTask.IsCompleted;
                 if (!taskCompleted)
                 {
-                    Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Background, new VoidHandler(() => { }));
+                    Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Background, static () => { });
                 }
                 return taskCompleted;
             });
         }
-
-        private delegate void VoidHandler();
 
         public string FullLogOfExecutedJavaScriptCode
         {
