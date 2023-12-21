@@ -81,9 +81,9 @@ namespace System.Windows.Media
         public override string ToString() => Color.ToString();
 
         internal override Task<string> GetDataStringAsync(UIElement parent)
-            => Task.FromResult(INTERNAL_ToHtmlString());
+            => Task.FromResult(ToHtmlString());
 
-        internal string INTERNAL_ToHtmlString() => Color.INTERNAL_ToHtmlString(Opacity);
+        internal string ToHtmlString() => Color.ToHtmlString(Opacity);
 
         internal override ISvgBrush GetSvgElement() => new SvgSolidColorBrush(this);
 
@@ -96,7 +96,7 @@ namespace System.Windows.Media
                 _brush = scb ?? throw new ArgumentNullException(nameof(scb));
             }
 
-            public string GetBrush(Shape shape) => _brush.INTERNAL_ToHtmlString();
+            public string GetBrush(Shape shape) => _brush.ToHtmlString();
 
             public void DestroyBrush(Shape shape) { }
         }
@@ -110,7 +110,7 @@ namespace System.Windows.Media
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public object ConvertToCSSValue() => Color.INTERNAL_ToHtmlString(Opacity);
+        public object ConvertToCSSValue() => Color.ToHtmlString(Opacity);
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]

@@ -64,7 +64,7 @@ namespace CSHTML5.Internal
                 throw;
             }
 
-            INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
+            ExecuteJavaScript.ExecutePendingJavaScriptCode();
 
             return returnValue ? result : null;
         }

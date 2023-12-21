@@ -24,7 +24,7 @@ namespace System.Windows.Input
 
         internal static int GetPointerWheelDelta(object jsEventArg)
         {
-            string sJsArg = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
+            string sJsArg = CSHTML5.InteropImplementation.GetVariableStringForJS(jsEventArg);
             return OpenSilver.Interop.ExecuteJavaScriptInt32(
                 $"(function (wheelArg) {{ if (wheelArg.wheelDelta != undefined) return wheelArg.wheelDelta; else return (wheelArg.delta || 0); }})({sJsArg})");
 

@@ -38,7 +38,7 @@ namespace System.Windows.Media
         }
 
         internal static Brush Parse(string source) =>
-            new SolidColorBrush(Color.INTERNAL_ConvertFromString(source));
+            new SolidColorBrush(Color.Parse(source));
 
         /// <summary>
         /// Identifies the <see cref="Opacity"/> dependency property.

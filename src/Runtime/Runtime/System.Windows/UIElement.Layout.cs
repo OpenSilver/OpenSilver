@@ -123,7 +123,7 @@ namespace System.Windows
         /// </remarks>
         public void Measure(Size availableSize)
         {
-            if (INTERNAL_OuterDomElement == null)
+            if (OuterDiv == null)
             {
                 if (MeasureRequest != null)
                     LayoutManager.Current.MeasureQueue.Remove(this);
@@ -285,7 +285,7 @@ namespace System.Windows
         /// </remarks>
         public void Arrange(Rect finalRect)
         {
-            if (INTERNAL_OuterDomElement == null)
+            if (OuterDiv == null)
             {
                 if (ArrangeRequest != null)
                     LayoutManager.Current.ArrangeQueue.Remove(this);
@@ -498,7 +498,7 @@ namespace System.Windows
             if (!BypassLayoutPolicies)
             {
                 INTERNAL_HtmlDomManager.SetVisualBounds(
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement),
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(OuterDiv),
                     VisualOffset, RenderSize, LayoutClip);
             }
         }

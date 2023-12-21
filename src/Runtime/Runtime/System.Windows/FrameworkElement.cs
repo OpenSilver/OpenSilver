@@ -323,13 +323,6 @@ namespace System.Windows
         private ResourceDictionary _resources;
 
         /// <summary>
-        /// Derived classes can set this flag in their constructor to prevent the "Style" property from being applied.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected bool INTERNAL_DoNotApplyStyle = false;
-
-        /// <summary>
         /// Provides base class initialization behavior for FrameworkElement-derived
         /// classes.
         /// </summary>
@@ -611,11 +604,11 @@ namespace System.Windows
             {
                 if (isEnabled)
                 {
-                    INTERNAL_HtmlDomManager.RemoveAttribute(INTERNAL_OuterDomElement, "disabled");
+                    INTERNAL_HtmlDomManager.RemoveAttribute(OuterDiv, "disabled");
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, "disabled", string.Empty);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "disabled", string.Empty);
                 }
             }
         }
@@ -740,7 +733,7 @@ namespace System.Windows
                         if (d is FrameworkElement fe)
                         {
                             INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                                fe.INTERNAL_OuterDomElement, "dataId", (string)newValue ?? string.Empty);
+                                fe.OuterDiv, "dataId", (string)newValue ?? string.Empty);
                         }
                     },
                 });
@@ -849,12 +842,12 @@ namespace System.Windows
                         if (VisualTreeHelper.GetParent(uie) is UIElement parent
                             && (FlowDirection)parent.GetValue(FlowDirectionProperty) == direction)
                         {
-                            INTERNAL_HtmlDomManager.RemoveAttribute(uie.INTERNAL_OuterDomElement, DIR);
+                            INTERNAL_HtmlDomManager.RemoveAttribute(uie.OuterDiv, DIR);
                             return;
                         }
 
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                            uie.INTERNAL_OuterDomElement,
+                            uie.OuterDiv,
                             DIR,
                             direction == FlowDirection.LeftToRight ? LTR : RTL);
                     },
@@ -997,11 +990,6 @@ namespace System.Windows
                 new PropertyMetadata((object)null));
 
 #endregion
-
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use DefaultStyleKey instead.")]
-        protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
-        {
-        }
 
         #region Loaded/Unloaded events
 

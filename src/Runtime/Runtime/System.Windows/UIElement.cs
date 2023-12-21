@@ -62,7 +62,7 @@ namespace System.Windows
         /// <summary>
         /// Returns the parent of this UIElement.
         /// </summary>
-        internal DependencyObject INTERNAL_VisualParent { get; private set; }
+        internal DependencyObject VisualParent { get; private set; }
 
 #endregion Visual Parent
 
@@ -128,7 +128,7 @@ namespace System.Windows
                 return;
             }
 
-            if (child.INTERNAL_VisualParent != null)
+            if (child.VisualParent != null)
             {
                 throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
             }
@@ -137,7 +137,7 @@ namespace System.Windows
 
             // Set the parent pointer.
 
-            child.INTERNAL_VisualParent = this;
+            child.VisualParent = this;
 
             //
             // Resume layout.
@@ -184,12 +184,12 @@ namespace System.Windows
         /// </summary>
         internal void RemoveVisualChild(UIElement child)
         {
-            if (child == null || child.INTERNAL_VisualParent == null)
+            if (child == null || child.VisualParent == null)
             {
                 return;
             }
 
-            if (child.INTERNAL_VisualParent != this)
+            if (child.VisualParent != this)
             {
                 throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
             }
@@ -201,7 +201,7 @@ namespace System.Windows
 
             // Set the parent pointer to null.
 
-            child.INTERNAL_VisualParent = null;
+            child.VisualParent = null;
 
             PropagateSuspendLayout(child);
 
@@ -246,9 +246,9 @@ namespace System.Windows
         internal virtual void OnVisualParentChanged(DependencyObject oldParent)
         {
             // Synchronize ForceInherit properties
-            if (INTERNAL_VisualParent != null)
+            if (VisualParent != null)
             {
-                SynchronizeForceInheritProperties(this, INTERNAL_VisualParent);
+                SynchronizeForceInheritProperties(this, VisualParent);
             }
             else
             {
@@ -261,13 +261,13 @@ namespace System.Windows
 
 #endregion Visual Children
 
-        internal Window INTERNAL_ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
+        internal Window ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
 
         // This is the main DIV of the HTML representation of the control
-        internal object INTERNAL_OuterDomElement { get; set; }
-        internal object INTERNAL_InnerDomElement { get; set; } // This is used to add visual children to the DOM (optionally wrapped into additional code, c.f. "INTERNAL_VisualChildInformation")
-        internal string INTERNAL_HtmlRepresentation { get; set; } // This can be used instead of overriding the "CreateDomElement" method to specify the appearance of the control.
-        internal Dictionary<UIElement, INTERNAL_VisualChildInformation> INTERNAL_VisualChildrenInformation { get; set; } //todo-performance: verify that JavaScript output is a performant dictionary too, otherwise change structure.
+        internal object OuterDiv { get; set; }
+        internal object InnerDiv { get; set; }
+        internal string HtmlRepresentation { get; set; }
+        internal Dictionary<UIElement, VisualChildInformation> VisualChildrenInformation { get; set; }
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
         internal bool _isLoaded;
 
@@ -383,7 +383,7 @@ namespace System.Windows
         {
             Debug.Assert(uie is not null);
 
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
             style.clipPath = geometry switch
             {
                 Geometry => $"path(\"{geometry.ToPathData(CultureInfo.InvariantCulture)}\")",
@@ -412,12 +412,11 @@ namespace System.Windows
         /// <returns></returns>
         public virtual object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
-            // This method is optional (cf. documentation in "INTERNAL_VisualChildInformation" class). It should return null if not used.
             domElementWhereToPlaceChild = null;
             return null;
         }
 
-        public virtual object GetDomElementWhereToPlaceChild(UIElement child) // Note: if overridden, it supercedes the "INTERNAL_InnerDomElement" property.
+        public virtual object GetDomElementWhereToPlaceChild(UIElement child)
         {
             return null;
         }
@@ -426,7 +425,7 @@ namespace System.Windows
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
             {
-                return INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
+                return VisualChildrenInformation[child].WrapperDiv;
             }
             else
             {
@@ -541,7 +540,7 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(null, OnEffectChanged)
                 {
-                    MethodToUpdateDom2 = (d, oldValue, newValue) =>
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var uie = (UIElement)d;
                         if (oldValue is Effect oldEffect)
@@ -780,11 +779,11 @@ namespace System.Windows
                         var uie = (UIElement)d;
                         if ((Visibility)newValue == Visibility.Collapsed)
                         {
-                            INTERNAL_HtmlDomManager.AddCSSClass(uie.INTERNAL_OuterDomElement, "uielement-collapsed");
+                            INTERNAL_HtmlDomManager.AddCSSClass(uie.OuterDiv, "uielement-collapsed");
                         }
                         else
                         {
-                            INTERNAL_HtmlDomManager.RemoveCSSClass(uie.INTERNAL_OuterDomElement, "uielement-collapsed");
+                            INTERNAL_HtmlDomManager.RemoveCSSClass(uie.OuterDiv, "uielement-collapsed");
                         }
                     },
                 });
@@ -1034,7 +1033,7 @@ namespace System.Windows
         internal bool EnablePointerEvents => EnablePointerEventsCore && EnablePointerEventsBase(this);
         
         internal virtual void SetPointerEventsImpl() =>
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement)
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(OuterDiv)
                 .pointerEvents = EnablePointerEvents ? "auto" : "none";
 
         internal static void SetPointerEvents(UIElement element)
@@ -1082,7 +1081,7 @@ namespace System.Windows
         /// <summary>
         /// Gets a value indicating whether the pointer is captured to this element.
         /// </summary>
-        public bool IsMouseCaptured => Pointer.INTERNAL_captured == this;
+        public bool IsMouseCaptured => Pointer.Captured == this;
 
         /// <summary>
         /// Releases pointer captures for capture of one specific pointer by this UIElement.
@@ -1115,7 +1114,7 @@ namespace System.Windows
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var uie = (UIElement)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
                         style.touchAction = (bool)newValue ? "auto" : "none";
                     },
                 });
@@ -1141,7 +1140,7 @@ namespace System.Windows
                 throw new ArgumentException();
             }
 
-            var outerDivOfThisControl = INTERNAL_OuterDomElement;
+            var outerDivOfThisControl = OuterDiv;
 
             // If no "visual" was specified, we use the Window root instead.
             // Note: This is useful for example when calculating the position of popups, which
@@ -1154,18 +1153,18 @@ namespace System.Windows
                     throw new ArgumentException(nameof(visual));
                 }
 
-                outerDivOfReferenceVisual = visual.INTERNAL_OuterDomElement;
+                outerDivOfReferenceVisual = visual.OuterDiv;
             }
             else
             {
                 UIElement rootVisual = Window.GetWindow(this)?.Content ?? throw new InvalidOperationException();
 
-                outerDivOfReferenceVisual = rootVisual.INTERNAL_OuterDomElement;
+                outerDivOfReferenceVisual = rootVisual.OuterDiv;
             }
 
             // Hack to improve the Simulator performance by making only one interop call rather than two:
-            string sOuterDivOfControl = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
-            string sOuterDivOfReferenceVisual = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
+            string sOuterDivOfControl = CSHTML5.InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
+            string sOuterDivOfReferenceVisual = CSHTML5.InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
             string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
                 $"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)");
             int sepIndex = concatenated.IndexOf('|');
@@ -1188,7 +1187,7 @@ namespace System.Windows
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                return INTERNAL_HtmlDomManager.GetBoundingClientSize(INTERNAL_OuterDomElement);
+                return INTERNAL_HtmlDomManager.GetBoundingClientSize(OuterDiv);
             }
 
             return new Size();

@@ -17,7 +17,7 @@ using System.Windows;
 
 namespace OpenSilver.Internal;
 
-internal static class INTERNAL_PropertyStore
+internal static class DependencyObjectStore
 {
     /// <summary>
     /// Attempt to get a Property Storage
@@ -33,9 +33,9 @@ internal static class INTERNAL_PropertyStore
         DependencyProperty dependencyProperty,
         PropertyMetadata metadata,
         bool createIfNotFoud,
-        out INTERNAL_PropertyStorage storage)
+        out Storage storage)
     {
-        if (dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
+        if (dependencyObject.EffectiveValues.TryGetValue(dependencyProperty, out storage))
         {
             return true;
         }
@@ -48,9 +48,9 @@ internal static class INTERNAL_PropertyStore
 
             metadata ??= dependencyProperty.GetMetadata(dependencyObject.DependencyObjectType);
 
-            storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
+            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
 
-            dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
+            dependencyObject.EffectiveValues.Add(dependencyProperty, storage);
 
             //-----------------------
             // CHECK IF THE PROPERTY IS INHERITABLE:
@@ -60,7 +60,7 @@ internal static class INTERNAL_PropertyStore
                 //-----------------------
                 // ADD THE STORAGE TO "INTERNAL_AllInheritedProperties" IF IT IS NOT ALREADY THERE:
                 //-----------------------
-                dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+                dependencyObject.InheritedValues.Add(dependencyProperty, storage);
             }
         }
 
@@ -82,10 +82,10 @@ internal static class INTERNAL_PropertyStore
         DependencyProperty dependencyProperty,
         PropertyMetadata metadata,
         bool createIfNotFoud,
-        out INTERNAL_PropertyStorage storage)
+        out Storage storage)
     {
         // Create the Storage if it does not already exist
-        if (dependencyObject.INTERNAL_AllInheritedProperties.TryGetValue(dependencyProperty, out storage))
+        if (dependencyObject.InheritedValues.TryGetValue(dependencyProperty, out storage))
         {
             return true;
         }
@@ -98,20 +98,20 @@ internal static class INTERNAL_PropertyStore
                 $"{dependencyProperty.Name} is not an inherited property.");
 
             // Create the storage:
-            storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
+            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
 
             //-----------------------
             // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
             //-----------------------
-            dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
-            dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
+            dependencyObject.EffectiveValues.Add(dependencyProperty, storage);
+            dependencyObject.InheritedValues.Add(dependencyProperty, storage);
         }
 
         return createIfNotFoud;
     }
 
     internal static void SetValueCommon(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -189,7 +189,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void ClearValueCommon(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata)
@@ -228,7 +228,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void SetAnimatedValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -253,7 +253,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void ClearAnimatedValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata)
@@ -283,7 +283,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void SetLocalStyleValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -332,7 +332,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     private static void ClearLocalStyleValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata)
@@ -374,7 +374,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void SetThemeStyleValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -426,7 +426,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     private static void ClearThemeStyleValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata)
@@ -468,7 +468,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static bool SetInheritedValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -505,7 +505,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     private static bool ClearInheritedValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -539,7 +539,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void SetCurrentValueCommon(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -579,7 +579,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void CoerceValueCommon(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata)
@@ -609,7 +609,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     internal static void RefreshExpressionCommon(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -716,7 +716,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     private static (object effectiveValue, BaseValueSourceInternal kind) ComputeEffectiveBaseValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject owner,
         DependencyProperty dp,
         PropertyMetadata metadata)
@@ -744,7 +744,7 @@ internal static class INTERNAL_PropertyStore
     }
 
     private static bool UpdateEffectiveValue(
-        INTERNAL_PropertyStorage storage,
+        Storage storage,
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
@@ -836,10 +836,10 @@ internal static class INTERNAL_PropertyStore
 
     private static void RemoveStorage(DependencyObject d, DependencyProperty dp, PropertyMetadata metadata)
     {
-        d.INTERNAL_PropertyStorageDictionary.Remove(dp);
+        d.EffectiveValues.Remove(dp);
         if (metadata != null && metadata.Inherits)
         {
-            d.INTERNAL_AllInheritedProperties.Remove(dp);
+            d.InheritedValues.Remove(dp);
         }
     }
 

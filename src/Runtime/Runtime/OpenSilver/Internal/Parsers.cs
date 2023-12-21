@@ -145,12 +145,12 @@ namespace OpenSilver.Internal
             {
                 Debug.Assert(isPossibleKnowColor);
 
-                if (!Enum.TryParse(trimmedColor, true, out Colors.INTERNAL_ColorsEnum kc))
+                if (!Enum.TryParse(trimmedColor, true, out Colors.KnownColor kc))
                 {
                     throw new FormatException("Token is not valid.");
                 }
 
-                return Color.INTERNAL_ConvertFromInt32((int)kc);
+                return Color.FromInt32((int)kc);
             }
         }
     }

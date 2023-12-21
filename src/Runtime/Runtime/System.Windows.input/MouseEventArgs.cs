@@ -66,14 +66,14 @@ namespace System.Windows.Input
         internal void FillEventArgs(UIElement element, object jsEventArg)
         {
             KeyModifiers = Keyboard.Modifiers;
-            SetPointerAbsolutePosition(jsEventArg, element.INTERNAL_ParentWindow);
+            SetPointerAbsolutePosition(jsEventArg, element.ParentWindow);
         }
 
         protected internal void SetPointerAbsolutePosition(object jsEventArg, Window window)
         {
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
+                string sEvent = InteropImplementation.GetVariableStringForJS(jsEventArg);
                 string type = OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.type");
                 IsTouchEvent = type.StartsWith("touch");
                 string concatenated = IsTouchEvent ? OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.changedTouches[0].pageX + '|' + {sEvent}.changedTouches[0].pageY")
@@ -91,8 +91,8 @@ namespace System.Windows.Input
             if (window != null)
             {
                 // Get the XAML Window root position relative to the page:
-                object windowRootDomElement = window.INTERNAL_OuterDomElement;
-                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(windowRootDomElement);
+                object windowRootDomElement = window.OuterDiv;
+                string sElement = InteropImplementation.GetVariableStringForJS(windowRootDomElement);
 
                 double windowRootLeft;
                 double windowRootTop;

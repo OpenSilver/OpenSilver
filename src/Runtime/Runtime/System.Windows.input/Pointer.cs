@@ -18,7 +18,7 @@ namespace System.Windows.Input
     /// </summary>
     public sealed class Pointer
     {
-        internal static UIElement INTERNAL_captured;
+        internal static UIElement Captured { get; set; }
 
         /// <summary>
         /// Gets a value that determines whether the pointer device was in contact with

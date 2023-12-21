@@ -156,9 +156,9 @@ internal partial class TextViewBase<T> : IScrollInfo
         if (!IsScrollClient) return;
         if (!_scrollData.CanHorizontallyScroll) return;
 
-        if (INTERNAL_OuterDomElement is not null)
+        if (OuterDiv is not null)
         {
-            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
             Interop.ExecuteJavaScriptFastAsync($"{sDiv}.scrollLeft = {offset.ToInvariantString()};");
         }
     }
@@ -168,9 +168,9 @@ internal partial class TextViewBase<T> : IScrollInfo
         if (!IsScrollClient) return;
         if (!_scrollData.CanVerticallyScroll) return;
 
-        if (INTERNAL_OuterDomElement is not null)
+        if (OuterDiv is not null)
         {
-            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
             Interop.ExecuteJavaScriptFastAsync($"{sDiv}.scrollTop = {offset.ToInvariantString()};");
         }
     }

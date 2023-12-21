@@ -85,9 +85,9 @@ namespace System.Windows
             // is still pressing the button, and never stops doing so. By releasing the pointer capture, controls like the "RepeatButton"
             // can know that the user is no longer pressing the button by listening to "OnPointerCaptureLost".
 
-            if (Pointer.INTERNAL_captured != null)
+            if (Pointer.Captured != null)
             {
-                Pointer.INTERNAL_captured.ReleaseMouseCapture();
+                Pointer.Captured.ReleaseMouseCapture();
             }
 
             //todo: raise the "PointerReleased" event as well.
@@ -124,11 +124,11 @@ namespace System.Windows
                 bool isOK = true;
                 if (button == MessageBoxButton.OK)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"alert({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"alert({CSHTML5.InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
                 }
                 else if (button == MessageBoxButton.OKCancel)
                 {
-                    isOK = OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
+                    isOK = OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({CSHTML5.InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
                 }
                 else
                 {

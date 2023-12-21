@@ -34,13 +34,13 @@ namespace System.Windows.Browser
 
         static ScriptObject()
         {
-            string getMemberCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+            string getMemberCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(
                 JavaScriptCallback.Create(GetMemberFromJS, true));
-            string setPropertyCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+            string setPropertyCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(
                 JavaScriptCallback.Create(SetPropertyFromJS, true));
-            string invokeMethodCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+            string invokeMethodCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(
                 JavaScriptCallback.Create(InvokeMethodFromJS, true));
-            string addEventListenerCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+            string addEventListenerCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(
                 JavaScriptCallback.Create(AddEventListenerFromJS, true));
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
@@ -147,7 +147,7 @@ namespace System.Windows.Browser
         {
             ValidateParameter(name);
 
-            string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
+            string sJSObj = CSHTML5.InteropImplementation.GetVariableStringForJS(_jsObjectRef);
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
@@ -184,7 +184,7 @@ namespace System.Windows.Browser
         {
             ValidateParameter(name);
 
-            string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
+            string sJSObj = CSHTML5.InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sParams = args is null ? string.Empty : string.Join(",", args.Select(a => ConvertToJavaScriptParam(a)));
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
@@ -210,7 +210,7 @@ namespace System.Windows.Browser
         /// </exception>
         public virtual object InvokeSelf(params object[] args)
         {
-            string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
+            string sJSObj = CSHTML5.InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sParams = args is null ? string.Empty : string.Join(",", args.Select(a => ConvertToJavaScriptParam(a)));
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
@@ -265,7 +265,7 @@ namespace System.Windows.Browser
         {
             ValidateParameter(name);
 
-            string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
+            string sJSObj = CSHTML5.InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sValue = ConvertToJavaScriptParam(value);
 
             JSParam result = JsonSerializer.Deserialize<JSParam>(
@@ -394,7 +394,7 @@ namespace System.Windows.Browser
                 object => OpenSilver.Interop.IsRunningInTheSimulator ? null : GetOrCreateManagedObject(value)._jsObjectRef,
             };
 
-            return CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(o);
+            return CSHTML5.InteropImplementation.GetVariableStringForJS(o);
         }
 
         private static ManagedObject GetOrCreateManagedObject(object obj)

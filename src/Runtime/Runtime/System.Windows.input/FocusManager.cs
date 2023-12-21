@@ -71,7 +71,7 @@ namespace System.Windows.Input
 
         internal static DependencyObject GetFocusScope(UIElement uie)
         {
-            return uie?.INTERNAL_ParentWindow ?? Window.Current;
+            return uie?.ParentWindow ?? Window.Current;
         }
 
         internal static bool HasFocus(UIElement uie, bool useLogicalTree = false)

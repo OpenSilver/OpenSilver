@@ -120,10 +120,6 @@ namespace System.Windows.Controls.Primitives
                 || value == PlacementMode.Top;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        public bool INTERNAL_AllowDisableClickTransparency = true;
-
         protected override AutomationPeer OnCreateAutomationPeer()
             => new PopupRootAutomationPeer(this);
 
@@ -589,7 +585,7 @@ namespace System.Windows.Controls.Primitives
                 Window parentWindow = GetParentWindowOfPopup();
 
                 // Create the popup root:
-                _popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(this, parentWindow);
+                _popupRoot = PopupsManager.CreateAndAppendNewPopupRoot(this, parentWindow);
 
                 UpdatePopupParent();
 
@@ -651,7 +647,7 @@ namespace System.Windows.Controls.Primitives
                 //---------------------
                 var popupRoot = _popupRoot;
                 popupRoot.Content = null;
-                INTERNAL_PopupsManager.RemovePopupRoot(popupRoot);
+                PopupsManager.RemovePopupRoot(popupRoot);
                 _popupRoot = null;
                 _outerBorder.Content = null;
                 _outerBorder = null;
@@ -681,9 +677,9 @@ namespace System.Windows.Controls.Primitives
         {
             // If the popup has a placement target, and the latter is in the visual tree,
             // we get the window from there. Otherwise, if the popup itself is inthe visual
-            // tree, "Popup.INTERNAL_ParentWindow" should be populated. Otherwise, we use
-            // the default window (MainWindow) to display the popup.
-            return PlacementTarget?.INTERNAL_ParentWindow ?? INTERNAL_ParentWindow ?? Application.Current.MainWindow;
+            // tree, "Popup.ParentWindow" should be populated. Otherwise, we use the default
+            // window (MainWindow) to display the popup.
+            return PlacementTarget?.ParentWindow ?? ParentWindow ?? Application.Current.MainWindow;
         }
 
         public event EventHandler ClosedDueToOutsideClick;

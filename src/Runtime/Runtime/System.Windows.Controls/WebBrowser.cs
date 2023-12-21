@@ -50,20 +50,20 @@ namespace System.Windows.Controls
             DisposeJsCallbacks();
             _jsCallbackOnIframeLoaded = JavaScriptCallback.Create(OnIframeLoad, true);
 
-            string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(_iFrame);
+            string sIFrame = InteropImplementation.GetVariableStringForJS(_iFrame);
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"{sIFrame}.onload = {INTERNAL_InteropImplementation.GetVariableStringForJS(_jsCallbackOnIframeLoaded)}");
+                $"{sIFrame}.onload = {InteropImplementation.GetVariableStringForJS(_jsCallbackOnIframeLoaded)}");
 
             var source = this.SourceUri;
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"{sIFrame}.src = {INTERNAL_InteropImplementation.GetVariableStringForJS(source.OriginalString)}");
+                    $"{sIFrame}.src = {InteropImplementation.GetVariableStringForJS(source.OriginalString)}");
             }
             else if (_htmlString != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"{sIFrame}.srcdoc = {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)};");
+                    $"{sIFrame}.srcdoc = {InteropImplementation.GetVariableStringForJS(_htmlString)};");
             }
             else
             {
@@ -134,11 +134,11 @@ namespace System.Windows.Controls
 
             if (this._isLoaded) // Note: if not loaded, we will set the HTML later when adding the control to the visual tree.
             {
-                string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(_iFrame);
+                string sIFrame = InteropImplementation.GetVariableStringForJS(_iFrame);
                 if (_htmlString != null)
                 {
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                        $"{sIFrame}.srcdoc = {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)};");
+                        $"{sIFrame}.srcdoc = {InteropImplementation.GetVariableStringForJS(_htmlString)};");
                 }
                 else
                 {

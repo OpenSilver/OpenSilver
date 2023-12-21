@@ -49,9 +49,9 @@ namespace System.Windows.Browser
                         target = "_self";
                     }
 
-                    string sUri = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(navigateToUri.ToString());
-                    string sTarget = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(target);
-                    string sTargetFeatures = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(targetFeatures);
+                    string sUri = CSHTML5.InteropImplementation.GetVariableStringForJS(navigateToUri.ToString());
+                    string sTarget = CSHTML5.InteropImplementation.GetVariableStringForJS(target);
+                    string sTargetFeatures = CSHTML5.InteropImplementation.GetVariableStringForJS(targetFeatures);
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync($"window.open({sUri}, {sTarget}, {sTargetFeatures})");
                 }
                 else
@@ -93,7 +93,7 @@ namespace System.Windows.Browser
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"alert({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(alertText)})");
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"alert({CSHTML5.InteropImplementation.GetVariableStringForJS(alertText)})");
             }
         }
 
@@ -115,7 +115,7 @@ namespace System.Windows.Browser
             }
             else
             {
-                return OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(confirmText)})");
+                return OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({CSHTML5.InteropImplementation.GetVariableStringForJS(confirmText)})");
             }
         }
     }

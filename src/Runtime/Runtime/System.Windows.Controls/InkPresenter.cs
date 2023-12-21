@@ -49,7 +49,7 @@ namespace System.Windows.Controls
             // 2 - increase the actual size of our canvas
             // 3 - ensure all drawing operations are scaled
             // 4 - scale everything down using CSS
-            string sCanvas = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDom);
+            string sCanvas = CSHTML5.InteropImplementation.GetVariableStringForJS(_canvasDom);
             string width = Math.Ceiling(renderSize.Width).ToInvariantString();
             string height = Math.Ceiling(renderSize.Height).ToInvariantString();
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
@@ -158,7 +158,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
                 return;
             }
 
-            string sCanvas = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDom);
+            string sCanvas = CSHTML5.InteropImplementation.GetVariableStringForJS(_canvasDom);
             var sb = new StringBuilder();
             sb.AppendLine($"(function(cvs) {{ const ctx = cvs.getContext('2d');");
             //object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
@@ -252,7 +252,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
                 return;
             }
 
-            string sCanvas = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDom);
+            string sCanvas = CSHTML5.InteropImplementation.GetVariableStringForJS(_canvasDom);
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                 $"(function(cvs) {{ const ctx = cvs.getContext('2d'); ctx.moveTo({_lastPos.X.ToInvariantString()}, {_lastPos.Y.ToInvariantString()}); ctx.lineTo({_mousePos.X.ToInvariantString()}, {_mousePos.Y.ToInvariantString()}); ctx.stroke(); }})({sCanvas})");
             //object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);

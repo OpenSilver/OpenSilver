@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,31 +11,15 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CSHTML5.Internal
 {
-    internal static class INTERNAL_ListsHelper
+    internal sealed class VisualChildInformation
     {
-        internal static List<object> ConvertToListOfObjectsOrNull(IEnumerable enumerable)
+        internal VisualChildInformation(object wrapperDiv)
         {
-            List<object> result = null;
-            if (enumerable != null)
-            {
-                result = new List<object>();
-                foreach (var obj in enumerable)
-                {
-                    result.Add(obj);
-                }
-            }
-            return result;
+            WrapperDiv = wrapperDiv;
         }
 
+        public object WrapperDiv { get; }
     }
 }

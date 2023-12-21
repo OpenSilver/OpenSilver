@@ -16,9 +16,9 @@ using OpenSilver.Internal.Media.Animation;
 
 namespace OpenSilver.Internal;
 
-internal sealed class INTERNAL_PropertyStorage
+internal sealed class Storage
 {
-    internal INTERNAL_PropertyStorage()
+    internal Storage()
     {
         LocalValue = DependencyProperty.UnsetValue;
         LocalStyleValue = DependencyProperty.UnsetValue;
@@ -26,8 +26,8 @@ internal sealed class INTERNAL_PropertyStorage
         InheritedValue = DependencyProperty.UnsetValue;
     }
 
-    internal static INTERNAL_PropertyStorage CreateDefaultValueEntry(object value) =>
-        new INTERNAL_PropertyStorage { Entry = new EffectiveValueEntry(value) };
+    internal static Storage CreateDefaultValueEntry(object value) =>
+        new Storage { Entry = new EffectiveValueEntry(value) };
 
     internal EffectiveValueEntry Entry { get; set; }
 

@@ -92,7 +92,7 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<object>();
 
-                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                string sCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(
                     JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<bool>(success =>
                     {
                         if (success)
@@ -105,7 +105,7 @@ namespace OpenSilver.Internal
                         }
                     }));
 
-                string sText = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(text);
+                string sText = CSHTML5.InteropImplementation.GetVariableStringForJS(text);
 
                 Interop.ExecuteJavaScriptVoid(
                     $"navigator.clipboard.writeText({sText}).then(() => {sCallback}(true), () => {sCallback}(false));",
@@ -121,7 +121,7 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<string>();
 
-                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                string sCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(
                     JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<string, bool>((content, success) =>
                     {
                         if (success)
@@ -148,7 +148,7 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<bool>();
 
-                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                string sCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(
                     JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<bool>(b => tcs.SetResult(b)));
 
                 Interop.ExecuteJavaScriptVoid(
@@ -189,7 +189,7 @@ namespace OpenSilver.Internal
 
             public void SetText(string text)
             {
-                string escapedText = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(text);
+                string escapedText = CSHTML5.InteropImplementation.GetVariableStringForJS(text);
                 Interop.ExecuteJavaScriptVoid($"_opensilver.clipboard.writeText({escapedText})");
             }
 

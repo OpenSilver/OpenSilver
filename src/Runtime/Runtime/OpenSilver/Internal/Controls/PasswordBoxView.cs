@@ -103,8 +103,8 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
     {
         int pwdLength = Host.Password.Length;
 
-        return INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
-            ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier,
+        return ParentWindow.TextMeasurementService.MeasureText(
+            ((INTERNAL_HtmlDomElementReference)OuterDiv).UniqueIdentifier,
             "pre",
             string.Empty,
             constraint.Width,
@@ -115,7 +115,7 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+            string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
             Interop.ExecuteJavaScriptVoid($"{sElement}.select();");
         }
     }
@@ -132,7 +132,7 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+            string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
             Interop.ExecuteJavaScriptVoid(
                 $"{sElement}.value = \"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\";");
 
@@ -170,7 +170,7 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+            string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
             return Interop.ExecuteJavaScriptString($"{sElement}.value;") ?? string.Empty;
         }
 

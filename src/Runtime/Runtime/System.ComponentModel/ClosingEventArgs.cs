@@ -22,9 +22,10 @@ namespace System.ComponentModel
     /// <summary>
     /// Provides data for the System.Windows.Window.Closing event.
     /// </summary>
-    public partial class ClosingEventArgs : CancelEventArgs
+    public class ClosingEventArgs : CancelEventArgs
     {
-        internal object INTERNAL_JSArgs;
+        private object _jsArgs;
+        private bool _showCloseConfirmationDialog;
 
         /// <summary>
         /// Initializes a new instance of the System.ComponentModel.ClosingEventArgs
@@ -33,16 +34,19 @@ namespace System.ComponentModel
         /// <param name="isCancelable">Initializes the System.ComponentModel.ClosingEventArgs.IsCancelable property.</param>
         public ClosingEventArgs(bool isCancelable)
         {
-            _isCancelable = isCancelable;
+            IsCancelable = isCancelable;
         }
 
-        bool _isCancelable = true;
+        internal ClosingEventArgs(bool isCancelable, object jsArgs)
+        {
+            IsCancelable = isCancelable;
+            _jsArgs = jsArgs;
+        }
+
         /// <summary>
         /// Gets a value that indicates whether you can cancel the Window.Closing event.
         /// </summary>
-        public bool IsCancelable { get { return _isCancelable; } }
-
-        private bool _showCloseConfirmationDialog;
+        public bool IsCancelable { get; }
 
         public bool ShowCloseConfirmationDialog
         {
@@ -50,17 +54,17 @@ namespace System.ComponentModel
             set
             {
                 _showCloseConfirmationDialog = value;
-                if (INTERNAL_JSArgs != null)
+                if (_jsArgs != null)
                 {
                     if (value)
                     {
                         OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_JSArgs)}.returnValue = 'The modifications you made may not be saved.';"); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe Edge).
+                            $"{CSHTML5.InteropImplementation.GetVariableStringForJS(_jsArgs)}.returnValue = 'The modifications you made may not be saved.';"); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe Edge).
                     }
                     else
                     {
                         OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_JSArgs)}.returnValue = '';");
+                            $"{CSHTML5.InteropImplementation.GetVariableStringForJS(_jsArgs)}.returnValue = '';");
                     }
                 }
             }

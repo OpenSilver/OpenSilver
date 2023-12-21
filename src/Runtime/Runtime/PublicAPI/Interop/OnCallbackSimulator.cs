@@ -57,7 +57,7 @@ namespace CSHTML5.Internal
                     throw;
                 }
 
-                INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
+                ExecuteJavaScript.ExecutePendingJavaScriptCode();
             }
 
             // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:

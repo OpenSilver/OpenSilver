@@ -195,9 +195,9 @@ namespace System.Windows.Controls
 
         internal void OnChildrenReset()
         {
-            if (this.INTERNAL_VisualChildrenInformation != null)
+            if (this.VisualChildrenInformation != null)
             {
-                foreach (var oldChild in this.INTERNAL_VisualChildrenInformation.Keys.ToArray())
+                foreach (var oldChild in this.VisualChildrenInformation.Keys.ToArray())
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
                 }

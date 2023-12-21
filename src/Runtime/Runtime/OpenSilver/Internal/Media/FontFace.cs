@@ -38,7 +38,7 @@ internal sealed class FontFace
                 var rootDiv = Application.Current?.GetRootDiv();
                 if (rootDiv is not null)
                 {
-                    string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(rootDiv);
+                    string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(rootDiv);
                     _defaultCssFontFamily = Interop.ExecuteJavaScriptString(
                         $"window.getComputedStyle({sDiv}).getPropertyValue('font-family');");
                 }
@@ -92,8 +92,8 @@ internal sealed class FontFace
 
             var loadCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback<bool>(OnFontLoaded);
 
-            string uriEscaped = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(CssFontUrl);
-            string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(loadCallback);
+            string uriEscaped = CSHTML5.InteropImplementation.GetVariableStringForJS(CssFontUrl);
+            string sCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(loadCallback);
             Interop.ExecuteJavaScriptVoid(
                 $"document.loadFont('{CssFontName}', 'url({uriEscaped})', {sCallback});");
         }

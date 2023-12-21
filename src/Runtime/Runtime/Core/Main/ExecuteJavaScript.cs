@@ -13,13 +13,10 @@
 
 using System;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
-using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
-    internal static class INTERNAL_ExecuteJavaScript
+    internal static class ExecuteJavaScript
     {
         internal static IPendingJavascript JavaScriptRuntime { get; set; }
 
@@ -121,7 +118,7 @@ namespace CSHTML5.Internal
         {
             string str = _javascriptCallsStore.Get(indexOfCallInList);
 
-            if (INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround())
+            if (InteropImplementation.IsRunningInTheSimulator_WorkAround())
             {
                 DotNetForHtml5.Core.INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, str);
             }

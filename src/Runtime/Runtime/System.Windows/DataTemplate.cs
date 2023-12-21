@@ -76,7 +76,14 @@ namespace System.Windows
         /// </returns>
         public DependencyObject LoadContent()
         {
-            return INTERNAL_InstantiateFrameworkTemplate() as DependencyObject;
+            if (Template != null)
+            {
+                return Template.LoadContent(null) as DependencyObject;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

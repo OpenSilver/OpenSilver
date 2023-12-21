@@ -171,7 +171,7 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnMouseLeftButtonUp(e);
 
-            if (Pointer.INTERNAL_captured == this)
+            if (Pointer.Captured == this)
             {
                 ReleaseMouseCapture();
             }

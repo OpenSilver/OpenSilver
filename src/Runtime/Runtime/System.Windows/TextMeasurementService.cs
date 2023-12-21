@@ -51,9 +51,9 @@ namespace System.Windows
 
         private string CreateMeasurementText(Window parent)
         {
-            Debug.Assert(parent.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference);
+            Debug.Assert(parent.OuterDiv is INTERNAL_HtmlDomElementReference);
 
-            string sParent = INTERNAL_InteropImplementation.GetVariableStringForJS(parent.INTERNAL_OuterDomElement);
+            string sParent = InteropImplementation.GetVariableStringForJS(parent.OuterDiv);
             return OpenSilver.Interop.ExecuteJavaScriptString($"document.createMeasurementService({sParent});");
         }
 

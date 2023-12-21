@@ -39,7 +39,7 @@ namespace System.Windows
 
         internal void InvokeCallback()
         {
-            Point position = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
+            Point position = PopupsManager.GetUIElementAbsolutePosition(_control);
             Size size = _control.GetBoundingClientSize();
             Rect bounds = new(position, size);
             if (_bounds != bounds)
@@ -51,7 +51,7 @@ namespace System.Windows
 
         private void Initialize()
         {
-            Point position = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
+            Point position = PopupsManager.GetUIElementAbsolutePosition(_control);
             Size size = _control switch
             {
                 FrameworkElement fe => fe.RenderSize,

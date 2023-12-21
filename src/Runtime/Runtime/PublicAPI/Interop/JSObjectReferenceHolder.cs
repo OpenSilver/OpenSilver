@@ -32,7 +32,7 @@ namespace OpenSilver.Internal
             private const int MAX_DUMP_JS_LEN = 100;
 
             public string Javascript;
-            public INTERNAL_JSObjectReference JsObject;
+            public JSObjectRef JsObject;
             public IReadOnlyList<FunctionDetails> StackTrace;
             public DateTime CreatedAt = DateTime.Now;
 
@@ -79,7 +79,7 @@ namespace OpenSilver.Internal
             }
         }
 
-        private static string Key(INTERNAL_JSObjectReference obj)
+        private static string Key(JSObjectRef obj)
         {
             var arrayIndex = obj.IsArray ? obj.ArrayIndex : -1;
             return $"{obj.ReferenceId}-{arrayIndex}";
@@ -99,7 +99,7 @@ namespace OpenSilver.Internal
             return stackTrace.Where(fd => _ignoreFunctionNames.All(l => !fd.FunctionName.EndsWith(l))).ToList();
         }
 
-        public void Add(INTERNAL_JSObjectReference obj, string javascript)
+        public void Add(JSObjectRef obj, string javascript)
         {
             var key = Key(obj);
             var stackTrace = StackTraceProvider.StackTrace();
@@ -115,7 +115,7 @@ namespace OpenSilver.Internal
             }
         }
 
-        public void Remove(INTERNAL_JSObjectReference obj)
+        public void Remove(JSObjectRef obj)
         {
             var key = Key(obj);
             lock (this)

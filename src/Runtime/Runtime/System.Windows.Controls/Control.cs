@@ -42,12 +42,6 @@ namespace System.Windows.Controls
             }
         }
 
-        /// <summary>
-        /// Derived classes can set this flag in their constructor to prevent the "Template" property from being applied.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        protected bool INTERNAL_DoNotApplyControlTemplate = false;
-
         //-----------------------
         // ISENABLED (OVERRIDE)
         //-----------------------

@@ -122,7 +122,7 @@ namespace System.Windows.Media
         }
 
         internal override Task<string> GetDataStringAsync(UIElement parent)
-            => Task.FromResult(INTERNAL_ToHtmlString(parent));
+            => Task.FromResult(ToHtmlString(parent));
 
         internal override ISvgBrush GetSvgElement() => new SvgLinearGradient(this);
 
@@ -414,7 +414,7 @@ namespace System.Windows.Media
             gradientStopsString = GetOffsetsString(startPointPercentage, endPointPercentage, startToEndPercentage, "%");
         }
 
-        internal string INTERNAL_ToHtmlString(DependencyObject parent)
+        internal string ToHtmlString(DependencyObject parent)
         {
             double alpha;
             string gradientStopsString;
@@ -429,7 +429,7 @@ namespace System.Windows.Media
                     if (gradientStop.Offset > biggestOffset)
                     {
                         biggestOffset = gradientStop.Offset;
-                        color = gradientStop.Color.INTERNAL_ToHtmlString(this.Opacity);
+                        color = gradientStop.Color.ToHtmlString(this.Opacity);
                     }
                 }
                 gradientStopsString = color + " 0%, " + color + " 100%";
@@ -472,7 +472,7 @@ namespace System.Windows.Media
 
             foreach (GradientStop gradientStop in GradientStops)
             {
-                string currentColor = gradientStop.Color.INTERNAL_ToHtmlString(this.Opacity);
+                string currentColor = gradientStop.Color.ToHtmlString(this.Opacity);
                 string str = currentColor + " " + (startPointPercentage + gradientStop.Offset * startToEndPercentage).ToInvariantString() + percentageSymbol;
                 tempList.Add(new Tuple<double, string>(gradientStop.Offset, str));
                 if (smallestOffset > gradientStop.Offset)
@@ -569,7 +569,7 @@ namespace System.Windows.Media
         [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {
-            string baseString = INTERNAL_ToHtmlString(parent);
+            string baseString = ToHtmlString(parent);
             return new List<object>(4)
             {
                 "-webkit-" + baseString,
@@ -604,9 +604,9 @@ namespace System.Windows.Media
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "spreadMethod", ConvertSpreadMethodToString(_brush.SpreadMethod));
 
                     var stops = _brush.GetGradientStops()
-                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.INTERNAL_ToHtmlString(_brush.Opacity)}\" />");
+                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.ToHtmlString(_brush.Opacity)}\" />");
 
-                    string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_gradientRef);
+                    string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(_gradientRef);
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
                 }
 

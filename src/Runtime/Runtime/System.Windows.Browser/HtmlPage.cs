@@ -133,7 +133,7 @@ namespace System.Windows.Browser
         /// </exception>
         public static void RegisterScriptableObject(string scriptKey, object instance)
         {
-            string sScriptKey = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(scriptKey);
+            string sScriptKey = CSHTML5.InteropImplementation.GetVariableStringForJS(scriptKey);
 
             OpenSilver.Interop.ExecuteJavaScriptVoid($"window[{sScriptKey}]={{}};");
 
@@ -143,8 +143,8 @@ namespace System.Windows.Browser
 
             foreach (var method in methods)
             {
-                string sMethodName = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(method.Name);
-                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Func<INTERNAL_JSObjectReference, object>)(jsObjectReference =>
+                string sMethodName = CSHTML5.InteropImplementation.GetVariableStringForJS(method.Name);
+                string sCallback = CSHTML5.InteropImplementation.GetVariableStringForJS((Func<CSHTML5.Types.JSObjectRef, object>)(jsObjectReference =>
                 {
                     var parameters = method.GetParameters();
                     var args = new object[parameters.Length];

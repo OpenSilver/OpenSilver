@@ -84,8 +84,8 @@ namespace System
 
         public bool EnableInteropLogging
         {
-            get { return INTERNAL_ExecuteJavaScript.EnableInteropLogging; }
-            set { INTERNAL_ExecuteJavaScript.EnableInteropLogging = value; }
+            get { return ExecuteJavaScript.EnableInteropLogging; }
+            set { ExecuteJavaScript.EnableInteropLogging = value; }
         }
 
         public bool EnablePerformanceLogging

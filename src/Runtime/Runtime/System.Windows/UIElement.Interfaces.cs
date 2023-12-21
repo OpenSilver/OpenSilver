@@ -33,8 +33,8 @@ public partial class UIElement : IInternalUIElement
 
     DependencyObject IInternalUIElement.VisualParent
     {
-        get => INTERNAL_VisualParent;
-        set => INTERNAL_VisualParent = value;
+        get => VisualParent;
+        set => VisualParent = value;
     }
 
     event RoutedEventHandler IInternalUIElement.LostFocus

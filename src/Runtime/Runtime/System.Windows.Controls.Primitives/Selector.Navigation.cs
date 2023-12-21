@@ -452,9 +452,9 @@ public partial class Selector
     private void ScrollIntoViewNative(int index)
     {
         if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
-            && container.INTERNAL_OuterDomElement != null)
+            && container.OuterDiv != null)
         {
-            string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(container.INTERNAL_OuterDomElement);
+            string sDomElement = CSHTML5.InteropImplementation.GetVariableStringForJS(container.OuterDiv);
             OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDomElement}.scrollIntoView({{ block: 'nearest' }})");
         }
     }

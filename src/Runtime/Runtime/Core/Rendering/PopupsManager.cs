@@ -15,16 +15,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Input;
 using CSHTML5;
 using CSHTML5.Internal;
 
-namespace DotNetForHtml5.Core // Important: do not rename this class without updating the Simulator as well! The class is called via reflection from the Simulator.
+//
+// Important: do not rename this class without updating the Simulator as well!
+// The class is called via reflection from the Simulator.
+//
+
+namespace DotNetForHtml5.Core
 {
-    internal static class INTERNAL_PopupsManager // Important! DO NOT RENAME this class without updating the Simulator as well! // Note: this class is "internal" but still visible to the Emulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
+    internal static class PopupsManager
     {
         private static int CurrentPopupRootIndentifier = 0;
         private static readonly HashSet<PopupRoot> PopupRootIdentifierToInstance = new();
@@ -41,8 +44,8 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
             //--------------------------------------
 
             object popupRootDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
-            popupRoot.INTERNAL_OuterDomElement
-                = popupRoot.INTERNAL_InnerDomElement
+            popupRoot.OuterDiv
+                = popupRoot.InnerDiv
                 = popupRootDiv;
             popupRoot.IsConnectedToLiveTree = true;
             popupRoot.INTERNAL_AttachToDomEvents();
@@ -62,7 +65,7 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
             if (!PopupRootIdentifierToInstance.Remove(popupRoot))
             {
                 throw new InvalidOperationException(
-                    $"No PopupRoot with identifier '{popupRoot.INTERNAL_UniqueIndentifier}' was found.");
+                    $"No PopupRoot with identifier '{popupRoot.UniqueIndentifier}' was found.");
             }
 
             //--------------------------------------
@@ -71,15 +74,15 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
 
             popupRoot.INTERNAL_DetachFromDomEvents();
 
-            string sWindow = INTERNAL_InteropImplementation.GetVariableStringForJS(popupRoot.INTERNAL_ParentWindow.INTERNAL_RootDomElement);
+            string sWindow = InteropImplementation.GetVariableStringForJS(popupRoot.ParentWindow.RootDomElement);
 
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $@"var popupRoot = document.getElementById(""{popupRoot.INTERNAL_UniqueIndentifier}"");
+                $@"var popupRoot = document.getElementById(""{popupRoot.UniqueIndentifier}"");
 if (popupRoot) {sWindow}.removeChild(popupRoot);");
 
-            popupRoot.INTERNAL_OuterDomElement = popupRoot.INTERNAL_InnerDomElement = null;
+            popupRoot.OuterDiv = popupRoot.InnerDiv = null;
             popupRoot.IsConnectedToLiveTree = false;
-            popupRoot.INTERNAL_LinkedPopup = null;
+            popupRoot.ParentPopup = null;
         }
 
         public static IEnumerable GetAllRootUIElements() // IMPORTANT: This is called via reflection from the "Visual Tree Inspector" of the Simulator. If you rename or remove it, be sure to update the Simulator accordingly!

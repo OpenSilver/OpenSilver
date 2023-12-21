@@ -21,7 +21,7 @@ namespace System.Windows.Media
     /// </summary>
     public struct Color : IFormattable
     {
-        internal static Color INTERNAL_ConvertFromInt32(int argb)
+        internal static Color FromInt32(int argb)
         {
             Color c1 = new Color();
 
@@ -360,12 +360,12 @@ namespace System.Windows.Media
             }
         }
 
-        internal string INTERNAL_ToHtmlString(double opacity)
+        internal string ToHtmlString(double opacity)
         {
             return $"rgba({R.ToInvariantString()}, {G.ToInvariantString()}, {B.ToInvariantString()}, {(opacity * A / 255d).ToInvariantString()})";
         }
 
-        internal static Color INTERNAL_ConvertFromString(string color)
+        internal static Color Parse(string color)
         {
             return Parsers.ParseColor(color, null);
         }

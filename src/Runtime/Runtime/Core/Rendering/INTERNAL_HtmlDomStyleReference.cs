@@ -145,23 +145,23 @@ namespace CSHTML5.Internal
         public string userSelect { set { SetStylePropertyValue("userSelect", value); } }
 
         internal void setProperty(string propertyName, string value) =>
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+            ExecuteJavaScript.QueueExecuteJavaScript(
                 $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}');");
 
         internal void setProperty(string propertyName, string value, string priority) =>
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+            ExecuteJavaScript.QueueExecuteJavaScript(
                 $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}', '{priority}');");
 
         private void SetStylePropertyValue(string propertyName, string value) =>
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+            ExecuteJavaScript.QueueExecuteJavaScript(
                 $"document.setDomStyle('{Uid}', '{propertyName}', '{value}');");
 
         private void SetTransformPropertyValue(string propertyValue) =>
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+            ExecuteJavaScript.QueueExecuteJavaScript(
                 $"document.setDomTransform('{Uid}', '{propertyValue}');");
 
         private void SetTransformOriginPropertyValue(string propertyValue) =>
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
+            ExecuteJavaScript.QueueExecuteJavaScript(
                 $"document.setDomTransformOrigin('{Uid}', '{propertyValue}');");
 
         private string GetCSSProperty(string propertyName) =>

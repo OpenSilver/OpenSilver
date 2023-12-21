@@ -62,22 +62,6 @@ namespace System.Windows
             return false;
         }
 
-        /// <summary>
-        /// Creates an instance of the Template. Intented to be called for templates that have no owner, such as DataTemplates (not ControlTemplates).
-        /// </summary>
-        /// <returns>The instantiated template.</returns>
-        internal IInternalFrameworkElement INTERNAL_InstantiateFrameworkTemplate()
-        {
-            if (Template != null)
-            {
-                return Template.LoadContent(null);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         [Obsolete(Helper.ObsoleteMemberMessage + " Please use the Template property instead.", true)]
         public void SetMethodToInstantiateFrameworkTemplate(Func<FrameworkElement, TemplateInstance> methodToInstantiateFrameworkTemplate)
         {

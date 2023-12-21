@@ -39,9 +39,6 @@ namespace System.Windows
     {
         #region Data
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        public bool INTERNAL_HasImplicitStyles = false;
-
         private PrivateFlags _flags = 0;
         private Dictionary<object, object> _baseDictionary;
         private ResourceDictionaryCollection _mergedDictionaries;
@@ -79,7 +76,7 @@ namespace System.Windows
         public ResourceDictionary()
         {
             _baseDictionary = new Dictionary<object, object>();
-            IsThemeDictionary = INTERNAL_XamlResourcesHandler.IsSystemResourcesParsing;
+            IsThemeDictionary = XamlResourcesHandler.IsSystemResourcesParsing;
 
             // Note: we want to handle the InheritanceContext here, so
             // we explicitly set these flags to make sur the Inheritance

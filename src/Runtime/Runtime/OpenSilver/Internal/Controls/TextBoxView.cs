@@ -119,7 +119,7 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+            string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
             Interop.ExecuteJavaScriptVoid(
                 $"{sElement}.value = \"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\";");
 
@@ -131,8 +131,8 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
     {
         if (InputDiv is null) return;
 
-        string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
-        string sArgs = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e.UIEventArg);
+        string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
+        string sArgs = CSHTML5.InteropImplementation.GetVariableStringForJS(e.UIEventArg);
         if (Interop.ExecuteJavaScriptBoolean($"document.textboxHelpers.onKeyDownNative({sElement}, {sArgs});"))
         {
             e.Handled = true;
@@ -146,7 +146,7 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
         {
             //--- SIMULATOR ONLY: ---
             // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
+            ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)InputDiv).UniqueIdentifier}"");
 element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower()}"");");
         }
@@ -219,7 +219,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
                 return Interop.ExecuteJavaScriptInt32($"{sElement}.selectionStart;");
             }
 
@@ -229,7 +229,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
                 Interop.ExecuteJavaScriptVoid($"{sElement}.selectionStart = {value.ToInvariantString()};");
             }
         }
@@ -241,7 +241,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
                 return Interop.ExecuteJavaScriptInt32($"{sElement}.selectionEnd - {sElement}.selectionStart;");
             }
 
@@ -251,7 +251,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
                 Interop.ExecuteJavaScriptVoid($"{sElement}.selectionEnd = {sElement}.selectionStart + {value.ToInvariantString()};");
             }
         }
@@ -263,7 +263,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
                 return Interop.ExecuteJavaScriptString(
                     $"{sElement}.value.substring({sElement}.selectionStart, {sElement}.selectionEnd);") ?? string.Empty;
             }
@@ -274,8 +274,8 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
-                string sText = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(value);
+                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
+                string sText = CSHTML5.InteropImplementation.GetVariableStringForJS(value);
                 Interop.ExecuteJavaScriptVoid(
                     $"{sElement}.setRangeText({sText}, {sElement}.selectionStart, {sElement}.selectionEnd, 'end');");
 
@@ -289,7 +289,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+            string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
             Interop.ExecuteJavaScriptVoid(
                 $"{sElement}.setSelectionRange({start.ToInvariantString()}, {end.ToInvariantString()});");
         }
@@ -326,7 +326,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         string uid = contentEditableDiv.UniqueIdentifier;
 
         // Set the "data-accepts-return" property (that we have invented) so that the "KeyDown" and "Paste" JavaScript events can retrieve this value:
-        INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
+        ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element = document.getElementByIdSafe('{uid}');
 element.setAttribute('data-acceptsreturn', '{Host.AcceptsReturn.ToString().ToLower()}');
 element.setAttribute('data-acceptstab', '{Host.AcceptsTab.ToString().ToLower()}');");
@@ -334,7 +334,7 @@ element.setAttribute('data-acceptstab', '{Host.AcceptsTab.ToString().ToLower()}'
         if (Interop.IsRunningInTheSimulator)
         {
             // Register the "keydown" javascript event:
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
+            ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
 element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
@@ -413,7 +413,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(InputDiv);
+            string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(InputDiv);
             return Interop.ExecuteJavaScriptString($"{sElement}.value;") ?? string.Empty;
         }
 
@@ -422,8 +422,8 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
     protected sealed override Size MeasureContent(Size constraint)
     {
-        return INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
-            ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier,
+        return ParentWindow.TextMeasurementService.MeasureText(
+            ((INTERNAL_HtmlDomElementReference)OuterDiv).UniqueIdentifier,
             Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
             Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
             constraint.Width,

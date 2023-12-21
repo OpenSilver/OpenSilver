@@ -25,12 +25,12 @@ using DotNetForHtml5.Core;
 
 namespace CSHTML5
 {
-    internal static class INTERNAL_InteropImplementation
+    internal static class InteropImplementation
     {
         private static bool _isInitialized;
         private static readonly ReferenceIDGenerator _refIdGenerator = new ReferenceIDGenerator();
 
-        static INTERNAL_InteropImplementation()
+        static InteropImplementation()
         {
             Application.INTERNAL_Reloaded += (sender, e) =>
             {
@@ -143,20 +143,20 @@ namespace CSHTML5
             if (runAsynchronously)
             {
                 if (wantsReferenceId)
-                    INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript, referenceId);
+                    ExecuteJavaScript.QueueExecuteJavaScript(javascript, referenceId);
                 else
-                    INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
+                    ExecuteJavaScript.QueueExecuteJavaScript(javascript);
             }
             else
             {
                 // run sync
-                result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId, wantsResult, flush: hasImpactOnPendingJSCode);
+                result = ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId, wantsResult, flush: hasImpactOnPendingJSCode);
             }
 
             if (wantsResult)
             {
                 if (wantsReferenceId)
-                    result = new INTERNAL_JSObjectReference(result, referenceId.ToString(), javascript);
+                    result = new JSObjectRef(result, referenceId.ToString(), javascript);
                 else if (runAsynchronously)
                     throw new Exception("runAsync + wantsResult + !wantsReferenceId -> use INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync");
             }
@@ -166,7 +166,7 @@ namespace CSHTML5
             return result;
         }
 
-        internal static INTERNAL_JSObjectReference ExecuteJavaScript_GetJSObject(
+        internal static JSObjectRef ExecuteJavaScript_GetJSObject(
             string javascript,
             bool runAsynchronously,
             bool hasImpactOnPendingJSCode = true,
@@ -176,7 +176,7 @@ namespace CSHTML5
                                                           wantsResult: true,
                                                           wantsReferenceId: true,
                                                           hasImpactOnPendingJSCode, variables);
-            return (INTERNAL_JSObjectReference)result;
+            return (JSObjectRef)result;
         }
 
         internal static void ResetLoadedFilesDictionaries()

@@ -112,7 +112,7 @@ imageView.onload = function() {
                 int height,
                 Action<string, int, int, int> callback)
             {
-                if (element.INTERNAL_OuterDomElement is not INTERNAL_HtmlDomElementReference outerDiv)
+                if (element.OuterDiv is not INTERNAL_HtmlDomElementReference outerDiv)
                 {
                     return Task.CompletedTask;
                 }

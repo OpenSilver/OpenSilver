@@ -775,7 +775,7 @@ namespace System.Windows.Controls
         {
             base.OnMouseMove(e);
 
-            if (!e.IsTouchEvent || Pointer.INTERNAL_captured is not null || ScrollInfo is null || _touchInfo is null)
+            if (!e.IsTouchEvent || Pointer.Captured is not null || ScrollInfo is null || _touchInfo is null)
             {
                 return;
             }

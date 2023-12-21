@@ -110,7 +110,7 @@ namespace System.Windows
             if (UIEventArg != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(UIEventArg)}.preventDefault();");
+                    $"{CSHTML5.InteropImplementation.GetVariableStringForJS(UIEventArg)}.preventDefault();");
             }
         }
     }

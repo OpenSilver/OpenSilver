@@ -270,13 +270,13 @@ namespace System.Windows.Media
 
             if (window is not null)
             {
-                foreach (PopupRoot root in INTERNAL_PopupsManager.GetActivePopupRoots())
+                foreach (PopupRoot root in PopupsManager.GetActivePopupRoots())
                 {
-                    if (root.INTERNAL_ParentWindow == window &&
-                        root.INTERNAL_LinkedPopup.IsOpen &&
-                        root.INTERNAL_LinkedPopup.Child != null)
+                    if (root.ParentWindow == window &&
+                        root.ParentPopup.IsOpen &&
+                        root.ParentPopup.Child != null)
                     {
-                        result.Add(root.INTERNAL_LinkedPopup);
+                        result.Add(root.ParentPopup);
                     }
                 }
             }

@@ -532,7 +532,7 @@ namespace System.Windows.Input
         Unknown = int.MaxValue,
     }
 
-    internal static class INTERNAL_VirtualKeysHelpers
+    internal static class VirtualKeysHelpers
     {
         private static readonly HashSet<int> _unknownKeys =
             new()

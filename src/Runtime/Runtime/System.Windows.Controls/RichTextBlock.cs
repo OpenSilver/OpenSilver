@@ -374,8 +374,8 @@ namespace System.Windows.Controls
             double paddingHeight = padding.Top + padding.Bottom;
             bool wrap = TextWrapping == TextWrapping.Wrap;
 
-            Size textSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
-                ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier,
+            Size textSize = ParentWindow.TextMeasurementService.MeasureText(
+                ((INTERNAL_HtmlDomElementReference)OuterDiv).UniqueIdentifier,
                 wrap ? "pre-wrap" : "pre",
                 wrap ? "break-word" : string.Empty,
                 wrap ? Math.Max(0, availableSize.Width - paddingWidth) : double.PositiveInfinity,

@@ -59,7 +59,7 @@ namespace System.Windows
         /// </summary>
         public static Application Current { get; private set; }
 
-        internal INTERNAL_XamlResourcesHandler XamlResourcesHandler { get; } = new INTERNAL_XamlResourcesHandler();
+        internal XamlResourcesHandler XamlResourcesHandler { get; } = new XamlResourcesHandler();
 
         public Application()
             : this("opensilver-root")
@@ -91,7 +91,7 @@ namespace System.Windows
             new DOMEventManager(GetWindow, "unload", ProcessOnExit).AttachToDomEvents();
 
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
-            INTERNAL_InteropImplementation.ResetLoadedFilesDictionaries();
+            InteropImplementation.ResetLoadedFilesDictionaries();
 
             // we change the resource manager for every resource registered
             ClientSideResourceRegister.Startup();
@@ -152,7 +152,7 @@ namespace System.Windows
             HTMLParam[] paramsArray;
             try
             {
-                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(_rootDiv);
+                string sElement = InteropImplementation.GetVariableStringForJS(_rootDiv);
                 paramsArray = JsonSerializer.Deserialize<HTMLParam[]>(
                     OpenSilver.Interop.ExecuteJavaScriptString($"document.getAppParams({sElement});"));
             }
@@ -584,7 +584,7 @@ namespace System.Windows
         public static void RunApplication(Action entryPoint)
         {
             entryPoint();
-            INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
+            ExecuteJavaScript.ExecutePendingJavaScriptCode();
         }
     }
 }

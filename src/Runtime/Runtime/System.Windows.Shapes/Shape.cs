@@ -758,7 +758,7 @@ namespace System.Windows.Shapes
         {
             if (SvgElement is not null)
             {
-                string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(SvgElement);
+                string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(SvgElement);
 
                 SVGRect bbox = JsonSerializer.Deserialize<SVGRect>(
                     OpenSilver.Interop.ExecuteJavaScriptString($"document.getBBox({sDiv});"));

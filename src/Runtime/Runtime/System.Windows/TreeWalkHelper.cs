@@ -62,7 +62,7 @@ namespace System.Windows
             if (inheritanceNode)
             {
                 BaseValueSourceInternal oldValueSource = BaseValueSourceInternal.Default;
-                if (INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d, dp, metadata, false, out INTERNAL_PropertyStorage storage))
+                if (DependencyObjectStore.TryGetInheritedPropertyStorage(d, dp, metadata, false, out Storage storage))
                 {
                     oldValueSource = storage.Entry.BaseValueSourceInternal;
                 }
@@ -91,7 +91,7 @@ namespace System.Windows
                     if (storage == null)
                     {
                         // get the storage if we didn't to it ealier.
-                        INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d,
+                        DependencyObjectStore.TryGetInheritedPropertyStorage(d,
                             dp,
                             metadata,
                             true,

@@ -32,7 +32,7 @@ internal abstract partial class TextViewBase<T> : FrameworkElement
 
     internal T Host { get; }
 
-    internal object InputDiv => INTERNAL_OuterDomElement;
+    internal object InputDiv => OuterDiv;
 
     internal sealed override UIElement KeyboardTarget => Host;
 
@@ -45,9 +45,9 @@ internal abstract partial class TextViewBase<T> : FrameworkElement
         _inputCallback = JavaScriptCallback.Create(OnInputNative, true);
         _scrollCallback = JavaScriptCallback.Create(OnScrollNative, true);
 
-        string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-        string sInputCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_inputCallback);
-        string sScrollCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_scrollCallback);
+        string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
+        string sInputCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_inputCallback);
+        string sScrollCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_scrollCallback);
         Interop.ExecuteJavaScriptFastAsync($@"{sDiv}.addEventListener('input', {sInputCallback});
 {sDiv}.addEventListener('scroll', {sScrollCallback});");
     }
@@ -75,7 +75,7 @@ internal abstract partial class TextViewBase<T> : FrameworkElement
     {
         if (!IsScrollClient) return;
 
-        string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+        string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
         double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft;");
         double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop;");
 

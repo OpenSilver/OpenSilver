@@ -178,7 +178,7 @@ namespace System.Windows.Media
         RadialGradientBrush ICloneOnAnimation<RadialGradientBrush>.Clone() => new RadialGradientBrush(this);
 
         internal override Task<string> GetDataStringAsync(UIElement parent)
-            => Task.FromResult(INTERNAL_ToHtmlString(parent));
+            => Task.FromResult(ToHtmlString(parent));
 
         internal override ISvgBrush GetSvgElement() => new SvgRadialGradient(this);
 
@@ -186,10 +186,10 @@ namespace System.Windows.Media
         {
             return string.Join(", ", 
                 GradientStops.OrderBy(gs => gs.Offset)
-                             .Select(gs => gs.Color.INTERNAL_ToHtmlString(this.Opacity) + gs.Offset * 100 + "%"));
+                             .Select(gs => gs.Color.ToHtmlString(this.Opacity) + gs.Offset * 100 + "%"));
         }
 
-        internal string INTERNAL_ToHtmlString(DependencyObject parent)
+        internal string ToHtmlString(DependencyObject parent)
         {
             // background-image: radial-gradient(50% 50% at 50% 100%,
             // blue 0%, white 10%, purple 20%, purple 99%, black 100%);
@@ -224,7 +224,7 @@ namespace System.Windows.Media
         [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {
-            string gradientString = INTERNAL_ToHtmlString(parent);
+            string gradientString = ToHtmlString(parent);
             return new List<object>(4)
             {
                 "-webkit-" + gradientString,
@@ -261,9 +261,9 @@ namespace System.Windows.Media
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "spreadMethod", ConvertSpreadMethodToString(_brush.SpreadMethod));
 
                     var stops = _brush.GetGradientStops()
-                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.INTERNAL_ToHtmlString(_brush.Opacity)}\" />");
+                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.ToHtmlString(_brush.Opacity)}\" />");
 
-                    string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_gradientRef);
+                    string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(_gradientRef);
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
                 }
 

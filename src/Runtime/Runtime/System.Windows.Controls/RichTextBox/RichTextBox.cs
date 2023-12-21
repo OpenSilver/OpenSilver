@@ -656,7 +656,7 @@ namespace System.Windows.Controls
                     if (run.FontStyle == FontStyles.Italic)
                         format.Add("italic", true);
                     if (run.Foreground is SolidColorBrush foreground)
-                        format.Add("color", foreground.INTERNAL_ToHtmlString());
+                        format.Add("color", foreground.ToHtmlString());
                     _textViewHost.View.SetText(run.Text, format);
                     break;
 

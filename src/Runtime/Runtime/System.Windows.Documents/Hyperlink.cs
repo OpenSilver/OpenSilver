@@ -103,11 +103,11 @@ public sealed class Hyperlink : Span
                     Hyperlink hyperlink = (Hyperlink)d;
                     string color = (Brush)newValue switch
                     {
-                        SolidColorBrush solidColorBrush => solidColorBrush.INTERNAL_ToHtmlString(),
+                        SolidColorBrush solidColorBrush => solidColorBrush.ToHtmlString(),
                         _ => string.Empty,
                     };
 
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(hyperlink.INTERNAL_OuterDomElement).setProperty(
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(hyperlink.OuterDiv).setProperty(
                         MouseOverForegroundVariable,
                         color);
                 },
@@ -143,7 +143,7 @@ public sealed class Hyperlink : Span
 
                     Hyperlink hyperlink = (Hyperlink)d;
                     string value = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(hyperlink.INTERNAL_OuterDomElement).setProperty(
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(hyperlink.OuterDiv).setProperty(
                         MouseOverTextDecorationsVariable,
                         value);
                 },
@@ -210,7 +210,7 @@ public sealed class Hyperlink : Span
     protected internal override void INTERNAL_OnAttachedToVisualTree()
     {
         base.INTERNAL_OnAttachedToVisualTree();
-        INTERNAL_HtmlDomManager.AddCSSClass(INTERNAL_OuterDomElement, "opensilver-hyperlink");
+        INTERNAL_HtmlDomManager.AddCSSClass(OuterDiv, "opensilver-hyperlink");
     }
 
     public override void INTERNAL_AttachToDomEvents()
@@ -219,8 +219,8 @@ public sealed class Hyperlink : Span
 
         _clickCallback = JavaScriptCallback.Create(OnClickNative, true);
 
-        string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-        string sClickCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_clickCallback);
+        string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
+        string sClickCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_clickCallback);
         OpenSilver.Interop.ExecuteJavaScriptFastAsync(
             $"{sDiv}.addEventListener('click', function (e) {{ {sClickCallback}(); }});");
     }

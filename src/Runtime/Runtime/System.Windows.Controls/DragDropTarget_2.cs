@@ -100,10 +100,10 @@ namespace System.Windows.Controls
             //----------------------------------
 
             // Add mouse events to the window to enable dropping on any other elements
-            this.INTERNAL_ParentWindow.MouseMove -= DragDropTarget_MouseMove;
-            this.INTERNAL_ParentWindow.MouseMove += DragDropTarget_MouseMove;
-            this.INTERNAL_ParentWindow.MouseLeftButtonUp -= DragDropTarget_MouseLeftButtonUp;
-            this.INTERNAL_ParentWindow.MouseLeftButtonUp += DragDropTarget_MouseLeftButtonUp;
+            this.ParentWindow.MouseMove -= DragDropTarget_MouseMove;
+            this.ParentWindow.MouseMove += DragDropTarget_MouseMove;
+            this.ParentWindow.MouseLeftButtonUp -= DragDropTarget_MouseLeftButtonUp;
+            this.ParentWindow.MouseLeftButtonUp += DragDropTarget_MouseLeftButtonUp;
 
             // Prevent the PointerPressed event from bubbling up so that if there are two nested DragDropTargets, only the inner one will be dragged:
             e.Handled = true;
@@ -295,8 +295,8 @@ namespace System.Windows.Controls
             //----------------------------------
             // POINTER RELEASED
             //----------------------------------
-            this.INTERNAL_ParentWindow.MouseMove -= DragDropTarget_MouseMove;
-            this.INTERNAL_ParentWindow.MouseLeftButtonUp -= DragDropTarget_MouseLeftButtonUp;
+            this.ParentWindow.MouseMove -= DragDropTarget_MouseMove;
+            this.ParentWindow.MouseLeftButtonUp -= DragDropTarget_MouseLeftButtonUp;
 
             // Remember the new pointer position:  
             _pointerX = e.GetPosition(null).X;
@@ -427,10 +427,10 @@ namespace System.Windows.Controls
             base.INTERNAL_OnAttachedToVisualTree();
 
             // Prevent the selection of text while dragging from the DragDropTarget
-            INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation("$0.style.userSelect = 'none'", 
+            InteropImplementation.ExecuteJavaScript_Implementation("$0.style.userSelect = 'none'", 
                 runAsynchronously: true, wantsResult: false, wantsReferenceId: false,
                 hasImpactOnPendingJSCode: false, 
-                INTERNAL_OuterDomElement);
+                OuterDiv);
         }
 
 

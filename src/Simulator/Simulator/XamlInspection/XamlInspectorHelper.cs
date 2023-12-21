@@ -103,13 +103,12 @@ namespace OpenSilver.Simulator.XamlInspection
                 }
                 treeNode.AreChildrenLoaded = true;
                 // Handle the children recursively:
-                IDictionary visualChildrenInformation = uiElement.INTERNAL_VisualChildrenInformation as IDictionary;
-                if (visualChildrenInformation != null)
+                if (uiElement.VisualChildrenInformation is IDictionary visualChildrenInformation)
                 {
                     if (currMaxLevel > 0 || maxTreeLevel == -1)
                     {
                         if (maxTreeLevel != -1) currMaxLevel--;
-                        foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
+                        foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "VisualChildInformation" in the "Core" assembly.
                         {
                             var childElement = item;
                             if (childElement != null)
@@ -152,10 +151,9 @@ namespace OpenSilver.Simulator.XamlInspection
                 parentNode.AreChildrenLoaded = true;
                 var parentElement = elementBranch[i];
 
-                IDictionary visualChildrenInformation = parentElement.INTERNAL_VisualChildrenInformation as IDictionary;
-                if (visualChildrenInformation != null)
+                if (parentElement.VisualChildrenInformation is IDictionary visualChildrenInformation)
                 {
-                    foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
+                    foreach (dynamic item in visualChildrenInformation.Keys) // This corresponds to elements of type "VisualChildInformation" in the "Core" assembly.
                     {
                         var childElement = item;
                         if (childElement != null)
@@ -167,7 +165,8 @@ namespace OpenSilver.Simulator.XamlInspection
                                 Name = GetNameOrNullFromElement(childElement),
                                 Children = new ObservableCollection<TreeNode>(),
                                 Parent = parentNode,
-                                AreChildrenLoaded = childElement.INTERNAL_VisualChildrenInformation == null || (childElement.INTERNAL_VisualChildrenInformation as IDictionary).Count == 0
+                                AreChildrenLoaded = childElement.VisualChildrenInformation == null || 
+                                    (childElement.VisualChildrenInformation is IDictionary children && children.Count == 0)
                             };
                             parentNode.Children.Add(treeNode);
                             if (childElement.Equals(elementBranch[i - 1]))
@@ -180,7 +179,6 @@ namespace OpenSilver.Simulator.XamlInspection
                 }
             }
 
-            //lastLeafNode.AreChildrenLoaded = elementBranch.First().INTERNAL_VisualChildrenInformation == null || (elementBranch.First().INTERNAL_VisualChildrenInformation as IDictionary).Count == 0;
             return lastLeafNode;
         }
 
@@ -287,8 +285,8 @@ namespace OpenSilver.Simulator.XamlInspection
             //     select a).FirstOrDefault();
             if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
             {
-                // Find the type "INTERNAL_PopupsManager" in Core:
-                Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "DotNetForHtml5.Core" && type.Name == "INTERNAL_PopupsManager") select type).FirstOrDefault();
+                // Find the type "PopupsManager" in Core:
+                Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "DotNetForHtml5.Core" && type.Name == "PopupsManager") select type).FirstOrDefault();
                 if (manager != null)
                 {
                     // Call the "GetAllRootUIElements" method:
@@ -409,7 +407,7 @@ namespace OpenSilver.Simulator.XamlInspection
         {
             if (uiElement != null)
             {
-                string uniqueIdentifier = ((dynamic)((dynamic)uiElement).INTERNAL_OuterDomElement).UniqueIdentifier.ToString();
+                string uniqueIdentifier = (((dynamic)uiElement).OuterDiv).UniqueIdentifier.ToString();
                 uniqueIdentifier = uniqueIdentifier != null ? $"'{uniqueIdentifier}'" : "null";
                 SimulatorProxy.OpenSilverRuntimeDispatcher.BeginInvoke(() =>
                 {

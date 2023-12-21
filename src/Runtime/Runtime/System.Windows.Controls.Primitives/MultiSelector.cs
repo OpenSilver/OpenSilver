@@ -57,7 +57,7 @@ namespace System.Windows.Controls.Primitives
             }
             if (e.OldItems != null)
             {
-                List<object> oldItems = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(e.OldItems);
+                List<object> oldItems = ConvertToListOfObjectsOrNull(e.OldItems);
                 foreach (object item in oldItems)
                 {
                     SetItemVisualSelectionState(item, false);
@@ -65,7 +65,7 @@ namespace System.Windows.Controls.Primitives
             }
             if (e.NewItems != null)
             {
-                List<object> newItems = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(e.NewItems);
+                List<object> newItems = ConvertToListOfObjectsOrNull(e.NewItems);
                 foreach (object item in newItems)
                 {
                     SetItemVisualSelectionState(item, true);
@@ -100,7 +100,20 @@ namespace System.Windows.Controls.Primitives
                     OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
                 });
             }
+        }
 
+        private static List<object> ConvertToListOfObjectsOrNull(IEnumerable enumerable)
+        {
+            List<object> result = null;
+            if (enumerable != null)
+            {
+                result = new List<object>();
+                foreach (var obj in enumerable)
+                {
+                    result.Add(obj);
+                }
+            }
+            return result;
         }
 
         protected abstract void UnselectAllItems();

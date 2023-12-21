@@ -287,28 +287,28 @@ namespace System.Windows.Controls
 
         private static void ChangeBorderColor(Border border, Brush oldBrush, Brush newBrush)
         {
-            var cssStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(border.INTERNAL_OuterDomElement);
+            var cssStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(border.OuterDiv);
             switch (oldBrush, newBrush)
             {
                 case (GradientBrush, SolidColorBrush solid):
                     cssStyle.borderImageSource = string.Empty;
                     cssStyle.borderImageSlice = string.Empty;
-                    cssStyle.borderColor = solid.INTERNAL_ToHtmlString();
+                    cssStyle.borderColor = solid.ToHtmlString();
                     break;
 
                 case (_, SolidColorBrush solid):
-                    cssStyle.borderColor = solid.INTERNAL_ToHtmlString();
+                    cssStyle.borderColor = solid.ToHtmlString();
                     break;
 
                 case (_, LinearGradientBrush linear):
                     cssStyle.borderColor = string.Empty;
-                    cssStyle.borderImageSource = linear.INTERNAL_ToHtmlString(border);
+                    cssStyle.borderImageSource = linear.ToHtmlString(border);
                     cssStyle.borderImageSlice = "1";
                     break;
 
                 case (_, RadialGradientBrush radial):
                     cssStyle.borderColor = string.Empty;
-                    cssStyle.borderImageSource = radial.INTERNAL_ToHtmlString(border);
+                    cssStyle.borderImageSource = radial.ToHtmlString(border);
                     cssStyle.borderImageSlice = "1";
                     break;
 

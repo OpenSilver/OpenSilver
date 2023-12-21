@@ -165,7 +165,7 @@ namespace System.Windows.Media.Effects
                 string shadowString = x.ToInvariantString() + "px " +
                     y.ToInvariantString() + "px " +
                     BlurRadius.ToInvariantString() + "px " +
-                    Color.FromArgb(Convert.ToByte(opacity * 255d), Color.R, Color.G, Color.B).INTERNAL_ToHtmlString(1d);
+                    Color.FromArgb(Convert.ToByte(opacity * 255d), Color.R, Color.G, Color.B).ToHtmlString(1d);
 
                 if (renderTarget is TextBlock)
                 {

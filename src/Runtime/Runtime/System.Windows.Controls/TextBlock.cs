@@ -546,11 +546,11 @@ namespace System.Windows.Controls
                 return new Size(paddingWidth, paddingHeight);
             }
 
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
+            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)OuterDiv).UniqueIdentifier;
 
             if (_noWrapSize == Size.Empty)
             {
-                _noWrapSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
+                _noWrapSize = ParentWindow.TextMeasurementService.MeasureText(
                     uniqueIdentifier,
                     "pre",
                     string.Empty,
@@ -573,7 +573,7 @@ namespace System.Windows.Controls
                 return desiredSize;
             }
 
-            Size textSize = INTERNAL_ParentWindow.TextMeasurementService.MeasureText(
+            Size textSize = ParentWindow.TextMeasurementService.MeasureText(
                 uniqueIdentifier,
                 "pre-wrap",
                 "break-word",

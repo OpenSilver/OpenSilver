@@ -27,7 +27,7 @@ namespace Microsoft.Windows
         {
             get
             {
-                return (Pointer.INTERNAL_captured != null);
+                return (Pointer.Captured != null);
             }
         }
     }

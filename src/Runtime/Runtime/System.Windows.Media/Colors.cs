@@ -18,7 +18,7 @@ namespace System.Windows.Media
     /// </summary>
     public static class Colors
     {
-        internal enum INTERNAL_ColorsEnum : int
+        internal enum KnownColor : int
         {
             AliceBlue = unchecked((int)0xFFF0F8FF),
             AntiqueWhite = unchecked((int)0xFFFAEBD7),
@@ -200,7 +200,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.AliceBlue);
+                return Color.FromInt32((int)KnownColor.AliceBlue);
             }
         }
  
@@ -211,7 +211,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.AntiqueWhite);
+                return Color.FromInt32((int)KnownColor.AntiqueWhite);
             }
         }
  
@@ -222,7 +222,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Aqua);
+                return Color.FromInt32((int)KnownColor.Aqua);
             }
         }
  
@@ -233,7 +233,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Aquamarine);
+                return Color.FromInt32((int)KnownColor.Aquamarine);
             }
         }
  
@@ -244,7 +244,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Azure);
+                return Color.FromInt32((int)KnownColor.Azure);
             }
         }
  
@@ -255,7 +255,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Beige);
+                return Color.FromInt32((int)KnownColor.Beige);
             }
         }
  
@@ -266,7 +266,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Bisque);
+                return Color.FromInt32((int)KnownColor.Bisque);
             }
         }
  
@@ -277,7 +277,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Black);
+                return Color.FromInt32((int)KnownColor.Black);
             }
         }
  
@@ -288,7 +288,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.BlanchedAlmond);
+                return Color.FromInt32((int)KnownColor.BlanchedAlmond);
             }
         }
  
@@ -299,7 +299,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Blue);
+                return Color.FromInt32((int)KnownColor.Blue);
             }
         }
  
@@ -310,7 +310,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.BlueViolet);
+                return Color.FromInt32((int)KnownColor.BlueViolet);
             }
         }
  
@@ -321,7 +321,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Brown);
+                return Color.FromInt32((int)KnownColor.Brown);
             }
         }
  
@@ -332,7 +332,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.BurlyWood);
+                return Color.FromInt32((int)KnownColor.BurlyWood);
             }
         }
  
@@ -343,7 +343,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.CadetBlue);
+                return Color.FromInt32((int)KnownColor.CadetBlue);
             }
         }
  
@@ -354,7 +354,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Chartreuse);
+                return Color.FromInt32((int)KnownColor.Chartreuse);
             }
         }
  
@@ -365,7 +365,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Chocolate);
+                return Color.FromInt32((int)KnownColor.Chocolate);
             }
         }
  
@@ -376,7 +376,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Coral);
+                return Color.FromInt32((int)KnownColor.Coral);
             }
         }
  
@@ -387,7 +387,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.CornflowerBlue);
+                return Color.FromInt32((int)KnownColor.CornflowerBlue);
             }
         }
  
@@ -398,7 +398,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Cornsilk);
+                return Color.FromInt32((int)KnownColor.Cornsilk);
             }
         }
  
@@ -409,7 +409,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Crimson);
+                return Color.FromInt32((int)KnownColor.Crimson);
             }
         }
  
@@ -420,7 +420,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Cyan);
+                return Color.FromInt32((int)KnownColor.Cyan);
             }
         }
  
@@ -431,7 +431,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkBlue);
+                return Color.FromInt32((int)KnownColor.DarkBlue);
             }
         }
  
@@ -442,7 +442,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkCyan);
+                return Color.FromInt32((int)KnownColor.DarkCyan);
             }
         }
  
@@ -453,7 +453,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkGoldenrod);
+                return Color.FromInt32((int)KnownColor.DarkGoldenrod);
             }
         }
  
@@ -464,7 +464,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkGray);
+                return Color.FromInt32((int)KnownColor.DarkGray);
             }
         }
  
@@ -475,7 +475,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkGreen);
+                return Color.FromInt32((int)KnownColor.DarkGreen);
             }
         }
  
@@ -486,7 +486,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkKhaki);
+                return Color.FromInt32((int)KnownColor.DarkKhaki);
             }
         }
  
@@ -497,7 +497,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkMagenta);
+                return Color.FromInt32((int)KnownColor.DarkMagenta);
             }
         }
  
@@ -508,7 +508,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkOliveGreen);
+                return Color.FromInt32((int)KnownColor.DarkOliveGreen);
             }
         }
  
@@ -519,7 +519,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkOrange);
+                return Color.FromInt32((int)KnownColor.DarkOrange);
             }
         }
  
@@ -530,7 +530,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkOrchid);
+                return Color.FromInt32((int)KnownColor.DarkOrchid);
             }
         }
  
@@ -541,7 +541,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkRed);
+                return Color.FromInt32((int)KnownColor.DarkRed);
             }
         }
  
@@ -552,7 +552,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkSalmon);
+                return Color.FromInt32((int)KnownColor.DarkSalmon);
             }
         }
  
@@ -563,7 +563,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkSeaGreen);
+                return Color.FromInt32((int)KnownColor.DarkSeaGreen);
             }
         }
  
@@ -574,7 +574,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkSlateBlue);
+                return Color.FromInt32((int)KnownColor.DarkSlateBlue);
             }
         }
  
@@ -585,7 +585,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkSlateGray);
+                return Color.FromInt32((int)KnownColor.DarkSlateGray);
             }
         }
  
@@ -596,7 +596,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkTurquoise);
+                return Color.FromInt32((int)KnownColor.DarkTurquoise);
             }
         }
  
@@ -607,7 +607,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DarkViolet);
+                return Color.FromInt32((int)KnownColor.DarkViolet);
             }
         }
  
@@ -618,7 +618,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DeepPink);
+                return Color.FromInt32((int)KnownColor.DeepPink);
             }
         }
  
@@ -629,7 +629,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DeepSkyBlue);
+                return Color.FromInt32((int)KnownColor.DeepSkyBlue);
             }
         }
  
@@ -640,7 +640,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DimGray);
+                return Color.FromInt32((int)KnownColor.DimGray);
             }
         }
  
@@ -651,7 +651,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.DodgerBlue);
+                return Color.FromInt32((int)KnownColor.DodgerBlue);
             }
         }
  
@@ -662,7 +662,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Firebrick);
+                return Color.FromInt32((int)KnownColor.Firebrick);
             }
         }
  
@@ -673,7 +673,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.FloralWhite);
+                return Color.FromInt32((int)KnownColor.FloralWhite);
             }
         }
  
@@ -684,7 +684,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.ForestGreen);
+                return Color.FromInt32((int)KnownColor.ForestGreen);
             }
         }
  
@@ -695,7 +695,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Fuchsia);
+                return Color.FromInt32((int)KnownColor.Fuchsia);
             }
         }
  
@@ -706,7 +706,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Gainsboro);
+                return Color.FromInt32((int)KnownColor.Gainsboro);
             }
         }
  
@@ -717,7 +717,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.GhostWhite);
+                return Color.FromInt32((int)KnownColor.GhostWhite);
             }
         }
  
@@ -728,7 +728,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Gold);
+                return Color.FromInt32((int)KnownColor.Gold);
             }
         }
  
@@ -739,7 +739,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Goldenrod);
+                return Color.FromInt32((int)KnownColor.Goldenrod);
             }
         }
  
@@ -750,7 +750,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Gray);
+                return Color.FromInt32((int)KnownColor.Gray);
             }
         }
  
@@ -761,7 +761,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Green);
+                return Color.FromInt32((int)KnownColor.Green);
             }
         }
  
@@ -772,7 +772,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.GreenYellow);
+                return Color.FromInt32((int)KnownColor.GreenYellow);
             }
         }
  
@@ -783,7 +783,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Honeydew);
+                return Color.FromInt32((int)KnownColor.Honeydew);
             }
         }
  
@@ -794,7 +794,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.HotPink);
+                return Color.FromInt32((int)KnownColor.HotPink);
             }
         }
  
@@ -805,7 +805,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.IndianRed);
+                return Color.FromInt32((int)KnownColor.IndianRed);
             }
         }
  
@@ -816,7 +816,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Indigo);
+                return Color.FromInt32((int)KnownColor.Indigo);
             }
         }
  
@@ -827,7 +827,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Ivory);
+                return Color.FromInt32((int)KnownColor.Ivory);
             }
         }
  
@@ -838,7 +838,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Khaki);
+                return Color.FromInt32((int)KnownColor.Khaki);
             }
         }
  
@@ -849,7 +849,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Lavender);
+                return Color.FromInt32((int)KnownColor.Lavender);
             }
         }
  
@@ -860,7 +860,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LavenderBlush);
+                return Color.FromInt32((int)KnownColor.LavenderBlush);
             }
         }
  
@@ -871,7 +871,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LawnGreen);
+                return Color.FromInt32((int)KnownColor.LawnGreen);
             }
         }
  
@@ -882,7 +882,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LemonChiffon);
+                return Color.FromInt32((int)KnownColor.LemonChiffon);
             }
         }
  
@@ -893,7 +893,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightBlue);
+                return Color.FromInt32((int)KnownColor.LightBlue);
             }
         }
  
@@ -904,7 +904,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightCoral);
+                return Color.FromInt32((int)KnownColor.LightCoral);
             }
         }
  
@@ -915,7 +915,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightCyan);
+                return Color.FromInt32((int)KnownColor.LightCyan);
             }
         }
  
@@ -926,7 +926,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightGoldenrodYellow);
+                return Color.FromInt32((int)KnownColor.LightGoldenrodYellow);
             }
         }
  
@@ -937,7 +937,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightGray);
+                return Color.FromInt32((int)KnownColor.LightGray);
             }
         }
  
@@ -948,7 +948,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightGreen);
+                return Color.FromInt32((int)KnownColor.LightGreen);
             }
         }
  
@@ -959,7 +959,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightPink);
+                return Color.FromInt32((int)KnownColor.LightPink);
             }
         }
  
@@ -970,7 +970,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightSalmon);
+                return Color.FromInt32((int)KnownColor.LightSalmon);
             }
         }
  
@@ -981,7 +981,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightSeaGreen);
+                return Color.FromInt32((int)KnownColor.LightSeaGreen);
             }
         }
  
@@ -992,7 +992,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightSkyBlue);
+                return Color.FromInt32((int)KnownColor.LightSkyBlue);
             }
         }
  
@@ -1003,7 +1003,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightSlateGray);
+                return Color.FromInt32((int)KnownColor.LightSlateGray);
             }
         }
  
@@ -1014,7 +1014,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightSteelBlue);
+                return Color.FromInt32((int)KnownColor.LightSteelBlue);
             }
         }
  
@@ -1025,7 +1025,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LightYellow);
+                return Color.FromInt32((int)KnownColor.LightYellow);
             }
         }
  
@@ -1036,7 +1036,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Lime);
+                return Color.FromInt32((int)KnownColor.Lime);
             }
         }
  
@@ -1047,7 +1047,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.LimeGreen);
+                return Color.FromInt32((int)KnownColor.LimeGreen);
             }
         }
  
@@ -1058,7 +1058,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Linen);
+                return Color.FromInt32((int)KnownColor.Linen);
             }
         }
  
@@ -1069,7 +1069,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Magenta);
+                return Color.FromInt32((int)KnownColor.Magenta);
             }
         }
  
@@ -1080,7 +1080,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Maroon);
+                return Color.FromInt32((int)KnownColor.Maroon);
             }
         }
  
@@ -1091,7 +1091,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumAquamarine);
+                return Color.FromInt32((int)KnownColor.MediumAquamarine);
             }
         }
  
@@ -1102,7 +1102,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumBlue);
+                return Color.FromInt32((int)KnownColor.MediumBlue);
             }
         }
  
@@ -1113,7 +1113,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumOrchid);
+                return Color.FromInt32((int)KnownColor.MediumOrchid);
             }
         }
  
@@ -1124,7 +1124,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumPurple);
+                return Color.FromInt32((int)KnownColor.MediumPurple);
             }
         }
  
@@ -1135,7 +1135,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumSeaGreen);
+                return Color.FromInt32((int)KnownColor.MediumSeaGreen);
             }
         }
  
@@ -1146,7 +1146,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumSlateBlue);
+                return Color.FromInt32((int)KnownColor.MediumSlateBlue);
             }
         }
  
@@ -1157,7 +1157,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumSpringGreen);
+                return Color.FromInt32((int)KnownColor.MediumSpringGreen);
             }
         }
  
@@ -1168,7 +1168,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumTurquoise);
+                return Color.FromInt32((int)KnownColor.MediumTurquoise);
             }
         }
  
@@ -1179,7 +1179,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MediumVioletRed);
+                return Color.FromInt32((int)KnownColor.MediumVioletRed);
             }
         }
  
@@ -1190,7 +1190,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MidnightBlue);
+                return Color.FromInt32((int)KnownColor.MidnightBlue);
             }
         }
  
@@ -1201,7 +1201,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MintCream);
+                return Color.FromInt32((int)KnownColor.MintCream);
             }
         }
  
@@ -1212,7 +1212,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.MistyRose);
+                return Color.FromInt32((int)KnownColor.MistyRose);
             }
         }
  
@@ -1223,7 +1223,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Moccasin);
+                return Color.FromInt32((int)KnownColor.Moccasin);
             }
         }
  
@@ -1234,7 +1234,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.NavajoWhite);
+                return Color.FromInt32((int)KnownColor.NavajoWhite);
             }
         }
  
@@ -1245,7 +1245,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Navy);
+                return Color.FromInt32((int)KnownColor.Navy);
             }
         }
  
@@ -1256,7 +1256,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.OldLace);
+                return Color.FromInt32((int)KnownColor.OldLace);
             }
         }
  
@@ -1267,7 +1267,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Olive);
+                return Color.FromInt32((int)KnownColor.Olive);
             }
         }
  
@@ -1278,7 +1278,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.OliveDrab);
+                return Color.FromInt32((int)KnownColor.OliveDrab);
             }
         }
  
@@ -1289,7 +1289,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Orange);
+                return Color.FromInt32((int)KnownColor.Orange);
             }
         }
  
@@ -1300,7 +1300,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.OrangeRed);
+                return Color.FromInt32((int)KnownColor.OrangeRed);
             }
         }
  
@@ -1311,7 +1311,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Orchid);
+                return Color.FromInt32((int)KnownColor.Orchid);
             }
         }
  
@@ -1322,7 +1322,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.PaleGoldenrod);
+                return Color.FromInt32((int)KnownColor.PaleGoldenrod);
             }
         }
  
@@ -1333,7 +1333,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.PaleGreen);
+                return Color.FromInt32((int)KnownColor.PaleGreen);
             }
         }
  
@@ -1344,7 +1344,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.PaleTurquoise);
+                return Color.FromInt32((int)KnownColor.PaleTurquoise);
             }
         }
  
@@ -1355,7 +1355,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.PaleVioletRed);
+                return Color.FromInt32((int)KnownColor.PaleVioletRed);
             }
         }
  
@@ -1366,7 +1366,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.PapayaWhip);
+                return Color.FromInt32((int)KnownColor.PapayaWhip);
             }
         }
  
@@ -1377,7 +1377,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.PeachPuff);
+                return Color.FromInt32((int)KnownColor.PeachPuff);
             }
         }
  
@@ -1388,7 +1388,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Peru);
+                return Color.FromInt32((int)KnownColor.Peru);
             }
         }
  
@@ -1399,7 +1399,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Pink);
+                return Color.FromInt32((int)KnownColor.Pink);
             }
         }
  
@@ -1410,7 +1410,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Plum);
+                return Color.FromInt32((int)KnownColor.Plum);
             }
         }
  
@@ -1421,7 +1421,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.PowderBlue);
+                return Color.FromInt32((int)KnownColor.PowderBlue);
             }
         }
  
@@ -1432,7 +1432,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Purple);
+                return Color.FromInt32((int)KnownColor.Purple);
             }
         }
  
@@ -1443,7 +1443,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Red);
+                return Color.FromInt32((int)KnownColor.Red);
             }
         }
  
@@ -1454,7 +1454,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.RosyBrown);
+                return Color.FromInt32((int)KnownColor.RosyBrown);
             }
         }
  
@@ -1465,7 +1465,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.RoyalBlue);
+                return Color.FromInt32((int)KnownColor.RoyalBlue);
             }
         }
  
@@ -1476,7 +1476,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SaddleBrown);
+                return Color.FromInt32((int)KnownColor.SaddleBrown);
             }
         }
  
@@ -1487,7 +1487,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Salmon);
+                return Color.FromInt32((int)KnownColor.Salmon);
             }
         }
  
@@ -1498,7 +1498,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SandyBrown);
+                return Color.FromInt32((int)KnownColor.SandyBrown);
             }
         }
  
@@ -1509,7 +1509,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SeaGreen);
+                return Color.FromInt32((int)KnownColor.SeaGreen);
             }
         }
  
@@ -1520,7 +1520,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SeaShell);
+                return Color.FromInt32((int)KnownColor.SeaShell);
             }
         }
  
@@ -1531,7 +1531,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Sienna);
+                return Color.FromInt32((int)KnownColor.Sienna);
             }
         }
  
@@ -1542,7 +1542,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Silver);
+                return Color.FromInt32((int)KnownColor.Silver);
             }
         }
  
@@ -1553,7 +1553,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SkyBlue);
+                return Color.FromInt32((int)KnownColor.SkyBlue);
             }
         }
  
@@ -1564,7 +1564,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SlateBlue);
+                return Color.FromInt32((int)KnownColor.SlateBlue);
             }
         }
  
@@ -1575,7 +1575,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SlateGray);
+                return Color.FromInt32((int)KnownColor.SlateGray);
             }
         }
  
@@ -1586,7 +1586,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Snow);
+                return Color.FromInt32((int)KnownColor.Snow);
             }
         }
  
@@ -1597,7 +1597,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SpringGreen);
+                return Color.FromInt32((int)KnownColor.SpringGreen);
             }
         }
  
@@ -1608,7 +1608,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.SteelBlue);
+                return Color.FromInt32((int)KnownColor.SteelBlue);
             }
         }
  
@@ -1619,7 +1619,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Tan);
+                return Color.FromInt32((int)KnownColor.Tan);
             }
         }
  
@@ -1630,7 +1630,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Teal);
+                return Color.FromInt32((int)KnownColor.Teal);
             }
         }
  
@@ -1641,7 +1641,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Thistle);
+                return Color.FromInt32((int)KnownColor.Thistle);
             }
         }
  
@@ -1652,7 +1652,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Tomato);
+                return Color.FromInt32((int)KnownColor.Tomato);
             }
         }
  
@@ -1663,7 +1663,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Transparent);
+                return Color.FromInt32((int)KnownColor.Transparent);
             }
         }
  
@@ -1674,7 +1674,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Turquoise);
+                return Color.FromInt32((int)KnownColor.Turquoise);
             }
         }
  
@@ -1685,7 +1685,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Violet);
+                return Color.FromInt32((int)KnownColor.Violet);
             }
         }
  
@@ -1696,7 +1696,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Wheat);
+                return Color.FromInt32((int)KnownColor.Wheat);
             }
         }
  
@@ -1707,7 +1707,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.White);
+                return Color.FromInt32((int)KnownColor.White);
             }
         }
  
@@ -1718,7 +1718,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.WhiteSmoke);
+                return Color.FromInt32((int)KnownColor.WhiteSmoke);
             }
         }
  
@@ -1729,7 +1729,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.Yellow);
+                return Color.FromInt32((int)KnownColor.Yellow);
             }
         }
  
@@ -1740,7 +1740,7 @@ namespace System.Windows.Media
         {
             get
             {
-                return Color.INTERNAL_ConvertFromInt32((int)INTERNAL_ColorsEnum.YellowGreen);
+                return Color.FromInt32((int)KnownColor.YellowGreen);
             }
         }
     }

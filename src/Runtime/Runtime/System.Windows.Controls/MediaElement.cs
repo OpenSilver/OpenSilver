@@ -193,7 +193,7 @@ namespace System.Windows.Controls
             }
         }
 
-        private void SetMediaSource(Uri source) => CreateMediaElement(INTERNAL_OuterDomElement, source);
+        private void SetMediaSource(Uri source) => CreateMediaElement(OuterDiv, source);
 
         /// <summary>
         /// Gets or sets the media's volume.
@@ -239,8 +239,8 @@ namespace System.Windows.Controls
         {
             if (_mediaElement != null)
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_mediaElement);
-                string sType = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(type);
+                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(_mediaElement);
+                string sType = CSHTML5.InteropImplementation.GetVariableStringForJS(type);
                 string canPlay = OpenSilver.Interop.ExecuteJavaScriptString($"{sElement}.canPlayType({sType});");
                 return ToMediaCanPlayResponse(canPlay);
             }

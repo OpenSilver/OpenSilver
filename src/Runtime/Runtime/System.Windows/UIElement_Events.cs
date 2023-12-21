@@ -765,7 +765,7 @@ namespace System.Windows
 
         #endregion
 
-        internal virtual object GetFocusTarget() => INTERNAL_OuterDomElement;
+        internal virtual object GetFocusTarget() => OuterDiv;
 
         public virtual void INTERNAL_AttachToDomEvents()
         {

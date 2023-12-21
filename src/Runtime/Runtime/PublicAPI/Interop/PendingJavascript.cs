@@ -153,7 +153,7 @@ namespace CSHTML5.Internal
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
         {
             if (referenceId > 0 && !javascript.StartsWith("document.callScriptSafe"))
-                javascript = INTERNAL_ExecuteJavaScript.WrapReferenceIdInJavascriptCall(javascript, referenceId);
+                javascript = Internal.ExecuteJavaScript.WrapReferenceIdInJavascriptCall(javascript, referenceId);
 
             if (wantsResult)
                 return PerformActualInteropCall(javascript);
@@ -166,7 +166,7 @@ namespace CSHTML5.Internal
 
         private object PerformActualInteropCall(string javaScriptToExecute)
         {
-            if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+            if (Internal.ExecuteJavaScript.EnableInteropLogging)
             {
                 javaScriptToExecute = "//---- START INTEROP ----"
                     + Environment.NewLine
@@ -177,7 +177,7 @@ namespace CSHTML5.Internal
 
             try
             {
-                if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+                if (Internal.ExecuteJavaScript.EnableInteropLogging)
                 {
                     Debug.WriteLine(javaScriptToExecute);
                 }
@@ -192,7 +192,7 @@ namespace CSHTML5.Internal
 
         private void PerformActualInteropCallVoid(string javaScriptToExecute)
         {
-            if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+            if (Internal.ExecuteJavaScript.EnableInteropLogging)
             {
                 javaScriptToExecute = "//---- START INTEROP ----"
                                       + Environment.NewLine
@@ -203,7 +203,7 @@ namespace CSHTML5.Internal
 
             try
             {
-                if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+                if (Internal.ExecuteJavaScript.EnableInteropLogging)
                 {
                     Debug.WriteLine(javaScriptToExecute);
                 }

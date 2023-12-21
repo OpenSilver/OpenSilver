@@ -247,19 +247,6 @@ namespace OpenSilver.Compatibility
             }
 
             webRequestHelper.MakeRequest(address, "GET", this, headers, null, OnDownloadStringCompleted, true, GetCredentialsMode());
-
-
-            //define the XMLHttpRequest:
-            //_xmlHttpRequest = GetWebRequest();
-
-            ////define the action when the xmlhttp has finished the request:
-            //INTERNAL_SetCallbackMethod((object)_xmlHttpRequest, OnDownloadStringCompleted);
-
-            ////create the request:
-            //INTERNAL_CreateRequest((object)_xmlHttpRequest, address.OriginalString, true);
-
-            ////send the request:
-            //INTERNAL_SendRequestAsync((object)_xmlHttpRequest, address, userToken);
         }
 
 

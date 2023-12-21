@@ -204,11 +204,11 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                     //Quill return color in 2 ways: single string , for example "#ff0000", or string array (["#ff0000","#ff00AA"])
                     if (format.Color is string)
                     {
-                        return new SolidColorBrush(Color.INTERNAL_ConvertFromString(format.Color.ToString()));
+                        return new SolidColorBrush(Color.Parse(format.Color.ToString()));
                     }
                     else if (format.Color is string[] colors)
                     {
-                        return new SolidColorBrush(Color.INTERNAL_ConvertFromString(colors[0]));
+                        return new SolidColorBrush(Color.Parse(colors[0]));
                     }
 
                     return null;
@@ -280,7 +280,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                         _quill,
                         start,
                         length,
-                        brush.INTERNAL_ToHtmlString());
+                        brush.ToHtmlString());
                 }
             }
             else if (prop == Block.LineHeightProperty)

@@ -42,13 +42,13 @@ public static partial class CSharpXamlForHtml5
         [Obsolete]
         public static dynamic GetDomElementFromControl(UIElement control)
         {
-            if (control.INTERNAL_OuterDomElement == null)
+            if (control.OuterDiv == null)
                 throw new InvalidOperationException("Cannot get the DOM element because the control is not (yet?) in the visual tree. Consider waiting until the Loaded event before calling this piece of code. You can also call the 'IsControlInVisualTree' method to check if the control is in the visual tree.");
 
             if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-                return control.INTERNAL_OuterDomElement;
+                return control.OuterDiv;
             else
-                return new CSharpXamlForHtml5.DomManagement.Types.DynamicDomElement((INTERNAL_HtmlDomElementReference)control.INTERNAL_OuterDomElement);
+                return new CSharpXamlForHtml5.DomManagement.Types.DynamicDomElement((INTERNAL_HtmlDomElementReference)control.OuterDiv);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ public static partial class CSharpXamlForHtml5
         [Obsolete(Helper.ObsoleteMemberMessage + " Use HtmlPresenter instead.")]
         public static void SetHtmlRepresentation(UIElement control, string htmlRepresentation)
         {
-            control.INTERNAL_HtmlRepresentation = htmlRepresentation;
+            control.HtmlRepresentation = htmlRepresentation;
         }
     }
 }
