@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using OpenSilver.Internal;
@@ -28,10 +28,7 @@ namespace System.Windows
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMetadata"/> class.
         /// </summary>
-        public PropertyMetadata()
-        {
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never;
-        }
+        public PropertyMetadata() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMetadata"/> class, using
@@ -44,7 +41,6 @@ namespace System.Windows
         public PropertyMetadata(object defaultValue)
         {
             DefaultValue = defaultValue;
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never;
         }
 
         /// <summary>
@@ -57,7 +53,6 @@ namespace System.Windows
         public PropertyMetadata(PropertyChangedCallback propertyChangedCallback)
         {
             PropertyChangedCallback = propertyChangedCallback;
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never;
         }
 
         /// <summary>
@@ -71,12 +66,10 @@ namespace System.Windows
         /// <param name="propertyChangedCallback">
         /// A reference to the callback to call for property changed behavior.
         /// </param>
-        public PropertyMetadata(object defaultValue,
-                                PropertyChangedCallback propertyChangedCallback)
+        public PropertyMetadata(object defaultValue, PropertyChangedCallback propertyChangedCallback)
         {
             DefaultValue = defaultValue;
             PropertyChangedCallback = propertyChangedCallback;
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never;
         }
 
         /// <summary>
@@ -99,14 +92,11 @@ namespace System.Windows
         /// <exception cref="ArgumentException">
         /// defaultValue cannot be set to the value <see cref="DependencyProperty.UnsetValue"/>;
         /// </exception>
-        public PropertyMetadata(object defaultValue,
-                                PropertyChangedCallback propertyChangedCallback,
-                                CoerceValueCallback coerceValueCallback)
+        public PropertyMetadata(object defaultValue, PropertyChangedCallback propertyChangedCallback, CoerceValueCallback coerceValueCallback)
         {
             DefaultValue = defaultValue;
             PropertyChangedCallback = propertyChangedCallback;
             CoerceValueCallback = coerceValueCallback;
-            CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Never;
         }
 
         /// <summary>
@@ -567,6 +557,8 @@ namespace System.Windows
         /// <summary>
         /// Determines if the callback method should be called when the element is added to the visual tree.
         /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public WhenToCallPropertyChangedEnum CallPropertyChangedWhenLoadedIntoVisualTree
         {
             get { return _whenToCallProperty; }

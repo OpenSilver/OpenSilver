@@ -1110,31 +1110,22 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.AllowScrollOnTouchMove"/> dependency 
-        /// property.
+        /// Identifies the <see cref="AllowScrollOnTouchMove"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty AllowScrollOnTouchMoveProperty =
             DependencyProperty.Register(
                 nameof(AllowScrollOnTouchMove), 
                 typeof(bool), 
                 typeof(UIElement), 
-                new PropertyMetadata(true, AllowScrollOnTouchMove_Changed)
+                new PropertyMetadata(BooleanBoxes.TrueBox)
                 {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                {
+                        var uie = (UIElement)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+                        style.touchAction = (bool)newValue ? "auto" : "none";
+                    },
                 });
-
-        private static void AllowScrollOnTouchMove_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UIElement element = (UIElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
-            {
-                // Note: "none" disables scrolling, pinching and other gestures.
-                // It is supposed to not have any effect on the "TouchStart",
-                // "TouchMove", and "TouchEnd" events.
-                OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(element.INTERNAL_OuterDomElement)}.style.touchAction = \"{((bool)e.NewValue ? "auto" : "none")}\"");
-            }
-        }
 
 #endregion
 

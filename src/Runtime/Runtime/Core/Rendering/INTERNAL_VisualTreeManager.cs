@@ -550,7 +550,9 @@ if(nextSibling != undefined) {
                     //--------------------------------------------------
 
                     if (propertyMetadata.PropertyChangedCallback != null
+#pragma warning disable CS0618 // Type or member is obsolete
                         && propertyMetadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
+#pragma warning restore CS0618 // Type or member is obsolete
                     {
                         if (!valueWasRetrieved)
                         {

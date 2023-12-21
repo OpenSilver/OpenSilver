@@ -40,10 +40,7 @@ namespace System.Windows.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            object outerDiv;
-            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomLayoutElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
-            outerDivStyle.width = "100%";
-            outerDivStyle.height = "100%";
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
 
             var iFrameStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("iframe", outerDiv, this, out _iFrame);
             iFrameStyle.width = "100%";
@@ -93,29 +90,27 @@ namespace System.Windows.Controls
         /// Note: to embed a piece of HTML code without using an iframe, use the HtmlPresenter control instead.
         /// </summary>
         public static readonly DependencyProperty SourceUriProperty =
-            DependencyProperty.Register("SourceUri", typeof(Uri), typeof(WebBrowser), new PropertyMetadata(null, Source_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        private static void Source_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            WebBrowser webView = (WebBrowser)d;
-
-            if (webView._isLoaded) // Note: if not loaded, we will set the source later when adding the control to the visual tree.
-            {
-                var source = webView.SourceUri;
-                string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(webView._iFrame);
-                if (source != null && !string.IsNullOrEmpty(source.OriginalString))
+            DependencyProperty.Register(
+                nameof(SourceUri),
+                typeof(Uri),
+                typeof(WebBrowser),
+                new PropertyMetadata((object)null)
                 {
-                    string uri = INTERNAL_UriHelper.ConvertToHtml5Path(source.OriginalString, null);
-                    string sUri = INTERNAL_InteropImplementation.GetVariableStringForJS(uri);
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = {sUri}");
-                }
-                else
-                {
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = 'about:blank'");
-                }
-            }
-        }
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        var webView = (WebBrowser)d;
+                        var source = (Uri)newValue;
+                        if (source != null && !string.IsNullOrEmpty(source.OriginalString))
+                        {
+                            string uri = INTERNAL_UriHelper.ConvertToHtml5Path(source.OriginalString, null);
+                            INTERNAL_HtmlDomManager.SetDomElementAttribute(webView._iFrame, "src", uri, true);
+                        }
+                        else
+                        {
+                            INTERNAL_HtmlDomManager.SetDomElementAttribute(webView._iFrame, "src", "about:blank");
+                        }
+                    },
+                });
 
         /// <summary>
         /// Loads the HTML content at the specified Uniform Resource Identifier (URI) inside an iframe.

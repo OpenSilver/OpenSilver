@@ -67,13 +67,18 @@ namespace System.Windows.Media.Imaging
                 SetValue(UriSourceProperty, value);
             }
         }
+
         /// <summary>
-        /// Identifies the UriSource dependency property.
+        /// Identifies the <see cref="UriSource"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty UriSourceProperty =
-            DependencyProperty.Register("UriSource", typeof(Uri), typeof(BitmapImage), new PropertyMetadata(null, UriSource_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        static void UriSource_Changed(DependencyObject i, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register(
+                nameof(UriSource),
+                typeof(Uri),
+                typeof(BitmapImage),
+                new PropertyMetadata(null, OnUriSourceChanged));
+
+        private static void OnUriSourceChanged(DependencyObject i, DependencyPropertyChangedEventArgs e)
         {
             var bitmapImage = (BitmapImage)i;
             bitmapImage.OnUriSourceChanged();

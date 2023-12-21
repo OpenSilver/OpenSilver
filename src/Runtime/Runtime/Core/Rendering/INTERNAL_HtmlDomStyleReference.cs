@@ -121,6 +121,7 @@ namespace CSHTML5.Internal
         public string transform { set { SetTransformPropertyValue(value); } }
         public string transformOrigin { set { SetTransformOriginPropertyValue(value); } }
         public string top { set { SetStylePropertyValue("top", value); } }
+        public string touchAction { set { SetStylePropertyValue("touchAction", value); } }
         public string verticalAlign { set { SetStylePropertyValue("verticalAlign", value); } }
         public string WebkitOverflowScrolling { set { SetStylePropertyValue("WebkitOverflowScrolling", value); } }
         public string WebkitTransform { set { transform = value; } }
