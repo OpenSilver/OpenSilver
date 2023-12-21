@@ -112,7 +112,7 @@ namespace System.Windows.Controls
                 typeof(UIElement),
                 new PropertyMetadata(0)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetZIndexNative((int)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetZIndex((int)newValue),
                 });
 
         /// <summary>

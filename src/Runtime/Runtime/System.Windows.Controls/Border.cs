@@ -344,19 +344,9 @@ namespace System.Windows.Controls
                 typeof(Border),
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    MethodToUpdateDom = BorderThickness_MethodToUpdateDom
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderWidth((Thickness)newValue),
                 },
                 IsThicknessValid);
-
-        private static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var border = (Border)d;
-            var domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(border);
-            var thickness = (Thickness)newValue;
-            domElement.boxSizing = "border-box";
-            domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-            domElement.borderWidth = $"{thickness.Top.ToInvariantString()}px {thickness.Right.ToInvariantString()}px {thickness.Bottom.ToInvariantString()}px {thickness.Left.ToInvariantString()}px";
-        }
 
         /// <summary>
         /// Gets or sets the radius for the corners of the border.
@@ -368,7 +358,7 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Border.CornerRadius"/> dependency property.
+        /// Identifies the <see cref="CornerRadius"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CornerRadiusProperty =
             DependencyProperty.Register(
@@ -377,17 +367,9 @@ namespace System.Windows.Controls
                 typeof(Border),
                 new PropertyMetadata(new CornerRadius())
                 {
-                    MethodToUpdateDom = CornerRadius_MethodToUpdateDom
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Border)d).SetBorderRadius((CornerRadius)newValue),
                 },
                 IsCornerRadiusValid);
-
-        private static void CornerRadius_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var border = (Border)d;
-            var cr = (CornerRadius)newValue;
-            var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(border);
-            domStyle.borderRadius = $"{cr.TopLeft.ToInvariantString()}px {cr.TopRight.ToInvariantString()}px {cr.BottomRight.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px";
-        }
 
         /// <summary>
         /// Gets or sets the distance between the border and its child object.

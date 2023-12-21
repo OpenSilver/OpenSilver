@@ -575,7 +575,7 @@ if(nextSibling != undefined) {
                 // the css z-index value is not 'auto'.
                 if (uie is not TextElement)
                 {
-                    uie.SetZIndexNative(Canvas.GetZIndex(uie));
+                    uie.SetZIndex(Canvas.GetZIndex(uie));
                 }
             }
         }

@@ -13,6 +13,7 @@
 
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 using System.Threading.Tasks;
@@ -181,11 +182,34 @@ internal static class UIElementHelpers
         style.transformOrigin = $"{(origin.X * 100).ToInvariantString()}% {(origin.Y * 100).ToInvariantString()}%";
     }
 
-    internal static void SetZIndexNative(this UIElement uie, int value)
+    internal static void SetZIndex(this UIElement uie, int value)
     {
         Debug.Assert(uie is not null);
         var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
         style.zIndex = value.ToInvariantString();
+    }
+
+    internal static void SetCursor(this UIElement uie, Cursor cursor)
+    {
+        Debug.Assert(uie is not null);
+        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+        style.cursor = cursor?.ToHtmlString() ?? string.Empty;
+    }
+
+    internal static void SetBorderRadius(this UIElement uie, CornerRadius radius)
+    {
+        Debug.Assert(uie is not null);
+        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+        style.borderRadius = $"{radius.TopLeft.ToInvariantString()}px {radius.TopRight.ToInvariantString()}px {radius.BottomRight.ToInvariantString()}px {radius.BottomLeft.ToInvariantString()}px";
+    }
+
+    internal static void SetBorderWidth(this UIElement uie, Thickness width)
+    {
+        Debug.Assert(uie is not null);
+        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
+        style.boxSizing = "border-box";
+        style.borderStyle = "solid";
+        style.borderWidth = $"{width.Top.ToInvariantString()}px {width.Right.ToInvariantString()}px {width.Bottom.ToInvariantString()}px {width.Left.ToInvariantString()}px";
     }
 
     internal static double GetBaseLineOffset(this UIElement uie)

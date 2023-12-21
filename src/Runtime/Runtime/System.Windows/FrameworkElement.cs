@@ -589,8 +589,7 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Identifies the <see cref="FrameworkElement.Cursor"/> dependency
-        /// property.
+        /// Identifies the <see cref="Cursor"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CursorProperty =
             DependencyProperty.Register(
@@ -599,15 +598,8 @@ namespace System.Windows
                 typeof(FrameworkElement), 
                 new PropertyMetadata((object)null)
                 {
-                    MethodToUpdateDom = Cursor_MethodToUpdateDom,
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((FrameworkElement)d).SetCursor((Cursor)newValue),
                 });
-
-        private static void Cursor_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var fe = (FrameworkElement)d;
-            var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_OuterDomElement);
-            styleOfOuterDomElement.cursor = ((Cursor)newValue)?.ToHtmlString() ?? "inherit";
-        }
 
         #endregion
 
@@ -743,18 +735,17 @@ namespace System.Windows
                 typeof(FrameworkElement),
                 new PropertyMetadata(string.Empty, null, OnCoerceName)
                 {
-                    MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
+                    {
+                        if (d is FrameworkElement fe)
+                        {
+                            INTERNAL_HtmlDomManager.SetDomElementAttribute(
+                                fe.INTERNAL_OuterDomElement, "dataId", (string)newValue ?? string.Empty);
+                        }
+                    },
                 });
 
         private static object OnCoerceName(DependencyObject d, object baseValue) => baseValue ?? string.Empty;
-
-        private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
-        {
-            if (d is FrameworkElement fe)
-            {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(fe.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
-            }
-        }
 
 #endregion
 

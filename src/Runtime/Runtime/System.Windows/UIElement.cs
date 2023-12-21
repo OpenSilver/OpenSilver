@@ -919,15 +919,15 @@ namespace System.Windows
                 }
             }
 
-            return isVisible;
+            return BooleanBoxes.Box(isVisible);
         }
 
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsVisible"/> property changes on this element.
+        /// </summary>
         public event DependencyPropertyChangedEventHandler IsVisibleChanged;
 
-        internal void UpdateIsVisible()
-        {
-            CoerceValue(IsVisibleProperty);
-        }
+        internal void UpdateIsVisible() => CoerceValue(IsVisibleProperty);
 
         #endregion
 
@@ -974,20 +974,16 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.IsHitTestVisible"/> dependency 
-        /// property.
+        /// Identifies the <see cref="IsHitTestVisible"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsHitTestVisibleProperty =
             DependencyProperty.Register(
                 nameof(IsHitTestVisible),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(true, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
+                new PropertyMetadata(BooleanBoxes.TrueBox, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
                 {
-                    MethodToUpdateDom = (d, e) =>
-                    {
-                        SetPointerEvents((UIElement)d);
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetPointerEvents((UIElement)d),
                 });
 
         private static void OnIsHitTestVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -1000,9 +996,6 @@ namespace System.Windows
         {
             UIElement uie = (UIElement)d;
 
-            if (!(baseValue is bool)) //todo: this is a temporary workaround - cf. comment in "CoerceIsEnabledProperty"
-                return true;
-
             // We must be false if our parent is false, but we can be
             // either true or false if our parent is true.
             //
@@ -1013,16 +1006,16 @@ namespace System.Windows
                 DependencyObject parent = VisualTreeHelper.GetParent(uie);
                 if (parent == null || (bool)parent.GetValue(IsHitTestVisibleProperty))
                 {
-                    return true;
+                    return BooleanBoxes.TrueBox;
                 }
                 else
                 {
-                    return false;
+                    return BooleanBoxes.FalseBox;
                 }
             }
             else
             {
-                return false;
+                return BooleanBoxes.FalseBox;
             }
         }
 
@@ -1114,13 +1107,13 @@ namespace System.Windows
         /// </summary>
         public static readonly DependencyProperty AllowScrollOnTouchMoveProperty =
             DependencyProperty.Register(
-                nameof(AllowScrollOnTouchMove), 
-                typeof(bool), 
-                typeof(UIElement), 
+                nameof(AllowScrollOnTouchMove),
+                typeof(bool),
+                typeof(UIElement),
                 new PropertyMetadata(BooleanBoxes.TrueBox)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                {
+                    {
                         var uie = (UIElement)d;
                         var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.INTERNAL_OuterDomElement);
                         style.touchAction = (bool)newValue ? "auto" : "none";
