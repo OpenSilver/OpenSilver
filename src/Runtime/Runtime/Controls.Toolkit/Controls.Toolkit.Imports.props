@@ -23,6 +23,21 @@
     <Compile Include="..\Controls.Toolkit\Expander\Expander.cs" Link="Controls.Toolkit\Expander\Expander.cs" />
     <Compile Include="..\Controls.Toolkit\Expander\ExpandDirection.cs" Link="Controls.Toolkit\Expander\ExpandDirection.cs" />
     <Compile Include="..\Controls.Toolkit\Expander\ExpanderAutomationPeer.cs" Link="Controls.Toolkit\Expander\ExpanderAutomationPeer.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarExtensions.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarExtensions.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\CalendarInfo\CalendarInfo.cs" Link="Controls.Toolkit\GlobalCalendar\CalendarInfo\CalendarInfo.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\CalendarInfo\CultureCalendarInfo.cs" Link="Controls.Toolkit\GlobalCalendar\CalendarInfo\CultureCalendarInfo.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\CalendarInfo\GregorianCalendarInfo.cs" Link="Controls.Toolkit\GlobalCalendar\CalendarInfo\GregorianCalendarInfo.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\CalendarDayButtonStyleSelector.cs" Link="Controls.Toolkit\GlobalCalendar\CalendarDayButtonStyleSelector.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendar.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendar.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarAutomationPeer.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarAutomationPeer.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarBlackoutDatesCollection.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarBlackoutDatesCollection.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarButton.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarButton.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarButtonAutomationPeer.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarButtonAutomationPeer.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarDateChangedEventArgs.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarDateChangedEventArgs.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarDayButton.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarDayButton.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarDayButtonAutomationPeer.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarDayButtonAutomationPeer.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarItem.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarItem.cs" />
+    <Compile Include="..\Controls.Toolkit\GlobalCalendar\GlobalSelectedDatesCollection.cs" Link="Controls.Toolkit\GlobalCalendar\GlobalSelectedDatesCollection.cs" />
     <Compile Include="..\Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.cs" Link="Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.cs" />
     <Compile Include="..\Controls.Toolkit\TreeView\TreeViewItemConnectingLineInfo.cs" Link="Controls.Toolkit\TreeView\TreeViewItemConnectingLineInfo.cs" />
     <Compile Include="..\Controls.Toolkit\TreeView\TreeViewConnectingLines.cs" Link="Controls.Toolkit\TreeView\TreeViewConnectingLines.cs" />
@@ -37,6 +52,10 @@
       <SubType>Designer</SubType>
     </Page>
     <None Include="..\Controls.Toolkit\Expander\Expander.xaml" Link="Controls.Toolkit\Expander\Expander.xaml" />
+    <None Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendar.xaml" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendar.xaml" />
+    <None Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarDayButton.xaml" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarDayButton.xaml" />
+    <None Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarItem.xaml" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarItem.xaml" />
+    <None Include="..\Controls.Toolkit\GlobalCalendar\GlobalCalendarButton.xaml" Link="Controls.Toolkit\GlobalCalendar\GlobalCalendarButton.xaml" />
     <None Include="..\Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.xaml" Link="Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.xaml" />
     <None Include="..\Controls.Toolkit\DragDrop\DragDecorator.xaml" Link="Controls.Toolkit\DragDrop\DragDecorator.xaml" />
     <None Include="..\Controls.Toolkit\BusyIndicator\BusyIndicator.xaml" Link="Controls.Toolkit\BusyIndicator\BusyIndicator.xaml" />
