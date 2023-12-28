@@ -6,7 +6,6 @@
 using System.Linq;
 using System.Globalization;
 using System.Windows.Media.Animation;
-using Properties = OpenSilver.Controls.Properties;
 
 namespace System.Windows.Controls
 {

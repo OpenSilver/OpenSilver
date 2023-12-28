@@ -1030,6 +1030,22 @@ namespace System.Windows.Controls
             return size;
         }
 
+        internal void LineUp() => ScrollInfo?.LineUp();
+
+        internal void LineDown() => ScrollInfo?.LineDown();
+
+        internal void LineLeft() => ScrollInfo?.LineLeft();
+
+        internal void LineRight() => ScrollInfo?.LineRight();
+
+        internal void PageUp() => ScrollInfo?.PageUp();
+
+        internal void PageDown() => ScrollInfo?.PageDown();
+
+        internal void PageLeft() => ScrollInfo?.PageLeft();
+
+        internal void PageRight() => ScrollInfo?.PageRight();
+
         private sealed class TouchInfo
         {
             public const int ScrollMultiplier = 5; // scrolling is very slow if do not increase the delta

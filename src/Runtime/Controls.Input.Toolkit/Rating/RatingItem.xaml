@@ -1,0 +1,110 @@
+<!--
+(c) Copyright Microsoft Corporation.
+This source is subject to the Microsoft Public License (Ms-PL).
+Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+All other rights reserved.    
+-->
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+    xmlns:inputToolkit="clr-namespace:System.Windows.Controls"
+    xmlns:inputToolkitPrimitives="clr-namespace:System.Windows.Controls.Primitives">
+
+    <Style TargetType="inputToolkit:RatingItem">
+        <Setter Property="BorderBrush" Value="#FF545454"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="inputToolkit:RatingItem">
+                    <Grid Background="{TemplateBinding Background}" Width="20" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="00:00:00.2000000"/>
+                                    <VisualTransition From="MouseOver" GeneratedDuration="00:00:00.2000000" To="Normal"/>
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="MouseOverRatingItem" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0.325"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="MouseOverHighlight" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                            <SplineColorKeyFrame KeyTime="00:00:00" Value="#FF6E0000"/>
+                                        </ColorAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ColorAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="PressedRatingItem" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                            <EasingColorKeyFrame KeyTime="00:00:00" Value="#FFFEFEFE"/>
+                                        </ColorAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="PressedRatingItem" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <EasingDoubleKeyFrame KeyTime="00:00:00" Value="0.39"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="DisabledRatingItem" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="DisabledRatingItemBackground" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="ReadOnly">
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="ReadOnlyRatingItem" Storyboard.TargetProperty="(UIElement.Opacity)">
+                                            <EasingDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="00:00:00.1000000"/>
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Focused">
+                                    <Storyboard/>
+                                </VisualState>
+                                <VisualState x:Name="Unfocused"/>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FillStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="00:00:00.1000000"/>
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Empty"/>
+                                <VisualState x:Name="Partial"/>
+                                <VisualState x:Name="Filled"/>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border Background="#02FFFFFF" BorderThickness="0"/>
+                        <Path x:Name="DefaultRatingItem" Fill="White" Stretch="Fill" Stroke="{TemplateBinding BorderBrush}" StrokeLineJoin="Round" StrokeThickness="0.4" VerticalAlignment="Stretch" Opacity="1" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z"/>
+                        <inputToolkitPrimitives:LinearClipper RatioVisible="{TemplateBinding DisplayValue}" ExpandDirection="Right">
+                            <Path Fill="{TemplateBinding Foreground}" Stretch="Fill" Stroke="{x:Null}" StrokeLineJoin="Round" VerticalAlignment="Stretch" Opacity="1" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z"/>
+                        </inputToolkitPrimitives:LinearClipper>
+                        <Path x:Name="MouseOverRatingItem" Fill="{TemplateBinding Foreground}" Stretch="Fill" Stroke="{x:Null}" StrokeLineJoin="Round" VerticalAlignment="Stretch" Opacity="0" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z"/>
+                        <Path x:Name="MouseOverHighlight" Fill="#FFFFFFFF" Stretch="Fill" Stroke="{x:Null}" StrokeLineJoin="Round" VerticalAlignment="Stretch" Opacity="0" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z"/>
+                        <Path x:Name="PressedRatingItem" Stretch="Fill" Stroke="{x:Null}" StrokeLineJoin="Round" VerticalAlignment="Stretch" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z" Fill="#82000000" Opacity="0"/>
+                        <Path x:Name="FocusRatingItem" Stretch="Fill" Stroke="#FF6DBDD1" StrokeLineJoin="Round" StrokeThickness="0.01" VerticalAlignment="Stretch" Opacity="0" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z"/>
+                        <Path x:Name="ReadOnlyRatingItem" Fill="#18FFFFFF" Stretch="Fill" Stroke="{TemplateBinding BorderBrush}" StrokeLineJoin="Round" StrokeThickness="0.4" VerticalAlignment="Stretch" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z" IsHitTestVisible="False" Opacity="0"/>
+                        <Path x:Name="DisabledRatingItemBackground" Stretch="Fill" Stroke="{x:Null}" StrokeLineJoin="Round" VerticalAlignment="Stretch" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z" Fill="Gainsboro" Opacity="0"/>
+                        <inputToolkitPrimitives:LinearClipper x:Name="DisabledRatingItem" RatioVisible="{TemplateBinding DisplayValue}" ExpandDirection="Right" Opacity="0">
+                            <Path Stretch="Fill" Stroke="{x:Null}" StrokeLineJoin="Round" VerticalAlignment="Stretch" Opacity="1" UseLayoutRounding="False" Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z" Fill="#FF5E5E5E"/>
+                        </inputToolkitPrimitives:LinearClipper>
+                        <ContentPresenter x:Name="Content" Cursor="{TemplateBinding Cursor}" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" ContentTemplate="{TemplateBinding ContentTemplate}" Grid.RowSpan="2" Grid.Row="1"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

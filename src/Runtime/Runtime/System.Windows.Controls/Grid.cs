@@ -1378,7 +1378,10 @@ namespace System.Windows.Controls
                 foreach (UIElement child in childrens)
                 {
                     child.Measure(availableSize);
-                    desiredSize = desiredSize.Max(child.DesiredSize);
+
+                    Size childDesiredSize = child.DesiredSize;
+                    desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
+                    desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
                 }
             }
             else

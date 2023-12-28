@@ -5,7 +5,6 @@
 
 using System.Globalization;
 using System.Windows.Media;
-using Properties = OpenSilver.Controls.Properties;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -369,7 +368,7 @@ namespace System.Windows.Controls.Primitives
                 if (Double.IsNaN(targetWidth))
                 {
                     // NaN has the same meaning as autosize, which in this context means the desired size
-                    targetWidth = ContentSite.ActualWidth;
+                    targetWidth = ContentSite.DesiredSize.Width;
                 }
 
                 Width = Percentage * targetWidth;
@@ -381,7 +380,7 @@ namespace System.Windows.Controls.Primitives
                 if (Double.IsNaN(targetHeight))
                 {
                     // NaN has the same meaning as autosize, which in this context means the desired size
-                    targetHeight = ContentSite.ActualHeight;
+                    targetHeight = ContentSite.DesiredSize.Height;
                 }
 
                 Height = Percentage * targetHeight;

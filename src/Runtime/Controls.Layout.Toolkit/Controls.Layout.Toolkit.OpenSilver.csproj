@@ -28,16 +28,16 @@
     <Compile Include="Accordion\SelectionSequence.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Runtime\System.Windows.Controls\InteractionHelper.cs">
+    <Compile Include="..\Controls\Common\InteractionHelper.cs">
       <Link>Common\InteractionHelper.cs</Link>
     </Compile>
-    <Compile Include="..\Runtime\System.Windows.Controls\ItemsControlHelper.cs">
+    <Compile Include="..\Controls\Common\ItemsControlHelper.cs">
       <Link>Common\ItemsControlHelper.cs</Link>
     </Compile>
-    <Compile Include="..\Runtime\System.Windows.Controls\IUpdateVisualState.cs">
+    <Compile Include="..\Controls\Common\IUpdateVisualState.cs">
       <Link>Common\IUpdateVisualState.cs</Link>
     </Compile>
-    <Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">
+    <Compile Include="..\Controls\Common\VisualStates.cs">
       <Link>Common\VisualStates.cs</Link>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
@@ -61,7 +61,6 @@
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>OpenSilver.Controls.Properties</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

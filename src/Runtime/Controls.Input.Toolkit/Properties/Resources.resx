@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
+    <value>Cannot perform operation.</value>
+    <comment>Exception thrown by automation peers.</comment>
+  </data>
+  <data name="DomainUpDown_CurrentIndex_InvalidValue" xml:space="preserve">
+    <value>Invalid index value '{0}'</value>
+    <comment>Exception thrown when the index is not within the collection.</comment>
+  </data>
+  <data name="DomainUpDown_InvalidInputAction_InvalidValue" xml:space="preserve">
+    <value>Invalid InvalidInputAction value '{0}'</value>
+    <comment>Exception thrown when the InvalidInputAction property is provided an invalid value.</comment>
+  </data>
+  <data name="Expander_OnExpandDirectionPropertyChanged_InvalidValue" xml:space="preserve">
+    <value>Invalid ExpandDirection value '{0}'.</value>
+    <comment>Exception thrown when the ExpandDirection property is provided an invalid value.</comment>
+  </data>
+  <data name="ListTimePickerPopup_TimeItemsSelection_ReadOnly" xml:space="preserve">
+    <value>Cannot set read-only property TimeItemsSelection.</value>
+    <comment>Exception thrown when a TimeItemsSelection is being set.</comment>
+  </data>
+  <data name="InvalidAttemptToChangeReadOnlyProperty" xml:space="preserve">
+    <value>Invalid attempt to change read-only property "{0}."</value>
+    <comment>Exception thrown when a read-only property is changed.</comment>
+  </data>
+  <data name="NumericUpDown_EnsureValidDoubleValue_InvalidDoubleValue" xml:space="preserve">
+    <value>Invalid double value '{0}': valid value is of double type and within decimal range.</value>
+    <comment>Exception thrown when dependency properties are provided an value that's not a valid double value or not in the decimal range.</comment>
+  </data>
+  <data name="NumericUpDown_EnsureValidIncrementValue_InvalidValue" xml:space="preserve">
+    <value>Invalid Increment value '{0}': valid value is of double type, within decimal range, and positive</value>
+    <comment>Exception thrown when the Increment property is provided an value that's not a double value, or not in decimal range, or is negative or zero.</comment>
+  </data>
+  <data name="NumericUpDown_OnDecimalPlacesPropertyChanged_InvalidValue" xml:space="preserve">
+    <value>Invalid DecimalPlaces value '{0}': valid value is of int type and within 0 and 15 inclusive.</value>
+    <comment>Exception thrown when the DecimalPlaces property is provided an value not in the range of 0 and 15 inclusive.</comment>
+  </data>
+  <data name="ObservableObjectCollection_ReadOnly" xml:space="preserve">
+    <value>The collection is currently ReadOnly and should not be modified.</value>
+    <comment>Exception thrown when the collection is readonly and was modified.</comment>
+  </data>
+  <data name="Picker_OnMaxDropDownHeightPropertyChanged_InvalidValue" xml:space="preserve">
+    <value>Invalid maximum drop down height value '{0}'. The value must be greater than or equal to zero.</value>
+    <comment>Exception thrown when the MaxDropDownHeight dependency property is seto to a value that is negative.</comment>
+  </data>
+  <data name="Picker_PopupButtonModeNotValid" xml:space="preserve">
+    <value>Invalid PopupButtonMode value '{0}'.</value>
+    <comment>Exception thrown when the PopupButtonMode is improperly set.</comment>
+  </data>
+  <data name="Spinner_SpinNotValid" xml:space="preserve">
+    <value>Spin action is not valid at this moment.</value>
+    <comment>Exception thrown when spinning in a direction that is not currently valid.</comment>
+  </data>
+  <data name="TimeInput_PopupMinutesInterval_InvalidValue" xml:space="preserve">
+    <value>Invalid PopupMinutesInterval '{0}'. The interval can be set to 0 (no interval) to and including 59.</value>
+    <comment>Exception thrown when an invalid interval is set.</comment>
+  </data>
+  <data name="TimeInput_PopupSecondsInterval_InvalidValue" xml:space="preserve">
+    <value>Invalid PopupSecondsInterval '{0}'.The interval can be set to 0 (no interval) to and including 59.</value>
+    <comment>Exception thrown when an invalid interval is set.</comment>
+  </data>
+  <data name="TimePicker_PopupSetInStyle" xml:space="preserve">
+    <value>Cannot set the PopupProperty in a style. Please use PopupTemplate.</value>
+    <comment>Exception thrown when the PopupProperty is set in a style.</comment>
+  </data>
+  <data name="TimePicker_PopupTimeSelectionModeNotValid" xml:space="preserve">
+    <value>Invalid PopupTimeSelectionMode for this popup, value '{0}'.</value>
+    <comment>Exception thrown by a TimePickerPopup if it does not support the selected PopupTimeSelectionMode.</comment>
+  </data>
+  <data name="TimeUpDown_OnTimeHintContentChanged" xml:space="preserve">
+    <value>Cannot set read-only property TimeHintContent.</value>
+    <comment>Exception thrown when the TimeHintContent property is improperly set.</comment>
+  </data>
+  <data name="TypeConverters_ConvertFrom_CannotConvertFromType" xml:space="preserve">
+    <value>'{0}' cannot convert from '{1}'.</value>
+    <comment>Exception thrown when a type converter is asked to convert something it cannot.</comment>
+  </data>
+  <data name="TypeConverters_Convert_CannotConvert" xml:space="preserve">
+    <value>'{0}' is unable to convert '{1}' to '{2}'.</value>
+    <comment>Exception thrown when a type converter fails to convert a value to another type.</comment>
+  </data>
+  <data name="UpDown_ParseException" xml:space="preserve">
+    <value>Cannot parse text '{0}'</value>
+    <comment>Exception thrown when the text supplied cannot be parsed.</comment>
+  </data>
+  <data name="RatingAutomationPeer_SetValue" xml:space="preserve">
+    <value>Value must be null or a number between 0 and 1.</value>
+    <comment>Exception thrown when a change is made to an automation peer.</comment>
+  </data>
+  <data name="RatingAutomationPeer_GetLocalizedControlTypeCore" xml:space="preserve">
+    <value>Rating</value>
+    <comment>The localized control type used by the RatingAutomationPeer.</comment>
+  </data>
+  <data name="RatingItemAutomationPeer_GetLocalizedControlTypeCore" xml:space="preserve">
+    <value>Star</value>
+    <comment>The localized control type name used by the RatingItemAutomationPeer.</comment>
+  </data>
+  <data name="Rating_SetItemCount_ItemCountMustBeLargerThanOrEqualToZero" xml:space="preserve">
+    <value>Value must be larger than or equal to 0.</value>
+    <comment>Exception thrown when the ItemCount is set to a value smaller than 0.</comment>
+  </data>
+</root>

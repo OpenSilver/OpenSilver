@@ -1,0 +1,53 @@
+﻿<Project>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileFullPath)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Controls.Toolkit\Properties\Resources.Designer.cs" Link="Controls.Toolkit\Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Controls.Toolkit\BusyIndicator\BusyIndicator.cs" Link="Controls.Toolkit\BusyIndicator\BusyIndicator.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\BindingSourceEvaluator.cs" Link="Controls.Toolkit\Common\BindingSourceEvaluator.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\CollectionHelper.cs" Link="Controls.Toolkit\Common\CollectionHelper.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\EnumerableExtensions.cs" Link="Controls.Toolkit\Common\EnumerableExtensions.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\ItemsControlExtensions.cs" Link="Controls.Toolkit\Common\ItemsControlExtensions.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\LengthConverter.cs" Link="Controls.Toolkit\Common\LengthConverter.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\ScrollViewerExtensions.cs" Link="Controls.Toolkit\Common\ScrollViewerExtensions.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\VisualTreeExtensions.cs" Link="Controls.Toolkit\Common\VisualTreeExtensions.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\ObjectCollection.cs" Link="Controls.Toolkit\Common\ObjectCollection.cs" />
+    <Compile Include="..\Controls.Toolkit\DockPanel\DockPanel.cs" Link="Controls.Toolkit\DockPanel\DockPanel.cs" />
+    <Compile Include="..\Controls.Toolkit\DragDrop\DragDecorator.cs" Link="Controls.Toolkit\DragDrop\DragDecorator.cs" />
+    <Compile Include="..\Controls.Toolkit\Expander\Expander.cs" Link="Controls.Toolkit\Expander\Expander.cs" />
+    <Compile Include="..\Controls.Toolkit\Expander\ExpandDirection.cs" Link="Controls.Toolkit\Expander\ExpandDirection.cs" />
+    <Compile Include="..\Controls.Toolkit\Expander\ExpanderAutomationPeer.cs" Link="Controls.Toolkit\Expander\ExpanderAutomationPeer.cs" />
+    <Compile Include="..\Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.cs" Link="Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.cs" />
+    <Compile Include="..\Controls.Toolkit\TreeView\TreeViewItemConnectingLineInfo.cs" Link="Controls.Toolkit\TreeView\TreeViewItemConnectingLineInfo.cs" />
+    <Compile Include="..\Controls.Toolkit\TreeView\TreeViewConnectingLines.cs" Link="Controls.Toolkit\TreeView\TreeViewConnectingLines.cs" />
+    <Compile Include="..\Controls.Toolkit\TreeView\TreeViewItemCheckBox.cs" Link="Controls.Toolkit\TreeView\TreeViewItemCheckBox.cs" />
+    <Compile Include="..\Controls.Toolkit\TreeView\TreeViewExtensions.cs" Link="Controls.Toolkit\TreeView\TreeViewExtensions.cs" />
+    <Compile Include="..\Controls.Toolkit\TreeView\TreeViewItemIndentationConverter.cs" Link="Controls.Toolkit\TreeView\TreeViewItemIndentationConverter.cs" />
+    <Compile Include="..\Controls.Toolkit\WrapPanel\WrapPanel.cs" Link="Controls.Toolkit\WrapPanel\WrapPanel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\Controls.Toolkit\Themes\generic.xaml" Link="Controls.Toolkit\Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="..\Controls.Toolkit\Expander\Expander.xaml" Link="Controls.Toolkit\Expander\Expander.xaml" />
+    <None Include="..\Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.xaml" Link="Controls.Toolkit\HeaderedContentControl\HeaderedContentControl.xaml" />
+    <None Include="..\Controls.Toolkit\DragDrop\DragDecorator.xaml" Link="Controls.Toolkit\DragDrop\DragDecorator.xaml" />
+    <None Include="..\Controls.Toolkit\BusyIndicator\BusyIndicator.xaml" Link="Controls.Toolkit\BusyIndicator\BusyIndicator.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Controls.Toolkit\Properties\Resources.resx" Link="Controls.Toolkit\Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Controls.Toolkit</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

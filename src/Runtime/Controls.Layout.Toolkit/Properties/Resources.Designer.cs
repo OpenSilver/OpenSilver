@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpenSilver.Controls.Properties {
+namespace System.Windows.Controls.Properties {
     using System;
     
     

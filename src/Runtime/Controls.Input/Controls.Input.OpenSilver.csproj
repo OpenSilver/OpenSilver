@@ -19,26 +19,13 @@
   <ItemGroup>
     <Compile Include="AutoCompleteBox\PopupHelper.cs" />
     <Compile Include="Common\WeakEventListener.cs" />
-    <!--
     <Compile Include="..\Controls\Common\BindingEvaluator.cs">
       <Link>Common\BindingEvaluator.cs</Link>
     </Compile>
-    -->
-    <Compile Include="Common\BindingEvaluator.cs" />
-    <!--
     <Compile Include="..\Controls\Common\InteractionHelper.cs">
       <Link>Common\InteractionHelper.cs</Link>
     </Compile>
-    -->
-    <Compile Include="..\Runtime\System.Windows.Controls\InteractionHelper.cs">
-      <Link>Common\InteractionHelper.cs</Link>
-    </Compile>
-    <!--
     <Compile Include="..\Controls\Common\IUpdateVisualState.cs">
-      <Link>Common\IUpdateVisualState.cs</Link>
-    </Compile>
-    -->
-    <Compile Include="..\Runtime\System.Windows.Controls\IUpdateVisualState.cs">
       <Link>Common\IUpdateVisualState.cs</Link>
     </Compile>
     <!--
@@ -46,12 +33,7 @@
       <Link>Common\ScrollExtensions.cs</Link>
     </Compile>
     -->
-    <!--
     <Compile Include="..\Controls\Common\VisualStates.cs">
-      <Link>Common\VisualStates.cs</Link>
-    </Compile>
-    -->
-    <Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">
       <Link>Common\VisualStates.cs</Link>
     </Compile>
     <Compile Include="AutoCompleteBox\AutoCompleteBox.cs" />
@@ -91,12 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="AutoCompleteBox\AutoCompleteBox.xaml" />
-    <!--
     <None Include="..\Controls\Common\Common.xaml">
       <Link>Common\Common.xaml</Link>
     </None>
-    -->
-    <None Include="Common\Common.xaml" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />

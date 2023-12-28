@@ -1,0 +1,100 @@
+﻿<Project>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileFullPath)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Controls\Properties\Resources.Designer.cs" Link="Controls\Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Controls\Calendar\Calendar.cs" Link="Controls\Calendar\Calendar.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarAutomationPeer.cs" Link="Controls\Calendar\CalendarAutomationPeer.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarBlackoutDatesCollection.cs" Link="Controls\Calendar\CalendarBlackoutDatesCollection.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarButton.cs" Link="Controls\Calendar\CalendarButton.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarButtonAutomationPeer.cs" Link="Controls\Calendar\CalendarButtonAutomationPeer.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarDateChangedEventArgs.cs" Link="Controls\Calendar\CalendarDateChangedEventArgs.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarDateRange.cs" Link="Controls\Calendar\CalendarDateRange.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarDayButton.cs" Link="Controls\Calendar\CalendarDayButton.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarDayButtonAutomationPeer.cs" Link="Controls\Calendar\CalendarDayButtonAutomationPeer.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarExtensions.cs" Link="Controls\Calendar\CalendarExtensions.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarItem.cs" Link="Controls\Calendar\CalendarItem.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarMode.cs" Link="Controls\Calendar\CalendarMode.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarModeChangedEventArgs.cs" Link="Controls\Calendar\CalendarModeChangedEventArgs.cs" />
+    <Compile Include="..\Controls\Calendar\CalendarSelectionMode.cs" Link="Controls\Calendar\CalendarSelectionMode.cs" />
+    <Compile Include="..\Controls\Calendar\DateTimeHelper.cs" Link="Controls\Calendar\DateTimeHelper.cs" />
+    <Compile Include="..\Controls\Calendar\DateTimeTypeConverter.cs" Link="Controls\Calendar\DateTimeTypeConverter.cs" />
+    <Compile Include="..\Controls\Calendar\SelectedDatesCollection.cs" Link="Controls\Calendar\SelectedDatesCollection.cs" />
+    <Compile Include="..\Controls\ChildWindow\ChildWindow.cs" Link="Controls\ChildWindow\ChildWindow.cs" />
+    <Compile Include="..\Controls\ChildWindow\ChildWindowAutomationPeer.cs" Link="Controls\ChildWindow\ChildWindowAutomationPeer.cs" />
+    <Compile Include="..\Controls\Common\BindingEvaluator.cs" Link="Controls\Common\BindingEvaluator.cs" />
+    <Compile Include="..\Controls\Common\Dock.cs" Link="Controls\Common\Dock.cs" />
+    <Compile Include="..\Controls\Common\InteractionHelper.cs" Link="Controls\Common\InteractionHelper.cs" />
+    <Compile Include="..\Controls\Common\ItemsControlHelper.cs" Link="Controls\Common\ItemsControlHelper.cs" />
+    <Compile Include="..\Controls\Common\IUpdateVisualState.cs" Link="Controls\Common\IUpdateVisualState.cs" />
+    <Compile Include="..\Controls\Common\NumericExtensions.cs" Link="Controls\Common\NumericExtensions.cs" />
+    <Compile Include="..\Controls\Common\RoutedPropertyChangingEventArgs.cs" Link="Controls\Common\RoutedPropertyChangingEventArgs.cs" />
+    <Compile Include="..\Controls\Common\RoutedPropertyChangingEventHandler.cs" Link="Controls\Common\RoutedPropertyChangingEventHandler.cs" />
+    <Compile Include="..\Controls\Common\ScrollExtensions.cs" Link="Controls\Common\ScrollExtensions.cs" />
+    <Compile Include="..\Controls\Common\TypeConverters.cs" Link="Controls\Common\TypeConverters.cs" />
+    <Compile Include="..\Controls\Common\VisualStates.cs" Link="Controls\Common\VisualStates.cs" />
+    <Compile Include="..\Controls\Data\HierarchicalDataTemplate.cs" Link="Controls\Data\HierarchicalDataTemplate.cs" />
+    <Compile Include="..\Controls\DatePicker\DatePicker.cs" Link="Controls\DatePicker\DatePicker.cs" />
+    <Compile Include="..\Controls\DatePicker\DatePicker.TestHook.cs" Link="Controls\DatePicker\DatePicker.TestHook.cs" />
+    <Compile Include="..\Controls\DatePicker\DatePickerAutomationPeer.cs" Link="Controls\DatePicker\DatePickerAutomationPeer.cs" />
+    <Compile Include="..\Controls\DatePicker\DatePickerDateValidationErrorEventArgs.cs" Link="Controls\DatePicker\DatePickerDateValidationErrorEventArgs.cs" />
+    <Compile Include="..\Controls\DatePicker\DatePickerFormat.cs" Link="Controls\DatePicker\DatePickerFormat.cs" />
+    <Compile Include="..\Controls\DatePicker\DatePickerTextBox.cs" Link="Controls\DatePicker\DatePickerTextBox.cs" />
+    <Compile Include="..\Controls\GridSplitter\DragValidator.cs" Link="Controls\GridSplitter\DragValidator.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.cs" Link="Controls\GridSplitter\GridSplitter.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.DefinitionAbstraction.cs" Link="Controls\GridSplitter\GridSplitter.DefinitionAbstraction.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.DoubleUtil.cs" Link="Controls\GridSplitter\GridSplitter.DoubleUtil.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.GridResizeBehavior.cs" Link="Controls\GridSplitter\GridSplitter.GridResizeBehavior.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.GridResizeDirection.cs" Link="Controls\GridSplitter\GridSplitter.GridResizeDirection.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.ResizeBehavior.cs" Link="Controls\GridSplitter\GridSplitter.ResizeBehavior.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.SplitBehavior.cs" Link="Controls\GridSplitter\GridSplitter.SplitBehavior.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitter.TestHook.cs" Link="Controls\GridSplitter\GridSplitter.TestHook.cs" />
+    <Compile Include="..\Controls\GridSplitter\GridSplitterAutomationPeer.cs" Link="Controls\GridSplitter\GridSplitterAutomationPeer.cs" />
+    <Compile Include="..\Controls\GridSplitter\PreviewControl.cs" Link="Controls\GridSplitter\PreviewControl.cs" />
+    <Compile Include="..\Controls\HeaderedItemsControl\HeaderedItemsControl.cs" Link="Controls\HeaderedItemsControl\HeaderedItemsControl.cs" />
+    <Compile Include="..\Controls\TabControl\TabControl.cs" Link="Controls\TabControl\TabControl.cs" />
+    <Compile Include="..\Controls\TabControl\TabControlAutomationPeer.cs" Link="Controls\TabControl\TabControlAutomationPeer.cs" />
+    <Compile Include="..\Controls\TabControl\TabItem.cs" Link="Controls\TabControl\TabItem.cs" />
+    <Compile Include="..\Controls\TabControl\TabItemAutomationPeer.cs" Link="Controls\TabControl\TabItemAutomationPeer.cs" />
+    <Compile Include="..\Controls\TabControl\TabPanel.cs" Link="Controls\TabControl\TabPanel.cs" />
+    <Compile Include="..\Controls\TreeView\TreeView.cs" Link="Controls\TreeView\TreeView.cs" />
+    <Compile Include="..\Controls\TreeView\TreeViewAutomationPeer.cs" Link="Controls\TreeView\TreeViewAutomationPeer.cs" />
+    <Compile Include="..\Controls\TreeView\TreeViewItem.cs" Link="Controls\TreeView\TreeViewItem.cs" />
+    <Compile Include="..\Controls\TreeView\TreeViewItemAutomationPeer.cs" Link="Controls\TreeView\TreeViewItemAutomationPeer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\Controls\Themes\generic.xaml" Link="Controls\Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="..\Controls\Calendar\Calendar.xaml" Link="Controls\Calendar\Calendar.xaml" />
+    <None Include="..\Controls\Calendar\CalendarItem.xaml" Link="Controls\Calendar\CalendarItem.xaml" />
+    <None Include="..\Controls\Calendar\CalendarDayButton.xaml" Link="Controls\Calendar\CalendarDayButton.xaml" />
+    <None Include="..\Controls\Calendar\CalendarButton.xaml" Link="Controls\Calendar\CalendarButton.xaml" />
+    <None Include="..\Controls\ChildWindow\ChildWindow.xaml" Link="Controls\ChildWindow\ChildWindow.xaml" />
+    <None Include="..\Controls\Common\Common.xaml" Link="Controls\Common\Common.xaml" />
+    <None Include="..\Controls\DatePicker\DatePicker.xaml" Link="Controls\DatePicker\DatePicker.xaml" />
+    <None Include="..\Controls\DatePicker\DatePickerTextBox.xaml" Link="Controls\DatePicker\DatePickerTextBox.xaml" />
+    <None Include="..\Controls\GridSplitter\GridSplitter.xaml" Link="Controls\GridSplitter\GridSplitter.xaml" />
+    <None Include="..\Controls\HeaderedItemsControl\HeaderedItemsControl.xaml" Link="Controls\HeaderedItemsControl\HeaderedItemsControl.xaml" />
+    <None Include="..\Controls\TabControl\TabControl.xaml" Link="Controls\TabControl\TabControl.xaml" />
+    <None Include="..\Controls\TabControl\TabItem.xaml" Link="Controls\TabControl\TabItem.xaml" />
+    <None Include="..\Controls\TreeView\TreeView.xaml" Link="Controls\TreeView\TreeView.xaml" />
+    <None Include="..\Controls\TreeView\TreeViewItem.xaml" Link="Controls\TreeView\TreeViewItem.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Controls\Properties\Resources.resx" Link="Controls\Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Controls</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

@@ -1,3 +1,4 @@
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -10,12 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Windows.Controls;
-using System.Windows.Media;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -27,12 +24,6 @@ namespace System.Windows
     /// </summary>
     public abstract partial class FrameworkElement : UIElement
     {
-        //static bool _theWarningAboutMarginsHasAlreadyBeenDisplayed = false;
-
-        //--------------------------------------
-        // Note: this is a "partial" class. This file handles anything related to Size and Alignment. Please refer to the other file for the rest of the FrameworkElement implementation.
-        //--------------------------------------
-
         protected virtual void OnAfterApplyHorizontalAlignmentAndWidth()
         {
         }
@@ -51,7 +42,7 @@ namespace System.Windows
         /// for the special <see cref="double.NaN"/> value, this value must be equal to or greater
         /// than 0.
         /// </returns>
-        [TypeConverter(typeof(LengthConverter))]
+        [TypeConverter(typeof(OpenSilver.Internal.LengthConverter))]
         public double Height
         {
             get => (double)GetValue(HeightProperty);
@@ -82,7 +73,7 @@ namespace System.Windows
         /// for the special <see cref="double.NaN"/> value, this value must be equal to or greater
         /// than 0.
         /// </returns>
-        [TypeConverter(typeof(LengthConverter))]
+        [TypeConverter(typeof(OpenSilver.Internal.LengthConverter))]
         public double Width
         {
             get => (double)GetValue(WidthProperty);

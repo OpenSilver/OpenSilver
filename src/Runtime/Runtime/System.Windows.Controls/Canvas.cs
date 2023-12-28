@@ -147,8 +147,11 @@ namespace System.Windows.Controls
             UIElement[] childrens = Children.ToArray();
             foreach (UIElement child in childrens)
             {
-                double x = GetLeft(child).DefaultIfNaN(0);
-                double y = GetTop(child).DefaultIfNaN(0);
+                double left = GetLeft(child);
+                double top = GetTop(child);
+
+                double x = double.IsNaN(left) ? 0 : left;
+                double y = double.IsNaN(top) ? 0 : top;
 
                 child.Arrange(new Rect(new Point(x, y), child.DesiredSize));
             }

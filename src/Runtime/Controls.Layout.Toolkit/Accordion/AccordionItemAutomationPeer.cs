@@ -5,7 +5,6 @@
 
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
-using Properties = OpenSilver.Controls.Properties;
 
 namespace System.Windows.Automation.Peers
 {
@@ -105,7 +104,7 @@ namespace System.Windows.Automation.Peers
             AccordionItem owner = OwnerAccordionItem;
             if (owner.IsLocked)
             {
-                throw new InvalidOperationException(Properties.Resources.Automation_OperationCannotBePerformed);
+                throw new InvalidOperationException(Controls.Properties.Resources.Automation_OperationCannotBePerformed);
             }
 
             owner.IsSelected = false;
@@ -128,7 +127,7 @@ namespace System.Windows.Automation.Peers
             AccordionItem owner = OwnerAccordionItem;
             if (owner.IsLocked)
             {
-                throw new InvalidOperationException(Properties.Resources.Automation_OperationCannotBePerformed);
+                throw new InvalidOperationException(Controls.Properties.Resources.Automation_OperationCannotBePerformed);
             }
 
             owner.IsSelected = true;
@@ -147,7 +146,7 @@ namespace System.Windows.Automation.Peers
             Accordion parent = owner.ParentAccordion;
             if (parent == null)
             {
-                throw new InvalidOperationException(Properties.Resources.Automation_OperationCannotBePerformed);
+                throw new InvalidOperationException(Controls.Properties.Resources.Automation_OperationCannotBePerformed);
             }
             parent.SelectedItems.Add(owner);
         }
@@ -178,7 +177,7 @@ namespace System.Windows.Automation.Peers
             Accordion parent = owner.ParentAccordion;
             if (parent == null)
             {
-                throw new InvalidOperationException(Properties.Resources.Automation_OperationCannotBePerformed);
+                throw new InvalidOperationException(Controls.Properties.Resources.Automation_OperationCannotBePerformed);
             }
             parent.SelectedItems.Remove(owner);
         }

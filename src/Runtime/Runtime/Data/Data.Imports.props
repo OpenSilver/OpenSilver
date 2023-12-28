@@ -1,0 +1,27 @@
+<Project>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileFullPath)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Data\PagedCollectionView\PagedCollectionViewResources.Designer.cs" Link="Data\PagedCollectionView\PagedCollectionViewResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PagedCollectionViewResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Data\PagedCollectionView\IPagedCollectionView.cs" Link="Data\PagedCollectionView\IPagedCollectionView.cs" />
+    <Compile Include="..\Data\PagedCollectionView\PageChangingEventArgs.cs" Link="Data\PagedCollectionView\PageChangingEventArgs.cs" />
+    <Compile Include="..\Data\PagedCollectionView\PagedCollectionView.cs" Link="Data\PagedCollectionView\PagedCollectionView.cs" />
+    <Compile Include="..\Data\PagedCollectionView\TypeHelper.cs" Link="Data\PagedCollectionView\TypeHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Data\PagedCollectionView\PagedCollectionViewResources.resx" Link="Data\PagedCollectionView\PagedCollectionViewResources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PagedCollectionViewResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>System.ComponentModel</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

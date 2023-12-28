@@ -17,9 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Controls.Data\WeakEventListener.cs" Link="WeakEventListener.cs" />
-    <Compile Include="..\Runtime\System.Windows.Controls\Toolkit\CollectionHelpers.cs" Link="Extensions\CollectionHelpers.cs" />
-    <Compile Include="..\Runtime\System.Windows.Controls\Toolkit\EnumerableExtensions.cs" Link="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="..\Controls.Toolkit\Common\CollectionHelper.cs">
+      <Link>Charting\CollectionHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\Controls.Toolkit\Common\EnumerableExtensions.cs">
+      <Link>EnumerableExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Controls.Data\WeakEventListener.cs">
+      <Link>WeakEventListener.cs</Link>
+    </Compile>
     <Compile Include="AggregatedObservableCollection.cs" />
     <Compile Include="Charting\AnimationSequence.cs" />
     <Compile Include="Charting\Axis\Axis.cs" />

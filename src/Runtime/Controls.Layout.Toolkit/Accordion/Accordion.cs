@@ -14,7 +14,6 @@ using System.Windows.Automation.Peers;
 using System.Windows.Data;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using Properties = OpenSilver.Controls.Properties;
 
 namespace System.Windows.Controls
 {

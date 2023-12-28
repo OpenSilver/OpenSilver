@@ -1,0 +1,100 @@
+﻿<Project>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileFullPath)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Controls.Input.Toolkit\Properties\Resources.Designer.cs" Link="Controls.Input.Toolkit\Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Controls.Input.Toolkit\ContextMenu\ContextMenu.cs" Link="Controls.Input.Toolkit\ContextMenu\ContextMenu.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\ContextMenu\ContextMenuService.cs" Link="Controls.Input.Toolkit\ContextMenu\ContextMenuService.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\ContextMenu\MenuBase.cs" Link="Controls.Input.Toolkit\ContextMenu\MenuBase.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\ContextMenu\MenuItem.cs" Link="Controls.Input.Toolkit\ContextMenu\MenuItem.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\ContextMenu\Separator.cs" Link="Controls.Input.Toolkit\ContextMenu\Separator.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\DomainUpDown\DomainUpDown.cs" Link="Controls.Input.Toolkit\DomainUpDown\DomainUpDown.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\DomainUpDown\DomainUpDownAutomationPeer.cs" Link="Controls.Input.Toolkit\DomainUpDown\DomainUpDownAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\DomainUpDown\InvalidInputAction.cs" Link="Controls.Input.Toolkit\DomainUpDown\InvalidInputAction.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\DomainUpDown\ObservableObjectCollection.cs" Link="Controls.Input.Toolkit\DomainUpDown\ObservableObjectCollection.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\NumericUpDown\NumericUpDown.cs" Link="Controls.Input.Toolkit\NumericUpDown\NumericUpDown.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\NumericUpDown\NumericUpDownAutomationPeer.cs" Link="Controls.Input.Toolkit\NumericUpDown\NumericUpDownAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\EnumerableExtensions.cs" Link="Controls.Input.Toolkit\EnumerableExtensions.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\Clipper.cs" Link="Controls.Input.Toolkit\Rating\Clipper.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\EnumerableFunctions.cs" Link="Controls.Input.Toolkit\Rating\EnumerableFunctions.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\LinearClipper.cs" Link="Controls.Input.Toolkit\Rating\LinearClipper.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\NullableConverter.cs" Link="Controls.Input.Toolkit\Rating\NullableConverter.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\Rating.cs" Link="Controls.Input.Toolkit\Rating\Rating.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\RatingAutomationPeer.cs" Link="Controls.Input.Toolkit\Rating\RatingAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\RatingItem.cs" Link="Controls.Input.Toolkit\Rating\RatingItem.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\RatingItemAutomationPeer.cs" Link="Controls.Input.Toolkit\Rating\RatingItemAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Rating\RatingSelectionMode.cs" Link="Controls.Input.Toolkit\Rating\RatingSelectionMode.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Spinner\ButtonSpinner.cs" Link="Controls.Input.Toolkit\Spinner\ButtonSpinner.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Spinner\SpinDirection.cs" Link="Controls.Input.Toolkit\Spinner\SpinDirection.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Spinner\SpinEventArgs.cs" Link="Controls.Input.Toolkit\Spinner\SpinEventArgs.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Spinner\Spinner.cs" Link="Controls.Input.Toolkit\Spinner\Spinner.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\Spinner\ValidSpinDirections.cs" Link="Controls.Input.Toolkit\Spinner\ValidSpinDirections.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\AutomationPeers\ListTimePickerPopupAutomationPeer.cs" Link="Controls.Input.Toolkit\TimeInput\AutomationPeers\ListTimePickerPopupAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\AutomationPeers\PickerAutomationPeer.cs" Link="Controls.Input.Toolkit\TimeInput\AutomationPeers\PickerAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\AutomationPeers\RangeTimePickerPopupAutomationPeer.cs" Link="Controls.Input.Toolkit\TimeInput\AutomationPeers\RangeTimePickerPopupAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\AutomationPeers\TimePickerPopupAutomationPeer.cs" Link="Controls.Input.Toolkit\TimeInput\AutomationPeers\TimePickerPopupAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\AutomationPeers\TimePickerAutomationPeer.cs" Link="Controls.Input.Toolkit\TimeInput\AutomationPeers\TimePickerAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\AutomationPeers\TimeUpDownAutomationPeer.cs" Link="Controls.Input.Toolkit\TimeInput\AutomationPeers\TimeUpDownAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\Popups\ItemSelectionHelper.cs" Link="Controls.Input.Toolkit\TimeInput\Popups\ItemSelectionHelper.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\Popups\ListTimePickerPopup.cs" Link="Controls.Input.Toolkit\TimeInput\Popups\ListTimePickerPopup.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\Popups\RangeTimePickerPopup.cs" Link="Controls.Input.Toolkit\TimeInput\Popups\RangeTimePickerPopup.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\Popups\TimePickerPopup.cs" Link="Controls.Input.Toolkit\TimeInput\Popups\TimePickerPopup.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\Popups\TimePickerPopupTemplate.cs" Link="Controls.Input.Toolkit\TimeInput\Popups\TimePickerPopupTemplate.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\PopupTimeSelectionMode.cs" Link="Controls.Input.Toolkit\TimeInput\PopupTimeSelectionMode.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeFormat\CustomTimeFormat.cs" Link="Controls.Input.Toolkit\TimeInput\TimeFormat\CustomTimeFormat.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeFormat\ITimeFormat.cs" Link="Controls.Input.Toolkit\TimeInput\TimeFormat\ITimeFormat.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeFormat\LongTimeFormat.cs" Link="Controls.Input.Toolkit\TimeInput\TimeFormat\LongTimeFormat.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeFormat\ShortTimeFormat.cs" Link="Controls.Input.Toolkit\TimeInput\TimeFormat\ShortTimeFormat.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeFormat\TimeFormatConverter.cs" Link="Controls.Input.Toolkit\TimeInput\TimeFormat\TimeFormatConverter.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeGlobalizationInfo.cs" Link="Controls.Input.Toolkit\TimeInput\TimeGlobalizationInfo.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\ITimeInput.cs" Link="Controls.Input.Toolkit\TimeInput\ITimeInput.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\Picker.cs" Link="Controls.Input.Toolkit\TimeInput\Picker.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeCoercionHelper.cs" Link="Controls.Input.Toolkit\TimeInput\TimeCoercionHelper.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeParser.cs" Link="Controls.Input.Toolkit\TimeInput\TimeParser.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeParserCollection.cs" Link="Controls.Input.Toolkit\TimeInput\TimeParserCollection.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeParsers\CatchallTimeParser.cs" Link="Controls.Input.Toolkit\TimeInput\TimeParsers\CatchallTimeParser.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimePicker.cs" Link="Controls.Input.Toolkit\TimeInput\TimePicker.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeTypeConverter.cs" Link="Controls.Input.Toolkit\TimeInput\TimeTypeConverter.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\TimeInput\TimeUpDown.cs" Link="Controls.Input.Toolkit\TimeInput\TimeUpDown.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\UpDownBase\UpDownBase.cs" Link="Controls.Input.Toolkit\UpDownBase\UpDownBase.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\UpDownBase\UpDownBase.Generic.cs" Link="Controls.Input.Toolkit\UpDownBase\UpDownBase.Generic.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\UpDownBase\UpDownBaseAutomationPeer.cs" Link="Controls.Input.Toolkit\UpDownBase\UpDownBaseAutomationPeer.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\UpDownBase\UpDownParseErrorEventArgs.cs" Link="Controls.Input.Toolkit\UpDownBase\UpDownParseErrorEventArgs.cs" />
+    <Compile Include="..\Controls.Input.Toolkit\UpDownBase\UpDownParsingEventArgs.cs" Link="Controls.Input.Toolkit\UpDownBase\UpDownParsingEventArgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\Controls.Input.Toolkit\Themes\generic.xaml" Link="Controls.Input.Toolkit\Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="..\Controls.Input.Toolkit\ContextMenu\ContextMenu.xaml" Link="Controls.Input.Toolkit\ContextMenu\ContextMenu.xaml" />
+    <None Include="..\Controls.Input.Toolkit\ContextMenu\MenuItem.xaml" Link="Controls.Input.Toolkit\ContextMenu\MenuItem.xaml" />
+    <None Include="..\Controls.Input.Toolkit\ContextMenu\Separator.xaml" Link="Controls.Input.Toolkit\ContextMenu\Separator.xaml" />
+    <None Include="..\Controls.Input.Toolkit\NumericUpDown\NumericUpDown.xaml" Link="Controls.Input.Toolkit\NumericUpDown\NumericUpDown.xaml" />
+    <None Include="..\Controls.Input.Toolkit\Spinner\ButtonSpinner.xaml" Link="Controls.Input.Toolkit\Spinner\ButtonSpinner.xaml" />
+    <None Include="..\Controls.Input.Toolkit\UpDownBase\UpDownBase.xaml" Link="Controls.Input.Toolkit\UpDownBase\UpDownBase.xaml" />
+    <None Include="..\Controls.Input.Toolkit\DomainUpDown\DomainUpDown.xaml" Link="Controls.Input.Toolkit\DomainUpDown\DomainUpDown.xaml" />
+    <None Include="..\Controls.Input.Toolkit\TimeInput\Picker.xaml" Link="Controls.Input.Toolkit\TimeInput\Picker.xaml" />
+    <None Include="..\Controls.Input.Toolkit\TimeInput\TimeUpDown.xaml" Link="Controls.Input.Toolkit\TimeInput\TimeUpDown.xaml" />
+    <None Include="..\Controls.Input.Toolkit\TimeInput\Popups\ListTimePickerPopup.xaml" Link="Controls.Input.Toolkit\TimeInput\Popups\ListTimePickerPopup.xaml" />
+    <None Include="..\Controls.Input.Toolkit\TimeInput\TimePicker.xaml" Link="Controls.Input.Toolkit\TimeInput\TimePicker.xaml" />
+    <None Include="..\Controls.Input.Toolkit\TimeInput\Popups\RangeTimePickerPopup.xaml" Link="Controls.Input.Toolkit\TimeInput\Popups\RangeTimePickerPopup.xaml" />
+    <None Include="..\Controls.Input.Toolkit\Rating\Rating.xaml" Link="Controls.Input.Toolkit\Rating\Rating.xaml" />
+    <None Include="..\Controls.Input.Toolkit\Rating\RatingItem.xaml" Link="Controls.Input.Toolkit\Rating\RatingItem.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Controls.Input.Toolkit\Properties\Resources.resx" Link="Controls.Input.Toolkit\Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Controls.Input.Toolkit</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
