@@ -46,6 +46,13 @@ namespace System.Windows.Controls.Primitives
             DefaultStyleKey = typeof(AccordionButton);
         }
 
+        /// <inheritdoc />
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            UpdateVisualState(false);
+        }
+
         /// <summary>
         /// Updates the state of the visual.
         /// </summary>
