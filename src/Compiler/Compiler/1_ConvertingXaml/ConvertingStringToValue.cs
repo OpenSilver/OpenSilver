@@ -46,13 +46,10 @@ namespace OpenSilver.Compiler
 
         internal virtual string PrepareStringForString(string source)
         {
-            // "{}" is used to escape '{' (when used at the beginning of the string)
-            string value = source.StartsWith("{}") ? source.Substring(2) : source;
-
             // Note: we use verbatim string (ie. a string that starts with "@") so
             // that the only character we have to escape is the quote (we need to
             // double it).
-            return GetQuotedVerbatimString(value);
+            return GetQuotedVerbatimString(source);
         }
 
         internal abstract bool IsNullableType(string type, out string underlyingType);

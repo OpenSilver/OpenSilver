@@ -469,7 +469,7 @@ namespace OpenSilver.Compiler
                     // ATTRIBUTE
                     //-------------
 
-                    string attributeValue = attribute.Value;
+                    string attributeValue = GetAttributeValue(attribute);
                     string attributeLocalName = attribute.Name.LocalName;
 
                     // Skip the utility attributes:
@@ -1831,6 +1831,18 @@ else
             private static string EscapeString(string stringValue)
             {
                 return string.Concat("@\"", stringValue.Replace("\"", "\"\""), "\"");
+            }
+
+            private static string GetAttributeValue(XAttribute attribute)
+            {
+                string value = attribute.Value;
+
+                if (value is not null && value.StartsWith("{}"))
+                {
+                    return value.Substring(2);
+                }
+
+                return value;
             }
 
             private bool IsPropertyAttached(XElement propertyElement)
