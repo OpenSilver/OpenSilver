@@ -873,14 +873,16 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="PopupRoot"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="1.0" />
+                                                         To="1.0"
+                                                         Duration="00:00:00.0010000" />
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="PopupClosed">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="PopupRoot"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="0.0" />
+                                                         To="0.0"
+                                                         Duration="00:00:00.0010000" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
