@@ -77,6 +77,9 @@ namespace OpenSilver.Compiler
                 case "System.Windows.Controls.Theming.ShinyBlue":
                     assemblyName = "OpenSilver.Controls.Theming.ShinyBlue";
                     return;
+                case "System.Windows.Controls.Theming.ShinyRed":
+                    assemblyName = "OpenSilver.Controls.Theming.ShinyRed";
+                    return;
                 case "System.Windows.Interactivity":
                     assemblyName = "OpenSilver.Interactivity";
                     return;

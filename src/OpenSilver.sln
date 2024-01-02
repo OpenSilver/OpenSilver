@@ -110,6 +110,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.RainierPur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.ShinyBlue.OpenSilver", "Runtime\Controls.Theming.ShinyBlue\Controls.Theming.ShinyBlue.OpenSilver.csproj", "{8BCB3961-6468-4CB7-A3E8-D0A4787D35B0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.ShinyRed.OpenSilver", "Runtime\Controls.Theming.ShinyRed\Controls.Theming.ShinyRed.OpenSilver.csproj", "{5317FD27-5087-497A-A497-3800167C42E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,6 +252,10 @@ Global
 		{8BCB3961-6468-4CB7-A3E8-D0A4787D35B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BCB3961-6468-4CB7-A3E8-D0A4787D35B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BCB3961-6468-4CB7-A3E8-D0A4787D35B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5317FD27-5087-497A-A497-3800167C42E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5317FD27-5087-497A-A497-3800167C42E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5317FD27-5087-497A-A497-3800167C42E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5317FD27-5087-497A-A497-3800167C42E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -296,6 +302,7 @@ Global
 		{670BB6DE-C829-42FA-94A0-C2425681E0E7} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{FE21FE5F-49F1-4EEF-BD4B-2D362440A971} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{8BCB3961-6468-4CB7-A3E8-D0A4787D35B0} = {5CABE705-CE13-456F-B02E-977B59D964FA}
+		{5317FD27-5087-497A-A497-3800167C42E6} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}
