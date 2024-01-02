@@ -844,6 +844,20 @@ document.loadFont = async function (family, source, loadedCallback) {
     }
 };
 
+document.getSystemColor = function (color) {
+    if (CSS.supports('color', color)) {
+        const div = document.createElement('div');
+        div.style.color = color;
+        div.style.display = 'none';
+        document.body.appendChild(div);
+        const computedColor = window.getComputedStyle(div).color;
+        document.body.removeChild(div);
+        return computedColor;
+    }
+
+    return '';
+};
+
 document.textboxHelpers = (function () {
     function getSelectionLength(view) {
         return view.selectionEnd - view.selectionStart;
