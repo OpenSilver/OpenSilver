@@ -98,6 +98,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.BubbleCrem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.BureauBlack.OpenSilver", "Runtime\Controls.Theming.BureauBlack\Controls.Theming.BureauBlack.OpenSilver.csproj", "{4D6CC22F-913A-49B0-B000-104354BE3D9F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.BureauBlue.OpenSilver", "Runtime\Controls.Theming.BureauBlue\Controls.Theming.BureauBlue.OpenSilver.csproj", "{42C16695-610B-473A-A57B-ECCADECE9486}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -214,6 +216,10 @@ Global
 		{4D6CC22F-913A-49B0-B000-104354BE3D9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D6CC22F-913A-49B0-B000-104354BE3D9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D6CC22F-913A-49B0-B000-104354BE3D9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42C16695-610B-473A-A57B-ECCADECE9486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42C16695-610B-473A-A57B-ECCADECE9486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42C16695-610B-473A-A57B-ECCADECE9486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42C16695-610B-473A-A57B-ECCADECE9486}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -254,6 +260,7 @@ Global
 		{ECB5921C-C695-473B-88E3-0A002ED097BF} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{284011CE-D0C8-4552-8DDB-6833B5A8430A} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{4D6CC22F-913A-49B0-B000-104354BE3D9F} = {5CABE705-CE13-456F-B02E-977B59D964FA}
+		{42C16695-610B-473A-A57B-ECCADECE9486} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}
