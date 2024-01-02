@@ -28,6 +28,7 @@
     </Compile>
     <Compile Include="AggregatedObservableCollection.cs" />
     <Compile Include="Charting\Axis\IAnchoredToOrigin.cs" />
+    <Compile Include="Charting\DataPointSeriesDragDropTarget.cs" />
     <Compile Include="Charting\DataPoint\AreaDataPoint.cs" />
     <Compile Include="Charting\FrameworkElementExtensions.cs" />
     <Compile Include="Charting\Primitives\Edge.cs" />

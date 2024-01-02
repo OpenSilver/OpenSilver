@@ -41,6 +41,31 @@ namespace System.Windows.Controls
         where TItemsControlType : UIElement
         where TItemContainerType : UIElement
     {
+        /// <summary>
+        /// The name of the DragPopup template part.
+        /// </summary>
+        protected const string DragPopupName = "DragPopup";
+
+        /// <summary>
+        /// The name of the DragContainer template part.
+        /// </summary>
+        protected const string DragContainerName = "DragContainer";
+
+        /// <summary>
+        /// The name of the DragDecorator template part.
+        /// </summary>
+        protected const string DragDecoratorName = "DragDecorator";
+
+        /// <summary>
+        /// The name of the insertion indicator template part.
+        /// </summary>
+        protected const string InsertionIndicatorName = "InsertionIndicator";
+
+        /// <summary>
+        /// The name of the insertion indicator container.
+        /// </summary>
+        protected const string InsertionIndicatorContainerName = "InsertionIndicatorContainer";
+
         //pointer variable used for mouse operation
         bool _isPointerCaptured;
         Pointer _capturedPointer;

@@ -4,7 +4,6 @@
 // All other rights reserved.
 
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Controls.Primitives;
 using System.Windows.Shapes;
@@ -25,7 +24,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
     [TemplatePart(Name = InsertionIndicatorName, Type = typeof(Path))]
     [TemplatePart(Name = InsertionIndicatorContainerName, Type = typeof(Canvas))]
     [TemplatePart(Name = DragPopupName, Type = typeof(Popup))]
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Use of Rx makes code appear more complex than it is to static analyzer.")]
     public class DataPointSeriesDragDropTarget : DragDropTarget<DataPointSeries, DataPoint>
     {
         /// <summary>
@@ -53,7 +51,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (newContent != null && !(newContent is Chart))
             {
-                throw new ArgumentException(OpenSilver.Controls.DataVisualization.OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesDropTarget_set_Content_ContentMustBeAChart);
+                throw new ArgumentException(Properties.Resources.DataPointSeriesDropTarget_set_Content_ContentMustBeAChart);
             }
 
             base.OnContentChanged(oldContent, newContent);
@@ -71,7 +69,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (itemsControl.ItemsSource != null)
             {
-                return itemsControl.ItemsSource.CanInsert(data);
+                return CollectionHelper.CanInsert(itemsControl.ItemsSource, data);
             }
             return false;
         }
@@ -83,7 +81,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <returns>The number of items in the items control.</returns>
         protected override int GetItemCount(DataPointSeries itemsControl)
         {
-            return itemsControl.ItemsSource.Count();
+            return CollectionHelper.Count(itemsControl.ItemsSource);
         }
 
         /// <summary>
@@ -140,7 +138,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (itemsControl.ItemsSource != null)
             {
-                itemsControl.ItemsSource.Add(data);
+                CollectionHelper.Add(itemsControl.ItemsSource, data);
             }
         }
 
@@ -153,7 +151,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (itemsControl.ItemsSource != null)
             {
-                itemsControl.ItemsSource.Remove(data);
+                CollectionHelper.Remove(itemsControl.ItemsSource, data);
             }
         }
 
@@ -167,7 +165,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (itemsControl.ItemsSource != null)
             {
-                itemsControl.ItemsSource.Insert(index, data);
+                CollectionHelper.Insert(itemsControl.ItemsSource, index, data);
             }
         }
 
