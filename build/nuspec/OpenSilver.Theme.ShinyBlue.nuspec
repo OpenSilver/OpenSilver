@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>OpenSilver.Theme.ShinyBlue</id>
+    <version>$PackageVersion$</version>
+    <authors>Userware</authors>
+    <projectUrl>https://www.opensilver.net</projectUrl>
+    <repository type="git" url="$RepositoryUrl$" />
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</description>
+    <copyright>Copyright (c) 2022, Userware. All rights reserved.</copyright>
+    <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
+    <icon>images\OpenSilver_icon.png</icon>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="OpenSilver" version="$OpenSilverPackageVersion$" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- OpenSilver runtime -->
+    <file src="../../src/Runtime/Controls.Theming.ShinyBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.dll" />
+    <file src="../../src/Runtime/Controls.Theming.ShinyBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.pdb" />
+    <file src="../../src/Runtime/Controls.Theming.ShinyBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.ShinyBlue.xml" />
+
+    <!-- OpenSilver icon -->
+    <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
+  </files>
+</package>
