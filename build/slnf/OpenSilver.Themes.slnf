@@ -1,0 +1,28 @@
+{
+  "solution": {
+    "path": "..\\..\\src\\OpenSilver.sln",
+    "projects": [
+      "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",
+      "Runtime\\Controls.Data.Input\\Controls.Data.Input.OpenSilver.csproj",
+      "Runtime\\Controls.DataVisualization\\Controls.DataVisualization.OpenSilver.csproj",
+      "Runtime\\Controls.Input\\Controls.Input.OpenSilver.csproj",
+      "Runtime\\Controls.Navigation\\Controls.Navigation.OpenSilver.csproj",
+      "Runtime\\Controls.Data\\Controls.Data.OpenSilver.csproj",
+      "Runtime\\Controls.Layout.Toolkit\\Controls.Layout.Toolkit.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.Toolkit\\Controls.Theming.Toolkit.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.BubbleCreme\\Controls.Theming.BubbleCreme.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.BureauBlack\\Controls.Theming.BureauBlack.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.BureauBlue\\Controls.Theming.BureauBlue.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.ExpressionDark\\Controls.Theming.ExpressionDark.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.ExpressionLight\\Controls.Theming.ExpressionLight.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.RainierOrange\\Controls.Theming.RainierOrange.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.RainierPurple\\Controls.Theming.RainierPurple.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.ShinyBlue\\Controls.Theming.ShinyBlue.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.ShinyRed\\Controls.Theming.ShinyRed.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.TwilightBlue\\Controls.Theming.TwilightBlue.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.WhistlerBlue\\Controls.Theming.WhistlerBlue.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.SystemColors\\Controls.Theming.SystemColors.OpenSilver.csproj",
+      "Runtime\\Runtime\\Runtime.OpenSilver.csproj"
+    ]
+  }
+}
