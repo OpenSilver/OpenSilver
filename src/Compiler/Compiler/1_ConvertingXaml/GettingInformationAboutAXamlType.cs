@@ -63,11 +63,14 @@ namespace OpenSilver.Compiler
                     assemblyName = "OpenRiaServices.Controls.DomainServices";
                     namespaceName = "OpenRiaServices.Controls";
                     return;
-                default:
-                    if (assemblyName == "System" || assemblyName.StartsWith("System."))
-                    {
-                        assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
-                    }
+                case "System":
+                case "System.Windows":
+                case "System.Windows.Browser":
+                case "System.Windows.Controls":
+                case "System.Windows.Controls.Toolkit":
+                case "System.Windows.Controls.Input.Toolkit":
+                case "System.Windows.Data":
+                    assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
                     return;
             }
         }
