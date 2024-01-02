@@ -103,6 +103,15 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static DependencyProperty DependencyPropertyFromName(string name, Type type)
+        {
+            Debug.Assert(name is not null);
+            Debug.Assert(type is not null);
+
+            return DependencyProperty.FromName(name, type);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
             Debug.Assert(dependencyObject is IFrameworkElement);
