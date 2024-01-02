@@ -1,0 +1,37 @@
+name: OpenSilver Themes Build
+
+on:
+  workflow_dispatch:
+    inputs:
+        opensilver-version:
+            description: 'OpenSilver version'
+            required: true
+        version:
+            description: 'Theme packages version'
+            required: true
+
+jobs:
+  OpenSilverThemesBuild:
+    #We should not run these steps on the forks by default.
+    if: github.repository_owner == 'OpenSilver'
+    runs-on: windows-latest
+    steps:
+      - uses: microsoft/setup-msbuild@v1.1
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.203'
+      - name: Clone OpenSilver repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Restore Packages
+        run: ./restore-packages-opensilver.bat
+      - name: Update compiler
+        run: ./build/update-compiler.bat
+      - name: Build Theme Packages
+        run: ./build/Build_Themes.bat ${{ github.event.inputs.opensilver-version }} ${{ github.event.inputs.version }}
+      - name: Upload packages to MyGet
+        run: |
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_TOKEN }} -s https://www.myget.org/F/opensilver/api/v2/package
