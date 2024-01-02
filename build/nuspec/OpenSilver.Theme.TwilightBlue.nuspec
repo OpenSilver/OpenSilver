@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>OpenSilver.Theme.TwilightBlue</id>
+    <version>$PackageVersion$</version>
+    <authors>Userware</authors>
+    <projectUrl>https://www.opensilver.net</projectUrl>
+    <repository type="git" url="$RepositoryUrl$" />
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</description>
+    <copyright>Copyright (c) 2022, Userware. All rights reserved.</copyright>
+    <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
+    <icon>images\OpenSilver_icon.png</icon>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="OpenSilver" version="$OpenSilverPackageVersion$" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- OpenSilver runtime -->
+    <file src="../../src/Runtime/Controls.Theming.TwilightBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.dll" />
+    <file src="../../src/Runtime/Controls.Theming.TwilightBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.pdb" />
+    <file src="../../src/Runtime/Controls.Theming.TwilightBlue/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.TwilightBlue.xml" />
+
+    <!-- OpenSilver icon -->
+    <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
+  </files>
+</package>
