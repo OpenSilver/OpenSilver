@@ -65,6 +65,9 @@ namespace OpenSilver.Compiler
                 case "System.Windows.Controls.Theming.ExpressionDark":
                     assemblyName = "OpenSilver.Controls.Theming.ExpressionDark";
                     return;
+                case "System.Windows.Controls.Theming.ExpressionLight":
+                    assemblyName = "OpenSilver.Controls.Theming.ExpressionLight";
+                    return;
                 case "System.Windows.Interactivity":
                     assemblyName = "OpenSilver.Interactivity";
                     return;
