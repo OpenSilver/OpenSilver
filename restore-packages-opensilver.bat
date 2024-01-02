@@ -1,2 +1,1 @@
-build\nuget.exe install OpenSilver -Version 2.0.0 -OutputDirectory src\packages -Source https://api.nuget.org/v3/index.json
-pause
+%~dp0\build\nuget.exe install OpenSilver -Version 2.0.0 -OutputDirectory %~dp0\src\packages -Source https://api.nuget.org/v3/index.json
