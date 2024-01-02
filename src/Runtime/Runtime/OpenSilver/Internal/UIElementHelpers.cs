@@ -49,22 +49,53 @@ internal static class UIElementHelpers
         style.fontWeight = fontWeight.ToOpenTypeWeight().ToInvariantString();
     }
 
-    internal static void SetForeground(this UIElement uie, Brush foreground)
+    internal static void SetForeground(this UIElement uie, Brush oldForeground, Brush newForeground)
     {
         var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        switch (foreground)
+        switch ((oldForeground, newForeground))
         {
-            case SolidColorBrush scb:
+            case (GradientBrush, SolidColorBrush scb):
+                style.backgroundImage = string.Empty;
+                style.backgroundClip = string.Empty;
                 style.color = scb.ToHtmlString();
                 break;
 
-            case null:
+            case (_, SolidColorBrush scb):
+                style.color = scb.ToHtmlString();
+                break;
+
+            case (GradientBrush, LinearGradientBrush lgb):
+                style.backgroundImage = lgb.ToHtmlString(uie);
+                break;
+
+            case (_, LinearGradientBrush lgb):
+                style.backgroundImage = lgb.ToHtmlString(uie);
+                style.color = "transparent";
+                style.backgroundClip = "text";
+                break;
+
+            case (GradientBrush, RadialGradientBrush rgb):
+                style.backgroundImage = rgb.ToHtmlString(uie);
+                break;
+
+            case (_, RadialGradientBrush rgb):
+                style.backgroundImage = rgb.ToHtmlString(uie);
+                style.color = "transparent";
+                style.backgroundClip = "text";
+                break;
+
+            case (SolidColorBrush, null):
+                style.color = string.Empty;
+                break;
+
+            case (GradientBrush, null):
+                style.backgroundImage = string.Empty;
+                style.backgroundClip = string.Empty;
                 style.color = string.Empty;
                 break;
 
             default:
-                // GradientBrush, ImageBrush and custom brushes are not supported.
-                // Keep using old brush.
+                // ImageBrush and custom brushes are not supported. Keep using old brush.
                 break;
         }
     }

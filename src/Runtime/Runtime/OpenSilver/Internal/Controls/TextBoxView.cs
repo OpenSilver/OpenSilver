@@ -67,7 +67,7 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
                 FrameworkPropertyMetadataOptions.Inherits,
                 OnForegroundChanged)
             {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetForeground((Brush)newValue),
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetForeground(oldValue as Brush, (Brush)newValue),
             });
 
         Block.LineHeightProperty.AddOwner(
@@ -460,7 +460,8 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
         {
-            this.SetForeground((Brush)sender);
+            var foreground = (Brush)sender; 
+            this.SetForeground(foreground, foreground);
         }
     }
 }

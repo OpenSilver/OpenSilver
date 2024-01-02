@@ -38,7 +38,9 @@ namespace CSHTML5.Internal
         }
 
         public string background { set { SetStylePropertyValue("background", value); } }
+        public string backgroundClip { set { SetStylePropertyValue("backgroundClip", value); } }
         public string backgroundColor { set { SetStylePropertyValue("backgroundColor", value); } }
+        public string backgroundImage { set { SetStylePropertyValue("backgroundImage", value); } }
         public string border { set { SetStylePropertyValue("border", value); } }
         public string borderRight { set { SetStylePropertyValue("borderRight", value); } }
         public string borderLeft { set { SetStylePropertyValue("borderLeft", value); } }

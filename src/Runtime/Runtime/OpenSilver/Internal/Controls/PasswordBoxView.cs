@@ -67,7 +67,7 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
                 FrameworkPropertyMetadataOptions.Inherits,
                 OnForegroundChanged)
             {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetForeground((Brush)newValue),
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetForeground(oldValue as Brush, (Brush)newValue),
             });
     }
 
@@ -207,7 +207,8 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
         {
-            this.SetForeground((Brush)sender);
+            var foreground = (Brush)sender;
+            this.SetForeground(foreground, foreground);
         }
     }
 }

@@ -68,7 +68,7 @@ public sealed class Run : Inline
                 FrameworkPropertyMetadataOptions.Inherits,
                 OnForegroundChanged)
             {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetForeground((Brush)newValue),
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetForeground(oldValue as Brush, (Brush)newValue),
             });
 
         TextDecorationsProperty.OverrideMetadata(
@@ -164,7 +164,8 @@ public sealed class Run : Inline
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
         {
-            this.SetForeground((Brush)sender);
+            var foreground = (Brush)sender;
+            this.SetForeground(foreground, foreground);
         }
     }
 }
