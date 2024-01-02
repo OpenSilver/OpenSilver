@@ -16,7 +16,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.JSInterop" Version="3.1.28" />
-		<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
 	</ItemGroup>
 
@@ -141,9 +140,6 @@
 		<Compile Include="PublicAPI\Interop\OnCallbackSimulator.cs" />
 		<Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
 		<Compile Include="System.Collections.Generic\PriorityQueue.cs" />
-		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\CompositionHost.cs" />
-		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
-		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
 		<Compile Include="System.Runtime.CompilerServices\DefaultInterpolatedStringHandler.cs" />
 		<Compile Include="System.Runtime.CompilerServices\InterpolatedStringHandlerAttribute.cs" />
 		<Compile Include="System.Runtime.CompilerServices\IsExternalInit.cs" />
@@ -421,7 +417,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="System.Collections.Generic\WORKINPROGRESS\SynchronizedReadOnlyCollection.cs" />
 		<Compile Include="System.ComponentModel\ICollectionViewFactory.cs" />
-		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\ExportProvider.cs" />
 		<Compile Include="System.Reflection\ICustomTypeProvider.cs" />
 		<Compile Include="System.Windows\ApplicationServiceContext.cs" />
 		<Compile Include="System.Windows\DataFormats.cs" />

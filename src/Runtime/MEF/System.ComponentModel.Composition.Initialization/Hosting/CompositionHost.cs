@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,43 +11,57 @@
 *  
 \*====================================================================================*/
 
-// UGiacobbi2000104 First implementation
-
 using System.ComponentModel.Composition.Primitives;
 using System.Threading;
 
 namespace System.ComponentModel.Composition.Hosting
 {
-    /// <summary>Provides static methods to control the container used by <see cref="T:System.ComponentModel.Composition.CompositionInitializer" />.</summary>
+    /// <summary>
+    /// Provides static methods to control the container used by <see cref="CompositionInitializer" />.
+    /// </summary>
     public static class CompositionHost
     {
-        internal static CompositionContainer _container;
-        
-        // Better to add some thread safety here
-        private static readonly object _lockObject = new object();
+        private static CompositionContainer _container;
+        private static readonly object _lockObject = new();
 
-        /// <summary>Sets <see cref="T:System.ComponentModel.Composition.CompositionInitializer" /> to use the specified container.</summary>
-        /// <param name="container">The container to use.</param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// <paramref name="container" /> is null.</exception>
-        /// <exception cref="T:System.InvalidOperationException">This method has already been called.</exception>
+        /// <summary>
+        /// Sets <see cref="CompositionInitializer" /> to use the specified container.
+        /// </summary>
+        /// <param name="container">
+        /// The container to use.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="container" /> is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// This method has already been called.
+        /// </exception>
         public static void Initialize(CompositionContainer container)
         {
             if (container == null)
+            {
                 throw new ArgumentNullException(nameof(container));
+            }
 
-            CompositionContainer globalContainer;
-            
-            if (TryGetOrCreateContainer(() => container, out globalContainer))
-                throw new InvalidOperationException("Global container already initialized.");
+            if (TryGetOrCreateContainer(() => container, out CompositionContainer globalContainer))
+            {
+                throw new InvalidOperationException(Resources.Error_ContainerAlreadyInitialized);
+            }
         }
 
-        /// <summary>Sets <see cref="T:System.ComponentModel.Composition.CompositionInitializer" /> to use a new container initialized with the specified catalogs.</summary>
-        /// <returns>The new container.</returns>
-        /// <param name="catalogs">The catalogs to load into the new container.</param>
+        /// <summary>
+        /// Sets <see cref="CompositionInitializer" /> to use a new container initialized 
+        /// with the specified catalogs.
+        /// </summary>
+        /// <param name="catalogs">
+        /// The catalogs to load into the new container.
+        /// </param>
+        /// <returns>
+        /// The new container.
+        /// </returns>
         public static CompositionContainer Initialize(params ComposablePartCatalog[] catalogs)
         {
-            AggregateCatalog catalog = new AggregateCatalog(catalogs);
+            var catalog = new AggregateCatalog(catalogs);
             var container = new CompositionContainer(catalog);
             
             try
@@ -65,11 +78,9 @@ namespace System.ComponentModel.Composition.Hosting
             return container;
         }
 
-        #region Implementation
-
         internal static bool TryGetOrCreateContainer(Func<CompositionContainer> createContainer, out CompositionContainer globalContainer)
         {
-            bool container = true;
+            bool flag = true;
 
             if (_container == null)
             {
@@ -80,16 +91,14 @@ namespace System.ComponentModel.Composition.Hosting
                     {
                         Thread.MemoryBarrier();
                         _container = compositionContainer;
-                        container = false;
+                        flag = false;
                     }
                 }
             }
 
             globalContainer = _container;
 
-            return container;
+            return flag;
         }
-
-        #endregion
     }
 }

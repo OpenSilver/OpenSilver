@@ -19,7 +19,8 @@
       "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
 	  "Runtime\\Blend\\Interactivity\\Interactivity.OpenSilver.csproj",
 	  "Runtime\\Blend\\Interactions\\Expression.Interactions.OpenSilver.csproj",
-	  "Runtime\\Blend\\Effects\\Expression.Effects.OpenSilver.csproj"
+	  "Runtime\\Blend\\Effects\\Expression.Effects.OpenSilver.csproj",
+	  "Runtime\\MEF\\System.ComponentModel.Composition.Initialization\\System.ComponentModel.Composition.Initialization.csproj"
 	]
   }
 }
