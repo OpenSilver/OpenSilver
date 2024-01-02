@@ -16,6 +16,7 @@
 	  "Runtime\\Controls.Navigation\\Controls.Navigation.OpenSilver.csproj",
 	  "Runtime\\Controls.Data\\Controls.Data.OpenSilver.csproj",
 	  "Runtime\\Controls.Layout.Toolkit\\Controls.Layout.Toolkit.OpenSilver.csproj",
+	  "Runtime\\Controls.Theming.Toolkit\\Controls.Theming.Toolkit.OpenSilver.csproj",
       "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
 	  "Runtime\\Blend\\Interactivity\\Interactivity.OpenSilver.csproj",
 	  "Runtime\\Blend\\Interactions\\Expression.Interactions.OpenSilver.csproj",

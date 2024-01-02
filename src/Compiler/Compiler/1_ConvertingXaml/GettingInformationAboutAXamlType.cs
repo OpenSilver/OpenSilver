@@ -50,6 +50,9 @@ namespace OpenSilver.Compiler
                 case "System.Windows.Controls.Layout.Toolkit":
                     assemblyName = "OpenSilver.Controls.Layout.Toolkit";
                     return;
+                case "System.Windows.Controls.Theming.Toolkit":
+                    assemblyName = "OpenSilver.Controls.Theming.Toolkit";
+                    return;
                 case "System.Windows.Interactivity":
                     assemblyName = "OpenSilver.Interactivity";
                     return;

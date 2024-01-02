@@ -92,6 +92,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MEF", "MEF", "{B36BB24A-A91
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.ComponentModel.Composition.Initialization", "Runtime\MEF\System.ComponentModel.Composition.Initialization\System.ComponentModel.Composition.Initialization.csproj", "{6F03E952-8F43-478E-8161-C843890914F2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.Toolkit.OpenSilver", "Runtime\Controls.Theming.Toolkit\Controls.Theming.Toolkit.OpenSilver.csproj", "{ECB5921C-C695-473B-88E3-0A002ED097BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,10 @@ Global
 		{6F03E952-8F43-478E-8161-C843890914F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F03E952-8F43-478E-8161-C843890914F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F03E952-8F43-478E-8161-C843890914F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECB5921C-C695-473B-88E3-0A002ED097BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECB5921C-C695-473B-88E3-0A002ED097BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECB5921C-C695-473B-88E3-0A002ED097BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECB5921C-C695-473B-88E3-0A002ED097BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -233,6 +239,7 @@ Global
 		{45C601D9-A208-4BB4-807B-4BF612FFE7EA} = {3731CAAC-26BC-476D-A6F5-B80507182818}
 		{B36BB24A-A915-4485-A69C-B0CE77EACA5A} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{6F03E952-8F43-478E-8161-C843890914F2} = {B36BB24A-A915-4485-A69C-B0CE77EACA5A}
+		{ECB5921C-C695-473B-88E3-0A002ED097BF} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}
