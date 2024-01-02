@@ -106,6 +106,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.Expression
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.RainierOrange.OpenSilver", "Runtime\Controls.Theming.RainierOrange\Controls.Theming.RainierOrange.OpenSilver.csproj", "{670BB6DE-C829-42FA-94A0-C2425681E0E7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.RainierPurple.OpenSilver", "Runtime\Controls.Theming.RainierPurple\Controls.Theming.RainierPurple.OpenSilver.csproj", "{FE21FE5F-49F1-4EEF-BD4B-2D362440A971}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -238,6 +240,10 @@ Global
 		{670BB6DE-C829-42FA-94A0-C2425681E0E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{670BB6DE-C829-42FA-94A0-C2425681E0E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{670BB6DE-C829-42FA-94A0-C2425681E0E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE21FE5F-49F1-4EEF-BD4B-2D362440A971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE21FE5F-49F1-4EEF-BD4B-2D362440A971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE21FE5F-49F1-4EEF-BD4B-2D362440A971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE21FE5F-49F1-4EEF-BD4B-2D362440A971}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -282,6 +288,7 @@ Global
 		{C9BE719E-CD7A-4605-97B6-AFA42FB1869C} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{B2AEC374-2245-4861-AEA7-4286EDF64AA3} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{670BB6DE-C829-42FA-94A0-C2425681E0E7} = {5CABE705-CE13-456F-B02E-977B59D964FA}
+		{FE21FE5F-49F1-4EEF-BD4B-2D362440A971} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}
