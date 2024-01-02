@@ -1,6 +1,4 @@
 ﻿
-
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,12 +11,13 @@
 *  
 \*====================================================================================*/
 
-// UGiacobbi2000104 First implementation - SITA
-
+using System.Collections.Generic;
 using System.ComponentModel.Composition.Primitives;
 using System.ComponentModel.Composition.Hosting;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using OpenSilver.Runtime.CompilerServices;
 
 namespace System.ComponentModel.Composition
 {
@@ -64,14 +63,23 @@ namespace System.ComponentModel.Composition
 
             CompositionContainer globalContainer;
 
-            // UGiacobbi 2000105 The original SL implementation allows us to pass a delegate and create a container, for now this is not support so me need a non-null container.
-
-            // we need a non null container to prevent NullReferenceExceptions
-            CompositionHost.TryGetOrCreateContainer(() => _container, out globalContainer);
+            CompositionHost.TryGetOrCreateContainer(CreateContainer, out globalContainer);
 
             globalContainer.Compose(batch);
         }
 
-        private static readonly CompositionContainer _container = new CompositionContainer();
+        private static CompositionContainer CreateContainer() =>
+            new(new AggregateCatalog(GetAssemblies().Select(asm => new AssemblyCatalog(asm))));
+
+        private static IEnumerable<Assembly> GetAssemblies()
+        {
+            foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.GetCustomAttribute<OpenSilverAssemblyAttribute>() is not null)
+                {
+                    yield return asm;
+                }
+            }
+        }
     }
 }
