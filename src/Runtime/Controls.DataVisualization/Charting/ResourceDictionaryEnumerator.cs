@@ -213,7 +213,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         public void Reset()
         {
-            throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.ResourceDictionaryEnumerator_CantResetEnumeratorResetDispenserInstead);
+            throw new NotSupportedException(Properties.Resources.ResourceDictionaryEnumerator_CantResetEnumeratorResetDispenserInstead);
         }
 
         /// <summary>

@@ -135,11 +135,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
             if (SeriesHost.IsUsedByASeries(axis))
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.SeriesHostAxesCollection_RemoveItem_AxisCannotBeRemovedFromASeriesHostWhenOneOrMoreSeriesAreListeningToIt);
+                throw new InvalidOperationException(Properties.Resources.SeriesHostAxesCollection_RemoveItem_AxisCannotBeRemovedFromASeriesHostWhenOneOrMoreSeriesAreListeningToIt);
             }
             else if (PersistentAxes.Contains(axis))
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.SeriesHostAxesCollection_InvalidAttemptToRemovePermanentAxisFromSeriesHost);
+                throw new InvalidOperationException(Properties.Resources.SeriesHostAxesCollection_InvalidAttemptToRemovePermanentAxisFromSeriesHost);
             }
             else
             {

@@ -27,7 +27,7 @@ namespace System.Windows.Controls.DataVisualization
             }
             else
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.UniqueObservableCollection_InvalidAttemptToInsertADuplicateItem);
+                throw new InvalidOperationException(Properties.Resources.UniqueObservableCollection_InvalidAttemptToInsertADuplicateItem);
             }
         }
 
@@ -41,7 +41,7 @@ namespace System.Windows.Controls.DataVisualization
             int newItemIndex = this.IndexOf(item);
             if (newItemIndex != -1 && newItemIndex != index)
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.UniqueObservableCollection_InvalidAttemptToInsertADuplicateItem);
+                throw new InvalidOperationException(Properties.Resources.UniqueObservableCollection_InvalidAttemptToInsertADuplicateItem);
             }
             else
             {

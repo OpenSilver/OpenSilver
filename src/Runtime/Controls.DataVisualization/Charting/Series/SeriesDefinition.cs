@@ -550,7 +550,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 _seriesHost = value;
                 if (!(_seriesHost is DefinitionSeries) && (null != value))
                 {
-                    throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.SeriesDefinition_SeriesHost_InvalidParent);
+                    throw new NotSupportedException(Properties.Resources.SeriesDefinition_SeriesHost_InvalidParent);
                 }
 
                 if (null != _seriesHost)
@@ -591,7 +591,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (globalIndex.HasValue)
             {
-                AutomaticTitle = string.Format(CultureInfo.CurrentCulture, OpenSilver.Controls.DataVisualization.Properties.Resources.Series_OnGlobalSeriesIndexPropertyChanged_UntitledSeriesFormatString, globalIndex + 1);
+                AutomaticTitle = string.Format(CultureInfo.CurrentCulture, Properties.Resources.Series_OnGlobalSeriesIndexPropertyChanged_UntitledSeriesFormatString, globalIndex + 1);
             }
         }
 

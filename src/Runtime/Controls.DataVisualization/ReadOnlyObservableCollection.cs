@@ -44,7 +44,7 @@ namespace System.Windows.Controls.DataVisualization
         {
             if (!IsMutating)
             {
-                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
+                throw new NotSupportedException(Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
             }
             else
             {
@@ -61,7 +61,7 @@ namespace System.Windows.Controls.DataVisualization
         {
             if (!IsMutating)
             {
-                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
+                throw new NotSupportedException(Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
             }
             else
             {
@@ -78,7 +78,7 @@ namespace System.Windows.Controls.DataVisualization
         {
             if (!IsMutating)
             {
-                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
+                throw new NotSupportedException(Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
             }
             else
             {
@@ -93,7 +93,7 @@ namespace System.Windows.Controls.DataVisualization
         {
             if (!IsMutating)
             {
-                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
+                throw new NotSupportedException(Properties.Resources.ReadOnlyObservableCollection_CollectionIsReadOnly);
             }
             else
             {

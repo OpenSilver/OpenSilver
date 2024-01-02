@@ -3,7 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.Collections.ObjectModel;
 
 namespace System.Windows.Controls.DataVisualization.Charting
@@ -51,7 +50,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (newValue != null && oldValue != null)
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Series_SeriesHost_SeriesHostPropertyNotNull);
+                throw new InvalidOperationException(Properties.Resources.Series_SeriesHost_SeriesHostPropertyNotNull);
             }
         }
         #endregion public ISeriesHost SeriesHost

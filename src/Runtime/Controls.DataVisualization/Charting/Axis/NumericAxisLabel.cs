@@ -4,10 +4,10 @@
 // All other rights reserved.
 
 namespace System.Windows.Controls.DataVisualization.Charting
-{ 
-/// <summary>
-/// A label used to display numeric axis values.
-/// </summary>
+{
+    /// <summary>
+    /// A label used to display numeric axis values.
+    /// </summary>
     public class NumericAxisLabel : AxisLabel
     {
 #if !SILVERLIGHT

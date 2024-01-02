@@ -46,7 +46,7 @@ namespace System.Windows.Controls.DataVisualization
             {
                 if (!HasData)
                 {
-                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Range_get_Maximum_CannotReadTheMaximumOfAnEmptyRange);
+                    throw new InvalidOperationException(Properties.Resources.Range_get_Maximum_CannotReadTheMaximumOfAnEmptyRange);
                 }
                 return _maximum;
             }
@@ -66,7 +66,7 @@ namespace System.Windows.Controls.DataVisualization
             {
                 if (!HasData)
                 {
-                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Range_get_Minimum_CannotReadTheMinimumOfAnEmptyRange);
+                    throw new InvalidOperationException(Properties.Resources.Range_get_Minimum_CannotReadTheMinimumOfAnEmptyRange);
                 }
                 return _minimum;
             }
@@ -95,7 +95,7 @@ namespace System.Windows.Controls.DataVisualization
             int compareValue = ValueHelper.Compare(minimum, maximum);
             if (compareValue == 1)
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Range_ctor_MaximumValueMustBeLargerThanOrEqualToMinimumValue);
+                throw new InvalidOperationException(Properties.Resources.Range_ctor_MaximumValueMustBeLargerThanOrEqualToMinimumValue);
             }
         }
 
@@ -259,11 +259,11 @@ namespace System.Windows.Controls.DataVisualization
         {
             if (!this.HasData)
             {
-                return OpenSilver.Controls.DataVisualization.Properties.Resources.Range_ToString_NoData;
+                return Properties.Resources.Range_ToString_NoData;
             }
             else
             {
-                return string.Format(CultureInfo.CurrentCulture, OpenSilver.Controls.DataVisualization.Properties.Resources.Range_ToString_Data, this.Minimum, this.Maximum);
+                return string.Format(CultureInfo.CurrentCulture, Properties.Resources.Range_ToString_Data, this.Minimum, this.Maximum);
             }
         }
     }

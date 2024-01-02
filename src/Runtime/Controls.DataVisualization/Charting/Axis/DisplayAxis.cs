@@ -4,7 +4,6 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -105,7 +104,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             }
             else
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DisplayAxis_GetLength_CannotDetermineTheLengthOfAnAxisWithAnOrientationOfNone);
+                throw new InvalidOperationException(Properties.Resources.DisplayAxis_GetLength_CannotDetermineTheLengthOfAnAxisWithAnOrientationOfNone);
             }
         }
 
@@ -273,7 +272,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets a value indicating whether grid lines should be shown.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLines", Justification = "This is the expected casing.")]
         public bool ShowGridLines
         {
             get { return (bool)GetValue(ShowGridLinesProperty); }
@@ -283,8 +281,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the ShowGridLines dependency property.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLines", Justification = "This is the expected capitalization.")]
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "This is the expected capitalization.")]
         public static readonly DependencyProperty ShowGridLinesProperty =
             DependencyProperty.Register(
                 "ShowGridLines",
@@ -310,8 +306,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">Old value.</param>
         /// <param name="newValue">New value.</param>        
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "This is the expected capitalization.")]
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLines", Justification = "This is the expected capitalization.")]
         protected virtual void OnShowGridLinesPropertyChanged(bool oldValue, bool newValue)
         {
             SetShowGridLines(newValue);
@@ -340,7 +334,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets the Style of the Axis's gridlines.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
         public Style GridLineStyle
         {
             get { return GetValue(GridLineStyleProperty) as Style; }
@@ -350,7 +343,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the GridlineStyle dependency property.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
         public static readonly DependencyProperty GridLineStyleProperty =
             DependencyProperty.Register(
                 "GridLineStyle",
@@ -485,8 +477,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="availableSize">The available size.</param>
         /// <returns>A sequence of coordinates at which to draw grid lines.
         /// </returns>
-        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "This is the expected capitalization.")]
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Returns the coordinates of the grid lines.")]
         protected abstract IEnumerable<UnitValue> GetMajorGridLineCoordinates(Size availableSize);
 
 #if !SILVERLIGHT
@@ -506,8 +496,12 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected DisplayAxis()
         {
             this.OrientedPanel = new OrientedPanel();
+#if SILVERLIGHT
             this.OrientedPanel.UseLayoutRounding = true;
+#endif
+
             this.DependentAxisGrid = new Grid();
+
             this.TitleLayoutTransformControl = new LayoutTransformControl();
             this.TitleLayoutTransformControl.HorizontalAlignment = HorizontalAlignment.Center;
             this.TitleLayoutTransformControl.VerticalAlignment = VerticalAlignment.Center;

@@ -105,7 +105,7 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
 
                 string message = string.Format(
                     CultureInfo.InvariantCulture,
-                    OpenSilver.Controls.DataVisualization.Properties.Resources.EdgePanel_OnEdgePropertyChanged,
+                    Properties.Resources.EdgePanel_OnEdgePropertyChanged,
                     value);
                  
                 throw new ArgumentException(message, "value");
@@ -530,9 +530,7 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
                         ((arrangeSize.Width - _leftRect.WidthOrDefault(0)) - _rightRect.WidthOrDefault(0)),
                         ((arrangeSize.Height - _topRect.HeightOrDefault(0)) - _bottomRect.HeightOrDefault(0)));
 
-            var children = Children.ToList();
-
-            foreach (UIElement element in children.OfType<UIElement>().Where(child => GetEdge(child) == Edge.Center))
+            foreach (UIElement element in Children.ToList().OfType<UIElement>().Where(child => GetEdge(child) == Edge.Center))
             {
                 element.Arrange(centerRect);
             }

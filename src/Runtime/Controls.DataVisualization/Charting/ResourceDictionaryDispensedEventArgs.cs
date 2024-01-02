@@ -3,7 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-namespace System.Windows.Controls.DataVisualization.Charting
+namespace System.Windows.Controls.DataVisualization
 {
     /// <summary>
     /// Information describing the ResourceDictionary dispensed when a

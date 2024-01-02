@@ -5,6 +5,7 @@
 
 namespace System.Windows.Controls.DataVisualization
 {
+#if SILVERLIGHT
     /// <summary>
     /// Extension methods for the ResourceDictionary class.
     /// </summary>
@@ -25,4 +26,5 @@ namespace System.Windows.Controls.DataVisualization
             return clone;
         }
     }
+#endif
 }

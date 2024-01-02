@@ -8,9 +8,9 @@ using System.Windows.Media.Animation;
 
 namespace System.Windows.Controls.DataVisualization
 {
-/// <summary>
-/// Represents a storyboard queue that plays storyboards in sequence.
-/// </summary>
+    /// <summary>
+    /// Represents a storyboard queue that plays storyboards in sequence.
+    /// </summary>
     internal class StoryboardQueue
     {
         /// <summary>

@@ -510,8 +510,8 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (null != SliceElement)
             {
-                SliceElement.MouseEnter -= SliceElement_MouseEnter;
-                SliceElement.MouseLeave -= SliceElement_MouseLeave;
+                SliceElement.MouseEnter -= new MouseEventHandler(SliceElement_MouseEnter);
+                SliceElement.MouseLeave -= new MouseEventHandler(SliceElement_MouseLeave);
             }
 
             base.OnApplyTemplate();
@@ -520,8 +520,8 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
             if (null != SliceElement)
             {
-                SliceElement.MouseEnter += SliceElement_MouseEnter;
-                SliceElement.MouseLeave += SliceElement_MouseLeave;
+                SliceElement.MouseEnter += new MouseEventHandler(SliceElement_MouseEnter);
+                SliceElement.MouseLeave += new MouseEventHandler(SliceElement_MouseLeave);
             }
         }
 
@@ -561,7 +561,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">The event data.</param>
         private void SliceElement_MouseLeave(object sender, MouseEventArgs e)
         {
-            // Defer to Control's default MouseLeave handling            
+            // Defer to Control's default MouseLeave handling
             base.OnMouseLeave(e);
         }
     }

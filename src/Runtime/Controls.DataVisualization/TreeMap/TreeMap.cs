@@ -290,7 +290,7 @@ namespace System.Windows.Controls.DataVisualization
         public Collection<Interpolator> Interpolators
         {
             get { return (Collection<Interpolator>)GetValue(InterpolatorsProperty); }
-            set { throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.TreeMap_Interpolators_SetterNotSupported); }
+            set { throw new NotSupportedException(Properties.Resources.TreeMap_Interpolators_SetterNotSupported); }
         }
         
         /// <summary>
@@ -570,7 +570,7 @@ namespace System.Windows.Controls.DataVisualization
                 if (template == null)
                 {
                     throw new ArgumentException(
-                        OpenSilver.Controls.DataVisualization.Properties.Resources.TreeMap_BuildTreeMapTree_TemplateNotSet);
+                        Properties.Resources.TreeMap_BuildTreeMapTree_TemplateNotSet);
                 }
 
                 // Silently create 0 elements if ValueBinding is set to null 
@@ -687,7 +687,7 @@ namespace System.Windows.Controls.DataVisualization
                                 if (interpolator.DataRangeBinding == null)
                                 {
                                     throw new ArgumentException(
-                                        OpenSilver.Controls.DataVisualization.Properties.Resources.TreeMap_CreateChildren_InterpolatorBindingNotSet);
+                                        Properties.Resources.TreeMap_CreateChildren_InterpolatorBindingNotSet);
                                 }
 
                                 // Extract the current value to interpolate
@@ -697,7 +697,7 @@ namespace System.Windows.Controls.DataVisualization
                                 if (value == null)
                                 {
                                     throw new ArgumentException(
-                                        OpenSilver.Controls.DataVisualization.Properties.Resources.Interpolator_IncludeInRange_DataRangeBindingNotIConvertible);
+                                        Properties.Resources.Interpolator_IncludeInRange_DataRangeBindingNotIConvertible);
                                 }
 
                                 // This will update the TargetProperty of the TargetName object

@@ -97,7 +97,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             {
                 if (value != null && ProtectedMinimum != null && ValueHelper.Compare(ProtectedMinimum, value) > 0)
                 {
-                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.RangeAxis_MaximumValueMustBeLargerThanOrEqualToMinimumValue);
+                    throw new InvalidOperationException(Properties.Resources.RangeAxis_MaximumValueMustBeLargerThanOrEqualToMinimumValue);
                 }
                 if (!object.ReferenceEquals(_protectedMaximum, value) && !object.Equals(_protectedMaximum, value))
                 {
@@ -125,7 +125,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             {
                 if (value != null && ProtectedMaximum != null && ValueHelper.Compare(value, ProtectedMaximum) > 0)
                 {
-                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.RangeAxis_MinimumValueMustBeLargerThanOrEqualToMaximumValue);
+                    throw new InvalidOperationException(Properties.Resources.RangeAxis_MinimumValueMustBeLargerThanOrEqualToMaximumValue);
                 }
                 if (!object.ReferenceEquals(_protectedMinimum, value) && !object.Equals(_protectedMinimum, value))
                 {

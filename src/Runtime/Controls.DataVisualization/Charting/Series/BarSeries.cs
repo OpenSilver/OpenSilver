@@ -47,7 +47,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     rangeAxis.Orientation = AxisOrientation.X;
                     if (rangeAxis == null || rangeAxis.Origin == null)
                     {
-                        throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_NoSuitableAxisAvailableForPlottingDependentValue);
+                        throw new InvalidOperationException(Properties.Resources.DataPointSeriesWithAxes_NoSuitableAxisAvailableForPlottingDependentValue);
                     }
                     DisplayAxis axis = rangeAxis as DisplayAxis;
                     if (axis != null)
@@ -78,7 +78,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             }
             else if (coordinateRange.Maximum.Unit != Unit.Pixels || coordinateRange.Minimum.Unit != Unit.Pixels)
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_ThisSeriesDoesNotSupportRadialAxes);
+                throw new InvalidOperationException(Properties.Resources.DataPointSeriesWithAxes_ThisSeriesDoesNotSupportRadialAxes);
             }
 
             double minimum = (double)coordinateRange.Minimum.Value;

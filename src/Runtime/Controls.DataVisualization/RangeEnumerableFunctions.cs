@@ -4,13 +4,12 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace System.Windows.Controls.DataVisualization
-{ 
-/// <summary>
-/// Collection of functions that manipulate streams of ranges.
-/// </summary>
+{
+    /// <summary>
+    /// Collection of functions that manipulate streams of ranges.
+    /// </summary>
     internal static class RangeEnumerableExtensions
     {
         /// <summary>
@@ -51,7 +50,6 @@ namespace System.Windows.Controls.DataVisualization
         /// </typeparam>
         /// <param name="that">The stream.</param>
         /// <returns>A range encompassing all ranges in a stream.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Nesting necessary to provide method for use with all types of Range<T>.")]
         public static Range<T> Sum<T>(this IEnumerable<Range<T>> that)
             where T : IComparable
         {

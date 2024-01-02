@@ -38,7 +38,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="d">DateTimeAxisLabel that changed its IntervalType.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnIntervalTypePropertyChanged(DependencyObject d,DependencyPropertyChangedEventArgs e)
+        private static void OnIntervalTypePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DateTimeAxisLabel source = (DateTimeAxisLabel)d;
             DateTimeIntervalType oldValue = (DateTimeIntervalType)e.OldValue;

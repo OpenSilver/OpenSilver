@@ -116,7 +116,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     DisplayAxis axis = (DisplayAxis)CreateRangeAxisFromData(firstDataPoint.DependentValue);
                     if (axis == null || (axis as IRangeAxis).Origin == null)
                     {
-                        throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_NoSuitableAxisAvailableForPlottingDependentValue);
+                        throw new InvalidOperationException(Properties.Resources.DataPointSeriesWithAxes_NoSuitableAxisAvailableForPlottingDependentValue);
                     }
                     axis.ShowGridLines = true;
                     axis.Orientation = AxisOrientation.Y;

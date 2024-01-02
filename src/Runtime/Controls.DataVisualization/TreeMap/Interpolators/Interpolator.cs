@@ -197,7 +197,7 @@ namespace System.Windows.Controls.DataVisualization
                 if (input == null)
                 {
                     throw new ArgumentException(
-                        OpenSilver.Controls.DataVisualization.Properties.Resources.Interpolator_IncludeInRange_DataRangeBindingNotIConvertible);
+                        Properties.Resources.Interpolator_IncludeInRange_DataRangeBindingNotIConvertible);
                 }
 
                 double value = input.ToDouble(CultureInfo.InvariantCulture);

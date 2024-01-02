@@ -5,10 +5,6 @@
 
 using System.Collections.Generic;
 
-#if DEBUG
-using System.Diagnostics;
-#endif
-
 namespace System.Windows.Controls.DataVisualization
 {
     /// <summary>
@@ -143,7 +139,7 @@ namespace System.Windows.Controls.DataVisualization
         public void Clear()
         {
 #if DEBUG
-            Debug.Assert(!_traversing, "Cannot clear an object pool while it is being traversed.");
+            System.Diagnostics.Debug.Assert(!_traversing, "Cannot clear an object pool while it is being traversed.");
 #endif
             _objects.Clear();
         }

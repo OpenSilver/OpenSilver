@@ -8,8 +8,8 @@
 <ResourceDictionary
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:datavis="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
-  xmlns:charting="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit">
+  xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization"
+  xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting">
 
     <Style TargetType="charting:NumericAxisLabel">
         <Setter Property="IsTabStop" Value="False"/>

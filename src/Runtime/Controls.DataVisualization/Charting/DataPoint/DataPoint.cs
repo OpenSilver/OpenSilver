@@ -9,7 +9,6 @@ using System.Linq;
 using System.Windows.Threading;
 using System.Windows.Input;
 using System.Windows.Media;
-using CommonKeys = System.Windows.Input.ModifierKeys;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
@@ -940,8 +939,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         protected override void OnMouseLeave(MouseEventArgs e)
         {
-             base.OnMouseLeave(e);
-           
+            base.OnMouseLeave(e);
             if (IsSelectionEnabled)
             {
                 IsHovered = false;
@@ -971,7 +969,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 base.OnMouseLeftButtonDown(e);
                 if (IsSelectionEnabled)
                 {
-                    IsSelected = (CommonKeys.None == (CommonKeys.Control & Keyboard.Modifiers));
+                    IsSelected = (ModifierKeys.None == (ModifierKeys.Control & Keyboard.Modifiers));
                     e.Handled = true;
                 }
             }

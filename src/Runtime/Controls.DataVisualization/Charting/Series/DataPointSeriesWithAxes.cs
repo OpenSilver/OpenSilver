@@ -425,7 +425,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     }
                     else
                     {
-                        throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_GetAxes_AssignedIndependentAxisCannotBeUsed);
+                        throw new InvalidOperationException(Properties.Resources.DataPointSeriesWithAxes_GetAxes_AssignedIndependentAxisCannotBeUsed);
                     }
                 }
 
@@ -463,7 +463,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     }
                     else
                     {
-                        throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_GetAxes_AssignedDependentAxisCannotBeUsed);
+                        throw new InvalidOperationException(Properties.Resources.DataPointSeriesWithAxes_GetAxes_AssignedDependentAxisCannotBeUsed);
                     }
                 }
 

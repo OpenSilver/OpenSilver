@@ -10,11 +10,11 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Markup;
-using System.Windows.Media;
+using System.Windows.Controls.DataVisualization.Charting.Primitives;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Controls.DataVisualization.Charting.Primitives;
+using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
@@ -307,7 +307,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         public Collection<SeriesDefinition> SeriesDefinitions
         {
             get { return _seriesDefinitions; }
-            set { throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.DefinitionSeries_SeriesDefinitions_SetterNotSupported); }
+            set { throw new NotSupportedException(Properties.Resources.DefinitionSeries_SeriesDefinitions_SetterNotSupported); }
         }
 
         /// <summary>
@@ -1020,11 +1020,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
             {
                 if (null == definition.DependentValueBinding)
                 {
-                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DefinitionSeries_EnsureAxes_MissingDependentValueBinding);
+                    throw new InvalidOperationException(Properties.Resources.DefinitionSeries_EnsureAxes_MissingDependentValueBinding);
                 }
                 if (null == definition.IndependentValueBinding)
                 {
-                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DefinitionSeries_EnsureAxes_MissingIndependentValueBinding);
+                    throw new InvalidOperationException(Properties.Resources.DefinitionSeries_EnsureAxes_MissingIndependentValueBinding);
                 }
             }
             if ((null != SeriesHost) && DataItems.Any())
@@ -1489,7 +1489,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
-            /// 
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             {
                 DataItem dataItem = value as DataItem;

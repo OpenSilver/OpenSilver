@@ -14,11 +14,11 @@
 -->
 
 <ResourceDictionary 
-    xmlns:charting="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit" 
-    xmlns:chartingprimitives="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit" 
-    xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit" 
-    xmlns:datavis="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting"
+    xmlns:chartingprimitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives"
+    xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 
     <!--  charting:AreaDataPoint  -->
@@ -691,7 +691,7 @@
     </Style>
 
     <!--  charting:DataPointSeriesDragDropTarget  -->
-    <!--<Style TargetType="charting:DataPointSeriesDragDropTarget" xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" xmlns="http://schemas.microsoft.com/client/2007">
+    <Style TargetType="charting:DataPointSeriesDragDropTarget" xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" xmlns="http://schemas.microsoft.com/client/2007">
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
@@ -710,7 +710,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>-->
+    </Style>
 
     <!--  charting:DateTimeAxisLabel  -->
     <Style TargetType="charting:DateTimeAxisLabel">
@@ -1202,20 +1202,6 @@
                         </DataTemplate>
                     </datavis:TreeMapItemDefinition.ItemTemplate>
                 </datavis:TreeMapItemDefinition>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style TargetType="datavis:LayoutTransformControl">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="datavis:LayoutTransformControl">
-                    <Grid x:Name='LayoutRoot' Background='{TemplateBinding Background}'>
-                        <Grid.RenderTransform>
-                            <MatrixTransform x:Name='MatrixTransform'/>
-                        </Grid.RenderTransform>
-                    </Grid>
-                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>

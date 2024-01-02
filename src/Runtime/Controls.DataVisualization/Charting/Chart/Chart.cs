@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Markup;
 using System.Windows.Controls.DataVisualization.Charting.Primitives;
@@ -50,8 +49,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets a collection of Axes in the Chart.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "value", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
         public Collection<IAxis> Axes
         {
             get
@@ -60,7 +57,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             }
             set
             {
-                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.Chart_Axes_SetterNotSupported);
+                throw new NotSupportedException(Properties.Resources.Chart_Axes_SetterNotSupported);
             }
         }
 
@@ -127,8 +124,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets the collection of Series displayed by the Chart.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "value", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
         public Collection<ISeries> Series
         {
             get
@@ -137,7 +132,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             }
             set
             {
-                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.Chart_Series_SetterNotSupported);
+                throw new NotSupportedException(Properties.Resources.Chart_Series_SetterNotSupported);
             }
         }
 
@@ -239,7 +234,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets a palette of ResourceDictionaries used by the children of the Chart.
         /// </summary>
-        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Want to allow this to be set from XAML.")]
         public Collection<ResourceDictionary> Palette
         {
             get { return GetValue(PaletteProperty) as Collection<ResourceDictionary>; }
@@ -379,7 +373,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 OnResourceDictionariesChanged(EventArgs.Empty);
             };
 
-            this.DefaultStyleKey = (object)typeof(Chart);
+            DefaultStyleKey = typeof(Chart);
         }
 
         /// <summary>
@@ -497,7 +491,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
             if (args.NewValue == AxisLocation.Auto)
             {
-                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Chart_AxisLocationChanged_CantBeChangedToAutoWhenHostedInsideOfASeriesHost);
+                throw new InvalidOperationException(Properties.Resources.Chart_AxisLocationChanged_CantBeChangedToAutoWhenHostedInsideOfASeriesHost);
             }
 
             SetEdge(axis);

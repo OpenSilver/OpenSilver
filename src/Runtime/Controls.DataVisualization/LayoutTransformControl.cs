@@ -4,7 +4,6 @@
 // All other rights reserved.
 
 using System.Windows.Markup;
-using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media;
 
 namespace System.Windows.Controls.DataVisualization
@@ -96,13 +95,59 @@ namespace System.Windows.Controls.DataVisualization
         {
             // Can't tab to LayoutTransformControl
             IsTabStop = false;
+#if SILVERLIGHT
             // Disable layout rounding because its rounding of values confuses 
             // things.
             UseLayoutRounding = false;
+#endif
 
-            // Moved the template to generic.xaml
-            //this.Template = (ControlTemplate)XamlReader.Load("<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'><Grid x:Name='LayoutRoot' Background='{TemplateBinding Background}'><Grid.RenderTransform><MatrixTransform x:Name='MatrixTransform'/></Grid.RenderTransform></Grid></ControlTemplate>");
-            DefaultStyleKey = typeof(LayoutTransformControl);
+#if OPENSILVER
+            var template = new ControlTemplate();
+            OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplateContent(
+                template,
+                OpenSilver.Internal.Xaml.RuntimeHelpers.Create_XamlContext(),
+                static (owner, context) =>
+                {
+                    var layoutRoot = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new Grid());
+                    OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplatedParent(layoutRoot, owner);
+                    layoutRoot.SetValue(NameProperty, "LayoutRoot");
+                    OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_RegisterName(context, "LayoutRoot", layoutRoot);
+                    var templateBinding = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new TemplateBindingExtension());
+                    templateBinding.DependencyPropertyName = "Background";
+                    OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteEndObject(context);
+                    layoutRoot.SetValue(Panel.BackgroundProperty, templateBinding.ProvideValue(new ServiceProvider(owner, null)));
+                    var matrixTransform = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new MatrixTransform());
+                    matrixTransform.SetValue(NameProperty, "MatrixTransform");
+                    OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_RegisterName(context, "MatrixTransform", matrixTransform);
+                    OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteEndObject(context);
+                    layoutRoot.RenderTransform = matrixTransform;
+                    OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteEndObject(context);
+                    return layoutRoot;
+                });
+
+            Template = template;
+#else
+            // Hard coded template is never meant to be changed and avoids the 
+            // need for generic.xaml.
+            string templateXaml =
+                @"<ControlTemplate " +
+                    "xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' " +
+                    "xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>" +
+                    "<Grid x:Name='LayoutRoot' Background='{TemplateBinding Background}'>" +
+                        "<Grid.RenderTransform>" +
+                            "<MatrixTransform x:Name='MatrixTransform'/>" +
+                        "</Grid.RenderTransform>" +
+                    "</Grid>" +
+                "</ControlTemplate>";
+#if SILVERLIGHT
+            Template = (ControlTemplate)XamlReader.Load(templateXaml);
+#else
+            using (MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(templateXaml)))
+            {
+                Template = (ControlTemplate)XamlReader.Load(stream);
+            }
+#endif
+#endif
         }
 
         /// <summary>
@@ -393,7 +438,6 @@ namespace System.Windows.Controls.DataVisualization
         /// </summary>
         /// <param name="arrangeBounds">The size to arrange within.</param>
         /// <returns>The size required.</returns>
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Closely corresponds to WPF's FrameworkElement.FindMaximalAreaLocalSpaceRect.")]
         private Size ComputeLargestTransformedSize(Size arrangeBounds)
         {
             // Computed largest transformed size
