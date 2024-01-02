@@ -1,0 +1,40 @@
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AssemblyName>OpenSilver.Controls.Theming.ExpressionDark</AssemblyName>
+    <RootNamespace>System.Windows.Controls.Theming</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DefineTrace>true</DefineTrace>
+    <DefineSilverlight>true</DefineSilverlight>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.DataVisualization\Controls.DataVisualization.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Data\Controls.Data.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Layout.Toolkit\Controls.Layout.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\DataForm.Toolkit\DataForm.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Input\Controls.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Theming.Toolkit\Controls.Theming.Toolkit.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="ExpressionDarkTheme.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Theme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(OpenSilverTargets)" />
+
+</Project>
