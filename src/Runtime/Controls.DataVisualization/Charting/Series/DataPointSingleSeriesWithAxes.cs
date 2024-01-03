@@ -249,6 +249,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
             dataPoint.SetBinding(DataPoint.StyleProperty, new Binding(ActualDataPointStyleName) { Source = this });
             // Start DataContext null to avoid Binding warnings in the output window
             LegendItem.DataContext = null;
+
+#if OPENSILVER
+            LegendItem.DataContext = dataPoint;
+#else
 #if !SILVERLIGHT
             if (null == LegendItem.Parent)
             {
@@ -264,6 +268,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             {
                 LegendItem.DataContext = dataPoint;
             }
+#endif
 #endif
         }
 
