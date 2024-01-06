@@ -1286,6 +1286,117 @@
         </Setter>
     </Style>
 
+    <!--  controlsToolkit:ListBoxDragDropTarget  -->
+    <Style TargetType="controlsToolkit:ListBoxDragDropTarget"
+           xmlns="http://schemas.microsoft.com/client/2007">
+        <Setter Property="IsTabStop"
+                Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controlsToolkit:ListBoxDragDropTarget">
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Cursor="{TemplateBinding Cursor}"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Canvas x:Name="InsertionIndicatorContainer"
+                                IsHitTestVisible="False">
+                            <Path x:Name="InsertionIndicator"
+                                  IsHitTestVisible="False"
+                                  Stroke="Gray"
+                                  StrokeThickness="2" />
+                        </Canvas>
+                        <Popup x:Name="DragPopup"
+                               IsHitTestVisible="False">
+                            <Canvas x:Name="DragContainer"
+                                    IsHitTestVisible="False">
+                                <toolkit:DragDecorator x:Name="DragDecorator"
+                                                       IsHitTestVisible="False"
+                                                       Visibility="Collapsed" />
+                            </Canvas>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  controlsToolkit:PanelDragDropTarget  -->
+    <Style TargetType="controlsToolkit:PanelDragDropTarget"
+           xmlns="http://schemas.microsoft.com/client/2007">
+        <Setter Property="IsTabStop"
+                Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controlsToolkit:PanelDragDropTarget">
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Cursor="{TemplateBinding Cursor}"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Canvas x:Name="InsertionIndicatorContainer"
+                                IsHitTestVisible="False">
+                            <Path x:Name="InsertionIndicator"
+                                  IsHitTestVisible="False"
+                                  Stroke="Gray"
+                                  StrokeThickness="2" />
+                        </Canvas>
+                        <Popup x:Name="DragPopup"
+                               IsHitTestVisible="False">
+                            <Canvas x:Name="DragContainer"
+                                    IsHitTestVisible="False">
+                                <toolkit:DragDecorator x:Name="DragDecorator"
+                                                       IsHitTestVisible="False"
+                                                       Visibility="Collapsed" />
+                            </Canvas>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  controlsToolkit:TreeViewDragDropTarget  -->
+    <Style TargetType="controlsToolkit:TreeViewDragDropTarget"
+           xmlns="http://schemas.microsoft.com/client/2007">
+        <Setter Property="IsTabStop"
+                Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controlsToolkit:TreeViewDragDropTarget">
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Cursor="{TemplateBinding Cursor}"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Canvas x:Name="InsertionIndicatorContainer"
+                                IsHitTestVisible="False">
+                            <Path x:Name="InsertionIndicator"
+                                  IsHitTestVisible="False"
+                                  Stroke="Gray"
+                                  StrokeThickness="2" />
+                        </Canvas>
+                        <Popup x:Name="DragPopup"
+                               IsHitTestVisible="False">
+                            <Canvas x:Name="DragContainer"
+                                    IsHitTestVisible="False">
+                                <toolkit:DragDecorator x:Name="DragDecorator"
+                                                       IsHitTestVisible="False"
+                                                       Visibility="Collapsed" />
+                            </Canvas>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  toolkit:GlobalCalendar  -->
     <Style TargetType="toolkit:GlobalCalendar">
         <Setter Property="IsTabStop"

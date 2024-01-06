@@ -200,8 +200,6 @@
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
-		<Compile Include="System.Windows.Controls\ItemsControlDragDropTarget.cs" />
-		<Compile Include="System.Windows.Controls\ListBoxDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBlock.NotImplemented.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
@@ -242,7 +240,6 @@
 		<Compile Include="System.Windows.input\StylusPoint.cs" />
 		<Compile Include="System.Windows.input\StylusPointCollection.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\TreeViewDragDropTarget.cs" />
 		<Compile Include="System.Windows.Media.Animation\EasingPointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
@@ -310,7 +307,6 @@
 		<Compile Include="System.Windows\ThicknessConverter.cs" />
 		<Compile Include="System.Windows.Media\TransformConverter.cs" />
 		<Compile Include="System.ComponentModel\TypeConverterHelper.cs" />
-		<Compile Include="System.Linq\WORKINPROGRESS\FunctionalProgramming.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventArgs.cs" />
 		<Compile Include="System.Net\DownloadStringCompletedEventHandler.cs" />
 		<Compile Include="System.Net\UploadStringCompletedEventArgs.cs" />
@@ -634,10 +630,7 @@
 		<Compile Include="System.Windows.Media.Effects\Effect.cs" />
 		<Compile Include="System.Windows.Resources\StreamResourceInfo.cs" />
 		<Compile Include="System.Windows\Clipboard.cs" />
-		<Compile Include="System.Windows\DataObject.cs" />
 		<Compile Include="System.Windows\Deployment.cs" />
-		<Compile Include="System.Windows\DragDrop.cs" />
-		<Compile Include="System.Windows\IDataObject.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangedEventArgs_1.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangedEventHandler.cs" />
 		<Compile Include="ToBeReviewed\GroupedEnumerable_3.cs" />
@@ -706,19 +699,12 @@
 		<Compile Include="System.Windows.Controls\ContextMenuEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\Control.cs" />
 		<Compile Include="System.Windows.Controls\ControlTemplate.cs" />
-		<Compile Include="System.Windows.Controls\DragDropEffects.cs" />
-		<Compile Include="System.Windows.Controls\DragDropKeyStates.cs" />
-		<Compile Include="System.Windows.Controls\DragDropTarget_2.cs" />
-		<Compile Include="System.Windows.Controls\DragEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\DragEventHandler.cs" />
-		<Compile Include="System.Windows.Controls\ExtendedRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Grid.cs" />
 		<Compile Include="System.Windows.Controls\HyperlinkButton.cs" />
 		<Compile Include="System.Windows.Controls\Image.cs" />
 		<Compile Include="System.Windows.Controls\INavigate.cs" />
 		<Compile Include="System.Windows.Controls\ItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\ItemContainerGenerator.cs" />
-		<Compile Include="System.Windows.Controls\ItemDragEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.cs" />
 		<Compile Include="System.Windows.Controls\ItemsPanelTemplate.cs" />
 		<Compile Include="System.Windows.Controls\ItemsPresenter.cs" />
@@ -727,7 +713,6 @@
 		<Compile Include="System.Windows.Controls\MediaElement.cs" />
 		<Compile Include="System.Windows.Controls\Orientation.cs" />
 		<Compile Include="System.Windows.Controls\Panel.cs" />
-		<Compile Include="System.Windows.Controls\PanelDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBox.cs" />
 		<Compile Include="System.Windows.Controls\ProgressBar.cs" />
 		<Compile Include="System.Windows.Controls\RadioButton.cs" />
@@ -736,10 +721,8 @@
 		<Compile Include="System.Windows.Controls\ScrollBarVisibility.cs" />
 		<Compile Include="System.Windows.Controls\ScrollMode.cs" />
 		<Compile Include="System.Windows.Controls\ScrollViewer.cs" />
-		<Compile Include="System.Windows.Controls\Selection.cs" />
 		<Compile Include="System.Windows.Controls\SelectionChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\SelectionChangedEventHandler.cs" />
-		<Compile Include="System.Windows.Controls\SelectionCollection.cs" />
 		<Compile Include="System.Windows.Controls\SelectionMode.cs" />
 		<Compile Include="System.Windows.Controls\Slider.cs" />
 		<Compile Include="System.Windows.Controls\StackPanel.cs" />

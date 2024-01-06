@@ -3,6 +3,8 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using Resource = OpenSilver.Controls.Toolkit.Resources;
+
 namespace System.Windows.Controls
 {
     /// <summary>
@@ -16,7 +18,7 @@ namespace System.Windows.Controls
         /// </summary>
         public PanelDragDropTarget()
         {
-
+            this.DefaultStyleKey = typeof(PanelDragDropTarget);
         }
 
         /// <summary>
@@ -185,7 +187,7 @@ namespace System.Windows.Controls
             // Enforce that the Content property must be a Panel.
             if (newContent != null && !(newContent is Panel))
             {
-                throw new ArgumentException("Content must be a Panel.");
+                throw new ArgumentException(Resource.PanelDragDropTarget_OnContentChanged_ContentMustBePanel);
             }
 
             base.OnContentChanged(oldContent, newContent);
