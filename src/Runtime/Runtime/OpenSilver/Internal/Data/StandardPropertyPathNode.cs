@@ -13,9 +13,7 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Reflection;
-using System.Windows.Markup;
 using System.Windows;
 
 namespace OpenSilver.Internal.Data
@@ -81,40 +79,27 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        internal override void UpdateValue()
+        internal override void OnUpdateValue()
         {
+            object value;
             if (_dp != null)
             {
-                UpdateValueAndIsBroken(((DependencyObject)Source).GetValue(_dp), CheckIsBroken());
+                value = ((DependencyObject)Source).GetValue(_dp);
             }
             else if (_prop != null)
             {
-                //TODO: this.ValueType = PropertyInfo.PropertyType;
-                //this.ValueType = null; //todo: don't know what this is for
-                try
-                {
-                    UpdateValueAndIsBroken(_prop.GetValue(this.Source), CheckIsBroken());
-                }
-                catch
-                {
-                    UpdateValueAndIsBroken(null, CheckIsBroken());
-                }
+                value = _prop.GetValue(Source);
             }
             else if (_field != null)
             {
-                try
-                {
-                    UpdateValueAndIsBroken(_field.GetValue(Source), CheckIsBroken());
-                }
-                catch
-                {
-                    UpdateValueAndIsBroken(null, CheckIsBroken());
-                }
+                value = _field.GetValue(Source);
             }
             else
             {
-                UpdateValueAndIsBroken(null, CheckIsBroken());
+                value = null;
             }
+
+            UpdateValueAndIsBroken(value, CheckIsBroken());
         }
 
         internal override void OnSourceChanged(object oldValue, object newValue)
@@ -191,19 +176,7 @@ namespace OpenSilver.Internal.Data
 
         private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
-            try
-            {
-                UpdateValue();
-                if (Next != null)
-                {
-                    Next.Source = Value;
-                }
-            }
-            catch (Exception ex)
-            {
-                //Ignore
-                Debug.WriteLine("Binding exception: " + ex.ToString());
-            }
+            UpdateValue();
         }
 
         private bool CheckIsBroken()
@@ -216,12 +189,6 @@ namespace OpenSilver.Internal.Data
             if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop != null || _field != null))
             {
                 UpdateValue();
-
-                IPropertyPathNode next = Next;
-                if (next != null)
-                {
-                    next.Source = Value;
-                }
             }
         }
     }

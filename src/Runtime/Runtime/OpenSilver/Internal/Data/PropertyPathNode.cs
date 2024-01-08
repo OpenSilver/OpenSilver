@@ -52,13 +52,7 @@ namespace OpenSilver.Internal.Data
         private void SetSource(object source, bool sourceIsCurrentItem)
         {
             UpdateSource(source, sourceIsCurrentItem);
-
             UpdateValue();
-
-            if (Next != null)
-            {
-                Next.Source = Value == DependencyProperty.UnsetValue ? null : Value;
-            }
         }
 
         private void UpdateSource(object source, bool sourceIsCurrentItem)
@@ -106,20 +100,29 @@ namespace OpenSilver.Internal.Data
             SetSource(_icv.CurrentItem, true);
         }
 
-        internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
+        internal void UpdateValue()
         {
-            IsBroken = isBroken;
-            Value = newValue;
+            OnUpdateValue();
 
-            if (Next == null)
+            if (Next is IPropertyPathNode next)
+            {
+                next.Source = Value == DependencyProperty.UnsetValue ? null : Value;
+            }
+            else
             {
                 Listener.ValueChanged();
             }
         }
 
+        internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
+        {
+            IsBroken = isBroken;
+            Value = newValue;
+        }
+
         internal abstract void OnSourceChanged(object oldSource, object newSource);
 
-        internal abstract void UpdateValue();
+        internal abstract void OnUpdateValue();
 
         internal abstract void SetValue(object value);
     }

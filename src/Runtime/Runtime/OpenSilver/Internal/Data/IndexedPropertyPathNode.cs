@@ -23,8 +23,8 @@ namespace OpenSilver.Internal.Data
     {
         private const string IndexerPropertyName = "Item[]";
 
-        private readonly string _index;
-        private int? _intIndex;
+        private readonly string _indexStr;
+        private readonly object[] _index;
         private PropertyInfo _indexer;
         private WeakEventListener<IndexedPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
 
@@ -33,27 +33,15 @@ namespace OpenSilver.Internal.Data
         internal IndexedPropertyPathNode(PropertyPathWalker listener, string index)
             : base(listener)
         {
-            _index = index;
+            _indexStr = index;
+            _index = new object[1] { index };
         }
 
         public override Type Type => _indexer?.PropertyType;
 
-        public override string PropertyName => $"{_indexer.Name}[{_index}]";
+        public override string PropertyName => $"{_indexer.Name}[{_indexStr}]";
 
         public override bool IsBound => _indexer != null;
-
-        private object Index
-        {
-            get
-            {
-                if (_intIndex.HasValue)
-                {
-                    return _intIndex.Value;
-                }
-
-                return _index;
-            }
-        }
 
         internal override void OnSourceChanged(object oldValue, object newValue)
         {
@@ -81,7 +69,6 @@ namespace OpenSilver.Internal.Data
             // set_Item). I guess it would be nice to be able to attach
             // to calls on set_item and handle it from there.
             _indexer = null;
-            _intIndex = null;
 
             if (newValue != null)
             {
@@ -97,7 +84,7 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        internal override void UpdateValue()
+        internal override void OnUpdateValue()
         {
             if (_indexer != null)
             {
@@ -112,7 +99,7 @@ namespace OpenSilver.Internal.Data
         {
             try
             {
-                _indexer.SetValue(Source, value, new object[1] { Index });
+                _indexer.SetValue(Source, value, _index);
                 return true;
             }
             catch
@@ -125,7 +112,7 @@ namespace OpenSilver.Internal.Data
         {
             try
             {
-                result = _indexer.GetValue(Source, new object[1] { Index });
+                result = _indexer.GetValue(Source, _index);
                 return true;
             }
             catch
@@ -140,12 +127,6 @@ namespace OpenSilver.Internal.Data
             if (e.PropertyName == IndexerPropertyName)
             {
                 UpdateValue();
-
-                IPropertyPathNode next = Next;
-                if (next != null)
-                {
-                    next.Source = Value;
-                }
             }
         }
 
@@ -156,7 +137,7 @@ namespace OpenSilver.Internal.Data
             // 3 - Use indexer from IList if the Binding source implement the interface
             foreach (MemberInfo member in type.GetDefaultMembers())
             {
-                if (!(member is PropertyInfo property))
+                if (member is not PropertyInfo property)
                     continue;
 
                 ParameterInfo[] parameters = property.GetIndexParameters();
@@ -165,17 +146,17 @@ namespace OpenSilver.Internal.Data
 
                 if (parameters[0].ParameterType == typeof(int))
                 {
-                    if (int.TryParse(_index, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
+                    if (int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
                     {
                         _indexer = property;
-                        _intIndex = value;
+                        _index[0] = value;
                         break;
                     }
                 }
                 else if (parameters[0].ParameterType == typeof(string))
                 {
                     _indexer = property;
-                    _intIndex = null;
+                    _index[0] = _indexStr;
                     // Do not exit the loop because we can still find an Int32 indexer,
                     // which takes priority over this one.
                 }
@@ -186,7 +167,7 @@ namespace OpenSilver.Internal.Data
                 if (type is IList)
                 {
                     _indexer = _iListIndexer;
-                    _intIndex = int.Parse(_index, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                    _index[0] = int.Parse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture);
                 }
             }
         }

@@ -49,7 +49,7 @@ namespace CSHTML5.Internal
             object[] callbackArgsObject,
             bool returnValue)
         {
-            object result = null;
+            object result;
 
             try
             {
