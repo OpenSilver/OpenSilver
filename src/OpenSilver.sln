@@ -118,6 +118,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.WhistlerBl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Theming.SystemColors.OpenSilver", "Runtime\Controls.Theming.SystemColors\Controls.Theming.SystemColors.OpenSilver.csproj", "{90059144-4971-4869-8B57-603F05C7B1D2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Data.Toolkit.OpenSilver", "Runtime\Controls.Data.Toolkit\Controls.Data.Toolkit.OpenSilver.csproj", "{EDB7357E-C8EA-4271-B35F-B0423C46678C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -274,6 +276,10 @@ Global
 		{90059144-4971-4869-8B57-603F05C7B1D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90059144-4971-4869-8B57-603F05C7B1D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90059144-4971-4869-8B57-603F05C7B1D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDB7357E-C8EA-4271-B35F-B0423C46678C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDB7357E-C8EA-4271-B35F-B0423C46678C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDB7357E-C8EA-4271-B35F-B0423C46678C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDB7357E-C8EA-4271-B35F-B0423C46678C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -324,6 +330,7 @@ Global
 		{794B51BC-6312-446D-93D9-FD70A70676CF} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{B11347ED-B4BB-4640-B848-32B452D0ECA1} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{90059144-4971-4869-8B57-603F05C7B1D2} = {5CABE705-CE13-456F-B02E-977B59D964FA}
+		{EDB7357E-C8EA-4271-B35F-B0423C46678C} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}

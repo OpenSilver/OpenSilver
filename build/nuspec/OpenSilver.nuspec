@@ -51,6 +51,9 @@
     <file src="../../src/Runtime/Controls.Data/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.dll" />
     <file src="../../src/Runtime/Controls.Data/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.pdb" />
     <file src="../../src/Runtime/Controls.Data/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.xml" target="lib/netstandard2.0/OpenSilver.Controls.Data.xml" />
+    <file src="../../src/Runtime/Controls.Data.Toolkit/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.Toolkit.dll" />
+    <file src="../../src/Runtime/Controls.Data.Toolkit/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.Toolkit.pdb" />
+    <file src="../../src/Runtime/Controls.Data.Toolkit/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Toolkit.xml" target="lib/netstandard2.0/OpenSilver.Controls.Data.Toolkit.xml" />
     <file src="../../src/Runtime/Controls.Theming.Toolkit/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Theming.Toolkit.dll" />
     <file src="../../src/Runtime/Controls.Theming.Toolkit/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Theming.Toolkit.pdb" />
     <file src="../../src/Runtime/Controls.Theming.Toolkit/bin/$Configuration$/netstandard2.0/OpenSilver.Controls.Theming.Toolkit.xml" target="lib/netstandard2.0/OpenSilver.Controls.Theming.Toolkit.xml" />

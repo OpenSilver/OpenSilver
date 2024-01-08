@@ -15,6 +15,7 @@
 	  "Runtime\\Controls.Input\\Controls.Input.OpenSilver.csproj",
 	  "Runtime\\Controls.Navigation\\Controls.Navigation.OpenSilver.csproj",
 	  "Runtime\\Controls.Data\\Controls.Data.OpenSilver.csproj",
+	  "Runtime\\Controls.Data.Toolkit\\Controls.Data.Toolkit.OpenSilver.csproj",
 	  "Runtime\\Controls.Layout.Toolkit\\Controls.Layout.Toolkit.OpenSilver.csproj",
 	  "Runtime\\Controls.Theming.Toolkit\\Controls.Theming.Toolkit.OpenSilver.csproj",
       "Runtime\\Runtime\\Runtime.OpenSilver.csproj",

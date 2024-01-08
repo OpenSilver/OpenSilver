@@ -35,6 +35,9 @@ namespace OpenSilver.Compiler
                 case "System.Windows.Controls.Data":
                     assemblyName = "OpenSilver.Controls.Data";
                     return;
+                case "System.Windows.Controls.Data.Toolkit":
+                    assemblyName = "OpenSilver.Controls.Data.Toolkit";
+                    return;
                 case "System.Windows.Controls.Data.DataForm.Toolkit":
                     assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
                     return;
