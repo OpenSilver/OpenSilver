@@ -25,7 +25,9 @@ namespace CSHTML5.Native.Html.Controls
         #region Data
 
         private object _nativeComboBoxDomElement;
+#pragma warning disable CS0618 // Type or member is obsolete
         private HtmlEventProxy _changeEventProxy;
+#pragma warning restore CS0618 // Type or member is obsolete
         private bool _changingSelectionProgrammatically;
         private bool _changingSelectionInHtml;
 
@@ -491,10 +493,12 @@ namespace CSHTML5.Native.Html.Controls
 
         private void SubscribeToHtmlChangeEvent()
         {
+#pragma warning disable CS0612 // Type or member is obsolete
             this._changeEventProxy = INTERNAL_EventsHelper.AttachToDomEvents(
                 "change",
                 this._nativeComboBoxDomElement,
                 (Action<object>)this.DomSelectionChanged);
+#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         private void UnsubscribeFromHtmlChangeEvent()
@@ -504,11 +508,13 @@ namespace CSHTML5.Native.Html.Controls
                 return;
             }
 
+#pragma warning disable CS0612 // Type or member is obsolete
             INTERNAL_EventsHelper.DetachEvent(
                 "change",
                 this._nativeComboBoxDomElement,
                 this._changeEventProxy,
                 (Action<object>)this.DomSelectionChanged);
+#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         #endregion Public Methods
@@ -608,7 +614,9 @@ namespace CSHTML5.Native.Html.Controls
             for (int i = 0; i < this.Items.Count + 1; ++i) // +1 to remove the 'empty option'
             {
                 // empty the combobox
+#pragma warning disable CS0618 // Type or member is obsolete
                 INTERNAL_HtmlDomManager.RemoveOptionFromNativeComboBox(this._nativeComboBoxDomElement, 0);
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             this.AddEmptyOption(); // 'empty option'
@@ -632,10 +640,12 @@ namespace CSHTML5.Native.Html.Controls
             object value = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(option, this.DisplayMemberPath);
             if (value != null)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 INTERNAL_HtmlDomManager.AddOptionToNativeComboBox(
                     this._nativeComboBoxDomElement,
                     value.ToString(),
                     index);
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -646,7 +656,9 @@ namespace CSHTML5.Native.Html.Controls
                 return;
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             INTERNAL_HtmlDomManager.RemoveOptionFromNativeComboBox(this._nativeComboBoxDomElement, index);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         // Add an empty option at the beginning of the combobox.
@@ -655,7 +667,9 @@ namespace CSHTML5.Native.Html.Controls
             // Add an empty element that will make it easier to have 
             // nothing selected when items are added to the ComboBox: 
             // See: http://stackoverflow.com/questions/8605516/default-select-option-as-blank
+#pragma warning disable CS0618 // Type or member is obsolete
             var emptyOption = INTERNAL_HtmlDomManager.AddOptionToNativeComboBox(this._nativeComboBoxDomElement, "", 0);
+#pragma warning restore CS0618 // Type or member is obsolete
             OpenSilver.Interop.ExecuteJavaScriptAsync("$0.disabled = true", emptyOption);
             OpenSilver.Interop.ExecuteJavaScriptAsync("$0.selected = true", emptyOption);
             OpenSilver.Interop.ExecuteJavaScriptAsync("$0.style.display = 'hidden'", emptyOption);

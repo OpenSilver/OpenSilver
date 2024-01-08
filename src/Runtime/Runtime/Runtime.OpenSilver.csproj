@@ -208,7 +208,6 @@
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxAutomationPeer.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextFormatParser.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
-		<Compile Include="System.Windows.Controls\Extensions.cs" />
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.input\KeyboardNavigation.cs" />
@@ -345,7 +344,6 @@
 		<Compile Include="System.Windows\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\WebRequestCreator.cs" />
-		<Compile Include="System.Windows\IntExtensions.cs" />
 		<Compile Include="System.Windows\LayoutManager.cs" />
 		<Compile Include="System.Windows.Automation.Peers\RangeBaseAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ScrollBarAutomationPeer.cs" />
@@ -544,7 +542,7 @@
 		<Compile Include="Core\Other\Tuple2_4.cs" />
 		<Compile Include="Core\Other\Tuple2_5.cs" />
 		<Compile Include="Core\Other\Tuple2_6.cs" />
-		<Compile Include="Core\Other\Windows.ApplicationModel.Activation.LaunchActivatedEventArgs.cs" />
+		<Compile Include="Core\Other\LaunchActivatedEventArgs.cs" />
 		<Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_Html2dContextReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
@@ -636,7 +634,6 @@
 		<Compile Include="ToBeReviewed\GroupedEnumerable_3.cs" />
 		<Compile Include="ToBeReviewed\GroupedEnumerable_4.cs" />
 		<Compile Include="ToBeReviewed\Grouping_2.cs" />
-		<Compile Include="ToBeReviewed\OrderedEnumerable.cs" />
 		<Compile Include="TypeScriptDefinitionsSupportFiles\EmptyNamespaceDefinition.cs" />
 		<Compile Include="TypeScriptDefinitionsSupportFiles\JSArray_1.cs" />
 		<Compile Include="TypeScriptDefinitionsSupportFiles\JSObject.cs" />
@@ -741,7 +738,7 @@
 		<Compile Include="System.Windows.Controls\ValidationErrorEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Viewbox.cs" />
 		<Compile Include="System.Windows.Controls\WebBrowser.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
+		<Compile Include="System.Windows.Controls\VirtualizationMode.cs" />
 		<Compile Include="System.Windows.Data\Binding.cs" />
 		<Compile Include="System.Windows.Data\BindingBase.cs" />
 		<Compile Include="System.Windows.Data\BindingExpression.cs" />

@@ -12,6 +12,8 @@
 \*====================================================================================*/
 
 using OpenSilver.Internal;
+using System;
+using System.ComponentModel;
 
 namespace CSHTML5.Internal
 {
@@ -21,16 +23,22 @@ namespace CSHTML5.Internal
         private string _jsCache;
         private INTERNAL_HtmlDomElementReference _parent;
         private INTERNAL_HtmlDomStyleReference _style;
+#pragma warning disable CS0618 // Type or member is obsolete
         private INTERNAL_Html2dContextReference _context2d;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public INTERNAL_HtmlDomElementReference(string uniqueIdentifier, INTERNAL_HtmlDomElementReference parent)
         {
             UniqueIdentifier = uniqueIdentifier;
+#pragma warning disable CS0618 // Type or member is obsolete
             Parent = parent;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public string UniqueIdentifier { get; }
-        
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public INTERNAL_HtmlDomElementReference Parent
         {
             get { return _parent; }
@@ -40,16 +48,19 @@ namespace CSHTML5.Internal
                     _parent.FirstChild = null;
                 _parent = value;
                 if (_parent != null)
-                    _parent.FirstChild = this; //what happens when we have multiple children? (is it even possible?)
-                //TODO: a DOM element can indeed have multiple children, so this probably doesn't works. The FirstChild property should be replaced with an array of children or smth like that.
+                    _parent.FirstChild = this;
             }
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public INTERNAL_HtmlDomElementReference FirstChild { get; internal set; }
         
         internal INTERNAL_HtmlDomStyleReference Style => _style ??= new INTERNAL_HtmlDomStyleReference(UniqueIdentifier);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         internal INTERNAL_Html2dContextReference Context2d => _context2d ??= new INTERNAL_Html2dContextReference(UniqueIdentifier);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         string IJavaScriptConvertible.ToJavaScriptString() => _jsCache ??= $"document.getElementByIdSafe(\"{UniqueIdentifier}\")";
     }

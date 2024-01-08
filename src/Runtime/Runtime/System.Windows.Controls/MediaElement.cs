@@ -265,7 +265,8 @@ namespace System.Windows.Controls
             {
                 if (_mediaElement != null)
                 {
-                    INTERNAL_HtmlDomManager.CallDomMethod(_mediaElement, "pause");
+                    string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(_mediaElement);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.pause();");
                 }
             }
         }
@@ -279,7 +280,8 @@ namespace System.Windows.Controls
             {
                 if (_mediaElement != null)
                 {
-                    INTERNAL_HtmlDomManager.CallDomMethod(_mediaElement, "play");
+                    string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(_mediaElement);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.play();");
                 }
             }
         }

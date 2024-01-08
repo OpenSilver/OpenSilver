@@ -13,9 +13,12 @@
 
 using CSHTML5.Internal;
 using System;
-using OpenSilver.Internal;
 using System.Windows;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
+[Obsolete(Helper.ObsoleteMemberMessage)]
+[EditorBrowsable(EditorBrowsableState.Never)]
 public static partial class CSharpXamlForHtml5
 {
     /// <summary>

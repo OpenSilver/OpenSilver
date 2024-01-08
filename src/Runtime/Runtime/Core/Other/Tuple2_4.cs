@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System
 {
@@ -19,7 +20,7 @@ namespace System
     // Credits: https://gist.github.com/michaelbartnett/5652076
     // (public domain)
     //-----------------------------
-    
+
     /// <summary>
     /// Represents a functional tuple that can be used to store
     /// two values of different types inside one object.
@@ -28,7 +29,8 @@ namespace System
     /// <typeparam name="T2">The type of the second element</typeparam>
     /// <typeparam name="T3">The type of the third element</typeparam>
     /// <typeparam name="T4">The type of the fourth element</typeparam>
-    [Obsolete]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class Tuple2<T1, T2, T3, T4>
     {
         private readonly T1 item1;

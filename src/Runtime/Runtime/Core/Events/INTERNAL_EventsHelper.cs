@@ -16,6 +16,7 @@ using System.Collections.Generic;
 
 namespace CSHTML5.Internal
 {
+    [Obsolete]
     internal static class INTERNAL_EventsHelper
     {
         public static HtmlEventProxy AttachToDomEvents(string eventName, object domElementRef, Action<object> eventHandlerWithJsEventArg, bool isSync = false)

@@ -19,39 +19,60 @@
 // namespace cannot be found.
 //-------------------------------------------------------------------------------
 
+using System.ComponentModel;
+using OpenSilver.Internal;
+
 namespace System.Windows.Ink
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }
 namespace System.Windows.Media.Animation
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }
 namespace System.Windows.Threading
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }
 namespace System.Windows.Data
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }
 namespace System.Windows.Printing
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }
 namespace System.Windows.Media.Imaging
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }
 namespace System.Windows.Resources
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class Empty { }
 }
 namespace System.Net.NetworkInformation
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }
 namespace System.Windows.Navigation
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Empty { }
 }

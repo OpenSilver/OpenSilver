@@ -85,10 +85,12 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 RemoveNodeNative(htmlDomElRef);
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (htmlDomElRef.Parent != null)
             {
                 htmlDomElRef.Parent.FirstChild = null;
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             RemoveFromGlobalStore(htmlDomElRef);
         }
@@ -99,17 +101,23 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.remove();");
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static INTERNAL_HtmlDomElementReference GetParentDomElement(object domElementRef)
         {
             var parent = ((INTERNAL_HtmlDomElementReference)domElementRef).Parent;
             return parent;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static INTERNAL_HtmlDomElementReference GetFirstChildDomElement(object domElementRef)
         {
             return ((INTERNAL_HtmlDomElementReference)domElementRef).FirstChild;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static INTERNAL_HtmlDomElementReference GetChildDomElementAt(INTERNAL_HtmlDomElementReference domElementRef, int index)
         {
             string sDomElement = InteropImplementation.GetVariableStringForJS(domElementRef);
@@ -130,6 +138,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return _window ??= OpenSilver.Interop.ExecuteJavaScript("window");
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool IsNotUndefinedOrNull(object obj)
         {
             return obj != null;
@@ -148,6 +158,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             }
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
         {
             object domElement = element.InnerDiv;
@@ -157,6 +169,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             Internal.ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static string GetTextBoxText(object domElementRef)
         {
             string sElement = InteropImplementation.GetVariableStringForJS(domElementRef);
@@ -164,6 +178,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 $"if ({sElement} instanceof HTMLTextAreaElement) {sElement}.value; else {sElement}.innerText;");
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object AddOptionToNativeComboBox(
             object nativeComboBoxDomElement,
             string elementToAdd,
@@ -181,6 +197,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return optionDomElement;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object AddOptionToNativeComboBox(object nativeComboBoxDomElement, string elementToAdd)
         {
             string sElement = InteropImplementation.GetVariableStringForJS(nativeComboBoxDomElement);
@@ -194,6 +212,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return optionDomElement;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RemoveOptionFromNativeComboBox(object optionToRemove, object nativeComboBoxDomElement)
         {
             string sElement = InteropImplementation.GetVariableStringForJS(nativeComboBoxDomElement);
@@ -201,6 +221,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sElement}.removeChild({sToRemove})");
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RemoveOptionFromNativeComboBox(object nativeComboBoxDomElement, int index)
         {
             string sElement = InteropImplementation.GetVariableStringForJS(nativeComboBoxDomElement);
@@ -215,6 +237,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         public static INTERNAL_HtmlDomStyleReference GetDomElementStyleForModification(object domElementRef)
             => ((INTERNAL_HtmlDomElementReference)domElementRef).Style;
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static INTERNAL_Html2dContextReference Get2dCanvasContext(object domElementRef)
             => ((INTERNAL_HtmlDomElementReference)domElementRef).Context2d;
 
@@ -336,6 +360,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sElement}.removeAttribute('{attributeName}');");
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object GetDomElementAttribute(object domElementRef, string attributeName)
         {
             string sElement = InteropImplementation.GetVariableStringForJS(domElementRef);
@@ -348,6 +374,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return OpenSilver.Interop.ExecuteJavaScriptInt32($"{sElement}['{attributeName}']");
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object CallDomMethod(object domElementRef, string methodName, params object[] args)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
@@ -641,6 +669,8 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object CreateDomFromStringAndAppendIt(string domAsString, object parentRef, UIElement associatedUIElement)
         {
             string uniqueIdentifier = NewId();

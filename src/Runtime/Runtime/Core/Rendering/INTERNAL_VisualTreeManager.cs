@@ -371,7 +371,9 @@ if(nextSibling != undefined) {
             }
             else
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 outerDomElement = INTERNAL_HtmlDomManager.CreateDomFromStringAndAppendIt(child.HtmlRepresentation, whereToPlaceTheChild, child);
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // For debugging purposes (to better read the output html), add a class to the outer DIV

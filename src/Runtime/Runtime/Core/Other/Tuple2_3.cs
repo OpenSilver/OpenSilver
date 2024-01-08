@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System
 {
@@ -27,7 +28,8 @@ namespace System
     /// <typeparam name="T1">The type of the first element</typeparam>
     /// <typeparam name="T2">The type of the second element</typeparam>
     /// <typeparam name="T3">The type of the third element</typeparam>
-    [Obsolete]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class Tuple2<T1, T2, T3>
     {
         private readonly T1 item1;

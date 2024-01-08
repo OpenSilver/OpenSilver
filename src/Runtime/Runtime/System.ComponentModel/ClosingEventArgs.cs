@@ -11,16 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using OpenSilver.Internal;
 
 namespace System.ComponentModel
 {
     /// <summary>
-    /// Provides data for the System.Windows.Window.Closing event.
+    /// Provides data for the <see cref="Window.Closing"/> event.
     /// </summary>
     public class ClosingEventArgs : CancelEventArgs
     {
@@ -28,10 +25,11 @@ namespace System.ComponentModel
         private bool _showCloseConfirmationDialog;
 
         /// <summary>
-        /// Initializes a new instance of the System.ComponentModel.ClosingEventArgs
-        /// class.
+        /// Initializes a new instance of the <see cref="ClosingEventArgs"/> class.
         /// </summary>
-        /// <param name="isCancelable">Initializes the System.ComponentModel.ClosingEventArgs.IsCancelable property.</param>
+        /// <param name="isCancelable">
+        /// Initializes the <see cref="IsCancelable"/> property.
+        /// </param>
         public ClosingEventArgs(bool isCancelable)
         {
             IsCancelable = isCancelable;
@@ -44,10 +42,15 @@ namespace System.ComponentModel
         }
 
         /// <summary>
-        /// Gets a value that indicates whether you can cancel the Window.Closing event.
+        /// Gets a value that indicates whether you can cancel the <see cref="Window.Closing"/> event.
         /// </summary>
+        /// <returns>
+        /// true if you can cancel the event; otherwise, false.
+        /// </returns>
         public bool IsCancelable { get; }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool ShowCloseConfirmationDialog
         {
             get { return _showCloseConfirmationDialog; }

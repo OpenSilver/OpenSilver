@@ -12,12 +12,16 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal.Attributes
 {
     /// <summary>
     /// Specifies the version number of the C#/XAML for HTML5 compiler used to compile the assembly being attributed.
     /// </summary>
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
     public sealed class CompilerVersionNumberAttribute : Attribute
     {

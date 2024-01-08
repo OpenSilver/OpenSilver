@@ -199,13 +199,6 @@ namespace OpenSilver.Internal.Data
                     Next.Source = Value;
                 }
             }
-            catch (XamlParseException ex)
-            {
-                if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-                    throw ex;
-                else
-                    MessageBox.Show(ex.ToString());
-            }
             catch (Exception ex)
             {
                 //Ignore

@@ -13,10 +13,11 @@
 
 using System;
 using System.Collections.Generic;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
-    [Obsolete]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
     public class INTERNAL_EventManager<EVENT_HANDLER, EVENT_ARGS>
     {
         //-----------------------------------------------------------

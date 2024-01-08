@@ -12,12 +12,16 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal.Attributes
 {
     /// <summary>
     /// Specifies whether the project was compiled in the "SLMigration" mode.
     /// </summary>
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
     public sealed class CompilerIsSLMigrationAttribute : Attribute
     {

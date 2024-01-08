@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,16 +12,16 @@
 \*====================================================================================*/
 
 using System;
-using System.Globalization;
-using System.Reflection;
-using System.Diagnostics;
-using System.Windows;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
     /// <summary>
     /// </summary>
     /// <exclude/>
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class HtmlEventProxy : IDisposable
     {
         /// <summary>

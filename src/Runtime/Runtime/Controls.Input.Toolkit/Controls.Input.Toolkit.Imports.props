@@ -9,6 +9,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="..\Controls.Input\Common\Extensions.cs" Link="Controls.Input.Toolkit\Common\Extensions.cs" />
     <Compile Include="..\Controls.Input.Toolkit\ContextMenu\ContextMenu.cs" Link="Controls.Input.Toolkit\ContextMenu\ContextMenu.cs" />
     <Compile Include="..\Controls.Input.Toolkit\ContextMenu\ContextMenuService.cs" Link="Controls.Input.Toolkit\ContextMenu\ContextMenuService.cs" />
     <Compile Include="..\Controls.Input.Toolkit\ContextMenu\MenuBase.cs" Link="Controls.Input.Toolkit\ContextMenu\MenuBase.cs" />

@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,17 @@
 *  
 \*====================================================================================*/
 
-
-using System;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System
 {
-	/// <summary>
+    /// <summary>
     /// Utility class that simplifies cration of tuples by using
     /// method calls instead of constructor calls
     /// </summary>
-    [Obsolete]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Tuple2
     {
         /// <summary>

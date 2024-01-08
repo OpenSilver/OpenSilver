@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,14 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 
 namespace AnonymousTypes
 {
     // This class allow the AnonymousTypes namespace to be visible
     // even if there are no AnonymousTypes defined in the typescript project
     // if this namespace doesn't exists the typescript will not compile
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class AnonymousType0
     {
 

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,19 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-//#define CHECK_THAT_ID_EXISTS 
-//#define PERFORMANCE_ANALYSIS
-
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
-    // Note: this class is intented to be used by the Simulator only, not when compiled to JavaScript.
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class INTERNAL_Html2dContextReference : DynamicObject
     {
         private readonly string _id;
