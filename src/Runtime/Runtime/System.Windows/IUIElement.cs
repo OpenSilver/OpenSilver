@@ -21,7 +21,7 @@ public interface IUIElement : IDependencyObject
 {
 }
 
-internal interface IInternalUIElement : IUIElement, IInternalDependencyObject
+internal interface IInternalUIElement : IUIElement
 {
     bool IsLoaded { get; }
 

@@ -110,7 +110,7 @@ namespace OpenSilver.Internal
         /// </summary>
         /// <param name="dependencyObject">Dependency Object  to set NameScope property on.</param>
         /// <param name="value">NameScope property value.</param>
-        public static void SetNameScope(IInternalDependencyObject dependencyObject, INameScope value)
+        public static void SetNameScope(IDependencyObject dependencyObject, INameScope value)
         {
             if (dependencyObject == null)
             {
@@ -125,7 +125,7 @@ namespace OpenSilver.Internal
         /// </summary>
         /// <param name="dependencyObject">DependencyObject to read NameScope property from.</param>
         /// <returns>NameScope property value.</returns>
-        public static INameScope GetNameScope(IInternalDependencyObject dependencyObject)
+        public static INameScope GetNameScope(IDependencyObject dependencyObject)
         {
             if (dependencyObject == null)
             {
