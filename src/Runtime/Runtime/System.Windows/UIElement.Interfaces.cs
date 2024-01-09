@@ -1,5 +1,4 @@
-﻿
-/*===================================================================================
+﻿/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -10,8 +9,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
-using System;
 
 namespace System.Windows;
 
@@ -36,18 +33,6 @@ public partial class UIElement : IInternalUIElement
         get => VisualParent;
         set => VisualParent = value;
     }
-
-    event RoutedEventHandler IInternalUIElement.LostFocus
-    {
-        add => LostFocus += value;
-        remove => LostFocus -= value;
-    }
-
-    void IInternalUIElement.AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo)
-        => AddHandler(routedEvent, handler, handledEventsToo);
-
-    void IInternalUIElement.RemoveHandler(RoutedEvent routedEvent, Delegate handler)
-        => RemoveHandler(routedEvent, handler);
 
     DependencyObject IInternalUIElement.GetVisualChild(int index) => GetVisualChild(index);
 
