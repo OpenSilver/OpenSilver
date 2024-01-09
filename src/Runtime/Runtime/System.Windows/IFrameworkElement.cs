@@ -20,11 +20,15 @@ namespace System.Windows;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IFrameworkElement : IUIElement
 {
+    event RoutedEventHandler Loaded;
+
+    bool IsLoaded { get; }
+
     DependencyObject Parent { get; }
 
     ResourceDictionary Resources { get; set; }
 
-    event RoutedEventHandler Loaded;
+    string Name { get; set; }
 
     object FindName(string name);
 }

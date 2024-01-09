@@ -1138,7 +1138,7 @@ namespace System.Windows
         private void LoadResource(object resource)
         {
             if (resource is IInternalFrameworkElement feResource
-                && !feResource.IsLoaded && !feResource.IsLoadedInResourceDictionary)
+                && !((IFrameworkElement)feResource).IsLoaded && !feResource.IsLoadedInResourceDictionary)
             {
                 feResource.IsLoadedInResourceDictionary = true;
                 feResource.LoadResources();
