@@ -16,6 +16,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <Import Project="$(MSBuildThisFileDirectory)\OpenSilver.GenerateAssemblyInfo.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)\OpenSilver.FSharpSupport.targets" />
   
   <!--============================================================
   LOCATION OF COMPILER TASKS
@@ -252,13 +253,9 @@
     <!--============================================================
       Change the Build Action of XAML and TypeScript files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition", "TypeScriptCompile"] to "Content" in case the developer has not already done so.
       ============================================================-->
-    <ItemGroup>
+	<ItemGroup>
       <Content Include="@(Page)"/>
       <Page Remove="@(Page)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <AllCompileItems Include="@(Compile)" />
-      <Compile Remove="@(AllCompileItems)" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="@(CodeAnalysisDictionary)"/>
@@ -272,7 +269,18 @@
       <Content Include="@(TypeScriptCompile)"/>
       <TypeScriptCompile Remove="@(TypeScriptCompile)"/>
     </ItemGroup>
-
+    <!--============================================================
+      F# Support : Read xaml files from the project file and change it to generated fs file names. Changed file names will be added as Include itemgroup later.
+      ============================================================-->
+    <PropertyGroup>
+      <AllItemsAsString>@(Compile);@(Content)</AllItemsAsString>
+    </PropertyGroup>
+    <ReadXmlAndGetItemGroupChildren ProjectPath="$(MSBuildProjectFullPath)" AllItemsAsString="$(AllItemsAsString)" Condition="'$(OutputExtension)'=='fs'">
+      <Output TaskParameter="AllIncludes" ItemName="AllIncludes" />
+    </ReadXmlAndGetItemGroupChildren>
+    <ChangeInPlaceXamlToGenerated ParamIntermediateOutputPath="$(IntermediateOutputPath)" ParamIsSecondPass="$(IsSecondPass)" ParamOutputExtension="$(OutputExtension)" OriginalItems="@(AllIncludes)" Condition="'$(OutputExtension)'=='fs'">
+      <Output TaskParameter="UpdatedItems" ItemName="UpdatedItems" />
+    </ChangeInPlaceXamlToGenerated>
     <!--============================================================
       Change the Build Action of JS/CSS/Image/Video/Audio/Text/Xml/Font files from ["Content", "Resource"] to "EmbeddedResource" in case the developer has not already done so.
       ============================================================-->
@@ -457,18 +465,19 @@
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined in the project.
       ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
+      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True') And '$(OutputExtension)'!='fs'"/>
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
       ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
+      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True') And '$(OutputExtension)'!='fs'"/>
       <!--============================================================
       Remove the XAML files from the solution and include the generated CS files.
       ============================================================-->
       <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
-      <Compile Include="@(ProcessedFiles)" />
-      <Compile Include="@(ProcessedFiles2)" />
-      <Compile Include="@(AllCompileItems)" />
+      <Compile Include="@(ProcessedFiles)" Condition="$(OutputExtension)!='fs'"/>
+      <Compile Include="@(ProcessedFiles2)" Condition="$(OutputExtension)!='fs'"/>
+      <Compile Remove="@(Compile)" Condition="$(OutputExtension)=='fs'" />
+      <Compile Include="@(UpdatedItems)" Condition="$(OutputExtension)=='fs'" />
     </ItemGroup> 
     
   </Target>
@@ -591,10 +600,6 @@
       <Page Remove="@(Page)"/>
     </ItemGroup>
     <ItemGroup>
-      <AllCompileItems Include="@(Compile)" />
-      <Compile Remove="@(AllCompileItems)" />
-    </ItemGroup>
-    <ItemGroup>
       <Content Include="@(CodeAnalysisDictionary)"/>
       <CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
     </ItemGroup>
@@ -606,7 +611,18 @@
       <Content Include="@(TypeScriptCompile)"/>
       <TypeScriptCompile Remove="@(TypeScriptCompile)"/>
     </ItemGroup>
-
+    <!--============================================================
+      F# Support : Read xaml files from the project file and change it to generated fs file names. Changed file names will be added as Include itemgroup later.
+      ============================================================-->
+    <PropertyGroup>
+      <AllItemsAsString>@(Compile);@(Content)</AllItemsAsString>
+    </PropertyGroup>
+    <ReadXmlAndGetItemGroupChildren ProjectPath="$(MSBuildProjectFullPath)" AllItemsAsString="$(AllItemsAsString)" Condition="'$(OutputExtension)'=='fs'">
+      <Output TaskParameter="AllIncludes" ItemName="AllIncludes" />
+    </ReadXmlAndGetItemGroupChildren>
+    <ChangeInPlaceXamlToGenerated ParamIntermediateOutputPath="$(IntermediateOutputPath)" ParamIsSecondPass="$(IsSecondPass)" ParamOutputExtension="$(OutputExtension)" OriginalItems="@(AllIncludes)" Condition="'$(OutputExtension)'=='fs'">
+      <Output TaskParameter="UpdatedItems" ItemName="UpdatedItems" />
+    </ChangeInPlaceXamlToGenerated>
     <!--============================================================
       TypeScriptDefToCSharp
       ============================================================-->
@@ -692,19 +708,20 @@
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined in the project.
       ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
+      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true' And '$(OutputExtension)'!='fs'"/>
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
       ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
+      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.$(OutputExtension)')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true' And '$(OutputExtension)'!='fs'"/>
 
       <!--============================================================
       Remove the XAML files from the solution and include the generated CS files.
       ============================================================-->
       <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
-      <Compile Include="@(ProcessedFiles)" />
-      <Compile Include="@(ProcessedFiles2)" />
-      <Compile Include="@(AllCompileItems)" />
+      <Compile Include="@(ProcessedFiles)" Condition="'$(OutputExtension)'!='fs'"/>
+      <Compile Include="@(ProcessedFiles2)" Condition="'$(OutputExtension)'!='fs'"/>
+      <Compile Remove="@(Compile)" Condition="'$(OutputExtension)'=='fs'" />
+      <Compile Include="@(UpdatedItems)" Condition="'$(OutputExtension)'=='fs'" />
     </ItemGroup>
     <Message
       Text="OpenSilver Design-Time Compilation ended"
