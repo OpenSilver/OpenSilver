@@ -10,7 +10,7 @@ namespace System.Windows
     /// </remark>
     public sealed class VisualStateChangedEventArgs : EventArgs
     {
-        internal VisualStateChangedEventArgs(VisualState oldState, VisualState newState, Control control)
+        internal VisualStateChangedEventArgs(VisualState oldState, VisualState newState, IControl control)
         {
             _oldState = oldState;
             _newState = newState;
@@ -46,12 +46,12 @@ namespace System.Windows
         {
             get
             {
-                return _control;
+                return _control as Control;
             }
         }
 
         private VisualState _oldState;
         private VisualState _newState;
-        private Control _control;
+        private IControl _control;
     }
 }

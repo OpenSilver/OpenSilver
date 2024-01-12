@@ -157,8 +157,8 @@ public sealed class Storyboard : Timeline
     /// </summary>
     public void Begin() => BeginCommon(this, false);
 
-    internal void Begin(FrameworkElement containingObject, bool alignedToLastTick) =>
-        BeginCommon(containingObject, alignedToLastTick);
+    internal void Begin(IInternalFrameworkElement containingObject, bool alignedToLastTick) =>
+        BeginCommon(containingObject.AsDependencyObject(), alignedToLastTick);
 
     private void BeginCommon(DependencyObject containingObject, bool alignedToLastTick)
     {
@@ -322,7 +322,7 @@ public sealed class Storyboard : Timeline
                 else
                 {
                     // The containing object must be either an FE.
-                    targetObject = containingObject as FrameworkElement;
+                    targetObject = (DependencyObject)(containingObject as IFrameworkElement);
 
                     if (targetObject == null)
                     {
