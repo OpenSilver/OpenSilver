@@ -568,13 +568,13 @@ if(nextSibling != undefined) {
 #if PERFSTAT
                 Performance.Counter("VisualTreeManager: RaisePropertyChanged for property '" + property.Name + "'", t1);
 #endif
+            }
 
-                // Silverlight creates a new stacking context for each element, so we need to make sure that
-                // the css z-index value is not 'auto'.
-                if (uie is not TextElement)
-                {
-                    uie.SetZIndex(Canvas.GetZIndex(uie));
-                }
+            // Silverlight creates a new stacking context for each element, so we need to make sure that
+            // the css z-index value is not 'auto'.
+            if (uie is not TextElement)
+            {
+                uie.SetZIndex(Canvas.GetZIndex(uie));
             }
         }
 
