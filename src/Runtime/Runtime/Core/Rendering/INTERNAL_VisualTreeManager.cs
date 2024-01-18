@@ -420,6 +420,15 @@ if(nextSibling != undefined) {
             // Raise the "OnAttached" event:
             child.INTERNAL_OnAttachedToVisualTree(); // IMPORTANT: Must be done BEFORE "RaiseChangedEventOnAllDependencyProperties" (for example, the ItemsControl uses this to initialize its visual)
 
+            // INTERNAL_OnAttachedToVisualTree will fire the Loaded event on children, so we need to make
+            // sure that 'child' has not been disconnected from the visual tree in the process.
+            // We check outer div rather than _isLoaded because 'child' may have been removed and added back,
+            // in which case the code below would run twice.
+            if (child.OuterDiv != outerDomElement)
+            {
+                return;
+            }
+
             //--------------------------------------------------------
             // RENDER THE ELEMENTS BY APPLYING THE CSS PROPERTIES:
             //--------------------------------------------------------
