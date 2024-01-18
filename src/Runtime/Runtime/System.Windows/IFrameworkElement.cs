@@ -55,6 +55,8 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     IInternalFrameworkElement TemplateChild { get; set; }
 
+    IFrameworkElement StateGroupsRoot { get; }
+
     void AddLogicalChild(object child);
 
     void RemoveLogicalChild(object child);

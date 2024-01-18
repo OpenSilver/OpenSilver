@@ -60,6 +60,8 @@ public partial class FrameworkElement : IInternalFrameworkElement
         set => TemplateChild = (FrameworkElement)value;
     }
 
+    IFrameworkElement IInternalFrameworkElement.StateGroupsRoot => StateGroupsRoot;
+
     event InheritedPropertyChangedEventHandler IInternalFrameworkElement.InheritedPropertyChanged
     {
         add => InheritedPropertyChanged += value;
