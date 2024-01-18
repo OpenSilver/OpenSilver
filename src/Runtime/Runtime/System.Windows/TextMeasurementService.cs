@@ -11,11 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Globalization;
 using CSHTML5;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -51,7 +49,7 @@ namespace System.Windows
 
         private string CreateMeasurementText(Window parent)
         {
-            Debug.Assert(parent.OuterDiv is INTERNAL_HtmlDomElementReference);
+            Debug.Assert(parent.OuterDiv is not null);
 
             string sParent = InteropImplementation.GetVariableStringForJS(parent.OuterDiv);
             return OpenSilver.Interop.ExecuteJavaScriptString($"document.createMeasurementService({sParent});");

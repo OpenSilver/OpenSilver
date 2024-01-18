@@ -20,6 +20,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Shapes;
@@ -44,6 +45,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         internal static bool SyncRenderingWithLayout { get; set; } = false;
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object GetApplicationRootDomElement() => Application.Current?.GetRootDiv();
 
         internal static UIElement GetElementById(string id)
@@ -72,10 +74,11 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store.Remove(htmlDomElRef.UniqueIdentifier);
         }
 
-        public static void RemoveFromDom(object domNode)
-        {
-            var htmlDomElRef = (INTERNAL_HtmlDomElementReference)domNode;
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void RemoveFromDom(object domNode) => RemoveFromDom((INTERNAL_HtmlDomElementReference)domNode);
 
+        internal static void RemoveFromDom(INTERNAL_HtmlDomElementReference htmlDomElRef)
+        {
             if (SyncRenderingWithLayout)
             {
                 LayoutManager.Current.UIRenderer.RemoveRootComponent(htmlDomElRef);
@@ -133,6 +136,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         private static object _window;
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object GetHtmlWindow()
         {
             return _window ??= OpenSilver.Interop.ExecuteJavaScript("window");
@@ -145,12 +149,13 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return obj != null;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetFocus(UIElement element)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                object domElement = element.GetFocusTarget();
-                if (domElement != null)
+                if (element.GetFocusTarget() is INTERNAL_HtmlDomElementReference domElement)
                 {
                     string sElement = InteropImplementation.GetVariableStringForJS(domElement);
                     OpenSilver.Interop.ExecuteJavaScriptVoid($"document.setFocus({sElement});");
@@ -162,10 +167,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
         {
-            object domElement = element.InnerDiv;
-
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElement).UniqueIdentifier;
-            string javaScriptCodeToExecute = $@"document.setContentString(""{ uniqueIdentifier}"",""{EscapeStringForUseInJavaScript(content)}"",{removeTextWrapping.ToString().ToLower()})";
+            string javaScriptCodeToExecute = $@"document.setContentString(""{element.InnerDiv.UniqueIdentifier}"",""{EscapeStringForUseInJavaScript(content)}"",{removeTextWrapping.ToString().ToLower()})";
             Internal.ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
@@ -229,11 +231,11 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sElement}.remove({index.ToInvariantString()})");
         }
 
-        public static INTERNAL_HtmlDomStyleReference GetFrameworkElementOuterStyleForModification(UIElement element)
-        {
-            return GetDomElementStyleForModification(element.OuterDiv);
-        }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static INTERNAL_HtmlDomStyleReference GetFrameworkElementOuterStyleForModification(UIElement element) =>
+            element.OuterDiv.Style;
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static INTERNAL_HtmlDomStyleReference GetDomElementStyleForModification(object domElementRef)
             => ((INTERNAL_HtmlDomElementReference)domElementRef).Style;
 
@@ -242,30 +244,35 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         public static INTERNAL_Html2dContextReference Get2dCanvasContext(object domElementRef)
             => ((INTERNAL_HtmlDomElementReference)domElementRef).Context2d;
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static INTERNAL_HtmlDomStyleReference CreateDomElementAppendItAndGetStyle(
             string domElementTag,
             object parentRef,
             UIElement associatedUIElement,
             out object newElementRef)
         {
-            newElementRef = CreateDomElementAndAppendIt(domElementTag, parentRef, associatedUIElement);
-            return GetDomElementStyleForModification(newElementRef);
+            var element = AppendDomElement(domElementTag, parentRef, associatedUIElement);
+            newElementRef = element;
+            return element.Style;
         }
 
-        internal static INTERNAL_HtmlDomStyleReference CreateDomLayoutElementAppendItAndGetStyle(
-            string tagName,
-            object parentRef,
-            UIElement uie,
-            out object newElementRef)
-        {
-            newElementRef = CreateDomLayoutElementAndAppendIt(tagName, parentRef, uie);
-            return GetDomElementStyleForModification(newElementRef);
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetDomElementProperty(object domElementRef,
+            string attributeName,
+            object attributeValue,
+            bool forceSimulatorExecuteImmediately = false) 
+            => SetDomElementProperty((INTERNAL_HtmlDomElementReference)domElementRef,
+                attributeName,
+                attributeValue,
+                forceSimulatorExecuteImmediately);
 
-        // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
-        public static void SetDomElementProperty(object domElementRef, string attributeName, object attributeValue, bool forceSimulatorExecuteImmediately = false)
+        internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference domElementRef,
+            string attributeName,
+            object attributeValue,
+            bool forceSimulatorExecuteImmediately = false)
         {
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
+            string uniqueIdentifier = domElementRef.UniqueIdentifier;
             string javaScriptCodeToExecute =
                 $@"var element = document.getElementById(""{uniqueIdentifier}"");if (element) {{ element[""{attributeName}""] = {ConvertToStringToUseInJavaScriptCode(attributeValue)} }};";
 
@@ -275,23 +282,33 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 Internal.ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetDomElementAttribute(object domElementRef, string attributeName, object attributeValue)
+            => SetDomElementAttribute(
+                (INTERNAL_HtmlDomElementReference)domElementRef,
+                attributeName,
+                ConvertToStringToUseInJavaScriptCode(attributeValue));
+
+        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, object attributeValue)
             => SetDomElementAttributeImpl(domElementRef, attributeName, ConvertToStringToUseInJavaScriptCode(attributeValue));
 
-        internal static void SetDomElementAttribute(object domElementRef, string attributeName, double value)
+        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, double value)
             => SetDomElementAttributeImpl(domElementRef, attributeName, value.ToInvariantString());
 
-        internal static void SetDomElementAttribute(object domElementRef, string attributeName, string value, bool escape = false)
+        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, bool value)
+            => SetDomElementAttributeImpl(domElementRef, attributeName, value ? "true" : "false");
+
+        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, string value, bool escape = false)
             => SetDomElementAttributeImpl(domElementRef, attributeName, $"\"{(escape ? EscapeStringForUseInJavaScript(value) : value)}\"");
 
-        private static void SetDomElementAttributeImpl(object domElementRef, string attributeName, string value)
+        private static void SetDomElementAttributeImpl(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, string value)
         {
-            string uid = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"document.setDomAttribute(\"{uid}\",\"{attributeName}\",{value})");
+                $"document.setDomAttribute(\"{domElementRef.UniqueIdentifier}\",\"{attributeName}\",{value})");
         }
 
-        internal static void AddCSSClass(object domElementRef, string className)
+        internal static void AddCSSClass(INTERNAL_HtmlDomElementReference domElementRef, string className)
         {
             Debug.Assert(domElementRef is not null);
 
@@ -299,7 +316,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.classList.add('{className}');");
         }
 
-        internal static void RemoveCSSClass(object domElementRef, string className)
+        internal static void RemoveCSSClass(INTERNAL_HtmlDomElementReference domElementRef, string className)
         {
             Debug.Assert(domElementRef is not null);
 
@@ -307,14 +324,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.classList.remove('{className}');");
         }
 
-        internal static void SetCSSStyleProperty(object domElementRef, string propertyName, string value)
-        {
-            Debug.Assert(domElementRef != null);
-            string uid = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.setDomStyle('{uid}', '{propertyName}', '{value}');");
-        }
-
-        // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetDomElementStyleProperty(object domElementRef, List<string> propertyCSSNames, object attributeValue, bool forceSimulatorExecuteImmediately = false)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
@@ -341,7 +352,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 Internal.ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
-        // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RemoveDomElementAttribute(object domElementRef, string attributeName, bool forceSimulatorExecuteImmediately = false)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
@@ -354,7 +366,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 Internal.ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
-        internal static void RemoveAttribute(object domElement, string attributeName)
+        internal static void RemoveAttribute(INTERNAL_HtmlDomElementReference domElement, string attributeName)
         {
             string sElement = InteropImplementation.GetVariableStringForJS(domElement);
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sElement}.removeAttribute('{attributeName}');");
@@ -368,7 +380,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return OpenSilver.Interop.ExecuteJavaScript($@"{sElement}[""{attributeName}""]");
         }
 
-        internal static int GetDomElementAttributeInt32(object domElementRef, string attributeName)
+        internal static int GetDomElementAttributeInt32(INTERNAL_HtmlDomElementReference domElementRef, string attributeName)
         {
             string sElement = InteropImplementation.GetVariableStringForJS(domElementRef);
             return OpenSilver.Interop.ExecuteJavaScriptInt32($"{sElement}['{attributeName}']");
@@ -391,16 +403,44 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object CreateDomElementAndAppendIt(
             string domElementTag,
             object parentRef,
             UIElement associatedUIElement,
             int index = -1)
         {
-            return CreateDomElementAndAppendIt_ForUseByTheSimulator(domElementTag, parentRef, associatedUIElement, index);
+            return AppendDomElement(domElementTag, parentRef, associatedUIElement, index);
         }
 
-        internal static object CreateDomLayoutElementAndAppendIt(
+        internal static INTERNAL_HtmlDomElementReference AppendDomElement(
+            string tagName,
+            object parentRef,
+            UIElement uie,
+            int index = -1)
+        {
+            string uid = NewId();
+
+            INTERNAL_HtmlDomElementReference parent = null;
+            if (parentRef is INTERNAL_HtmlDomElementReference domRef)
+            {
+                parent = domRef;
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"document.createElementSafe('{tagName}', '{uid}', '{parent.UniqueIdentifier}', {index.ToInvariantString()})");
+            }
+            else
+            {
+                string sParentRef = InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"document.createElementSafe('{tagName}', '{uid}', {sParentRef}, {index.ToInvariantString()})");
+            }
+
+            AddToGlobalStore(uid, uie);
+
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
+        }
+
+        internal static INTERNAL_HtmlDomElementReference CreateDomLayoutElementAndAppendIt(
             string tagName,
             object parentRef,
             UIElement uie,
@@ -427,7 +467,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
-        internal static object CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
+        internal static INTERNAL_HtmlDomElementReference CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
         {
             Debug.Assert(popupRoot != null);
 
@@ -443,7 +483,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null);
         }
 
-        internal static object CreateTextBlockDomElementAndAppendIt(
+        internal static INTERNAL_HtmlDomElementReference CreateTextBlockDomElementAndAppendIt(
             object parentRef,
             UIElement associatedUIElement,
             bool wrap)
@@ -471,34 +511,27 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateImageDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
+        internal static INTERNAL_HtmlDomElementReference CreateImageDomElementAndAppendIt(
+            INTERNAL_HtmlDomElementReference parent,
+            Image image)
         {
 #if PERFSTAT
             Performance.Counter("CreateImageDomElementAndAppendIt", t0);
 #endif
+            Debug.Assert(parent is not null);
+            Debug.Assert(image is not null);
+
             string uniqueIdentifier = NewId();
 
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createImageElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
-            }
-            else
-            {
-                string sParentRef = InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createImageElement(""{uniqueIdentifier}"", {sParentRef})");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $@"document.createImageElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            AddToGlobalStore(uniqueIdentifier, image);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateTextElementDomElementAndAppendIt(object parentRef, TextElement textElement)
+        internal static INTERNAL_HtmlDomElementReference CreateTextElementDomElementAndAppendIt(object parentRef, TextElement textElement)
         {
             string uniqueIdentifier = NewId();
 
@@ -602,6 +635,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static object CreateDomElementAndInsertIt(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition) //associatedUIElement is the UIElement of which the current dom element is a part.
         {
 #if PERFSTAT
@@ -613,41 +648,11 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         private static string NewId() => "id" + _idGenerator.NewId().ToString();
 
-        private static object CreateDomElementAndAppendIt_ForUseByTheSimulator(
-            string tagName,
+        private static INTERNAL_HtmlDomElementReference CreateDomElementAndInsertIt_ForUseByTheSimulator(string domElementTag,
             object parentRef,
-            UIElement uie,
-            int index)
-        {
-            //------------------
-            // This is the WPF version of the DOM element creation, intented to be used only by the Simulator (not by
-            // the compiled JavaScript). For performance reasons, in the Simulator we never store a direct reference
-            // to DOM elements, instead we only store their Id and we retrieve them in every JS call by using
-            // document.getElementByIdSafe().
-            //------------------
-
-            string uid = NewId();
-
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference domRef)
-            {
-                parent = domRef;
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"document.createElementSafe('{tagName}', '{uid}', '{parent.UniqueIdentifier}', {index.ToInvariantString()})");
-            }
-            else
-            {
-                string sParentRef = InteropImplementation.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"document.createElementSafe('{tagName}', '{uid}', {sParentRef}, {index.ToInvariantString()})");
-            }
-
-            AddToGlobalStore(uid, uie);
-
-            return new INTERNAL_HtmlDomElementReference(uid, parent);
-        }
-
-        static object CreateDomElementAndInsertIt_ForUseByTheSimulator(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition)
+            UIElement associatedUIElement,
+            int insertionIndex,
+            string relativePosition)
         {
             //------------------
             // This is the WPF version of the DOM element creation, intented to be used only by the Simulator (not by
@@ -798,7 +803,7 @@ parentElement.appendChild(child);";
         {
             if (obj == null)
             {
-                throw new ArgumentNullException("obj");
+                throw new ArgumentNullException(nameof(obj));
             }
             else if (obj is string str)
             {
@@ -844,6 +849,7 @@ parentElement.appendChild(child);";
         /// </summary>
         /// <returns>The UIElement object that is determined to be located
         /// in the visual tree composition at the specified point.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static UIElement FindElementInHostCoordinates_UsedBySimulatorToo(double x, double y) // IMPORTANT: If you rename this method or change its signature, make sure to rename its dynamic call in the Simulator.
         {
             using (var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
@@ -858,10 +864,12 @@ parentElement.appendChild(child);";
         return domElementAtCoordinates;
     }}
 }}())"))
+            {
                 return GetUIElementFromDomElement(domElementAtCoordinates);
-
+            }
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static UIElement GetUIElementFromDomElement(object domElementRef)
         {
             return GetUIElementFromDomElement_UsedBySimulatorToo(domElementRef);
@@ -909,6 +917,7 @@ parentElement.appendChild(child);";
             return result;
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool IsNullOrUndefined(object jsObject)
         {
             return OpenSilver.Interop.IsNull(jsObject) || OpenSilver.Interop.IsUndefined(jsObject);
@@ -943,7 +952,7 @@ parentElement.appendChild(child);";
             Internal.ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
-        internal static Size GetBoundingClientSize(object domRef)
+        internal static Size GetBoundingClientSize(INTERNAL_HtmlDomElementReference domRef)
         {
             if (domRef is not null)
             {

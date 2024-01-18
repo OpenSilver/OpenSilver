@@ -11,9 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Globalization;
@@ -21,6 +18,7 @@ using System.Windows.Markup;
 using System.Windows.Input;
 using CSHTML5.Internal;
 using CSHTML5;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -105,13 +103,13 @@ namespace System.Windows
         public string Title { get; set; }
         #endregion
 
-        internal object RootDomElement { get; private set; }
+        internal INTERNAL_HtmlDomElementReference RootDomElement { get; private set; }
 
         /// <summary>
         /// Set the DOM element that will host the window. This can be set only to new windows. The MainWindow looks for a DIV that has the ID "cshtml5-root" or "opensilver-root".
         /// </summary>
         /// <param name="rootDomElement">The DOM element that will host the window</param>
-        public void AttachToDomElement(object rootDomElement)
+        public void AttachToDomElement(INTERNAL_HtmlDomElementReference rootDomElement)
         {
             if (OuterDiv != null || RootDomElement != null)
             {
@@ -127,16 +125,13 @@ namespace System.Windows
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.style.overflow = 'clip'");
 
             // Create the DIV that will correspond to the root of the window visual tree:
-            var windowRootDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", rootDomElement, this, out object windowRootDiv);
+            OuterDiv = InnerDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", rootDomElement, this);
 
-            windowRootDivStyle.width = "100%";
-            windowRootDivStyle.height = "100%";
-            windowRootDivStyle.overflowX = "hidden";
-            windowRootDivStyle.overflowY = "hidden";
-
-            OuterDiv = windowRootDiv;
-            InnerDiv = windowRootDiv;
-
+            OuterDiv.Style.width = "100%";
+            OuterDiv.Style.height = "100%";
+            OuterDiv.Style.overflowX = "hidden";
+            OuterDiv.Style.overflowY = "hidden";
+            
             INTERNAL_AttachToDomEvents();
 
             // Set the window as "loaded":
@@ -157,6 +152,18 @@ namespace System.Windows
             RaiseLoadedEvent();
             
             SizeChanged += WindowSizeChangedEventHandler;
+        }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void AttachToDomElement(object rootDomElement)
+        {
+            if (rootDomElement is not INTERNAL_HtmlDomElementReference domRef)
+            {
+                throw new ArgumentException($"'{nameof(rootDomElement)}' must be a '{typeof(INTERNAL_HtmlDomElementReference)}'");
+            }
+
+            AttachToDomElement(domRef);
         }
 
         private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)

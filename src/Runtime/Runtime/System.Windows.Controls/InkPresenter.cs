@@ -26,7 +26,7 @@ namespace System.Windows.Controls
     /// </summary>
     public class InkPresenter : Canvas
     {
-        private object _canvasDom;
+        private INTERNAL_HtmlDomElementReference _canvasDom;
         private Stroke _currentStroke;
         private StylusPoint _lastPos;
         private StylusPoint _mousePos;
@@ -72,8 +72,8 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var div = base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-            _canvasDom = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("canvas", div, this);
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_canvasDom);
+            _canvasDom = INTERNAL_HtmlDomManager.AppendDomElement("canvas", div, this);
+            var style = _canvasDom.Style;
             style.width = "100%";
             style.height = "100%";
             style.position = "absolute";

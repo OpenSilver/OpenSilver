@@ -162,7 +162,7 @@ internal sealed class InputManager
     /// </summary>
     public static InputManager Current { get; } = new InputManager();
 
-    internal void RegisterRoot(object element)
+    internal void RegisterRoot(INTERNAL_HtmlDomElementReference element)
     {
         string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(element);
         OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.registerRoot({sElement});");
@@ -205,17 +205,9 @@ internal sealed class InputManager
 
     internal void AddEventListeners(UIElement uie, bool isFocusable)
     {
-        if (uie.OuterDiv is INTERNAL_HtmlDomElementReference domRef)
-        {
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"document.inputManager.addListeners('{domRef.UniqueIdentifier}', {(isFocusable ? "true" : "false")});");
-        }
-        else
-        {
-            string sOuter = CSHTML5.InteropImplementation.GetVariableStringForJS(uie.OuterDiv);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"document.inputManager.addListeners({sOuter}, {(isFocusable ? "true" : "false")});");
-        }
+        Debug.Assert(uie.OuterDiv is not null);
+        OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+            $"document.inputManager.addListeners('{uie.OuterDiv.UniqueIdentifier}', {(isFocusable ? "true" : "false")});");
     }
 
     internal bool SetFocus(UIElement uie)
@@ -227,7 +219,7 @@ internal sealed class InputManager
             return true;
         }
 
-        if (uie.GetFocusTarget() is object target)
+        if (uie.GetFocusTarget() is INTERNAL_HtmlDomElementReference target)
         {
             if (SetFocusNative(target))
             {
@@ -247,7 +239,7 @@ internal sealed class InputManager
         return false;
     }
 
-    internal static bool SetFocusNative(object domElement)
+    internal static bool SetFocusNative(INTERNAL_HtmlDomElementReference domElement)
     {
         string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(domElement);
         return OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.inputManager.focus({sDiv});");
@@ -255,7 +247,7 @@ internal sealed class InputManager
 
     internal static void ClearTabIndex(UIElement uie)
     {
-        if (uie.GetFocusTarget() is { } domElement)
+        if (uie.GetFocusTarget() is INTERNAL_HtmlDomElementReference domElement)
         {
             switch (uie)
             {

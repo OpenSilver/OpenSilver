@@ -30,7 +30,7 @@ namespace System.Windows.Controls
         // If not, find a way to know which one it currently is.
         private static readonly HashSet<string> SupportedAudioTypes = new() { "mp3", "ogg" };
         
-        private object _mediaElement;
+        private INTERNAL_HtmlDomElementReference _mediaElement;
 
         /// <summary>
         /// Gets or sets a value that indicates whether media will begin playback automatically
@@ -290,11 +290,11 @@ namespace System.Windows.Controls
         {
             domElementWhereToPlaceChildren = null;
             var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
-            CreateMediaElement(outerDiv, Source);
+            CreateMediaElement((INTERNAL_HtmlDomElementReference)outerDiv, Source);
             return outerDiv;
         }
 
-        private void CreateMediaElement(object parentRef, Uri source)
+        private void CreateMediaElement(INTERNAL_HtmlDomElementReference parentRef, Uri source)
         {
             string absoluteURI = string.Empty;
 
@@ -336,13 +336,12 @@ namespace System.Windows.Controls
                             INTERNAL_HtmlDomManager.RemoveFromDom(_mediaElement);
                         }
 
-                        var mediaElementStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle(
-                            tagName, parentRef, this, out _mediaElement);
-
+                        _mediaElement = INTERNAL_HtmlDomManager.AppendDomElement(tagName, parentRef, this);
+                        
                         if (!IsAudioOnly)
                         {
-                            mediaElementStyle.width = "100%";
-                            mediaElementStyle.height = "100%";
+                            _mediaElement.Style.width = "100%";
+                            _mediaElement.Style.height = "100%";
                         }
 
                         Refresh();

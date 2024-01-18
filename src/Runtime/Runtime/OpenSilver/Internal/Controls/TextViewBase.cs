@@ -32,7 +32,7 @@ internal abstract partial class TextViewBase<T> : FrameworkElement
 
     internal T Host { get; }
 
-    internal object InputDiv => OuterDiv;
+    internal INTERNAL_HtmlDomElementReference InputDiv => OuterDiv;
 
     internal sealed override UIElement KeyboardTarget => Host;
 

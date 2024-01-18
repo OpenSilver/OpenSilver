@@ -48,8 +48,8 @@ namespace System.Windows.Controls
 
             domElementWhereToPlaceChildren = null;
 
-            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
-            object quillContainer = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", div, this);
+            var div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
+            var quillContainer = INTERNAL_HtmlDomManager.AppendDomElement("div", div, this);
 
             string script = "let options = {"
                 + $"readOnly: {(Host.IsReadOnly ? "true" : "false")},modules: {{clipboard: {{matchVisual:false}}}}"

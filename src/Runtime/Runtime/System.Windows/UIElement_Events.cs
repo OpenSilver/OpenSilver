@@ -11,11 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media;
+using CSHTML5.Internal;
 
 namespace System.Windows
 {
@@ -765,7 +764,7 @@ namespace System.Windows
 
         #endregion
 
-        internal virtual object GetFocusTarget() => OuterDiv;
+        internal virtual INTERNAL_HtmlDomElementReference GetFocusTarget() => OuterDiv;
 
         public virtual void INTERNAL_AttachToDomEvents()
         {

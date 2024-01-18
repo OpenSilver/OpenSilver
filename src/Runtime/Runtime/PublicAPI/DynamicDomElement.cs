@@ -46,7 +46,7 @@ public static partial class CSharpXamlForHtml5
                 {
                     string attributeName = binder.Name;
                     if (attributeName == "style")
-                        result = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_domElementRef);
+                        result = _domElementRef.Style;
                     else
                         result = INTERNAL_HtmlDomManager.GetDomElementAttribute(_domElementRef, attributeName);
                     return true;

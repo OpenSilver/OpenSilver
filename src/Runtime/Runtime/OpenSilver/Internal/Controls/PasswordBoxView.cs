@@ -142,10 +142,12 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
 
     private object AddPasswordInputDomElement(object parentRef, out object domElementWhereToPlaceChildren)
     {
-        var passwordFieldStyle = INTERNAL_HtmlDomManager.CreateDomLayoutElementAppendItAndGetStyle(
-            "input", parentRef, this, out object passwordField);
+        var passwordField = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt(
+            "input", parentRef, this);
 
-        domElementWhereToPlaceChildren = passwordField; // Note: this value is used by the Padding_Changed method to set the padding of the PasswordBox.
+        domElementWhereToPlaceChildren = passwordField;
+
+        var passwordFieldStyle = passwordField.Style;
 
         passwordFieldStyle.border = "transparent"; // This removes the border. We do not need it since we are templated
         passwordFieldStyle.outline = "none";

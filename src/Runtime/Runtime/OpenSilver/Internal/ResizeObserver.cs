@@ -47,7 +47,7 @@ internal sealed class ResizeObserverAdapter
     /// <param name="callback">
     /// The action to call when resizing occurs.
     /// </param>
-    public void Observe(object elementReference, Action<Size> callback)
+    public void Observe(INTERNAL_HtmlDomElementReference elementReference, Action<Size> callback)
     {
         EnsureResizeObserverInitialized();
 

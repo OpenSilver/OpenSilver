@@ -24,7 +24,7 @@ namespace CSHTML5.Native.Html.Controls
     {
         #region Data
 
-        private object _nativeComboBoxDomElement;
+        private INTERNAL_HtmlDomElementReference _nativeComboBoxDomElement;
 #pragma warning disable CS0618 // Type or member is obsolete
         private HtmlEventProxy _changeEventProxy;
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -477,10 +477,7 @@ namespace CSHTML5.Native.Html.Controls
             domElementWhereToPlaceChildren = select;
             this._nativeComboBoxDomElement = select;
 
-            INTERNAL_HtmlDomManager.SetDomElementStyleProperty(select, new List<string>() { "fontSize" }, "inherit");
-
-            // Set the mark saying that the pointer events must be "absorbed" by the ComboBox:
-            INTERNAL_HtmlDomManager.SetDomElementProperty(select, "data-absorb-events", true);
+            select.Style.fontSize = "inherit";
 
             // Fill the ComboBox and synchronize selection properties
             this.Refresh();

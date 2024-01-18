@@ -156,7 +156,7 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
+                var domStyle = renderTarget.OuterDiv.Style;
 
                 double x = Math.Cos(Direction * Math.PI / 180d) * ShadowDepth;
                 double y = -(Math.Sin(Direction * Math.PI / 180d) * ShadowDepth);
@@ -185,7 +185,7 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
+                var domStyle = renderTarget.OuterDiv.Style;
                 if (renderTarget is TextBlock)
                 {
                     domStyle.textShadow = string.Empty;

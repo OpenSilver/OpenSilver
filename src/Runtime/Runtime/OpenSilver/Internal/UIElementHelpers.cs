@@ -11,13 +11,14 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
-using System.Threading.Tasks;
-using System;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal;
@@ -27,31 +28,27 @@ internal static class UIElementHelpers
     internal static void SetCharacterSpacing(this UIElement uie, int cSpacing)
     {
         double value = cSpacing / 1000.0;
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.letterSpacing = $"{value.ToInvariantString()}em";
+        uie.OuterDiv.Style.letterSpacing = $"{value.ToInvariantString()}em";
     }
 
     internal static void SetFontFamily(this UIElement uie, FontFamily font)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.fontFamily = font.GetFontFace(uie).CssFontName;
+        uie.OuterDiv.Style.fontFamily = font.GetFontFace(uie).CssFontName;
     }
 
     internal static void SetFontStyle(this UIElement uie, FontStyle fontStyle)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.fontStyle = fontStyle.ToString().ToLower();
+        uie.OuterDiv.Style.fontStyle = fontStyle.ToString().ToLower();
     }
 
     internal static void SetFontWeight(this UIElement uie, FontWeight fontWeight)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.fontWeight = fontWeight.ToOpenTypeWeight().ToInvariantString();
+        uie.OuterDiv.Style.fontWeight = fontWeight.ToOpenTypeWeight().ToInvariantString();
     }
 
     internal static void SetForeground(this UIElement uie, Brush oldForeground, Brush newForeground)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
+        var style = uie.OuterDiv.Style;
         switch ((oldForeground, newForeground))
         {
             case (GradientBrush, SolidColorBrush scb):
@@ -102,8 +99,7 @@ internal static class UIElementHelpers
 
     internal static async Task SetBackgroundAsync(this UIElement uie, Brush brush)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.background = brush switch
+        uie.OuterDiv.Style.background = brush switch
         {
             Brush => await brush.GetDataStringAsync(uie),
             _ => string.Empty,
@@ -112,8 +108,7 @@ internal static class UIElementHelpers
 
     internal static void SetLineHeight(this UIElement uie, double lineHeight)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.lineHeight = lineHeight switch
+        uie.OuterDiv.Style.lineHeight = lineHeight switch
         {
             0.0 => "normal",
             _ => $"{lineHeight.ToInvariantString()}px",
@@ -122,14 +117,12 @@ internal static class UIElementHelpers
 
     internal static void SetPadding(this UIElement uie, Thickness padding)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.padding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
+        uie.OuterDiv.Style.padding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
     }
 
     internal static void SetTextAlignment(this UIElement uie, TextAlignment textAlignment)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.textAlign = textAlignment switch
+        uie.OuterDiv.Style.textAlign = textAlignment switch
         {
             TextAlignment.Center => "center",
             TextAlignment.Right => "end",
@@ -140,14 +133,12 @@ internal static class UIElementHelpers
 
     internal static void SetTextDecorations(this UIElement uie, TextDecorationCollection tdc)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.textDecoration = tdc?.ToHtmlString() ?? string.Empty;
+        uie.OuterDiv.Style.textDecoration = tdc?.ToHtmlString() ?? string.Empty;
     }
 
     internal static void SetTextTrimming(this UIElement uie, TextTrimming textTrimming)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.textOverflow = textTrimming switch
+        uie.OuterDiv.Style.textOverflow = textTrimming switch
         {
             TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "ellipsis",
             _ => "clip",
@@ -156,7 +147,7 @@ internal static class UIElementHelpers
 
     internal static void SetTextWrapping(this UIElement uie, TextWrapping textWrapping)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
+        var style = uie.OuterDiv.Style;
         switch (textWrapping)
         {
             case TextWrapping.Wrap:
@@ -174,14 +165,12 @@ internal static class UIElementHelpers
 
     internal static void SetFontSize(this UIElement uie, double fontSize)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.fontSize = $"{fontSize.ToInvariantString()}px";
+        uie.OuterDiv.Style.fontSize = $"{fontSize.ToInvariantString()}px";
     }
 
     internal static void SetTextSelection(this UIElement uie, bool enabled)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.userSelect = enabled ? "auto" : "none";
+        uie.OuterDiv.Style.userSelect = enabled ? "auto" : "none";
     }
 
     internal static void SetInnerText(this UIElement uie, string text)
@@ -193,14 +182,12 @@ internal static class UIElementHelpers
 
     internal static void SetOpacity(this UIElement uie, double opacity)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.opacity = Math.Round(opacity, 3).ToInvariantString();
+        uie.OuterDiv.Style.opacity = Math.Round(opacity, 3).ToInvariantString();
     }
 
     internal static void SetTransform(this UIElement uie, Transform transform)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.transform = transform switch
+        uie.OuterDiv.Style.transform = transform switch
         {
             Transform when !transform.IsIdentity => MatrixTransform.MatrixToHtmlString(transform.ValueInternal),
             _ => string.Empty,
@@ -209,38 +196,50 @@ internal static class UIElementHelpers
 
     internal static void SetTransformOrigin(this UIElement uie, Point origin)
     {
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.transformOrigin = $"{(origin.X * 100).ToInvariantString()}% {(origin.Y * 100).ToInvariantString()}%";
+        uie.OuterDiv.Style.transformOrigin = $"{(origin.X * 100).ToInvariantString()}% {(origin.Y * 100).ToInvariantString()}%";
     }
 
     internal static void SetZIndex(this UIElement uie, int value)
     {
         Debug.Assert(uie is not null);
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.zIndex = value.ToInvariantString();
+        uie.OuterDiv.Style.zIndex = value.ToInvariantString();
     }
 
     internal static void SetCursor(this UIElement uie, Cursor cursor)
     {
         Debug.Assert(uie is not null);
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.cursor = cursor?.ToHtmlString() ?? string.Empty;
+        uie.OuterDiv.Style.cursor = cursor?.ToHtmlString() ?? string.Empty;
     }
 
     internal static void SetBorderRadius(this UIElement uie, CornerRadius radius)
     {
         Debug.Assert(uie is not null);
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-        style.borderRadius = $"{radius.TopLeft.ToInvariantString()}px {radius.TopRight.ToInvariantString()}px {radius.BottomRight.ToInvariantString()}px {radius.BottomLeft.ToInvariantString()}px";
+        uie.OuterDiv.Style.borderRadius = $"{radius.TopLeft.ToInvariantString()}px {radius.TopRight.ToInvariantString()}px {radius.BottomRight.ToInvariantString()}px {radius.BottomLeft.ToInvariantString()}px";
     }
 
     internal static void SetBorderWidth(this UIElement uie, Thickness width)
     {
         Debug.Assert(uie is not null);
-        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
+        var style = uie.OuterDiv.Style;
         style.boxSizing = "border-box";
         style.borderStyle = "solid";
         style.borderWidth = $"{width.Top.ToInvariantString()}px {width.Right.ToInvariantString()}px {width.Bottom.ToInvariantString()}px {width.Left.ToInvariantString()}px";
+    }
+
+    internal static void SetClipPath(this UIElement uie, Geometry geometry)
+    {
+        Debug.Assert(uie is not null);
+        uie.OuterDiv.Style.clipPath = geometry switch
+        {
+            Geometry => $"path(\"{geometry.ToPathData(CultureInfo.InvariantCulture)}\")",
+            _ => string.Empty,
+        };
+    }
+
+    internal static void SetTouchAction(this UIElement uie, string value)
+    {
+        Debug.Assert(uie is not null);
+        uie.OuterDiv.Style.touchAction = value;
     }
 
     internal static double GetBaseLineOffset(this UIElement uie)

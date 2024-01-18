@@ -91,8 +91,7 @@ namespace System.Windows.Input
             if (window != null)
             {
                 // Get the XAML Window root position relative to the page:
-                object windowRootDomElement = window.OuterDiv;
-                string sElement = InteropImplementation.GetVariableStringForJS(windowRootDomElement);
+                string sElement = InteropImplementation.GetVariableStringForJS(window.OuterDiv);
 
                 double windowRootLeft;
                 double windowRootTop;

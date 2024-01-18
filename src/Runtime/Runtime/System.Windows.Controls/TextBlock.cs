@@ -546,12 +546,10 @@ namespace System.Windows.Controls
                 return new Size(paddingWidth, paddingHeight);
             }
 
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)OuterDiv).UniqueIdentifier;
-
             if (_noWrapSize == Size.Empty)
             {
                 _noWrapSize = ParentWindow.TextMeasurementService.MeasureText(
-                    uniqueIdentifier,
+                    OuterDiv.UniqueIdentifier,
                     "pre",
                     string.Empty,
                     double.PositiveInfinity,
@@ -574,7 +572,7 @@ namespace System.Windows.Controls
             }
 
             Size textSize = ParentWindow.TextMeasurementService.MeasureText(
-                uniqueIdentifier,
+                OuterDiv.UniqueIdentifier,
                 "pre-wrap",
                 "break-word",
                 Math.Max(0, availableSize.Width - paddingWidth),

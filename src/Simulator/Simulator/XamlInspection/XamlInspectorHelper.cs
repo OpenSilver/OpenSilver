@@ -264,7 +264,7 @@ namespace OpenSilver.Simulator.XamlInspection
         {
             if (uiElement != null)
             {
-                string uniqueIdentifier = ((opensilver::CSHTML5.Internal.INTERNAL_HtmlDomElementReference)uiElement.OuterDiv).UniqueIdentifier;
+                string uniqueIdentifier = uiElement.OuterDiv.UniqueIdentifier;
                 uniqueIdentifier = uniqueIdentifier != null ? $"'{uniqueIdentifier}'" : "null";
                 SimulatorProxy.OpenSilverRuntimeDispatcher.BeginInvoke(() =>
                 {

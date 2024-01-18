@@ -287,7 +287,7 @@ namespace System.Windows.Controls
 
         private static void ChangeBorderColor(Border border, Brush oldBrush, Brush newBrush)
         {
-            var cssStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(border.OuterDiv);
+            var cssStyle = border.OuterDiv.Style;
             switch (oldBrush, newBrush)
             {
                 case (GradientBrush, SolidColorBrush solid):

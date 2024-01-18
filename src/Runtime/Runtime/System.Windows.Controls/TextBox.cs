@@ -16,6 +16,7 @@ using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Input;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
@@ -60,7 +61,8 @@ namespace System.Windows.Controls
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
-        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv ?? base.GetFocusTarget();
+        internal sealed override INTERNAL_HtmlDomElementReference GetFocusTarget()
+            => _textViewHost?.View?.InputDiv ?? base.GetFocusTarget();
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays

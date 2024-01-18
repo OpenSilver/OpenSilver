@@ -489,13 +489,9 @@ namespace System.Windows.Controls
 
         internal void UpdateSystemFocusVisuals()
         {
-            object focusTarget = GetFocusTarget();
-            if (focusTarget != null)
+            if (GetFocusTarget() is INTERNAL_HtmlDomElementReference focusTarget)
             {
-                INTERNAL_HtmlDomManager.SetCSSStyleProperty(
-                    focusTarget,
-                    "outline",
-                    _useSystemFocusVisuals ? string.Empty : "none");
+                focusTarget.Style.outline = _useSystemFocusVisuals ? string.Empty : "none";
             }
         }
 

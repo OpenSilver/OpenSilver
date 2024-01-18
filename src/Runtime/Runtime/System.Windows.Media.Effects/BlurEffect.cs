@@ -64,7 +64,7 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
+                var domStyle = renderTarget.OuterDiv.Style;
 
                 // This gets a result very similar to Silverlight. Using the Radius directly
                 // makes the element much more blurry than Silverlight.
@@ -77,7 +77,7 @@ namespace System.Windows.Media.Effects
         {
             if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
+                var domStyle = renderTarget.OuterDiv.Style;
                 domStyle.filter = string.Empty;
             }
         }

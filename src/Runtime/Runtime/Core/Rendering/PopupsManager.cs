@@ -43,7 +43,7 @@ namespace DotNetForHtml5.Core
             // Create a DIV for the PopupRoot in the DOM tree:
             //--------------------------------------
 
-            object popupRootDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
+            var popupRootDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
             popupRoot.OuterDiv
                 = popupRoot.InnerDiv
                 = popupRootDiv;

@@ -903,7 +903,7 @@ namespace System.Windows.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(OuterDiv).userSelect = "none";
+            OuterDiv.Style.userSelect = "none";
         }
 
         /// <summary>

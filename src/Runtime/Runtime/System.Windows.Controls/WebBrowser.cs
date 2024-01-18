@@ -24,7 +24,7 @@ namespace System.Windows.Controls
     /// </summary>
     public partial class WebBrowser : FrameworkElement
     {
-        private object _iFrame;
+        private INTERNAL_HtmlDomElementReference _iFrame;
         private string _htmlString;
         private JavaScriptCallback _jsCallbackOnIframeLoaded;
 
@@ -42,10 +42,10 @@ namespace System.Windows.Controls
         {
             var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
 
-            var iFrameStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("iframe", outerDiv, this, out _iFrame);
-            iFrameStyle.width = "100%";
-            iFrameStyle.height = "100%";
-            iFrameStyle.border = "none";
+            _iFrame = INTERNAL_HtmlDomManager.AppendDomElement("iframe", outerDiv, this);
+            _iFrame.Style.width = "100%";
+            _iFrame.Style.height = "100%";
+            _iFrame.Style.border = "none";
 
             DisposeJsCallbacks();
             _jsCallbackOnIframeLoaded = JavaScriptCallback.Create(OnIframeLoad, true);

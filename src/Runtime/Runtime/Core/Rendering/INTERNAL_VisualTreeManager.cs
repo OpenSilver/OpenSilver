@@ -137,8 +137,8 @@ namespace CSHTML5.Internal
                     fe.UnloadResources();
                 }
 
-                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.OuterDiv as INTERNAL_HtmlDomElementReference);
-                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.InnerDiv as INTERNAL_HtmlDomElementReference);
+                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.OuterDiv);
+                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.InnerDiv);
             }
 
             // Reset all visual-tree related information:
@@ -355,24 +355,24 @@ if(nextSibling != undefined) {
 
             // Create and append the DOM structure of the Child:
             object domElementWhereToPlaceGrandChildren = null;
-            object outerDomElement;
+            INTERNAL_HtmlDomElementReference outerDomElement;
             bool isChildAControl = child is Control;
             if (child.HtmlRepresentation == null)
             {
                 bool hasTemplate = isChildAControl && ((Control)child).HasTemplate;
                 if (hasTemplate)
                 {
-                    outerDomElement = ((Control)child).CreateDomElementForControlTemplate(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
+                    outerDomElement = (INTERNAL_HtmlDomElementReference)((Control)child).CreateDomElementForControlTemplate(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
                 }
                 else
                 {
-                    outerDomElement = child.CreateDomElement(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
+                    outerDomElement = (INTERNAL_HtmlDomElementReference)child.CreateDomElement(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
                 }
             }
             else
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                outerDomElement = INTERNAL_HtmlDomManager.CreateDomFromStringAndAppendIt(child.HtmlRepresentation, whereToPlaceTheChild, child);
+                outerDomElement = (INTERNAL_HtmlDomElementReference)INTERNAL_HtmlDomManager.CreateDomFromStringAndAppendIt(child.HtmlRepresentation, whereToPlaceTheChild, child);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
 
@@ -390,7 +390,7 @@ if(nextSibling != undefined) {
 
             // Remember the DIVs:
             child.OuterDiv = outerDomElement;
-            child.InnerDiv = domElementWhereToPlaceGrandChildren;
+            child.InnerDiv = (INTERNAL_HtmlDomElementReference)domElementWhereToPlaceGrandChildren;
 
             //--------------------------------------------------------
             // HANDLE SPECIAL CASES:

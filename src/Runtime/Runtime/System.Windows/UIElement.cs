@@ -264,8 +264,8 @@ namespace System.Windows
         internal Window ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
 
         // This is the main DIV of the HTML representation of the control
-        internal object OuterDiv { get; set; }
-        internal object InnerDiv { get; set; }
+        internal INTERNAL_HtmlDomElementReference OuterDiv { get; set; }
+        internal INTERNAL_HtmlDomElementReference InnerDiv { get; set; }
         internal string HtmlRepresentation { get; set; }
         internal Dictionary<UIElement, VisualChildInformation> VisualChildrenInformation { get; set; }
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
@@ -334,7 +334,7 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(null, OnClipChanged)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetClipGeometry((UIElement)d, (Geometry)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetClipPath((Geometry)newValue),
                 });
 
         /// <summary>
@@ -375,20 +375,8 @@ namespace System.Windows
         {
             if (e.AffectsMeasure)
             {
-                SetClipGeometry(this, Clip);
+                this.SetClipPath(Clip);
             }
-        }
-
-        private static void SetClipGeometry(UIElement uie, Geometry geometry)
-        {
-            Debug.Assert(uie is not null);
-
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-            style.clipPath = geometry switch
-            {
-                Geometry => $"path(\"{geometry.ToPathData(CultureInfo.InvariantCulture)}\")",
-                _ => string.Empty,
-            };
         }
 
         private WeakEventListener<UIElement, Geometry, GeometryInvalidatedEventsArgs> _clipGeometryListener;
@@ -1033,8 +1021,7 @@ namespace System.Windows
         internal bool EnablePointerEvents => EnablePointerEventsCore && EnablePointerEventsBase(this);
         
         internal virtual void SetPointerEventsImpl() =>
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(OuterDiv)
-                .pointerEvents = EnablePointerEvents ? "auto" : "none";
+            OuterDiv.Style.pointerEvents = EnablePointerEvents ? "auto" : "none";
 
         internal static void SetPointerEvents(UIElement element)
         {
@@ -1111,12 +1098,7 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(BooleanBoxes.TrueBox)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var uie = (UIElement)d;
-                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(uie.OuterDiv);
-                        style.touchAction = (bool)newValue ? "auto" : "none";
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetTouchAction((bool)newValue ? "auto" : "none"),
                 });
 
 #endregion
@@ -1139,13 +1121,10 @@ namespace System.Windows
             {
                 throw new ArgumentException();
             }
-
-            var outerDivOfThisControl = OuterDiv;
-
             // If no "visual" was specified, we use the Window root instead.
             // Note: This is useful for example when calculating the position of popups, which
             // are defined in absolute coordinates, at the same level as the Window root.
-            object outerDivOfReferenceVisual;
+            INTERNAL_HtmlDomElementReference outerDivOfReferenceVisual;
             if (visual != null)
             {
                 if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(visual))
@@ -1163,7 +1142,7 @@ namespace System.Windows
             }
 
             // Hack to improve the Simulator performance by making only one interop call rather than two:
-            string sOuterDivOfControl = CSHTML5.InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
+            string sOuterDivOfControl = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
             string sOuterDivOfReferenceVisual = CSHTML5.InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
             string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
                 $"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)");

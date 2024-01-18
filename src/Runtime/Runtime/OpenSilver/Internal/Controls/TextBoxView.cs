@@ -147,7 +147,7 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
             //--- SIMULATOR ONLY: ---
             // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
             ExecuteJavaScript.QueueExecuteJavaScript($@"
-var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)InputDiv).UniqueIdentifier}"");
+var element = document.getElementByIdSafe(""{InputDiv.UniqueIdentifier}"");
 element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower()}"");");
         }
     }
@@ -156,9 +156,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv != null)
         {
-            TextBlock.ApplyTextWrapping(
-                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(InputDiv),
-                textWrapping);
+            TextBlock.ApplyTextWrapping(InputDiv.Style, textWrapping);
         }
     }
 
@@ -181,7 +179,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            ApplyTextDecorations(INTERNAL_HtmlDomManager.GetDomElementStyleForModification(InputDiv), tdc);
+            ApplyTextDecorations(InputDiv.Style, tdc);
         }
     }
 

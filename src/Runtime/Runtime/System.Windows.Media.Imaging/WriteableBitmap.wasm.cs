@@ -112,7 +112,7 @@ imageView.onload = function() {
                 int height,
                 Action<string, int, int, int> callback)
             {
-                if (element.OuterDiv is not INTERNAL_HtmlDomElementReference outerDiv)
+                if (element.OuterDiv is null)
                 {
                     return Task.CompletedTask;
                 }
@@ -146,7 +146,7 @@ element.style.transform = currentTransform;
 
                 var data = new WB_Data
                 {
-                    Id = outerDiv.UniqueIdentifier,
+                    Id = element.OuterDiv.UniqueIdentifier,
                     Size = new WB_Size { Width = width, Height = height },
                 };
 

@@ -24,7 +24,7 @@ namespace CSHTML5.Native.Html.Controls
     [ContentProperty(nameof(Html))]
     public class HtmlPresenter : FrameworkElement
     {
-        private object _jsDiv;
+        private INTERNAL_HtmlDomElementReference _jsDiv;
         private ResizeObserverAdapter _resizeObserver;
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace CSHTML5.Native.Html.Controls
                         var htmlPresenter = (HtmlPresenter)d;
                         string sDiv = InteropImplementation.GetVariableStringForJS(htmlPresenter._jsDiv);
                         string sContent = InteropImplementation.GetVariableStringForJS((string)newValue ?? string.Empty);
-                        OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.shadowRoot.innerHTML = {sContent};");
+                        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.shadowRoot.innerHTML = {sContent};");
                     },
                 });
         
@@ -74,8 +74,7 @@ namespace CSHTML5.Native.Html.Controls
 
         private static void SetScrollMode(HtmlPresenter htmlPresenter, ScrollMode mode)
         {
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(htmlPresenter.OuterDiv);
-            style.overflow = mode switch
+            htmlPresenter.OuterDiv.Style.overflow = mode switch
             {
                 ScrollMode.Enabled => "scroll",
                 ScrollMode.Auto => "auto",

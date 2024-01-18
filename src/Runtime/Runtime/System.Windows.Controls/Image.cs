@@ -40,7 +40,7 @@ namespace System.Windows.Controls
     /// </example>
     public sealed class Image : FrameworkElement
     {
-        private object _imageDiv;
+        private INTERNAL_HtmlDomElementReference _imageDiv;
         private Size _naturalSize;
         private JavaScriptCallback _imgLoadCallback;
         private JavaScriptCallback _imgErrorCallack;
@@ -133,8 +133,7 @@ namespace System.Windows.Controls
         {
             Image img = (Image)d;
 
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(img._imageDiv)
-                .objectFit = (Stretch)newValue switch
+            img._imageDiv.Style.objectFit = (Stretch)newValue switch
                 {
                     Stretch.None => "none",
                     Stretch.Fill => "fill",
@@ -185,11 +184,11 @@ namespace System.Windows.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var style = INTERNAL_HtmlDomManager.CreateDomLayoutElementAppendItAndGetStyle("div", parentRef, this, out object div);
-            style.lineHeight = "0px";
-            _imageDiv = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt(div, this);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
+            outerDiv.Style.lineHeight = "0px";
+            _imageDiv = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt(outerDiv, this);
             domElementWhereToPlaceChildren = null;
-            return div;
+            return outerDiv;
         }
 
         protected override void OnAfterApplyHorizontalAlignmentAndWidth() => SetObjectPosition();
@@ -267,7 +266,7 @@ namespace System.Windows.Controls
                     break;
             }
 
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_imageDiv).objectPosition = $"{hPos} {vPos}";
+            _imageDiv.Style.objectPosition = $"{hPos} {vPos}";
         }
 
         private void DisposeJSCallbacks()

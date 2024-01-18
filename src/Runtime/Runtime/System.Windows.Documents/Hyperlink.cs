@@ -107,9 +107,7 @@ public sealed class Hyperlink : Span
                         _ => string.Empty,
                     };
 
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(hyperlink.OuterDiv).setProperty(
-                        MouseOverForegroundVariable,
-                        color);
+                    hyperlink.OuterDiv.Style.setProperty(MouseOverForegroundVariable, color);
                 },
             });
 
@@ -143,9 +141,7 @@ public sealed class Hyperlink : Span
 
                     Hyperlink hyperlink = (Hyperlink)d;
                     string value = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(hyperlink.OuterDiv).setProperty(
-                        MouseOverTextDecorationsVariable,
-                        value);
+                    hyperlink.OuterDiv.Style.setProperty(MouseOverTextDecorationsVariable, value);
                 },
             });
 

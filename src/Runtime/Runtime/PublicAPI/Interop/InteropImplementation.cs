@@ -22,6 +22,8 @@ using CSHTML5.Types;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using DotNetForHtml5.Core;
+using System.Diagnostics;
+using TypeScriptDefinitionsSupport;
 
 namespace CSHTML5
 {
@@ -71,7 +73,7 @@ namespace CSHTML5
 
             if (variable is IJavaScriptConvertible jsConvertible)
             {
-                return jsConvertible.ToJavaScriptString();
+                return GetVariableStringForJS(jsConvertible);
             }
             else if (variable == null)
             {
@@ -92,6 +94,12 @@ namespace CSHTML5
 
                 return INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(variable);
             }
+        }
+
+        internal static string GetVariableStringForJS(IJavaScriptConvertible jsObject)
+        {
+            Debug.Assert(jsObject is not null);
+            return jsObject.ToJavaScriptString();
         }
 
         internal static string ReplaceJSArgs(string javascript, params object[] variables)

@@ -769,8 +769,7 @@ namespace System.Windows.Shapes
         }
 
         internal sealed override void SetPointerEventsImpl() =>
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(SvgElement)
-                .pointerEvents = EnablePointerEvents ? "auto" : "none";
+            SvgElement.Style.pointerEvents = EnablePointerEvents ? "auto" : "none";
 
         internal virtual string SvgTagName => "path";
 
