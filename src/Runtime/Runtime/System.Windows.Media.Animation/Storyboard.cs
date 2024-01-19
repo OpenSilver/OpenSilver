@@ -322,7 +322,7 @@ public sealed class Storyboard : Timeline
                 else
                 {
                     // The containing object must be either an FE.
-                    targetObject = (DependencyObject)(containingObject as IFrameworkElement);
+                    targetObject = containingObject;
 
                     if (targetObject == null)
                     {
