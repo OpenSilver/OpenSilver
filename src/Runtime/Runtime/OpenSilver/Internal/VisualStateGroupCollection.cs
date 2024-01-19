@@ -18,11 +18,11 @@ namespace OpenSilver.Internal
 {
     internal sealed class VisualStateGroupCollection : PresentationFrameworkCollection<VisualStateGroup>
     {
-        public VisualStateGroupCollection(IInternalFrameworkElement owner)
+        public VisualStateGroupCollection(DependencyObject owner)
             : base(false)
         {
             Debug.Assert(owner != null);
-            owner.AsDependencyObject().ProvideSelfAsInheritanceContext(this, null);
+            owner.ProvideSelfAsInheritanceContext(this, null);
         }
 
         internal override void AddOverride(VisualStateGroup value)

@@ -230,7 +230,7 @@ namespace System.Windows.Data
                     ((d is TextBox && dp == TextBox.TextProperty) || (d is PasswordBox && dp == PasswordBox.PasswordProperty));
                 if (_isUpdateOnLostFocus)
                 {
-                    ((IInternalFrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
+                    ((FrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
                 }
 
                 _targetPropertyListener = new DependencyPropertyChangedListener(Target, TargetProperty, UpdateSourceCallback);
@@ -290,7 +290,7 @@ namespace System.Windows.Data
             if (_isUpdateOnLostFocus)
             {
                 _isUpdateOnLostFocus = false;
-                ((IInternalFrameworkElement)Target).LostFocus -= new RoutedEventHandler(OnTargetLostFocus);
+                ((FrameworkElement)Target).LostFocus -= new RoutedEventHandler(OnTargetLostFocus);
             }
 
             DetachMentor();

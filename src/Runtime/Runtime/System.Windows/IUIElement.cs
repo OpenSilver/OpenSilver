@@ -19,8 +19,6 @@ namespace System.Windows;
 public interface IUIElement : IDependencyObject
 {
     Visibility Visibility { get; set; }
-    
-    event RoutedEventHandler LostFocus;
 
     void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo);
 
