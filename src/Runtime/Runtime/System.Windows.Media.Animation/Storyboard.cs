@@ -324,7 +324,7 @@ public sealed class Storyboard : Timeline
                     // The containing object must be either an FE.
                     targetObject = containingObject;
 
-                    if (targetObject == null)
+                    if (targetObject is not IFrameworkElement)
                     {
                         // The containing object is not an FE.
                         throw new InvalidOperationException(
