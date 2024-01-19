@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows.Controls;
 
 namespace System.Windows
@@ -49,6 +50,9 @@ namespace System.Windows
                 return _control as Control;
             }
         }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IControl IControl => _control;
 
         private VisualState _oldState;
         private VisualState _newState;
