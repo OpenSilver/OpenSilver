@@ -157,8 +157,8 @@ public sealed class Storyboard : Timeline
     /// </summary>
     public void Begin() => BeginCommon(this, false);
 
-    internal void Begin(IInternalFrameworkElement containingObject, bool alignedToLastTick) =>
-        BeginCommon(containingObject.AsDependencyObject(), alignedToLastTick);
+    internal void Begin(DependencyObject containingObject, bool alignedToLastTick) =>
+        BeginCommon(containingObject alignedToLastTick);
 
     private void BeginCommon(DependencyObject containingObject, bool alignedToLastTick)
     {
