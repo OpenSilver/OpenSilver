@@ -41,7 +41,7 @@ public sealed class ExponentialEase : EasingFunctionBase
     public double Exponent
     {
         get => (double)GetValue(ExponentProperty);
-        set => SetValue(ExponentProperty, value);
+        set => SetValueInternal(ExponentProperty, value);
     }
 
     /// <inheritdoc />

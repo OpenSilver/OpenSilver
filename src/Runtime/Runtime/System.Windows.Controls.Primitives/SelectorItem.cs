@@ -31,7 +31,7 @@ namespace System.Windows.Controls.Primitives
         public bool IsSelected
         {
             get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
+            set { SetValueInternal(IsSelectedProperty, value); }
         }
 
         /// <summary>

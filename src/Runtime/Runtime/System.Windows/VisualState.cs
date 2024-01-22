@@ -38,7 +38,7 @@ namespace System.Windows
         {
             get => (string)GetValue(FrameworkElement.NameProperty);
             [EditorBrowsable(EditorBrowsableState.Never)]
-            set => SetValue(FrameworkElement.NameProperty, value);
+            set => SetValueInternal(FrameworkElement.NameProperty, value);
         }
 
         private static readonly DependencyProperty StoryboardProperty =
@@ -59,7 +59,7 @@ namespace System.Windows
         public Storyboard Storyboard
         {
             get => (Storyboard)GetValue(StoryboardProperty);
-            set => SetValue(StoryboardProperty, value);
+            set => SetValueInternal(StoryboardProperty, value);
         }
     }
 }

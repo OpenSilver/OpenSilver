@@ -445,7 +445,7 @@ namespace System.Windows.Controls
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
-            SetValue(IsSelectionActivePropertyKey, true);
+            SetValueInternal(IsSelectionActivePropertyKey, true);
         }
 
         /// <summary>
@@ -457,7 +457,7 @@ namespace System.Windows.Controls
         protected override void OnLostFocus(RoutedEventArgs e)
         {
             base.OnLostFocus(e);
-            SetValue(IsSelectionActivePropertyKey, FocusManager.HasFocus(this, true));
+            SetValueInternal(IsSelectionActivePropertyKey, FocusManager.HasFocus(this, true));
         }
 
         /// <inheritdoc />
@@ -548,9 +548,9 @@ namespace System.Windows.Controls
 
         private void OnPopupChildSizeChanged(object sender, SizeChangedEventArgs e) => _popup?.Reposition();
 
-        private void OnPopupGotFocus(object sender, RoutedEventArgs e) => SetValue(IsSelectionActivePropertyKey, true);
+        private void OnPopupGotFocus(object sender, RoutedEventArgs e) => SetValueInternal(IsSelectionActivePropertyKey, true);
         
-        private void OnPopupLostFocus(object sender, RoutedEventArgs e) => SetValue(IsSelectionActivePropertyKey, false);
+        private void OnPopupLostFocus(object sender, RoutedEventArgs e) => SetValueInternal(IsSelectionActivePropertyKey, false);
 
         private void OnDropDownToggleClick(object sender, RoutedEventArgs e)
         {
@@ -592,7 +592,7 @@ namespace System.Windows.Controls
         public bool IsDropDownOpen
         {
             get { return (bool)GetValue(IsDropDownOpenProperty); }
-            set { SetValue(IsDropDownOpenProperty, value); }
+            set { SetValueInternal(IsDropDownOpenProperty, value); }
         }
 
         /// <summary>
@@ -728,7 +728,7 @@ namespace System.Windows.Controls
         public double MaxDropDownHeight
         {
             get { return (double)GetValue(MaxDropDownHeightProperty); }
-            set { SetValue(MaxDropDownHeightProperty, value); }
+            set { SetValueInternal(MaxDropDownHeightProperty, value); }
         }
 
         /// <summary>
@@ -772,8 +772,8 @@ namespace System.Windows.Controls
         /// </summary>
         public object SelectionBoxItem
         {
-            get { return this.GetValue(SelectionBoxItemProperty); }
-            private set { this.SetValue(SelectionBoxItemProperty, value); }
+            get { return GetValue(SelectionBoxItemProperty); }
+            private set { SetValueInternal(SelectionBoxItemProperty, value); }
         }
 
         /// <summary>
@@ -791,8 +791,8 @@ namespace System.Windows.Controls
         /// </summary>
         public DataTemplate SelectionBoxItemTemplate
         {
-            get { return (DataTemplate)this.GetValue(SelectionBoxItemTemplateProperty); }
-            private set { this.SetValue(SelectionBoxItemTemplateProperty, value); }
+            get { return (DataTemplate)GetValue(SelectionBoxItemTemplateProperty); }
+            private set { SetValueInternal(SelectionBoxItemTemplateProperty, value); }
         }
 
         /// <summary>
@@ -822,8 +822,8 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         public bool IsSelectionBoxHighlighted
         {
-            get { return (bool)this.GetValue(IsSelectionBoxHighlightedProperty); }
-            private set { this.SetValue(IsSelectionBoxHighlightedProperty, value); }
+            get { return (bool)GetValue(IsSelectionBoxHighlightedProperty); }
+            private set { SetValueInternal(IsSelectionBoxHighlightedProperty, value); }
         }
 
         internal override void UpdateVisualStates()

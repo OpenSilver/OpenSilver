@@ -40,14 +40,14 @@ namespace System.Windows.Controls
         public bool IsOpen
         {
             get { return (bool)GetValue(IsOpenProperty); }
-            set { SetValue(IsOpenProperty, value); }
+            set { SetValueInternal(IsOpenProperty, value); }
         }
 
         /// <summary>
         /// Identifies the IsOpen dependency property.
         /// </summary>
         public static readonly DependencyProperty IsOpenProperty =
-            DependencyProperty.Register("IsOpen", typeof(bool), typeof(ToolTip), new PropertyMetadata(false, IsOpen_Changed));
+            DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(ToolTip), new PropertyMetadata(false, IsOpen_Changed));
 
         private static void IsOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -170,7 +170,7 @@ namespace System.Windows.Controls
         public UIElement PlacementTarget
         {
             get { return (UIElement)GetValue(PlacementTargetProperty); }
-            set { SetValue(PlacementTargetProperty, value); }
+            set { SetValueInternal(PlacementTargetProperty, value); }
         }
 
         private UIElement EffectivePlacementTarget
@@ -207,7 +207,7 @@ namespace System.Windows.Controls
         public PlacementMode Placement
         {
             get { return (PlacementMode)GetValue(PlacementProperty); }
-            set { SetValue(PlacementProperty, value); }
+            set { SetValueInternal(PlacementProperty, value); }
         }
 
         private PlacementMode EffectivePlacement
@@ -233,13 +233,13 @@ namespace System.Windows.Controls
         public double HorizontalOffset
         {
             get { return (double)GetValue(HorizontalOffsetProperty); }
-            set { SetValue(HorizontalOffsetProperty, value); }
+            set { SetValueInternal(HorizontalOffsetProperty, value); }
         }
         /// <summary>
         /// Identifies the HorizontalOffset dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalOffsetProperty =
-            DependencyProperty.Register("HorizontalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
+            DependencyProperty.Register(nameof(HorizontalOffset), typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
 
 
         //-----------------------
@@ -252,12 +252,12 @@ namespace System.Windows.Controls
         public double VerticalOffset
         {
             get { return (double)GetValue(VerticalOffsetProperty); }
-            set { SetValue(VerticalOffsetProperty, value); }
+            set { SetValueInternal(VerticalOffsetProperty, value); }
         }
         /// <summary>
         /// Identifies the VerticalOffset dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalOffsetProperty =
-            DependencyProperty.Register("VerticalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
+            DependencyProperty.Register(nameof(VerticalOffset), typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
     }
 }

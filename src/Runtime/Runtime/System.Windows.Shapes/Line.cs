@@ -52,7 +52,7 @@ namespace System.Windows.Shapes
         public double X1
         {
             get => (double)GetValue(X1Property);
-            set => SetValue(X1Property, value);
+            set => SetValueInternal(X1Property, value);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace System.Windows.Shapes
         public double X2
         {
             get => (double)GetValue(X2Property);
-            set => SetValue(X2Property, value);
+            set => SetValueInternal(X2Property, value);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace System.Windows.Shapes
         public double Y1
         {
             get => (double)GetValue(Y1Property);
-            set => SetValue(Y1Property, value);
+            set => SetValueInternal(Y1Property, value);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace System.Windows.Shapes
         public double Y2
         {
             get => (double)GetValue(Y2Property);
-            set => SetValue(Y2Property, value);
+            set => SetValueInternal(Y2Property, value);
         }
 
         internal sealed override string SvgTagName => "line";

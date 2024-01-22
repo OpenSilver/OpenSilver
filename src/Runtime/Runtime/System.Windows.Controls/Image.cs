@@ -57,7 +57,7 @@ namespace System.Windows.Controls
         public ImageSource Source
         {
             get => (ImageSource)GetValue(SourceProperty);
-            set => SetValue(SourceProperty, value);
+            set => SetValueInternal(SourceProperty, value);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace System.Windows.Controls
         public Stretch Stretch
         {
             get => (Stretch)GetValue(StretchProperty);
-            set => SetValue(StretchProperty, value);
+            set => SetValueInternal(StretchProperty, value);
         }
 
         /// <summary>

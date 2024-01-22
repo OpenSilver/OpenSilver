@@ -578,7 +578,7 @@ namespace System.Windows
         public Cursor Cursor
         {
             get { return (Cursor)GetValue(CursorProperty); }
-            set { SetValue(CursorProperty, value); }
+            set { SetValueInternal(CursorProperty, value); }
         }
 
         /// <summary>
@@ -715,7 +715,7 @@ namespace System.Windows
         public string Name
         {
             get { return (string)GetValue(NameProperty); }
-            set { SetValue(NameProperty, value); }
+            set { SetValueInternal(NameProperty, value); }
         }
 
         /// <summary>
@@ -751,7 +751,7 @@ namespace System.Windows
         public object DataContext
         {
             get { return GetValue(DataContextProperty); }
-            set { SetValue(DataContextProperty, value); }
+            set { SetValueInternal(DataContextProperty, value); }
         }
 
         /// <summary>
@@ -795,7 +795,7 @@ namespace System.Windows
                 if (triggers == null)
                 {
                     triggers = new TriggerCollection(this);
-                    SetValue(TriggersProperty, triggers);
+                    SetValueInternal(TriggersProperty, triggers);
                 }
 
                 return triggers;
@@ -865,7 +865,7 @@ namespace System.Windows
         public FlowDirection FlowDirection
         {
             get => IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-            set => SetValue(FlowDirectionProperty, value);
+            set => SetValueInternal(FlowDirectionProperty, value);
         }
 
         private static void OnFlowDirectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -917,8 +917,8 @@ namespace System.Windows
         [TypeConverter(typeof(XmlLanguageConverter))]
         public XmlLanguage Language
         {
-            get { return (XmlLanguage)this.GetValue(LanguageProperty); }
-            set { this.SetValue(LanguageProperty, value); }
+            get { return (XmlLanguage)GetValue(LanguageProperty); }
+            set { SetValueInternal(LanguageProperty, value); }
         }
 
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -975,12 +975,12 @@ namespace System.Windows
         /// </summary>
         public object Tag
         {
-            get { return (object)GetValue(TagProperty); }
-            set { SetValue(TagProperty, value); }
+            get { return GetValue(TagProperty); }
+            set { SetValueInternal(TagProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the <see cref="FrameworkElement.Tag"/> dependency property.
+        /// Identifies the <see cref="Tag"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TagProperty =
             DependencyProperty.Register(

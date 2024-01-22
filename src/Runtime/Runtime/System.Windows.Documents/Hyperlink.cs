@@ -59,7 +59,7 @@ public sealed class Hyperlink : Span
     public ICommand Command
     {
         get => (ICommand)GetValue(CommandProperty);
-        set => SetValue(CommandProperty, value);
+        set => SetValueInternal(CommandProperty, value);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public sealed class Hyperlink : Span
     public object CommandParameter
     {
         get => GetValue(CommandParameterProperty);
-        set => SetValue(CommandParameterProperty, value);
+        set => SetValueInternal(CommandParameterProperty, value);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public sealed class Hyperlink : Span
     public Brush MouseOverForeground
     {
         get => (Brush)GetValue(MouseOverForegroundProperty);
-        set => SetValue(MouseOverForegroundProperty, value);
+        set => SetValueInternal(MouseOverForegroundProperty, value);
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public sealed class Hyperlink : Span
     public TextDecorationCollection MouseOverTextDecorations
     {
         get => (TextDecorationCollection)GetValue(MouseOverTextDecorationsProperty);
-        set => SetValue(MouseOverTextDecorationsProperty, value);
+        set => SetValueInternal(MouseOverTextDecorationsProperty, value);
     }
 
     /// <summary>
@@ -178,7 +178,7 @@ public sealed class Hyperlink : Span
     public Uri NavigateUri
     {
         get => (Uri)GetValue(NavigateUriProperty);
-        set => SetValue(NavigateUriProperty, value);
+        set => SetValueInternal(NavigateUriProperty, value);
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public sealed class Hyperlink : Span
     public string TargetName
     {
         get => (string)GetValue(TargetNameProperty);
-        set => SetValue(TargetNameProperty, value);
+        set => SetValueInternal(TargetNameProperty, value);
     }
 
     protected internal override void INTERNAL_OnAttachedToVisualTree()

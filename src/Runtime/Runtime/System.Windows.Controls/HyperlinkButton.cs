@@ -159,7 +159,7 @@ namespace System.Windows.Controls
         public Uri NavigateUri
         {
             get { return (Uri)GetValue(NavigateUriProperty); }
-            set { SetValue(NavigateUriProperty, value); }
+            set { SetValueInternal(NavigateUriProperty, value); }
         }
         /// <summary>
         /// Identifies the NavigateUri dependency property.
@@ -176,7 +176,7 @@ namespace System.Windows.Controls
         public string TargetName
         {
             get { return (string)GetValue(TargetNameProperty); }
-            set { SetValue(TargetNameProperty, value); }
+            set { SetValueInternal(TargetNameProperty, value); }
         }
         /// <summary>
         /// Identifies the TargetName dependency property.

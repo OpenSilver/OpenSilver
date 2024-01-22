@@ -47,7 +47,7 @@ namespace System.Windows.Media
         public Point Point
         {
             get => (Point)GetValue(PointProperty);
-            set => SetValue(PointProperty, value);
+            set => SetValueInternal(PointProperty, value);
         }
 
         internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)

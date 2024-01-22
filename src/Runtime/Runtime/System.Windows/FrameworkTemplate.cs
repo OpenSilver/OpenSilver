@@ -74,7 +74,7 @@ namespace System.Windows
         public IUIElement ContentPropertyUsefulOnlyDuringTheCompilation
         {
             get { return (IUIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
-            set { SetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
+            set { SetValueInternal(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

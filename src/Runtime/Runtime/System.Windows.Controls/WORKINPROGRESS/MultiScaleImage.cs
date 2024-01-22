@@ -212,7 +212,7 @@ namespace System.Windows.Controls
 		public bool AllowDownloading
 		{
 			get { return (bool)GetValue(AllowDownloadingProperty); }
-			set { SetValue(AllowDownloadingProperty, value); }
+			set { SetValueInternal(AllowDownloadingProperty, value); }
 		}
 		//
 		// Summary:
@@ -239,7 +239,7 @@ namespace System.Windows.Controls
 		public double BlurFactor
 		{
 			get { return (double)GetValue(BlurFactorProperty); }
-			set { SetValue(BlurFactorProperty, value); }
+			set { SetValueInternal(BlurFactorProperty, value); }
 		}
 		//
 		// Summary:
@@ -299,7 +299,7 @@ namespace System.Windows.Controls
 		public int SkipLevels
 		{
 			get { return (int)GetValue(SkipLevelsProperty); }
-			set { SetValue(SkipLevelsProperty, value); }
+			set { SetValueInternal(SkipLevelsProperty, value); }
 		}
 		//
 		// Summary:
@@ -313,7 +313,7 @@ namespace System.Windows.Controls
 		public MultiScaleTileSource Source
 		{
 			get { return (MultiScaleTileSource)GetValue(SourceProperty); }
-			set { SetValue(SourceProperty, value); }
+			set { SetValueInternal(SourceProperty, value); }
 		}
 		//
 		// Summary:
@@ -340,7 +340,7 @@ namespace System.Windows.Controls
 		public bool UseSprings
 		{
 			get { return (bool)GetValue(UseSpringsProperty); }
-			set { SetValue(UseSpringsProperty, value); }
+			set { SetValueInternal(UseSpringsProperty, value); }
 		}
 		//
 		// Summary:
@@ -352,7 +352,7 @@ namespace System.Windows.Controls
 		public Point ViewportOrigin
 		{
 			get { return (Point)GetValue(ViewportOriginProperty); }
-			set { SetValue(ViewportOriginProperty, value); }
+			set { SetValueInternal(ViewportOriginProperty, value); }
 		}
 		//
 		// Summary:
@@ -364,7 +364,7 @@ namespace System.Windows.Controls
 		public double ViewportWidth
 		{
 			get { return (double)GetValue(ViewportWidthProperty); }
-			set { SetValue(ViewportWidthProperty, value); }
+			set { SetValueInternal(ViewportWidthProperty, value); }
 		}
 
 		//

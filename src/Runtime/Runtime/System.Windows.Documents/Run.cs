@@ -101,7 +101,7 @@ public sealed class Run : Inline
     public string Text
     {
         get => (string)GetValue(TextProperty);
-        set => SetValue(TextProperty, value);
+        set => SetValueInternal(TextProperty, value);
     }
 
     private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -131,7 +131,7 @@ public sealed class Run : Inline
     public FlowDirection FlowDirection
     {
         get => (FlowDirection)GetValue(FlowDirectionProperty);
-        set => SetValue(FlowDirectionProperty, value);
+        set => SetValueInternal(FlowDirectionProperty, value);
     }
 
     private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

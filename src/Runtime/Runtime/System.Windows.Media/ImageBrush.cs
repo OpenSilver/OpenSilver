@@ -47,7 +47,7 @@ namespace System.Windows.Media
 		public ImageSource ImageSource
         {
             get => (ImageSource)GetValue(ImageSourceProperty);
-            set => SetValue(ImageSourceProperty, value);
+            set => SetValueInternal(ImageSourceProperty, value);
         }
 
         /// <summary>

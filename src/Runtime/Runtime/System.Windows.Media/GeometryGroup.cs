@@ -62,7 +62,7 @@ namespace System.Windows.Media
         public GeometryCollection Children
         {
             get => (GeometryCollection)GetValue(ChildrenProperty);
-            set => SetValue(ChildrenProperty, value);
+            set => SetValueInternal(ChildrenProperty, value);
         }
 
         private static void OnChildrenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -122,7 +122,7 @@ namespace System.Windows.Media
         public FillRule FillRule
         {
             get => (FillRule)GetValue(FillRuleProperty);
-            set => SetValue(FillRuleProperty, value);
+            set => SetValueInternal(FillRuleProperty, value);
         }
 
         internal override Rect BoundsInternal

@@ -55,7 +55,7 @@ namespace System.Windows.Controls
         public double MaxWidth
         {
             get => (double)GetValue(MaxWidthProperty);
-            set => SetValue(MaxWidthProperty, value);
+            set => SetValueInternal(MaxWidthProperty, value);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace System.Windows.Controls
         public double MinWidth
         {
             get => (double)GetValue(MinWidthProperty);
-            set => SetValue(MinWidthProperty, value);
+            set => SetValueInternal(MinWidthProperty, value);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace System.Windows.Controls
         public GridLength Width
         {
             get => (GridLength)GetValue(WidthProperty);
-            set => SetValue(WidthProperty, value);
+            set => SetValueInternal(WidthProperty, value);
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace System.Windows.Controls
         public double ActualWidth
         {
             get => (double)GetValue(ActualWidthProperty);
-            private set => SetValue(ActualWidthPropertyKey, value);
+            private set => SetValueInternal(ActualWidthPropertyKey, value);
         }
 
         double IDefinitionBase.MinLength => MinWidth;

@@ -79,7 +79,7 @@ public abstract class Inline : TextElement
     public TextDecorationCollection TextDecorations
     {
         get => (TextDecorationCollection)GetValue(TextDecorationsProperty);
-        set => SetValue(TextDecorationsProperty, value);
+        set => SetValueInternal(TextDecorationsProperty, value);
     }
 
     internal override bool EnablePointerEventsCore => true;

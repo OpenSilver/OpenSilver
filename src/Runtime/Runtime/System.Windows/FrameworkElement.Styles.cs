@@ -78,7 +78,7 @@ namespace System.Windows
         public Style Style
         {
             get { return _styleCache; }
-            set { SetValue(StyleProperty, value); }
+            set { SetValueInternal(StyleProperty, value); }
         }
 
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -109,7 +109,7 @@ namespace System.Windows
         protected object DefaultStyleKey
         {
             get { return GetValue(DefaultStyleKeyProperty); }
-            set { SetValue(DefaultStyleKeyProperty, value); }
+            set { SetValueInternal(DefaultStyleKeyProperty, value); }
         }
 
         private static void OnThemeStyleKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

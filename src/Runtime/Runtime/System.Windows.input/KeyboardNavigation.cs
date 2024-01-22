@@ -64,14 +64,14 @@ internal sealed class KeyboardNavigation
             if (GetVisualRoot(activeElement) == GetVisualRoot(d))
                 return activeElement;
             else
-                d.SetValue(TabOnceActiveElementProperty, null);
+                d.SetValueInternal(TabOnceActiveElementProperty, null);
         }
         return null;
     }
 
     internal static void SetTabOnceActiveElement(DependencyObject d, DependencyObject value)
     {
-        d.SetValue(TabOnceActiveElementProperty, new WeakReference(value));
+        d.SetValueInternal(TabOnceActiveElementProperty, new WeakReference(value));
     }
 
     private DependencyObject GetActiveElement(DependencyObject d)

@@ -23,13 +23,13 @@ namespace System.Windows
     public sealed partial class WindowSettings : DependencyObject
     {
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty WindowStyleProperty = DependencyProperty.Register("WindowStyle", typeof(WindowStyle), typeof(WindowSettings), null);
+        public static readonly DependencyProperty WindowStyleProperty = DependencyProperty.Register(nameof(WindowStyle), typeof(WindowStyle), typeof(WindowSettings), null);
 
         [OpenSilver.NotImplemented]
         public WindowStyle WindowStyle
         {
-            get { return (WindowStyle)this.GetValue(WindowStyleProperty); }
-            private set { this.SetValue(WindowStyleProperty, value); }
+            get { return (WindowStyle)GetValue(WindowStyleProperty); }
+            private set { SetValueInternal(WindowStyleProperty, value); }
         }
     }
 }

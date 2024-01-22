@@ -44,7 +44,7 @@ namespace System.Windows.Media
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            set { SetValueInternal(TextProperty, value); }
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace System.Windows.Media
         public TimeSpan Time
         {
             get { return (TimeSpan)GetValue(TimeProperty); }
-            set { SetValue(TimeProperty, value); }
+            set { SetValueInternal(TimeProperty, value); }
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace System.Windows.Media
         public string Type
         {
             get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            set { SetValueInternal(TextProperty, value); }
         }
     }
 }

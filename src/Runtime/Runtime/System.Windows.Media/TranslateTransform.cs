@@ -38,7 +38,7 @@ namespace System.Windows.Media
         public double X
         {
             get => (double)GetValue(XProperty);
-            set => SetValue(XProperty, value);
+            set => SetValueInternal(XProperty, value);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace System.Windows.Media
         public double Y
         {
             get => (double)GetValue(YProperty);
-            set => SetValue(YProperty, value);
+            set => SetValueInternal(YProperty, value);
         }
 
         internal override Matrix ValueInternal

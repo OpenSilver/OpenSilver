@@ -69,7 +69,7 @@ namespace System.Windows
 		public FrameworkElement Content
 		{
 			get { return (FrameworkElement)GetValue(ContentProperty); }
-			set { SetValue(ContentProperty, value); }
+			set { SetValueInternal(ContentProperty, value); }
 		}
 		//
 		// Summary:
@@ -88,7 +88,7 @@ namespace System.Windows
 		public double Height
 		{
 			get { return (double)GetValue(HeightProperty); }
-			set { SetValue(HeightProperty, value); }
+			set { SetValueInternal(HeightProperty, value); }
 		}
 		//
 		// Summary:
@@ -115,7 +115,7 @@ namespace System.Windows
 		public double Width
 		{
 			get { return (double)GetValue(WidthProperty); }
-			set { SetValue(WidthProperty, value); }
+			set { SetValueInternal(WidthProperty, value); }
 		}
 
 		//

@@ -36,7 +36,7 @@ namespace System.Windows.Controls
         public FontStretch FontStretch
         {
             get => (FontStretch)GetValue(FontStretchProperty);
-            set => SetValue(FontStretchProperty, value);
+            set => SetValueInternal(FontStretchProperty, value);
         }
 
         private static readonly DependencyPropertyKey HasOverflowContentPropertyKey =
@@ -63,7 +63,7 @@ namespace System.Windows.Controls
         public bool HasOverflowContent
         {
             get => (bool)GetValue(HasOverflowContentProperty);
-            private set => SetValue(HasOverflowContentPropertyKey, value);
+            private set => SetValueInternal(HasOverflowContentPropertyKey, value);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace System.Windows.Controls
         public RichTextBlockOverflow OverflowContentTarget
         {
             get => (RichTextBlockOverflow)GetValue(OverflowContentTargetProperty);
-            set => SetValue(OverflowContentTargetProperty, value);
+            set => SetValueInternal(OverflowContentTargetProperty, value);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace System.Windows.Controls
         public LineStackingStrategy LineStackingStrategy
         {
             get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
-            set => SetValue(LineStackingStrategyProperty, value);
+            set => SetValueInternal(LineStackingStrategyProperty, value);
         }
 
         private static readonly DependencyPropertyKey SelectedTextPropertyKey =
@@ -137,7 +137,7 @@ namespace System.Windows.Controls
         public string SelectedText
         {
             get => (string)GetValue(SelectedTextProperty);
-            private set => SetValue(SelectedTextPropertyKey, value);
+            private set => SetValueInternal(SelectedTextPropertyKey, value);
         }
 
         /// <summary>

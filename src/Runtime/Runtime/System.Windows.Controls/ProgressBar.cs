@@ -65,7 +65,7 @@ namespace System.Windows.Controls
         public bool IsIndeterminate
         {
             get { return (bool)GetValue(IsIndeterminateProperty); }
-            set { SetValue(IsIndeterminateProperty, value); }
+            set { SetValueInternal(IsIndeterminateProperty, value); }
         }
 
         private static void IsIndeterminatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -53,7 +53,7 @@ namespace System.Windows.Media
         public Point EndPoint
         {
             get => (Point)GetValue(EndPointProperty);
-            set => SetValue(EndPointProperty, value);
+            set => SetValueInternal(EndPointProperty, value);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace System.Windows.Media
         public Point StartPoint
         {
             get => (Point)GetValue(StartPointProperty);
-            set => SetValue(StartPointProperty, value);
+            set => SetValueInternal(StartPointProperty, value);
         }
 
         internal override Rect BoundsInternal

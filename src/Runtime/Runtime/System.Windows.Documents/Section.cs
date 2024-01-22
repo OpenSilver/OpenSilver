@@ -26,7 +26,7 @@ public sealed class Section : Block
 {
     public Section()
     {
-        SetValue(BlocksProperty, new BlockCollection(this));
+        SetValueInternal(BlocksProperty, new BlockCollection(this));
     }
 
     internal override string TagName => "section";

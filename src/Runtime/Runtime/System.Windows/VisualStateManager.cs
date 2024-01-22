@@ -211,7 +211,7 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(obj));
             }
 
-            obj.SetValue(CustomVisualStateManagerProperty, value);
+            obj.SetValueInternal(CustomVisualStateManagerProperty, value);
         }
 
         #endregion CustomVisualStateManager
@@ -265,7 +265,7 @@ namespace System.Windows
             if (value == null)
             {
                 value = new Collection<VisualStateGroup>(new VisualStateGroupCollection(obj));
-                obj.SetValue(VisualStateGroupsProperty, value);
+                obj.SetValueInternal(VisualStateGroupsProperty, value);
             }
 
             return value;

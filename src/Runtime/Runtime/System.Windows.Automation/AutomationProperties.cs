@@ -90,12 +90,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
 
-            element.SetValue(AcceleratorKeyProperty, value);
+            element.SetValueInternal(AcceleratorKeyProperty, value);
         }
 
         /// <summary>
@@ -168,12 +168,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
 
-            element.SetValue(AccessKeyProperty, value);
+            element.SetValueInternal(AccessKeyProperty, value);
         }
 
         /// <summary>
@@ -247,12 +247,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
 
-            element.SetValue(AutomationIdProperty, value);
+            element.SetValueInternal(AutomationIdProperty, value);
         }
 
         /// <summary>
@@ -326,12 +326,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
             
-            element.SetValue(HelpTextProperty, value);
+            element.SetValueInternal(HelpTextProperty, value);
         }
 
         /// <summary>
@@ -405,12 +405,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
             
-            element.SetValue(IsRequiredForFormProperty, value);
+            element.SetValueInternal(IsRequiredForFormProperty, value);
         }
 
         /// <summary>
@@ -484,12 +484,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
             
-            element.SetValue(ItemStatusProperty, value);
+            element.SetValueInternal(ItemStatusProperty, value);
         }
 
         /// <summary>
@@ -563,12 +563,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
             
-            element.SetValue(ItemTypeProperty, value);
+            element.SetValueInternal(ItemTypeProperty, value);
         }
 
         /// <summary>
@@ -646,12 +646,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
 
-            element.SetValue(LabeledByProperty, value);
+            element.SetValueInternal(LabeledByProperty, value);
         }
 
         /// <summary>
@@ -725,12 +725,12 @@ namespace System.Windows.Automation
                 throw new ArgumentNullException(nameof(element));
             }
 
-            if (!(element is UIElement))
+            if (element is not UIElement)
             {
                 throw new ArgumentException(nameof(element));
             }
 
-            element.SetValue(NameProperty, value);
+            element.SetValueInternal(NameProperty, value);
         }
     }
 }

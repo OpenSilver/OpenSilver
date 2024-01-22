@@ -36,7 +36,7 @@ namespace System.Windows.Controls.Primitives
         public double Minimum
         {
             get { return (double)GetValue(MinimumProperty); }
-            set { SetValue(MinimumProperty, value); }
+            set { SetValueInternal(MinimumProperty, value); }
         }
 
         /// <summary> 
@@ -84,7 +84,7 @@ namespace System.Windows.Controls.Primitives
         public double Maximum
         {
             get { return (double)GetValue(MaximumProperty); }
-            set { SetValue(MaximumProperty, value); }
+            set { SetValueInternal(MaximumProperty, value); }
         }
 
         /// <summary> 
@@ -143,7 +143,7 @@ namespace System.Windows.Controls.Primitives
         public double LargeChange
         {
             get { return (double)GetValue(LargeChangeProperty); }
-            set { SetValue(LargeChangeProperty, value); }
+            set { SetValueInternal(LargeChangeProperty, value); }
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace System.Windows.Controls.Primitives
         public double SmallChange
         {
             get { return (double)GetValue(SmallChangeProperty); }
-            set { SetValue(SmallChangeProperty, value); }
+            set { SetValueInternal(SmallChangeProperty, value); }
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace System.Windows.Controls.Primitives
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+            set { SetValueInternal(ValueProperty, value); }
         }
 
         /// <summary> 

@@ -52,7 +52,7 @@ namespace System.Windows.Media
         public bool IsClosed
         {
             get => (bool)GetValue(IsClosedProperty);
-            set => SetValue(IsClosedProperty, value);
+            set => SetValueInternal(IsClosedProperty, value);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace System.Windows.Media
         public bool IsFilled
         {
             get => (bool)GetValue(IsFilledProperty);
-            set => SetValue(IsFilledProperty, value);
+            set => SetValueInternal(IsFilledProperty, value);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace System.Windows.Media
         public PathSegmentCollection Segments
         {
             get => (PathSegmentCollection)GetValue(SegmentsProperty);
-            set => SetValue(SegmentsProperty, value);
+            set => SetValueInternal(SegmentsProperty, value);
         }
 
         private static void OnSegmentsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -159,7 +159,7 @@ namespace System.Windows.Media
         public Point StartPoint
         {
             get => (Point)GetValue(StartPointProperty);
-            set => SetValue(StartPointProperty, value);
+            set => SetValueInternal(StartPointProperty, value);
         }
 
         internal void SetParentGeometry(Geometry geometry)

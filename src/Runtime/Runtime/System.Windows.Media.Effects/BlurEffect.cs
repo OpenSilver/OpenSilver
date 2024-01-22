@@ -46,7 +46,7 @@ namespace System.Windows.Media.Effects
         public double Radius
         {
             get => (double)GetValue(RadiusProperty);
-            set => SetValue(RadiusProperty, value);
+            set => SetValueInternal(RadiusProperty, value);
         }
 
         private static void OnRadiusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

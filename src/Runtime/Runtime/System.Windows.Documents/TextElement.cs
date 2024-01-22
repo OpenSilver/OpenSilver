@@ -55,7 +55,7 @@ public abstract class TextElement : UIElement
     public int CharacterSpacing
     {
         get => (int)GetValue(CharacterSpacingProperty);
-        set => SetValue(CharacterSpacingProperty, value);
+        set => SetValueInternal(CharacterSpacingProperty, value);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public abstract class TextElement : UIElement
     public FontFamily FontFamily
     {
         get => (FontFamily)GetValue(FontFamilyProperty);
-        set => SetValue(FontFamilyProperty, value);
+        set => SetValueInternal(FontFamilyProperty, value);
     }
 
     private static bool IsValidFontFamily(object o) => o is FontFamily;
@@ -103,7 +103,7 @@ public abstract class TextElement : UIElement
     public double FontSize
     {
         get => (double)GetValue(FontSizeProperty);
-        set => SetValue(FontSizeProperty, value);
+        set => SetValueInternal(FontSizeProperty, value);
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ public abstract class TextElement : UIElement
     public FontStretch FontStretch
     {
         get => (FontStretch)GetValue(FontStretchProperty);
-        set => SetValue(FontStretchProperty, value);
+        set => SetValueInternal(FontStretchProperty, value);
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public abstract class TextElement : UIElement
     public FontStyle FontStyle
     {
         get => (FontStyle)GetValue(FontStyleProperty);
-        set => SetValue(FontStyleProperty, value);
+        set => SetValueInternal(FontStyleProperty, value);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public abstract class TextElement : UIElement
     public FontWeight FontWeight
     {
         get => (FontWeight)GetValue(FontWeightProperty);
-        set => SetValue(FontWeightProperty, value);
+        set => SetValueInternal(FontWeightProperty, value);
     }
 
     /// <summary>
@@ -198,7 +198,7 @@ public abstract class TextElement : UIElement
     public Brush Foreground
     {
         get => (Brush)GetValue(ForegroundProperty);
-        set => SetValue(ForegroundProperty, value);
+        set => SetValueInternal(ForegroundProperty, value);
     }
 
     /// <summary>
@@ -217,7 +217,7 @@ public abstract class TextElement : UIElement
     public XmlLanguage Language
     {
         get => (XmlLanguage)GetValue(LanguageProperty);
-        set => SetValue(LanguageProperty, value);
+        set => SetValueInternal(LanguageProperty, value);
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ public abstract class TextElement : UIElement
     public string Name
     {
         get => (string)GetValue(FrameworkElement.NameProperty);
-        set => SetValue(FrameworkElement.NameProperty, value);
+        set => SetValueInternal(FrameworkElement.NameProperty, value);
     }
 
     /// <summary>

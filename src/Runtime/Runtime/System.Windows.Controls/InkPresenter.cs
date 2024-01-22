@@ -90,7 +90,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
         public StrokeCollection Strokes
         {
             get => (StrokeCollection)GetValue(StrokesProperty);
-            set => SetValue(StrokesProperty, value);
+            set => SetValueInternal(StrokesProperty, value);
         }
 
         /// <summary>

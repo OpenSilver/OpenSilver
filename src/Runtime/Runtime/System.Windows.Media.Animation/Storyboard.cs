@@ -75,7 +75,7 @@ public sealed class Storyboard : Timeline
     /// <param name="name">
     /// The name of the object to target.
     /// </param>
-    public static void SetTargetName(Timeline element, string name) => element.SetValue(TargetNameProperty, name);
+    public static void SetTargetName(Timeline element, string name) => element.SetValueInternal(TargetNameProperty, name);
 
     /// <summary>
     /// Identifies the Storyboard.TargetProperty attached property.
@@ -114,7 +114,7 @@ public sealed class Storyboard : Timeline
     /// <exception cref="ArgumentNullException">
     /// One or more of the parameters is null.
     /// </exception>
-    public static void SetTargetProperty(Timeline element, PropertyPath value) => element.SetValue(TargetPropertyProperty, value);
+    public static void SetTargetProperty(Timeline element, PropertyPath value) => element.SetValueInternal(TargetPropertyProperty, value);
 
     /// <summary>
     /// Identifies the Storyboard.TargetName attached property.
@@ -150,7 +150,7 @@ public sealed class Storyboard : Timeline
     /// <exception cref="ArgumentNullException">
     /// One or more of the parameters is null.
     /// </exception>
-    public static void SetTarget(Timeline element, DependencyObject target) => element.SetValue(TargetProperty, target);
+    public static void SetTarget(Timeline element, DependencyObject target) => element.SetValueInternal(TargetProperty, target);
 
     /// <summary>
     /// Initiates the set of animations associated with the storyboard.

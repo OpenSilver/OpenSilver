@@ -46,7 +46,7 @@ namespace System.Windows.Media
         public bool IsLargeArc
         {
             get => (bool)GetValue(IsLargeArcProperty);
-            set => SetValue(IsLargeArcProperty, value);
+            set => SetValueInternal(IsLargeArcProperty, value);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace System.Windows.Media
         public Point Point
         {
             get => (Point)GetValue(PointProperty);
-            set => SetValue(PointProperty, value);
+            set => SetValueInternal(PointProperty, value);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace System.Windows.Media
         public double RotationAngle
         {
             get => (double)GetValue(RotationAngleProperty);
-            set => SetValue(RotationAngleProperty, value);
+            set => SetValueInternal(RotationAngleProperty, value);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace System.Windows.Media
         public Size Size
         {
             get => (Size)GetValue(SizeProperty);
-            set => SetValue(SizeProperty, value);
+            set => SetValueInternal(SizeProperty, value);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace System.Windows.Media
         public SweepDirection SweepDirection
         {
             get => (SweepDirection)GetValue(SweepDirectionProperty);
-            set => SetValue(SweepDirectionProperty, value);
+            set => SetValueInternal(SweepDirectionProperty, value);
         }
 
         internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)

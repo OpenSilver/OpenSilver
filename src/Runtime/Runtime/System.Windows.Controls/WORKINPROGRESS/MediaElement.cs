@@ -55,7 +55,7 @@ namespace System.Windows.Controls
         public TimeSpan BufferingTime
         {
             get { return (TimeSpan)GetValue(BufferingTimeProperty); }
-            set { SetValue(BufferingTimeProperty, value); }
+            set { SetValueInternal(BufferingTimeProperty, value); }
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace System.Windows.Controls
         public TimeSpan Position
         {
             get { return (TimeSpan)GetValue(PositionProperty); }
-            set { SetValue(PositionProperty, value); }
+            set { SetValueInternal(PositionProperty, value); }
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace System.Windows.Controls
         public Stretch Stretch
         {
             get { return (Stretch)GetValue(StretchProperty); }
-            set { SetValue(StretchProperty, value); }
+            set { SetValueInternal(StretchProperty, value); }
         }
 
         /// <summary>

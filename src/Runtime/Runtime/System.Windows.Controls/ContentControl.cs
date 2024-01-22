@@ -42,8 +42,8 @@ namespace System.Windows.Controls
         /// </summary>
         public object Content
         {
-            get { return this.GetValue(ContentProperty); }
-            set { this.SetValue(ContentProperty, value); }
+            get { return GetValue(ContentProperty); }
+            set { SetValueInternal(ContentProperty, value); }
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace System.Windows.Controls
         /// </summary>
         public DataTemplate ContentTemplate
         {
-            get { return (DataTemplate)this.GetValue(ContentTemplateProperty); }
-            set { this.SetValue(ContentTemplateProperty, value); }
+            get { return (DataTemplate)GetValue(ContentTemplateProperty); }
+            set { SetValueInternal(ContentTemplateProperty, value); }
         }
 
         /// <summary>

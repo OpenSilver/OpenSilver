@@ -222,8 +222,8 @@ namespace System.Windows.Controls
         /// </returns>
         public string GroupName
         {
-            get { return (string)this.GetValue(GroupNameProperty); }
-            set { this.SetValue(GroupNameProperty, value); }
+            get { return (string)GetValue(GroupNameProperty); }
+            set { SetValueInternal(GroupNameProperty, value); }
         }
 
         #endregion Properties and Events

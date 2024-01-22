@@ -79,7 +79,7 @@ namespace System.Windows.Media
         public GradientStopCollection GradientStops
         {
             get => (GradientStopCollection)GetValue(GradientStopsProperty);
-            set => SetValue(GradientStopsProperty, value);
+            set => SetValueInternal(GradientStopsProperty, value);
         }
 
         private static void OnGradientStopsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -141,7 +141,7 @@ namespace System.Windows.Media
         public BrushMappingMode MappingMode
         {
             get => (BrushMappingMode)GetValue(MappingModeProperty);
-            set => SetValue(MappingModeProperty, value);
+            set => SetValueInternal(MappingModeProperty, value);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace System.Windows.Media
         public GradientSpreadMethod SpreadMethod
         {
             get => (GradientSpreadMethod)GetValue(SpreadMethodProperty);
-            set => SetValue(SpreadMethodProperty, value);
+            set => SetValueInternal(SpreadMethodProperty, value);
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace System.Windows.Media
         public ColorInterpolationMode ColorInterpolationMode
         {
             get => (ColorInterpolationMode)GetValue(ColorInterpolationModeProperty);
-            set => SetValue(ColorInterpolationModeProperty, value);
+            set => SetValueInternal(ColorInterpolationModeProperty, value);
         }
 
         internal IEnumerable<(double Offset, Color Color)> GetGradientStops()

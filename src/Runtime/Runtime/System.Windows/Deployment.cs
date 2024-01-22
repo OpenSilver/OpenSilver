@@ -108,8 +108,8 @@ namespace System.Windows
             {
                 Type appType = app.GetType();
 
-                deployment.SetValue(EntryPointAssemblyPropertyKey, appType.Assembly.GetName().Name);
-                deployment.SetValue(EntryPointTypePropertyKey, appType.FullName);
+                deployment.SetValueInternal(EntryPointAssemblyPropertyKey, appType.Assembly.GetName().Name);
+                deployment.SetValueInternal(EntryPointTypePropertyKey, appType.FullName);
 
                 _current = deployment;
             }

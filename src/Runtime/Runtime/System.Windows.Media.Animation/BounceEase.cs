@@ -40,7 +40,7 @@ public class BounceEase : EasingFunctionBase
     public int Bounces
     {
         get => (int)GetValue(BouncesProperty);
-        set => SetValue(BouncesProperty, value);
+        set => SetValueInternal(BouncesProperty, value);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class BounceEase : EasingFunctionBase
     public double Bounciness
     {
         get => (double)GetValue(BouncinessProperty);
-        set => SetValue(BouncinessProperty, value);
+        set => SetValueInternal(BouncinessProperty, value);
     }
 
     /// <inheritdoc />

@@ -61,7 +61,7 @@ namespace System.Windows.Media
         public PointCollection Points
         {
             get => (PointCollection)GetValue(PointsProperty);
-            set => SetValue(PointsProperty, value);
+            set => SetValueInternal(PointsProperty, value);
         }
 
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

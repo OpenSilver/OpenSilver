@@ -48,7 +48,7 @@ public sealed class BeginStoryboard : TriggerAction
     public Storyboard Storyboard
     {
         get => (Storyboard)GetValue(StoryboardProperty);
-        set => SetValue(StoryboardProperty, value);
+        set => SetValueInternal(StoryboardProperty, value);
     }
 
     internal override void Invoke(IFrameworkElement fe) => Storyboard?.Begin();

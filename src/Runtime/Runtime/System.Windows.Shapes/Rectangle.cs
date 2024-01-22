@@ -61,7 +61,7 @@ namespace System.Windows.Shapes
         public double RadiusX
         {
             get => (double)GetValue(RadiusXProperty);
-            set => SetValue(RadiusXProperty, value);
+            set => SetValueInternal(RadiusXProperty, value);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace System.Windows.Shapes
         public double RadiusY
         {
             get => (double)GetValue(RadiusYProperty);
-            set => SetValue(RadiusYProperty, value);
+            set => SetValueInternal(RadiusYProperty, value);
         }
 
         internal sealed override string SvgTagName => "rect";

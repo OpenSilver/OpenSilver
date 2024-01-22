@@ -69,7 +69,7 @@ namespace System.Windows.Shapes
         public Geometry Data
         {
             get => (Geometry)GetValue(DataProperty);
-            set => SetValue(DataProperty, value);
+            set => SetValueInternal(DataProperty, value);
         }
 
         private static void OnDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

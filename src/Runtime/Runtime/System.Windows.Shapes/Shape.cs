@@ -66,7 +66,7 @@ namespace System.Windows.Shapes
         public Brush Fill
         {
             get => (Brush)GetValue(FillProperty);
-            set => SetValue(FillProperty, value);
+            set => SetValueInternal(FillProperty, value);
         }
 
         private static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -137,7 +137,7 @@ namespace System.Windows.Shapes
         public Stretch Stretch
         {
             get => (Stretch)GetValue(StretchProperty);
-            set => SetValue(StretchProperty, value);
+            set => SetValueInternal(StretchProperty, value);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace System.Windows.Shapes
         public Brush Stroke
         {
             get => (Brush)GetValue(StrokeProperty);
-            set => SetValue(StrokeProperty, value);
+            set => SetValueInternal(StrokeProperty, value);
         }
 
         private static void OnStrokeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -253,7 +253,7 @@ namespace System.Windows.Shapes
         public DoubleCollection StrokeDashArray
         {
             get => (DoubleCollection)GetValue(StrokeDashArrayProperty);
-            set => SetValue(StrokeDashArrayProperty, value);
+            set => SetValueInternal(StrokeDashArrayProperty, value);
         }
 
         private static object CoerceStrokeDashArray(DependencyObject d, object baseValue)
@@ -297,7 +297,7 @@ namespace System.Windows.Shapes
         public PenLineCap StrokeDashCap
         {
             get => (PenLineCap)GetValue(StrokeDashCapProperty);
-            set => SetValue(StrokeDashCapProperty, value);
+            set => SetValueInternal(StrokeDashCapProperty, value);
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace System.Windows.Shapes
         public double StrokeDashOffset
         {
             get => (double)GetValue(StrokeDashOffsetProperty);
-            set => SetValue(StrokeDashOffsetProperty, value);
+            set => SetValueInternal(StrokeDashOffsetProperty, value);
         }
 
         /// <summary>
@@ -355,7 +355,7 @@ namespace System.Windows.Shapes
         public PenLineCap StrokeEndLineCap
         {
             get => (PenLineCap)GetValue(StrokeEndLineCapProperty);
-            set => SetValue(StrokeEndLineCapProperty, value);
+            set => SetValueInternal(StrokeEndLineCapProperty, value);
         }
 
         /// <summary>
@@ -394,7 +394,7 @@ namespace System.Windows.Shapes
         public PenLineJoin StrokeLineJoin
         {
             get => (PenLineJoin)GetValue(StrokeLineJoinProperty);
-            set => SetValue(StrokeLineJoinProperty, value);
+            set => SetValueInternal(StrokeLineJoinProperty, value);
         }
 
         /// <summary>
@@ -427,7 +427,7 @@ namespace System.Windows.Shapes
         public double StrokeMiterLimit
         {
             get => (double)GetValue(StrokeMiterLimitProperty);
-            set => SetValue(StrokeMiterLimitProperty, value);
+            set => SetValueInternal(StrokeMiterLimitProperty, value);
         }
 
         /// <summary>
@@ -453,7 +453,7 @@ namespace System.Windows.Shapes
         public PenLineCap StrokeStartLineCap
         {
             get => (PenLineCap)GetValue(StrokeStartLineCapProperty);
-            set => SetValue(StrokeStartLineCapProperty, value);
+            set => SetValueInternal(StrokeStartLineCapProperty, value);
         }
 
         /// <summary>
@@ -484,7 +484,7 @@ namespace System.Windows.Shapes
         public double StrokeThickness
         {
             get => (double)GetValue(StrokeThicknessProperty);
-            set => SetValue(StrokeThicknessProperty, value);
+            set => SetValueInternal(StrokeThicknessProperty, value);
         }
 
         internal double GetStrokeThickness()

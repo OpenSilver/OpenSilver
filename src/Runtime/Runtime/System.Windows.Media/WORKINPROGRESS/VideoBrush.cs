@@ -45,7 +45,7 @@ namespace System.Windows.Media
         public string SourceName
         {
             get => (string)GetValue(SourceNameProperty);
-            set => SetValue(SourceNameProperty, value);
+            set => SetValueInternal(SourceNameProperty, value);
         }
 
         /// <summary>

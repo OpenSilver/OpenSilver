@@ -45,7 +45,7 @@ namespace System.Windows.Media
         public AlignmentX AlignmentX
         {
             get => (AlignmentX)GetValue(AlignmentXProperty);
-            set => SetValue(AlignmentXProperty, value);
+            set => SetValueInternal(AlignmentXProperty, value);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace System.Windows.Media
         public AlignmentY AlignmentY
         {
             get => (AlignmentY)GetValue(AlignmentYProperty);
-            set => SetValue(AlignmentYProperty, value);
+            set => SetValueInternal(AlignmentYProperty, value);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace System.Windows.Media
 		public Stretch Stretch
 		{
 			get => (Stretch)GetValue(StretchProperty);
-			set => SetValue(StretchProperty, value);
+			set => SetValueInternal(StretchProperty, value);
 		}
 	}
 }

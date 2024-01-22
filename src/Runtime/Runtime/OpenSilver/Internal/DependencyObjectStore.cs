@@ -115,7 +115,8 @@ internal static class DependencyObjectStore
         DependencyObject d,
         DependencyProperty dp,
         PropertyMetadata metadata,
-        object newValue)
+        object newValue,
+        bool isInternal)
     {
         if (newValue == DependencyProperty.UnsetValue)
         {
@@ -123,7 +124,7 @@ internal static class DependencyObjectStore
             return;
         }
 
-        ValidateValue(dp, newValue, true);
+        ValidateValue(dp, newValue, true, isInternal);
 
         EffectiveValueEntry oldEntry = storage.Entry;
         EffectiveValueEntry newEntry = null;
@@ -234,7 +235,7 @@ internal static class DependencyObjectStore
         PropertyMetadata metadata,
         object value)
     {
-        ValidateValue(dp, value, false);
+        ValidateValue(dp, value, false, true);
 
         EffectiveValueEntry oldEntry = storage.Entry;
 
@@ -552,7 +553,7 @@ internal static class DependencyObjectStore
             return;
         }
 
-        ValidateValue(dp, newValue, false);
+        ValidateValue(dp, newValue, false, true);
 
         var oldEntry = storage.Entry;
         var newEntry = new EffectiveValueEntry(oldEntry);
@@ -881,9 +882,14 @@ internal static class DependencyObjectStore
         return ReferenceEquals(obj1, obj2);
     }
 
-    private static void ValidateValue(DependencyProperty dp, object value, bool allowExpression)
+    private static void ValidateValue(DependencyProperty dp, object value, bool allowExpression, bool isInternal)
     {
-        bool isValidValue = dp.IsValidValue(value) || (allowExpression && value is Expression);
+        bool isValidValue = isInternal ? dp.IsValidValueInternal(value) : dp.IsValidValue(value);
+
+        if (!isValidValue)
+        {
+            isValidValue = allowExpression && value is Expression;
+        }
 
         if (!isValidValue)
         {

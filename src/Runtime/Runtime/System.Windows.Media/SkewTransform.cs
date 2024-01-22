@@ -39,7 +39,7 @@ namespace System.Windows.Media
         public double AngleX
         {
             get => (double)GetValue(AngleXProperty);
-            set => SetValue(AngleXProperty, value);
+            set => SetValueInternal(AngleXProperty, value);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace System.Windows.Media
         public double AngleY
         {
             get => (double)GetValue(AngleYProperty);
-            set => SetValue(AngleYProperty, value);
+            set => SetValueInternal(AngleYProperty, value);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace System.Windows.Media
         public double CenterX
         {
             get => (double)GetValue(CenterXProperty);
-            set => SetValue(CenterXProperty, value);
+            set => SetValueInternal(CenterXProperty, value);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace System.Windows.Media
         public double CenterY
         {
             get => (double)GetValue(CenterYProperty);
-            set => SetValue(CenterYProperty, value);
+            set => SetValueInternal(CenterYProperty, value);
         }
 
         internal override Matrix ValueInternal

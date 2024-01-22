@@ -28,7 +28,7 @@ namespace System.Windows
         public Brush OpacityMask
         {
             get { return (Brush)GetValue(OpacityMaskProperty); }
-            set { SetValue(OpacityMaskProperty, value); }
+            set { SetValueInternal(OpacityMaskProperty, value); }
         }
 
         /// <summary>
@@ -57,15 +57,15 @@ namespace System.Windows
 		[OpenSilver.NotImplemented]
         public CacheMode CacheMode
         {
-            get { return (CacheMode)this.GetValue(UIElement.CacheModeProperty); }
-            set { this.SetValue(UIElement.CacheModeProperty, (DependencyObject)value); }
+            get { return (CacheMode)GetValue(CacheModeProperty); }
+            set { SetValueInternal(CacheModeProperty, value); }
         }
 
-        /// <summary>Identifies the <see cref="UIElement.CacheMode" /> dependency property.</summary>
-        /// <returns>The identifier for the <see cref="UIElement.CacheMode" /> dependency property.</returns>
+        /// <summary>Identifies the <see cref="CacheMode" /> dependency property.</summary>
+        /// <returns>The identifier for the <see cref="CacheMode" /> dependency property.</returns>
 		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty CacheModeProperty =
-            DependencyProperty.Register("CacheMode", 
+            DependencyProperty.Register(nameof(CacheMode), 
                                         typeof(CacheMode), 
                                         typeof(UIElement), 
                                         null);
@@ -73,13 +73,13 @@ namespace System.Windows
 		[OpenSilver.NotImplemented]
         public Projection Projection
         {
-            get { return (Projection)this.GetValue(UIElement.ProjectionProperty); }
-            set { this.SetValue(UIElement.ProjectionProperty, value); }
+            get { return (Projection)GetValue(ProjectionProperty); }
+            set { SetValueInternal(ProjectionProperty, value); }
         }
 
 		[OpenSilver.NotImplemented]
         public static readonly DependencyProperty ProjectionProperty =
-            DependencyProperty.Register("Projection", 
+            DependencyProperty.Register(nameof(Projection), 
                                         typeof(Projection), 
                                         typeof(UIElement), 
                                         null);

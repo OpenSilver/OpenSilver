@@ -74,7 +74,7 @@ namespace System.Windows.Controls
 
             if (newErrors != null)
             {
-                d.SetValue(ErrorsProperty, new ReadOnlyObservableCollection<ValidationError>(newErrors));
+                d.SetValueInternal(ErrorsProperty, new ReadOnlyObservableCollection<ValidationError>(newErrors));
             }
             else
             {
@@ -182,7 +182,7 @@ namespace System.Windows.Controls
                 wasValid = true;
                 validationErrors = new ValidationErrorCollection();
                 validationErrors.Add(validationError);
-                targetElement.SetValue(ValidationErrorsInternalProperty, validationErrors);
+                targetElement.SetValueInternal(ValidationErrorsInternalProperty, validationErrors);
             }
             else
             {
@@ -192,7 +192,7 @@ namespace System.Windows.Controls
 
             if (wasValid)
             {
-                targetElement.SetValue(HasErrorProperty, true);
+                targetElement.SetValueInternal(HasErrorProperty, true);
             }
 
             if (shouldRaiseEvent)

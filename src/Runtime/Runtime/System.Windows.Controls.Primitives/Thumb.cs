@@ -70,7 +70,7 @@ namespace System.Windows.Controls.Primitives
         public bool IsDragging
         {
             get { return (bool)GetValue(IsDraggingProperty); }
-            private set { SetValue(IsDraggingPropertyKey, value); }
+            private set { SetValueInternal(IsDraggingPropertyKey, value); }
         }
 
         private static void OnIsDraggingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -104,7 +104,7 @@ namespace System.Windows.Controls.Primitives
         public bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
-            private set { SetValue(IsFocusedPropertyKey, value); }
+            private set { SetValueInternal(IsFocusedPropertyKey, value); }
         }
 
         /// <summary> 

@@ -57,7 +57,7 @@ namespace System.Windows.Controls
         public UIElement Child
         {
             get => (UIElement)GetValue(ChildProperty);
-            set => SetValue(ChildProperty, value);
+            set => SetValueInternal(ChildProperty, value);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace System.Windows.Controls
         public Stretch Stretch
         {
             get => (Stretch)GetValue(StretchProperty);
-            set => SetValue(StretchProperty, value);
+            set => SetValueInternal(StretchProperty, value);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace System.Windows.Controls
         public StretchDirection StretchDirection
         {
             get => (StretchDirection)GetValue(StretchDirectionProperty);
-            set => SetValue(StretchDirectionProperty, value);
+            set => SetValueInternal(StretchDirectionProperty, value);
         }
 
         /// <summary>

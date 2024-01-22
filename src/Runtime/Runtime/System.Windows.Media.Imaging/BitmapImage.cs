@@ -64,7 +64,7 @@ namespace System.Windows.Media.Imaging
             {
                 string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
                 INTERNAL_NameOfAssemblyThatSetTheSourceUri = callerAssemblyName;
-                SetValue(UriSourceProperty, value);
+                SetValueInternal(UriSourceProperty, value);
             }
         }
 

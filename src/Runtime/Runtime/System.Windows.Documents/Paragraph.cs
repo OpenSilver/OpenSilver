@@ -27,7 +27,7 @@ public sealed class Paragraph : Block
     /// </summary>
     public Paragraph()
     {
-        SetValue(InlinesProperty, new InlineCollection(this));
+        SetValueInternal(InlinesProperty, new InlineCollection(this));
     }
 
     internal override string TagName => "section";

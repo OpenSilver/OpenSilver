@@ -42,7 +42,7 @@ namespace System.Windows.Media
         public Point Center
         {
             get => (Point)GetValue(CenterProperty);
-            set => SetValue(CenterProperty, value);
+            set => SetValueInternal(CenterProperty, value);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace System.Windows.Media
         public double RadiusX
         {
             get => (double)GetValue(RadiusXProperty);
-            set => SetValue(RadiusXProperty, value);
+            set => SetValueInternal(RadiusXProperty, value);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace System.Windows.Media
         public double RadiusY
         {
             get => (double)GetValue(RadiusYProperty);
-            set => SetValue(RadiusYProperty, value);
+            set => SetValueInternal(RadiusYProperty, value);
         }
 
         internal override Rect BoundsInternal

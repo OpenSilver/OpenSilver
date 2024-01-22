@@ -60,7 +60,7 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="element">The object to which the property value is written.</param>
         /// <param name="value">The value to set.</param>
-        public static void SetLeft(UIElement element, double value) => element.SetValue(LeftProperty, value);
+        public static void SetLeft(UIElement element, double value) => element.SetValueInternal(LeftProperty, value);
 
         /// <summary>
         /// Gets the value of the Canvas.Left XAML attached property for the target element.
@@ -84,7 +84,7 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="element">The object to which the property value is written.</param>
         /// <param name="value">The value to set.</param>
-        public static void SetTop(UIElement element, double value) => element.SetValue(TopProperty, value);
+        public static void SetTop(UIElement element, double value) => element.SetValueInternal(TopProperty, value);
 
         /// <summary>
         /// Gets the value of the Canvas.Top XAML attached property for the target element.
@@ -120,7 +120,7 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="element">The object to which the property value is written.</param>
         /// <param name="value">The value to set.</param>
-        public static void SetZIndex(UIElement element, int value) => element.SetValue(ZIndexProperty, value);
+        public static void SetZIndex(UIElement element, int value) => element.SetValueInternal(ZIndexProperty, value);
 
         /// <summary>
         /// Gets the value of the Canvas.ZIndex XAML attached property for the target element.

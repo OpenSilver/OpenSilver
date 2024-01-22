@@ -68,7 +68,7 @@ namespace System.Windows.Controls
         public Brush Background
         {
             get { return (Brush)GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
+            set { SetValueInternal(BackgroundProperty, value); }
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace System.Windows.Controls
         public Brush BorderBrush
         {
             get { return (Brush)GetValue(BorderBrushProperty); }
-            set { SetValue(BorderBrushProperty, value); }
+            set { SetValueInternal(BorderBrushProperty, value); }
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace System.Windows.Controls
         public Thickness BorderThickness
         {
             get { return (Thickness)GetValue(BorderThicknessProperty); }
-            set { SetValue(BorderThicknessProperty, value); }
+            set { SetValueInternal(BorderThicknessProperty, value); }
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace System.Windows.Controls
         public FontWeight FontWeight
         {
             get { return (FontWeight)GetValue(FontWeightProperty); }
-            set { SetValue(FontWeightProperty, value); }
+            set { SetValueInternal(FontWeightProperty, value); }
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace System.Windows.Controls
         public FontStyle FontStyle
         {
             get { return (FontStyle)GetValue(FontStyleProperty); }
-            set { SetValue(FontStyleProperty, value); }
+            set { SetValueInternal(FontStyleProperty, value); }
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace System.Windows.Controls
         public Brush Foreground
         {
             get => (Brush)GetValue(ForegroundProperty);
-            set => SetValue(ForegroundProperty, value);
+            set => SetValueInternal(ForegroundProperty, value);
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace System.Windows.Controls
         public FontFamily FontFamily
         {
             get { return (FontFamily)GetValue(FontFamilyProperty); }
-            set { SetValue(FontFamilyProperty, value); }
+            set { SetValueInternal(FontFamilyProperty, value); }
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace System.Windows.Controls
         public double FontSize
         {
             get => (double)GetValue(FontSizeProperty);
-            set => SetValue(FontSizeProperty, value);
+            set => SetValueInternal(FontSizeProperty, value);
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace System.Windows.Controls
         public TextDecorationCollection TextDecorations
         {
             get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
-            set { SetValue(TextDecorationsProperty, value); }
+            set { SetValueInternal(TextDecorationsProperty, value); }
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace System.Windows.Controls
         public Thickness Padding
         {
             get { return (Thickness)GetValue(PaddingProperty); }
-            set { SetValue(PaddingProperty, value); }
+            set { SetValueInternal(PaddingProperty, value); }
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace System.Windows.Controls
         public HorizontalAlignment HorizontalContentAlignment
         {
             get { return (HorizontalAlignment)GetValue(HorizontalContentAlignmentProperty); }
-            set { SetValue(HorizontalContentAlignmentProperty, value); }
+            set { SetValueInternal(HorizontalContentAlignmentProperty, value); }
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace System.Windows.Controls
         public VerticalAlignment VerticalContentAlignment
         {
             get { return (VerticalAlignment)GetValue(VerticalContentAlignmentProperty); }
-            set { SetValue(VerticalContentAlignmentProperty, value); }
+            set { SetValueInternal(VerticalContentAlignmentProperty, value); }
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace System.Windows.Controls
         public int TabIndex
         {
             get => (int)GetValue(TabIndexProperty);
-            set => SetValue(TabIndexProperty, value);
+            set => SetValueInternal(TabIndexProperty, value);
         }
 
         /// <summary>
@@ -348,7 +348,7 @@ namespace System.Windows.Controls
         public bool IsTabStop
         {
             get => (bool)GetValue(IsTabStopProperty);
-            set => SetValue(IsTabStopProperty, value);
+            set => SetValueInternal(IsTabStopProperty, value);
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace System.Windows.Controls
         public KeyboardNavigationMode TabNavigation
         {
             get => (KeyboardNavigationMode)GetValue(TabNavigationProperty);
-            set => SetValue(TabNavigationProperty, value);
+            set => SetValueInternal(TabNavigationProperty, value);
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace System.Windows.Controls
         public ControlTemplate Template
         {
             get { return this._templateCache; }
-            set { SetValue(TemplateProperty, value); }
+            set { SetValueInternal(TemplateProperty, value); }
         }
 
         // Internal Helper so the FrameworkElement could see this property
@@ -593,7 +593,7 @@ namespace System.Windows.Controls
         public int CharacterSpacing
         {
             get => (int)GetValue(CharacterSpacingProperty);
-            set => SetValue(CharacterSpacingProperty, value);
+            set => SetValueInternal(CharacterSpacingProperty, value);
         }
 
         /// <summary>
@@ -614,7 +614,7 @@ namespace System.Windows.Controls
         public FontStretch FontStretch
         {
             get { return (FontStretch)GetValue(FontStretchProperty); }
-            set { SetValue(FontStretchProperty, value); }
+            set { SetValueInternal(FontStretchProperty, value); }
         }
 
         [OpenSilver.NotImplemented]

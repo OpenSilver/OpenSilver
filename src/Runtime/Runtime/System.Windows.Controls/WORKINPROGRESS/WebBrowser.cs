@@ -34,7 +34,7 @@ namespace System.Windows.Controls
         public Uri Source
         {
             get => (Uri)GetValue(SourceProperty);
-            set => SetValue(SourceProperty, value);
+            set => SetValueInternal(SourceProperty, value);
         }
 
         //

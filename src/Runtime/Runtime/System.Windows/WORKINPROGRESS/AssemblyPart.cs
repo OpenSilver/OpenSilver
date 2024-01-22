@@ -48,7 +48,7 @@ namespace System.Windows
         public string Source
         {
             get { return (string)this.GetValue(SourceProperty); }
-            set { this.SetValue(SourceProperty, value); }
+            set { this.SetValueInternal(SourceProperty, value); }
         }
 
         //

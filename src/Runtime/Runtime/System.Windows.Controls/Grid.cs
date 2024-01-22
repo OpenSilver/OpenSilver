@@ -133,7 +133,7 @@ namespace System.Windows.Controls
         /// <param name="value">The property value to set.</param>
         public static void SetRow(UIElement element, int value)
         {
-            element.SetValue(RowProperty, value);
+            element.SetValueInternal(RowProperty, value);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace System.Windows.Controls
 
         public static void SetRowSpan(UIElement element, int value)
         {
-            element.SetValue(RowSpanProperty, value);
+            element.SetValueInternal(RowSpanProperty, value);
         }
 
         public static int GetRowSpan(UIElement element)
@@ -190,7 +190,7 @@ namespace System.Windows.Controls
         /// <param name="value">The property value to set.</param>
         public static void SetColumn(UIElement element, int value)
         {
-            element.SetValue(ColumnProperty, value);
+            element.SetValueInternal(ColumnProperty, value);
         }
         
         /// <summary>
@@ -216,7 +216,7 @@ namespace System.Windows.Controls
 
         public static void SetColumnSpan(UIElement element, int value)
         {
-            element.SetValue(ColumnSpanProperty, value);
+            element.SetValueInternal(ColumnSpanProperty, value);
         }
 
         public static int GetColumnSpan(UIElement element)
@@ -245,7 +245,7 @@ namespace System.Windows.Controls
         public bool ShowGridLines
         {
             get { return (bool)GetValue(ShowGridLinesProperty); }
-            set { SetValue(ShowGridLinesProperty, value); }
+            set { SetValueInternal(ShowGridLinesProperty, value); }
         }
 
         // private

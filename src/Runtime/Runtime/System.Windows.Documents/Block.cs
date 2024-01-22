@@ -64,7 +64,7 @@ public abstract class Block : TextElement
     public double LineHeight
     {
         get => (double)GetValue(LineHeightProperty);
-        set => SetValue(LineHeightProperty, value);
+        set => SetValueInternal(LineHeightProperty, value);
     }
 
     private static bool IsValidLineHeight(object o)
@@ -93,7 +93,7 @@ public abstract class Block : TextElement
     public LineStackingStrategy LineStackingStrategy
     {
         get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
-        set => SetValue(LineStackingStrategyProperty, value);
+        set => SetValueInternal(LineStackingStrategyProperty, value);
     }
 
     /// <summary>
@@ -113,6 +113,6 @@ public abstract class Block : TextElement
     public TextAlignment TextAlignment
     {
         get => (TextAlignment)GetValue(TextAlignmentProperty);
-        set => SetValue(TextAlignmentProperty, value);
+        set => SetValueInternal(TextAlignmentProperty, value);
     }
 }

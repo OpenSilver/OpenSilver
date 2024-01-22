@@ -49,7 +49,7 @@ public class DoubleAnimation : AnimationTimeline, IFromByToAnimation<double>
     public double? By
     {
         get => (double?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class DoubleAnimation : AnimationTimeline, IFromByToAnimation<double>
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ public class DoubleAnimation : AnimationTimeline, IFromByToAnimation<double>
     public double? From
     {
         get => (double?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public class DoubleAnimation : AnimationTimeline, IFromByToAnimation<double>
     public double? To
     {
         get => (double?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

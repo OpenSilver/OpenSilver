@@ -41,7 +41,7 @@ namespace System.Windows.Controls
 
         public TextBlock()
         {
-            SetValue(InlinesProperty, new InlineCollection(this));
+            SetValueInternal(InlinesProperty, new InlineCollection(this));
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace System.Windows.Controls
         public int CharacterSpacing
         {
             get => (int)GetValue(CharacterSpacingProperty);
-            set => SetValue(CharacterSpacingProperty, value);
+            set => SetValueInternal(CharacterSpacingProperty, value);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace System.Windows.Controls
         public FontFamily FontFamily
         {
             get => (FontFamily)GetValue(FontFamilyProperty);
-            set => SetValue(FontFamilyProperty, value);
+            set => SetValueInternal(FontFamilyProperty, value);
         }
 
         private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -114,7 +114,7 @@ namespace System.Windows.Controls
         public double FontSize
         {
             get => (double)GetValue(FontSizeProperty);
-            set => SetValue(FontSizeProperty, value);
+            set => SetValueInternal(FontSizeProperty, value);
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace System.Windows.Controls
         public FontStretch FontStretch
         {
             get => (FontStretch)GetValue(FontStretchProperty);
-            set => SetValue(FontStretchProperty, value);
+            set => SetValueInternal(FontStretchProperty, value);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace System.Windows.Controls
         public FontStyle FontStyle
         {
             get => (FontStyle)GetValue(FontStyleProperty);
-            set => SetValue(FontStyleProperty, value);
+            set => SetValueInternal(FontStyleProperty, value);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace System.Windows.Controls
         public FontWeight FontWeight
         {
             get => (FontWeight)GetValue(FontWeightProperty);
-            set => SetValue(FontWeightProperty, value);
+            set => SetValueInternal(FontWeightProperty, value);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace System.Windows.Controls
         public Brush Foreground
         {
             get => (Brush)GetValue(ForegroundProperty);
-            set => SetValue(ForegroundProperty, value);
+            set => SetValueInternal(ForegroundProperty, value);
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace System.Windows.Controls
         public double LineHeight
         {
             get => (double)GetValue(LineHeightProperty);
-            set => SetValue(LineHeightProperty, value);
+            set => SetValueInternal(LineHeightProperty, value);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace System.Windows.Controls
         public LineStackingStrategy LineStackingStrategy
         {
             get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
-            set => SetValue(LineStackingStrategyProperty, value);
+            set => SetValueInternal(LineStackingStrategyProperty, value);
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace System.Windows.Controls
         public Thickness Padding
         {
             get => (Thickness)GetValue(PaddingProperty);
-            set => SetValue(PaddingProperty, value);
+            set => SetValueInternal(PaddingProperty, value);
         }
 
         private static bool IsPaddingValid(object value)
@@ -314,7 +314,7 @@ namespace System.Windows.Controls
         public TextAlignment TextAlignment
         {
             get => (TextAlignment)GetValue(TextAlignmentProperty);
-            set => SetValue(TextAlignmentProperty, value);
+            set => SetValueInternal(TextAlignmentProperty, value);
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace System.Windows.Controls
         public TextDecorationCollection TextDecorations
         {
             get => (TextDecorationCollection)GetValue(TextDecorationsProperty);
-            set => SetValue(TextDecorationsProperty, value);
+            set => SetValueInternal(TextDecorationsProperty, value);
         }
 
         /// <summary>
@@ -361,7 +361,7 @@ namespace System.Windows.Controls
         public string Text
         {
             get => (string)GetValue(TextProperty);
-            set => SetValue(TextProperty, value);
+            set => SetValueInternal(TextProperty, value);
         }
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -440,7 +440,7 @@ namespace System.Windows.Controls
         public TextTrimming TextTrimming
         {
             get => (TextTrimming)GetValue(TextTrimmingProperty);
-            set => SetValue(TextTrimmingProperty, value);
+            set => SetValueInternal(TextTrimmingProperty, value);
         }
 
         /// <summary>
@@ -466,7 +466,7 @@ namespace System.Windows.Controls
         public TextWrapping TextWrapping
         {
             get => (TextWrapping)GetValue(TextWrappingProperty);
-            set => SetValue(TextWrappingProperty, value);
+            set => SetValueInternal(TextWrappingProperty, value);
         }
 
         private static readonly DependencyProperty InlinesProperty =

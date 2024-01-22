@@ -258,7 +258,7 @@ namespace System.Windows
         public FrameworkElement Content
         {
             get { return (FrameworkElement)GetValue(ContentProperty); }
-            set { SetValue(ContentProperty, value); }
+            set { SetValueInternal(ContentProperty, value); }
         }
 
         /// <summary>

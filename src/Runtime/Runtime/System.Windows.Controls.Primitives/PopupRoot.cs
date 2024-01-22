@@ -68,7 +68,7 @@ namespace System.Windows.Controls.Primitives
         public UIElement Content
         {
             get { return (UIElement)GetValue(ContentProperty); }
-            set { SetValue(ContentProperty, value); }
+            set { SetValueInternal(ContentProperty, value); }
         }
 
         /// <summary>

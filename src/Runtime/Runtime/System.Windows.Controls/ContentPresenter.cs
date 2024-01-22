@@ -67,7 +67,7 @@ namespace System.Windows.Controls
         public object Content
         {
             get { return GetValue(ContentProperty); }
-            set { SetValue(ContentProperty, value); }
+            set { SetValueInternal(ContentProperty, value); }
         }
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -138,7 +138,7 @@ namespace System.Windows.Controls
         public DataTemplate ContentTemplate
         {
             get { return (DataTemplate)GetValue(ContentTemplateProperty); }
-            set { SetValue(ContentTemplateProperty, value); }
+            set { SetValueInternal(ContentTemplateProperty, value); }
         }
 
         private static void OnContentTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -168,7 +168,7 @@ namespace System.Windows.Controls
         private DataTemplate Template
         {
             get { return _templateCache; }
-            set { SetValue(TemplateProperty, value); }
+            set { SetValueInternal(TemplateProperty, value); }
         }
 
         // Property invalidation callback invoked when TemplateProperty is invalidated

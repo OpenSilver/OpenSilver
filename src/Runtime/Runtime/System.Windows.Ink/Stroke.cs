@@ -79,11 +79,11 @@ namespace System.Windows.Ink
                 if (points == null)
                 {
                     points = new StylusPointCollection();
-                    SetValue(StylusPointsProperty, points);
+                    SetValueInternal(StylusPointsProperty, points);
                 }
                 return points;
             }
-            set { SetValue(StylusPointsProperty, value); }
+            set { SetValueInternal(StylusPointsProperty, value); }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -110,7 +110,7 @@ namespace System.Windows.Ink
                 if (attributes == null)
                 {
                     attributes = new DrawingAttributes();
-                    SetValue(DrawingAttributesProperty, attributes);
+                    SetValueInternal(DrawingAttributesProperty, attributes);
                 }
                 return attributes;
             }
@@ -121,7 +121,7 @@ namespace System.Windows.Ink
                     throw new ArgumentNullException(nameof(value));
                 }
 
-                SetValue(DrawingAttributesProperty, value);
+                SetValueInternal(DrawingAttributesProperty, value);
             }
         }
     }

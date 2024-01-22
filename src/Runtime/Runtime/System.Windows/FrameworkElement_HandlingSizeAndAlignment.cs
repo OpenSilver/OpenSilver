@@ -46,7 +46,7 @@ namespace System.Windows
         public double Height
         {
             get => (double)GetValue(HeightProperty);
-            set => SetValue(HeightProperty, value);
+            set => SetValueInternal(HeightProperty, value);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace System.Windows
         public double Width
         {
             get => (double)GetValue(WidthProperty);
-            set => SetValue(WidthProperty, value);
+            set => SetValueInternal(WidthProperty, value);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace System.Windows
         public HorizontalAlignment HorizontalAlignment
         {
             get { return (HorizontalAlignment)GetValue(HorizontalAlignmentProperty); }
-            set { SetValue(HorizontalAlignmentProperty, value); }
+            set { SetValueInternal(HorizontalAlignmentProperty, value); }
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace System.Windows
         public VerticalAlignment VerticalAlignment
         {
             get { return (VerticalAlignment)GetValue(VerticalAlignmentProperty); }
-            set { SetValue(VerticalAlignmentProperty, value); }
+            set { SetValueInternal(VerticalAlignmentProperty, value); }
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace System.Windows
         public Thickness Margin
         {
             get { return (Thickness)GetValue(MarginProperty); }
-            set { SetValue(MarginProperty, value); }
+            set { SetValueInternal(MarginProperty, value); }
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace System.Windows
         public double MinHeight
         {
             get { return (double)GetValue(MinHeightProperty); }
-            set { SetValue(MinHeightProperty, value); }
+            set { SetValueInternal(MinHeightProperty, value); }
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace System.Windows
         public double MinWidth
         {
             get { return (double)GetValue(MinWidthProperty); }
-            set { SetValue(MinWidthProperty, value); }
+            set { SetValueInternal(MinWidthProperty, value); }
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace System.Windows
         public double MaxHeight
         {
             get { return (double)GetValue(MaxHeightProperty); }
-            set { SetValue(MaxHeightProperty, value); }
+            set { SetValueInternal(MaxHeightProperty, value); }
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace System.Windows
         public double MaxWidth
         {
             get { return (double)GetValue(MaxWidthProperty); }
-            set { SetValue(MaxWidthProperty, value); }
+            set { SetValueInternal(MaxWidthProperty, value); }
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace System.Windows
         public ContextMenu ContextMenu
         {
             get { return (ContextMenu)GetValue(ContextMenuProperty); }
-            set { SetValue(ContextMenuProperty, value); }
+            set { SetValueInternal(ContextMenuProperty, value); }
         }
 
         /// <summary>

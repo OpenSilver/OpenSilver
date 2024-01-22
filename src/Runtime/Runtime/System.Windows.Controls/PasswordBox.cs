@@ -68,7 +68,7 @@ namespace System.Windows.Controls
         public char PasswordChar
         {
             get => (char)GetValue(PasswordCharProperty);
-            set => SetValue(PasswordCharProperty, value);
+            set => SetValueInternal(PasswordCharProperty, value);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace System.Windows.Controls
         public int MaxLength
         {
             get => (int)GetValue(MaxLengthProperty);
-            set => SetValue(MaxLengthProperty, value);
+            set => SetValueInternal(MaxLengthProperty, value);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace System.Windows.Controls
                     throw new ArgumentNullException(nameof(value));
                 }
 
-                SetValue(PasswordProperty, value);
+                SetValueInternal(PasswordProperty, value);
             }
         }
 
@@ -329,7 +329,7 @@ namespace System.Windows.Controls
         public Brush CaretBrush
         {
             get => (Brush)GetValue(CaretBrushProperty);
-            set => SetValue(CaretBrushProperty, value);
+            set => SetValueInternal(CaretBrushProperty, value);
         }
 
         [OpenSilver.NotImplemented]
@@ -347,7 +347,7 @@ namespace System.Windows.Controls
         public Brush SelectionBackground
         {
             get => (Brush)GetValue(SelectionBackgroundProperty);
-            set => SetValue(SelectionBackgroundProperty, value);
+            set => SetValueInternal(SelectionBackgroundProperty, value);
         }
 
         /// <summary>
@@ -369,7 +369,7 @@ namespace System.Windows.Controls
         public Brush SelectionForeground
         {
             get => (Brush)GetValue(SelectionForegroundProperty);
-            set => SetValue(SelectionForegroundProperty, value);
+            set => SetValueInternal(SelectionForegroundProperty, value);
         }
 
         #endregion

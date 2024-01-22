@@ -27,7 +27,7 @@ public class Span : Inline
     /// </summary>
     public Span()
     {
-        SetValue(InlinesProperty, new InlineCollection(this));
+        SetValueInternal(InlinesProperty, new InlineCollection(this));
     }
 
     private static readonly DependencyProperty InlinesProperty =

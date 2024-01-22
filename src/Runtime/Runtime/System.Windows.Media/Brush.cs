@@ -60,7 +60,7 @@ namespace System.Windows.Media
         public double Opacity
         {
             get => (double)GetValue(OpacityProperty);
-            set => SetValue(OpacityProperty, value);
+            set => SetValueInternal(OpacityProperty, value);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace System.Windows.Media
         public Transform RelativeTransform
         {
             get => (Transform)GetValue(RelativeTransformProperty);
-            set => SetValue(RelativeTransformProperty, value);
+            set => SetValueInternal(RelativeTransformProperty, value);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace System.Windows.Media
         public Transform Transform
         {
             get => (Transform)GetValue(TransformProperty);
-            set => SetValue(TransformProperty, value);
+            set => SetValueInternal(TransformProperty, value);
         }
 
         internal virtual Task<string> GetDataStringAsync(UIElement parent) =>

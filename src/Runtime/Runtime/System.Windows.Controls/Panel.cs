@@ -274,7 +274,7 @@ namespace System.Windows.Controls
         public Brush Background
         {
             get => (Brush)GetValue(BackgroundProperty);
-            set => SetValue(BackgroundProperty, value);
+            set => SetValueInternal(BackgroundProperty, value);
         }
 
         private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -784,7 +784,7 @@ namespace System.Windows.Controls
         public bool IsItemsHost
         {
             get { return (bool)GetValue(IsItemsHostProperty); }
-            internal set { SetValue(IsItemsHostPropertyKey, value); }
+            internal set { SetValueInternal(IsItemsHostPropertyKey, value); }
         }
 
         private static void OnIsItemsHostChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

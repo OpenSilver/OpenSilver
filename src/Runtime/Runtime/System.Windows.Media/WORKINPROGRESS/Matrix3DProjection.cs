@@ -36,8 +36,8 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
 		public Matrix3D ProjectionMatrix
 		{
-			get { return (Matrix3D)this.GetValue(ProjectionMatrixProperty); }
-			set { this.SetValue(ProjectionMatrixProperty, value); }
+			get { return (Matrix3D)GetValue(ProjectionMatrixProperty); }
+			set { SetValueInternal(ProjectionMatrixProperty, value); }
 		}
 	}
 }

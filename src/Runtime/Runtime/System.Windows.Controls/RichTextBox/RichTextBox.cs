@@ -40,7 +40,7 @@ namespace System.Windows.Controls
         public RichTextBox()
         {
             DefaultStyleKey = typeof(RichTextBox);
-            SetValue(BlocksProperty, new BlockCollection(this));
+            SetValueInternal(BlocksProperty, new BlockCollection(this));
             _selection = new TextSelection(this);
             IsEnabledChanged += (o, e) => _textViewHost?.View.SetEnable((bool)e.NewValue);
         }
@@ -203,7 +203,7 @@ namespace System.Windows.Controls
         public bool IsReadOnly
         {
             get => (bool)GetValue(IsReadOnlyProperty);
-            set => SetValue(IsReadOnlyProperty, value);
+            set => SetValueInternal(IsReadOnlyProperty, value);
         }
 
         private static void OnIsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -234,7 +234,7 @@ namespace System.Windows.Controls
         public double LineHeight
         {
             get => (double)GetValue(LineHeightProperty);
-            set => SetValue(LineHeightProperty, value);
+            set => SetValueInternal(LineHeightProperty, value);
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace System.Windows.Controls
         public bool AcceptsReturn
         {
             get => (bool)GetValue(AcceptsReturnProperty);
-            set => SetValue(AcceptsReturnProperty, value);
+            set => SetValueInternal(AcceptsReturnProperty, value);
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace System.Windows.Controls
         public Brush CaretBrush
         {
             get => (Brush)GetValue(CaretBrushProperty);
-            set => SetValue(CaretBrushProperty, value);
+            set => SetValueInternal(CaretBrushProperty, value);
         }
 
         /// <summary>
@@ -314,7 +314,7 @@ namespace System.Windows.Controls
         public LineStackingStrategy LineStackingStrategy
         {
             get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
-            set => SetValue(LineStackingStrategyProperty, value);
+            set => SetValueInternal(LineStackingStrategyProperty, value);
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace System.Windows.Controls
         public TextAlignment TextAlignment
         {
             get => (TextAlignment)GetValue(TextAlignmentProperty);
-            set => SetValue(TextAlignmentProperty, value);
+            set => SetValueInternal(TextAlignmentProperty, value);
         }
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace System.Windows.Controls
         public TextWrapping TextWrapping
         {
             get => (TextWrapping)GetValue(TextWrappingProperty);
-            set => SetValue(TextWrappingProperty, value);
+            set => SetValueInternal(TextWrappingProperty, value);
         }
 
         /// <summary>

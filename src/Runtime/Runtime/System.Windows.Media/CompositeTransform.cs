@@ -38,7 +38,7 @@ namespace System.Windows.Media
         public double ScaleX
         {
             get => (double)GetValue(ScaleXProperty);
-            set => SetValue(ScaleXProperty, value);
+            set => SetValueInternal(ScaleXProperty, value);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace System.Windows.Media
         public double ScaleY
         {
             get => (double)GetValue(ScaleYProperty);
-            set => SetValue(ScaleYProperty, value);
+            set => SetValueInternal(ScaleYProperty, value);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace System.Windows.Media
         public double SkewX
         {
             get => (double)GetValue(SkewXProperty);
-            set => SetValue(SkewXProperty, value);
+            set => SetValueInternal(SkewXProperty, value);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace System.Windows.Media
         public double SkewY
         {
             get => (double)GetValue(SkewYProperty);
-            set => SetValue(SkewYProperty, value);
+            set => SetValueInternal(SkewYProperty, value);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace System.Windows.Media
         public double Rotation
         {
             get => (double)GetValue(RotationProperty);
-            set => SetValue(RotationProperty, value);
+            set => SetValueInternal(RotationProperty, value);
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace System.Windows.Media
         public double TranslateX
         {
             get => (double)GetValue(TranslateXProperty);
-            set => SetValue(TranslateXProperty, value);
+            set => SetValueInternal(TranslateXProperty, value);
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace System.Windows.Media
         public double TranslateY
         {
             get => (double)GetValue(TranslateYProperty);
-            set => SetValue(TranslateYProperty, value);
+            set => SetValueInternal(TranslateYProperty, value);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace System.Windows.Media
         public double CenterX
         {
             get => (double)GetValue(CenterXProperty);
-            set => SetValue(CenterXProperty, value);
+            set => SetValueInternal(CenterXProperty, value);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace System.Windows.Media
         public double CenterY
         {
             get => (double)GetValue(CenterYProperty);
-            set => SetValue(CenterYProperty, value);
+            set => SetValueInternal(CenterYProperty, value);
         }
 
         internal override Matrix ValueInternal

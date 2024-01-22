@@ -30,7 +30,7 @@ namespace System.Windows.Controls
         /// </summary>
         public RichTextBlock()
         {
-            SetValue(BlocksProperty, new BlockCollection(this));
+            SetValueInternal(BlocksProperty, new BlockCollection(this));
         }
 
         internal sealed override bool EnablePointerEventsCore => true;
@@ -71,7 +71,7 @@ namespace System.Windows.Controls
         public Thickness Padding
         {
             get => (Thickness)GetValue(PaddingProperty);
-            set => SetValue(PaddingProperty, value);
+            set => SetValueInternal(PaddingProperty, value);
         }
 
         private static bool IsPaddingValid(object value)
@@ -97,7 +97,7 @@ namespace System.Windows.Controls
         public double FontSize
         {
             get => (double)GetValue(FontSizeProperty);
-            set => SetValue(FontSizeProperty, value);
+            set => SetValueInternal(FontSizeProperty, value);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace System.Windows.Controls
         public FontWeight FontWeight
         {
             get => (FontWeight)GetValue(FontWeightProperty);
-            set => SetValue(FontWeightProperty, value);
+            set => SetValueInternal(FontWeightProperty, value);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace System.Windows.Controls
         public FontStyle FontStyle
         {
             get => (FontStyle)GetValue(FontStyleProperty);
-            set => SetValue(FontStyleProperty, value);
+            set => SetValueInternal(FontStyleProperty, value);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace System.Windows.Controls
         public FontFamily FontFamily
         {
             get => (FontFamily)GetValue(FontFamilyProperty);
-            set => SetValue(FontFamilyProperty, value);
+            set => SetValueInternal(FontFamilyProperty, value);
         }
 
         private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -187,7 +187,7 @@ namespace System.Windows.Controls
         public TextWrapping TextWrapping
         {
             get => (TextWrapping)GetValue(TextWrappingProperty);
-            set => SetValue(TextWrappingProperty, value);
+            set => SetValueInternal(TextWrappingProperty, value);
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace System.Windows.Controls
         public TextAlignment TextAlignment
         {
             get => (TextAlignment)GetValue(TextAlignmentProperty);
-            set => SetValue(TextAlignmentProperty, value);
+            set => SetValueInternal(TextAlignmentProperty, value);
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace System.Windows.Controls
         public TextTrimming TextTrimming
         {
             get => (TextTrimming)GetValue(TextTrimmingProperty);
-            set => SetValue(TextTrimmingProperty, value);
+            set => SetValueInternal(TextTrimmingProperty, value);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace System.Windows.Controls
         public bool IsTextSelectionEnabled
         {
             get => (bool)GetValue(IsTextSelectionEnabledProperty);
-            set => SetValue(IsTextSelectionEnabledProperty, value);
+            set => SetValueInternal(IsTextSelectionEnabledProperty, value);
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace System.Windows.Controls
         public Brush Foreground
         {
             get => (Brush)GetValue(ForegroundProperty);
-            set => SetValue(ForegroundProperty, value);
+            set => SetValueInternal(ForegroundProperty, value);
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace System.Windows.Controls
         public int CharacterSpacing
         {
             get => (int)GetValue(CharacterSpacingProperty);
-            set => SetValue(CharacterSpacingProperty, value);
+            set => SetValueInternal(CharacterSpacingProperty, value);
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace System.Windows.Controls
         public double LineHeight
         {
             get => (double)GetValue(LineHeightProperty);
-            set => SetValue(LineHeightProperty, value);
+            set => SetValueInternal(LineHeightProperty, value);
         }
 
         /// <summary>

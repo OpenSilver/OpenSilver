@@ -53,7 +53,7 @@ namespace System.Windows.Media.Effects
         public double BlurRadius
         {
             get => (double)GetValue(BlurRadiusProperty);
-            set => SetValue(BlurRadiusProperty, value);
+            set => SetValueInternal(BlurRadiusProperty, value);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace System.Windows.Media.Effects
         public Color Color
         {
             get => (Color)GetValue(ColorProperty);
-            set => SetValue(ColorProperty, value);
+            set => SetValueInternal(ColorProperty, value);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace System.Windows.Media.Effects
         public double Direction
         {
             get => (double)GetValue(DirectionProperty);
-            set => SetValue(DirectionProperty, value);
+            set => SetValueInternal(DirectionProperty, value);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace System.Windows.Media.Effects
         public double Opacity
         {
             get => (double)GetValue(OpacityProperty);
-            set => SetValue(OpacityProperty, value);
+            set => SetValueInternal(OpacityProperty, value);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace System.Windows.Media.Effects
         public double ShadowDepth
         {
             get => (double)GetValue(ShadowDepthProperty);
-            set => SetValue(ShadowDepthProperty, value);
+            set => SetValueInternal(ShadowDepthProperty, value);
         }
 
         private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

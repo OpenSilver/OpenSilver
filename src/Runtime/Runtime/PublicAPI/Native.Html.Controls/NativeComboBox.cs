@@ -91,7 +91,7 @@ namespace CSHTML5.Native.Html.Controls
         public IEnumerable ItemsSource
         {
             get { return (IEnumerable)this.GetValue(NativeComboBox.ItemsSourceProperty); }
-            set { this.SetValue(NativeComboBox.ItemsSourceProperty, value); }
+            set { this.SetValueInternal(NativeComboBox.ItemsSourceProperty, value); }
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace CSHTML5.Native.Html.Controls
         public string DisplayMemberPath
         {
             get { return (string)this.GetValue(NativeComboBox.DisplayMemberPathProperty); }
-            set { this.SetValue(NativeComboBox.DisplayMemberPathProperty, value); }
+            set { this.SetValueInternal(NativeComboBox.DisplayMemberPathProperty, value); }
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace CSHTML5.Native.Html.Controls
         public int SelectedIndex
         {
             get { return (int)GetValue(NativeComboBox.SelectedIndexProperty); }
-            set { SetValue(NativeComboBox.SelectedIndexProperty, value); }
+            set { SetValueInternal(NativeComboBox.SelectedIndexProperty, value); }
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace CSHTML5.Native.Html.Controls
         public object SelectedItem
         {
             get { return this.GetValue(NativeComboBox.SelectedItemProperty); }
-            set { this.SetValue(NativeComboBox.SelectedItemProperty, value); }
+            set { this.SetValueInternal(NativeComboBox.SelectedItemProperty, value); }
         }
 
         /// <summary>
@@ -350,7 +350,7 @@ namespace CSHTML5.Native.Html.Controls
         public object SelectedValue
         {
             get { return this.GetValue(NativeComboBox.SelectedValueProperty); }
-            set { this.SetValue(NativeComboBox.SelectedValueProperty, value); }
+            set { this.SetValueInternal(NativeComboBox.SelectedValueProperty, value); }
         }
 
         /// <summary>
@@ -431,7 +431,7 @@ namespace CSHTML5.Native.Html.Controls
         public string SelectedValuePath
         {
             get { return (string)this.GetValue(NativeComboBox.SelectedValuePathProperty); }
-            set { this.SetValue(NativeComboBox.SelectedValuePathProperty, value); }
+            set { this.SetValueInternal(NativeComboBox.SelectedValuePathProperty, value); }
         }
 
         /// <summary>

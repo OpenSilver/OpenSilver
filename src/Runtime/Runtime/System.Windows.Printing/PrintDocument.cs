@@ -77,7 +77,7 @@ namespace System.Windows.Printing
         public int PrintedPageCount
         {
             get => (int)GetValue(PrintedPageCountProperty);
-            private set => SetValue(PrintedPageCountProperty, value);
+            private set => SetValueInternal(PrintedPageCountProperty, value);
         }
 
         /// <summary>

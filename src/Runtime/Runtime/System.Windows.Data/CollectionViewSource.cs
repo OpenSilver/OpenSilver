@@ -115,8 +115,8 @@ namespace System.Windows.Data
         /// </exception>
         public object Source
         {
-            get { return (object)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            get { return GetValue(SourceProperty); }
+            set { SetValueInternal(SourceProperty, value); }
         }
 
         /// <summary>
@@ -379,7 +379,7 @@ namespace System.Windows.Data
             }
 
             // update the View property
-            SetValue(ViewPropertyKey, view);
+            SetValueInternal(ViewPropertyKey, view);
         }
 
         private ViewRecord GetViewRecord(object source)

@@ -71,7 +71,7 @@ namespace System.Windows.Controls
         public bool AcceptsReturn
         {
             get { return (bool)GetValue(AcceptsReturnProperty); }
-            set { SetValue(AcceptsReturnProperty, value); }
+            set { SetValueInternal(AcceptsReturnProperty, value); }
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace System.Windows.Controls
         public bool AcceptsTab
         {
             get { return (bool)GetValue(AcceptsTabProperty); }
-            set { SetValue(AcceptsTabProperty, value); }
+            set { SetValueInternal(AcceptsTabProperty, value); }
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace System.Windows.Controls
         public string PlaceholderText
         {
             get { return (string)GetValue(PlaceholderTextProperty); }
-            set { SetValue(PlaceholderTextProperty, value); }
+            set { SetValueInternal(PlaceholderTextProperty, value); }
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace System.Windows.Controls
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            set { SetValueInternal(TextProperty, value); }
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace System.Windows.Controls
         public TextAlignment TextAlignment
         {
             get => (TextAlignment)GetValue(TextAlignmentProperty);
-            set => SetValue(TextAlignmentProperty, value);
+            set => SetValueInternal(TextAlignmentProperty, value);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace System.Windows.Controls
         public double LineHeight
         {
             get => (double)GetValue(LineHeightProperty);
-            set => SetValue(LineHeightProperty, value);
+            set => SetValueInternal(LineHeightProperty, value);
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace System.Windows.Controls
         public Brush CaretBrush
         {
             get { return (Brush)GetValue(CaretBrushProperty); }
-            set { SetValue(CaretBrushProperty, value); }
+            set { SetValueInternal(CaretBrushProperty, value); }
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace System.Windows.Controls
         public TextWrapping TextWrapping
         {
             get { return (TextWrapping)GetValue(TextWrappingProperty); }
-            set { SetValue(TextWrappingProperty, value); }
+            set { SetValueInternal(TextWrappingProperty, value); }
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace System.Windows.Controls
         public ScrollBarVisibility HorizontalScrollBarVisibility
         {
             get { return (ScrollBarVisibility)GetValue(HorizontalScrollBarVisibilityProperty); }
-            set { SetValue(HorizontalScrollBarVisibilityProperty, value); }
+            set { SetValueInternal(HorizontalScrollBarVisibilityProperty, value); }
         }
 
         /// <summary>
@@ -311,7 +311,7 @@ namespace System.Windows.Controls
         public ScrollBarVisibility VerticalScrollBarVisibility
         {
             get { return (ScrollBarVisibility)GetValue(VerticalScrollBarVisibilityProperty); }
-            set { SetValue(VerticalScrollBarVisibilityProperty, value); }
+            set { SetValueInternal(VerticalScrollBarVisibilityProperty, value); }
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace System.Windows.Controls
         public int MaxLength
         {
             get { return (int)GetValue(MaxLengthProperty); }
-            set { SetValue(MaxLengthProperty, value); }
+            set { SetValueInternal(MaxLengthProperty, value); }
         }
 
         /// <summary>
@@ -374,7 +374,7 @@ namespace System.Windows.Controls
         public new TextDecorationCollection TextDecorations
         {
             get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
-            set { SetValue(TextDecorationsProperty, value); }
+            set { SetValueInternal(TextDecorationsProperty, value); }
         }
 
         /// <summary>
@@ -399,7 +399,7 @@ namespace System.Windows.Controls
         public bool IsReadOnly
         {
             get { return (bool)GetValue(IsReadOnlyProperty); }
-            set { SetValue(IsReadOnlyProperty, value); }
+            set { SetValueInternal(IsReadOnlyProperty, value); }
         }
 
         public static readonly DependencyProperty IsReadOnlyProperty =
@@ -431,7 +431,7 @@ namespace System.Windows.Controls
         public bool IsSpellCheckEnabled
         {
             get { return (bool)GetValue(IsSpellCheckEnabledProperty); }
-            set { SetValue(IsSpellCheckEnabledProperty, value); }
+            set { SetValueInternal(IsSpellCheckEnabledProperty, value); }
         }
 
         /// <summary>
@@ -778,8 +778,8 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         public Brush SelectionForeground
         {
-            get { return (Brush)this.GetValue(TextBox.SelectionForegroundProperty); }
-            set { this.SetValue(TextBox.SelectionForegroundProperty, value); }
+            get { return (Brush)GetValue(SelectionForegroundProperty); }
+            set { SetValueInternal(SelectionForegroundProperty, value); }
         }
 
         [OpenSilver.NotImplemented]
@@ -794,7 +794,7 @@ namespace System.Windows.Controls
         public Brush SelectionBackground
         {
             get { return (Brush)GetValue(SelectionBackgroundProperty); }
-            set { SetValue(SelectionBackgroundProperty, value); }
+            set { SetValueInternal(SelectionBackgroundProperty, value); }
         }
 
         /// <summary>

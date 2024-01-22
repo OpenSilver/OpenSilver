@@ -46,7 +46,7 @@ public sealed class PointAnimation : AnimationTimeline, IFromByToAnimation<Point
     public Point? By
     {
         get => (Point?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public sealed class PointAnimation : AnimationTimeline, IFromByToAnimation<Point
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public sealed class PointAnimation : AnimationTimeline, IFromByToAnimation<Point
     public Point? From
     {
         get => (Point?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class PointAnimation : AnimationTimeline, IFromByToAnimation<Point
     public Point? To
     {
         get => (Point?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

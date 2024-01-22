@@ -82,7 +82,7 @@ namespace System.Windows
         public RoutedEvent RoutedEvent
         {
             get { return (RoutedEvent)GetValue(RoutedEventProperty); }
-            set { SetValue(RoutedEventProperty, value); }
+            set { SetValueInternal(RoutedEventProperty, value); }
         }
 
         //

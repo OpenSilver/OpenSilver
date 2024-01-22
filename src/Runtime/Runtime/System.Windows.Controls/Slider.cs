@@ -110,7 +110,7 @@ namespace System.Windows.Controls
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
+            set { SetValueInternal(OrientationProperty, value); }
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace System.Windows.Controls
         public bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
-            internal set { SetValue(IsFocusedPropertyKey, value); }
+            internal set { SetValueInternal(IsFocusedPropertyKey, value); }
         }
 
         private static readonly DependencyPropertyKey IsFocusedPropertyKey =
@@ -194,7 +194,7 @@ namespace System.Windows.Controls
         public bool IsDirectionReversed
         {
             get { return (bool)GetValue(IsDirectionReversedProperty); }
-            set { SetValue(IsDirectionReversedProperty, value); }
+            set { SetValueInternal(IsDirectionReversedProperty, value); }
         }
 
         /// <summary> 
@@ -541,11 +541,11 @@ namespace System.Windows.Controls
                         templateGrid.ColumnDefinitions[2].Width = new GridLength(1, IsDirectionReversed ? GridUnitType.Auto : GridUnitType.Star);
                         if (ElementHorizontalLargeDecrease != null)
                         {
-                            ElementHorizontalLargeDecrease.SetValue(Grid.ColumnProperty, IsDirectionReversed ? 2 : 0);
+                            ElementHorizontalLargeDecrease.SetValueInternal(Grid.ColumnProperty, IsDirectionReversed ? 2 : 0);
                         }
                         if (ElementHorizontalLargeIncrease != null)
                         {
-                            ElementHorizontalLargeIncrease.SetValue(Grid.ColumnProperty, IsDirectionReversed ? 0 : 2);
+                            ElementHorizontalLargeIncrease.SetValueInternal(Grid.ColumnProperty, IsDirectionReversed ? 0 : 2);
                         }
                     }
 
@@ -562,11 +562,11 @@ namespace System.Windows.Controls
                         templateGrid.RowDefinitions[2].Height = new GridLength(1, IsDirectionReversed ? GridUnitType.Star : GridUnitType.Auto);
                         if (ElementVerticalLargeDecrease != null)
                         {
-                            ElementVerticalLargeDecrease.SetValue(Grid.RowProperty, IsDirectionReversed ? 0 : 2);
+                            ElementVerticalLargeDecrease.SetValueInternal(Grid.RowProperty, IsDirectionReversed ? 0 : 2);
                         }
                         if (ElementVerticalLargeIncrease != null)
                         {
-                            ElementVerticalLargeIncrease.SetValue(Grid.RowProperty, IsDirectionReversed ? 2 : 0);
+                            ElementVerticalLargeIncrease.SetValueInternal(Grid.RowProperty, IsDirectionReversed ? 2 : 0);
                         }
                     }
 

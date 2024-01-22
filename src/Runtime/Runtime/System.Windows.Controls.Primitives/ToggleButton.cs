@@ -65,8 +65,8 @@ namespace System.Windows.Controls.Primitives
         /// </returns>
         public bool? IsChecked
         {
-            get { return (bool?)this.GetValue(IsCheckedProperty); }
-            set { this.SetValue(IsCheckedProperty, value); }
+            get { return (bool?)GetValue(IsCheckedProperty); }
+            set { SetValueInternal(IsCheckedProperty, value); }
         }
 
         private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -111,8 +111,8 @@ namespace System.Windows.Controls.Primitives
         /// </returns>
         public bool IsThreeState
         {
-            get { return (bool)this.GetValue(IsThreeStateProperty); }
-            set { this.SetValue(IsThreeStateProperty, value); }
+            get { return (bool)GetValue(IsThreeStateProperty); }
+            set { SetValueInternal(IsThreeStateProperty, value); }
         }
 
         #endregion Dependency Properties

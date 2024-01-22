@@ -615,7 +615,7 @@ namespace System.Windows
 
         internal void UpdateCountProperty()
         {
-            this.SetValue(CountPropertyKey, this.CountInternal);
+            SetValueInternal(CountPropertyKey, CountInternal);
         }
 
         internal event NotifyCollectionChangedEventHandler CollectionChanged;

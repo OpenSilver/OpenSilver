@@ -54,7 +54,7 @@ namespace System.Windows.Media
         public Matrix Matrix
         {
             get => (Matrix)GetValue(MatrixProperty);
-            set => SetValue(MatrixProperty, value);
+            set => SetValueInternal(MatrixProperty, value);
         }
 
         internal override Matrix ValueInternal => Matrix;

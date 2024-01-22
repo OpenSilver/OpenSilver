@@ -67,8 +67,8 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public int SelectedIndex
         {
-            get { return (int)this.GetValue(SelectedIndexProperty); }
-            set { this.SetValue(SelectedIndexProperty, value); }
+            get { return (int)GetValue(SelectedIndexProperty); }
+            set { SetValueInternal(SelectedIndexProperty, value); }
         }
 
         /// <summary>
@@ -111,8 +111,8 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public object SelectedItem
         {
-            get { return this.GetValue(SelectedItemProperty); }
-            set { this.SetValue(SelectedItemProperty, value); }
+            get { return GetValue(SelectedItemProperty); }
+            set { SetValueInternal(SelectedItemProperty, value); }
         }
 
         /// <summary>
@@ -157,8 +157,8 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public object SelectedValue
         {
-            get { return this.GetValue(SelectedValueProperty); }
-            set { this.SetValue(SelectedValueProperty, value); }
+            get { return GetValue(SelectedValueProperty); }
+            set { SetValueInternal(SelectedValueProperty, value); }
         }
 
         /// <summary>
@@ -228,8 +228,8 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public string SelectedValuePath
         {
-            get { return (string)this.GetValue(SelectedValuePathProperty); }
-            set { this.SetValue(SelectedValuePathProperty, value); }
+            get { return (string)GetValue(SelectedValuePathProperty); }
+            set { SetValueInternal(SelectedValuePathProperty, value); }
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace System.Windows.Controls.Primitives
         public bool? IsSynchronizedWithCurrentItem
         {
             get { return (bool?)GetValue(IsSynchronizedWithCurrentItemProperty); }
-            set { SetValue(IsSynchronizedWithCurrentItemProperty, value); }
+            set { SetValueInternal(IsSynchronizedWithCurrentItemProperty, value); }
         }
 
         /// <summary>
@@ -1417,16 +1417,18 @@ namespace System.Windows.Controls.Primitives
         /// Gets or sets the bakground color of the selected Items.
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush SelectedItemBackground
         {
-            get { return (Brush)this.GetValue(Selector.SelectedItemBackgroundProperty); }
-            set { this.SetValue(Selector.SelectedItemBackgroundProperty, value); }
+            get { return (Brush)GetValue(SelectedItemBackgroundProperty); }
+            set { SetValueInternal(SelectedItemBackgroundProperty, value); }
         }
 
         /// <summary>
         /// Identifies the SelectedItemBackground dependency property
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty SelectedItemBackgroundProperty =
             DependencyProperty.Register(
                 "SelectedItemBackground",
@@ -1438,16 +1440,18 @@ namespace System.Windows.Controls.Primitives
         /// Gets or sets the foreground color of the selected Items.
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush SelectedItemForeground
         {
-            get { return (Brush)this.GetValue(Selector.SelectedItemForegroundProperty); }
-            set { this.SetValue(Selector.SelectedItemForegroundProperty, value); }
+            get { return (Brush)GetValue(SelectedItemForegroundProperty); }
+            set { SetValueInternal(SelectedItemForegroundProperty, value); }
         }
 
         /// <summary>
         /// Identifies the SelectedItemForeground dependency property
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty SelectedItemForegroundProperty =
             DependencyProperty.Register(
                 "SelectedItemForeground",
@@ -1459,16 +1463,18 @@ namespace System.Windows.Controls.Primitives
         /// Gets or sets the bakground color of the Items that are not selected.
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush RowBackground
         {
-            get { return (Brush)this.GetValue(Selector.RowBackgroundProperty); }
-            set { this.SetValue(Selector.RowBackgroundProperty, value); }
+            get { return (Brush)GetValue(RowBackgroundProperty); }
+            set { SetValueInternal(RowBackgroundProperty, value); }
         }
 
         /// <summary>
         /// Identifies the RowBackground dependency property
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty RowBackgroundProperty =
             DependencyProperty.Register(
                 "RowBackground",
@@ -1481,16 +1487,18 @@ namespace System.Windows.Controls.Primitives
         /// Gets or sets the foreground color of the Items that are not selected.
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush UnselectedItemForeground
         {
-            get { return (Brush)this.GetValue(Selector.UnselectedItemForegroundProperty); }
-            set { this.SetValue(Selector.UnselectedItemForegroundProperty, value); }
+            get { return (Brush)GetValue(UnselectedItemForegroundProperty); }
+            set { SetValueInternal(UnselectedItemForegroundProperty, value); }
         }
 
         /// <summary>
         /// Identifies the UnselectedItemForeground dependency property
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty UnselectedItemForegroundProperty =
             DependencyProperty.Register(
                 "UnselectedItemForeground",
@@ -1502,6 +1510,7 @@ namespace System.Windows.Controls.Primitives
         /// Gets or sets the bakground color of the Items that are not selected.
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Brush UnselectedItemBackground
         {
             get { return this.RowBackground; }
@@ -1509,6 +1518,7 @@ namespace System.Windows.Controls.Primitives
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected bool ChangingSelectionProgrammatically { get; set; }
 
         #endregion Obsolete

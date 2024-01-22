@@ -115,7 +115,7 @@ namespace System.Windows.Controls
         public ItemsPanelTemplate ItemsPanel
         {
             get { return (ItemsPanelTemplate)GetValue(ItemsPanelProperty); }
-            set { SetValue(ItemsPanelProperty, value); }
+            set { SetValueInternal(ItemsPanelProperty, value); }
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace System.Windows.Controls
         public IEnumerable ItemsSource
         {
             get { return (IEnumerable)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
+            set { SetValueInternal(ItemsSourceProperty, value); }
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace System.Windows.Controls
         public DataTemplate ItemTemplate
         {
             get { return (DataTemplate)GetValue(ItemTemplateProperty); }
-            set { SetValue(ItemTemplateProperty, value); }
+            set { SetValueInternal(ItemTemplateProperty, value); }
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace System.Windows.Controls
         public string DisplayMemberPath
         {
             get { return (string)GetValue(DisplayMemberPathProperty); }
-            set { SetValue(DisplayMemberPathProperty, value); }
+            set { SetValueInternal(DisplayMemberPathProperty, value); }
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace System.Windows.Controls
         public Style ItemContainerStyle
         {
             get { return (Style)GetValue(ItemContainerStyleProperty); }
-            set { SetValue(ItemContainerStyleProperty, value); }
+            set { SetValueInternal(ItemContainerStyleProperty, value); }
         }
 
         /// <summary>

@@ -40,7 +40,7 @@ public class BackEase : EasingFunctionBase
     public double Amplitude
     {
         get => (double)GetValue(AmplitudeProperty);
-        set => SetValue(AmplitudeProperty, value);
+        set => SetValueInternal(AmplitudeProperty, value);
     }
 
     /// <inheritdoc />

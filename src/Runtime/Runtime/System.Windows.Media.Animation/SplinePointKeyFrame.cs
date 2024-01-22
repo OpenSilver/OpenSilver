@@ -41,7 +41,7 @@ public sealed class SplinePointKeyFrame : PointKeyFrame
     public KeySpline KeySpline
     {
         get => (KeySpline)GetValue(KeySplineProperty);
-        set => SetValue(KeySplineProperty, value);
+        set => SetValueInternal(KeySplineProperty, value);
     }
 
     /// <inheritdoc />

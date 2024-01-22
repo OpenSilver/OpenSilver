@@ -42,7 +42,7 @@ public class PowerEase : EasingFunctionBase
     public double Power
     {
         get => (double)GetValue(PowerProperty);
-        set => SetValue(PowerProperty, value);
+        set => SetValueInternal(PowerProperty, value);
     }
 
     /// <inheritdoc />

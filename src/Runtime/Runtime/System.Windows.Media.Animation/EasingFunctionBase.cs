@@ -40,7 +40,7 @@ public abstract class EasingFunctionBase : DependencyObject, IEasingFunction
     public EasingMode EasingMode
     {
         get => (EasingMode)GetValue(EasingModeProperty);
-        set => SetValue(EasingModeProperty, value);
+        set => SetValueInternal(EasingModeProperty, value);
     }
 
     /// <summary>

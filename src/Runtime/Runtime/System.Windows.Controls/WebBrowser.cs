@@ -82,7 +82,7 @@ namespace System.Windows.Controls
         public Uri SourceUri
         {
             get { return (Uri)GetValue(SourceUriProperty); }
-            set { SetValue(SourceUriProperty, value); }
+            set { SetValueInternal(SourceUriProperty, value); }
         }
         /// <summary>
         /// Gets or sets the Uniform Resource Identifier (URI) source of the HTML content to display in the control inside an iframe.

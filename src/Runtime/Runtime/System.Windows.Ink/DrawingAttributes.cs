@@ -46,7 +46,7 @@ namespace System.Windows.Ink
         public Color Color
         {
             get => (Color)GetValue(ColorProperty);
-            set => SetValue(ColorProperty, value);
+            set => SetValueInternal(ColorProperty, value);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -67,7 +67,7 @@ namespace System.Windows.Ink
         public Color OutlineColor
         {
             get => (Color)GetValue(OutlineColorProperty);
-            set => SetValue(OutlineColorProperty, value);
+            set => SetValueInternal(OutlineColorProperty, value);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -88,7 +88,7 @@ namespace System.Windows.Ink
         public double Width
         {
             get => (double)GetValue(WidthProperty);
-            set => SetValue(WidthProperty, value);
+            set => SetValueInternal(WidthProperty, value);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -109,7 +109,7 @@ namespace System.Windows.Ink
         public double Height
         {
             get => (double)GetValue(HeightProperty);
-            set => SetValue(HeightProperty, value);
+            set => SetValueInternal(HeightProperty, value);
         }
     }
 }

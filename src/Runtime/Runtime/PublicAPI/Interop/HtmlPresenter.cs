@@ -55,7 +55,7 @@ namespace CSHTML5.Native.Html.Controls
         public string Html
         {
             get => (string)GetValue(HtmlProperty);
-            set => SetValue(HtmlProperty, value);
+            set => SetValueInternal(HtmlProperty, value);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace CSHTML5.Native.Html.Controls
         public ScrollMode ScrollMode
         {
             get => (ScrollMode)GetValue(ScrollModeProperty);
-            set => SetValue(ScrollModeProperty, value);
+            set => SetValueInternal(ScrollModeProperty, value);
         }
 
         private static bool IsValidScrollMode(object value)

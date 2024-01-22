@@ -72,7 +72,7 @@ namespace System.Windows.Controls.Primitives
         public UIElement PlacementTarget
         {
             get { return (UIElement)GetValue(PlacementTargetProperty); }
-            set { SetValue(PlacementTargetProperty, value); }
+            set { SetValueInternal(PlacementTargetProperty, value); }
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace System.Windows.Controls.Primitives
         public PlacementMode Placement
         {
             get { return (PlacementMode)GetValue(PlacementProperty); }
-            set { SetValue(PlacementProperty, value); }
+            set { SetValueInternal(PlacementProperty, value); }
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace System.Windows.Controls.Primitives
         public UIElement Child
         {
             get { return (UIElement)GetValue(ChildProperty); }
-            set { SetValue(ChildProperty, value); }
+            set { SetValueInternal(ChildProperty, value); }
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace System.Windows.Controls.Primitives
         public bool IsOpen
         {
             get { return (bool)GetValue(IsOpenProperty); }
-            set { SetValue(IsOpenProperty, value); }
+            set { SetValueInternal(IsOpenProperty, value); }
         }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace System.Windows.Controls.Primitives
         public double HorizontalOffset
         {
             get { return (double)GetValue(HorizontalOffsetProperty); }
-            set { SetValue(HorizontalOffsetProperty, value); }
+            set { SetValueInternal(HorizontalOffsetProperty, value); }
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace System.Windows.Controls.Primitives
         public double VerticalOffset
         {
             get { return (double)GetValue(VerticalOffsetProperty); }
-            set { SetValue(VerticalOffsetProperty, value); }
+            set { SetValueInternal(VerticalOffsetProperty, value); }
         }
 
         /// <summary>
@@ -341,7 +341,7 @@ namespace System.Windows.Controls.Primitives
         public HorizontalAlignment HorizontalContentAlignment
         {
             get { return (HorizontalAlignment)GetValue(HorizontalContentAlignmentProperty); }
-            set { SetValue(HorizontalContentAlignmentProperty, value); }
+            set { SetValueInternal(HorizontalContentAlignmentProperty, value); }
         }
 
         /// <summary>
@@ -373,7 +373,7 @@ namespace System.Windows.Controls.Primitives
         public VerticalAlignment VerticalContentAlignment
         {
             get { return (VerticalAlignment)GetValue(VerticalContentAlignmentProperty); }
-            set { SetValue(VerticalContentAlignmentProperty, value); }
+            set { SetValueInternal(VerticalContentAlignmentProperty, value); }
         }
 
         /// <summary>
@@ -401,7 +401,7 @@ namespace System.Windows.Controls.Primitives
         public bool StaysWithinScreenBounds
         {
             get { return (bool)GetValue(StaysWithinScreenBoundsProperty); }
-            set { SetValue(StaysWithinScreenBoundsProperty, value); }
+            set { SetValueInternal(StaysWithinScreenBoundsProperty, value); }
         }
 
         /// <summary>

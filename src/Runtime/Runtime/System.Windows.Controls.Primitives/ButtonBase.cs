@@ -67,7 +67,7 @@ namespace System.Windows.Controls.Primitives
         public ClickMode ClickMode
         {
             get => (ClickMode)GetValue(ClickModeProperty);
-            set => SetValue(ClickModeProperty, value);
+            set => SetValueInternal(ClickModeProperty, value);
         }
 
         private static bool IsValidClickMode(object o)
@@ -99,7 +99,7 @@ namespace System.Windows.Controls.Primitives
         public bool IsFocused
         {
             get => (bool)GetValue(IsFocusedProperty);
-            private set => SetValue(IsFocusedPropertyKey, value);
+            private set => SetValueInternal(IsFocusedPropertyKey, value);
         }
 
         private static readonly DependencyPropertyKey IsMouseOverPropertyKey =
@@ -124,7 +124,7 @@ namespace System.Windows.Controls.Primitives
         public bool IsMouseOver
         {
             get => (bool)GetValue(IsMouseOverProperty);
-            private set => SetValue(IsMouseOverPropertyKey, value);
+            private set => SetValueInternal(IsMouseOverPropertyKey, value);
         }
 
         private static readonly DependencyPropertyKey IsPressedPropertyKey =
@@ -150,7 +150,7 @@ namespace System.Windows.Controls.Primitives
         public bool IsPressed
         {
             get => (bool)GetValue(IsPressedProperty);
-            protected set => SetValue(IsPressedPropertyKey, value);
+            protected set => SetValueInternal(IsPressedPropertyKey, value);
         }
 
         private static void OnIsPressedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -177,7 +177,7 @@ namespace System.Windows.Controls.Primitives
         public object CommandParameter
         {
             get => GetValue(CommandParameterProperty);
-            set => SetValue(CommandParameterProperty, value);
+            set => SetValueInternal(CommandParameterProperty, value);
         }
 
         private static void OnCommandParameterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -204,7 +204,7 @@ namespace System.Windows.Controls.Primitives
         public ICommand Command
         {
             get => (ICommand)GetValue(CommandProperty);
-            set => SetValue(CommandProperty, value);
+            set => SetValueInternal(CommandProperty, value);
         }
 
         private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

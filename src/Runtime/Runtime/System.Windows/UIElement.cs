@@ -296,7 +296,7 @@ namespace System.Windows
         public bool ClipToBounds
         {
             get { return ClipToBoundsCache; }
-            set { SetValue(ClipToBoundsProperty, value); }
+            set { SetValueInternal(ClipToBoundsProperty, value); }
         }
 
         /// <summary>
@@ -347,7 +347,7 @@ namespace System.Windows
         public Geometry Clip
         {
             get => (Geometry)GetValue(ClipProperty);
-            set => SetValue(ClipProperty, value);
+            set => SetValueInternal(ClipProperty, value);
         }
 
         private static void OnClipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -461,7 +461,7 @@ namespace System.Windows
         public bool IsEnabled
         {
             get => (bool)GetValue(IsEnabledProperty);
-            set => SetValue(IsEnabledProperty, value);
+            set => SetValueInternal(IsEnabledProperty, value);
         }
 
         private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -555,7 +555,7 @@ namespace System.Windows
         public Effect Effect
         {
             get => (Effect)GetValue(EffectProperty);
-            set => SetValue(EffectProperty, value);
+            set => SetValueInternal(EffectProperty, value);
         }
 
         private static void OnEffectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -615,7 +615,7 @@ namespace System.Windows
         public Transform RenderTransform
         {
             get => (Transform)GetValue(RenderTransformProperty) ?? new MatrixTransform();
-            set => SetValue(RenderTransformProperty, value);
+            set => SetValueInternal(RenderTransformProperty, value);
         }
 
         private static void OnRenderTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -672,7 +672,7 @@ namespace System.Windows
         public Point RenderTransformOrigin
         {
             get => (Point)GetValue(RenderTransformOriginProperty);
-            set => SetValue(RenderTransformOriginProperty, value);
+            set => SetValueInternal(RenderTransformOriginProperty, value);
         }
 
 #endregion
@@ -687,12 +687,11 @@ namespace System.Windows
         public bool UseLayoutRounding
         {
             get { return (bool)GetValue(UseLayoutRoundingProperty); }
-            set { SetValue(UseLayoutRoundingProperty, value); }
+            set { SetValueInternal(UseLayoutRoundingProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.UseLayoutRounding"/> dependency 
-        /// property.
+        /// Identifies the <see cref="UseLayoutRounding"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty UseLayoutRoundingProperty =
             DependencyProperty.Register(
@@ -749,7 +748,7 @@ namespace System.Windows
         public Visibility Visibility
         {
             get { return VisibilityCache; }
-            set { SetValue(VisibilityProperty, value); }
+            set { SetValueInternal(VisibilityProperty, value); }
         }
 
         /// <summary>
@@ -930,7 +929,7 @@ namespace System.Windows
         public double Opacity
         {
             get => (double)GetValue(OpacityProperty);
-            set => SetValue(OpacityProperty, value);
+            set => SetValueInternal(OpacityProperty, value);
         }
 
         /// <summary>
@@ -957,7 +956,7 @@ namespace System.Windows
         public bool IsHitTestVisible
         {
             get { return (bool)GetValue(IsHitTestVisibleProperty); }
-            set { SetValue(IsHitTestVisibleProperty, value); }
+            set { SetValueInternal(IsHitTestVisibleProperty, value); }
         }
 
         /// <summary>
@@ -1042,7 +1041,7 @@ namespace System.Windows
         public bool AllowDrop
         {
             get { return (bool)GetValue(AllowDropProperty); }
-            set { SetValue(AllowDropProperty, value); }
+            set { SetValueInternal(AllowDropProperty, value); }
         }
 
         /// <summary>
@@ -1085,7 +1084,7 @@ namespace System.Windows
         public bool AllowScrollOnTouchMove
         {
             get { return (bool)GetValue(AllowScrollOnTouchMoveProperty); }
-            set { SetValue(AllowScrollOnTouchMoveProperty, value); }
+            set { SetValueInternal(AllowScrollOnTouchMoveProperty, value); }
         }
 
         /// <summary>

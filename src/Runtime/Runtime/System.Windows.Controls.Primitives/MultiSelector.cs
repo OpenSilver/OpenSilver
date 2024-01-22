@@ -137,7 +137,7 @@ namespace System.Windows.Controls.Primitives
         public IList SelectedItems
         {
             get { return (IList)GetValue(SelectedItemsProperty); }
-            private set { SetValue(SelectedItemsProperty, value); }
+            private set { SetValueInternal(SelectedItemsProperty, value); }
         }
         /// <summary>
         /// Identifies the SelectedItems dependency property.

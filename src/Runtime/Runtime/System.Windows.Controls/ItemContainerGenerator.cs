@@ -1466,7 +1466,7 @@ namespace System.Windows.Controls
         {
             // always set the ItemForItemContainer property
             container.ClearValue(ItemForItemContainerProperty);
-            container.SetValue(ItemForItemContainerProperty, item);
+            container.SetValueInternal(ItemForItemContainerProperty, item);
 
             // for non-direct items, set the DataContext property
             if (container != item)
@@ -1479,7 +1479,7 @@ namespace System.Windows.Controls
                 Debug.Assert(container.ReadLocalValueInternal(dp) as BindingExpression == null, "DataContext set by expression (unexpectedly)");
 #endif
 
-                container.SetValue(FrameworkElement.DataContextProperty, item);
+                container.SetValueInternal(FrameworkElement.DataContextProperty, item);
             }
         }
 

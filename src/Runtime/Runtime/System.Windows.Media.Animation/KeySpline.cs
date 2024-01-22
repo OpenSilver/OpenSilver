@@ -67,7 +67,7 @@ public sealed class KeySpline : DependencyObject
     public Point ControlPoint1
     {
         get => (Point)GetValue(ControlPoint1Property);
-        set => SetValue(ControlPoint1Property, value);
+        set => SetValueInternal(ControlPoint1Property, value);
     }
 
     private static readonly DependencyProperty ControlPoint2Property =
@@ -87,7 +87,7 @@ public sealed class KeySpline : DependencyObject
     public Point ControlPoint2
     {
         get => (Point)GetValue(ControlPoint2Property);
-        set => SetValue(ControlPoint2Property, value);
+        set => SetValueInternal(ControlPoint2Property, value);
     }
 
     private static void OnControlPointChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

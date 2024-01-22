@@ -102,7 +102,7 @@ namespace System.Windows.Controls
                 throw new ArgumentNullException(nameof(element));
             }
 
-            element.SetValue(PlacementProperty, value);
+            element.SetValueInternal(PlacementProperty, value);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace System.Windows.Controls
         /// </param>
         public static void SetPlacementTarget(DependencyObject element, UIElement value)
         {
-            element.SetValue(PlacementTargetProperty, value);
+            element.SetValueInternal(PlacementTargetProperty, value);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace System.Windows.Controls
                 throw new ArgumentNullException(nameof(element));
             }
 
-            element.SetValue(ToolTipProperty, value);
+            element.SetValueInternal(ToolTipProperty, value);
         }
 
         private static void OnToolTipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -380,7 +380,7 @@ namespace System.Windows.Controls
             owner.MouseEnter += new MouseEventHandler(OnOwnerMouseEnter);
             owner.MouseLeave += new MouseEventHandler(OnOwnerMouseLeave);
             var converted = ConvertToToolTip(toolTip);
-            owner.SetValue(ToolTipInternalProperty, converted);
+            owner.SetValueInternal(ToolTipInternalProperty, converted);
             converted.SetOwner(owner);
         }
 

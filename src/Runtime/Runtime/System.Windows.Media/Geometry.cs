@@ -53,7 +53,7 @@ namespace System.Windows.Media
         public Transform Transform
         {
             get => (Transform)GetValue(TransformProperty);
-            set => SetValue(TransformProperty, value);
+            set => SetValueInternal(TransformProperty, value);
         }
 
         /// <summary>

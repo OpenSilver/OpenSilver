@@ -124,7 +124,7 @@ namespace System.Windows.Controls
         public UIElement Child
         {
             get => (UIElement)GetValue(ChildProperty);
-            set => SetValue(ChildProperty, value);
+            set => SetValueInternal(ChildProperty, value);
         }
 
         private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -184,7 +184,7 @@ namespace System.Windows.Controls
         public Brush Background
         {
             get => (Brush)GetValue(BackgroundProperty);
-            set => SetValue(BackgroundProperty, value);
+            set => SetValueInternal(BackgroundProperty, value);
         }
 
         private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -252,7 +252,7 @@ namespace System.Windows.Controls
         public Brush BorderBrush
         {
             get => (Brush)GetValue(BorderBrushProperty);
-            set => SetValue(BorderBrushProperty, value);
+            set => SetValueInternal(BorderBrushProperty, value);
         }
 
         private static void OnBorderBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -331,7 +331,7 @@ namespace System.Windows.Controls
         public Thickness BorderThickness
         {
             get { return (Thickness)GetValue(BorderThicknessProperty); }
-            set { SetValue(BorderThicknessProperty, value); }
+            set { SetValueInternal(BorderThicknessProperty, value); }
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace System.Windows.Controls
         public CornerRadius CornerRadius
         {
             get { return (CornerRadius)GetValue(CornerRadiusProperty); }
-            set { SetValue(CornerRadiusProperty, value); }
+            set { SetValueInternal(CornerRadiusProperty, value); }
         }
 
         /// <summary>
@@ -377,7 +377,7 @@ namespace System.Windows.Controls
         public Thickness Padding
         {
             get { return (Thickness)GetValue(PaddingProperty); }
-            set { SetValue(PaddingProperty, value); }
+            set { SetValueInternal(PaddingProperty, value); }
         }
 
         /// <summary>

@@ -52,7 +52,7 @@ namespace System.Windows.Shapes
         public FillRule FillRule
         {
             get => (FillRule)GetValue(FillRuleProperty);
-            set => SetValue(FillRuleProperty, value);
+            set => SetValueInternal(FillRuleProperty, value);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace System.Windows.Shapes
         public PointCollection Points
         {
             get => (PointCollection)GetValue(PointsProperty);
-            set => SetValue(PointsProperty, value);
+            set => SetValueInternal(PointsProperty, value);
         }
 
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

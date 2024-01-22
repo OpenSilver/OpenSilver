@@ -80,7 +80,7 @@ namespace System.Windows.Controls
         internal ItemsPanelTemplate Template
         {
             get { return _templateCache; }
-            set { SetValue(TemplateProperty, value); }
+            set { SetValueInternal(TemplateProperty, value); }
         }
 
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

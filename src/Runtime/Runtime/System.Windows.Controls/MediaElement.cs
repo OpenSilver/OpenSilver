@@ -39,7 +39,7 @@ namespace System.Windows.Controls
         public bool AutoPlay
         {
             get { return (bool)GetValue(AutoPlayProperty); }
-            set { SetValue(AutoPlayProperty, value); }
+            set { SetValueInternal(AutoPlayProperty, value); }
         }
         /// <summary>
         /// Identifies the <see cref="AutoPlay"/> dependency property.
@@ -84,7 +84,7 @@ namespace System.Windows.Controls
         public bool IsAudioOnly
         {
             get { return (bool)GetValue(IsAudioOnlyProperty); }
-            private set { SetValue(IsAudioOnlyPropertyKey, value); }
+            private set { SetValueInternal(IsAudioOnlyPropertyKey, value); }
         }
 
         private static readonly DependencyPropertyKey IsAudioOnlyPropertyKey =
@@ -107,7 +107,7 @@ namespace System.Windows.Controls
         public bool IsLooping
         {
             get { return (bool)GetValue(IsLoopingProperty); }
-            set { SetValue(IsLoopingProperty, value); }
+            set { SetValueInternal(IsLoopingProperty, value); }
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace System.Windows.Controls
         public bool IsMuted
         {
             get { return (bool)GetValue(IsMutedProperty); }
-            set { SetValue(IsMutedProperty, value); }
+            set { SetValueInternal(IsMutedProperty, value); }
         }
         /// <summary>
         /// Identifies the <see cref="IsMuted"/> dependency property.
@@ -162,7 +162,7 @@ namespace System.Windows.Controls
         public Uri Source
         {
             get { return (Uri)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            set { SetValueInternal(SourceProperty, value); }
         }
         /// <summary>
         /// Identifies the Source dependency property.
@@ -201,7 +201,7 @@ namespace System.Windows.Controls
         public double Volume
         {
             get { return (double)GetValue(VolumeProperty); }
-            set { SetValue(VolumeProperty, value); }
+            set { SetValueInternal(VolumeProperty, value); }
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace System.Windows.Controls
         public bool ShowControls
         {
             get { return (bool)GetValue(ShowControlsProperty); }
-            set { SetValue(ShowControlsProperty, value); }
+            set { SetValueInternal(ShowControlsProperty, value); }
         }
 
         /// <summary>

@@ -76,7 +76,7 @@ namespace System.Windows.Controls
         public SelectionMode SelectionMode
         {
             get { return (SelectionMode)GetValue(SelectionModeProperty); }
-            set { SetValue(SelectionModeProperty, value); }
+            set { SetValueInternal(SelectionModeProperty, value); }
         }
 
         /// <summary>
@@ -300,14 +300,14 @@ namespace System.Windows.Controls
         protected override void OnLostFocus(RoutedEventArgs e)
         {
             base.OnLostFocus(e);
-            SetValue(IsSelectionActivePropertyKey, false);
+            SetValueInternal(IsSelectionActivePropertyKey, false);
         }
 
         /// <inheritdoc />
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
-            SetValue(IsSelectionActivePropertyKey, true);
+            SetValueInternal(IsSelectionActivePropertyKey, true);
         }
 
         /// <summary>

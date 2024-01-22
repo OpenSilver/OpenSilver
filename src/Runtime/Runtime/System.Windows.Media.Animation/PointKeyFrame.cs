@@ -42,7 +42,7 @@ public abstract class PointKeyFrame : DependencyObject, IKeyFrame<Point>
     public KeyTime KeyTime
     {
         get => (KeyTime)GetValue(KeyTimeProperty);
-        set => SetValue(KeyTimeProperty, value);
+        set => SetValueInternal(KeyTimeProperty, value);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public abstract class PointKeyFrame : DependencyObject, IKeyFrame<Point>
     public Point Value
     {
         get => (Point)GetValue(ValueProperty);
-        set => SetValue(ValueProperty, value);
+        set => SetValueInternal(ValueProperty, value);
     }
 
     object IKeyFrame.Value

@@ -56,7 +56,7 @@ public abstract partial class Timeline : DependencyObject
     public bool AutoReverse
     {
         get => (bool)GetValue(AutoReverseProperty);
-        set => SetValue(AutoReverseProperty, value);
+        set => SetValueInternal(AutoReverseProperty, value);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public abstract partial class Timeline : DependencyObject
     public TimeSpan? BeginTime
     {
         get => (TimeSpan?)GetValue(BeginTimeProperty);
-        set => SetValue(BeginTimeProperty, value);
+        set => SetValueInternal(BeginTimeProperty, value);
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public abstract partial class Timeline : DependencyObject
     public Duration Duration
     {
         get => (Duration)GetValue(DurationProperty);
-        set => SetValue(DurationProperty, value);
+        set => SetValueInternal(DurationProperty, value);
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ public abstract partial class Timeline : DependencyObject
     public FillBehavior FillBehavior
     {
         get => (FillBehavior)GetValue(FillBehaviorProperty);
-        set => SetValue(FillBehaviorProperty, value);
+        set => SetValueInternal(FillBehaviorProperty, value);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ public abstract partial class Timeline : DependencyObject
     public RepeatBehavior RepeatBehavior
     {
         get => (RepeatBehavior)GetValue(RepeatBehaviorProperty);
-        set => SetValue(RepeatBehaviorProperty, value);
+        set => SetValueInternal(RepeatBehaviorProperty, value);
     }
 
     /// <summary>
@@ -185,7 +185,7 @@ public abstract partial class Timeline : DependencyObject
     public double SpeedRatio
     {
         get => (double)GetValue(SpeedRatioProperty);
-        set => SetValue(SpeedRatioProperty, value);
+        set => SetValueInternal(SpeedRatioProperty, value);
     }
 
     /// <summary>

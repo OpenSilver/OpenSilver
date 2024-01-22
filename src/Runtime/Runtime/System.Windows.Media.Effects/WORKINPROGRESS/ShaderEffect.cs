@@ -23,8 +23,8 @@ namespace System.Windows.Media.Effects
 		[OpenSilver.NotImplemented]
         protected PixelShader PixelShader
         {
-            get { return (PixelShader)this.GetValue(ShaderEffect.PixelShaderProperty); }
-            set { this.SetValue(ShaderEffect.PixelShaderProperty, value); }
+            get { return (PixelShader)GetValue(PixelShaderProperty); }
+            set { SetValueInternal(PixelShaderProperty, value); }
         }
 
 		[OpenSilver.NotImplemented]

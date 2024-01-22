@@ -29,8 +29,8 @@ namespace System.Windows
 		[OpenSilver.NotImplemented]
         public WindowSettings WindowSettings
         {
-            get { return (WindowSettings)this.GetValue(WindowSettingsProperty); }
-            private set { this.SetValue(WindowSettingsProperty, value); }
+            get { return (WindowSettings)GetValue(WindowSettingsProperty); }
+            private set { SetValueInternal(WindowSettingsProperty, value); }
         }
     }
 }

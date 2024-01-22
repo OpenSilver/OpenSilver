@@ -45,7 +45,7 @@ public sealed class EasingColorKeyFrame : ColorKeyFrame
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <inheritdoc />

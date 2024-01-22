@@ -57,7 +57,7 @@ namespace System.Windows.Controls.Primitives
         public TimeSpan Debounce
         {
             get => (TimeSpan)GetValue(DebounceProperty);
-            set => SetValue(DebounceProperty, value);
+            set => SetValueInternal(DebounceProperty, value);
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -79,7 +79,7 @@ namespace System.Windows.Controls.Primitives
                 throw new ArgumentNullException(nameof(fe));
             }
 
-            fe.SetValue(DebounceProperty, debounce);
+            fe.SetValueInternal(DebounceProperty, debounce);
         }
 
         /// <summary> 
@@ -266,7 +266,7 @@ namespace System.Windows.Controls.Primitives
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
+            set { SetValueInternal(OrientationProperty, value); }
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace System.Windows.Controls.Primitives
         public double ViewportSize
         {
             get { return (double)GetValue(ViewportSizeProperty); }
-            set { SetValue(ViewportSizeProperty, value); }
+            set { SetValueInternal(ViewportSizeProperty, value); }
         }
 
         /// <summary> 

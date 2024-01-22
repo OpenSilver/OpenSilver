@@ -70,7 +70,7 @@ namespace System.Windows.Controls.Primitives
         public int Delay
         {
             get => (int)GetValue(DelayProperty);
-            set => SetValue(DelayProperty, value);
+            set => SetValueInternal(DelayProperty, value);
         }
 
         private static bool IsDelayValid(object value) => (int)value >= 0;
@@ -100,7 +100,7 @@ namespace System.Windows.Controls.Primitives
         public int Interval
         {
             get => (int)GetValue(IntervalProperty);
-            set => SetValue(IntervalProperty, value);
+            set => SetValueInternal(IntervalProperty, value);
         }
 
         private static bool IsIntervalValid(object value) => (int)value > 0;

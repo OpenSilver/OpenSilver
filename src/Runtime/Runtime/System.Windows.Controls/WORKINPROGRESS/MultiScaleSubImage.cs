@@ -162,7 +162,7 @@ namespace System.Windows.Controls
 		public double Opacity
 		{
 			get { return (double)GetValue(OpacityProperty); }
-			set { SetValue(OpacityProperty, value); }
+			set { SetValueInternal(OpacityProperty, value); }
 		}
 		//
 		// Summary:
@@ -196,7 +196,7 @@ namespace System.Windows.Controls
 		public Point ViewportOrigin
 		{
 			get { return (Point)GetValue(ViewportOriginProperty); }
-			set { SetValue(ViewportOriginProperty, value); }
+			set { SetValueInternal(ViewportOriginProperty, value); }
 		}
 		//
 		// Summary:
@@ -208,7 +208,7 @@ namespace System.Windows.Controls
 		public double ViewportWidth
 		{
 			get { return (double)GetValue(ViewportWidthProperty); }
-			set { SetValue(ViewportWidthProperty, value); }
+			set { SetValueInternal(ViewportWidthProperty, value); }
 		}
 		//
 		// Summary:
@@ -223,7 +223,7 @@ namespace System.Windows.Controls
 		public int ZIndex
 		{
 			get { return (int)GetValue(ZIndexProperty); }
-			set { SetValue(ZIndexProperty, value); }
+			set { SetValueInternal(ZIndexProperty, value); }
 		}
 	}
 }

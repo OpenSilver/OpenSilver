@@ -86,7 +86,7 @@ namespace System.Windows.Media
         public PathFigureCollection Figures
         {
             get => (PathFigureCollection)GetValue(FiguresProperty);
-            set => SetValue(FiguresProperty, value);
+            set => SetValueInternal(FiguresProperty, value);
         }
 
         private static void OnFiguresChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -134,7 +134,7 @@ namespace System.Windows.Media
         public FillRule FillRule
         {
             get => (FillRule)GetValue(FillRuleProperty);
-            set => SetValue(FillRuleProperty, value);
+            set => SetValueInternal(FillRuleProperty, value);
         }
 
         /// <summary>

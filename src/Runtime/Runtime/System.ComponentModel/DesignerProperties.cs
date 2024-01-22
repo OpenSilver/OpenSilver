@@ -52,7 +52,7 @@ namespace System.ComponentModel
         {
             if (element == null)
                 throw new ArgumentNullException("The element parameter cannot be null");
-            element.SetValue(IsInDesignModeProperty, value);
+            element.SetValueInternal(IsInDesignModeProperty, value);
         }
         /// <summary>
         /// Identifies the System.ComponentModel.DesignerProperties.IsInDesignMode attached

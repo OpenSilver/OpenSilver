@@ -58,7 +58,7 @@ namespace System.Windows.Input
         /// <param name="newFocus"></param>
         internal static void SetFocusedElement(DependencyObject scope, UIElement newFocus)
         {
-            scope.SetValue(FocusedElementProperty, newFocus);
+            scope.SetValueInternal(FocusedElementProperty, newFocus);
         }
 
         private static void OnFocusedElementChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)

@@ -50,7 +50,7 @@ namespace System.Windows
         {
             get => (string)GetValue(FrameworkElement.NameProperty);
             [EditorBrowsable(EditorBrowsableState.Never)]
-            set => SetValue(FrameworkElement.NameProperty, value);
+            set => SetValueInternal(FrameworkElement.NameProperty, value);
         }
 
         /// <summary>

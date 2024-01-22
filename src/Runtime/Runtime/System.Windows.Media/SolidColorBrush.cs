@@ -74,7 +74,7 @@ namespace System.Windows.Media
         public Color Color
         {
             get => (Color)GetValue(ColorProperty);
-            set => SetValue(ColorProperty, value);
+            set => SetValueInternal(ColorProperty, value);
         }
 
         /// <inheritdoc />

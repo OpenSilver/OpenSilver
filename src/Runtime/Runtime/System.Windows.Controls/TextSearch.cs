@@ -47,7 +47,7 @@ namespace System.Windows.Controls
             if (instance == null)
             {
                 instance = new TextSearch(itemsControl);
-                itemsControl.SetValue(TextSearchInstanceProperty, instance);
+                itemsControl.SetValueInternal(TextSearchInstanceProperty, instance);
             }
 
             return instance;
@@ -99,7 +99,7 @@ namespace System.Windows.Controls
                 throw new ArgumentNullException(nameof(element));
             }
 
-            element.SetValue(TextPathProperty, path);
+            element.SetValueInternal(TextPathProperty, path);
         }
 
         /// <summary>

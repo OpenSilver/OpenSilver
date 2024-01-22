@@ -556,7 +556,31 @@ namespace System.Windows
                 this,
                 dp,
                 metadata,
-                value);
+                value,
+                false);
+        }
+
+        internal void SetValueInternal(DependencyProperty dp, object value)
+        {
+            if (dp == null)
+            {
+                throw new ArgumentNullException(nameof(dp));
+            }
+
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            DependencyObjectStore.TryGetStorage(this,
+                dp,
+                metadata,
+                true,
+                out Storage storage);
+
+            DependencyObjectStore.SetValueCommon(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                true);
         }
 
         internal void SetValue(DependencyPropertyKey key, object value)
@@ -578,7 +602,31 @@ namespace System.Windows
                 this,
                 dp,
                 metadata,
-                value);
+                value,
+                false);
+        }
+
+        internal void SetValueInternal(DependencyPropertyKey key, object value)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
+
+            DependencyObjectStore.TryGetStorage(this,
+                dp,
+                metadata,
+                true,
+                out Storage storage);
+
+            DependencyObjectStore.SetValueCommon(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                true);
         }
 
         internal virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

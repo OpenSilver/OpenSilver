@@ -56,7 +56,7 @@ namespace System.Windows.Media
         public TransformCollection Children
         {
             get => (TransformCollection)GetValue(ChildrenProperty);
-            set => SetValue(ChildrenProperty, value);
+            set => SetValueInternal(ChildrenProperty, value);
         }
 
         private static void OnChildrenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -98,7 +98,7 @@ internal sealed class AnimationClock<TValue> : AnimationClock
                         if (i == 0 && value is ICloneOnAnimation<DependencyObject> cloneable && !cloneable.IsClone)
                         {
                             value = cloneable.Clone();
-                            target.SetValue(dp, value);
+                            target.SetValueInternal(dp, value);
                         }
                         target = value;
                         break;

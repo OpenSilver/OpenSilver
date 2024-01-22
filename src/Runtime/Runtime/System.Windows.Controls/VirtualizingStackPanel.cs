@@ -69,8 +69,8 @@ namespace System.Windows.Controls
         /// </summary>
         public Orientation Orientation
         {
-            get { return (Orientation)this.GetValue(OrientationProperty); }
-            set { this.SetValue(OrientationProperty, value); }
+            get { return (Orientation)GetValue(OrientationProperty); }
+            set { SetValueInternal(OrientationProperty, value); }
         }
 
         internal sealed override Orientation LogicalOrientation => Orientation;
@@ -112,7 +112,7 @@ namespace System.Windows.Controls
             if (o == null)
                 throw new ArgumentNullException(nameof(o));
 
-            o.SetValue(IsVirtualizingPropertyKey, value);
+            o.SetValueInternal(IsVirtualizingPropertyKey, value);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace System.Windows.Controls
         /// </exception>
         public static void SetVirtualizationMode(DependencyObject element, VirtualizationMode value)
         {
-            element.SetValue(VirtualizationModeProperty, value);
+            element.SetValueInternal(VirtualizationModeProperty, value);
         }
 
         static void OrientationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)

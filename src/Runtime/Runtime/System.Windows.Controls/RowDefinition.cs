@@ -54,7 +54,7 @@ namespace System.Windows.Controls
         public double MaxHeight
         {
             get => (double)GetValue(MaxHeightProperty);
-            set => SetValue(MaxHeightProperty, value);
+            set => SetValueInternal(MaxHeightProperty, value);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace System.Windows.Controls
         public double MinHeight
         {
             get => (double)GetValue(MinHeightProperty);
-            set => SetValue(MinHeightProperty, value);
+            set => SetValueInternal(MinHeightProperty, value);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace System.Windows.Controls
         public GridLength Height
         {
             get => (GridLength)GetValue(HeightProperty);
-            set => SetValue(HeightProperty, value);
+            set => SetValueInternal(HeightProperty, value);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace System.Windows.Controls
         public double ActualHeight
         {
             get => (double)GetValue(ActualHeightProperty);
-            private set => SetValue(ActualHeightPropertyKey, value);
+            private set => SetValueInternal(ActualHeightPropertyKey, value);
         }
 
         double IDefinitionBase.MinLength => MinHeight;

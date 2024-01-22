@@ -24,7 +24,7 @@ namespace System.Windows
         /// <summary>
         /// Identifies the <see cref="CustomLayout"/> dependency property.
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty CustomLayoutProperty =
             DependencyProperty.Register(
@@ -36,18 +36,18 @@ namespace System.Windows
         /// <summary>
         /// Enable or disable measure/arrange layout system in a sub part
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool CustomLayout
         {
             get => (bool)GetValue(CustomLayoutProperty);
-            set => SetValue(CustomLayoutProperty, value);
+            set => SetValueInternal(CustomLayoutProperty, value);
         }
 
         /// <summary>
         /// Identifies the <see cref="IsAutoWidthOnCustomLayout"/> dependency property.
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty IsAutoWidthOnCustomLayoutProperty =
             DependencyProperty.Register(
@@ -59,18 +59,18 @@ namespace System.Windows
         /// <summary>
         /// Gets or sets the Auto Width to the root of CustomLayout
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool? IsAutoWidthOnCustomLayout
         {
             get => (bool?)GetValue(IsAutoWidthOnCustomLayoutProperty);
-            set => SetValue(IsAutoWidthOnCustomLayoutProperty, value);
+            set => SetValueInternal(IsAutoWidthOnCustomLayoutProperty, value);
         }
 
         /// <summary>
         /// Identifies the <see cref="IsAutoHeightOnCustomLayout"/> dependency property.
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty IsAutoHeightOnCustomLayoutProperty =
             DependencyProperty.Register(
@@ -82,12 +82,12 @@ namespace System.Windows
         /// <summary>
         /// Gets or sets the Auto Height to the root of CustomLayout
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool? IsAutoHeightOnCustomLayout
         {
             get => (bool?)GetValue(IsAutoHeightOnCustomLayoutProperty);
-            set => SetValue(IsAutoHeightOnCustomLayoutProperty, value);
+            set => SetValueInternal(IsAutoHeightOnCustomLayoutProperty, value);
         }
 
         internal sealed override Size MeasureCore(Size availableSize)
@@ -482,8 +482,8 @@ namespace System.Windows
 
             if (cachedLayoutUpdatedItems == null)
             {
-                SetValue(LayoutUpdatedListItemsField, item);
-                SetValue(LayoutUpdatedHandlersField, handler);
+                SetValueInternal(LayoutUpdatedListItemsField, item);
+                SetValueInternal(LayoutUpdatedHandlersField, handler);
             }
             else
             {
@@ -502,7 +502,7 @@ namespace System.Windows
                     };
 
                     ClearValue(LayoutUpdatedHandlersField);
-                    SetValue(LayoutUpdatedListItemsField, list);
+                    SetValueInternal(LayoutUpdatedListItemsField, list);
                 }
                 else //already have a list
                 {

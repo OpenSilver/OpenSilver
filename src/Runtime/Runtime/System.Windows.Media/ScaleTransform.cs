@@ -37,7 +37,7 @@ namespace System.Windows.Media
         public double ScaleX
         {
             get => (double)GetValue(ScaleXProperty);
-            set => SetValue(ScaleXProperty, value);
+            set => SetValueInternal(ScaleXProperty, value);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace System.Windows.Media
         public double ScaleY
         {
             get => (double)GetValue(ScaleYProperty);
-            set => SetValue(ScaleYProperty, value);
+            set => SetValueInternal(ScaleYProperty, value);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace System.Windows.Media
         public double CenterX
         {
             get => (double)GetValue(CenterXProperty);
-            set => SetValue(CenterXProperty, value);
+            set => SetValueInternal(CenterXProperty, value);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace System.Windows.Media
         public double CenterY
         {
             get => (double)GetValue(CenterYProperty);
-            set => SetValue(CenterYProperty, value);
+            set => SetValueInternal(CenterYProperty, value);
         }
 
         internal override Matrix ValueInternal

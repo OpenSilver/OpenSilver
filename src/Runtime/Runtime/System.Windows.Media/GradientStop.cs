@@ -42,7 +42,7 @@ namespace System.Windows.Media
         public Color Color
         {
             get => (Color)GetValue(ColorProperty);
-            set => SetValue(ColorProperty, value);
+            set => SetValueInternal(ColorProperty, value);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace System.Windows.Media
         public double Offset
         {
             get => (double)GetValue(OffsetProperty);
-            set => SetValue(OffsetProperty, value);
+            set => SetValueInternal(OffsetProperty, value);
         }
 
         private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

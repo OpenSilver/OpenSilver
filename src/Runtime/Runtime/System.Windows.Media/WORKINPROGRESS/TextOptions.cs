@@ -89,10 +89,10 @@ namespace System.Windows.Media
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
 
-            element.SetValue(TextFormattingModeProperty, value);
+            element.SetValueInternal(TextFormattingModeProperty, value);
         }
 
         /// <summary>
@@ -106,10 +106,10 @@ namespace System.Windows.Media
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
 
-            element.SetValue(TextHintingModeProperty, value);
+            element.SetValueInternal(TextHintingModeProperty, value);
         }
 
         /// <summary>
@@ -123,10 +123,10 @@ namespace System.Windows.Media
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
 
-            element.SetValue(TextRenderingModeProperty, value);
+            element.SetValueInternal(TextRenderingModeProperty, value);
         }
     }
 }

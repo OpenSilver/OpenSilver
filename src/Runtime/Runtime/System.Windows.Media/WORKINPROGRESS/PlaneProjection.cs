@@ -58,7 +58,7 @@ namespace System.Windows.Media
         public double RotationX
         {
             get { return (double)GetValue(RotationXProperty); }
-            set { SetValue(RotationXProperty, value); }
+            set { SetValueInternal(RotationXProperty, value); }
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace System.Windows.Media
         public double RotationY
         {
             get { return (double)GetValue(RotationYProperty); }
-            set { SetValue(RotationYProperty, value); }
+            set { SetValueInternal(RotationYProperty, value); }
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace System.Windows.Media
         public double RotationZ
         {
             get { return (double)GetValue(RotationZProperty); }
-            set { SetValue(RotationZProperty, value); }
+            set { SetValueInternal(RotationZProperty, value); }
         }
 
         #endregion Rotation
@@ -137,8 +137,8 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public double CenterOfRotationX
         {
-            get { return (double)this.GetValue(CenterOfRotationXProperty); }
-            set { this.SetValue(CenterOfRotationXProperty, value); }
+            get { return (double)GetValue(CenterOfRotationXProperty); }
+            set { SetValueInternal(CenterOfRotationXProperty, value); }
         }
 
 
@@ -166,8 +166,8 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public double CenterOfRotationY
         {
-            get { return (double)this.GetValue(CenterOfRotationYProperty); }
-            set { this.SetValue(CenterOfRotationYProperty, value); }
+            get { return (double)GetValue(CenterOfRotationYProperty); }
+            set { SetValueInternal(CenterOfRotationYProperty, value); }
         }
 
 
@@ -194,8 +194,8 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public double CenterOfRotationZ
         {
-            get { return (double)this.GetValue(CenterOfRotationZProperty); }
-            set { this.SetValue(CenterOfRotationZProperty, value); }
+            get { return (double)GetValue(CenterOfRotationZProperty); }
+            set { SetValueInternal(CenterOfRotationZProperty, value); }
         }
 
         #endregion CenterOfRotation
@@ -220,7 +220,7 @@ namespace System.Windows.Media
         public double LocalOffsetX
         {
             get { return (double)GetValue(LocalOffsetXProperty); }
-            set { SetValue(LocalOffsetXProperty, value); }
+            set { SetValueInternal(LocalOffsetXProperty, value); }
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace System.Windows.Media
         public double LocalOffsetY
         {
             get { return (double)GetValue(LocalOffsetYProperty); }
-            set { SetValue(LocalOffsetYProperty, value); }
+            set { SetValueInternal(LocalOffsetYProperty, value); }
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace System.Windows.Media
         public double LocalOffsetZ
         {
             get { return (double)GetValue(LocalOffsetZProperty); }
-            set { SetValue(LocalOffsetZProperty, value); }
+            set { SetValueInternal(LocalOffsetZProperty, value); }
         }
 
         #endregion Local Offset
@@ -287,7 +287,7 @@ namespace System.Windows.Media
         public double GlobalOffsetX
         {
             get { return (double)GetValue(GlobalOffsetXProperty); }
-            set { SetValue(GlobalOffsetXProperty, value); }
+            set { SetValueInternal(GlobalOffsetXProperty, value); }
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace System.Windows.Media
         public double GlobalOffsetY
         {
             get { return (double)GetValue(GlobalOffsetYProperty); }
-            set { SetValue(GlobalOffsetYProperty, value); }
+            set { SetValueInternal(GlobalOffsetYProperty, value); }
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace System.Windows.Media
         public double GlobalOffsetZ
         {
             get { return (double)GetValue(GlobalOffsetZProperty); }
-            set { SetValue(GlobalOffsetZProperty, value); }
+            set { SetValueInternal(GlobalOffsetZProperty, value); }
         }
 
         #endregion Global Offset
@@ -354,8 +354,8 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public Matrix3D ProjectionMatrix
         {
-            get { return (Matrix3D)this.GetValue(ProjectionMatrixProperty); }
-            private set { this.SetValue(ProjectionMatrixProperty, value); }
+            get { return (Matrix3D)GetValue(ProjectionMatrixProperty); }
+            private set { SetValueInternal(ProjectionMatrixProperty, value); }
         }
 
         #endregion Projection Matrix

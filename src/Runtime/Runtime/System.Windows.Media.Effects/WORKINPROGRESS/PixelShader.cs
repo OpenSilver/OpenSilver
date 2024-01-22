@@ -23,8 +23,8 @@ namespace System.Windows.Media.Effects
 		[OpenSilver.NotImplemented]
         public Uri UriSource
         {
-            get { return (Uri)this.GetValue(PixelShader.UriSourceProperty); }
-            set { this.SetValue(PixelShader.UriSourceProperty, value); }
+            get { return (Uri)GetValue(UriSourceProperty); }
+            set { SetValueInternal(UriSourceProperty, value); }
         }
         
 
