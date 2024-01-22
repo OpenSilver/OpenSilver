@@ -560,6 +560,8 @@ namespace System.Windows
                 false);
         }
 
+        internal void SetValue(DependencyProperty dp, bool value) => SetValue(dp, BooleanBoxes.Box(value));
+
         internal void SetValueInternal(DependencyProperty dp, object value)
         {
             if (dp == null)
@@ -582,6 +584,8 @@ namespace System.Windows
                 value,
                 true);
         }
+
+        internal void SetValueInternal(DependencyProperty dp, bool value) => SetValueInternal(dp, BooleanBoxes.Box(value));
 
         internal void SetValue(DependencyPropertyKey key, object value)
         {
@@ -606,6 +610,8 @@ namespace System.Windows
                 false);
         }
 
+        internal void SetValue(DependencyPropertyKey key, bool value) => SetValue(key, BooleanBoxes.Box(value));
+
         internal void SetValueInternal(DependencyPropertyKey key, object value)
         {
             if (key == null)
@@ -628,6 +634,8 @@ namespace System.Windows
                 value,
                 true);
         }
+
+        internal void SetValueInternal(DependencyPropertyKey key, bool value) => SetValueInternal(key, BooleanBoxes.Box(value));
 
         internal virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
