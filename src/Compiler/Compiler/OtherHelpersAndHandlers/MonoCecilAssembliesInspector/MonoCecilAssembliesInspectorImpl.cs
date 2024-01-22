@@ -463,7 +463,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false, CompilerType);
             propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeString = typeRef.IsString();
-            isTypeEnum = typeRef.ResolveOrThrow().IsEnum;
+            isTypeEnum = typeRef.ResolveOrThrow().IsEnum || (CompilerType == SupportedLanguage.FSharp && typeRef.ResolveOrThrow().CustomAttributes.Any(attr => attr.AttributeType.FullName == "Microsoft.FSharp.Core.CompilationMappingAttribute"));
         }
 
         public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName,
@@ -806,6 +806,14 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 {
                     return $"{prefix}{type.ConvertToString(CompilerType)}.{field.Name}";
                 }
+
+                // At F#, Enum works like property
+                var property = FindPropertyDeep(type, name, out _);
+                if (property is not null)
+                {
+                    return $"{prefix}{type.ConvertToString(CompilerType)}.{property.Name}";
+                }
+
                 if (allowIntegerValue)
                 {
                     if (long.TryParse(name, out var l))

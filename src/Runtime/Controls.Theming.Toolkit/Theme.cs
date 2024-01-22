@@ -365,6 +365,11 @@ namespace System.Windows.Controls.Theming
             string assemblyName = ExtractAssemblyNameFromComponentUri(componentUri);
 
             Type factoryType = Type.GetType($"{className}, {assemblyName}");
+            if (factoryType == null)
+            {
+                // For F#.
+                factoryType = Type.GetType($"{assemblyName}.{className}, {assemblyName}");
+            }
             if (factoryType != null)
             {
                 return Activator.CreateInstance(factoryType) as IXamlComponentFactory;

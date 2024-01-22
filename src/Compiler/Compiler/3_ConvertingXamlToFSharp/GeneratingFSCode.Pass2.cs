@@ -297,7 +297,7 @@ namespace OpenSilver.Compiler
                     string componentTypeFullName = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
 
                     string additionalConstructors = IsClassTheApplicationClass(baseType)
-                        ? @$"    new(stub: OpenSilver.XamlDesignerConstructorStub) as this =
+                        ? @$"    private new(stub: OpenSilver.XamlDesignerConstructorStub) as this =
         {componentTypeFullName}()
         then
             this.InitializeComponent ()
@@ -315,11 +315,12 @@ namespace OpenSilver.Compiler
                                                                namespaceStringIfAny,
                                                                baseType);
 
+                    string behindClassTypeName = $"{namespaceStringIfAny}.{className}, {namespaceStringIfAny}";
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
-                        $"        CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof<{componentTypeFullName}>) :?> {componentTypeFullName}",
+                        $"        CSHTML5.Internal.TypeInstantiationHelper.Instantiate(System.Type.GetType(\"{behindClassTypeName}\")) :?> {componentTypeFullName}",
                         parameters.ResultingMethods,
                         $"{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,

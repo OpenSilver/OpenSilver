@@ -259,7 +259,7 @@ and {className}() =
 [<System.Diagnostics.DebuggerNonUserCode>]
 [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
 type {factoryName}() =
-    static member private Instantiate(): obj =
+    static member public Instantiate(): obj =
         {factoryName}.CreateComponentImpl()
     interface {IXamlComponentFactoryClass}<{componentTypeFullName}> with
         member this.CreateComponent(): obj = 
