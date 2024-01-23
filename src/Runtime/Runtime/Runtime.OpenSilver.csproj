@@ -29,6 +29,7 @@
 		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
 		<Compile Include="Core\Events\DOMEventManager.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
+		<Compile Include="OpenSilver\Buffers\StackVector.cs" />
 		<Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
 		<Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
 		<Compile Include="OpenSilver\Internal\Storage.cs" />

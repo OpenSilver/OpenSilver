@@ -24,7 +24,8 @@ namespace System.Windows.Controls
         private double _sizeCache;
         private double _finalOffset;
         private GridUnitType _effectiveUnitType;
-        internal Grid Parent;
+        private double _actualWidth;
+        private Grid _parent;
 
         public ColumnDefinition()
         {
@@ -71,7 +72,7 @@ namespace System.Windows.Controls
 
         private static void OnMaxWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ColumnDefinition)d).Parent?.InvalidateMeasure();
+            ((ColumnDefinition)d)._parent?.InvalidateMeasure();
         }
 
         /// <summary>
@@ -99,7 +100,7 @@ namespace System.Windows.Controls
 
         private static void OnMinWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ColumnDefinition)d).Parent?.InvalidateMeasure();
+            ((ColumnDefinition)d)._parent?.InvalidateMeasure();
         }
 
         /// <summary>
@@ -129,15 +130,23 @@ namespace System.Windows.Controls
 
         private static void OnWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ColumnDefinition)d).Parent?.InvalidateMeasure();
+            ((ColumnDefinition)d)._parent?.InvalidateMeasure();
         }
+
+        private static readonly PropertyMetadata _actualWidthMetadata = new ReadOnlyPropertyMetadata(0.0, GetActualWidth);
 
         private static readonly DependencyPropertyKey ActualWidthPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(ActualWidth),
                 typeof(double),
                 typeof(ColumnDefinition),
-                new PropertyMetadata(0.0));
+                _actualWidthMetadata);
+
+        private static object GetActualWidth(DependencyObject d)
+        {
+            ColumnDefinition column = (ColumnDefinition)d;
+            return column._actualWidth;
+        }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty ActualWidthProperty = ActualWidthPropertyKey.DependencyProperty;
@@ -150,9 +159,24 @@ namespace System.Windows.Controls
         /// </returns>
         public double ActualWidth
         {
-            get => (double)GetValue(ActualWidthProperty);
-            private set => SetValueInternal(ActualWidthPropertyKey, value);
+            get => _actualWidth;
+            private set
+            {
+                double previousWidth = _actualWidth;
+                if (previousWidth != value)
+                {
+                    _actualWidth = value;
+                    NotifyPropertyChange(
+                        new DependencyPropertyChangedEventArgs(
+                            previousWidth,
+                            value,
+                            ActualWidthProperty,
+                            _actualWidthMetadata));
+                }
+            }
         }
+
+        internal void SetParent(Grid parent) => _parent = parent;
 
         double IDefinitionBase.MinLength => MinWidth;
 

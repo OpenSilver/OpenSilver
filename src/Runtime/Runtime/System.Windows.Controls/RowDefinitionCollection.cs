@@ -18,58 +18,72 @@ namespace System.Windows.Controls
     {
         private readonly Grid _parentGrid;
 
-        internal RowDefinitionCollection() : base(true)
+        internal RowDefinitionCollection(Grid parent)
+            : base(true)
         {
-        }
-
-        internal RowDefinitionCollection(Grid parent) : base(true)
-        {
-            this._parentGrid = parent;
+            _parentGrid = parent;
             parent.ProvideSelfAsInheritanceContext(this, null);
         }
 
+        internal override bool IsReadOnlyImpl => AreDefinitionsLocked();
+
         internal override void AddOverride(RowDefinition value)
         {
-            this.AddDependencyObjectInternal(value);
-            value.Parent = this._parentGrid;
+            VerifyWriteAccess();
+            AddDependencyObjectInternal(value);
+            value.SetParent(_parentGrid);
         }
 
         internal override void ClearOverride()
         {
-            if (this._parentGrid != null)
+            VerifyWriteAccess();
+
+            if (_parentGrid != null)
             {
                 foreach (RowDefinition column in this)
                 {
-                    column.Parent = null;
+                    column.SetParent(null);
                 }
             }
 
-            this.ClearDependencyObjectInternal();
+            ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, RowDefinition value)
         {
-            value.Parent = this._parentGrid;
-            this.InsertDependencyObjectInternal(index, value);
+            VerifyWriteAccess();
+            value.SetParent(_parentGrid);
+            InsertDependencyObjectInternal(index, value);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            RowDefinition removedRow = this.GetItemInternal(index);
-            removedRow.Parent = null;
-            this.RemoveAtDependencyObjectInternal(index);
+            VerifyWriteAccess();
+            RowDefinition removedRow = GetItemInternal(index);
+            removedRow.SetParent(null);
+            RemoveAtDependencyObjectInternal(index);
         }
 
-        internal override RowDefinition GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override RowDefinition GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, RowDefinition value)
         {
-            RowDefinition originalItem = this.GetItemInternal(index);
-            originalItem.Parent = null;
-            this.SetItemDependencyObjectInternal(index, value);
+            VerifyWriteAccess();
+            RowDefinition originalItem = GetItemInternal(index);
+            originalItem.SetParent(null);
+            SetItemDependencyObjectInternal(index, value);
         }
+
+        private void VerifyWriteAccess()
+        {
+            if (AreDefinitionsLocked())
+            {
+                throw new InvalidOperationException("Cannot modify 'RowDefinitionCollection' in read-only state.");
+            }
+        }
+
+        private bool AreDefinitionsLocked() =>
+            _parentGrid is not null &&
+            (_parentGrid.MeasureOverrideInProgress || _parentGrid.ArrangeOverrideInProgress);
     }
 }

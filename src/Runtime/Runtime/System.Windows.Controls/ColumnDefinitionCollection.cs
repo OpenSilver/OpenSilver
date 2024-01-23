@@ -13,62 +13,76 @@
 
 namespace System.Windows.Controls
 {
-    public sealed partial class ColumnDefinitionCollection : PresentationFrameworkCollection<ColumnDefinition>
+    public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection<ColumnDefinition>
     {
         private readonly Grid _parentGrid;
 
-        internal ColumnDefinitionCollection() : base(true)
+        internal ColumnDefinitionCollection(Grid parent)
+            : base(true)
         {
-        }
-
-        internal ColumnDefinitionCollection(Grid parent) : base(true)
-        {
-            this._parentGrid = parent;
+            _parentGrid = parent;
             parent.ProvideSelfAsInheritanceContext(this, null);
         }
 
+        internal override bool IsReadOnlyImpl => AreDefinitionsLocked();
+
         internal override void AddOverride(ColumnDefinition value)
         {
-            this.AddDependencyObjectInternal(value);
-            value.Parent = this._parentGrid;
+            VerifyWriteAccess();
+            AddDependencyObjectInternal(value);
+            value.SetParent(_parentGrid);
         }
 
         internal override void ClearOverride()
         {
-            if (this._parentGrid != null)
+            VerifyWriteAccess();
+
+            if (_parentGrid != null)
             {
                 foreach (ColumnDefinition column in this)
                 {
-                    column.Parent = null;
+                    column.SetParent(null);
                 }
             }
 
-            this.ClearDependencyObjectInternal();
+            ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, ColumnDefinition value)
         {
-            value.Parent = this._parentGrid;
-            this.InsertDependencyObjectInternal(index, value);
+            VerifyWriteAccess();
+            value.SetParent(_parentGrid);
+            InsertDependencyObjectInternal(index, value);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            ColumnDefinition removedColumn = this.GetItemInternal(index);
-            removedColumn.Parent = null;
-            this.RemoveAtDependencyObjectInternal(index);
+            VerifyWriteAccess();
+            ColumnDefinition removedColumn = GetItemInternal(index);
+            removedColumn.SetParent(null);
+            RemoveAtDependencyObjectInternal(index);
         }
 
-        internal override ColumnDefinition GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override ColumnDefinition GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, ColumnDefinition value)
         {
-            ColumnDefinition originalItem = this.GetItemInternal(index);
-            originalItem.Parent = null;
-            this.SetItemDependencyObjectInternal(index, value);
+            VerifyWriteAccess();
+            ColumnDefinition originalItem = GetItemInternal(index);
+            originalItem.SetParent(null);
+            SetItemDependencyObjectInternal(index, value);
         }
+
+        private void VerifyWriteAccess()
+        {
+            if (AreDefinitionsLocked())
+            {
+                throw new InvalidOperationException("Cannot modify 'ColumnDefinitionCollection' in read-only state.");
+            }
+        }
+
+        private bool AreDefinitionsLocked() =>
+            _parentGrid is not null &&
+            (_parentGrid.MeasureOverrideInProgress || _parentGrid.ArrangeOverrideInProgress);
     }
 }

@@ -443,6 +443,11 @@ namespace System.Windows
 
         #region Generic collection manipulation methods
 
+        internal List<T> InternalItems
+        {
+            get { return this._collection; }
+        }
+
         /// <summary>
         /// Call the Add method of underlying <see cref="List{T}"/> collection.
         /// </summary>

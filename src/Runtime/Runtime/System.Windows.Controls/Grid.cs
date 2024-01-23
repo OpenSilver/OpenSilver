@@ -13,9 +13,9 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Diagnostics;
 using System.Windows.Media;
+using OpenSilver.Buffers;
 
 namespace System.Windows.Controls
 {
@@ -72,10 +72,10 @@ namespace System.Windows.Controls
     /// //Do not forget to add the Grid to the visual tree.
     /// </code>
     /// </example>
-    public partial class Grid : Panel
+    public class Grid : Panel
     {
-        private ColumnDefinitionCollection _columnDefinitionsOrNull;
-        private RowDefinitionCollection _rowDefinitionsOrNull;
+        private ColumnDefinitionCollection _columns;
+        private RowDefinitionCollection _rows;
 
         /// <summary>
         /// Initializes a new instance of the Grid class.
@@ -89,18 +89,13 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (_columnDefinitionsOrNull == null)
+                if (_columns == null)
                 {
-                    _columnDefinitionsOrNull = new ColumnDefinitionCollection(this);
-                    _columnDefinitionsOrNull.CollectionChanged += ColumnDefinitions_CollectionChanged;
+                    _columns = new ColumnDefinitionCollection(this);
+                    _columns.CollectionChanged += OnDefinitionsCollectionChanged;
                 }
-                return _columnDefinitionsOrNull;
+                return _columns;
             }
-        }
-
-        void ColumnDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            InvalidateDefinitions();
         }
 
         /// <summary>
@@ -110,21 +105,16 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (_rowDefinitionsOrNull == null)
+                if (_rows == null)
                 {
-                    _rowDefinitionsOrNull = new RowDefinitionCollection(this);
-                    _rowDefinitionsOrNull.CollectionChanged += RowDefinitions_CollectionChanged;
+                    _rows = new RowDefinitionCollection(this);
+                    _rows.CollectionChanged += OnDefinitionsCollectionChanged;
                 }
-                return _rowDefinitionsOrNull;
+                return _rows;
             }
         }
 
-        void RowDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            InvalidateDefinitions();
-        }
-
-        #region ****************** Attached Properties ******************
+        private void OnDefinitionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateDefinitions();
 
         /// <summary>
         /// Sets the value of the Grid.Row XAML attached property on the specified FrameworkElement.
@@ -133,6 +123,11 @@ namespace System.Windows.Controls
         /// <param name="value">The property value to set.</param>
         public static void SetRow(UIElement element, int value)
         {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             element.SetValueInternal(RowProperty, value);
         }
 
@@ -144,6 +139,11 @@ namespace System.Windows.Controls
         /// <returns>The value of the Grid.Row XAML attached property on the target element.</returns>
         public static int GetRow(UIElement element)
         {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             return (int)element.GetValue(RowProperty);
         }
 
@@ -155,7 +155,106 @@ namespace System.Windows.Controls
                 "Row",
                 typeof(int),
                 typeof(UIElement),
-                new PropertyMetadata(0, OnCellAttachedPropertyChanged));
+                new PropertyMetadata(0, OnCellAttachedPropertyChanged),
+                IsIntValueNotNegative);
+
+        public static void SetRowSpan(UIElement element, int value)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(RowSpanProperty, value);
+        }
+
+        public static int GetRowSpan(UIElement element)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (int)element.GetValue(RowSpanProperty);
+        }
+
+        public static readonly DependencyProperty RowSpanProperty =
+            DependencyProperty.RegisterAttached(
+                "RowSpan",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(1, OnCellAttachedPropertyChanged),
+                IsIntValueGreaterThanZero);
+
+        /// <summary>
+        /// Sets the value of the Grid.Column XAML attached property on the specified FrameworkElement.
+        /// </summary>
+        /// <param name="element">The target element on which to set the Grid.Row XAML attached property.</param>
+        /// <param name="value">The property value to set.</param>
+        public static void SetColumn(UIElement element, int value)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(ColumnProperty, value);
+        }
+
+        /// <summary>
+        /// Gets the value of the Grid.Column XAML attached property from the specified
+        /// FrameworkElement.
+        /// </summary>
+        /// <param name="element">The element from which to read the property value.</param>
+        /// <returns>The value of the Grid.Column XAML attached property on the target element.</returns>
+        public static int GetColumn(UIElement element)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (int)element.GetValue(ColumnProperty);
+        }
+
+        /// <summary>
+        /// Identifies the Grid.Column XAML attached property
+        /// </summary>
+        public static readonly DependencyProperty ColumnProperty =
+            DependencyProperty.RegisterAttached(
+                "Column",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(0, OnCellAttachedPropertyChanged),
+                IsIntValueNotNegative);
+
+        public static void SetColumnSpan(UIElement element, int value)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(ColumnSpanProperty, value);
+        }
+
+        public static int GetColumnSpan(UIElement element)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (int)element.GetValue(ColumnSpanProperty);
+        }
+
+        public static readonly DependencyProperty ColumnSpanProperty =
+            DependencyProperty.RegisterAttached(
+                "ColumnSpan",
+                typeof(int),
+                typeof(UIElement),
+                new PropertyMetadata(1, OnCellAttachedPropertyChanged),
+                IsIntValueGreaterThanZero);
 
         private static void OnCellAttachedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -166,72 +265,9 @@ namespace System.Windows.Controls
             }
         }
 
-        public static void SetRowSpan(UIElement element, int value)
-        {
-            element.SetValueInternal(RowSpanProperty, value);
-        }
+        private static bool IsIntValueNotNegative(object value) => (int)value >= 0;
 
-        public static int GetRowSpan(UIElement element)
-        {
-            return (int)element.GetValue(RowSpanProperty);
-        }
-
-        public static readonly DependencyProperty RowSpanProperty =
-            DependencyProperty.RegisterAttached(
-                "RowSpan",
-                typeof(int),
-                typeof(UIElement),
-                new PropertyMetadata(1, OnCellAttachedPropertyChanged));
-
-        /// <summary>
-        /// Sets the value of the Grid.Column XAML attached property on the specified FrameworkElement.
-        /// </summary>
-        /// <param name="element">The target element on which to set the Grid.Row XAML attached property.</param>
-        /// <param name="value">The property value to set.</param>
-        public static void SetColumn(UIElement element, int value)
-        {
-            element.SetValueInternal(ColumnProperty, value);
-        }
-        
-        /// <summary>
-        /// Gets the value of the Grid.Column XAML attached property from the specified
-        /// FrameworkElement.
-        /// </summary>
-        /// <param name="element">The element from which to read the property value.</param>
-        /// <returns>The value of the Grid.Column XAML attached property on the target element.</returns>
-        public static int GetColumn(UIElement element)
-        {
-            return (int)element.GetValue(ColumnProperty);
-        }
-        
-        /// <summary>
-        /// Identifies the Grid.Column XAML attached property
-        /// </summary>
-        public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.RegisterAttached(
-                "Column",
-                typeof(int),
-                typeof(UIElement),
-                new PropertyMetadata(0, OnCellAttachedPropertyChanged));
-
-        public static void SetColumnSpan(UIElement element, int value)
-        {
-            element.SetValueInternal(ColumnSpanProperty, value);
-        }
-
-        public static int GetColumnSpan(UIElement element)
-        {
-            return (int)element.GetValue(ColumnSpanProperty);
-        }
-
-        public static readonly DependencyProperty ColumnSpanProperty =
-            DependencyProperty.RegisterAttached(
-                "ColumnSpan",
-                typeof(int),
-                typeof(UIElement),
-                new PropertyMetadata(1, OnCellAttachedPropertyChanged));
-
-        #endregion
+        private static bool IsIntValueGreaterThanZero(object value) => (int)value > 0;
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ShowGridLinesProperty =
@@ -244,13 +280,13 @@ namespace System.Windows.Controls
         [OpenSilver.NotImplemented]
         public bool ShowGridLines
         {
-            get { return (bool)GetValue(ShowGridLinesProperty); }
-            set { SetValueInternal(ShowGridLinesProperty, value); }
+            get => (bool)GetValue(ShowGridLinesProperty);
+            set => SetValueInternal(ShowGridLinesProperty, value);
         }
 
         // private
-        RowDefinitionCollection m_pRows = null;         // Effective row collection.
-        ColumnDefinitionCollection m_pColumns = null;   // Effective column collection.
+        private List<RowDefinition> m_pRows;         // Effective row collection.
+        private List<ColumnDefinition> m_pColumns;   // Effective column collection.
 
         // Grid classifies cells into four groups based on their column/row
         // type. The following diagram depicts all the possible combinations
@@ -271,7 +307,7 @@ namespace System.Windows.Controls
         //              |        |        |        |
         //              +--------+--------+--------+
         //
-        struct CellGroups
+        private struct CellGroups
         {
             internal int group1;
             internal int group2;
@@ -286,9 +322,11 @@ namespace System.Windows.Controls
             HasStarColumns = 0x02,
             HasAutoRowsAndStarColumn = 0x04,
             DefinitionsChanged = 0x08,
+            MeasureOverrideInProgress = 0x10,
+            ArrangeOverrideInProgress = 0x20,
         }
 
-        GridFlags m_gridFlags = GridFlags.None;
+        private GridFlags m_gridFlags = GridFlags.None;
 
         [Flags]
         private enum CellUnitTypes : byte
@@ -299,7 +337,7 @@ namespace System.Windows.Controls
             Pixel = 0x04,
         };
 
-        struct CellCache
+        private struct CellCache
         {
             internal UIElement m_child;
 
@@ -325,7 +363,7 @@ namespace System.Windows.Controls
             }
         };
 
-        struct SpanStoreEntry
+        private struct SpanStoreEntry
         {
             internal SpanStoreEntry(int spanStart, int spanCount, double desiredSize, bool isColumnDefinition)
             {
@@ -345,36 +383,67 @@ namespace System.Windows.Controls
             internal double m_desiredSize;
 
             internal bool m_isColumnDefinition;
-
         }
 
         // This is a temporary storage that is released after arrange.
         // Note the ScopeExit in ArrangeOveride
-        IDefinitionBase[] m_ppTempDefinitions = null; // Temporary definitions storage.
-        int m_cTempDefinitions = 0; // Size in elements of temporary definitions storage
+        private IDefinitionBase[] m_ppTempDefinitions; // Temporary definitions storage.
+        private int m_cTempDefinitions; // Size in elements of temporary definitions storage
 
-        void SetGridFlags(GridFlags mask)
+        internal bool MeasureOverrideInProgress
+        {
+            get { return HasGridFlags(GridFlags.MeasureOverrideInProgress); }
+            set
+            {
+                if (value)
+                {
+                    SetGridFlags(GridFlags.MeasureOverrideInProgress);
+                }
+                else
+                {
+                    ClearGridFlags(GridFlags.MeasureOverrideInProgress);
+                }
+            }
+        }
+
+        internal bool ArrangeOverrideInProgress
+        {
+            get { return HasGridFlags(GridFlags.ArrangeOverrideInProgress); }
+            set
+            {
+                if (value)
+                {
+                    SetGridFlags(GridFlags.ArrangeOverrideInProgress);
+                }
+                else
+                {
+                    ClearGridFlags(GridFlags.ArrangeOverrideInProgress);
+                }
+            }
+        }
+
+        private void SetGridFlags(GridFlags mask)
         {
             m_gridFlags |= mask;
         }
 
-        void ClearGridFlags(GridFlags mask)
+        private void ClearGridFlags(GridFlags mask)
         {
             m_gridFlags &= ~mask;
         }
 
-        bool HasGridFlags(GridFlags mask)
+        private bool HasGridFlags(GridFlags mask)
         {
             return (m_gridFlags & mask) == mask;
         }
 
-        bool IsWithoutRowAndColumnDefinitions()
+        private bool IsWithoutRowAndColumnDefinitions()
         {
             return (RowDefinitions == null || RowDefinitions.Count == 0) &&
                    (ColumnDefinitions == null || ColumnDefinitions.Count == 0);
         }
 
-        void InvalidateDefinitions()
+        private void InvalidateDefinitions()
         {
             SetGridFlags(GridFlags.DefinitionsChanged);
             InvalidateMeasure();
@@ -388,42 +457,36 @@ namespace System.Windows.Controls
         //                 or to a default single element collection. This is the only method where user supplied
         //                 row or column definitions is directly used. All other must use m_pRows/m_pColumns
         //------------------------------------------------------------------------
-        void InitializeDefinitionStructure()
+        private void InitializeDefinitionStructure()
         {
-            RowDefinition emptyRow = null;
-            ColumnDefinition emptyColumn = null;
-
             Debug.Assert(!IsWithoutRowAndColumnDefinitions());
 
             if (RowDefinitions == null || RowDefinitions.Count == 0)
             {
                 //empty collection defaults to single row
-                m_pRows = new RowDefinitionCollection();
-                emptyRow = new RowDefinition();
-                m_pRows.Add(emptyRow);
+                m_pRows = new List<RowDefinition>() { new RowDefinition() };
             }
             else
             {
-                m_pRows = RowDefinitions;
+                m_pRows = RowDefinitions.InternalItems;
             }
 
             if (ColumnDefinitions == null || ColumnDefinitions.Count == 0)
             {
                 //empty collection defaults to single row
-                m_pColumns = new ColumnDefinitionCollection();
-                emptyColumn = new ColumnDefinition();
-                m_pColumns.Add(emptyColumn);
+                m_pColumns = new List<ColumnDefinition> { new ColumnDefinition() };
             }
             else
             {
-                m_pColumns = ColumnDefinitions;
+                m_pColumns = ColumnDefinitions.InternalItems;
             }
         }
 
         // Sets the initial, effective values of an IEnumerable<IDefinitionBase> .
-        void ValidateDefinitions(
-            IEnumerable<IDefinitionBase> definitions,
+        private static void ValidateDefinitions<T>(
+            List<T> definitions,
             bool treatStarAsAuto)
+            where T : IDefinitionBase
         {
             //for (auto & cdo : definitions)
             foreach (IDefinitionBase def in definitions)
@@ -463,19 +526,20 @@ namespace System.Windows.Controls
         }
 
         // Gets the union of the length types for a given range of definitions.
-        CellUnitTypes GetLengthTypeForRange(
-            IEnumerable<IDefinitionBase> definitions,
+        private static CellUnitTypes GetLengthTypeForRange<T>(
+            List<T> definitions,
             int start,
             int count)
+            where T : IDefinitionBase
         {
-            Debug.Assert((count > 0) && ((start + count) <= definitions.Count()));
+            Debug.Assert((count > 0) && ((start + count) <= definitions.Count));
 
             CellUnitTypes unitTypes = CellUnitTypes.None;
             int index = start + count - 1;
 
             do
             {
-                var def = (IDefinitionBase)(definitions.ElementAt(index));
+                var def = definitions[index];
                 switch (def.GetEffectiveUnitType())
                 {
                     case GridUnitType.Auto:
@@ -493,9 +557,9 @@ namespace System.Windows.Controls
             return unitTypes;
         }
 
-        CellGroups ValidateCells(
-            UIElement[] children,
-            List<CellCache> cellCacheVector)
+        private CellGroups ValidateCells(
+            UIElementCollection children,
+            ref StackVector<CellCache> cellCacheVector)
         {
             m_gridFlags = GridFlags.None;
 
@@ -505,13 +569,13 @@ namespace System.Windows.Controls
             cellGroups.group3 = int.MaxValue;
             cellGroups.group4 = int.MaxValue;
 
-            var childrenCount = children.Count();
+            var childrenCount = children.Count;
 
             var childIndex = childrenCount;
             while (childIndex-- > 0)
             {
                 UIElement currentChild = children[childIndex];
-                CellCache cell = cellCacheVector[childIndex];
+                ref CellCache cell = ref cellCacheVector[childIndex];
 
                 cell.m_child = currentChild;
                 cell.m_rowHeightTypes = GetLengthTypeForRange(m_pRows, GetRowIndex(currentChild), GetRowSpanAdjusted(currentChild));
@@ -576,92 +640,92 @@ namespace System.Windows.Controls
                 {
                     SetGridFlags(GridFlags.HasStarColumns);
                 }
-
-                cellCacheVector[childIndex] = cell;
             }
 
             return cellGroups;
         }
 
         // Get the row index of a child.
-        int GetRowIndex(
-            UIElement child)
+        private int GetRowIndex(UIElement child)
         {
-            return Math.Min(
-                GetRow(child),
-                m_pRows.Count - 1);
+            return Math.Min(GetRow(child), m_pRows.Count - 1);
         }
 
         // Get the column index of a child.
-        int GetColumnIndex(
-            UIElement child)
+        private int GetColumnIndex(UIElement child)
         {
-            return Math.Min(
-                GetColumn(child),
-                m_pColumns.Count - 1);
+            return Math.Min(GetColumn(child), m_pColumns.Count - 1);
         }
 
-        int GetRowSpanAdjusted(UIElement child)
+        private int GetRowSpanAdjusted(UIElement child)
         {
             return Math.Min(GetRowSpan(child), m_pRows.Count - GetRowIndex(child));
         }
 
-        int GetColumnSpanAdjusted(UIElement child)
+        private int GetColumnSpanAdjusted(UIElement child)
         {
             return Math.Min(GetColumnSpan(child), m_pColumns.Count - GetColumnIndex(child));
         }
 
-        IDefinitionBase GetRowNoRef(UIElement pChild)
+        private IDefinitionBase GetRowNoRef(UIElement pChild)
         {
-            return m_pRows.ElementAtOrDefault(GetRowIndex(pChild));
+            int index = GetRowIndex(pChild);
+            if (index < m_pRows.Count)
+            {
+                return m_pRows[index];
+            }
+            return null;
         }
 
-        IDefinitionBase GetColumnNoRef(UIElement pChild)
+        private IDefinitionBase GetColumnNoRef(UIElement pChild)
         {
-            return m_pColumns.ElementAtOrDefault(GetColumnIndex(pChild));
+            int index = GetColumnIndex(pChild);
+            if (index < m_pColumns.Count)
+            {
+                return m_pColumns[index];
+            }
+            return null;
         }
 
         // Adds a span entry to the list.
-        void RegisterSpan(
-            List<SpanStoreEntry> spanStore,
+        private static void RegisterSpan(
+            ref StackVector<SpanStoreEntry> spanStore,
             int spanStart,
             int spanCount,
             double desiredSize,
             bool isColumnDefinition)
         {
-            var spanStoreVector = spanStore;
             // If an entry already exists with the same row/column index and span, 
             // then update the desired size stored in the entry.
 
-            for(int i = 0; i < spanStore.Count; i++)
+            for (int i = 0; i < spanStore.Count; i++)
             {
-                SpanStoreEntry it = spanStore[i];
+                ref SpanStoreEntry it = ref spanStore[i];
 
                 if (it.m_isColumnDefinition == isColumnDefinition && it.m_spanStart == spanStart && it.m_spanCount == spanCount)
                 {
                     if (it.m_desiredSize < desiredSize)
                     {
                         it.m_desiredSize = desiredSize;
-                        spanStore[i] = it;
                     }
                     return;
                 }
             }
 
-            spanStore.Add(new SpanStoreEntry(spanStart, spanCount, desiredSize, isColumnDefinition));
+            spanStore.PushBack(new SpanStoreEntry(spanStart, spanCount, desiredSize, isColumnDefinition));
         }
 
-        void MeasureCellsGroup(
+        private void MeasureCellsGroup(
             int cellsHead, //cell group number
             int cellCount, //elements in the cell
             double rowSpacing,
             double columnSpacing,
             bool ignoreColumnDesiredSize,
             bool forceRowToInfinity,
-            ref List<CellCache> cellCacheVector)
+            ref StackVector<CellCache> cellCacheVector,
+            ref StackVector<SpanStoreEntry> spanStore)
         {
-
-            List<SpanStoreEntry> spanStore = new List<SpanStoreEntry>();
+            spanStore = new StackVector<SpanStoreEntry>(16);
 
             if (cellsHead >= cellCount)
             {
@@ -690,7 +754,7 @@ namespace System.Windows.Controls
                     else
                     {
                         RegisterSpan(
-                            spanStore,
+                            ref spanStore,
                             GetColumnIndex(pChild),
                             columnSpan,
                             pChild.DesiredSize.Width,
@@ -710,7 +774,7 @@ namespace System.Windows.Controls
                     else
                     {
                         RegisterSpan(
-                            spanStore,
+                            ref spanStore,
                             GetRowIndex(pChild),
                             rowSpan,
                             pChild.DesiredSize.Height,
@@ -723,7 +787,7 @@ namespace System.Windows.Controls
             } while (cellsHead < cellCount);
 
             //Go through the spanned rows/columns allocating sizes.
-            foreach(var entry in spanStore)
+            foreach (var entry in spanStore)
             {
                 if (entry.m_isColumnDefinition)
                 {
@@ -744,6 +808,9 @@ namespace System.Windows.Controls
                         entry.m_desiredSize);
                 }
             }
+
+            // Return allocated memory to the pool
+            spanStore.Dispose();
         }
 
         //------------------------------------------------------------------------
@@ -753,7 +820,7 @@ namespace System.Windows.Controls
         //  Synopsis:  allocates memory for temporary definitions storage.
         //
         //------------------------------------------------------------------------
-        void EnsureTempDefinitionsStorage(int minCount)
+        private void EnsureTempDefinitionsStorage(int minCount)
         {
             if (m_ppTempDefinitions == null || m_cTempDefinitions < minCount)
             {
@@ -770,8 +837,8 @@ namespace System.Windows.Controls
         //                  desired Size is greater than rangeMinSize but less than rangePreferredSize.
         //
         //------------------------------------------------------------------------
-        void SortDefinitionsForSpanPreferredDistribution(
-            IList<IDefinitionBase> ppDefinitions,
+        private static void SortDefinitionsForSpanPreferredDistribution(
+            IDefinitionBase[] ppDefinitions,
             int cDefinitions)
         {
             IDefinitionBase pTemp;
@@ -821,8 +888,8 @@ namespace System.Windows.Controls
         //                  desired Size is greater than rangePreferredSize but less than rangeMaxSize.
         //
         //------------------------------------------------------------------------
-        void SortDefinitionsForSpanMaxSizeDistribution(
-            IList<IDefinitionBase> ppDefinitions,
+        private static void SortDefinitionsForSpanMaxSizeDistribution(
+            IDefinitionBase[] ppDefinitions,
             int cDefinitions)
         {
             IDefinitionBase pTemp;
@@ -874,8 +941,8 @@ namespace System.Windows.Controls
         //                 finalSize in that dimension.
         //
         //------------------------------------------------------------------------
-        void SortDefinitionsForOverflowSizeDistribution(
-            IList<IDefinitionBase> ppDefinitions,
+        private static void SortDefinitionsForOverflowSizeDistribution(
+            IDefinitionBase[] ppDefinitions,
             int cDefinitions)
         {
             IDefinitionBase pTemp;
@@ -907,9 +974,9 @@ namespace System.Windows.Controls
         //  Synopsis: Sort definitions for distributing star space.
         //
         //------------------------------------------------------------------------
-        void SortDefinitionsForStarSizeDistribution(
-                IList<IDefinitionBase> ppDefinitions,
-                int cDefinitions
+        private static void SortDefinitionsForStarSizeDistribution(
+            IDefinitionBase[] ppDefinitions,
+            int cDefinitions
         )
         {
             IDefinitionBase pTemp;
@@ -942,14 +1009,15 @@ namespace System.Windows.Controls
         //  Synopsis:  Distributes min size back to definition array's range.
         //
         //------------------------------------------------------------------------
-        void EnsureMinSizeInDefinitionRange(
-            IEnumerable<IDefinitionBase> definitions,
+        private void EnsureMinSizeInDefinitionRange<T>(
+            List<T> definitions,
             int spanStart,
             int spanCount,
             double spacing,
             double childDesiredSize)
+            where T : IDefinitionBase
         {
-            Debug.Assert((spanCount > 1) && (spanStart + spanCount) <= definitions.Count());
+            Debug.Assert((spanCount > 1) && (spanStart + spanCount) <= definitions.Count);
             // The spacing between definitions that this element spans through must not
             // be distributed.
             double requestedSize = Math.Max((childDesiredSize - spacing * (spanCount - 1)), 0.0f);
@@ -977,7 +1045,7 @@ namespace System.Windows.Controls
             // e) Prepare indices.
             for (int i = spanStart; i < spanEnd; i++)
             {
-                var def = definitions.ElementAt(i);
+                var def = definitions[i];
                 double effectiveMinSize = def.GetEffectiveMinSize();
                 double preferredSize = def.GetPreferredSize();
                 double maxSize = Math.Max(def.GetUserMaxSize(), effectiveMinSize);
@@ -1138,7 +1206,7 @@ namespace System.Windows.Controls
                 }
             }
         }
-        void MeasureCell(
+        private void MeasureCell(
             UIElement child,
             CellUnitTypes rowHeightTypes,
             CellUnitTypes columnWidthTypes,
@@ -1187,20 +1255,21 @@ namespace System.Windows.Controls
         }
 
         // Accumulates available size information for a given range of definitions.
-        double GetAvailableSizeForRange(
-            IEnumerable<IDefinitionBase> definitions,
+        private static double GetAvailableSizeForRange<T>(
+            List<T> definitions,
             int start,
             int count,
             double spacing)
+            where T : IDefinitionBase
         {
-            Debug.Assert((count > 0) && ((start + count) <= definitions.Count()));
+            Debug.Assert((count > 0) && ((start + count) <= definitions.Count));
 
             double availableSize = 0.0f;
             int index = start + count - 1;
 
             do
             {
-                var def = (IDefinitionBase)(definitions.ElementAt(index));
+                var def = definitions[index];
                 availableSize += (def.GetEffectiveUnitType() == GridUnitType.Auto)
                     ? def.GetEffectiveMinSize()
                     : def.GetMeasureArrangeSize();
@@ -1218,22 +1287,22 @@ namespace System.Windows.Controls
         //  Synopsis:  Resolves Star's for given array of definitions during measure pass
         //
         //------------------------------------------------------------------------
-        void ResolveStar(
-            IEnumerable<IDefinitionBase> definitions, //the definitions collection
+        private void ResolveStar<T>(
+            List<T> definitions, //the definitions collection
             double availableSize //the total available size across this dimension
-        )
+        ) where T : IDefinitionBase
         {
             int cStarDefinitions = 0;
             double takenSize = 0.0f;
             double effectiveAvailableSize = availableSize;
 
-            EnsureTempDefinitionsStorage(definitions.Count());
+            EnsureTempDefinitionsStorage(definitions.Count);
 
-            for (int i = 0; i < definitions.Count(); i++)
+            for (int i = 0; i < definitions.Count; i++)
             {
                 //if star definition, setup values for distribution calculation
 
-                IDefinitionBase pDef = (IDefinitionBase)(definitions.ElementAt(i));
+                IDefinitionBase pDef = definitions[i];
 
                 if (pDef.GetEffectiveUnitType() == GridUnitType.Star)
                 {
@@ -1289,7 +1358,7 @@ namespace System.Windows.Controls
         //  Synopsis:  Distributes available space between star definitions.
         //
         //------------------------------------------------------------------------
-        void DistributeStarSpace(
+        private static void DistributeStarSpace(
             IDefinitionBase[] ppStarDefinitions,
             int cStarDefinitions,
             double availableSize,
@@ -1348,13 +1417,14 @@ namespace System.Windows.Controls
 
         // Calculates the desired size of the Grid minus its BorderThickness and
         // Padding assuming all the cells have already been measured.
-        double GetDesiredInnerSize(IEnumerable<IDefinitionBase> definitions)
+        private static double GetDesiredInnerSize<T>(List<T> definitions)
+            where T : IDefinitionBase
         {
             double desiredSize = 0.0f;
 
-            for (int i = 0; i < definitions.Count(); ++i)
+            for (int i = 0; i < definitions.Count; ++i)
             {
-                var def = (IDefinitionBase)(definitions.ElementAt(i));
+                var def = definitions[i];
                 desiredSize += def.GetEffectiveMinSize();
             }
 
@@ -1362,6 +1432,36 @@ namespace System.Windows.Controls
         }
 
         protected override Size MeasureOverride(Size availableSize)
+        {
+            StackVector<CellCache> cellCacheVector = default;
+            StackVector<SpanStoreEntry> spanStore = default;
+
+            bool gotException = true;
+            Size desiredSize;
+
+            MeasureOverrideInProgress = true;
+            try
+            {
+                desiredSize = InnerMeasureOverride(availableSize, ref cellCacheVector, ref spanStore);
+                gotException = false;
+            }
+            finally
+            {
+                MeasureOverrideInProgress = false;
+                if (gotException)
+                {
+                    cellCacheVector.Dispose();
+                    spanStore.Dispose();
+                }
+            }
+
+            return desiredSize;
+        }
+
+        private Size InnerMeasureOverride(
+            Size availableSize,
+            ref StackVector<CellCache> cellCacheVector,
+            ref StackVector<SpanStoreEntry> spanStore)
         {
             double rowSpacing = 0;
             double columnSpacing = 0;
@@ -1374,9 +1474,10 @@ namespace System.Windows.Controls
             {
                 // If this Grid has no user-defined rows or columns, it is possible
                 // to shortcut this MeasureOverride.
-                UIElement[] childrens = Children.ToArray();
-                foreach (UIElement child in childrens)
+                UIElementCollection children = Children;
+                for (int i = 0; i < children.Count; i++)
                 {
+                    UIElement child = children[i];
                     child.Measure(availableSize);
 
                     Size childDesiredSize = child.DesiredSize;
@@ -1400,15 +1501,15 @@ namespace System.Windows.Controls
                 innerAvailableSize.Width -= combinedColumnSpacing;
                 innerAvailableSize.Height -= combinedRowSpacing;
 
-                UIElement[] childrens = Children.ToArray();
-                int childrenCount = childrens.Count();
+                UIElementCollection children = Children;
+                int childrenCount = children.Count;
 
-                List<CellCache> cellCacheVector = new List<CellCache>(new CellCache[childrenCount]);
-                CellGroups cellGroups = ValidateCells(childrens, cellCacheVector);
+                cellCacheVector = new StackVector<CellCache>(16, childrenCount);
+                CellGroups cellGroups = ValidateCells(children, ref cellCacheVector);
 
                 // Measure Group1. After Group1 is measured, only Group3 can have
                 // cells belonging to var rows.
-                MeasureCellsGroup((int)cellGroups.group1, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector);
+                MeasureCellsGroup(cellGroups.group1, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
 
                 // After Group1 is measured, only Group3 may have cells belonging to
                 // Auto rows.
@@ -1421,7 +1522,7 @@ namespace System.Windows.Controls
                     }
 
                     // Measure Group2.
-                    MeasureCellsGroup((int)cellGroups.group2, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector);
+                    MeasureCellsGroup(cellGroups.group2, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
 
                     if (HasGridFlags(GridFlags.HasStarColumns))
                     {
@@ -1429,7 +1530,7 @@ namespace System.Windows.Controls
                     }
 
                     // Measure Group3.
-                    MeasureCellsGroup((int)cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector);
+                    MeasureCellsGroup(cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
                 }
                 else
                 {
@@ -1443,7 +1544,7 @@ namespace System.Windows.Controls
                         }
 
                         // Measure Group3.
-                        MeasureCellsGroup((int)cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector);
+                        MeasureCellsGroup(cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
 
                         if (HasGridFlags(GridFlags.HasStarRows))
                         {
@@ -1454,7 +1555,7 @@ namespace System.Windows.Controls
                     {
                         // We have a cyclic dependency; measure Group2 for their
                         // widths, while setting the row heights to infinity.
-                        MeasureCellsGroup((int)cellGroups.group2, childrenCount, rowSpacing, columnSpacing, false, true, ref cellCacheVector);
+                        MeasureCellsGroup(cellGroups.group2, childrenCount, rowSpacing, columnSpacing, false, true, ref cellCacheVector, ref spanStore);
 
                         if (HasGridFlags(GridFlags.HasStarColumns))
                         {
@@ -1462,7 +1563,7 @@ namespace System.Windows.Controls
                         }
 
                         // Measure Group3.
-                        MeasureCellsGroup(cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector);
+                        MeasureCellsGroup(cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
 
                         if (HasGridFlags(GridFlags.HasStarRows))
                         {
@@ -1470,15 +1571,18 @@ namespace System.Windows.Controls
                         }
 
                         // Now, Measure Group2 again for their heights and ignore their widths.
-                        MeasureCellsGroup((int)cellGroups.group2, childrenCount, rowSpacing, columnSpacing, true, false, ref cellCacheVector);
+                        MeasureCellsGroup(cellGroups.group2, childrenCount, rowSpacing, columnSpacing, true, false, ref cellCacheVector, ref spanStore);
                     }
                 }
 
                 // Finally, measure Group4.
-                MeasureCellsGroup((int)cellGroups.group4, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector);
+                MeasureCellsGroup(cellGroups.group4, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
 
                 desiredSize.Width = GetDesiredInnerSize(m_pColumns) + combinedColumnSpacing;
                 desiredSize.Height = GetDesiredInnerSize(m_pRows) + combinedRowSpacing;
+
+                // Return memory to the array pool
+                cellCacheVector.Dispose();
             }
 
             return desiredSize;
@@ -1492,22 +1596,18 @@ namespace System.Windows.Controls
         //      Computes the offsets and sizes for each row and column
         //
         //------------------------------------------------------------------------
-        void SetFinalSize(
-            IEnumerable<IDefinitionBase> definitions,
-            double finalSize
-        )
+        private void SetFinalSize<T>(List<T> definitions, double finalSize)
+            where T : IDefinitionBase
         {
             double allPreferredArrangeSize = 0;
-            IDefinitionBase currDefinition = null;
-            IDefinitionBase nextDefinition = null;
             int cStarDefinitions = 0;
-            int cNonStarDefinitions = definitions.Count();
+            int cNonStarDefinitions = definitions.Count;
 
-            EnsureTempDefinitionsStorage(definitions.Count());
+            EnsureTempDefinitionsStorage(definitions.Count);
 
-            for (int i = 0; i < definitions.Count(); i++)
+            for (int i = 0; i < definitions.Count; i++)
             {
-                IDefinitionBase pDef = (IDefinitionBase)(definitions.ElementAt(i));
+                IDefinitionBase pDef = definitions[i];
 
                 if (pDef.GetUserSizeType() == GridUnitType.Star)
                 {
@@ -1573,13 +1673,13 @@ namespace System.Windows.Controls
             if ((allPreferredArrangeSize > finalSize) && Math.Abs(allPreferredArrangeSize - finalSize) > double.Epsilon)
             {
                 //sort definitions to define an order for space distribution.
-                SortDefinitionsForOverflowSizeDistribution(m_ppTempDefinitions, definitions.Count());
+                SortDefinitionsForOverflowSizeDistribution(m_ppTempDefinitions, definitions.Count);
                 double sizeToDistribute = finalSize - allPreferredArrangeSize;
 
-                for (int i = 0; i < definitions.Count(); i++)
+                for (int i = 0; i < definitions.Count; i++)
                 {
                     double finalSize2 = m_ppTempDefinitions[i].GetMeasureArrangeSize() +
-                                       (sizeToDistribute / (definitions.Count() - i));
+                                       (sizeToDistribute / (definitions.Count - i));
 
                     finalSize2 = Math.Max(finalSize2, m_ppTempDefinitions[i].GetEffectiveMinSize());
                     finalSize2 = Math.Min(finalSize2, m_ppTempDefinitions[i].GetMeasureArrangeSize());
@@ -1589,33 +1689,33 @@ namespace System.Windows.Controls
             }
 
             //Process definitions in original order to calculate offsets
-            currDefinition = (IDefinitionBase)(definitions.ElementAt(0));
+            IDefinitionBase currDefinition = definitions[0];
             currDefinition.SetFinalOffset(0.0f);
 
-            for (int i = 0; i < definitions.Count() - 1; i++)
+            for (int i = 0; i < definitions.Count - 1; i++)
             {
-                nextDefinition = (IDefinitionBase)(definitions.ElementAt(i + 1));
+                IDefinitionBase nextDefinition = definitions[i + 1];
                 nextDefinition.SetFinalOffset(currDefinition.GetFinalOffset() + currDefinition.GetMeasureArrangeSize());
                 currDefinition = nextDefinition;
-                nextDefinition = null;
             }
         }
 
         // Accumulates final size information for a given range of definitions.
-        double GetFinalSizeForRange(
-            IEnumerable<IDefinitionBase> definitions,
+        private static double GetFinalSizeForRange<T>(
+            List<T> definitions,
             int start,
             int count,
             double spacing)
+            where T : IDefinitionBase
         {
-            Debug.Assert((count > 0) && ((start + count) <= definitions.Count()));
+            Debug.Assert((count > 0) && ((start + count) <= definitions.Count));
 
             double finalSize = 0.0f;
             int index = start + count - 1;
 
             do
             {
-                var def = (IDefinitionBase)(definitions.ElementAt(index));
+                var def = definitions[index];
                 finalSize += def.GetMeasureArrangeSize();
             } while (index > 0 && --index >= start);
 
@@ -1633,62 +1733,69 @@ namespace System.Windows.Controls
                 return default(Size);  // Returning (0, 0)
             }
 
+            ArrangeOverrideInProgress = true;
             try
             {
-                Rect innerRect = new Rect(0, 0,finalSize.Width, finalSize.Height);
-
-                if (IsWithoutRowAndColumnDefinitions())
-                {
-                    // If this Grid has no user-defined rows or columns, it is possible
-                    // to shortcut this ArrangeOverride.
-                    UIElement[] childrens = Children.ToArray();
-                    foreach (UIElement currentChild in childrens)
-                    {
-                        currentChild.Arrange(innerRect);
-                    }
-                }
-                else
-                {
-                    double rowSpacing = 0;
-                    double columnSpacing = 0;
-                    double combinedRowSpacing = rowSpacing * (m_pRows.Count - 1);
-                    double combinedColumnSpacing = columnSpacing * (m_pColumns.Count - 1);
-
-                    // Given an effective final size, compute the offsets and sizes of each
-                    // row and column, including the resdistribution of Star sizes based on
-                    // the new width and height.
-                    SetFinalSize(m_pRows, (double)innerRect.Height - combinedRowSpacing);
-                    SetFinalSize(m_pColumns, (double)innerRect.Width - combinedColumnSpacing);
-
-                    UIElement[] childrens = Children.ToArray();
-                    int count = childrens.Count();
-
-                    foreach (UIElement currentChild in childrens)
-                    {
-                        IDefinitionBase row = GetRowNoRef(currentChild);
-                        IDefinitionBase column = GetColumnNoRef(currentChild);
-                        int columnIndex = GetColumnIndex(currentChild);
-                        int rowIndex = GetRowIndex(currentChild);
-
-                        Rect arrangeRect = new Rect();
-                        arrangeRect.X = column.GetFinalOffset() + innerRect.X + (columnSpacing * columnIndex);
-                        arrangeRect.Y = row.GetFinalOffset() + innerRect.Y + (rowSpacing * rowIndex);
-                        arrangeRect.Width = GetFinalSizeForRange(m_pColumns, columnIndex, GetColumnSpanAdjusted(currentChild), columnSpacing);
-                        arrangeRect.Height = GetFinalSizeForRange(m_pRows, rowIndex, GetRowSpanAdjusted(currentChild), rowSpacing);
-
-                        currentChild.Arrange(arrangeRect);
-                    }
-                }
-
-                Size newFinalSize = finalSize;
-
-                return newFinalSize;
+                return InnerArrangeOverride(finalSize);
             }
             finally
             {
+                ArrangeOverrideInProgress = false;
                 m_ppTempDefinitions = null;
                 m_cTempDefinitions = 0;
             }
+        }
+
+        private Size InnerArrangeOverride(Size finalSize)
+        {
+            Rect innerRect = new Rect(0, 0, finalSize.Width, finalSize.Height);
+
+            if (IsWithoutRowAndColumnDefinitions())
+            {
+                // If this Grid has no user-defined rows or columns, it is possible
+                // to shortcut this ArrangeOverride.
+                UIElementCollection children = Children;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    UIElement currentChild = children[i];
+                    currentChild.Arrange(innerRect);
+                }
+            }
+            else
+            {
+                double rowSpacing = 0;
+                double columnSpacing = 0;
+                double combinedRowSpacing = rowSpacing * (m_pRows.Count - 1);
+                double combinedColumnSpacing = columnSpacing * (m_pColumns.Count - 1);
+
+                // Given an effective final size, compute the offsets and sizes of each
+                // row and column, including the resdistribution of Star sizes based on
+                // the new width and height.
+                SetFinalSize(m_pRows, (double)innerRect.Height - combinedRowSpacing);
+                SetFinalSize(m_pColumns, (double)innerRect.Width - combinedColumnSpacing);
+
+                UIElementCollection children = Children;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    UIElement currentChild = children[i];
+                    IDefinitionBase row = GetRowNoRef(currentChild);
+                    IDefinitionBase column = GetColumnNoRef(currentChild);
+                    int columnIndex = GetColumnIndex(currentChild);
+                    int rowIndex = GetRowIndex(currentChild);
+
+                    Rect arrangeRect = new Rect();
+                    arrangeRect.X = column.GetFinalOffset() + innerRect.X + (columnSpacing * columnIndex);
+                    arrangeRect.Y = row.GetFinalOffset() + innerRect.Y + (rowSpacing * rowIndex);
+                    arrangeRect.Width = GetFinalSizeForRange(m_pColumns, columnIndex, GetColumnSpanAdjusted(currentChild), columnSpacing);
+                    arrangeRect.Height = GetFinalSizeForRange(m_pRows, rowIndex, GetRowSpanAdjusted(currentChild), rowSpacing);
+
+                    currentChild.Arrange(arrangeRect);
+                }
+            }
+
+            Size newFinalSize = finalSize;
+
+            return newFinalSize;
         }
     }
 }
