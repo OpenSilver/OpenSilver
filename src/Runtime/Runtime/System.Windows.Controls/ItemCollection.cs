@@ -234,6 +234,8 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Items collection must be empty before using ItemsSource.");
             }
 
+            int previousCount = Count;
+
             this.TryUnsubscribeFromCollectionChangedEvent();
 
             this._itemsSource = value;
@@ -243,15 +245,17 @@ namespace System.Windows.Controls
 
             this.InitializeSourceList(value);
 
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(previousCount, Count);
 
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            this.OnCollectionReset();
         }
 
         internal void ClearItemsSource()
         {
             if (this.IsUsingItemsSource)
             {
+                int previousCount = Count;
+
                 // return to normal mode
                 this.TryUnsubscribeFromCollectionChangedEvent();
 
@@ -260,9 +264,9 @@ namespace System.Windows.Controls
                 this._isUsingItemsSource = false;
                 this._isUsingListWrapper = false;
 
-                this.UpdateCountProperty();
+                this.UpdateCountProperty(previousCount, Count);
 
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                this.OnCollectionReset();
             }
         }
 
@@ -319,6 +323,8 @@ namespace System.Windows.Controls
         {
             this.ValidateCollectionChangedEventArgs(e);
 
+            int previousCount = Count;
+
             // Update list wrapper
             if (this._isUsingListWrapper)
             {
@@ -342,7 +348,7 @@ namespace System.Windows.Controls
                 }
             }
 
-            this.UpdateCountProperty();
+            this.UpdateCountProperty(previousCount, Count);
 
             // Raise collection changed
             this.OnCollectionChanged(e);
