@@ -23,7 +23,7 @@ using System.Windows.Markup;
 
 [assembly: InternalsVisibleTo("Telerik.Windows.Controls.GridView")]
 
-[assembly: OpenSilver.XamlDesigner(1)]
+[assembly: OpenSilver.XamlDesigner(2)]
 
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]
