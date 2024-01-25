@@ -62,6 +62,7 @@ namespace CSHTML5.Types
         private JSObjectRef(object value)
         {
             Value = value;
+            GC.SuppressFinalize(this);
         }
 
         public JSObjectRef(object value, string referenceId, string javascript)
@@ -75,7 +76,7 @@ namespace CSHTML5.Types
             }
         }
 
-        public JSObjectRef(object value, string referenceId, int arrayIndex, string javascript)
+        public JSObjectRef(object value, string referenceId, int arrayIndex)
         {
             Value = value;
             ReferenceId = referenceId;
@@ -84,7 +85,7 @@ namespace CSHTML5.Types
 
             if (IsTrackingAllJavascriptObjects)
             {
-                JSObjectReferenceHolder.Instance.Add(this, javascript);
+                JSObjectReferenceHolder.Instance.Add(this, $"callback {referenceId}");
             }
         }
 
@@ -96,7 +97,7 @@ namespace CSHTML5.Types
 
         private void RemoveFromJS()
         {
-            if (ReferenceId != string.Empty)
+            if (ReferenceId is not null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"delete document.jsObjRef['{ReferenceId}']");
 
@@ -105,7 +106,7 @@ namespace CSHTML5.Types
                     JSObjectReferenceHolder.Instance.Remove(this);
                 }
 
-                ReferenceId = string.Empty;
+                ReferenceId = null;
             }
         }
 

@@ -135,7 +135,7 @@ namespace CSHTML5.Internal
             }
 
             object[] arguments = null;
-            IReadOnlyList<object> extraJsObjects = null;
+            IReadOnlyList<IDisposable> extraJsObjects = null;
             try
             {
                 int argumentCount = 0;
@@ -164,28 +164,36 @@ namespace CSHTML5.Internal
             finally
             {
                 if (arguments != null)
+                {
                     foreach (var arg in arguments.OfType<IDisposable>())
+                    {
                         arg.Dispose();
+                    }
+                }
                 if (extraJsObjects != null)
-                    foreach (var arg in extraJsObjects.OfType<IDisposable>())
+                {
+                    foreach (IDisposable arg in extraJsObjects)
+                    {
                         arg.Dispose();
+                    }
+                }
             }
 
             throw new Exception($"Callback type not supported: '{callbackType.FullName}'");
         }
 
-        private static (object[], IReadOnlyList<object>) MakeArgumentsForCallback(
+        private static (object[], IReadOnlyList<IDisposable>) MakeArgumentsForCallback(
             int count,
             string idWhereCallbackArgsAreStored,
             object callbackArgs,
             Type[] callbackGenericArgs)
         {
             var result = new object[count];
-            List<object> extraJsObjects = null;
+            List<IDisposable> extraJsObjects = null;
 
             for (int i = 0; i < count; i++)
             {
-                var arg = new JSObjectRef(callbackArgs, idWhereCallbackArgsAreStored, i, $"callback {idWhereCallbackArgsAreStored}");
+                var arg = new JSObjectRef(callbackArgs, idWhereCallbackArgsAreStored, i);
 
                 if (callbackGenericArgs != null
                     && i < callbackGenericArgs.Length
@@ -196,9 +204,7 @@ namespace CSHTML5.Internal
                     // when passing an Action<string> to an Interop.ExecuteJavaScript so as to not get an exception that says
                     // that it cannot cast the JS object into string (when running in the Simulator only):
                     result[i] = Convert.ChangeType(arg, callbackGenericArgs[i]);
-                    // this may leak the JSobjectReference?
-                    if (extraJsObjects == null)
-                        extraJsObjects = new List<object>();
+                    extraJsObjects ??= new();
                     extraJsObjects.Add(arg);
                 }
                 else
