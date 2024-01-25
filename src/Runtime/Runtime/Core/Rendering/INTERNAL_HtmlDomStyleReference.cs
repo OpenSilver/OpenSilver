@@ -120,8 +120,8 @@ namespace CSHTML5.Internal
         public string textDecoration { set { SetStylePropertyValue("textDecoration", value); } }
         public string textOverflow { set { SetStylePropertyValue("textOverflow", value); } }
         public string textShadow { set { SetStylePropertyValue("textShadow", value); } }
-        public string transform { set { SetTransformPropertyValue(value); } }
-        public string transformOrigin { set { SetTransformOriginPropertyValue(value); } }
+        public string transform { set { SetStylePropertyValue("transform", value); } }
+        public string transformOrigin { set { SetStylePropertyValue("transformOrigin", value); } }
         public string top { set { SetStylePropertyValue("top", value); } }
         public string touchAction { set { SetStylePropertyValue("touchAction", value); } }
         public string verticalAlign { set { SetStylePropertyValue("verticalAlign", value); } }
@@ -157,14 +157,6 @@ namespace CSHTML5.Internal
         private void SetStylePropertyValue(string propertyName, string value) =>
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setDomStyle('{Uid}', '{propertyName}', '{value}');");
-
-        private void SetTransformPropertyValue(string propertyValue) =>
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setDomTransform('{Uid}', '{propertyValue}');");
-
-        private void SetTransformOriginPropertyValue(string propertyValue) =>
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setDomTransformOrigin('{Uid}', '{propertyValue}');");
 
         private string GetCSSProperty(string propertyName) =>
             OpenSilver.Interop.ExecuteJavaScriptString(

@@ -258,26 +258,6 @@ document.setStyleProperty = function (id, propertyName, value, priority) {
     }
 };
 
-document.setDomTransform = function (id, value) {
-    const element = document.getElementById(id);
-    if (!element)
-        return;
-
-    element.style['transform'] = value;
-    element.style['msTransform'] = value;
-    element.style['WebkitTransform'] = value;
-};
-
-document.setDomTransformOrigin = function (id, value) {
-    const element = document.getElementById(id);
-    if (!element)
-        return;
-
-    element.style['transformOrigin'] = value;
-    element.style['msTransformOrigin'] = value;
-    element.style['WebkitTransformOrigin'] = value;
-};
-
 document.setDomAttribute = function (id, propertyName, value) {
     const element = document.getElementById(id);
     if (!element)
