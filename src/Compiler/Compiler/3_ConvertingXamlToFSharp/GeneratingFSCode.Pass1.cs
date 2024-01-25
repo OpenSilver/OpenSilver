@@ -110,16 +110,18 @@ namespace OpenSilver.Compiler
                     // combine local variables and members
                     resultingFieldsForNamedElements.AddRange(resultingMembersForNamedElements);
 
-                    string componentTypeFullName = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
+                    string classNameXaml = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
 
                     // Wrap everything into a partial class:
                     string partialClass = GeneratePartialClass("",
                                                                initializeComponentMethod,
                                                                new ComponentConnectorBuilderFS().ToString(),
                                                                resultingFieldsForNamedElements,
-                                                               componentTypeFullName,
+                                                               classNameXaml,
                                                                namespaceStringIfAny,
                                                                baseType);
+
+                    string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, classNameXaml);
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
@@ -136,15 +138,17 @@ namespace OpenSilver.Compiler
                     {
                         finalCode = $@"
 namespace {namespaceStringIfAny}
-{factoryClass}
 {partialClass}
+
+namespace global
+{factoryClass}
 ";
                     }
                     else
                     {
                         finalCode = $@"
-{factoryClass}
-{partialClass}";
+{partialClass}
+{factoryClass}";
                     }
 
                     return finalCode;
@@ -164,7 +168,7 @@ namespace {namespaceStringIfAny}
                     if (!string.IsNullOrEmpty(namespaceStringIfAny))
                     {
                         finalCode = $@"
-namespace {namespaceStringIfAny}
+namespace global
 {finalCode}
 ";
                     } else {
