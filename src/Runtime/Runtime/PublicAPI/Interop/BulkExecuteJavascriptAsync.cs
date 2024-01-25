@@ -33,8 +33,7 @@ namespace OpenSilver
 
         public IDisposable AddJavascriptAsync(string javascript, params object[] variables)
         {
-            javascript = InteropImplementation.ReplaceJSArgs(javascript, variables);
-            return AddJavascriptAsync(javascript);
+            return AddDisposable(Interop.ExecuteJavaScriptAsync(javascript, variables));
         }
 
         public IDisposable AddJavascriptAsync(string javascript)
@@ -50,7 +49,7 @@ namespace OpenSilver
 
         public void AddJavascript(string javascript, params object[] variables)
         {
-            javascript = InteropImplementation.ReplaceJSArgs(javascript, variables);
+            javascript = Interop.FormatArguments(javascript, variables);
             AddJavascript(javascript);
         }
 
@@ -70,9 +69,9 @@ namespace OpenSilver
                 {
                     // very important: the first functions need to be executed before executing the remaining javascript,
                     // since the remaining javascript can rely on the results from here
-                    ExecuteJavaScript.JavaScriptRuntime.Flush();
+                    Interop.JavaScriptRuntime.Flush();
 
-                    await ExecuteJavaScript.ExecuteJavaScriptAsync(_javascript.ToString(), 0, false);
+                    await Interop.ExecuteJavaScriptAsync(_javascript.ToString(), 0, false);
                 }
                 catch (Exception e)
                 {

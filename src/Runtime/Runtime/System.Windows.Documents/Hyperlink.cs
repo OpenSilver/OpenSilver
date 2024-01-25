@@ -215,9 +215,9 @@ public sealed class Hyperlink : Span
 
         _clickCallback = JavaScriptCallback.Create(OnClickNative, true);
 
-        string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
-        string sClickCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_clickCallback);
-        OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+        string sDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
+        string sClickCallback = OpenSilver.Interop.GetVariableStringForJS(_clickCallback);
+        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
             $"{sDiv}.addEventListener('click', function (e) {{ {sClickCallback}(); }});");
     }
 

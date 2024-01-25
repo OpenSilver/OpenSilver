@@ -36,7 +36,7 @@ internal sealed class AnimationManager
     private AnimationManager()
     {
         var jsCallback = JavaScriptCallback.Create(OnRequestAnimationFrameNative, true);
-        string sHandler = CSHTML5.InteropImplementation.GetVariableStringForJS(jsCallback);
+        string sHandler = Interop.GetVariableStringForJS(jsCallback);
         Interop.ExecuteJavaScriptVoid($"document.createAnimationManager({sHandler});");
         SetFrameRate(DefaultFrameRate);
     }

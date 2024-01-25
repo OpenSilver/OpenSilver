@@ -50,24 +50,24 @@ namespace System.Windows.Controls
             DisposeJsCallbacks();
             _jsCallbackOnIframeLoaded = JavaScriptCallback.Create(OnIframeLoad, true);
 
-            string sIFrame = InteropImplementation.GetVariableStringForJS(_iFrame);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"{sIFrame}.onload = {InteropImplementation.GetVariableStringForJS(_jsCallbackOnIframeLoaded)}");
+            string sIFrame = OpenSilver.Interop.GetVariableStringForJS(_iFrame);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"{sIFrame}.onload = {OpenSilver.Interop.GetVariableStringForJS(_jsCallbackOnIframeLoaded)}");
 
             var source = this.SourceUri;
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))
             {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"{sIFrame}.src = {InteropImplementation.GetVariableStringForJS(source.OriginalString)}");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"{sIFrame}.src = {OpenSilver.Interop.GetVariableStringForJS(source.OriginalString)}");
             }
             else if (_htmlString != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"{sIFrame}.srcdoc = {InteropImplementation.GetVariableStringForJS(_htmlString)};");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)};");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = 'about:blank'");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sIFrame}.src = 'about:blank'");
             }
 
             domElementWhereToPlaceChildren = _iFrame;
@@ -134,15 +134,15 @@ namespace System.Windows.Controls
 
             if (this._isLoaded) // Note: if not loaded, we will set the HTML later when adding the control to the visual tree.
             {
-                string sIFrame = InteropImplementation.GetVariableStringForJS(_iFrame);
+                string sIFrame = OpenSilver.Interop.GetVariableStringForJS(_iFrame);
                 if (_htmlString != null)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                        $"{sIFrame}.srcdoc = {InteropImplementation.GetVariableStringForJS(_htmlString)};");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                        $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)};");
                 }
                 else
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = 'about:blank'");
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sIFrame}.src = 'about:blank'");
                 }
             }
         }

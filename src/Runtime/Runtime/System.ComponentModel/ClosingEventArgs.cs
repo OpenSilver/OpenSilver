@@ -62,12 +62,12 @@ namespace System.ComponentModel
                     if (value)
                     {
                         OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{CSHTML5.InteropImplementation.GetVariableStringForJS(_jsArgs)}.returnValue = 'The modifications you made may not be saved.';"); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe Edge).
+                            $"{OpenSilver.Interop.GetVariableStringForJS(_jsArgs)}.returnValue = 'The modifications you made may not be saved.';"); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe Edge).
                     }
                     else
                     {
                         OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{CSHTML5.InteropImplementation.GetVariableStringForJS(_jsArgs)}.returnValue = '';");
+                            $"{OpenSilver.Interop.GetVariableStringForJS(_jsArgs)}.returnValue = '';");
                     }
                 }
             }

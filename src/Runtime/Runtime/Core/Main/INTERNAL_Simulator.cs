@@ -46,6 +46,10 @@ namespace DotNetForHtml5.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static dynamic DynamicJavaScriptExecutionHandler { internal get; set; }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static Action<object> SimulatorCallbackSetup { get; set; }
+
         // BeginInvoke of the WebControl's Dispatcher
         public static Action<Action> WebControlDispatcherBeginInvoke
         {
@@ -77,13 +81,13 @@ namespace DotNetForHtml5.Core
                     if (value is IWebAssemblyExecutionHandler wasmHandler)
                     {
                         jsRuntime = wasmHandler;
-                        ExecuteJavaScript.JavaScriptRuntime =
+                        OpenSilver.Interop.JavaScriptRuntime =
                             new PendingJavascript(Cshtml5Initializer.PendingJsBufferSize, wasmHandler);
                     }
                     else
                     {
                         jsRuntime = new JSRuntimeWrapper(value);
-                        ExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator(value);
+                        OpenSilver.Interop.JavaScriptRuntime = new PendingJavascriptSimulator(value);
                     }
                 }
                 
@@ -100,12 +104,6 @@ namespace DotNetForHtml5.Core
         public static dynamic SimulatorProxy { internal get; set; }
 
         public static bool IsRunningInTheSimulator_WorkAround
-        {
-            get;
-            set;
-        }
-
-        public static Action<object> SimulatorCallbackSetup
         {
             get;
             set;

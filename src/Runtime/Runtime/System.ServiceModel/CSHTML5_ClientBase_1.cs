@@ -283,7 +283,7 @@ namespace System.ServiceModel
             out string endpointAddress)
         {
             bool isNullOrUndefined = OpenSilver.Interop.ExecuteJavaScriptBoolean(
-                $"!{CSHTML5.InteropImplementation.GetVariableStringForJS(configFileContent)}");
+                $"!{OpenSilver.Interop.GetVariableStringForJS(configFileContent)}");
             if (!isNullOrUndefined)
             {
                 string fileContentAsString = Convert.ToString(configFileContent);

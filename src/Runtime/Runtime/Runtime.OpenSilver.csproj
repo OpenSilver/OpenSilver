@@ -68,6 +68,7 @@
 		<Compile Include="OpenSilver\Internal\Media\Animation\TimelineClock.cs" />
 		<Compile Include="OpenSilver\Internal\Media\ISvgBrush.cs" />
 		<Compile Include="OpenSilver\Internal\NamedObject.cs" />
+		<Compile Include="OpenSilver\Internal\SynchronyzedStore.cs" />
 		<Compile Include="OpenSilver\Internal\UIElementHelpers.cs" />
 		<Compile Include="OpenSilver\Internal\ValidateValueCallback.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
@@ -131,6 +132,7 @@
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
 		<Compile Include="OpenSilver\Internal\IJavaScriptConvertible.cs" />
 		<Compile Include="PublicAPI\Interop\BulkExecuteJavascriptAsync.cs" />
+		<Compile Include="OpenSilver\Interop.ResourceFiles.cs" />
 		<Compile Include="PublicAPI\Interop\JSObjectReferenceHolder.cs" />
 		<Compile Include="PublicAPI\Interop\StackTraceProvider.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
@@ -527,7 +529,6 @@
 		<Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
 		<Compile Include="Core\Main\INTERNAL_Simulator.cs" />
-		<Compile Include="Core\Main\ExecuteJavaScript.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
 		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
 		<Compile Include="Core\Other\HashSet2_1.cs" />
@@ -572,9 +573,8 @@
 		<Compile Include="PublicAPI\Internal\StartupAssemblyInfo.cs" />
 		<Compile Include="PublicAPI\Internal\TypeInstantiationHelper.cs" />
 		<Compile Include="PublicAPI\Interop\HtmlPresenter.cs" />
-		<Compile Include="PublicAPI\Interop\InteropImplementation.cs" />
 		<Compile Include="PublicAPI\Interop\JSObjectRef.cs" />
-		<Compile Include="PublicAPI\Interop\Interop.cs" />
+		<Compile Include="OpenSilver\Interop.cs" />
 		<Compile Include="PublicAPI\Interop\OnCallBack.cs" />
 		<Compile Include="PublicAPI\MinimumRequiredCompilerVersionFriendlyNameAttribute.cs" />
 		<Compile Include="PublicAPI\MinimumRequiredCompilerVersionNumberAttribute.cs" />

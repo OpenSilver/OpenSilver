@@ -33,7 +33,7 @@ namespace CSHTML5.Internal
             {
                 string errorMessage = OpenSilver.Interop.ExecuteJavaScriptString($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][0]");
                 int indexOfNextUnmodifiedJSCallInList = OpenSilver.Interop.ExecuteJavaScriptInt32($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][1]");
-                ExecuteJavaScript.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
+                ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
             };
 
             if (OpenSilver.Interop.IsRunningInTheSimulator)
@@ -44,6 +44,28 @@ namespace CSHTML5.Internal
             else
             {
                 action();
+            }
+        }
+
+        private static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
+        {
+            string javascript = OpenSilver.Interop.GetJavaScript(indexOfCallInList);
+
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, javascript);
+            }
+            else
+            {
+                string message = string.Format(@"Error in the following javascript code:
+
+{0}
+
+----- Error: -----
+
+{1}
+", javascript, errorMessage);
+                Console.WriteLine(message);
             }
         }
 

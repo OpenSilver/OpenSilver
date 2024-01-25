@@ -153,10 +153,14 @@ namespace CSHTML5.Internal
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
         {
             if (referenceId > 0 && !javascript.StartsWith("document.callScriptSafe"))
-                javascript = Internal.ExecuteJavaScript.WrapReferenceIdInJavascriptCall(javascript, referenceId);
+            {
+                javascript = OpenSilver.Interop.WrapReferenceIdInJavascriptCall(javascript, referenceId);
+            }
 
             if (wantsResult)
+            {
                 return PerformActualInteropCall(javascript);
+            }
             else
             {
                 PerformActualInteropCallVoid(javascript);
@@ -166,7 +170,7 @@ namespace CSHTML5.Internal
 
         private object PerformActualInteropCall(string javaScriptToExecute)
         {
-            if (Internal.ExecuteJavaScript.EnableInteropLogging)
+            if (OpenSilver.Interop.EnableInteropLogging)
             {
                 javaScriptToExecute = "//---- START INTEROP ----"
                     + Environment.NewLine
@@ -177,7 +181,7 @@ namespace CSHTML5.Internal
 
             try
             {
-                if (Internal.ExecuteJavaScript.EnableInteropLogging)
+                if (OpenSilver.Interop.EnableInteropLogging)
                 {
                     Debug.WriteLine(javaScriptToExecute);
                 }
@@ -192,7 +196,7 @@ namespace CSHTML5.Internal
 
         private void PerformActualInteropCallVoid(string javaScriptToExecute)
         {
-            if (Internal.ExecuteJavaScript.EnableInteropLogging)
+            if (OpenSilver.Interop.EnableInteropLogging)
             {
                 javaScriptToExecute = "//---- START INTEROP ----"
                                       + Environment.NewLine
@@ -203,7 +207,7 @@ namespace CSHTML5.Internal
 
             try
             {
-                if (Internal.ExecuteJavaScript.EnableInteropLogging)
+                if (OpenSilver.Interop.EnableInteropLogging)
                 {
                     Debug.WriteLine(javaScriptToExecute);
                 }

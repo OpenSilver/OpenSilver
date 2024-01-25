@@ -112,7 +112,7 @@ namespace System.Windows.Browser
         public string Cookies
         {
             get => OpenSilver.Interop.ExecuteJavaScriptString("document.cookie") ?? string.Empty;
-            set => OpenSilver.Interop.ExecuteJavaScriptVoid($"document.cookie = {InteropImplementation.GetVariableStringForJS(value)}");
+            set => OpenSilver.Interop.ExecuteJavaScriptVoid($"document.cookie = {OpenSilver.Interop.GetVariableStringForJS(value)}");
         }
 
         /// <summary>

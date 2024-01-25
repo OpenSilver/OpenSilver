@@ -30,20 +30,20 @@ namespace CSHTML5.Internal
 
         static void AttachEvent(string eventName, object domElementRef, HtmlEventProxy newProxy, Action<object> originalEventHandler)
         {
-            string sAction = InteropImplementation.GetVariableStringForJS(newProxy.Handler);
+            string sAction = OpenSilver.Interop.GetVariableStringForJS(newProxy.Handler);
             if (domElementRef is INTERNAL_HtmlDomElementReference)
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($@"document.addEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
             else
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe({InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($@"document.addEventListenerSafe({OpenSilver.Interop.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
         }
 
         internal static void DetachEvent(string eventName, object domElementRef, HtmlEventProxy proxy, Action<object> originalEventHandler)
         {
-            string sAction = InteropImplementation.GetVariableStringForJS(proxy.Handler);
+            string sAction = OpenSilver.Interop.GetVariableStringForJS(proxy.Handler);
             if (domElementRef is INTERNAL_HtmlDomElementReference)
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($@"document.removeEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
             else
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe({InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($@"document.removeEventListenerSafe({OpenSilver.Interop.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
         }
 
 

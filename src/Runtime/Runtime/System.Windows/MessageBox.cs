@@ -124,11 +124,11 @@ namespace System.Windows
                 bool isOK = true;
                 if (button == MessageBoxButton.OK)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"alert({CSHTML5.InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"alert({OpenSilver.Interop.GetVariableStringForJS(messageIncludingTitleIfAny)})");
                 }
                 else if (button == MessageBoxButton.OKCancel)
                 {
-                    isOK = OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({CSHTML5.InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
+                    isOK = OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({OpenSilver.Interop.GetVariableStringForJS(messageIncludingTitleIfAny)})");
                 }
                 else
                 {

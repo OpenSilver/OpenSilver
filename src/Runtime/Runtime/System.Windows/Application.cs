@@ -91,7 +91,7 @@ namespace System.Windows
             new DOMEventManager(GetWindow, "unload", ProcessOnExit).AttachToDomEvents();
 
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
-            InteropImplementation.ResetLoadedFilesDictionaries();
+            OpenSilver.Interop.ResetLoadedFilesDictionaries();
 
             // we change the resource manager for every resource registered
             ClientSideResourceRegister.Startup();
@@ -152,7 +152,7 @@ namespace System.Windows
             HTMLParam[] paramsArray;
             try
             {
-                string sElement = InteropImplementation.GetVariableStringForJS(_rootDiv);
+                string sElement = OpenSilver.Interop.GetVariableStringForJS(_rootDiv);
                 paramsArray = JsonSerializer.Deserialize<HTMLParam[]>(
                     OpenSilver.Interop.ExecuteJavaScriptString($"document.getAppParams({sElement});"));
             }
@@ -581,10 +581,6 @@ namespace System.Windows
         /// to ensure correction functioning of the application.
         /// </summary>
         /// <param name="entryPoint"></param>
-        public static void RunApplication(Action entryPoint)
-        {
-            entryPoint();
-            ExecuteJavaScript.ExecutePendingJavaScriptCode();
-        }
+        public static void RunApplication(Action entryPoint) => entryPoint();
     }
 }

@@ -111,9 +111,9 @@ namespace System.Windows.Printing
                         OnEndPrint(new EndPrintEventArgs());
                         _printDocument.EndPendingOperation();
                     });
-                string sPrint = InteropImplementation.GetVariableStringForJS(_printDocumentNative);
-                string sTitle = InteropImplementation.GetVariableStringForJS(documentName);
-                string sCallback = InteropImplementation.GetVariableStringForJS(_endPrintJSCallback);
+                string sPrint = OpenSilver.Interop.GetVariableStringForJS(_printDocumentNative);
+                string sTitle = OpenSilver.Interop.GetVariableStringForJS(documentName);
+                string sCallback = OpenSilver.Interop.GetVariableStringForJS(_endPrintJSCallback);
                 OpenSilver.Interop.ExecuteJavaScriptVoid($"{sPrint}.print({sTitle}, {sCallback});");
 
                 RemovePrintSection();
@@ -125,7 +125,7 @@ namespace System.Windows.Printing
                 foreach (UIElement e in _elements)
                 {
                     OpenSilver.Interop.ExecuteJavaScriptVoid(
-                        $"{InteropImplementation.GetVariableStringForJS(e.OuterDiv)}.classList.add(\"print-section\")");
+                        $"{OpenSilver.Interop.GetVariableStringForJS(e.OuterDiv)}.classList.add(\"print-section\")");
                 }
             }
 
@@ -135,7 +135,7 @@ namespace System.Windows.Printing
                 foreach (UIElement e in _elements)
                 {
                     OpenSilver.Interop.ExecuteJavaScriptVoid(
-                        $"{InteropImplementation.GetVariableStringForJS(e.OuterDiv)}.classList.remove(\"print-section\")");
+                        $"{OpenSilver.Interop.GetVariableStringForJS(e.OuterDiv)}.classList.remove(\"print-section\")");
                 }
             }
 
@@ -184,7 +184,7 @@ namespace System.Windows.Printing
                         foreach (UIElement el in unloadedElements)
                         {
                             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                                $"{InteropImplementation.GetVariableStringForJS(el.OuterDiv)}.classList.add(\"print-section\")");
+                                $"{OpenSilver.Interop.GetVariableStringForJS(el.OuterDiv)}.classList.add(\"print-section\")");
                         }
 
                         _printJSCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(() =>
@@ -194,9 +194,9 @@ namespace System.Windows.Printing
                             _printJSCallback = null;
                         });
 
-                        string sCallback = InteropImplementation.GetVariableStringForJS(_printJSCallback);
+                        string sCallback = OpenSilver.Interop.GetVariableStringForJS(_printJSCallback);
                         // Even though the Loaded event is fired, sometimes we need to wait little bit more.
-                        OpenSilver.Interop.ExecuteJavaScriptFastAsync($"setTimeout({sCallback}, 100)");
+                        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"setTimeout({sCallback}, 100)");
                     });
                 };
 

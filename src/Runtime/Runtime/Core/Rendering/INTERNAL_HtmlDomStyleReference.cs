@@ -147,23 +147,23 @@ namespace CSHTML5.Internal
         public string userSelect { set { SetStylePropertyValue("userSelect", value); } }
 
         internal void setProperty(string propertyName, string value) =>
-            ExecuteJavaScript.QueueExecuteJavaScript(
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}');");
 
         internal void setProperty(string propertyName, string value, string priority) =>
-            ExecuteJavaScript.QueueExecuteJavaScript(
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}', '{priority}');");
 
         private void SetStylePropertyValue(string propertyName, string value) =>
-            ExecuteJavaScript.QueueExecuteJavaScript(
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setDomStyle('{Uid}', '{propertyName}', '{value}');");
 
         private void SetTransformPropertyValue(string propertyValue) =>
-            ExecuteJavaScript.QueueExecuteJavaScript(
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setDomTransform('{Uid}', '{propertyValue}');");
 
         private void SetTransformOriginPropertyValue(string propertyValue) =>
-            ExecuteJavaScript.QueueExecuteJavaScript(
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.setDomTransformOrigin('{Uid}', '{propertyValue}');");
 
         private string GetCSSProperty(string propertyName) =>

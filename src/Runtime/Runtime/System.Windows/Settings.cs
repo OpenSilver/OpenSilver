@@ -84,8 +84,8 @@ namespace System
 
         public bool EnableInteropLogging
         {
-            get { return ExecuteJavaScript.EnableInteropLogging; }
-            set { ExecuteJavaScript.EnableInteropLogging = value; }
+            get { return OpenSilver.Interop.EnableInteropLogging; }
+            set { OpenSilver.Interop.EnableInteropLogging = value; }
         }
 
         public bool EnablePerformanceLogging

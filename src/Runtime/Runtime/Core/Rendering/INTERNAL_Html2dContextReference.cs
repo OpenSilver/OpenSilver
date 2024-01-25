@@ -40,7 +40,7 @@ namespace CSHTML5.Internal
         public override bool TrySetMember(SetMemberBinder binder, object value) => throw new NotSupportedException();
 
         void SetPropertyValue(string propertyName, string propertyValue)
-            => OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.set2dContextProperty(\"{_id}\",\"{propertyName}\",\"{propertyValue}\");");
+            => OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.set2dContextProperty(\"{_id}\",\"{propertyName}\",\"{propertyValue}\");");
 
         void InvokeMethod(string methodName, object[] args)
             => InvokeMethodImpl(methodName, string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x))));
@@ -62,7 +62,7 @@ namespace CSHTML5.Internal
             => InvokeMethodImpl(methodName, string.Join(", ", args.Select(x => x.ToInvariantString())));
 
         void InvokeMethodImpl(string methodName, string args)
-            => OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.invoke2dContextMethod(\"{_id}\", \"{methodName}\", \"{args}\");");
+            => OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.invoke2dContextMethod(\"{_id}\", \"{methodName}\", \"{args}\");");
 
 #pragma warning disable IDE1006 // Naming Styles
         public string fillStyle { set { SetPropertyValue("fillStyle", value); } }
@@ -89,7 +89,7 @@ namespace CSHTML5.Internal
 
         public void arc(double centerX, double centerY, double radius, double startAngle, double endAngle, bool counterClockwise = false)
         {
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(@$"
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(@$"
 document.getElementById('{_id}').getContext('2d').arc({centerX.ToInvariantString()}, {centerY.ToInvariantString()}, {radius.ToInvariantString()}, 
 {startAngle.ToInvariantString()}, {endAngle.ToInvariantString()}, {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(counterClockwise)});");
         }

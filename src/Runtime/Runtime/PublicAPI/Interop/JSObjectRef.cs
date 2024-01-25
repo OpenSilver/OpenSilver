@@ -20,6 +20,8 @@ namespace CSHTML5.Types
 {
     internal sealed class JSObjectRef : IConvertible, IJavaScriptConvertible, IDisposable
     {
+        private static bool IsTrackingAllJavascriptObjects => OpenSilver.Interop.DumpAllJavascriptObjectsEveryMs > 0;
+
         private string _jsCache;
 
         string IJavaScriptConvertible.ToJavaScriptString()
@@ -67,8 +69,10 @@ namespace CSHTML5.Types
             Value = value;
             ReferenceId = referenceId;
 
-            if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
+            if (IsTrackingAllJavascriptObjects)
+            {
                 JSObjectReferenceHolder.Instance.Add(this, javascript);
+            }
         }
 
         public JSObjectRef(object value, string referenceId, int arrayIndex, string javascript)
@@ -78,8 +82,10 @@ namespace CSHTML5.Types
             IsArray = true;
             ArrayIndex = arrayIndex;
 
-            if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
+            if (IsTrackingAllJavascriptObjects)
+            {
                 JSObjectReferenceHolder.Instance.Add(this, javascript);
+            }
         }
 
         ~JSObjectRef()
@@ -92,14 +98,15 @@ namespace CSHTML5.Types
         {
             if (ReferenceId != string.Empty)
             {
-                ExecuteJavaScript.QueueExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"delete document.jsObjRef['{ReferenceId}']");
 
-                if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
+                if (IsTrackingAllJavascriptObjects)
+                {
                     JSObjectReferenceHolder.Instance.Remove(this);
+                }
 
                 ReferenceId = string.Empty;
             }
-
         }
 
         public object GetActualValue()

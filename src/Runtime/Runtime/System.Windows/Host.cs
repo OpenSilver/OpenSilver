@@ -36,7 +36,7 @@ namespace System.Windows
             _navigationState = GetBrowserNavigationState();
             _hashChangeCallback = JavaScriptCallback.Create(OnNavigationChanged, true);
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"window.addEventListener('hashchange', {CSHTML5.InteropImplementation.GetVariableStringForJS(_hashChangeCallback)}, false)");
+                $"window.addEventListener('hashchange', {OpenSilver.Interop.GetVariableStringForJS(_hashChangeCallback)}, false)");
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace System.Windows
                     throw new ArgumentNullException(nameof(value));
                 }
 
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"window.location.hash = {CSHTML5.InteropImplementation.GetVariableStringForJS(value)}");
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"window.location.hash = {OpenSilver.Interop.GetVariableStringForJS(value)}");
             }
         }
 

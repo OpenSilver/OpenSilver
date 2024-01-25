@@ -176,9 +176,9 @@ namespace System.Windows.Controls.Primitives
 
         internal void PutPopupInFront()
         {
-            string parentDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(ParentWindow.RootDomElement);
-            string popupDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{parentDiv}.appendChild({popupDiv});");
+            string parentDiv = OpenSilver.Interop.GetVariableStringForJS(ParentWindow.RootDomElement);
+            string popupDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{parentDiv}.appendChild({popupDiv});");
         }
     }
 }

@@ -21,7 +21,7 @@ namespace CSHTML5.Internal
 
         public static void Counter(string name, double initialTime)
         {
-            string sName = InteropImplementation.GetVariableStringForJS(name);
+            string sName = OpenSilver.Interop.GetVariableStringForJS(name);
             string sTime = initialTime.ToInvariantString();
             OpenSilver.Interop.ExecuteJavaScriptVoid(
                 $"document.addToPerformanceCounters({sName}, {sTime});");

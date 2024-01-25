@@ -454,7 +454,7 @@ public partial class Selector
         if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
             && container.OuterDiv != null)
         {
-            string sDomElement = CSHTML5.InteropImplementation.GetVariableStringForJS(container.OuterDiv);
+            string sDomElement = OpenSilver.Interop.GetVariableStringForJS(container.OuterDiv);
             OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDomElement}.scrollIntoView({{ block: 'nearest' }})");
         }
     }

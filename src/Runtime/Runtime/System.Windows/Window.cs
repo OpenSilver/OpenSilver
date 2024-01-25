@@ -120,9 +120,9 @@ namespace System.Windows
             RootDomElement = rootDomElement ?? throw new ArgumentNullException(nameof(rootDomElement));
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
-            string sRootElement = InteropImplementation.GetVariableStringForJS(rootDomElement);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.style.display = 'grid'");
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.style.overflow = 'clip'");
+            string sRootElement = OpenSilver.Interop.GetVariableStringForJS(rootDomElement);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sRootElement}.style.display = 'grid'");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sRootElement}.style.overflow = 'clip'");
 
             // Create the DIV that will correspond to the root of the window visual tree:
             OuterDiv = InnerDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", rootDomElement, this);
@@ -185,7 +185,7 @@ namespace System.Windows
         {
             double width;
             double height;
-            string sElement = InteropImplementation.GetVariableStringForJS(this.OuterDiv);
+            string sElement = OpenSilver.Interop.GetVariableStringForJS(this.OuterDiv);
             // Hack to improve the Simulator performance by making only one interop call rather than two:
             string concatenated = OpenSilver.Interop.ExecuteJavaScriptString($"{sElement}.offsetWidth + '|' + {sElement}.offsetHeight");
             int sepIndex = concatenated.IndexOf('|');
@@ -215,7 +215,7 @@ namespace System.Windows
             {
                 if (OuterDiv is not null)
                 {
-                    string sDiv = InteropImplementation.GetVariableStringForJS(OuterDiv);
+                    string sDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
                     double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDiv}.offsetWidth");
                     double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDiv}.offsetHeight");
                     return new Rect(0, 0, width, height);

@@ -45,10 +45,10 @@ internal abstract partial class TextViewBase<T> : FrameworkElement
         _inputCallback = JavaScriptCallback.Create(OnInputNative, true);
         _scrollCallback = JavaScriptCallback.Create(OnScrollNative, true);
 
-        string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
-        string sInputCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_inputCallback);
-        string sScrollCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_scrollCallback);
-        Interop.ExecuteJavaScriptFastAsync($@"{sDiv}.addEventListener('input', {sInputCallback});
+        string sDiv = Interop.GetVariableStringForJS(OuterDiv);
+        string sInputCallback = Interop.GetVariableStringForJS(_inputCallback);
+        string sScrollCallback = Interop.GetVariableStringForJS(_scrollCallback);
+        Interop.ExecuteJavaScriptVoidAsync($@"{sDiv}.addEventListener('input', {sInputCallback});
 {sDiv}.addEventListener('scroll', {sScrollCallback});");
     }
 
@@ -75,7 +75,7 @@ internal abstract partial class TextViewBase<T> : FrameworkElement
     {
         if (!IsScrollClient) return;
 
-        string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
+        string sDiv = Interop.GetVariableStringForJS(OuterDiv);
         double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft;");
         double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop;");
 

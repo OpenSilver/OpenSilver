@@ -51,7 +51,7 @@ namespace System.Windows
         {
             Debug.Assert(parent.OuterDiv is not null);
 
-            string sParent = InteropImplementation.GetVariableStringForJS(parent.OuterDiv);
+            string sParent = OpenSilver.Interop.GetVariableStringForJS(parent.OuterDiv);
             return OpenSilver.Interop.ExecuteJavaScriptString($"document.createMeasurementService({sParent});");
         }
 

@@ -35,7 +35,7 @@ namespace System.Windows.Interop
 
                 // Hooks the FullScreenChanged event
                 OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"document.addEventListener('fullscreenchange', {InteropImplementation.GetVariableStringForJS(_fullscreenchangeCallback)})");
+                    $"document.addEventListener('fullscreenchange', {OpenSilver.Interop.GetVariableStringForJS(_fullscreenchangeCallback)})");
 
                 _resizeObserver = new ResizeObserverAdapter();
                 _resizeObserver.Observe(app.GetRootDiv(), OnContentSizeChanged);

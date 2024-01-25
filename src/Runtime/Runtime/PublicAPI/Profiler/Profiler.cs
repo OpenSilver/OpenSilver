@@ -28,7 +28,7 @@ namespace OpenSilver
 
         static Profiler()
         {
-            string sCallback = CSHTML5.InteropImplementation.GetVariableStringForJS((Action)ViewProfilerResults);
+            string sCallback = Interop.GetVariableStringForJS((Action)ViewProfilerResults);
             Interop.ExecuteJavaScriptVoid($"window.ViewProfilerResults = {sCallback}");
         }
 
@@ -114,19 +114,19 @@ namespace OpenSilver
         public static void ConsoleTime(string label)
         {
             Interop.ExecuteJavaScriptVoid(
-                $"console.time({CSHTML5.InteropImplementation.GetVariableStringForJS(label)})");
+                $"console.time({Interop.GetVariableStringForJS(label)})");
         }
 
         public static void ConsoleTimeEnd(string label)
         {
             Interop.ExecuteJavaScriptVoid(
-                $"console.timeEnd({CSHTML5.InteropImplementation.GetVariableStringForJS(label)})");
+                $"console.timeEnd({Interop.GetVariableStringForJS(label)})");
         }
 
         public static void ConsoleTimeLog(string label)
         {
             Interop.ExecuteJavaScriptVoid(
-                $"console.timeLog({CSHTML5.InteropImplementation.GetVariableStringForJS(label)})");
+                $"console.timeLog({Interop.GetVariableStringForJS(label)})");
         }
     }
 

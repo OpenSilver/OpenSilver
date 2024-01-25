@@ -158,8 +158,8 @@ internal partial class TextViewBase<T> : IScrollInfo
 
         if (OuterDiv is not null)
         {
-            string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
-            Interop.ExecuteJavaScriptFastAsync($"{sDiv}.scrollLeft = {offset.ToInvariantString()};");
+            string sDiv = Interop.GetVariableStringForJS(OuterDiv);
+            Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.scrollLeft = {offset.ToInvariantString()};");
         }
     }
 
@@ -170,8 +170,8 @@ internal partial class TextViewBase<T> : IScrollInfo
 
         if (OuterDiv is not null)
         {
-            string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
-            Interop.ExecuteJavaScriptFastAsync($"{sDiv}.scrollTop = {offset.ToInvariantString()};");
+            string sDiv = Interop.GetVariableStringForJS(OuterDiv);
+            Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.scrollTop = {offset.ToInvariantString()};");
         }
     }
 

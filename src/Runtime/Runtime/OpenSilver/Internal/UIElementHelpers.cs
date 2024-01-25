@@ -175,7 +175,7 @@ internal static class UIElementHelpers
 
     internal static void SetInnerText(this UIElement uie, string text)
     {
-        string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(uie.OuterDiv);
+        string sDiv = Interop.GetVariableStringForJS(uie.OuterDiv);
         string escapedText = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text);
         Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.innerText = \"{escapedText}\";");
     }
@@ -247,7 +247,7 @@ internal static class UIElementHelpers
         Debug.Assert(uie is not null);
         if (uie.OuterDiv is not null)
         {
-            string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(uie.OuterDiv);
+            string sDiv = Interop.GetVariableStringForJS(uie.OuterDiv);
             return Interop.ExecuteJavaScriptDouble($"document.getBaseLineOffset({sDiv});");
         }
 

@@ -164,10 +164,10 @@ namespace System.Windows.Controls
             _imgLoadCallback = JavaScriptCallback.Create(ProcessLoadEvent, true);
             _imgErrorCallack = JavaScriptCallback.Create(ProcessErrorEvent, true);
 
-            string sImage = CSHTML5.InteropImplementation.GetVariableStringForJS(_imageDiv);
-            string sLoadCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_imgLoadCallback);
-            string sErrorCallback = CSHTML5.InteropImplementation.GetVariableStringForJS(_imgErrorCallack);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+            string sImage = OpenSilver.Interop.GetVariableStringForJS(_imageDiv);
+            string sLoadCallback = OpenSilver.Interop.GetVariableStringForJS(_imgLoadCallback);
+            string sErrorCallback = OpenSilver.Interop.GetVariableStringForJS(_imgErrorCallack);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 @$"{sImage}.addEventListener('load', function (e) {{ {sLoadCallback}(); }});
 {sImage}.addEventListener('error', function (e) {{ {sErrorCallback}(); }});");
         }
@@ -293,7 +293,7 @@ namespace System.Windows.Controls
         {
             _naturalSize = new Size();
 
-            string sImageDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(_imageDiv);
+            string sImageDiv = OpenSilver.Interop.GetVariableStringForJS(_imageDiv);
             if (Source != null)
             {
                 var imageSrc = await Source.GetDataStringAsync(this);
@@ -329,7 +329,7 @@ namespace System.Windows.Controls
 
         private Size GetNaturalSize()
         {
-            string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(_imageDiv);
+            string sDiv = OpenSilver.Interop.GetVariableStringForJS(_imageDiv);
             var size = OpenSilver.Interop.ExecuteJavaScriptString(
                 $"(function(img) {{ return img.naturalWidth + '|' + img.naturalHeight; }})({sDiv});");
 

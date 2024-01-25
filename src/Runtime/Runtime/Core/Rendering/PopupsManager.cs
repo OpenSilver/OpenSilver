@@ -74,9 +74,9 @@ namespace DotNetForHtml5.Core
 
             popupRoot.INTERNAL_DetachFromDomEvents();
 
-            string sWindow = InteropImplementation.GetVariableStringForJS(popupRoot.ParentWindow.RootDomElement);
+            string sWindow = OpenSilver.Interop.GetVariableStringForJS(popupRoot.ParentWindow.RootDomElement);
 
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $@"var popupRoot = document.getElementById(""{popupRoot.UniqueIndentifier}"");
 if (popupRoot) {sWindow}.removeChild(popupRoot);");
 

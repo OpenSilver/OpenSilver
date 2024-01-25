@@ -54,11 +54,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             INTERNAL_Simulator.SimulatorProxy = simulatorProxy;
         }
 
-        internal static void InjectSimulatorCallbackSetup(Action<object> callbackSetup)
-        {
-            INTERNAL_Simulator.SimulatorCallbackSetup = callbackSetup;
-        }
-
         internal static void InjectOpenSilverRuntimeDispatcher(Dispatcher dispatcher)
         {
             INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke = (method) => dispatcher.BeginInvoke(method);

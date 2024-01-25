@@ -56,8 +56,6 @@ namespace CSHTML5.Internal
                     Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
                     throw;
                 }
-
-                ExecuteJavaScript.ExecutePendingJavaScriptCode();
             }
 
             // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:

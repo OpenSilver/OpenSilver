@@ -40,8 +40,8 @@ namespace CSHTML5.Native.Html.Controls
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var htmlPresenter = (HtmlPresenter)d;
-                        string sDiv = InteropImplementation.GetVariableStringForJS(htmlPresenter._jsDiv);
-                        string sContent = InteropImplementation.GetVariableStringForJS((string)newValue ?? string.Empty);
+                        string sDiv = OpenSilver.Interop.GetVariableStringForJS(htmlPresenter._jsDiv);
+                        string sContent = OpenSilver.Interop.GetVariableStringForJS((string)newValue ?? string.Empty);
                         OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.shadowRoot.innerHTML = {sContent};");
                     },
                 });
@@ -110,7 +110,7 @@ namespace CSHTML5.Native.Html.Controls
                 {
                     if (_jsDiv is not null)
                     {
-                        string sDiv = InteropImplementation.GetVariableStringForJS(_jsDiv);
+                        string sDiv = OpenSilver.Interop.GetVariableStringForJS(_jsDiv);
                         if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.shadowRoot && {sDiv}.shadowRoot.hasChildNodes()"))
                         {
                             return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.shadowRoot.firstChild");
@@ -159,8 +159,8 @@ namespace CSHTML5.Native.Html.Controls
         {
             base.OnMouseWheel(e);
 
-            string sElement = InteropImplementation.GetVariableStringForJS(OuterDiv);
-            string sArgs = InteropImplementation.GetVariableStringForJS(e.UIEventArg);
+            string sElement = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
+            string sArgs = OpenSilver.Interop.GetVariableStringForJS(e.UIEventArg);
             if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onWheelNative({sElement}, {sArgs})"))
             {
                 e.Handled = true;
@@ -173,8 +173,8 @@ namespace CSHTML5.Native.Html.Controls
         {
             base.OnKeyDown(e);
 
-            string sElement = InteropImplementation.GetVariableStringForJS(OuterDiv);
-            string sArgs = InteropImplementation.GetVariableStringForJS(e.UIEventArg);
+            string sElement = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
+            string sArgs = OpenSilver.Interop.GetVariableStringForJS(e.UIEventArg);
             if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.htmlPresenterHelpers.onKeyDownNative({sElement}, {sArgs})"))
             {
                 e.Handled = true;

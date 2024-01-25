@@ -161,7 +161,7 @@ namespace OpenSilver.Compatibility
         /// <returns>A System.String containing the requested resource.</returns>
         public string DownloadString(Uri address)
         {
-            if (Interop.IsRunningInTheSimulator_WorkAround)
+            if (Interop.IsRunningInTheSimulator)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
                 var netStandardWebClient = new System.Net.WebClient();
@@ -216,7 +216,7 @@ namespace OpenSilver.Compatibility
         /// </param>
         private void DownloadStringAsync(Uri address, object userToken)
         {
-            if (Interop.IsRunningInTheSimulator_WorkAround)
+            if (Interop.IsRunningInTheSimulator)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
                 var netStandardWebClient = new System.Net.WebClient();
@@ -269,7 +269,7 @@ namespace OpenSilver.Compatibility
         /// <returns>Returns the resource as <see cref="System.Threading.Tasks.Task{TResult}"/>.</returns>
         public Task<string> DownloadStringTaskAsync(Uri address)
         {
-            if (Interop.IsRunningInTheSimulator_WorkAround)
+            if (Interop.IsRunningInTheSimulator)
             {
                 // When running in the Simulator, we use the WebClient implementation provided by WPF:
                 var netStandardWebClient = new System.Net.WebClient();
@@ -426,7 +426,7 @@ namespace OpenSilver.Compatibility
 
         private string UploadString(Uri address, string method, string data, INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventHandler onCompleted, bool isAsync) //todo: see if we should use UploadStringCompletedEventHandler instead
         {
-            if (Interop.IsRunningInTheSimulator_WorkAround)
+            if (Interop.IsRunningInTheSimulator)
             {
                 var netStandardWebClient = new System.Net.WebClient();
                 if (isAsync)

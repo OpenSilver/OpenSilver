@@ -263,8 +263,8 @@ namespace System.Windows.Media
                     var stops = _brush.GetGradientStops()
                         .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.ToHtmlString(_brush.Opacity)}\" />");
 
-                    string sDiv = CSHTML5.InteropImplementation.GetVariableStringForJS(_gradientRef);
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
+                    string sDiv = OpenSilver.Interop.GetVariableStringForJS(_gradientRef);
+                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
                 }
 
                 return $"url(#{_gradientRef.UniqueIdentifier})";

@@ -73,7 +73,7 @@ namespace System.Windows.Input
         {
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string sEvent = InteropImplementation.GetVariableStringForJS(jsEventArg);
+                string sEvent = OpenSilver.Interop.GetVariableStringForJS(jsEventArg);
                 string type = OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.type");
                 IsTouchEvent = type.StartsWith("touch");
                 string concatenated = IsTouchEvent ? OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.changedTouches[0].pageX + '|' + {sEvent}.changedTouches[0].pageY")
@@ -91,7 +91,7 @@ namespace System.Windows.Input
             if (window != null)
             {
                 // Get the XAML Window root position relative to the page:
-                string sElement = InteropImplementation.GetVariableStringForJS(window.OuterDiv);
+                string sElement = OpenSilver.Interop.GetVariableStringForJS(window.OuterDiv);
 
                 double windowRootLeft;
                 double windowRootTop;

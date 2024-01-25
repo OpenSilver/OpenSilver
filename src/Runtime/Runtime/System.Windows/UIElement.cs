@@ -1141,8 +1141,8 @@ namespace System.Windows
             }
 
             // Hack to improve the Simulator performance by making only one interop call rather than two:
-            string sOuterDivOfControl = CSHTML5.InteropImplementation.GetVariableStringForJS(OuterDiv);
-            string sOuterDivOfReferenceVisual = CSHTML5.InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
+            string sOuterDivOfControl = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
+            string sOuterDivOfReferenceVisual = OpenSilver.Interop.GetVariableStringForJS(outerDivOfReferenceVisual);
             string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
                 $"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)");
             int sepIndex = concatenated.IndexOf('|');

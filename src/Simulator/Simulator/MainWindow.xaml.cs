@@ -1,4 +1,6 @@
-﻿using MahApps.Metro.Controls;
+﻿extern alias opensilver;
+
+using MahApps.Metro.Controls;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Core.DevToolsProtocolExtension;
 using Microsoft.Web.WebView2.Wpf;
@@ -344,6 +346,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
                 await WaitForDocumentToBeFullyLoadedAsync(); // Note: without this, we got errors when running rokjs (with localhost as base url) without any breakpoints.
 
+                await SetupSimulatorHostObject();
+
                 bool success = await _openSilverRuntimeDispatcher.InvokeAsync(() => StartApplication());
 
                 await Dispatcher.BeginInvoke(async () =>
@@ -622,7 +626,6 @@ Click OK to continue.";
                         }
                     });
 
-                InteropHelpers.InjectSimulatorCallbackSetup(SetupSimulatorHostObject);
                 InteropHelpers.InjectOpenSilverRuntimeDispatcher(_openSilverRuntimeDispatcher);
 
                 return true;
@@ -635,19 +638,19 @@ Click OK to continue.";
             }
         }
 
-        private async void SetupSimulatorHostObject(object callback)
+        private async Task SetupSimulatorHostObject()
         {
             const string name = "onCallBack";
             await Dispatcher.InvokeAsync(() =>
             {
-                MainWebBrowser.CoreWebView2.AddHostObjectToScript(name, callback);
+                MainWebBrowser.CoreWebView2.AddHostObjectToScript(name, new opensilver::CSHTML5.Internal.OnCallbackSimulator());
                 _javaScriptExecutionHandler.ExecuteJavaScript($"window.onCallBack = chrome.webview.hostObjects.{name};");
 
                 MainWebBrowser.CoreWebView2.AddHostObjectToScript("XamlInspectorCallback", new XamlInspectorCallback());
             });
         }
 
-        bool StartApplication()
+        private bool StartApplication()
         {
             // Create a new instance of the application:
             try

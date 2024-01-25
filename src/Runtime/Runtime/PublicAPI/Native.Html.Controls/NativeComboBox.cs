@@ -769,8 +769,7 @@ namespace CSHTML5.Native.Html.Controls
                 INTERNAL_HtmlDomManager.SetDomElementProperty(
                     _nativeComboBoxDomElement,
                     "selectedIndex",
-                    value >= 0 ? value + 1 : value,
-                    true);
+                    value >= 0 ? value + 1 : value);
             }
         }
 

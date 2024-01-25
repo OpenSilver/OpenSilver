@@ -58,16 +58,16 @@ namespace CSHTML5.Native.Html.Printing
             {
                 if (element._isLoaded)
                 {
-                    if (!OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+                    if (!OpenSilver.Interop.IsRunningInTheSimulator)
                     {
                         // Remove the class "section-to-print" from the previous print area:
                         if (CurrentPrintArea != null && CurrentPrintArea._isLoaded)
                             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                                $"{InteropImplementation.GetVariableStringForJS(CurrentPrintArea.OuterDiv)}.classList.remove(\"section-to-print\")");
+                                $"{OpenSilver.Interop.GetVariableStringForJS(CurrentPrintArea.OuterDiv)}.classList.remove(\"section-to-print\")");
 
                         // Add the class "section-to-print" to the new print area: (credits: https://stackoverflow.com/questions/468881/print-div-id-printarea-div-only )
                         OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{InteropImplementation.GetVariableStringForJS(element.OuterDiv)}.classList.add(\"section-to-print\")");
+                            $"{OpenSilver.Interop.GetVariableStringForJS(element.OuterDiv)}.classList.add(\"section-to-print\")");
 
                         // Remember the new print area:
                         CurrentPrintArea = element;
@@ -90,7 +90,7 @@ namespace CSHTML5.Native.Html.Printing
         /// </summary>
         public static void ResetPrintArea()
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+            if (!OpenSilver.Interop.IsRunningInTheSimulator)
             {
                 // Set the print area to be the whole window (this is the default value, also called from the "setter" of "Window.Current.Content"):
                 var root = Window.Current.Content;
@@ -122,7 +122,7 @@ namespace CSHTML5.Native.Html.Printing
         /// <param name="element">The element to print.</param>
         public static void Print(UIElement element)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+            if (!OpenSilver.Interop.IsRunningInTheSimulator)
             {
                 // Remember the previous print area, if any:
                 var previousPrintArea = CurrentPrintArea;

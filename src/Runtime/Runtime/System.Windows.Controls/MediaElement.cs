@@ -239,8 +239,8 @@ namespace System.Windows.Controls
         {
             if (_mediaElement != null)
             {
-                string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(_mediaElement);
-                string sType = CSHTML5.InteropImplementation.GetVariableStringForJS(type);
+                string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
+                string sType = OpenSilver.Interop.GetVariableStringForJS(type);
                 string canPlay = OpenSilver.Interop.ExecuteJavaScriptString($"{sElement}.canPlayType({sType});");
                 return ToMediaCanPlayResponse(canPlay);
             }
@@ -265,7 +265,7 @@ namespace System.Windows.Controls
             {
                 if (_mediaElement != null)
                 {
-                    string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(_mediaElement);
+                    string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
                     OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.pause();");
                 }
             }
@@ -280,7 +280,7 @@ namespace System.Windows.Controls
             {
                 if (_mediaElement != null)
                 {
-                    string sElement = CSHTML5.InteropImplementation.GetVariableStringForJS(_mediaElement);
+                    string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
                     OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.play();");
                 }
             }
