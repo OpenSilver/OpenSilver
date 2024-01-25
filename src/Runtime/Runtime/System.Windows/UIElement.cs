@@ -286,6 +286,17 @@ namespace System.Windows
             WriteVisualFlag(VisualFlags.IsUIElement, true);
         }
 
+        internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (e.Metadata is PropertyMetadata metadata && _isLoaded)
+            {
+                metadata.MethodToUpdateDom?.Invoke(this, e.NewValue);
+                metadata.MethodToUpdateDom2?.Invoke(this, e.OldValue, e.NewValue);
+            }
+
+            base.OnPropertyChanged(e);
+        }
+
 #region ClipToBounds
 
         /// <summary>

@@ -803,8 +803,13 @@ internal static class DependencyObjectStore
         bool valueChanged = !Equals(dp, oldValue, newValue);
         if (valueChanged)
         {
-            // Raise the PropertyChanged event
-            OnPropertyChanged(d, dp, metadata, oldValue, newValue, operationType);
+            d.NotifyPropertyChange(
+                new DependencyPropertyChangedEventArgs(
+                    oldValue,
+                    newValue,
+                    dp,
+                    metadata,
+                    operationType));
         }
 
         return valueChanged;
@@ -844,35 +849,6 @@ internal static class DependencyObjectStore
         {
             d.InheritedValues.Remove(propertyIndex);
         }
-    }
-
-    private static void OnPropertyChanged(
-        DependencyObject d,
-        DependencyProperty dp,
-        PropertyMetadata metadata,
-        object oldValue,
-        object newValue,
-        OperationType operationType)
-    {
-        //---------------------
-        // If the element is in the Visual Tree, update the DOM:
-        //---------------------
-
-        if (metadata != null)
-        {
-            if (d is IInternalUIElement uiElement && uiElement.IsLoaded)
-            {
-                // Note: this we call only if the element is in the visual tree.
-                metadata.MethodToUpdateDom?.Invoke(d, newValue);
-                metadata.MethodToUpdateDom2?.Invoke(d, oldValue, newValue);
-            }
-        }
-
-        //---------------------
-        // Call the PropertyChangedCallback if any:
-        //---------------------
-
-        d.NotifyPropertyChange(new DependencyPropertyChangedEventArgs(oldValue, newValue, dp, metadata, operationType));
     }
 
     private static bool Equals(DependencyProperty dp, object obj1, object obj2)
