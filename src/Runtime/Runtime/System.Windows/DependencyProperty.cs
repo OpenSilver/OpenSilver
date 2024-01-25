@@ -1324,20 +1324,4 @@ namespace System.Windows
             }
         }
     }
-
-    internal sealed class DependencyPropertyComparer : IEqualityComparer<DependencyProperty>
-    {
-        public static DependencyPropertyComparer Default { get; } = new DependencyPropertyComparer();
-
-        public bool Equals(DependencyProperty x, DependencyProperty y)
-        {
-            return ReferenceEquals(x, y);
-        }
-
-        public int GetHashCode(DependencyProperty dp)
-        {
-            Debug.Assert(dp != null);
-            return dp.GlobalIndex;
-        }
-    }
 }

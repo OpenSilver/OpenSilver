@@ -113,12 +113,12 @@ namespace System.Windows.Tests
             // Check s1.EffectiveValues
             var effectiveValues = s1.EffectiveValues;
             effectiveValues.Count.Should().Be(3);
-            effectiveValues.ContainsKey(FrameworkElement.HeightProperty).Should().BeTrue();
-            effectiveValues[FrameworkElement.HeightProperty].Should().Be(40d);
-            effectiveValues.ContainsKey(FrameworkElement.WidthProperty).Should().BeTrue();
-            effectiveValues[FrameworkElement.WidthProperty].Should().Be(20d);
-            effectiveValues.ContainsKey(ContentControl.ContentTemplateProperty).Should().BeTrue();
-            effectiveValues[ContentControl.ContentTemplateProperty].Should().Be(contentTemplate);
+            effectiveValues.ContainsKey(FrameworkElement.HeightProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[FrameworkElement.HeightProperty.GlobalIndex].Should().Be(40d);
+            effectiveValues.ContainsKey(FrameworkElement.WidthProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[FrameworkElement.WidthProperty.GlobalIndex].Should().Be(20d);
+            effectiveValues.ContainsKey(ContentControl.ContentTemplateProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[ContentControl.ContentTemplateProperty.GlobalIndex].Should().Be(contentTemplate);
         }
 
         [TestMethod]
@@ -156,16 +156,16 @@ namespace System.Windows.Tests
 
             var effectiveValues = s1.EffectiveValues;
             effectiveValues.Count.Should().Be(5);
-            effectiveValues.ContainsKey(ListBox.SelectionModeProperty).Should().BeTrue();
-            effectiveValues[ListBox.SelectionModeProperty].Should().Be(SelectionMode.Extended);
-            effectiveValues.ContainsKey(ItemsControl.DisplayMemberPathProperty).Should().BeTrue();
-            effectiveValues[ItemsControl.DisplayMemberPathProperty].Should().Be("DisplayMemberPathListBox");
-            effectiveValues.ContainsKey(ItemsControl.ItemTemplateProperty).Should().BeTrue();
-            effectiveValues[ItemsControl.ItemTemplateProperty].Should().Be(itemTemplate);
-            effectiveValues.ContainsKey(FrameworkElement.WidthProperty).Should().BeTrue();
-            effectiveValues[FrameworkElement.WidthProperty].Should().Be(22d);
-            effectiveValues.ContainsKey(FrameworkElement.HeightProperty).Should().BeTrue();
-            effectiveValues[FrameworkElement.HeightProperty].Should().Be(40d);
+            effectiveValues.ContainsKey(ListBox.SelectionModeProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[ListBox.SelectionModeProperty.GlobalIndex].Should().Be(SelectionMode.Extended);
+            effectiveValues.ContainsKey(ItemsControl.DisplayMemberPathProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[ItemsControl.DisplayMemberPathProperty.GlobalIndex].Should().Be("DisplayMemberPathListBox");
+            effectiveValues.ContainsKey(ItemsControl.ItemTemplateProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[ItemsControl.ItemTemplateProperty.GlobalIndex].Should().Be(itemTemplate);
+            effectiveValues.ContainsKey(FrameworkElement.WidthProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[FrameworkElement.WidthProperty.GlobalIndex].Should().Be(22d);
+            effectiveValues.ContainsKey(FrameworkElement.HeightProperty.GlobalIndex).Should().BeTrue();
+            effectiveValues[FrameworkElement.HeightProperty.GlobalIndex].Should().Be(40d);
         }
     }
 }

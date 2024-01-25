@@ -504,10 +504,10 @@ if(nextSibling != undefined) {
             Performance.Counter("VisualTreeManager: Copy list of properties", t0);
 #endif
 
-            foreach (KeyValuePair<DependencyProperty, Storage> propertiesAndTheirStorage in list)
+            foreach (KeyValuePair<int, Storage> propertiesAndTheirStorage in list)
             {
                 // Read the value:
-                DependencyProperty property = propertiesAndTheirStorage.Key;
+                DependencyProperty property = DependencyProperty.RegisteredPropertyList[propertiesAndTheirStorage.Key];
 
 #if PERFSTAT
                 var t1 = Performance.now();

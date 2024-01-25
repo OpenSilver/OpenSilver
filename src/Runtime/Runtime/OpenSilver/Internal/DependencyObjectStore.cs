@@ -22,20 +22,21 @@ internal static class DependencyObjectStore
     /// <summary>
     /// Attempt to get a Property Storage
     /// </summary>
-    /// <param name="dependencyObject"></param>
-    /// <param name="dependencyProperty"></param>
+    /// <param name="d"></param>
+    /// <param name="dp"></param>
     /// <param name="metadata"></param>
     /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
     /// <param name="storage"></param>
     /// <returns></returns>
     public static bool TryGetStorage(
-        DependencyObject dependencyObject,
-        DependencyProperty dependencyProperty,
+        DependencyObject d,
+        DependencyProperty dp,
         PropertyMetadata metadata,
         bool createIfNotFoud,
         out Storage storage)
     {
-        if (dependencyObject.EffectiveValues.TryGetValue(dependencyProperty, out storage))
+        int propertyIndex = dp.GlobalIndex;
+        if (d.EffectiveValues.TryGetValue(propertyIndex, out storage))
         {
             return true;
         }
@@ -46,11 +47,11 @@ internal static class DependencyObjectStore
             // CREATE A NEW STORAGE:
             //----------------------
 
-            metadata ??= dependencyProperty.GetMetadata(dependencyObject.DependencyObjectType);
+            metadata ??= dp.GetMetadata(d.DependencyObjectType);
 
-            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
+            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(d, dp));
 
-            dependencyObject.EffectiveValues.Add(dependencyProperty, storage);
+            d.EffectiveValues.Add(propertyIndex, storage);
 
             //-----------------------
             // CHECK IF THE PROPERTY IS INHERITABLE:
@@ -60,7 +61,7 @@ internal static class DependencyObjectStore
                 //-----------------------
                 // ADD THE STORAGE TO "INTERNAL_AllInheritedProperties" IF IT IS NOT ALREADY THERE:
                 //-----------------------
-                dependencyObject.InheritedValues.Add(dependencyProperty, storage);
+                d.InheritedValues.Add(propertyIndex, storage);
             }
         }
 
@@ -71,40 +72,40 @@ internal static class DependencyObjectStore
     /// Attemp to get a Property Storage for an inherited property 
     /// (faster than generic accessor 'TryGetStorage')
     /// </summary>
-    /// <param name="dependencyObject"></param>
-    /// <param name="dependencyProperty"></param>
+    /// <param name="d"></param>
+    /// <param name="dp"></param>
     /// <param name="metadata"></param>
     /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
     /// <param name="storage"></param>
     /// <returns></returns>
     internal static bool TryGetInheritedPropertyStorage(
-        DependencyObject dependencyObject,
-        DependencyProperty dependencyProperty,
+        DependencyObject d,
+        DependencyProperty dp,
         PropertyMetadata metadata,
         bool createIfNotFoud,
         out Storage storage)
     {
-        // Create the Storage if it does not already exist
-        if (dependencyObject.InheritedValues.TryGetValue(dependencyProperty, out storage))
+        int propertyIndex = dp.GlobalIndex;
+        if (d.InheritedValues.TryGetValue(propertyIndex, out storage))
         {
             return true;
         }
 
         if (createIfNotFoud)
         {
-            metadata ??= dependencyProperty.GetMetadata(dependencyObject.DependencyObjectType);
+            metadata ??= dp.GetMetadata(d.DependencyObjectType);
 
             Debug.Assert(metadata != null && metadata.Inherits,
-                $"{dependencyProperty.Name} is not an inherited property.");
+                $"{dp.Name} is not an inherited property.");
 
             // Create the storage:
-            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
+            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(d, dp));
 
             //-----------------------
             // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
             //-----------------------
-            dependencyObject.EffectiveValues.Add(dependencyProperty, storage);
-            dependencyObject.InheritedValues.Add(dependencyProperty, storage);
+            d.EffectiveValues.Add(propertyIndex, storage);
+            d.InheritedValues.Add(propertyIndex, storage);
         }
 
         return createIfNotFoud;
@@ -837,10 +838,11 @@ internal static class DependencyObjectStore
 
     private static void RemoveStorage(DependencyObject d, DependencyProperty dp, PropertyMetadata metadata)
     {
-        d.EffectiveValues.Remove(dp);
+        int propertyIndex = dp.GlobalIndex;
+        d.EffectiveValues.Remove(propertyIndex);
         if (metadata != null && metadata.Inherits)
         {
-            d.InheritedValues.Remove(dp);
+            d.InheritedValues.Remove(propertyIndex);
         }
     }
 

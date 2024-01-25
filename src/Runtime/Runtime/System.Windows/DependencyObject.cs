@@ -256,9 +256,9 @@ namespace System.Windows
 
         #endregion
 
-        private Dictionary<DependencyProperty, DependentList> _dependentListMap;
-        internal Dictionary<DependencyProperty, Storage> EffectiveValues { get; }
-        internal Dictionary<DependencyProperty, Storage> InheritedValues { get; }
+        private Dictionary<int, DependentList> _dependentListMap;
+        internal Dictionary<int, Storage> EffectiveValues { get; }
+        internal Dictionary<int, Storage> InheritedValues { get; }
 
         private DependencyObjectType _dType;
 
@@ -274,8 +274,8 @@ namespace System.Windows
         public DependencyObject()
         {
             CanBeInheritanceContext = true;
-            EffectiveValues = new(DependencyPropertyComparer.Default);
-            InheritedValues = new(DependencyPropertyComparer.Default);
+            EffectiveValues = new();
+            InheritedValues = new();
         }
 
         object IInternalDependencyObject.GetValue(DependencyProperty dp) => GetValue(dp);
@@ -767,7 +767,7 @@ namespace System.Windows
             {
                 foreach (var kvp in d.InheritedValues.ToArray())
                 {
-                    DependencyProperty dp = kvp.Key;
+                    DependencyProperty dp = DependencyProperty.RegisteredPropertyList[kvp.Key];
                     Storage storage = kvp.Value;
 
                     DependencyObjectStore.SetInheritedValue(storage,
@@ -782,7 +782,7 @@ namespace System.Windows
             {
                 foreach (var kvp in newParent.InheritedValues.ToArray())
                 {
-                    DependencyProperty dp = kvp.Key;
+                    DependencyProperty dp = DependencyProperty.RegisteredPropertyList[kvp.Key];
                     Storage storage = kvp.Value;
 
                     PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
@@ -936,7 +936,7 @@ namespace System.Windows
                 return;
             }
 
-            if (_dependentListMap.TryGetValue(args.Property, out var dependents))
+            if (_dependentListMap.TryGetValue(args.Property.GlobalIndex, out var dependents))
             {
                 if (dependents.IsEmpty)
                 {
@@ -951,10 +951,11 @@ namespace System.Windows
 
         internal void AddDependent(DependencyProperty dp, IDependencyPropertyChangedListener dependent)
         {
+            int propertyIndex = dp.GlobalIndex;
             _dependentListMap ??= new();
-            if (!_dependentListMap.TryGetValue(dp, out var dependents))
+            if (!_dependentListMap.TryGetValue(propertyIndex, out var dependents))
             {
-                _dependentListMap[dp] = dependents = new();
+                _dependentListMap[propertyIndex] = dependents = new();
             }
             dependents.Add(dependent);
         }
@@ -966,7 +967,7 @@ namespace System.Windows
                 return;
             }
 
-            if (_dependentListMap.TryGetValue(dp, out var dependents))
+            if (_dependentListMap.TryGetValue(dp.GlobalIndex, out var dependents))
             {
                 dependents.Remove(dependent);
                 if (dependents.IsEmpty)

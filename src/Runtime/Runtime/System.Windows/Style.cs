@@ -45,7 +45,7 @@ namespace System.Windows
         }
 
         // Style tables (includes based-on data)
-        internal new Dictionary<DependencyProperty, object> EffectiveValues
+        internal new Dictionary<int, object> EffectiveValues
         {
             get;
             private set;
@@ -237,7 +237,7 @@ namespace System.Windows
 
             // Process all PropertyValues (all are "Self") in the Style
             // chain (base added first)
-            EffectiveValues = new Dictionary<DependencyProperty, object>();
+            EffectiveValues = new Dictionary<int, object>();
             ProcessSelfStyles(this);
 
             // All done, seal self and call it a day.
@@ -395,7 +395,7 @@ namespace System.Windows
             for (int i = 0; i < style.PropertyValues.Count; i++)
             {
                 PropertyValue propertyValue = style.PropertyValues[i];
-                EffectiveValues[propertyValue.Property] = propertyValue.ValueInternal;
+                EffectiveValues[propertyValue.Property.GlobalIndex] = propertyValue.ValueInternal;
             }
         }
 
