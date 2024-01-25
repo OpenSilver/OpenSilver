@@ -420,16 +420,14 @@ namespace OpenSilver.Compiler
 
             var sb = new StringBuilder();
 
-            sb.Append($"new {destinationType}()");
-            sb.Append("{");
-
+            sb.AppendLine();
+            sb.AppendLine($"                let collection = {destinationType}()");
             for (int i = 0; i < split.Length; i += 2)
             {
-                sb.Append(ConvertPointHelper(split[i], split[i + 1], pointTypeFullName))
-                  .Append(", ");
+                sb.AppendLine($"                collection.Add({ConvertPointHelper(split[i], split[i + 1], pointTypeFullName)})");
             }
 
-            sb.Append("}");
+            sb.Append("                collection");
 
             return sb.ToString();
         }
