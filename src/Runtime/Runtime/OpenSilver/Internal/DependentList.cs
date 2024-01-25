@@ -82,7 +82,7 @@ internal class DependentList
         return _listStore.ToArray();
     }
 
-    public void Add(IDependencyPropertyChangedListener expr)
+    public void Add(DependencyPropertyChangedListener expr)
     {
         // don't clean up every time.  This would make Add() cost O(N),
         // which would cause building a list to cost O(N^2).  yuck!
@@ -93,7 +93,7 @@ internal class DependentList
         Add(new Dependent(expr));
     }
 
-    public void Remove(IDependencyPropertyChangedListener expr)
+    public void Remove(DependencyPropertyChangedListener expr)
     {
         Remove(new Dependent(expr));
     }
@@ -125,8 +125,7 @@ internal class DependentList
         for (int i = 0; i < snapList.Length; i++)
         {
             //Expression expression = snapList[i].Expr;
-            IDependencyPropertyChangedListener expression = snapList[i].Expr;
-            if (null != expression)
+            if (snapList[i].Expr is DependencyPropertyChangedListener expression)
             {
                 expression.OnPropertyChanged(source, sourceArgs);
             }
@@ -227,12 +226,12 @@ internal readonly struct Dependent
         return _wrEX.IsAlive;
     }
 
-    public Dependent(IDependencyPropertyChangedListener e)
+    public Dependent(DependencyPropertyChangedListener e)
     {
         _wrEX = new WeakReference(e);
     }
 
-    public IDependencyPropertyChangedListener Expr => (IDependencyPropertyChangedListener)_wrEX.Target;
+    public DependencyPropertyChangedListener Expr => (DependencyPropertyChangedListener)_wrEX.Target;
 
     public override bool Equals(object o)
     {
@@ -268,7 +267,7 @@ internal readonly struct Dependent
     // Write a good HashCode anyway (if not a fast one)
     public override int GetHashCode()
     {
-        var ex = (IDependencyPropertyChangedListener)_wrEX.Target;
+        var ex = (DependencyPropertyChangedListener)_wrEX.Target;
         int hashCode = (null == ex) ? 0 : ex.GetHashCode();
 
         return hashCode;

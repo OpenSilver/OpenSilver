@@ -97,9 +97,7 @@
 		<Compile Include="OpenSilver\Internal\Data\DataExtensionMethods.cs" />
 		<Compile Include="OpenSilver\Internal\Data\EnumerableCollectionView.cs" />
 		<Compile Include="OpenSilver\Internal\Data\IndexedEnumerable.cs" />
-		<Compile Include="OpenSilver\Internal\Data\IDependencyPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\Data\IndexedPropertyPathNode.cs" />
-		<Compile Include="OpenSilver\Internal\Data\IDependencyPropertyChangedListener.cs" />
 		<Compile Include="OpenSilver\Internal\Data\DependencyPropertyChangedListener.cs" />
 		<Compile Include="OpenSilver\Internal\Data\PropertyPathNode.cs" />
 		<Compile Include="OpenSilver\Internal\Data\PropertyPathParser.cs" />

@@ -17,7 +17,7 @@ using System.Windows;
 
 namespace OpenSilver.Internal.Data
 {
-    internal sealed class DependencyPropertyChangedListener : IDependencyPropertyChangedListener, IDisposable
+    internal sealed class DependencyPropertyChangedListener : IDisposable
     {
         private readonly DependencyProperty _dp;
         private DependencyObject _source;

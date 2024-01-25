@@ -11,14 +11,12 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal.Data;
-
 namespace System.Windows
 {
     /// <summary>
     /// Provides data for a <see cref="PropertyChangedCallback"/> implementation.
     /// </summary>
-    public sealed class DependencyPropertyChangedEventArgs : IDependencyPropertyChangedEventArgs
+    public sealed class DependencyPropertyChangedEventArgs
     {
         internal DependencyPropertyChangedEventArgs(
             object oldValue,

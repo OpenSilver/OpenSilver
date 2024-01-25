@@ -949,7 +949,7 @@ namespace System.Windows
             }
         }
 
-        internal void AddDependent(DependencyProperty dp, IDependencyPropertyChangedListener dependent)
+        internal void AddDependent(DependencyProperty dp, DependencyPropertyChangedListener dependent)
         {
             int propertyIndex = dp.GlobalIndex;
             _dependentListMap ??= new();
@@ -960,7 +960,7 @@ namespace System.Windows
             dependents.Add(dependent);
         }
 
-        internal void RemoveDependent(DependencyProperty dp, IDependencyPropertyChangedListener dependent)
+        internal void RemoveDependent(DependencyProperty dp, DependencyPropertyChangedListener dependent)
         {
             if (_dependentListMap is null)
             {
