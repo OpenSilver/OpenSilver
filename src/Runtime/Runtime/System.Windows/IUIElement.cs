@@ -18,8 +18,6 @@ namespace System.Windows;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IUIElement : IDependencyObject
 {
-    Visibility Visibility { get; set; }
-
     void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo);
 
     void RemoveHandler(RoutedEvent routedEvent, Delegate handler);
