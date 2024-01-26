@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Windows.Controls;
 
 namespace System.Windows
@@ -11,7 +10,7 @@ namespace System.Windows
     /// </remark>
     public sealed class VisualStateChangedEventArgs : EventArgs
     {
-        internal VisualStateChangedEventArgs(VisualState oldState, VisualState newState, IControl control)
+        internal VisualStateChangedEventArgs(VisualState oldState, VisualState newState, Control control)
         {
             _oldState = oldState;
             _newState = newState;
@@ -47,15 +46,12 @@ namespace System.Windows
         {
             get
             {
-                return _control as Control;
+                return _control;
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IControl IControl => _control;
-
         private VisualState _oldState;
         private VisualState _newState;
-        private IControl _control;
+        private Control _control;
     }
 }

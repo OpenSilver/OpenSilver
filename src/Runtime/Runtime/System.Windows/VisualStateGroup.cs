@@ -84,12 +84,12 @@ namespace System.Windows
             return null;
         }
 
-        internal void RaiseCurrentStateChanging(DependencyObject stateGroupsRoot, VisualState oldState, VisualState newState, IControl control)
+        internal void RaiseCurrentStateChanging(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
         {
             CurrentStateChanging?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
         }
 
-        internal void RaiseCurrentStateChanged(DependencyObject stateGroupsRoot, VisualState oldState, VisualState newState, IControl control)
+        internal void RaiseCurrentStateChanged(FrameworkElement stateGroupsRoot, VisualState oldState, VisualState newState, Control control)
         {
             CurrentStateChanged?.Invoke(stateGroupsRoot, new VisualStateChangedEventArgs(oldState, newState, control));
         }
