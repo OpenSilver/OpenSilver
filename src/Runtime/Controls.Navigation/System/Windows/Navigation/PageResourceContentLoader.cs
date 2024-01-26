@@ -364,13 +364,7 @@ namespace System.Windows.Navigation
                 "/" + assemblyPartSource + UriParsingHelper.ComponentDelimiterWithoutSlash + pagePathAndNameWithoutAssembly
             );
 
-            Type factoryType = Type.GetType(string.Concat(factoryTypeName, ", ", assemblyPartSource));
-            if (factoryType == null)
-            {
-                // For F#.
-                factoryType = Type.GetType(string.Concat(assemblyPartSource + "." + factoryTypeName, ", ", assemblyPartSource));
-            }
-            return factoryType;
+            return Type.GetType(string.Concat(factoryTypeName, ", ", assemblyPartSource));
         }
 
         private static bool GetXamlPagePath(string pagePathAndName, out string assemblyPartSource, out string pagePathAndNameWithoutAssembly)
