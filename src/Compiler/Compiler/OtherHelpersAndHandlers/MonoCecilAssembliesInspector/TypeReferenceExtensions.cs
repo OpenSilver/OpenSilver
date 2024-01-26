@@ -125,7 +125,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
             else if (compilerType == SupportedLanguage.FSharp)
             {
-                prefix = ""; 
+                prefix = "global.";
             }
             else
             {

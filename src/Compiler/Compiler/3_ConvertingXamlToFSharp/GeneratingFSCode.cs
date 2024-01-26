@@ -48,9 +48,9 @@ namespace OpenSilver.Compiler
             {
                 StringBuilder builder = new StringBuilder();
 
-                builder.Append(' ', 4).AppendLine("interface OpenSilver.Internal.Xaml.IComponentConnector with")
-                    .Append(' ', 4 * 2).AppendLine("[<System.Diagnostics.DebuggerNonUserCode>]")
-                    .Append(' ', 4 * 2).AppendLine("[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]")
+                builder.Append(' ', 4).AppendLine("interface global.OpenSilver.Internal.Xaml.IComponentConnector with")
+                    .Append(' ', 4 * 2).AppendLine("[<global.System.Diagnostics.DebuggerNonUserCode>]")
+                    .Append(' ', 4 * 2).AppendLine("[<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]")
                     .Append(' ', 4 * 2 ).AppendLine($"member this.Connect({componentIdParam}: int, {targetParam}: obj): unit = ");
 
                 if (_entries.Count > 0)
@@ -126,9 +126,9 @@ namespace OpenSilver.Compiler
         {
             string componentUri = $"/{assemblyNameWithoutExtension};component/{fileNameWithPathRelativeToProjectRoot.Replace('\\', '/')}";
 
-            // string loadComponentCall = $"{applicationTypeFullName}.LoadComponent(this, {XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri)}())";
+            // string loadComponentCall = $"{applicationTypeFullName}.LoadComponent(this, global.{XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri)}())";
             // enable this to replicate the Silverlight behavior. We use a custom variant of Application.LoadComponent that uses less reflection.
-            string loadComponentCall = $"{applicationTypeFullName}.LoadComponent(this, System.Uri(\"{componentUri}\", System.UriKind.Relative))";
+            string loadComponentCall = $"{applicationTypeFullName}.LoadComponent(this, global.System.Uri(\"{componentUri}\", global.System.UriKind.Relative))";
 
             return $@"
     // <summary>
@@ -229,10 +229,10 @@ type {className}() =
         {
             if (string.IsNullOrEmpty(namespaceName))
             {
-                return $"{typeName}";
+                return $"global.{typeName}";
             }
 
-            return $"{namespaceName}.{typeName}";
+            return $"global.{namespaceName}.{typeName}";
         }
 
         private static string GenerateFactoryClass(
@@ -257,8 +257,8 @@ type {className}() =
 #nowarn ""3391""
 #nowarn ""0067""
 
-[<System.Diagnostics.DebuggerNonUserCode>]
-[<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+[<global.System.Diagnostics.DebuggerNonUserCode>]
+[<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]
 type {factoryName}() =
     static member public Instantiate(): obj =
         {factoryName}.CreateComponentImpl()
@@ -285,12 +285,12 @@ type {factoryName}() =
             return finalCode;
         }
 
-        private const string RuntimeHelperClass = "OpenSilver.Internal.Xaml.RuntimeHelpers";
-        private const string IXamlComponentFactoryClass = "OpenSilver.Internal.Xaml.IXamlComponentFactory";
-        private const string IXamlComponentLoaderClass = "OpenSilver.Internal.Xaml.IXamlComponentLoader";
-        private const string IComponentConnectorClass = "OpenSilver.Internal.Xaml.IComponentConnector";
-        private const string XamlContextClass = "OpenSilver.Internal.Xaml.Context.XamlContext";
-        private const string IMarkupExtensionClass = "System.Xaml.IMarkupExtension<obj>";
-        private const string XamlDesignerBridgeClass = "OpenSilver.Internal.Xaml.XamlDesignerBridge";
+        private const string RuntimeHelperClass = "global.OpenSilver.Internal.Xaml.RuntimeHelpers";
+        private const string IXamlComponentFactoryClass = "global.OpenSilver.Internal.Xaml.IXamlComponentFactory";
+        private const string IXamlComponentLoaderClass = "global.OpenSilver.Internal.Xaml.IXamlComponentLoader";
+        private const string IComponentConnectorClass = "global.OpenSilver.Internal.Xaml.IComponentConnector";
+        private const string XamlContextClass = "global.OpenSilver.Internal.Xaml.Context.XamlContext";
+        private const string IMarkupExtensionClass = "global.System.Xaml.IMarkupExtension<obj>";
+        private const string XamlDesignerBridgeClass = "global.OpenSilver.Internal.Xaml.XamlDesignerBridge";
     }
 }

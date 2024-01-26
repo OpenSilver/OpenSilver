@@ -50,42 +50,42 @@ namespace OpenSilver.Compiler
         {
             return new Dictionary<string, Func<string, string>>(28)
             {
-                ["system.windows.input.cursor"] = (s => CoreTypesHelperFS.ConvertToCursor(s, "System.Windows.Input.Cursor", "System.Windows.Input.Cursors")),
-                ["system.windows.media.animation.keytime"] = (s => CoreTypesHelperFS.ConvertToKeyTime(s, "System.Windows.Media.Animation.KeyTime")),
-                ["system.windows.media.animation.repeatbehavior"] = (s => CoreTypesHelperFS.ConvertToRepeatBehavior(s, "System.Windows.Media.Animation.RepeatBehavior")),
-                ["system.windows.media.animation.keyspline"] = (s => CoreTypesHelperFS.ConvertToKeySpline(s, "System.Windows.Media.Animation.KeySpline", "global::System.Windows.Point")),
-                ["system.windows.media.brush"] = (s => CoreTypesHelperFS.ConvertToBrush(s, "System.Windows.Media.SolidColorBrush", "System.Windows.Media.Color")),
-                ["system.windows.media.solidcolorbrush"] = (s => CoreTypesHelperFS.ConvertToBrush(s, "System.Windows.Media.SolidColorBrush", "System.Windows.Media.Color")),
-                ["system.windows.media.color"] = (s => CoreTypesHelperFS.ConvertToColor(s, "System.Windows.Media.Color")),
-                ["system.windows.media.doublecollection"] = (s => CoreTypesHelperFS.ConvertToDoubleCollection(s, "System.Windows.Media.DoubleCollection")),
-                ["system.windows.media.fontfamily"] = (s => CoreTypesHelperFS.ConvertToFontFamily(s, "System.Windows.Media.FontFamily")),
-                ["system.windows.media.geometry"] = (s => CoreTypesHelperFS.ConvertToGeometry(s, "System.Windows.Media.Geometry")),
-                ["system.windows.media.pathgeometry"] = (s => CoreTypesHelperFS.ConvertToGeometry(s, "System.Windows.Media.PathGeometry")),
-                ["system.windows.media.matrix"] = (s => CoreTypesHelperFS.ConvertToMatrix(s, "System.Windows.Media.Matrix")),
-                ["system.windows.media.pointcollection"] = (s => CoreTypesHelperFS.ConvertToPointCollection(s, "System.Windows.Media.PointCollection", "System.Windows.Point")),
-                ["system.windows.media.transform"] = (s => CoreTypesHelperFS.ConvertToTransform(s, "System.Windows.Media.MatrixTransform", "System.Windows.Media.Matrix")),
-                ["system.windows.media.matrixtransform"] = (s => CoreTypesHelperFS.ConvertToTransform(s, "System.Windows.Media.MatrixTransform", "System.Windows.Media.Matrix")),
-                ["system.windows.media.cachemode"] = (s => CoreTypesHelperFS.ConvertToCacheMode(s, "System.Windows.Media.CacheMode", "System.Windows.Media.BitmapCache")),
-                ["system.windows.cornerradius"] = (s => CoreTypesHelperFS.ConvertToCornerRadius(s, "System.Windows.CornerRadius")),
-                ["system.windows.duration"] = (s => CoreTypesHelperFS.ConvertToDuration(s, "System.Windows.Duration")),
-                ["system.windows.fontweight"] = (s => CoreTypesHelperFS.ConvertToFontWeight(s, "System.Windows.FontWeight", "System.Windows.FontWeights")),
-                ["system.windows.gridlength"] = (s => CoreTypesHelperFS.ConvertToGridLength(s, "System.Windows.GridLength", "System.Windows.GridUnitType")),
-                ["system.windows.point"] = (s => CoreTypesHelperFS.ConvertToPoint(s, "System.Windows.Point")),
-                ["system.windows.propertypath"] = (s => CoreTypesHelperFS.ConvertToPropertyPath(s, "System.Windows.PropertyPath")),
-                ["system.windows.rect"] = (s => CoreTypesHelperFS.ConvertToRect(s, "System.Windows.Rect")),
-                ["system.windows.size"] = (s => CoreTypesHelperFS.ConvertToSize(s, "System.Windows.Size")),
-                ["system.windows.thickness"] = (s => CoreTypesHelperFS.ConvertToThickness(s, "System.Windows.Thickness")),
-                ["system.windows.fontstretch"] = (s => CoreTypesHelperFS.ConvertToFontStretch(s, "System.Windows.FontStretch")),
-                ["system.windows.fontstyle"] = (s => CoreTypesHelperFS.ConvertToFontStyle(s, "System.Windows.FontStyle", "System.Windows.FontStyles")),
-                ["system.windows.textdecorationcollection"] = (s => CoreTypesHelperFS.ConvertToTextDecorationCollection(s, "System.Windows.TextDecorationCollection", "System.Windows.TextDecorations")),
-                ["system.windows.media.imagesource"] = (s => CoreTypesHelperFS.ConvertToImageSource(s, "System.Windows.Media.ImageSource", "System.Windows.Media.Imaging.BitmapImage")),
+                ["system.windows.input.cursor"] = (s => CoreTypesHelperFS.ConvertToCursor(s, "global.System.Windows.Input.Cursor", "global.System.Windows.Input.Cursors")),
+                ["system.windows.media.animation.keytime"] = (s => CoreTypesHelperFS.ConvertToKeyTime(s, "global.System.Windows.Media.Animation.KeyTime")),
+                ["system.windows.media.animation.repeatbehavior"] = (s => CoreTypesHelperFS.ConvertToRepeatBehavior(s, "global.System.Windows.Media.Animation.RepeatBehavior")),
+                ["system.windows.media.animation.keyspline"] = (s => CoreTypesHelperFS.ConvertToKeySpline(s, "global.System.Windows.Media.Animation.KeySpline", "global.System.Windows.Point")),
+                ["system.windows.media.brush"] = (s => CoreTypesHelperFS.ConvertToBrush(s, "global.System.Windows.Media.SolidColorBrush", "global.System.Windows.Media.Color")),
+                ["system.windows.media.solidcolorbrush"] = (s => CoreTypesHelperFS.ConvertToBrush(s, "global.System.Windows.Media.SolidColorBrush", "global.System.Windows.Media.Color")),
+                ["system.windows.media.color"] = (s => CoreTypesHelperFS.ConvertToColor(s, "global.System.Windows.Media.Color")),
+                ["system.windows.media.doublecollection"] = (s => CoreTypesHelperFS.ConvertToDoubleCollection(s, "global.System.Windows.Media.DoubleCollection")),
+                ["system.windows.media.fontfamily"] = (s => CoreTypesHelperFS.ConvertToFontFamily(s, "global.System.Windows.Media.FontFamily")),
+                ["system.windows.media.geometry"] = (s => CoreTypesHelperFS.ConvertToGeometry(s, "global.System.Windows.Media.Geometry")),
+                ["system.windows.media.pathgeometry"] = (s => CoreTypesHelperFS.ConvertToGeometry(s, "global.System.Windows.Media.PathGeometry")),
+                ["system.windows.media.matrix"] = (s => CoreTypesHelperFS.ConvertToMatrix(s, "global.System.Windows.Media.Matrix")),
+                ["system.windows.media.pointcollection"] = (s => CoreTypesHelperFS.ConvertToPointCollection(s, "global.System.Windows.Media.PointCollection", "global.System.Windows.Point")),
+                ["system.windows.media.transform"] = (s => CoreTypesHelperFS.ConvertToTransform(s, "global.System.Windows.Media.MatrixTransform", "global.System.Windows.Media.Matrix")),
+                ["system.windows.media.matrixtransform"] = (s => CoreTypesHelperFS.ConvertToTransform(s, "global.System.Windows.Media.MatrixTransform", "global.System.Windows.Media.Matrix")),
+                ["system.windows.media.cachemode"] = (s => CoreTypesHelperFS.ConvertToCacheMode(s, "global.System.Windows.Media.CacheMode", "global.System.Windows.Media.BitmapCache")),
+                ["system.windows.cornerradius"] = (s => CoreTypesHelperFS.ConvertToCornerRadius(s, "global.System.Windows.CornerRadius")),
+                ["system.windows.duration"] = (s => CoreTypesHelperFS.ConvertToDuration(s, "global.System.Windows.Duration")),
+                ["system.windows.fontweight"] = (s => CoreTypesHelperFS.ConvertToFontWeight(s, "global.System.Windows.FontWeight", "global.System.Windows.FontWeights")),
+                ["system.windows.gridlength"] = (s => CoreTypesHelperFS.ConvertToGridLength(s, "global.System.Windows.GridLength", "global.System.Windows.GridUnitType")),
+                ["system.windows.point"] = (s => CoreTypesHelperFS.ConvertToPoint(s, "global.System.Windows.Point")),
+                ["system.windows.propertypath"] = (s => CoreTypesHelperFS.ConvertToPropertyPath(s, "global.System.Windows.PropertyPath")),
+                ["system.windows.rect"] = (s => CoreTypesHelperFS.ConvertToRect(s, "global.System.Windows.Rect")),
+                ["system.windows.size"] = (s => CoreTypesHelperFS.ConvertToSize(s, "global.System.Windows.Size")),
+                ["system.windows.thickness"] = (s => CoreTypesHelperFS.ConvertToThickness(s, "global.System.Windows.Thickness")),
+                ["system.windows.fontstretch"] = (s => CoreTypesHelperFS.ConvertToFontStretch(s, "global.System.Windows.FontStretch")),
+                ["system.windows.fontstyle"] = (s => CoreTypesHelperFS.ConvertToFontStyle(s, "global.System.Windows.FontStyle", "global.System.Windows.FontStyles")),
+                ["system.windows.textdecorationcollection"] = (s => CoreTypesHelperFS.ConvertToTextDecorationCollection(s, "global.System.Windows.TextDecorationCollection", "global.System.Windows.TextDecorations")),
+                ["system.windows.media.imagesource"] = (s => CoreTypesHelperFS.ConvertToImageSource(s, "global.System.Windows.Media.ImageSource", "global.System.Windows.Media.Imaging.BitmapImage")),
             };
         }
     }
 
     internal static class CoreTypesHelperFS
     {
-        public const string TypeFromStringConvertersFullName = "DotNetForHtml5.Core.TypeFromStringConverters";
+        public const string TypeFromStringConvertersFullName = "global.DotNetForHtml5.Core.TypeFromStringConverters";
 
         private static SystemTypesHelper SystemTypesHelperFS = new SystemTypesHelperFS();
 
@@ -160,7 +160,7 @@ namespace OpenSilver.Compiler
             string[] split = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (split.Length == 4)
             {
-                return $"new {destinationType} {{ ControlPoint1 = new {pointTypeName}({split[0]}, {split[1]}), ControlPoint2 = new {pointTypeName}({split[2]}, {split[3]}), }}";
+                return $"{destinationType}(ControlPoint1 = new {pointTypeName}({split[0]}, {split[1]}), ControlPoint2 = new {pointTypeName}({split[2]}, {split[3]}))";
             }
 
             throw GetConvertException(source, destinationType);
@@ -689,14 +689,14 @@ namespace OpenSilver.Compiler
             string uriKind;
             if (source.Contains(":/"))
             {
-                uriKind = "System.UriKind.Absolute";
+                uriKind = "global.System.UriKind.Absolute";
             }
             else
             {
-                uriKind = "System.UriKind.Relative";
+                uriKind = "global.System.UriKind.Relative";
             }
 
-            return $"new {bitmapImageTypeFullName}(new System.Uri({Escape(source)}, {uriKind}))";
+            return $"new {bitmapImageTypeFullName}(new global.System.Uri({Escape(source)}, {uriKind}))";
         }
 
         private static Exception GetConvertException(string value, string destinationTypeFullName)

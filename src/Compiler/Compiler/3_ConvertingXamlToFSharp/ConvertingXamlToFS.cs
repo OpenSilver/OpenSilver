@@ -47,7 +47,7 @@ namespace OpenSilver.Compiler
             // Insert implicit nodes in XAML:
             if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
             {
-                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "", new SystemTypesHelperFS());
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global.", new SystemTypesHelperFS());
 
                 FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
 
@@ -66,10 +66,10 @@ namespace OpenSilver.Compiler
 
             // Prepare the code that will be put in the "InitializeComponent" of the Application class, which means that it will be executed when the application is launched:
             string codeToPutInTheInitializeComponentOfTheApplicationClass = string.Format(@"
-        CSHTML5.Internal.StartupAssemblyInfo.OutputRootPath <- @""{0}""
-        CSHTML5.Internal.StartupAssemblyInfo.OutputAppFilesPath <- @""{1}""
-        CSHTML5.Internal.StartupAssemblyInfo.OutputLibrariesPath <- @""{2}""
-        CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath <- @""{3}""
+        global.CSHTML5.Internal.StartupAssemblyInfo.OutputRootPath <- @""{0}""
+        global.CSHTML5.Internal.StartupAssemblyInfo.OutputAppFilesPath <- @""{1}""
+        global.CSHTML5.Internal.StartupAssemblyInfo.OutputLibrariesPath <- @""{2}""
+        global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath <- @""{3}""
 ", outputRootPath, outputAppFilesPath, outputLibrariesPath, outputResourcesPath);
 
             // Generate Vb code from the tree:

@@ -27,7 +27,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
     {
         private const string GlobalPrefix_CS = "global::";
         private const string GlobalPrefix_VB = "Global.";
-        private const string GlobalPrefix_FS = "";
+        private const string GlobalPrefix_FS = "global.";
         private const string SystemXamlNamespace = "System.Xaml";
         private const string GenericMarkupExtension = "IMarkupExtension`1";
         private const string ContentPropertyAttributeFullName = "System.Windows.Markup.ContentPropertyAttribute";

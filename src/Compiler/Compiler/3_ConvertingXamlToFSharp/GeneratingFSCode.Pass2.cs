@@ -141,7 +141,7 @@ namespace OpenSilver.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"    static member private {MethodName} ({TemplateOwner}: {_metadata.SystemWindowsNS}.IFrameworkElement) ({XamlContext}: {XamlContextClass}): {_metadata.SystemWindowsNS}.IFrameworkElement =")
+                    builder.AppendLine($"    static member private {MethodName} ({TemplateOwner}: global.{_metadata.SystemWindowsNS}.IFrameworkElement) ({XamlContext}: {XamlContextClass}): global.{_metadata.SystemWindowsNS}.IFrameworkElement =")
                         .Append(AddSpacesToLines(StringBuilder.ToString(), "        "));
                     builder.AppendLine($"        {Root}");
 
@@ -288,7 +288,7 @@ namespace OpenSilver.Compiler
                 {
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"{_settings.Metadata.SystemWindowsNS}.Application",
+                        $"global.{_settings.Metadata.SystemWindowsNS}.Application",
                         IsClassTheApplicationClass(baseType) ? _codeToPutInTheInitializeComponentOfTheApplicationClass : string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
@@ -297,7 +297,7 @@ namespace OpenSilver.Compiler
                     string classNameXaml = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
 
                     string additionalConstructors = IsClassTheApplicationClass(baseType)
-                        ? @$"    private new(stub: OpenSilver.XamlDesignerConstructorStub) as this =
+                        ? @$"    private new(stub: global.OpenSilver.XamlDesignerConstructorStub) as this =
         {classNameXaml}()
         then
             this.InitializeComponent ()
@@ -322,9 +322,9 @@ namespace OpenSilver.Compiler
                         componentTypeFullName,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
-                        $"        CSHTML5.Internal.TypeInstantiationHelper.Instantiate(System.Type.GetType(\"{behindClassTypeName}\")) :?> {componentTypeFullName}",
+                        $"        global.CSHTML5.Internal.TypeInstantiationHelper.Instantiate(System.Type.GetType(\"{behindClassTypeName}\")) :?> {componentTypeFullName}",
                         parameters.ResultingMethods,
-                        $"{_settings.Metadata.SystemWindowsNS}.UIElement",
+                        $"global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -356,7 +356,7 @@ namespace global
                         parameters.CurrentScope.ToString(),
                         string.Join(Environment.NewLine, $"        let {rootElementName} = new {baseType}()", $"        {_factoryName}.LoadComponentImpl({rootElementName})", $"        {rootElementName}"),
                         parameters.ResultingMethods,
-                        $"{_settings.Metadata.SystemWindowsNS}.UIElement",
+                        $"global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -395,7 +395,7 @@ namespace GlobalResource
 
                 bool isRootElement = IsElementTheRootElement(element);
                 bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
-                    elementTypeInCSharp, assemblyNameIfAny
+                    elementTypeInCSharp.Substring("global.".Length), assemblyNameIfAny
                 );
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
@@ -431,7 +431,7 @@ namespace GlobalResource
                                 "let {0}: {1} = {3}.XamlContext_WriteStartObject({4}, {2})",
                                 elementUniqueNameOrThisKeyword,
                                 elementTypeInCSharp,
-                                _systemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp),
+                                _systemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global.".Length)),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
                             )
@@ -446,7 +446,7 @@ namespace GlobalResource
                         string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
 
                         bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
-                            elementTypeInCSharp, assemblyNameIfAny
+                            elementTypeInCSharp.Substring("global.".Length), assemblyNameIfAny
                         );
 
                         string preparedValue = ConvertFromInvariantString(
@@ -583,7 +583,7 @@ namespace GlobalResource
                                         element.Name.NamespaceName, element.Name.LocalName))
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                            $"{elementUniqueNameOrThisKeyword}.SetValue({_settings.Metadata.SystemWindowsNS}.FrameworkElement.NameProperty, \"{name}\")");                                        
+                                            $"{elementUniqueNameOrThisKeyword}.SetValue(global.{_settings.Metadata.SystemWindowsNS}.FrameworkElement.NameProperty, \"{name}\")");                                        
                                     }
                                 }
                                 else
@@ -603,7 +603,7 @@ namespace GlobalResource
                                 // TODO Check that 'attributeLocalName' is effectively the LoadedEvent routed event.
                                 // Silverlight only allows the FrameworkElement.LoadedEvent as value for the EventTrigger.RoutedEvent
                                 // property, so for now we assume the xaml is always valid.
-                                parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent <- {_settings.Metadata.SystemWindowsNS}.FrameworkElement.LoadedEvent");
+                                parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent <- global.{_settings.Metadata.SystemWindowsNS}.FrameworkElement.LoadedEvent");
                             }
                             else if (string.IsNullOrEmpty(attribute.Name.NamespaceName))
                             {
@@ -644,7 +644,7 @@ namespace GlobalResource
 
                                             // Generate the code for instantiating the attribute value:
                                             string codeForInstantiatingTheAttributeValue;
-                                            if (elementTypeInCSharp == $"{_settings.Metadata.SystemWindowsNS}.Setter")
+                                            if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsNS}.Setter")
                                             {
                                                 //we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
                                                 if (element.Parent != null && element.Parent.Parent != null && element.Parent.Parent.Name.LocalName == "Style")
@@ -683,7 +683,7 @@ namespace GlobalResource
                                                 else
                                                     throw new XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
                                             }
-                                            else if (elementTypeInCSharp == $"{_settings.Metadata.SystemWindowsDataNS}.Binding"
+                                            else if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsDataNS}.Binding"
                                                 && memberName == "Path")
                                             {
                                                 if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
@@ -708,7 +708,7 @@ namespace GlobalResource
                                                         element
                                                     );
                                             }
-                                            else if (elementTypeInCSharp == $"{_settings.Metadata.SystemWindowsNS}.TemplateBindingExtension"
+                                            else if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsNS}.TemplateBindingExtension"
                                                 && memberName == "Path")
                                             {
                                                 ResolvePathForTemplateBinding(attributeValue, element, out string typeName, out string propertyName);
@@ -895,7 +895,7 @@ namespace GlobalResource
                             }
                             else if (isImplicitDataTemplate)
                             {
-                                string key = $"new {_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof<{childKey}>)";
+                                string key = $"new global.{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof<{childKey}>)";
                                 // System.Collections.IDictionary
                                 parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add({key}, {GeneratingCode.GetUniqueName(child)}) |> ignore");
                             }
@@ -977,7 +977,7 @@ namespace GlobalResource
                                             elementTypeInCSharp,
                                             propertyName,
                                             GeneratingCode.GetUniqueName(parent),
-                                            (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
+                                            "global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
                                             parameters.CurrentXamlContext,
                                             childUniqueName
@@ -1004,7 +1004,7 @@ namespace GlobalResource
                                             "{0}.{1} <- ({3}.CallProvideValue({4}, {5}) :?> {2})",
                                             GeneratingCode.GetUniqueName(parent),
                                             propertyName,
-                                            (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
+                                            "global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
                                             parameters.CurrentXamlContext,
                                             childUniqueName
@@ -1059,8 +1059,8 @@ namespace GlobalResource
 
                                 // Check if the property is of type "Binding" (or "BindingBase"), in which 
                                 // case we should directly assign the value instead of calling "SetBinding"
-                                bool isPropertyOfTypeBinding = propertyTypeFullName == $"{_settings.Metadata.SystemWindowsDataNS}.Binding" ||
-                                    propertyTypeFullName == $"{_settings.Metadata.SystemWindowsDataNS}.BindingBase";
+                                bool isPropertyOfTypeBinding = propertyTypeFullName == $"global.{_settings.Metadata.SystemWindowsDataNS}.Binding" ||
+                                    propertyTypeFullName == $"global.{_settings.Metadata.SystemWindowsDataNS}.BindingBase";
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
@@ -1070,7 +1070,7 @@ namespace GlobalResource
                                 {
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
-                                            "{3}.BindingOperations.SetBinding({0}, {1}, {2}) |> ignore",
+                                            "global.{3}.BindingOperations.SetBinding({0}, {1}, {2}) |> ignore",
                                             parentElementUniqueNameOrThisKeyword,
                                             propertyDeclaringTypeName + "." + propertyName + "Property",
                                             GeneratingCode.GetUniqueName(child),
@@ -1087,7 +1087,7 @@ namespace GlobalResource
                                         _assemblyNameWithoutExtension);
 
                                 parameters.StringBuilder.AppendLine(string.Format(
-                                    "{0}.SetValue({1}, {2}.ProvideValue(new System.ServiceProvider({3}, null)))",
+                                    "{0}.SetValue({1}, {2}.ProvideValue(new global.System.ServiceProvider({3}, null)))",
                                     parentElementUniqueNameOrThisKeyword,
                                     dependencyPropertyName,
                                     GeneratingCode.GetUniqueName(child),
@@ -1108,7 +1108,7 @@ namespace GlobalResource
                                 {
                                     parameters.StringBuilder.AppendLine(string.Format("{0}.{1} <- null", parentElementUniqueNameOrThisKeyword, propertyName));
                                 }
-                                //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
+                                //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new global.System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
                             }
                             else
                             {
@@ -1143,14 +1143,14 @@ namespace GlobalResource
                                     );
 
                                     string propertyType = string.Format(
-                                        "{0}{1}{2}",
+                                        "global.{0}{1}{2}",
                                         propertyNamespaceName,
                                         string.IsNullOrEmpty(propertyNamespaceName) ? string.Empty : ".",
                                         propertyLocalTypeName
                                     );
 
                                     string markupExtension = string.Format(
-                                        "({1} :> {0}).ProvideValue(new System.ServiceProvider({2}, {3}))",
+                                        "({1} :> {0}).ProvideValue(new global.System.ServiceProvider({2}, {3}))",
                                         IMarkupExtensionClass, childUniqueName, GeneratingCode.GetUniqueName(parent), propertyKeyString
                                     );
 
@@ -1206,14 +1206,14 @@ namespace GlobalResource
 
                                     if (isDependencyProperty)
                                     {
-                                        string bindingBaseTypeString = $"{_settings.Metadata.SystemWindowsDataNS}.Binding";
+                                        string bindingBaseTypeString = $"global.{_settings.Metadata.SystemWindowsDataNS}.Binding";
 
                                         //todo: make this more readable by cutting it into parts ?
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format(@"let {0} = ({1} :> {10}).ProvideValue(new System.ServiceProvider({2}, {3}))
+                                            string.Format(@"let {0} = ({1} :> {10}).ProvideValue(new global.System.ServiceProvider({2}, {3}))
 match {0} with
 | :? {4} as binding ->
-    {9}.BindingOperations.SetBinding({7}, {8}, binding) |> ignore
+    global.{9}.BindingOperations.SetBinding({7}, {8}, binding) |> ignore
 | :? {6} as objVal ->
     {2}.{5} <- objVal
 | _ -> ()",
@@ -1223,7 +1223,7 @@ match {0} with
                                                             propertyKeyString,//3
                                                             bindingBaseTypeString,//4
                                                             propertyName,//5
-                                                            (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
+                                                            "global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
                                                             parentElementUniqueNameOrThisKeyword,//7
                                                             propertyDeclaringTypeName + "." + propertyName + "Property", //8
                                                             _settings.Metadata.SystemWindowsDataNS, //9
@@ -1233,10 +1233,10 @@ match {0} with
                                     {
                                         parameters.StringBuilder.AppendLine(
                                             string.Format(
-                                                "{0}.{1} = ((({4} :> {3}).ProvideValue(new System.ServiceProvider({0}, {5})) :> {2})",
+                                                "{0}.{1} = ((({4} :> {3}).ProvideValue(new global.System.ServiceProvider({0}, {5})) :> {2})",
                                                 GeneratingCode.GetUniqueName(parent),
                                                 propertyName,
-                                                (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
+                                                "global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                                 IMarkupExtensionClass,
                                                 childUniqueName,
                                                 propertyKeyString));
@@ -1266,7 +1266,7 @@ match {0} with
                     }
                     else if (isImplicitDataTemplate)
                     {
-                        string key = $"new {_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof<{childKey}>)";
+                        string key = $"new global.{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof<{childKey}>)";
                         // System.Collections.IDictionary
                         parameters.StringBuilder.AppendLine($"{targetUniqueName}.Add({key}, {GeneratingCode.GetUniqueName(child)}) |> ignore");
                     }
@@ -1337,7 +1337,7 @@ match {0} with
 
             private bool IsClassTheApplicationClass(string className)
             {
-                return className == $"{_settings.Metadata.SystemWindowsNS}.Application";
+                return className == $"global.{_settings.Metadata.SystemWindowsNS}.Application";
             }
 
             private string GenerateCodeForSetterProperty(XElement styleElement, string attributeValue)
@@ -1548,7 +1548,7 @@ match {0} with
                 }
 
                 string valueTypeFullName = string.Format(
-                    "{0}{1}{2}",
+                    "global.{0}{1}{2}",
                     valueNamespaceName,
                     string.IsNullOrEmpty(valueNamespaceName) ? string.Empty : ".",
                     valueLocalTypeName
@@ -1600,7 +1600,7 @@ match {0} with
                             $"Field '{value.Trim()}' not found in type: '{valueTypeFullName}'.");
                     }
                 }
-                else if (valueTypeFullName == "System.Type")
+                else if (valueTypeFullName == "global.System.Type")
                 {
                     string typeFullName = GetCSharpFullTypeName(value, elementWhereTheTypeIsUsed);
 
@@ -1619,11 +1619,11 @@ match {0} with
                         xName);
 
                     bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
-                        valueTypeFullName, valueAssemblyName
+                        valueTypeFullName.Substring("global.".Length), valueAssemblyName
                     );
 
                     bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
-                        valueTypeFullName, valueAssemblyName
+                        valueTypeFullName.Substring("global.".Length), valueAssemblyName
                     );
 
                     string declaringTypeName = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
@@ -1657,8 +1657,8 @@ match {0} with
                     || parentXName.LocalName == "HyperlinkButton";
 
                 // We change relative paths into absolute paths in case of <Image> controls and other controls that have the "Source" property:
-                if ((valueTypeFullName == $"{_settings.Metadata.SystemWindowsMediaNS}.ImageSource"
-                    || valueTypeFullName == "System.Uri"
+                if ((valueTypeFullName == $"global.{_settings.Metadata.SystemWindowsMediaNS}.ImageSource"
+                    || valueTypeFullName == "global.System.Uri"
                     || (propertyName == "FontFamily" && path.Contains('.')))
                     && !IsFrameOrUriMappingSpecialCase
                     && !path.ToLower().EndsWith(".xaml")) // Note: this is to avoid messing with Frame controls, which paths are always relative to the startup assembly (in SL).
@@ -1857,13 +1857,13 @@ match {0} with
                 if (isKnownCoreType)
                 {
                     preparedValue = _settings.CoreTypesConverter.ConvertFromInvariantString(
-                        value, type
+                        value, type.Substring("global.".Length)
                     );
                 }
                 else if (isKnownSystemType)
                 {
                     preparedValue = _systemTypesHelper.ConvertFromInvariantString(
-                        value, type
+                        value, type.Substring("global.".Length)
                     );
                 }
                 else
@@ -1894,7 +1894,7 @@ match {0} with
             }
 
             private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)
-                => propertyName == "RoutedEvent" && typeFullName == $"{_settings.Metadata.SystemWindowsNS}.EventTrigger";
+                => propertyName == "RoutedEvent" && typeFullName == $"global.{_settings.Metadata.SystemWindowsNS}.EventTrigger";
 
             private static bool IsReservedAttribute(string attributeName)
             {

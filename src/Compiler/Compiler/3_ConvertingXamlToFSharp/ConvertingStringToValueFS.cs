@@ -35,25 +35,25 @@ namespace OpenSilver.Compiler
 
             switch (underlyingType)
             {
-                case "System.SByte":
-                case "System.UInt16":
-                case "System.UInt32":
-                case "System.UInt64":
+                case "global.System.SByte":
+                case "global.System.UInt16":
+                case "global.System.UInt32":
+                case "global.System.UInt64":
                     // Note: for numeric types, removing the quotation marks is sufficient
                     // (+ potential additional letter to tell the actual type because casts
                     // from int to double for example causes an exception).
                     result = value;
                     break;
 
-                case "System.Decimal":
+                case "global.System.Decimal":
                     result = PrepareStringForDecimal(value);
                     break;
 
-                case "System.Char":
+                case "global.System.Char":
                     result = PrepareStringForChar(value);
                     break;
 
-                case "System.Object":
+                case "global.System.Object":
                     result = PrepareStringForString(source);
                     break;
 
@@ -74,15 +74,15 @@ namespace OpenSilver.Compiler
         {
             if (source != null && source.Length == 1)
             {
-                return $"\"{source}\"c";
+                return $"'{source}'";
             }
 
-            return "Chr(0)";
+            return "char(0)";
         }
 
         internal override bool IsNullableType(string type, out string underlyingType)
         {
-            if (type.StartsWith("System.Nullable<"))
+            if (type.StartsWith("global.System.Nullable<"))
             {
                 // skips "System.Nullable<" and then remove 
                 // the trailing '>' at the end

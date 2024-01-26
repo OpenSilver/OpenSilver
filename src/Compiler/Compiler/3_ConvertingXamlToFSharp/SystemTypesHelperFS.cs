@@ -21,7 +21,7 @@ namespace OpenSilver.Compiler
 {
     internal class SystemTypesHelperFS : SystemTypesHelper
     {
-        private const string InvariantCulture = "System.Globalization.CultureInfo.InvariantCulture";
+        private const string InvariantCulture = "global.System.Globalization.CultureInfo.InvariantCulture";
         private const string mscorlib = "mscorlib";
 
         private static SystemTypesHelperFS systemTypesHelper = new SystemTypesHelperFS();
@@ -43,15 +43,15 @@ namespace OpenSilver.Compiler
         private static Dictionary<string, string> SupportIntrinsicTypesDefaultValues { get; } =
             new Dictionary<string, string>(9)
             {
-                ["system.double"] = "0D",
+                ["system.double"] = "0.0",
                 ["system.single"] = "0F",
-                ["system.timespan"] = "new System.TimeSpan()",
+                ["system.timespan"] = "new global.System.TimeSpan()",
                 ["system.string"] = "",
                 ["system.boolean"] = "false",
-                ["system.byte"] = "CByte(0)",
-                ["system.int16"] = "CShort(0)",
+                ["system.byte"] = "byte(0)",
+                ["system.int16"] = "int16(0)",
                 ["system.int32"] = "0",
-                ["system.int64"] = "0L",
+                ["system.int64"] = "int64(0)",
             };
 
         public override bool IsSupportedSystemType(string typeFullName, string assemblyIfAny)
@@ -69,7 +69,7 @@ namespace OpenSilver.Compiler
             Debug.Assert(IsMscorlibOrNull(assemblyIfAny));
             Debug.Assert(namespaceName == "System");
 
-            return $"{namespaceName}.{typeName}";
+            return $"global.{namespaceName}.{typeName}";
         }
 
         public override string ConvertFromInvariantString(string source, string typeFullName)
@@ -109,13 +109,13 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "System.Double.NaN";
+                    return "global.System.Double.NaN";
 
                 case "infinity":
-                    return "System.Double.PositiveInfinity";
+                    return "global.System.Double.PositiveInfinity";
 
                 case "-infinity":
-                    return "System.Double.NegativeInfinity";
+                    return "global.System.Double.NegativeInfinity";
             }
 
             if (value.EndsWith("d"))
@@ -145,13 +145,13 @@ namespace OpenSilver.Compiler
             {
                 case "auto":
                 case "nan":
-                    return "System.Single.NaN";
+                    return "global.System.Single.NaN";
 
                 case "infinity":
-                    return "System.Single.PositiveInfinity";
+                    return "global.System.Single.PositiveInfinity";
 
                 case "-infinity":
-                    return "System.Single.NegativeInfinity";                    
+                    return "global.System.Single.NegativeInfinity";                    
             }
 
             if (value.EndsWith("f"))
@@ -184,10 +184,10 @@ namespace OpenSilver.Compiler
             // Optimization to avoid parsing at runtime
             if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out TimeSpan timeSpan))
             {
-                return $"new System.TimeSpan({timeSpan.Ticks}L)";
+                return $"new global.System.TimeSpan({timeSpan.Ticks}L)";
             }
 
-            return $"System.TimeSpan.Parse({Escape(value)}, {InvariantCulture})";
+            return $"global.System.TimeSpan.Parse({Escape(value)}, {InvariantCulture})";
         }
 
         internal override string ConvertToString(string source)
@@ -216,7 +216,7 @@ namespace OpenSilver.Compiler
                 return SupportIntrinsicTypesDefaultValues["system.byte"];
             }
 
-            return $"CByte({value})";
+            return $"byte({value})";
         }
 
         internal override string ConvertToInt16(string source)
@@ -228,7 +228,7 @@ namespace OpenSilver.Compiler
                 return SupportIntrinsicTypesDefaultValues["system.int16"];
             }
 
-            return $"CShort({value})";
+            return $"int16({value})";
         }
 
         internal override string ConvertToInt32(string source)
@@ -252,7 +252,7 @@ namespace OpenSilver.Compiler
                 return SupportIntrinsicTypesDefaultValues["system.int64"];
             }
 
-            return $"{value}L";
+            return $"int64({value})";
         }
 
         internal override bool IsMscorlibOrNull(string assemblyName)

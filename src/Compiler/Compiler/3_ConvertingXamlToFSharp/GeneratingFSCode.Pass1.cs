@@ -101,7 +101,7 @@ namespace OpenSilver.Compiler
                 {
                     // Create the "IntializeComponent()" method:
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"{_settings.Metadata.SystemWindowsNS}.Application",
+                        $"global.{_settings.Metadata.SystemWindowsNS}.Application",
                         string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
@@ -126,10 +126,10 @@ namespace OpenSilver.Compiler
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
-                        "        raise (System.NotImplementedException())",
-                        "        raise (System.NotImplementedException())",
+                        "        raise (global.System.NotImplementedException())",
+                        "        raise (global.System.NotImplementedException())",
                         Enumerable.Empty<string>(),
-                        $"{_settings.Metadata.SystemWindowsNS}.UIElement",
+                        $"global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -158,10 +158,10 @@ namespace global
                     string finalCode = GenerateFactoryClass(
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
-                        "        raise (System.NotImplementedException())",
-                        "        raise (System.NotImplementedException())",
+                        "        raise (global.System.NotImplementedException())",
+                        "        raise (global.System.NotImplementedException())",
                         Enumerable.Empty<string>(),
-                        $"{_settings.Metadata.SystemWindowsNS}.UIElement",
+                        $"global.{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
