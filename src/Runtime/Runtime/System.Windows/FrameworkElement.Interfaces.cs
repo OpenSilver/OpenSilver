@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using OpenSilver.Internal;
 
@@ -61,31 +60,15 @@ public partial class FrameworkElement : IInternalFrameworkElement
         set => TemplateChild = (FrameworkElement)value;
     }
 
-    DependencyObject IInternalFrameworkElement.Parent => Parent;
-
-    ResourceDictionary IInternalFrameworkElement.Resources
-    {
-        get => Resources;
-        set => Resources = value;
-    }
-
     event InheritedPropertyChangedEventHandler IInternalFrameworkElement.InheritedPropertyChanged
     {
         add => InheritedPropertyChanged += value;
         remove => InheritedPropertyChanged -= value;
     }
 
-    event RoutedEventHandler IInternalFrameworkElement.Loaded
-    {
-        add => Loaded += value;
-        remove => Loaded -= value;
-    }
-
     void IInternalFrameworkElement.AddLogicalChild(object child) => AddLogicalChild(child);
 
     void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent) => ChangeLogicalParent(newParent);
-
-    object IInternalFrameworkElement.FindName(string name) => FindName(name);
 
     void IInternalFrameworkElement.LoadResources() => LoadResources();
 

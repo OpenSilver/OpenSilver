@@ -30,7 +30,7 @@ namespace System.Windows
     /// other important Silverlight classes, such as <see cref="UIElement"/>, <see cref="Geometry"/>,
     /// <see cref="FrameworkTemplate"/>, <see cref="Style"/>, and <see cref="ResourceDictionary"/>.
     /// </summary>
-    public class DependencyObject : IInternalDependencyObject
+    public class DependencyObject : IDependencyObject
     {
         #region Inheritance Context
 
@@ -277,10 +277,6 @@ namespace System.Windows
             EffectiveValues = new();
             InheritedValues = new();
         }
-
-        object IInternalDependencyObject.GetValue(DependencyProperty dp) => GetValue(dp);
-
-        void IInternalDependencyObject.SetValue(DependencyProperty dp, object value) => SetValue(dp, value);
 
         /// <summary>
         /// Returns the current effective value of a dependency property from a <see cref="DependencyObject"/>.

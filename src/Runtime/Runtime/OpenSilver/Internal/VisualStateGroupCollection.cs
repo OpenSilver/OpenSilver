@@ -18,7 +18,7 @@ namespace OpenSilver.Internal
 {
     internal sealed class VisualStateGroupCollection : PresentationFrameworkCollection<VisualStateGroup>
     {
-        public VisualStateGroupCollection(FrameworkElement owner)
+        public VisualStateGroupCollection(DependencyObject owner)
             : base(false)
         {
             Debug.Assert(owner != null);

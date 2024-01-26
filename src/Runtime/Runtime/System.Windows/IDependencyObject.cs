@@ -18,10 +18,6 @@ namespace System.Windows;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IDependencyObject
 {
-}
-
-internal interface IInternalDependencyObject : IDependencyObject
-{
     object GetValue(DependencyProperty dp);
 
     void SetValue(DependencyProperty dp, object value);

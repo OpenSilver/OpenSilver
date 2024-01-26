@@ -20,6 +20,17 @@ namespace System.Windows;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IFrameworkElement : IUIElement
 {
+    event RoutedEventHandler Loaded;
+
+    bool IsLoaded { get; }
+
+    DependencyObject Parent { get; }
+
+    ResourceDictionary Resources { get; set; }
+
+    string Name { get; set; }
+
+    object FindName(string name);
 }
 
 internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement
@@ -43,14 +54,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
     DependencyObject TemplatedParent { get; set; }
 
     IInternalFrameworkElement TemplateChild { get; set; }
-
-    DependencyObject Parent { get; }
-
-    ResourceDictionary Resources { get; set; }
-
-    event RoutedEventHandler Loaded;
-
-    object FindName(string name);
 
     void AddLogicalChild(object child);
 

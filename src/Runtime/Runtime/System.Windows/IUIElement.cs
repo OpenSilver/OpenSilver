@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 
 namespace System.Windows;
@@ -19,9 +18,12 @@ namespace System.Windows;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IUIElement : IDependencyObject
 {
+    void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo);
+
+    void RemoveHandler(RoutedEvent routedEvent, Delegate handler);
 }
 
-internal interface IInternalUIElement : IUIElement, IInternalDependencyObject
+internal interface IInternalUIElement : IUIElement
 {
     bool IsLoaded { get; }
 
@@ -38,12 +40,6 @@ internal interface IInternalUIElement : IUIElement, IInternalDependencyObject
     void OnVisualParentChanged(DependencyObject oldParent);
 
     DependencyObject GetVisualChild(int index);
-
-    event RoutedEventHandler LostFocus;
-
-    void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo);
-
-    void RemoveHandler(RoutedEvent routedEvent, Delegate handler);
 
     DependencyObject AsDependencyObject();
 }
