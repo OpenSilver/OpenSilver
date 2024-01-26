@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Targets", "Targets", "{09E99548-4F69-40F9-8E5B-CDFF20052F90}"
 	ProjectSection(SolutionItems) = preProject
 		Targets\OpenSilver.Common.targets = Targets\OpenSilver.Common.targets
+		Targets\OpenSilver.FSharpSupport.targets = Targets\OpenSilver.FSharpSupport.targets
 		Targets\OpenSilver.GenerateAssemblyInfo.targets = Targets\OpenSilver.GenerateAssemblyInfo.targets
 		Targets\OpenSilver.Simulator.targets = Targets\OpenSilver.Simulator.targets
 		Targets\OpenSilver.targets = Targets\OpenSilver.targets

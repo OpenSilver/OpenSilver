@@ -15,6 +15,11 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <!--============================================================
+  LOCATION OF COMPILER TASKS
+  ============================================================-->
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="OpenSilver.Compiler.XamlDesignerAttributesProcessor" />
+
   <PropertyGroup>
     <OpenSilverGenerateAssemblyInfo Condition="'$(OpenSilverGenerateAssemblyInfo)' == ''">true</OpenSilverGenerateAssemblyInfo>
   </PropertyGroup>
@@ -87,6 +92,7 @@
   </Target>
 
   <Target Name="GenerateXamlDesignerAttributes"
+          Condition="'$(Language)'=='VB' or '$(Language)'=='C#'"
           BeforeTargets="BeforeCompile;CoreCompile">
     <ItemGroup>
       <OpenSilver_XamlDesigner Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -107,5 +113,23 @@
       <Output TaskParameter="OutputFile" ItemName="Compile" />
       <Output TaskParameter="OutputFile" ItemName="FileWrites" />
     </WriteCodeFragment>
+  </Target>
+	
+  <Target Name="GenerateXamlDesignerAttributes"
+          Condition="'$(Language)'=='F#'"
+          BeforeTargets="BeforeCompile;CoreCompile">
+    <PropertyGroup>
+      <GeneratedXamlDesignerAttributesFile Condition="'$(GeneratedXamlDesignerAttributesFile)' ==''">$(MSBuildProjectDirectory)\$(IntermediateOutputPath)$(MSBuildProjectName).AssemblyInfo.OpenSilver.XamlDesigner$(DefaultLanguageSourceExtension)</GeneratedXamlDesignerAttributesFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <!-- Ensure the generated file is not already part of the Compile sources -->
+      <Compile Remove="$(GeneratedXamlDesignerAttributesFile)" />
+    </ItemGroup>
+
+    <XamlDesignerAttributesProcessor AssemblyInclude="System.Runtime.CompilerServices.InternalsVisibleTo" AssemblyParameter="XamlDesignerBackground" Outputfile="$(GeneratedXamlDesignerAttributesFile)"/>
+    <ItemGroup>
+      <Compile Include="$(GeneratedXamlDesignerAttributesFile)" />
+    </ItemGroup>
   </Target>
 </Project>

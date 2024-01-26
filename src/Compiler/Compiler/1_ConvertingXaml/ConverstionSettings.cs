@@ -44,4 +44,15 @@ namespace OpenSilver.Compiler
                 EnableImplicitAssemblyRedirection = true,
             };
     }
+
+    internal static class ConversionSettingsFS
+    {
+        public static ConversionSettings Silverlight { get; } =
+            new ConversionSettings
+            {
+                Metadata = MetadatasFS.Silverlight,
+                CoreTypesConverter = CoreTypesConvertersFS.Silverlight,
+                EnableImplicitAssemblyRedirection = true,
+            };
+    }
 }

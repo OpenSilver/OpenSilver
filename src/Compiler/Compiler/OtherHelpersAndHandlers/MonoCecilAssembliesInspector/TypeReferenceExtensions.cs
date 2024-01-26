@@ -123,6 +123,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 prefix = "Global.";
             }
+            else if (compilerType == SupportedLanguage.FSharp)
+            {
+                prefix = "global.";
+            }
             else
             {
                 throw new InvalidCompilerTypeException();
@@ -151,6 +155,11 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 result.Append(
                     $"(Of {string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))})");
+            }
+            else if (compilerType == SupportedLanguage.FSharp)
+            {
+                result.Append(
+                    $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true, compilerType)))}>");
             }
             else
             {

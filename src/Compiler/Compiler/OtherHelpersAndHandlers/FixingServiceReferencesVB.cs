@@ -340,11 +340,6 @@ namespace OpenSilver.Compiler
                 string methodParametersDefinitions = match.Groups["METHOD_PARAMETERS_DEFINITIONS"].Value;
                 string methodName = match.Groups["METHOD_NAME"].Value;
 
-                if (methodName == "PhiddoSVC_IsvcCodeSet_BeginGetIntervention")
-                {
-                    Console.WriteLine();
-                }
-
                 if (implementsDefinition.Length > 0)
                 {
                     string[] splits = implementsDefinition.Split(".".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);

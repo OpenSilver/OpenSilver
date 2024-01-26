@@ -63,7 +63,8 @@ namespace OpenSilver.Compiler
             {
                 prefix = prefix.Substring(0, 30);
             }
-            
+
+            prefix = char.ToLower(prefix[0]) + prefix.Substring(1);     // Because of f# warning, makes lower the first letter
             return $"{prefix}_{guidAsString}"; // Example: Button_4541C363579C48A981219C392BF8ACD5
         }
 

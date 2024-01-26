@@ -50,8 +50,10 @@ namespace OpenSilver.Compiler
             string operationName = "";
             if (outputFile.EndsWith(".cs"))
                 operationName = "C#/XAML for HTML5: ServiceReferenceFixer";
-            else
+            else if (outputFile.EndsWith(".vb"))
                 operationName = "VB.Net/XAML for HTML5: ServiceReferenceFixer";
+            else
+                operationName = "F#/XAML for HTML5: ServiceReferenceFixer";
 
             try
             {
@@ -83,7 +85,7 @@ namespace OpenSilver.Compiler
                             item.GetMetadata("SoapVersion"),
                             out wasAnythingFixed);
                     }
-                    else
+                    else if (outputFile.EndsWith(".vb"))
                     {
                         sourceCode = FixingServiceReferencesVB.Fix(
                             sourceCode,
@@ -92,6 +94,10 @@ namespace OpenSilver.Compiler
                             item.GetMetadata("EndpointCode"),
                             item.GetMetadata("SoapVersion"),
                             out wasAnythingFixed);
+                    }
+                    else
+                    {
+                        throw new Exception("The compiler doesn't support this file.");
                     }
 
                     // Create output directory:
