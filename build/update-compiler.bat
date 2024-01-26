@@ -17,7 +17,6 @@ ECHO %ESC%[95mCopying targets.%ESC%[0m
 ECHO.
 
 COPY "%SRC_DIR%\Targets\OpenSilver.targets" "%COMPILER_DIR%\build"
-COPY "%SRC_DIR%\Targets\OpenSilver.FSharpSupport.targets" "%COMPILER_DIR%\build"
 COPY "%SRC_DIR%\Targets\OpenSilver.Common.targets" "%COMPILER_DIR%\build"
 COPY "%SRC_DIR%\Targets\OpenSilver.GenerateAssemblyInfo.targets" "%COMPILER_DIR%\build"
 

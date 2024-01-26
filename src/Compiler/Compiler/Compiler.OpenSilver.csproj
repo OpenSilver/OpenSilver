@@ -55,6 +55,7 @@
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.Pass2.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\IMetadataFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\SystemTypesHelperFS.cs" />
+    <Compile Include="EntryPoints\ChangeInPlaceXamlToGenerated.cs" />
     <Compile Include="EntryPoints\XamlDesignerAttributesProcessor.cs" />
     <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferencesVB.cs" />

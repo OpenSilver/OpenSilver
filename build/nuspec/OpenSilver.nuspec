@@ -72,7 +72,6 @@
 
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/OpenSilver.targets" target="build/OpenSilver.targets" />
-    <file src="../../src/Targets/OpenSilver.FSharpSupport.targets" target="build/OpenSilver.FSharpSupport.targets" />
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
     <file src="../../src/Targets/OpenSilver.GenerateAssemblyInfo.targets" target="build/OpenSilver.GenerateAssemblyInfo.targets" />
 
