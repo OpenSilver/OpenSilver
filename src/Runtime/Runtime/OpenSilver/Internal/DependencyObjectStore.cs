@@ -49,7 +49,7 @@ internal static class DependencyObjectStore
 
             metadata ??= dp.GetMetadata(d.DependencyObjectType);
 
-            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(d, dp));
+            storage = Storage.CreateDefaultValueEntry(dp, metadata.GetDefaultValue(d, dp));
 
             d.EffectiveValues.Add(propertyIndex, storage);
 
@@ -99,7 +99,7 @@ internal static class DependencyObjectStore
                 $"{dp.Name} is not an inherited property.");
 
             // Create the storage:
-            storage = Storage.CreateDefaultValueEntry(metadata.GetDefaultValue(d, dp));
+            storage = Storage.CreateDefaultValueEntry(dp, metadata.GetDefaultValue(d, dp));
 
             //-----------------------
             // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):

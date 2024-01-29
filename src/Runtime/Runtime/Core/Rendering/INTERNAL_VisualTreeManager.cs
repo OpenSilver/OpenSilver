@@ -12,8 +12,8 @@
 \*====================================================================================*/
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -488,95 +488,99 @@ if(nextSibling != undefined) {
             // no value set by the user are not concerned (their default 
             // state is rendered elsewhere).
 
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-            // we copy the Dictionary so that the foreach doesn't break when 
-            // we modify a DependencyProperty inside the Changed of another 
-            // one (which causes it to be added to the Dictionary).
-            // we exclude properties where source is set to default because
-            // it means they have been set at some point, and unset afterward,
-            // so we should not call the PropertyChanged callback.
-            var list = uie.EffectiveValues
-                .Where(s => s.Value.Entry.BaseValueSourceInternal > BaseValueSourceInternal.Default)
-                .ToList();
-#if PERFSTAT
-            Performance.Counter("VisualTreeManager: Copy list of properties", t0);
-#endif
-
-            foreach (KeyValuePair<int, Storage> propertiesAndTheirStorage in list)
+            if (uie.EffectiveValues.Count > 0)
             {
-                // Read the value:
-                DependencyProperty property = DependencyProperty.RegisteredPropertyList[propertiesAndTheirStorage.Key];
+                // we copy the Dictionary so that the foreach doesn't break when 
+                // we modify a DependencyProperty inside the Changed of another 
+                // one (which causes it to be added to the Dictionary).
+                // we exclude properties where source is set to default because
+                // it means they have been set at some point, and unset afterward,
+                // so we should not call the PropertyChanged callback.
 
-#if PERFSTAT
-                var t1 = Performance.now();
-#endif
-
-                PropertyMetadata propertyMetadata = property.GetMetadata(uie.DependencyObjectType);
-
-                if (propertyMetadata != null)
+                Storage[] storages = ArrayPool<Storage>.Shared.Rent(uie.EffectiveValues.Count);
+                int length = 0;
+                foreach (KeyValuePair<int, Storage> kvp in uie.EffectiveValues)
                 {
-                    Storage storage = propertiesAndTheirStorage.Value;
-                    object value = null;
-                    bool valueWasRetrieved = false;
-
-                    //--------------------------------------------------
-                    // Call "MethodToUpdateDom"
-                    //--------------------------------------------------
-                    if (propertyMetadata.MethodToUpdateDom != null)
+                    if (kvp.Value.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default)
                     {
-                        if (!valueWasRetrieved)
-                        {
-                            value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
-                            valueWasRetrieved = true;
-                        }
-
-                        // Call the "Method to update DOM"
-                        propertyMetadata.MethodToUpdateDom(uie, value);
+                        continue;
                     }
 
-                    if (propertyMetadata.MethodToUpdateDom2 != null)
-                    {
-                        if (!valueWasRetrieved)
-                        {
-                            value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
-                            valueWasRetrieved = true;
-                        }
-
-                        // DependencyProperty.UnsetValue for the old value signify that
-                        // the old value should be ignored.
-                        propertyMetadata.MethodToUpdateDom2(
-                            uie,
-                            DependencyProperty.UnsetValue,
-                            value);
-                    }
-
-                    //--------------------------------------------------
-                    // Call PropertyChanged
-                    //--------------------------------------------------
-
-                    if (propertyMetadata.PropertyChangedCallback != null
-#pragma warning disable CS0618 // Type or member is obsolete
-                        && propertyMetadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
-#pragma warning restore CS0618 // Type or member is obsolete
-                    {
-                        if (!valueWasRetrieved)
-                        {
-                            value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
-                            valueWasRetrieved = true;
-                        }
-
-                        // Raise the "PropertyChanged" event
-                        propertyMetadata.PropertyChangedCallback(
-                            uie,
-                            new DependencyPropertyChangedEventArgs(value, value, property, propertyMetadata));
-                    }
+                    storages[length++] = kvp.Value;
                 }
 
-#if PERFSTAT
-                Performance.Counter("VisualTreeManager: RaisePropertyChanged for property '" + property.Name + "'", t1);
-#endif
+                Span<Storage> span = storages.AsSpan(0, length);
+                try
+                {
+                    foreach (Storage storage in span)
+                    {
+                        DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
+                        if (dp.GetMetadata(uie.DependencyObjectType) is not PropertyMetadata metadata)
+                        {
+                            continue;
+                        }
+                        
+                        object value = null;
+                        bool valueWasRetrieved = false;
+
+                        //--------------------------------------------------
+                        // Call "MethodToUpdateDom"
+                        //--------------------------------------------------
+                        if (metadata.MethodToUpdateDom != null)
+                        {
+                            if (!valueWasRetrieved)
+                            {
+                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                valueWasRetrieved = true;
+                            }
+
+                            // Call the "Method to update DOM"
+                            metadata.MethodToUpdateDom(uie, value);
+                        }
+
+                        if (metadata.MethodToUpdateDom2 != null)
+                        {
+                            if (!valueWasRetrieved)
+                            {
+                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                valueWasRetrieved = true;
+                            }
+
+                            // DependencyProperty.UnsetValue for the old value signify that
+                            // the old value should be ignored.
+                            metadata.MethodToUpdateDom2(
+                                uie,
+                                DependencyProperty.UnsetValue,
+                                value);
+                        }
+
+                        //--------------------------------------------------
+                        // Call PropertyChanged
+                        //--------------------------------------------------
+
+                        if (metadata.PropertyChangedCallback != null
+#pragma warning disable CS0618 // Type or member is obsolete
+                            && metadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
+#pragma warning restore CS0618 // Type or member is obsolete
+                        {
+                            if (!valueWasRetrieved)
+                            {
+                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                valueWasRetrieved = true;
+                            }
+                            
+                            // Raise the "PropertyChanged" event
+                            metadata.PropertyChangedCallback(
+                                uie,
+                                new DependencyPropertyChangedEventArgs(value, value, dp, metadata));
+                        }
+                    }
+                }
+                finally
+                {
+                    ArrayPool<Storage>.Shared.Return(storages, false);
+                    span.Clear();
+                }
             }
 
             // Silverlight creates a new stacking context for each element, so we need to make sure that

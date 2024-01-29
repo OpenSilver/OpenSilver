@@ -761,11 +761,9 @@ namespace System.Windows
         {
             if (newParent == null)
             {
-                foreach (var kvp in d.InheritedValues.ToArray())
+                foreach (Storage storage in CopyStorages(d.InheritedValues))
                 {
-                    DependencyProperty dp = DependencyProperty.RegisteredPropertyList[kvp.Key];
-                    Storage storage = kvp.Value;
-
+                    DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
                     DependencyObjectStore.SetInheritedValue(storage,
                         d,
                         dp,
@@ -776,11 +774,9 @@ namespace System.Windows
             }
             else
             {
-                foreach (var kvp in newParent.InheritedValues.ToArray())
+                foreach (Storage storage in CopyStorages(newParent.InheritedValues))
                 {
-                    DependencyProperty dp = DependencyProperty.RegisteredPropertyList[kvp.Key];
-                    Storage storage = kvp.Value;
-
+                    DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
                     PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
                     if (TreeWalkHelper.IsInheritanceNode(metadata))
                     {
@@ -791,6 +787,22 @@ namespace System.Windows
                             true);
                     }
                 }
+            }
+
+            static Storage[] CopyStorages(Dictionary<int, Storage> d)
+            {
+                if (d.Count > 0)
+                {
+                    Storage[] s = new Storage[d.Count];
+                    int i = 0;
+                    foreach (KeyValuePair<int, Storage> kvp in d)
+                    {
+                        s[i++] = kvp.Value;
+                    }
+                    return s;
+                }
+                
+                return Array.Empty<Storage>();
             }
         }
 
