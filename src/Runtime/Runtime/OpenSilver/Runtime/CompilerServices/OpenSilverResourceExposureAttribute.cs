@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 namespace OpenSilver.Runtime.CompilerServices;
 
@@ -25,6 +26,12 @@ public sealed class OpenSilverResourceExposureAttribute : Attribute
     public OpenSilverResourceExposureAttribute(bool exposeResourcesToExtractor)
     {
         ExposeResourcesToExtractor = exposeResourcesToExtractor;
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public OpenSilverResourceExposureAttribute(string exposeResourcesToExtractor)
+    {
+        ExposeResourcesToExtractor = bool.Parse(exposeResourcesToExtractor);
     }
 
     public bool ExposeResourcesToExtractor { get; }

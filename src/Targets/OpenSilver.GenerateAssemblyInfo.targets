@@ -15,11 +15,6 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!--============================================================
-  LOCATION OF COMPILER TASKS
-  ============================================================-->
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="OpenSilver.Compiler.XamlDesignerAttributesProcessor" />
-
   <PropertyGroup>
     <OpenSilverGenerateAssemblyInfo Condition="'$(OpenSilverGenerateAssemblyInfo)' == ''">true</OpenSilverGenerateAssemblyInfo>
   </PropertyGroup>
@@ -43,7 +38,7 @@
       <OpenSilver_AssemblyAttribute Include="OpenSilver.Runtime.CompilerServices.OpenSilverAssemblyAttribute" />
       <OpenSilver_AssemblyAttribute Include="OpenSilver.Runtime.CompilerServices.OpenSilverResourceExposureAttribute">
         <_Parameter1>$(OpenSilverExposeResourcesToExtractor)</_Parameter1>
-        <_Parameter1_TypeName>System.Boolean</_Parameter1_TypeName>
+        <_Parameter1_TypeName Condition="'$(Language)'=='VB' or '$(Language)'=='C#'">System.Boolean</_Parameter1_TypeName>
       </OpenSilver_AssemblyAttribute>
     </ItemGroup>
 
@@ -74,7 +69,6 @@
   </Target>
 
   <Target Name="CoreGenerateOpenSilverAssemblyInfo"
-          Condition="'$(Language)'=='VB' or '$(Language)'=='C#'"
           DependsOnTargets="GetOpenSilverAssemblyAttributes">
     <PropertyGroup>
       <GeneratedOpenSilverAssemblyInfoFile Condition="'$(GeneratedOpenSilverAssemblyInfoFile)' ==''">$(MSBuildProjectName).AssemblyInfo.OpenSilver$(DefaultLanguageSourceExtension)</GeneratedOpenSilverAssemblyInfoFile>
@@ -85,14 +79,15 @@
       <Compile Remove="$(GeneratedOpenSilverAssemblyInfoFile)" />
     </ItemGroup>
 
-    <WriteCodeFragment AssemblyAttributes="@(OpenSilver_AssemblyAttribute)" Language="$(Language)" OutputDirectory="$(IntermediateOutputPath)" OutputFile="$(GeneratedOpenSilverAssemblyInfoFile)">
+    <WriteCodeFragment AssemblyAttributes="@(OpenSilver_AssemblyAttribute)"
+                       Language="$(Language)"
+                       OutputFile="$(IntermediateOutputPath)\$(GeneratedOpenSilverAssemblyInfoFile)">
       <Output TaskParameter="OutputFile" ItemName="Compile" />
       <Output TaskParameter="OutputFile" ItemName="FileWrites" />
     </WriteCodeFragment>
   </Target>
 
   <Target Name="GenerateXamlDesignerAttributes"
-          Condition="'$(Language)'=='VB' or '$(Language)'=='C#'"
           BeforeTargets="BeforeCompile;CoreCompile">
     <ItemGroup>
       <OpenSilver_XamlDesigner Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -109,27 +104,11 @@
       <Compile Remove="$(GeneratedXamlDesignerAttributesFile)" />
     </ItemGroup>
 
-    <WriteCodeFragment AssemblyAttributes="@(OpenSilver_XamlDesigner)" Language="$(Language)" OutputDirectory="$(IntermediateOutputPath)" OutputFile="$(GeneratedXamlDesignerAttributesFile)">
+    <WriteCodeFragment AssemblyAttributes="@(OpenSilver_XamlDesigner)"
+                       Language="$(Language)"
+                       OutputFile="$(IntermediateOutputPath)\$(GeneratedXamlDesignerAttributesFile)">
       <Output TaskParameter="OutputFile" ItemName="Compile" />
       <Output TaskParameter="OutputFile" ItemName="FileWrites" />
     </WriteCodeFragment>
-  </Target>
-	
-  <Target Name="GenerateXamlDesignerAttributes"
-          Condition="'$(Language)'=='F#'"
-          BeforeTargets="BeforeCompile;CoreCompile">
-    <PropertyGroup>
-      <GeneratedXamlDesignerAttributesFile Condition="'$(GeneratedXamlDesignerAttributesFile)' ==''">$(MSBuildProjectDirectory)\$(IntermediateOutputPath)$(MSBuildProjectName).AssemblyInfo.OpenSilver.XamlDesigner$(DefaultLanguageSourceExtension)</GeneratedXamlDesignerAttributesFile>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <!-- Ensure the generated file is not already part of the Compile sources -->
-      <Compile Remove="$(GeneratedXamlDesignerAttributesFile)" />
-    </ItemGroup>
-
-    <XamlDesignerAttributesProcessor AssemblyInclude="System.Runtime.CompilerServices.InternalsVisibleTo" AssemblyParameter="XamlDesignerBackground" Outputfile="$(GeneratedXamlDesignerAttributesFile)"/>
-    <ItemGroup>
-      <Compile Include="$(GeneratedXamlDesignerAttributesFile)" />
-    </ItemGroup>
   </Target>
 </Project>

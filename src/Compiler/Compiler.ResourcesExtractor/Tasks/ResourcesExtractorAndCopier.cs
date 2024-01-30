@@ -216,7 +216,12 @@ namespace OpenSilver.Compiler.Resources
             if (ca is not null)
             {
                 CustomAttributeArgument arg = ca.ConstructorArguments[0];
-                return (bool)arg.Value;
+                return arg.Value switch
+                {
+                    bool b => b,
+                    string s when bool.TryParse(s, out bool b) => b,
+                    _ => false,
+                };
             }
 
             return true;
