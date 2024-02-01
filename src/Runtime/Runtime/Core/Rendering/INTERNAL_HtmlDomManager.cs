@@ -532,6 +532,30 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
+        internal static INTERNAL_HtmlDomElementReference CreateBorderDomElementAndAppendIt(object parentRef, Border border)
+        {
+            Debug.Assert(border is not null);
+
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.createBorderElement('{uniqueIdentifier}', '{parent.UniqueIdentifier}')");
+            }
+            else
+            {
+                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.createBorderElement('{uniqueIdentifier}', {sParentRef})");
+            }
+
+            AddToGlobalStore(uniqueIdentifier, border);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
         internal static (INTERNAL_HtmlDomElementReference SvgElement, INTERNAL_HtmlDomElementReference SvgShape, INTERNAL_HtmlDomElementReference SvgDefs)
             CreateShapeElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, Shape shape)
         {

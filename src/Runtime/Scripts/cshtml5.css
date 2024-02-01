@@ -70,6 +70,13 @@ body {
     stroke-miterlimit: 10; /* CSS default value is 4 */
 }
 
+.opensilver-border {
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: transparent; /* CSS default value matches the color property (currentcolor) */
+    border-width: 0px; /* CSS default value is medium */
+}
+
 /* Media query used for printing (cf. "CSHTML5.Native.Html.Printing.PrintManager") */
 @media print {
     body {

@@ -131,6 +131,13 @@ document.createTextBlockElement = function (id, parent, wrap) {
     }
 };
 
+document.createBorderElement = function (id, parent) {
+    const element = document.createLayoutElement('div', id, parent, -1);
+    if (element) {
+        element.classList.add('opensilver-border');
+    }
+};
+
 document.createPopupRootElement = function (id, rootElement, pointerEvents) {
     if (!rootElement) return;
 

@@ -220,10 +220,7 @@ internal static class UIElementHelpers
     internal static void SetBorderWidth(this UIElement uie, Thickness width)
     {
         Debug.Assert(uie is not null);
-        var style = uie.OuterDiv.Style;
-        style.boxSizing = "border-box";
-        style.borderStyle = "solid";
-        style.borderWidth = $"{width.Top.ToInvariantString()}px {width.Right.ToInvariantString()}px {width.Bottom.ToInvariantString()}px {width.Left.ToInvariantString()}px";
+        uie.OuterDiv.Style.borderWidth = $"{width.Top.ToInvariantString()}px {width.Right.ToInvariantString()}px {width.Bottom.ToInvariantString()}px {width.Left.ToInvariantString()}px";
     }
 
     internal static void SetClipPath(this UIElement uie, Geometry geometry)

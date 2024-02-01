@@ -148,12 +148,6 @@ namespace System.Windows.Controls
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
-
-            if (BorderBrush == null)
-            {
-                ChangeBorderColor(this, null, null);
-            }
-
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
         }
 
@@ -451,6 +445,13 @@ namespace System.Windows.Controls
         {
             CornerRadius cr = (CornerRadius)value;
             return CornerRadius.IsValid(cr, false, false, false, false);
+        }
+
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            var div = INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parentRef, this);
+            domElementWhereToPlaceChildren = div;
+            return div;
         }
     }
 }
