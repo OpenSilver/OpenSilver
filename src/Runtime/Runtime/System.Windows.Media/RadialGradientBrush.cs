@@ -186,38 +186,29 @@ namespace System.Windows.Media
         {
             return string.Join(", ", 
                 GradientStops.OrderBy(gs => gs.Offset)
-                             .Select(gs => gs.Color.ToHtmlString(this.Opacity) + gs.Offset * 100 + "%"));
+                             .Select(gs => $"{gs.Color.ToHtmlString(Opacity)} {(gs.Offset * 100).ToInvariantString()}%"));
         }
 
         internal string ToHtmlString(DependencyObject parent)
         {
             // background-image: radial-gradient(50% 50% at 50% 100%,
             // blue 0%, white 10%, purple 20%, purple 99%, black 100%);
-            string gradientStopsString = GetGradientStopsString();
+            string stops = GetGradientStopsString();
 
-            string percentageSymbol = "%";
-            int multiplicatorForPercentage = 100;
+            string unit = "%";
+            int multiplier = 100;
             if (MappingMode == BrushMappingMode.Absolute)
             {
-                percentageSymbol = "px";
-                multiplicatorForPercentage = 1;
+                unit = "px";
+                multiplier = 1;
             }
 
-            string gradientString = string.Format(CultureInfo.InvariantCulture, 
-                "radial-gradient({0}{5} {1}{5} at {2}{5} {3}{5}, {4})",
-                (int)(RadiusX * multiplicatorForPercentage), //{0}
-                (int)(RadiusY * multiplicatorForPercentage), //{1}
-                (int)(Center.X * multiplicatorForPercentage), //{2}
-                (int)(Center.Y * multiplicatorForPercentage), //{3}
-                gradientStopsString, //{4}
-                percentageSymbol); //{5}
-
-            if (SpreadMethod == GradientSpreadMethod.Repeat)
-            {
-                gradientString = "repeating-" + gradientString;
-            }
-
-            return gradientString;
+            string gradientType = SpreadMethod == GradientSpreadMethod.Repeat ? "repeating-radial-gradient" : "radial-gradient";
+            string rx = ((int)(RadiusX * multiplier)).ToInvariantString();
+            string ry = ((int)(RadiusY * multiplier)).ToInvariantString();
+            string cx = ((int)(Center.X * multiplier)).ToInvariantString();
+            string cy = ((int)(Center.Y * multiplier)).ToInvariantString();
+            return $"{gradientType}({rx}{unit} {ry}{unit} at {cx}{unit} {cy}{unit}, {stops})";
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
