@@ -45,8 +45,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     bool ShouldLookupImplicitStyles { get; set; }
 
-    bool IsLoadedInResourceDictionary { get; set; }
-
     IEnumerator LogicalChildren { get; }
 
     RoutedEvent LoadedEvent { get; }
@@ -60,12 +58,4 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
     void RemoveLogicalChild(object child);
 
     void ChangeLogicalParent(DependencyObject newParent);
-
-    void LoadResources();
-
-    void UnloadResources();
-
-    void RaiseLoadedEvent();
-
-    void RaiseUnloadedEvent();
 }

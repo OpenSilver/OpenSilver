@@ -1137,8 +1137,8 @@ namespace System.Windows
 
         private void LoadResource(object resource)
         {
-            if (resource is IInternalFrameworkElement feResource
-                && !((IFrameworkElement)feResource).IsLoaded && !feResource.IsLoadedInResourceDictionary)
+            if (resource is FrameworkElement feResource
+                && !feResource.IsLoaded && !feResource.IsLoadedInResourceDictionary)
             {
                 feResource.IsLoadedInResourceDictionary = true;
                 feResource.LoadResources();
@@ -1148,7 +1148,7 @@ namespace System.Windows
 
         private static void UnloadResource(object resource)
         {
-            if (resource is IInternalFrameworkElement feResource && feResource.IsLoadedInResourceDictionary)
+            if (resource is FrameworkElement feResource && feResource.IsLoadedInResourceDictionary)
             {
                 feResource.IsLoadedInResourceDictionary = false;
                 feResource.RaiseUnloadedEvent();

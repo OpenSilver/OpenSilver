@@ -38,12 +38,6 @@ public partial class FrameworkElement : IInternalFrameworkElement
         set => ShouldLookupImplicitStyles = value;
     }
 
-    bool IInternalFrameworkElement.IsLoadedInResourceDictionary
-    {
-        get => IsLoadedInResourceDictionary;
-        set => IsLoadedInResourceDictionary = value;
-    }
-
     IEnumerator IInternalFrameworkElement.LogicalChildren => LogicalChildren;
 
     RoutedEvent IInternalFrameworkElement.LoadedEvent => LoadedEvent;
@@ -70,13 +64,5 @@ public partial class FrameworkElement : IInternalFrameworkElement
 
     void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent) => ChangeLogicalParent(newParent);
 
-    void IInternalFrameworkElement.LoadResources() => LoadResources();
-
-    void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();
-
-    void IInternalFrameworkElement.RaiseUnloadedEvent() => RaiseUnloadedEvent();
-
     void IInternalFrameworkElement.RemoveLogicalChild(object child) => RemoveLogicalChild(child);
-
-    void IInternalFrameworkElement.UnloadResources() => UnloadResources();
 }
