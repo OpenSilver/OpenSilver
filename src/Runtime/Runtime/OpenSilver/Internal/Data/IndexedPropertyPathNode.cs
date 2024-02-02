@@ -39,7 +39,7 @@ namespace OpenSilver.Internal.Data
 
         public override Type Type => _indexer?.PropertyType;
 
-        public override string PropertyName => $"{_indexer.Name}[{_indexStr}]";
+        public override string PropertyName => $"{_indexer?.Name ?? string.Empty}[{_indexStr}]";
 
         public override bool IsBound => _indexer != null;
 
