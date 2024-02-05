@@ -4,7 +4,7 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<AssemblyName>OpenSilver</AssemblyName>
-    <AssemblyVersion>2.0.1</AssemblyVersion>
+    <AssemblyVersion>2.1.0</AssemblyVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);CS1591;CS0067</NoWarn>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
