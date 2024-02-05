@@ -714,6 +714,8 @@ internal static class DependencyObjectStore
             exprValue = exprValue?.ToString();
         }
 
+        ValidateValue(dp, exprValue, false, false);
+
         entry.SetExpressionValue(exprValue);
     }
 
