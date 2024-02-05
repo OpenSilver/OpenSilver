@@ -195,7 +195,7 @@ namespace System.Windows
                 // For non-controls the implicit StyleResource lookup must stop at
                 // the templated parent.
                 DependencyObject boundaryElement = null;
-                if (!(fe is Control) || fe is TextBlock)
+                if (fe is not Control)
                 {
                     boundaryElement = fe.TemplatedParent;
                 }
