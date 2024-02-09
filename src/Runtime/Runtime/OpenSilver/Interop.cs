@@ -114,8 +114,18 @@ public static partial class Interop
 
     public static void ExecuteJavaScriptVoidAsync(string javascript)
     {
-        JavaScriptRuntime.AddJavaScript(javascript);
+        JavaScriptRuntime.AppendLine(javascript);
+        BeginInvokeJavaScript();
+    }
 
+    internal static void ExecuteJavaScriptVoidAsync(ref AppendInterpolatedStringHandler _)
+    {
+        JavaScriptRuntime.AppendLine();
+        BeginInvokeJavaScript();
+    }
+
+    private static void BeginInvokeJavaScript()
+    {
         if (!_isDispatcherPending)
         {
             _isDispatcherPending = true;
@@ -467,5 +477,22 @@ public static partial class Interop
     public static bool IsNull(object jsObject)
     {
         return ((JSObjectRef)jsObject).IsNull();
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [InterpolatedStringHandler]
+    internal ref struct AppendInterpolatedStringHandler
+    {
+        public AppendInterpolatedStringHandler(int literalLength, int formattedCount)
+        {
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AppendLiteral(string value) => JavaScriptRuntime.Append(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AppendFormatted(string value) => JavaScriptRuntime.Append(value);
+
+        public void AppendFormatted<T>(T value) => JavaScriptRuntime.Append(value.ToString());
     }
 }

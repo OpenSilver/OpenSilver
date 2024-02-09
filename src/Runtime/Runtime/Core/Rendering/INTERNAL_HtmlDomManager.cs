@@ -1025,8 +1025,6 @@ parentElement.appendChild(child)";
             string width = Math.Round(size.Width, 2).ToInvariantString();
             string height = Math.Round(size.Height, 2).ToInvariantString();
             
-            string javaScriptCodeToExecute;
-            
             if (clip.HasValue)
             {
                 Rect clipRect = clip.Value;
@@ -1035,16 +1033,14 @@ parentElement.appendChild(child)";
                 string clipRight = Math.Round(clipRect.Right, 2).ToInvariantString();
                 string clipBottom = Math.Round(clipRect.Bottom, 2).ToInvariantString();
 
-                javaScriptCodeToExecute =
-                    $"document.arrange('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})";
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.arrange('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})");
             }
             else
             {
-                javaScriptCodeToExecute =
-                    $"document.arrange('{style.Uid}',{left},{top},{width},{height})";
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.arrange('{style.Uid}',{left},{top},{width},{height})");
             }
-
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptCodeToExecute);
         }
 
         internal static Size GetBoundingClientSize(INTERNAL_HtmlDomElementReference domRef)

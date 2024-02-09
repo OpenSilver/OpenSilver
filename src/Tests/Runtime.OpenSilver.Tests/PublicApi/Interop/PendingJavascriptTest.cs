@@ -27,8 +27,8 @@ namespace CSHTML5.Internal
         {
             var pj = new PendingJavascriptSimulator(new Mock<IJavaScriptExecutionHandler>().Object);
 
-            pj.AddJavaScript("console.log(1)");
-            pj.AddJavaScript("console.log(2)");
+            pj.AppendLine("console.log(1)");
+            pj.AppendLine("console.log(2)");
 
             pj.ReadAndClearAggregatedPendingJavaScriptCode().Should().Be("console.log(1);\nconsole.log(2);\n");
         }
@@ -38,7 +38,7 @@ namespace CSHTML5.Internal
         {
             var pj = new PendingJavascriptSimulator(new Mock<IJavaScriptExecutionHandler>().Object);
 
-            pj.AddJavaScript("console.log(1)");
+            pj.AppendLine("console.log(1)");
 
             pj.ReadAndClearAggregatedPendingJavaScriptCode().Should().Be("console.log(1);\n");
         }
@@ -52,7 +52,7 @@ namespace CSHTML5.Internal
             var executionHandlerMock = new Mock<IWebAssemblyExecutionHandler>();
             var pj = new PendingJavascript(1024, executionHandlerMock.Object);
 
-            pj.AddJavaScript("console.log(1)");
+            pj.AppendLine("console.log(1)");
 
             var res = pj.ExecuteJavaScript("", 0, true);
             res.Should().BeNull();

@@ -17,6 +17,7 @@ using DotNetForHtml5;
 using DotNetForHtml5.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using OpenSilver;
 using System;
 using System.Text;
 using System.Text.Json;
@@ -104,6 +105,8 @@ namespace Runtime.OpenSilver.Tests
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext testContext)
         {
+            Features.Interop.UseNewLineSeparator = true;
+
             var javaScriptExecutionHandlerMock = new Mock<IWebAssemblyExecutionHandler>();
             javaScriptExecutionHandlerMock
                 .Setup(x => x.ExecuteJavaScriptWithResult(It.IsAny<string>()))

@@ -132,6 +132,7 @@
 		<Compile Include="OpenSilver\Internal\IJavaScriptConvertible.cs" />
 		<Compile Include="PublicAPI\Interop\BulkExecuteJavascriptAsync.cs" />
 		<Compile Include="OpenSilver\Interop.ResourceFiles.cs" />
+		<Compile Include="OpenSilver\Buffers\CharArrayBuilder.cs" />
 		<Compile Include="PublicAPI\Interop\JSObjectReferenceHolder.cs" />
 		<Compile Include="PublicAPI\Interop\StackTraceProvider.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
