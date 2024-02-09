@@ -289,8 +289,8 @@ namespace System.Windows.Controls
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             domElementWhereToPlaceChildren = null;
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
-            CreateMediaElement((INTERNAL_HtmlDomElementReference)outerDiv, Source);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, false);
+            CreateMediaElement(outerDiv, Source);
             return outerDiv;
         }
 

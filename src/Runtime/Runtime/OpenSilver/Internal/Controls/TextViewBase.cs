@@ -12,25 +12,37 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 using System.Windows;
-using System.Windows.Input;
+using System.Windows.Controls;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
-internal abstract partial class TextViewBase<T> : FrameworkElement
-    where T : UIElement
+internal abstract partial class TextViewBase : FrameworkElement
 {
-    private Size _contentSize;
-    private JavaScriptCallback _inputCallback;
-    private JavaScriptCallback _scrollCallback;
+    private static readonly JavaScriptCallback _inputHandler;
+    private static readonly JavaScriptCallback _scrollHandler;
 
-    internal TextViewBase(T host)
+    private Size _contentSize;
+
+    static TextViewBase()
     {
+        _inputHandler = JavaScriptCallback.Create(OnInputNative, true);
+        _scrollHandler = JavaScriptCallback.Create(OnScrollNative, true);
+        string sInputHandler = Interop.GetVariableStringForJS(_inputHandler);
+        string sScrollHandler = Interop.GetVariableStringForJS(_scrollHandler);
+        Interop.ExecuteJavaScriptVoidAsync($"document.createTextviewManager({sInputHandler},{sScrollHandler});");
+    }
+
+    internal TextViewBase(UIElement host)
+    {
+        Debug.Assert(host is TextBox || host is PasswordBox);
+
         Host = host ?? throw new ArgumentNullException(nameof(host));
     }
 
-    internal T Host { get; }
+    internal UIElement Host { get; }
 
     internal INTERNAL_HtmlDomElementReference InputDiv => OuterDiv;
 
@@ -38,48 +50,30 @@ internal abstract partial class TextViewBase<T> : FrameworkElement
 
     internal sealed override bool EnablePointerEventsCore => true;
 
-    public sealed override void INTERNAL_AttachToDomEvents()
-    {
-        base.INTERNAL_AttachToDomEvents();
-
-        _inputCallback = JavaScriptCallback.Create(OnInputNative, true);
-        _scrollCallback = JavaScriptCallback.Create(OnScrollNative, true);
-
-        string sDiv = Interop.GetVariableStringForJS(OuterDiv);
-        string sInputCallback = Interop.GetVariableStringForJS(_inputCallback);
-        string sScrollCallback = Interop.GetVariableStringForJS(_scrollCallback);
-        Interop.ExecuteJavaScriptVoidAsync($@"{sDiv}.addEventListener('input', {sInputCallback});
-{sDiv}.addEventListener('scroll', {sScrollCallback});");
-    }
-
-    public sealed override void INTERNAL_DetachFromDomEvents()
-    {
-        base.INTERNAL_DetachFromDomEvents();
-
-        _inputCallback?.Dispose();
-        _inputCallback = null;
-
-        _scrollCallback?.Dispose();
-        _scrollCallback = null;
-    }
-
-    internal sealed override void AddEventListeners() => InputManager.Current.AddEventListeners(this, true);
-
     protected abstract Size MeasureContent(Size constraint);
 
     protected abstract void OnInput();
 
-    private void OnInputNative() => OnInput();
-
-    private void OnScrollNative()
+    private static void OnInputNative(string id)
     {
-        if (!IsScrollClient) return;
+        if (INTERNAL_HtmlDomManager.GetElementById(id) is TextViewBase textview)
+        {
+            textview.OnInput();
+        }
+    }
 
-        string sDiv = Interop.GetVariableStringForJS(OuterDiv);
-        double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft;");
-        double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop;");
+    private static void OnScrollNative(string id)
+    {
+        if (INTERNAL_HtmlDomManager.GetElementById(id) is TextViewBase textview)
+        {
+            if (!textview.IsScrollClient) return;
 
-        UpdateOffsets(new Point(scrollLeft, scrollTop));
+            string sDiv = Interop.GetVariableStringForJS(textview.OuterDiv);
+            double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft;");
+            double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop;");
+
+            textview.UpdateOffsets(new Point(scrollLeft, scrollTop));
+        }
     }
 
     protected sealed override Size MeasureOverride(Size availableSize)

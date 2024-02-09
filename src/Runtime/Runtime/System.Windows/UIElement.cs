@@ -453,14 +453,9 @@ namespace System.Windows
                 nameof(IsEnabled),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(true, OnIsEnabledChanged, CoerceIsEnabled)
+                new PropertyMetadata(BooleanBoxes.TrueBox, OnIsEnabledChanged, CoerceIsEnabled)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var uie = (UIElement)d;
-                        SetPointerEvents(uie);
-                        uie.ManageIsEnabled((bool)newValue);
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).ManageIsEnabled((bool)newValue),
                 });
 
         /// <summary>
@@ -480,6 +475,9 @@ namespace System.Windows
             var uie = (UIElement)d;
             uie.IsEnabledChanged?.Invoke(uie, e);
             uie.InvalidateForceInheritPropertyOnChildren(e.Property);
+
+            // Update pointer events
+            uie.CoerceIsHitTestable();
         }
 
         private static object CoerceIsEnabled(DependencyObject d, object baseValue)
@@ -773,17 +771,7 @@ namespace System.Windows
                 new PropertyMetadata(VisibilityBoxes.VisibleBox, OnVisibilityChanged, CoerceVisibility)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var uie = (UIElement)d;
-                        if ((Visibility)newValue == Visibility.Collapsed)
-                        {
-                            INTERNAL_HtmlDomManager.AddCSSClass(uie.OuterDiv, "uielement-collapsed");
-                        }
-                        else
-                        {
-                            INTERNAL_HtmlDomManager.RemoveCSSClass(uie.OuterDiv, "uielement-collapsed");
-                        }
-                    },
+                        INTERNAL_HtmlDomManager.SetVisible(((UIElement)d).OuterDiv, (Visibility)newValue == Visibility.Visible),
                 });
 
         private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -978,18 +966,20 @@ namespace System.Windows
                 nameof(IsHitTestVisible),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(BooleanBoxes.TrueBox, OnIsHitTestVisiblePropertyChanged, CoerceIsHitTestVisibleProperty)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => SetPointerEvents((UIElement)d),
-                });
+                new PropertyMetadata(BooleanBoxes.TrueBox, OnIsHitTestVisibleChanged, CoerceIsHitTestVisible));
 
-        private static void OnIsHitTestVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsHitTestVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            UIElement uie = (UIElement)d;
+
             // Invalidate the children so that they will inherit the new value.
-            ((UIElement)d).InvalidateForceInheritPropertyOnChildren(e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
+
+            // Update pointer events
+            uie.CoerceIsHitTestable();
         }
 
-        private static object CoerceIsHitTestVisibleProperty(DependencyObject d, object baseValue)
+        private static object CoerceIsHitTestVisible(DependencyObject d, object baseValue)
         {
             UIElement uie = (UIElement)d;
 
@@ -1020,30 +1010,55 @@ namespace System.Windows
 
 #region pointer-events
 
-        internal static bool EnablePointerEventsBase(UIElement uie) =>
-            (bool)uie.GetValue(IsEnabledProperty) && uie.IsHitTestVisible;
-
         /// <summary>
         /// Fetches the value that pointer-events (css) should be coerced to.
         /// </summary>
         internal virtual bool EnablePointerEventsCore => false;
 
-        internal bool EnablePointerEvents => EnablePointerEventsCore && EnablePointerEventsBase(this);
-        
-        internal virtual void SetPointerEventsImpl() =>
-            OuterDiv.Style.pointerEvents = EnablePointerEvents ? "auto" : "none";
+        internal virtual void SetPointerEvents(bool hitTestable) =>
+            OuterDiv.Style.pointerEvents = hitTestable ? "auto" : "none";
 
-        internal static void SetPointerEvents(UIElement element)
+        // IsHitTestable should be updated exclusively with Coercion, that is why we create a read-only
+        // property and just drop the key.
+        internal static readonly DependencyProperty IsHitTestableProperty =
+            DependencyProperty.Register(
+                nameof(IsHitTestable),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, null, CoerceIsHitTestable)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetPointerEvents((bool)newValue),
+                });
+
+        internal bool IsHitTestable => (bool)GetValue(IsHitTestableProperty);
+
+        private static object CoerceIsHitTestable(DependencyObject d, object value)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
-            {
-                element.SetPointerEventsImpl();
-            }
+            UIElement uie = (UIElement)d;
+            return BooleanBoxes.Box(uie.EnablePointerEventsCore && uie.IsEnabled && uie.IsHitTestVisible);
         }
 
-#endregion pointer-events
+        internal void CoerceIsHitTestable() => CoerceValue(IsHitTestableProperty);
 
-#region AllowDrop
+        #endregion pointer-events
+        
+        private static readonly DependencyProperty UseSystemFocusVisualsProperty =
+            DependencyProperty.Register(
+                nameof(UseSystemFocusVisuals),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetOutline((bool)newValue),
+                });
+
+        internal bool UseSystemFocusVisuals
+        {
+            get => (bool)GetValue(UseSystemFocusVisualsProperty);
+            set => SetValue(UseSystemFocusVisualsProperty, value);
+        }
+
+        #region AllowDrop
 
         /// <summary>
         /// Gets or sets a value that determines whether this UIElement

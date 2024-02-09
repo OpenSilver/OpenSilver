@@ -47,7 +47,7 @@ namespace System.Windows.Shapes
                     {
                         Rectangle rect = (Rectangle)d;
                         double rx = (double)newValue;
-                        rect.SetSvgAttribute("rx", rx.ToInvariantString());
+                        rect.SetSvgAttribute("rx", Math.Round(rx, 2).ToInvariantString());
                     },
                 });
 
@@ -78,7 +78,7 @@ namespace System.Windows.Shapes
                     {
                         Rectangle rect = (Rectangle)d;
                         double ry = (double)newValue;
-                        rect.SetSvgAttribute("ry", ry.ToInvariantString());
+                        rect.SetSvgAttribute("ry", Math.Round(ry, 2).ToInvariantString());
                     },
                 });
 
@@ -177,12 +177,19 @@ namespace System.Windows.Shapes
                     break;
             }
 
-            SetSvgAttribute("x", rect.X.ToInvariantString());
-            SetSvgAttribute("y", rect.Y.ToInvariantString());
-            SetSvgAttribute("width", rect.Width.ToInvariantString());
-            SetSvgAttribute("height", rect.Height.ToInvariantString());
-
+            ArrangeNative(rect);
+            
             return finalSize;
+        }
+
+        private void ArrangeNative(Rect rect)
+        {
+            string x = Math.Round(rect.X, 2).ToInvariantString();
+            string y = Math.Round(rect.Y, 2).ToInvariantString();
+            string width = Math.Round(rect.Width, 2).ToInvariantString();
+            string height = Math.Round(rect.Height, 2).ToInvariantString();
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.arrangeRectangle('{SvgElement.UniqueIdentifier}',{x},{y},{width},{height})");
         }
 
         internal sealed override Size GetNaturalSize()

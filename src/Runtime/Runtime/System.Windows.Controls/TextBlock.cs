@@ -39,6 +39,11 @@ namespace System.Windows.Controls
         private Size _noWrapSize = Size.Empty;
         private bool _textContentChanging;
 
+        static TextBlock()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(TextBlock), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
+
         public TextBlock()
         {
             SetValueInternal(InlinesProperty, new InlineCollection(this));
@@ -520,7 +525,7 @@ namespace System.Windows.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.Wrap);
+            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this);
             domElementWhereToPlaceChildren = div;
             return div;
         }
@@ -583,7 +588,7 @@ namespace System.Windows.Controls
 
         protected override Size ArrangeOverride(Size finalSize) => finalSize;
 
-        internal override bool EnablePointerEventsCore => true;
+        internal sealed override bool EnablePointerEventsCore => true;
 
         internal override int VisualChildrenCount => Inlines.Count;
 
@@ -596,8 +601,6 @@ namespace System.Windows.Controls
 
             return Inlines[index];
         }
-
-        internal sealed override void AddEventListeners() => InputManager.Current.AddEventListeners(this, false);
 
         internal override string GetPlainText() => Text;
 

@@ -257,12 +257,7 @@ namespace System.Windows.Controls
                 typeof(Panel),
                 new PropertyMetadata(null, OnBackgroundChanged)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var panel = (Panel)d;
-                        _ = panel.SetBackgroundAsync((Brush)newValue);
-                        SetPointerEvents(panel);
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => _ = ((Panel)d).SetBackgroundAsync((Brush)newValue),
                 });
 
         /// <summary>
@@ -301,6 +296,9 @@ namespace System.Windows.Controls
                 };
                 newBrush.Changed += panel._backgroundChangedListener.OnEvent;
             }
+
+            // Update pointer events
+            panel.CoerceIsHitTestable();
         }
 
         private void OnBackgroundChanged(object sender, EventArgs e)

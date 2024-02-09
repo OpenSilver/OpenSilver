@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Globalization;
@@ -40,11 +39,23 @@ namespace System.Windows.Controls
     /// </example>
     public sealed class Image : FrameworkElement
     {
+        private static readonly JavaScriptCallback _loadHandler;
+        private static readonly JavaScriptCallback _errorHandler;
+
         private INTERNAL_HtmlDomElementReference _imageDiv;
         private Size _naturalSize;
-        private JavaScriptCallback _imgLoadCallback;
-        private JavaScriptCallback _imgErrorCallack;
         private WeakEventListener<Image, BitmapImage, EventArgs> _sourceChangedListener;
+
+        static Image()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(Image), new PropertyMetadata(BooleanBoxes.TrueBox));
+
+            _loadHandler = JavaScriptCallback.Create(ProcessLoadEvent, true);
+            _errorHandler = JavaScriptCallback.Create(ProcessErrorEvent, true);
+            string sLoadHandler = OpenSilver.Interop.GetVariableStringForJS(_loadHandler);
+            string sErrorHandler = OpenSilver.Interop.GetVariableStringForJS(_errorHandler);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createImageManager({sLoadHandler},{sErrorHandler});");
+        }
 
         internal override bool EnablePointerEventsCore => true;
 
@@ -134,13 +145,13 @@ namespace System.Windows.Controls
             Image img = (Image)d;
 
             img._imageDiv.Style.objectFit = (Stretch)newValue switch
-                {
-                    Stretch.None => "none",
-                    Stretch.Fill => "fill",
-                    Stretch.Uniform => "contain",
-                    Stretch.UniformToFill => "cover",
-                    _ => string.Empty,
-                };
+            {
+                Stretch.None => "none",
+                Stretch.Fill => "fill",
+                Stretch.Uniform => "contain",
+                Stretch.UniformToFill => "cover",
+                _ => string.Empty,
+            };
 
             img.SetObjectPosition();
         }
@@ -155,45 +166,16 @@ namespace System.Windows.Controls
         /// </summary>
         public event EventHandler<RoutedEventArgs> ImageOpened;
 
-        public override void INTERNAL_AttachToDomEvents()
-        {
-            base.INTERNAL_AttachToDomEvents();
-
-            DisposeJSCallbacks();
-
-            _imgLoadCallback = JavaScriptCallback.Create(ProcessLoadEvent, true);
-            _imgErrorCallack = JavaScriptCallback.Create(ProcessErrorEvent, true);
-
-            string sImage = OpenSilver.Interop.GetVariableStringForJS(_imageDiv);
-            string sLoadCallback = OpenSilver.Interop.GetVariableStringForJS(_imgLoadCallback);
-            string sErrorCallback = OpenSilver.Interop.GetVariableStringForJS(_imgErrorCallack);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                @$"{sImage}.addEventListener('load', function (e) {{ {sLoadCallback}(); }});
-{sImage}.addEventListener('error', function (e) {{ {sErrorCallback}(); }});");
-        }
-
-        public override void INTERNAL_DetachFromDomEvents()
-        {
-            base.INTERNAL_DetachFromDomEvents();
-            DisposeJSCallbacks();
-        }
-
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object INTERNAL_DomImageElement => _imageDiv;
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
-            outerDiv.Style.lineHeight = "0px";
-            _imageDiv = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt(outerDiv, this);
+            (var outerDiv, _imageDiv) = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt(parentRef, this);
             domElementWhereToPlaceChildren = null;
             return outerDiv;
         }
-
-        protected override void OnAfterApplyHorizontalAlignmentAndWidth() => SetObjectPosition();
-
-        protected override void OnAfterApplyVerticalAlignmentAndWidth() => SetObjectPosition();
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ImageAutomationPeer(this);
@@ -269,21 +251,6 @@ namespace System.Windows.Controls
             _imageDiv.Style.objectPosition = $"{hPos} {vPos}";
         }
 
-        private void DisposeJSCallbacks()
-        {
-            if (_imgLoadCallback != null)
-            {
-                _imgLoadCallback.Dispose();
-                _imgLoadCallback = null;
-            }
-
-            if (_imgErrorCallack != null)
-            {
-                _imgErrorCallack.Dispose();
-                _imgErrorCallack = null;
-            }
-        }
-
         private void OnBitmapImageSourceChanged(object sender, EventArgs e)
         {
             _ = RefreshSource();
@@ -293,7 +260,6 @@ namespace System.Windows.Controls
         {
             _naturalSize = new Size();
 
-            string sImageDiv = OpenSilver.Interop.GetVariableStringForJS(_imageDiv);
             if (Source != null)
             {
                 var imageSrc = await Source.GetDataStringAsync(this);
@@ -301,15 +267,23 @@ namespace System.Windows.Controls
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"{sImageDiv}.removeAttribute('src'); {sImageDiv}.style.display = 'none';");
+                INTERNAL_HtmlDomManager.RemoveAttribute(_imageDiv, "src");
+                _imageDiv.Style.display = "none";
 
                 InvalidateMeasure();
                 InvalidateArrange();
             }
         }
 
-        private void ProcessLoadEvent()
+        private static void ProcessLoadEvent(string id)
+        {
+            if (INTERNAL_HtmlDomManager.GetElementById(id) is Image image)
+            {
+                image.OnLoadNative();
+            }
+        }
+
+        private void OnLoadNative()
         {
             _naturalSize = GetNaturalSize();
 
@@ -318,7 +292,15 @@ namespace System.Windows.Controls
             ImageOpened?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
         }
 
-        private void ProcessErrorEvent()
+        private static void ProcessErrorEvent(string id)
+        {
+            if (INTERNAL_HtmlDomManager.GetElementById(id) is Image image)
+            {
+                image.OnErrorNative();
+            }
+        }
+
+        private void OnErrorNative()
         {
             _naturalSize = new Size();
 

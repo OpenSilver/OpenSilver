@@ -62,6 +62,14 @@ namespace System.Windows.Media
         internal override bool IsIdentity => Matrix.IsIdentity;
 
         internal static string MatrixToHtmlString(Matrix m)
-            => $"matrix({m.M11.ToInvariantString()}, {m.M12.ToInvariantString()}, {m.M21.ToInvariantString()}, {m.M22.ToInvariantString()}, {m.OffsetX.ToInvariantString()}, {m.OffsetY.ToInvariantString()})";
+        {
+            string m11 = Math.Round(m.M11, 4).ToInvariantString();
+            string m12 = Math.Round(m.M12, 4).ToInvariantString();
+            string m21 = Math.Round(m.M21, 4).ToInvariantString();
+            string m22 = Math.Round(m.M22, 4).ToInvariantString();
+            string offsetX = Math.Round(m.OffsetX, 4).ToInvariantString();
+            string offsetY = Math.Round(m.OffsetY, 4).ToInvariantString();
+            return $"matrix({m11},{m12},{m21},{m22},{offsetX},{offsetY})";
+        }
     }
 }

@@ -27,6 +27,11 @@ namespace System.Windows.Shapes
     /// </summary>
     public abstract class Shape : FrameworkElement
     {
+        static Shape()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(Shape), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Shape"/> class.
         /// </summary>
@@ -234,7 +239,7 @@ namespace System.Windows.Shapes
                         {
                             shape.SetSvgAttribute(
                                 "stroke-dasharray",
-                                string.Join(",", dashArray.Select(d => d.ToInvariantString())));
+                                string.Join(",", dashArray.Select(d => Math.Round(d, 2).ToInvariantString())));
                         }
                         else
                         {
@@ -314,7 +319,7 @@ namespace System.Windows.Shapes
                     {
                         Shape shape = (Shape)d;
                         double offset = (double)newValue;
-                        shape.SetSvgAttribute("stroke-dashoffset", offset.ToInvariantString());
+                        shape.SetSvgAttribute("stroke-dashoffset", Math.Round(offset, 2).ToInvariantString());
                     },
                 });
 
@@ -411,7 +416,7 @@ namespace System.Windows.Shapes
                     {
                         Shape shape = (Shape)d;
                         double limit = (double)newValue;
-                        shape.SetSvgAttribute("stroke-miterlimit", limit.ToInvariantString());
+                        shape.SetSvgAttribute("stroke-miterlimit", Math.Round(limit, 2).ToInvariantString());
                     },
                 });
 
@@ -470,7 +475,7 @@ namespace System.Windows.Shapes
                     {
                         Shape shape = (Shape)d;
                         double thickness = GetComputedStrokeThickess((double)newValue);
-                        shape.SetSvgAttribute("stroke-width", thickness.ToInvariantString());
+                        shape.SetSvgAttribute("stroke-width", Math.Round(thickness, 2).ToInvariantString());
                     },
                 });
 
@@ -768,8 +773,8 @@ namespace System.Windows.Shapes
             return new Rect();
         }
 
-        internal sealed override void SetPointerEventsImpl() =>
-            SvgElement.Style.pointerEvents = EnablePointerEvents ? "auto" : "none";
+        internal sealed override void SetPointerEvents(bool hitTestable) =>
+            SvgElement.Style.pointerEvents = hitTestable ? "auto" : "none";
 
         internal virtual string SvgTagName => "path";
 

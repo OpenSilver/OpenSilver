@@ -308,9 +308,7 @@ public abstract class TextElement : UIElement
 
     internal sealed override UIElement KeyboardTarget => null;
 
-    internal sealed override void AddEventListeners() { }
-
-    internal override sealed void SetPointerEventsImpl() { }
+    internal override sealed void SetPointerEvents(bool hitTestable) { }
 
     internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {

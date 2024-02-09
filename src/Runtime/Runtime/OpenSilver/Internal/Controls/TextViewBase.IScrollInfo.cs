@@ -16,10 +16,11 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
-internal partial class TextViewBase<T> : IScrollInfo
+internal partial class TextViewBase : IScrollInfo
 {
     private ScrollData _scrollData;
 
@@ -158,8 +159,7 @@ internal partial class TextViewBase<T> : IScrollInfo
 
         if (OuterDiv is not null)
         {
-            string sDiv = Interop.GetVariableStringForJS(OuterDiv);
-            Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.scrollLeft = {offset.ToInvariantString()};");
+            INTERNAL_HtmlDomManager.SetDomElementProperty(OuterDiv, "scrollLeft", offset);
         }
     }
 
@@ -170,8 +170,7 @@ internal partial class TextViewBase<T> : IScrollInfo
 
         if (OuterDiv is not null)
         {
-            string sDiv = Interop.GetVariableStringForJS(OuterDiv);
-            Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.scrollTop = {offset.ToInvariantString()};");
+            INTERNAL_HtmlDomManager.SetDomElementProperty(OuterDiv, "scrollTop", offset);
         }
     }
 

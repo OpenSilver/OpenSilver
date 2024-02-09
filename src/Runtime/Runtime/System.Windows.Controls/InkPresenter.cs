@@ -66,19 +66,14 @@ cvs.style.width = {width} + 'px';
 cvs.style.height = {height} + 'px';
 ctx.strokeStyle = '#222222';
 ctx.lineWidth = '4';
-ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
+ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-            _canvasDom = INTERNAL_HtmlDomManager.AppendDomElement("canvas", div, this);
-            var style = _canvasDom.Style;
-            style.width = "100%";
-            style.height = "100%";
-            style.position = "absolute";
-            style.pointerEvents = "none";
-            return div;
+            (var outerDiv, _canvasDom) = INTERNAL_HtmlDomManager.CreateInkPresenterDomElementAndAppendIt(parentRef, this);
+            domElementWhereToPlaceChildren = outerDiv;
+            return outerDiv;
         }
         
         /// <summary>
@@ -173,7 +168,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
             }
 
             //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.stroke();", context);
-            sb.AppendLine($"ctx.stroke(); }})({sCanvas});");
+            sb.AppendLine($"ctx.stroke(); }})({sCanvas})");
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(sb.ToString());
         }
 

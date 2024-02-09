@@ -161,12 +161,7 @@ namespace System.Windows.Controls
                 typeof(Border),
                 new PropertyMetadata(null, OnBackgroundChanged)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var border = (Border)d;
-                        _ = border.SetBackgroundAsync((Brush)newValue);
-                        SetPointerEvents(border);
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => _ = ((Border)d).SetBackgroundAsync((Brush)newValue),
                 });
 
         /// <summary>
@@ -205,6 +200,9 @@ namespace System.Windows.Controls
                 };
                 newBrush.Changed += border._backgroundChangedListener.OnEvent;
             }
+
+            // Update pointer events
+            border.CoerceIsHitTestable();
         }
 
         private void OnBackgroundChanged(object sender, EventArgs e)

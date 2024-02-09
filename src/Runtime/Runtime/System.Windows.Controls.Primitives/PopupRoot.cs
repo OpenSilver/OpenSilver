@@ -49,15 +49,12 @@ namespace System.Windows.Controls.Primitives
             return Content;
         }
 
-        internal string UniqueIndentifier { get; set; }
-
         internal Popup ParentPopup { get; set; }
 
-        internal PopupRoot(string uniqueIdentifier, Window parentWindow, Popup popup)
+        internal PopupRoot(Window parentWindow, Popup popup)
         {
             BypassLayoutPolicies = true;
 
-            UniqueIndentifier = uniqueIdentifier;
             ParentWindow = parentWindow;
             ParentPopup = popup;
         }
@@ -178,7 +175,7 @@ namespace System.Windows.Controls.Primitives
         {
             string parentDiv = OpenSilver.Interop.GetVariableStringForJS(ParentWindow.RootDomElement);
             string popupDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{parentDiv}.appendChild({popupDiv});");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{parentDiv}.appendChild({popupDiv})");
         }
     }
 }

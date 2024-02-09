@@ -14,6 +14,7 @@
 using System.Windows.Navigation;
 using CSHTML5;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -28,19 +29,21 @@ namespace System.Windows.Controls
         private string _htmlString;
         private JavaScriptCallback _jsCallbackOnIframeLoaded;
 
+        static WebBrowser()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(WebBrowser), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
+
         public WebBrowser()
         {
             Unloaded += (o, e) => DisposeJsCallbacks();
         }
 
-        internal override bool EnablePointerEventsCore
-        {
-            get { return true; }
-        }        
+        internal sealed override bool EnablePointerEventsCore => true;
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, false);
 
             _iFrame = INTERNAL_HtmlDomManager.AppendDomElement("iframe", outerDiv, this);
             _iFrame.Style.width = "100%";
@@ -63,7 +66,7 @@ namespace System.Windows.Controls
             else if (_htmlString != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)};");
+                    $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)}");
             }
             else
             {
@@ -138,7 +141,7 @@ namespace System.Windows.Controls
                 if (_htmlString != null)
                 {
                     OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                        $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)};");
+                        $"{sIFrame}.srcdoc = {OpenSilver.Interop.GetVariableStringForJS(_htmlString)}");
                 }
                 else
                 {

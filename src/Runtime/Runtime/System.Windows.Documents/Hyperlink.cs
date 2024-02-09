@@ -218,7 +218,7 @@ public sealed class Hyperlink : Span
         string sDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
         string sClickCallback = OpenSilver.Interop.GetVariableStringForJS(_clickCallback);
         OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"{sDiv}.addEventListener('click', function (e) {{ {sClickCallback}(); }});");
+            $"{sDiv}.addEventListener('click', function (e) {{ {sClickCallback}(); }})");
     }
 
     public override void INTERNAL_DetachFromDomEvents()

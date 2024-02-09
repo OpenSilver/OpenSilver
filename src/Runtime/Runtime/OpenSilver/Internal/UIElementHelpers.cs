@@ -117,7 +117,7 @@ internal static class UIElementHelpers
 
     internal static void SetPadding(this UIElement uie, Thickness padding)
     {
-        uie.OuterDiv.Style.padding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
+        uie.OuterDiv.Style.padding = CollapseThicknessHelper(padding);
     }
 
     internal static void SetTextAlignment(this UIElement uie, TextAlignment textAlignment)
@@ -175,14 +175,24 @@ internal static class UIElementHelpers
 
     internal static void SetInnerText(this UIElement uie, string text)
     {
-        string sDiv = Interop.GetVariableStringForJS(uie.OuterDiv);
-        string escapedText = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text);
-        Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.innerText = \"{escapedText}\";");
+        INTERNAL_HtmlDomManager.SetDomElementProperty(uie.OuterDiv,
+            "innerText",
+            INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text));
     }
 
     internal static void SetOpacity(this UIElement uie, double opacity)
     {
-        uie.OuterDiv.Style.opacity = Math.Round(opacity, 3).ToInvariantString();
+        uie.OuterDiv.Style.opacity = Math.Round(opacity, 2).ToInvariantString();
+    }
+
+    internal static void SetOutline(this UIElement uie, bool enable)
+    {
+        // Every UIElement has a css class that sets 'outline' to 'none'. 'revert' will
+        // roll back that change so that 'outline' can be set to the default computed value.
+        if (uie.GetFocusTarget() is INTERNAL_HtmlDomElementReference focusTarget)
+        {
+            focusTarget.Style.outline = enable ? "revert" : "none";
+        }
     }
 
     internal static void SetTransform(this UIElement uie, Transform transform)
@@ -196,7 +206,7 @@ internal static class UIElementHelpers
 
     internal static void SetTransformOrigin(this UIElement uie, Point origin)
     {
-        uie.OuterDiv.Style.transformOrigin = $"{(origin.X * 100).ToInvariantString()}% {(origin.Y * 100).ToInvariantString()}%";
+        uie.OuterDiv.Style.transformOrigin = $"{Math.Round(origin.X * 100, 4).ToInvariantString()}% {Math.Round(origin.Y * 100, 4).ToInvariantString()}%";
     }
 
     internal static void SetZIndex(this UIElement uie, int value)
@@ -214,13 +224,13 @@ internal static class UIElementHelpers
     internal static void SetBorderRadius(this UIElement uie, CornerRadius radius)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.borderRadius = $"{radius.TopLeft.ToInvariantString()}px {radius.TopRight.ToInvariantString()}px {radius.BottomRight.ToInvariantString()}px {radius.BottomLeft.ToInvariantString()}px";
+        uie.OuterDiv.Style.borderRadius = CollapseCornerRadiusHelper(radius);
     }
 
     internal static void SetBorderWidth(this UIElement uie, Thickness width)
     {
         Debug.Assert(uie is not null);
-        uie.OuterDiv.Style.borderWidth = $"{width.Top.ToInvariantString()}px {width.Right.ToInvariantString()}px {width.Bottom.ToInvariantString()}px {width.Left.ToInvariantString()}px";
+        uie.OuterDiv.Style.borderWidth = CollapseThicknessHelper(width);
     }
 
     internal static void SetClipPath(this UIElement uie, Geometry geometry)
@@ -286,4 +296,22 @@ internal static class UIElementHelpers
             d = VisualTreeHelper.GetParent(d);
         }
     }
+
+    private static string CollapseThicknessHelper(Thickness t) =>
+        (t.Top == t.Bottom, t.Left == t.Right) switch
+        {
+            (true, true) when t.Top == t.Left => $"{t.Top.ToInvariantString()}px",
+            (true, true) => $"{t.Top.ToInvariantString()}px {t.Left.ToInvariantString()}px",
+            (false, true) => $"{t.Top.ToInvariantString()}px {t.Left.ToInvariantString()}px {t.Bottom.ToInvariantString()}px",
+            _ => $"{t.Top.ToInvariantString()}px {t.Right.ToInvariantString()}px {t.Bottom.ToInvariantString()}px {t.Left.ToInvariantString()}px",
+        };
+
+    private static string CollapseCornerRadiusHelper(CornerRadius cr) =>
+        (cr.TopLeft == cr.BottomRight, cr.BottomLeft == cr.TopRight) switch
+        {
+            (true, true) when cr.TopLeft == cr.BottomLeft => $"{cr.TopLeft.ToInvariantString()}px",
+            (true, true) => $"{cr.TopLeft.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px",
+            (false, true) => $"{cr.TopLeft.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px {cr.BottomRight.ToInvariantString()}px",
+            _ => $"{cr.TopLeft.ToInvariantString()}px {cr.TopRight.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px {cr.BottomRight.ToInvariantString()}px",
+        };
 }

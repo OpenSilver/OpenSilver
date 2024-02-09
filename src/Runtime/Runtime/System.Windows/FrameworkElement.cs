@@ -24,6 +24,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver;
 
 namespace System.Windows
 {
@@ -448,12 +449,12 @@ namespace System.Windows
         /// <returns>The "root" dom element of the FrameworkElement.</returns>
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            return CreateDomElementInternal(parentRef, out domElementWhereToPlaceChildren);
+            return CreateDomElementInternal(parentRef, false, out domElementWhereToPlaceChildren);
         }
 
-        internal object CreateDomElementInternal(object parentRef, out object domElementWhereToPlaceChildren)
+        internal object CreateDomElementInternal(object parentRef, bool isKeyboardFocusable, out object domElementWhereToPlaceChildren)
         {
-            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
+            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, isKeyboardFocusable);
             domElementWhereToPlaceChildren = div;
             return div;
         }
@@ -730,7 +731,7 @@ namespace System.Windows
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        if (d is FrameworkElement fe)
+                        if (Features.DOM.AssignName && d is FrameworkElement fe)
                         {
                             INTERNAL_HtmlDomManager.SetDomElementAttribute(
                                 fe.OuterDiv, "dataId", (string)newValue ?? string.Empty);

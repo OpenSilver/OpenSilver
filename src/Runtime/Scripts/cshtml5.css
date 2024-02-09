@@ -62,7 +62,15 @@ body {
     text-decoration: var(--mouse-over-decoration, underline) !important;
 }
 
-.uielement-shape {
+.opensilver-uielement {
+    position: absolute;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 0;
+    outline: none;
+}
+
+.opensilver-shape {
     pointer-events: none !important;
     fill: none; /* CSS default value is black */
     fill-rule: evenodd; /* CSS default value is nonzero, and evenodd is the default value of every shape */
@@ -71,10 +79,23 @@ body {
 }
 
 .opensilver-border {
-    box-sizing: border-box;
     border-style: solid;
     border-color: transparent; /* CSS default value matches the color property (currentcolor) */
     border-width: 0px; /* CSS default value is medium */
+}
+
+.opensilver-popup {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: clip;
+}
+
+.opensilver-inkpresenter {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    pointer-events: none;
 }
 
 /* Media query used for printing (cf. "CSHTML5.Native.Html.Printing.PrintManager") */

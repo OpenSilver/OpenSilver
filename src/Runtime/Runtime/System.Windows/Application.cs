@@ -11,27 +11,21 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
-using System.Windows;
 using System.Windows.Resources;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
 using System.Text.Json;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Xaml.Markup;
 using System.ApplicationModel.Activation;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using CSHTML5;
 using CSHTML5.Internal;
 
 namespace System.Windows
@@ -80,6 +74,8 @@ namespace System.Windows
 
             // Initialize Deployment
             _ = Deployment.Current;
+            // Ensure InputManager is created
+            _ = InputManager.Current;
 
             AppParams = GetAppParams();
 

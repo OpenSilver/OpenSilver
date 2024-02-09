@@ -120,19 +120,18 @@ namespace System.Windows
             RootDomElement = rootDomElement ?? throw new ArgumentNullException(nameof(rootDomElement));
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
-            string sRootElement = OpenSilver.Interop.GetVariableStringForJS(rootDomElement);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sRootElement}.style.display = 'grid'");
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sRootElement}.style.overflow = 'clip'");
+            RootDomElement.Style.display = "grid";
+            RootDomElement.Style.overflow = "clip";
 
             // Create the DIV that will correspond to the root of the window visual tree:
-            OuterDiv = InnerDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", rootDomElement, this);
+            OuterDiv = InnerDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", RootDomElement, this);
 
             OuterDiv.Style.width = "100%";
             OuterDiv.Style.height = "100%";
             OuterDiv.Style.overflowX = "hidden";
             OuterDiv.Style.overflowY = "hidden";
             
-            INTERNAL_AttachToDomEvents();
+            InputManager.Current.RegisterRoot(RootDomElement);
 
             // Set the window as "loaded":
             _isLoaded = true;
@@ -299,12 +298,6 @@ namespace System.Windows
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             throw new InvalidOperationException("\"CreateDomElement\" should not be called for the Window object.");
-        }
-
-        public override void INTERNAL_AttachToDomEvents()
-        {
-            InputManager.Current.RegisterRoot(RootDomElement);
-            base.INTERNAL_AttachToDomEvents();
         }
 
         #region Closing event

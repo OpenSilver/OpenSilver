@@ -111,12 +111,18 @@ namespace System.Windows.Shapes
                     break;
             }
 
-            SetSvgAttribute("cx", (rx + penThickness / 2).ToInvariantString());
-            SetSvgAttribute("cy", (ry + penThickness / 2).ToInvariantString());
-            SetSvgAttribute("rx", rx.ToInvariantString());
-            SetSvgAttribute("ry", ry.ToInvariantString());
+            ArrangeNative(rx, ry, penThickness);
 
             return finalSize;
+        }
+
+        private void ArrangeNative(double rx, double ry, double penThickness)
+        {
+            rx = Math.Round(rx, 2);
+            ry = Math.Round(ry, 2);
+            penThickness = Math.Round(penThickness, 2);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.arrangeEllipse('{SvgElement.UniqueIdentifier}',{rx.ToInvariantString()},{ry.ToInvariantString()},{penThickness.ToInvariantString()})");
         }
 
         internal sealed override Size GetNaturalSize()

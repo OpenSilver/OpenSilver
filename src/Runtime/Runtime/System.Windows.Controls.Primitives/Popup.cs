@@ -20,7 +20,6 @@ using System.Windows.Media;
 using System.Windows.Data;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls.Primitives

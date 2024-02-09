@@ -148,15 +148,15 @@ namespace CSHTML5.Internal
 
         internal void setProperty(string propertyName, string value) =>
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}');");
+                $"document.setCSSProperty('{Uid}','{propertyName}','{value}')");
 
         internal void setProperty(string propertyName, string value, string priority) =>
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setStyleProperty('{Uid}', '{propertyName}', '{value}', '{priority}');");
+                $"document.setCSSProperty('{Uid}','{propertyName}','{value}','{priority}')");
 
         private void SetStylePropertyValue(string propertyName, string value) =>
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setDomStyle('{Uid}', '{propertyName}', '{value}');");
+                $"document.setCSS('{Uid}','{propertyName}','{value}')");
 
         private string GetCSSProperty(string propertyName) =>
             OpenSilver.Interop.ExecuteJavaScriptString(

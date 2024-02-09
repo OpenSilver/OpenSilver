@@ -21,7 +21,7 @@ using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
-internal sealed class TextBoxView : TextViewBase<TextBox>
+internal sealed class TextBoxView : TextViewBase
 {
     static TextBoxView()
     {
@@ -83,6 +83,8 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBoxView)d).SetTextAlignment((TextAlignment)newValue),
             });
+
+        IsHitTestableProperty.OverrideMetadata(typeof(TextBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
     private WeakEventListener<TextBoxView, Brush, EventArgs> _foregroundChangedListener;
@@ -91,6 +93,8 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
         : base(host)
     {
     }
+
+    internal new TextBox Host => (TextBox)base.Host;
 
     public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
     {
@@ -133,7 +137,7 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
 
         string sElement = Interop.GetVariableStringForJS(InputDiv);
         string sArgs = Interop.GetVariableStringForJS(e.UIEventArg);
-        if (Interop.ExecuteJavaScriptBoolean($"document.textboxHelpers.onKeyDownNative({sElement}, {sArgs});"))
+        if (Interop.ExecuteJavaScriptBoolean($"document.textviewManager.onKeyDownNative({sElement}, {sArgs});"))
         {
             e.Handled = true;
             e.Cancellable = false;
@@ -144,11 +148,9 @@ internal sealed class TextBoxView : TextViewBase<TextBox>
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv != null)
         {
-            //--- SIMULATOR ONLY: ---
-            // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
-            Interop.ExecuteJavaScriptVoidAsync($@"
-var element = document.getElementByIdSafe(""{InputDiv.UniqueIdentifier}"");
-element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower()}"");");
+            // Set the "data-accepts-return" property (that we have invented)
+            // so that the "keydown" JavaScript event can retrieve this value:
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(InputDiv, "data-acceptsreturn", acceptsReturn);
         }
     }
 
@@ -194,7 +196,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (isReadOnly)
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(InputDiv, "readonly", "''");
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(InputDiv, "readonly", string.Empty);
             }
             else
             {
@@ -306,7 +308,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
 
         if (Host.IsReadOnly)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "readonly", "''");
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "readonly", string.Empty);
         }
 
         int maxlength = Host.MaxLength;
@@ -320,17 +322,16 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
 
         domElementWhereToPlaceChildren = contentEditableDiv;
 
-        // ---- SIMULATOR ----
-        string uid = contentEditableDiv.UniqueIdentifier;
-
-        // Set the "data-accepts-return" property (that we have invented) so that the "KeyDown" and "Paste" JavaScript events can retrieve this value:
-        Interop.ExecuteJavaScriptVoidAsync($@"
-var element = document.getElementByIdSafe('{uid}');
-element.setAttribute('data-acceptsreturn', '{Host.AcceptsReturn.ToString().ToLower()}');
-element.setAttribute('data-acceptstab', '{Host.AcceptsTab.ToString().ToLower()}');");
+        // Set the "data-accepts-return" property (that we have invented) so that the
+        // "KeyDown" and "Paste" JavaScript events can retrieve this value:
+        INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "data-acceptsreturn", Host.AcceptsReturn);
+        INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "data-acceptstab", Host.AcceptsTab);
 
         if (Interop.IsRunningInTheSimulator)
         {
+            // ---- SIMULATOR ----
+            string uid = contentEditableDiv.UniqueIdentifier;
+
             // Register the "keydown" javascript event:
             Interop.ExecuteJavaScriptVoidAsync($@"
 var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
@@ -401,7 +402,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         e.preventDefault();
             return false;
     }}
-}}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
+}}, false)");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
         }
 
         return contentEditableDiv;

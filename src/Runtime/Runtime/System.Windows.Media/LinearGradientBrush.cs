@@ -429,7 +429,7 @@ namespace System.Windows.Media
                     if (gradientStop.Offset > biggestOffset)
                     {
                         biggestOffset = gradientStop.Offset;
-                        color = gradientStop.Color.ToHtmlString(this.Opacity);
+                        color = gradientStop.Color.ToHtmlString(Opacity);
                     }
                 }
                 gradientStopsString = color + " 0%, " + color + " 100%";
@@ -472,7 +472,7 @@ namespace System.Windows.Media
 
             foreach (GradientStop gradientStop in GradientStops)
             {
-                string currentColor = gradientStop.Color.ToHtmlString(this.Opacity);
+                string currentColor = gradientStop.Color.ToHtmlString(Opacity);
                 string str = currentColor + " " + (startPointPercentage + gradientStop.Offset * startToEndPercentage).ToInvariantString() + percentageSymbol;
                 tempList.Add(new Tuple<double, string>(gradientStop.Offset, str));
                 if (smallestOffset > gradientStop.Offset)
@@ -591,25 +591,7 @@ namespace System.Windows.Media
 
             public string GetBrush(Shape shape)
             {
-                if (_gradientRef is null)
-                {
-                    _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(
-                        shape.DefsElement, "linearGradient");
-
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "x1", _brush.StartPoint.X.ToInvariantString());
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "y1", _brush.StartPoint.Y.ToInvariantString());
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "x2", _brush.EndPoint.X.ToInvariantString());
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "y2", _brush.EndPoint.Y.ToInvariantString());
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "gradientUnits", ConvertBrushMappingModeToString(_brush.MappingMode));
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "spreadMethod", ConvertSpreadMethodToString(_brush.SpreadMethod));
-
-                    var stops = _brush.GetGradientStops()
-                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.ToHtmlString(_brush.Opacity)}\" />");
-
-                    string sDiv = OpenSilver.Interop.GetVariableStringForJS(_gradientRef);
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
-                }
-
+                _gradientRef ??= INTERNAL_HtmlDomManager.CreateLinearGradientAndAppendIt(shape.DefsElement, _brush);
                 return $"url(#{_gradientRef.UniqueIdentifier})";
             }
 

@@ -22,6 +22,7 @@ using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -30,6 +31,11 @@ namespace System.Windows.Controls
         private static bool _quillJSInitialized;
 
         private object _quill;
+
+        static RichTextBoxView()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(RichTextBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
 
         public RichTextBoxView(RichTextBox rtb)
         {
@@ -48,7 +54,7 @@ namespace System.Windows.Controls
 
             domElementWhereToPlaceChildren = null;
 
-            var div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this);
+            var div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, true);
             var quillContainer = INTERNAL_HtmlDomManager.AppendDomElement("div", div, this);
 
             string script = "let options = {"
@@ -68,11 +74,6 @@ namespace System.Windows.Controls
         }
 
         protected override Size MeasureOverride(Size availableSize) => GetBoundingClientSize();
-
-        internal sealed override void AddEventListeners()
-        {
-            InputManager.Current.AddEventListeners(this, true);
-        }
 
         internal sealed override UIElement KeyboardTarget => Host;
 

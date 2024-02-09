@@ -25,6 +25,11 @@ namespace System.Windows.Controls
     [ContentProperty(nameof(Blocks))]
     public sealed partial class RichTextBlock : FrameworkElement
     {
+        static RichTextBlock()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(RichTextBlock), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextBlock"/> class.
         /// </summary>
@@ -353,7 +358,7 @@ namespace System.Windows.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.Wrap);
+            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this);
             domElementWhereToPlaceChildren = div;
             return div;
         }

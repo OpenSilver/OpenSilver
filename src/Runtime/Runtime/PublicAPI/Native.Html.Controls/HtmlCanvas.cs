@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,14 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Windows;
 using System.Windows.Input;
 using CSHTML5.Internal;
 using CSHTML5.Native.Html.Input;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -60,6 +56,11 @@ namespace CSHTML5.Native.Html.Controls
         public List<HtmlCanvasElement> Children;
 
         private HtmlCanvasElement[] _LastPointerMove;
+
+        static HtmlCanvas()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(HtmlCanvas), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
 
         /// <summary>
         /// Create an html5 native canvas
@@ -313,7 +314,7 @@ namespace CSHTML5.Native.Html.Controls
             // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
             //------------------
 
-            object div1 = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("canvas", parentRef, this);
+            object div1 = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("canvas", parentRef, this, false);
             domElementWhereToPlaceChildren = div1;
 
             // Use the div2 as the js canvas object

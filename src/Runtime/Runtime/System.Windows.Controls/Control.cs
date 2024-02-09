@@ -15,7 +15,6 @@ using System.Windows.Input;
 using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows.Documents;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -51,11 +50,6 @@ namespace System.Windows.Controls
             base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
 
             UpdateVisualStates();
-        }
-
-        internal override void AddEventListeners()
-        {
-            InputManager.Current.AddEventListeners(this, true);
         }
 
         //-----------------------
@@ -470,29 +464,12 @@ namespace System.Windows.Controls
             KeyboardNavigation.Current.Focus(this) is UIElement uie &&
             InputManager.Current.SetFocus(uie);
 
-        private bool _useSystemFocusVisuals;
-
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool UseSystemFocusVisuals
+        public new bool UseSystemFocusVisuals
         {
-            get => _useSystemFocusVisuals;
-            set
-            {
-                if (_useSystemFocusVisuals != value)
-                {
-                    _useSystemFocusVisuals = value;
-                    UpdateSystemFocusVisuals();
-                }
-            }
-        }
-
-        internal void UpdateSystemFocusVisuals()
-        {
-            if (GetFocusTarget() is INTERNAL_HtmlDomElementReference focusTarget)
-            {
-                focusTarget.Style.outline = _useSystemFocusVisuals ? string.Empty : "none";
-            }
+            get => base.UseSystemFocusVisuals;
+            set => base.UseSystemFocusVisuals = value;
         }
 
         /// <summary>
@@ -562,7 +539,12 @@ namespace System.Windows.Controls
         /// <returns>The "root" dom element of the FrameworkElement.</returns>
         internal object CreateDomElementForControlTemplate(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            return CreateDomElementInternal(parentRef, out domElementWhereToPlaceChildren);
+            return CreateDomElementInternal(parentRef, true, out domElementWhereToPlaceChildren);
+        }
+
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            return CreateDomElementForControlTemplate(parentRef, out domElementWhereToPlaceChildren);
         }
 
         /// <summary>

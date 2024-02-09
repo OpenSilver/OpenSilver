@@ -82,8 +82,6 @@ public abstract class Inline : TextElement
         set => SetValueInternal(TextDecorationsProperty, value);
     }
 
-    internal override bool EnablePointerEventsCore => true;
-
     // Defining an implicit conversion from string to Inline allows to
     // support the following usage: TextBlock1.Inlines.Add("test");
     public static implicit operator Inline(string s) => new Run() { Text = s };

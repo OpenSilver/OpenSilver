@@ -37,7 +37,7 @@ namespace CSHTML5.Internal
         private const string CallJSMethodNameSync = "callJSUnmarshalled_v2";
 
         private static readonly Encoding DefaultEncoding = Encoding.Unicode;
-        private static readonly byte[] Delimiter = DefaultEncoding.GetBytes(";\n");
+        private static readonly byte[] Delimiter = DefaultEncoding.GetBytes(OpenSilver.Features.Interop.UseNewLineSeparator ? ";\n" : ";");
         private readonly IWebAssemblyExecutionHandler _webAssemblyExecutionHandler;
         private readonly byte[] _buffer;
         private int _currentLength;

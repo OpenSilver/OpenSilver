@@ -14,7 +14,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text.Json;
 using System.Text;
 using System.Linq;
 using System.Diagnostics;
@@ -24,6 +23,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Shapes;
+using System.Windows.Media;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using HtmlPresenter = CSHTML5.Native.Html.Controls.HtmlPresenter;
@@ -98,11 +98,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             RemoveFromGlobalStore(htmlDomElRef);
         }
 
-        internal static void RemoveNodeNative(INTERNAL_HtmlDomElementReference domNode)
-        {
-            string sDiv = OpenSilver.Interop.GetVariableStringForJS(domNode);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.remove();");
-        }
+        internal static void RemoveNodeNative(INTERNAL_HtmlDomElementReference element) =>
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.detachView('{element.UniqueIdentifier}')");
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -261,21 +258,23 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         public static void SetDomElementProperty(object domElementRef,
             string attributeName,
             object attributeValue,
-            bool forceSimulatorExecuteImmediately = false) 
-            => SetDomElementProperty((INTERNAL_HtmlDomElementReference)domElementRef,
+            bool forceSimulatorExecuteImmediately = false) =>
+            SetDomElementAttributeImpl((INTERNAL_HtmlDomElementReference)domElementRef,
                 attributeName,
-                attributeValue);
+                ConvertToStringToUseInJavaScriptCode(attributeValue));
 
-        internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference domElementRef,
-            string attributeName,
-            object attributeValue)
-        {
-            string uniqueIdentifier = domElementRef.UniqueIdentifier;
-            string javaScriptCodeToExecute =
-                $@"var element = document.getElementById(""{uniqueIdentifier}"");if (element) {{ element[""{attributeName}""] = {ConvertToStringToUseInJavaScriptCode(attributeValue)} }};";
+        internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, double value)
+            => SetDomElementAttributeImpl(element, propertyName, value.ToInvariantString());
 
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptCodeToExecute);
-        }
+        internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, int value)
+            => SetDomElementAttributeImpl(element, propertyName, value.ToInvariantString());
+
+        internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, string value, bool escape = false)
+            => SetDomElementPropertyImpl(element, propertyName, $"\"{(escape ? EscapeStringForUseInJavaScript(value) : value)}\"");
+
+        private static void SetDomElementPropertyImpl(INTERNAL_HtmlDomElementReference element, string propertyName, string value)
+            => OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.setProp('{element.UniqueIdentifier}','{propertyName}',{value})");
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -291,6 +290,9 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, double value)
             => SetDomElementAttributeImpl(domElementRef, attributeName, value.ToInvariantString());
 
+        internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, int value)
+            => SetDomElementAttributeImpl(domElementRef, attributeName, value.ToInvariantString());
+
         internal static void SetDomElementAttribute(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, bool value)
             => SetDomElementAttributeImpl(domElementRef, attributeName, value ? "true" : "false");
 
@@ -298,17 +300,15 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             => SetDomElementAttributeImpl(domElementRef, attributeName, $"\"{(escape ? EscapeStringForUseInJavaScript(value) : value)}\"");
 
         private static void SetDomElementAttributeImpl(INTERNAL_HtmlDomElementReference domElementRef, string attributeName, string value)
-        {
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.setDomAttribute(\"{domElementRef.UniqueIdentifier}\",\"{attributeName}\",{value})");
-        }
+            => OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.setAttr('{domElementRef.UniqueIdentifier}','{attributeName}',{value})");
 
         internal static void AddCSSClass(INTERNAL_HtmlDomElementReference domElementRef, string className)
         {
             Debug.Assert(domElementRef is not null);
 
             string sDiv = OpenSilver.Interop.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.classList.add('{className}');");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.classList.add('{className}')");
         }
 
         internal static void RemoveCSSClass(INTERNAL_HtmlDomElementReference domElementRef, string className)
@@ -316,7 +316,15 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             Debug.Assert(domElementRef is not null);
 
             string sDiv = OpenSilver.Interop.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.classList.remove('{className}');");
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.classList.remove('{className}')");
+        }
+
+        internal static void SetVisible(INTERNAL_HtmlDomElementReference element, bool visible)
+        {
+            Debug.Assert(element is not null);
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.setVisible('{element.UniqueIdentifier}',{(visible ? "true" : "false")})");
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
@@ -328,7 +336,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             var value = ConvertToStringToUseInJavaScriptCode(attributeValue);
             if (propertyCSSNames.Count == 1)
             {
-                javaScriptCodeToExecute = $@"document.setDomStyle(""{uniqueIdentifier}"", ""{propertyCSSNames[0]}"", {value})";
+                javaScriptCodeToExecute = $@"document.setCSS(""{uniqueIdentifier}"", ""{propertyCSSNames[0]}"", {value})";
             }
             else
             {
@@ -338,7 +346,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                     settingProperties += $"element.style.{propertyName} = {value};";
                 }
                 javaScriptCodeToExecute =
-                    $@"var element = document.getElementById(""{uniqueIdentifier}"");if (element) {{ {settingProperties} }};";
+                    $@"var element = document.getElementById(""{uniqueIdentifier}"");if (element) {{ {settingProperties} }}";
             }
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptCodeToExecute);
@@ -350,16 +358,14 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
             string javaScriptCodeToExecute =
-                $@"var element = document.getElementById(""{uniqueIdentifier}"");if (element) {{ element.removeAttribute(""{attributeName}"") }};";
+                $@"var element = document.getElementById(""{uniqueIdentifier}"");if (element) {{ element.removeAttribute(""{attributeName}"") }}";
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptCodeToExecute);
         }
 
-        internal static void RemoveAttribute(INTERNAL_HtmlDomElementReference domElement, string attributeName)
-        {
-            string sElement = OpenSilver.Interop.GetVariableStringForJS(domElement);
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.removeAttribute('{attributeName}');");
-        }
+        internal static void RemoveAttribute(INTERNAL_HtmlDomElementReference element, string attributeName) =>
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.unsetAttr('{element.UniqueIdentifier}','{attributeName}')");
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -420,25 +426,21 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
         internal static INTERNAL_HtmlDomElementReference CreateDomLayoutElementAndAppendIt(
-            string tagName,
-            object parentRef,
-            UIElement uie,
-            int index = -1)
+            string tagName, object parentRef, UIElement uie, bool isKeyboardFocusable)
         {
             string uid = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference domRef)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = domRef;
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createLayoutElement('{tagName}', '{uid}', '{parent.UniqueIdentifier}', {index.ToInvariantString()})");
+                    $"document.createLayout('{tagName}','{uid}','{parent.UniqueIdentifier}'{(isKeyboardFocusable ? ",true" : string.Empty)})");
             }
             else
             {
                 string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createLayoutElement('{tagName}', '{uid}', {sParentRef}, {index.ToInvariantString()})");
+                    $"document.createLayout('{tagName}','{uid}',{sParentRef}{(isKeyboardFocusable ? ",true" : string.Empty)})");
             }
 
             AddToGlobalStore(uid, uie);
@@ -450,22 +452,18 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         {
             Debug.Assert(popupRoot != null);
 
-            string uniqueIdentifier = popupRoot.UniqueIndentifier;
-            string sRootElement = OpenSilver.Interop.GetVariableStringForJS(
-                popupRoot.ParentWindow.RootDomElement);
+            string uid = NewId();
+
             string sPointerEvents = popupRoot.ParentPopup.StayOpen ? "none" : "auto";
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createPopupRootElement('{uniqueIdentifier}', {sRootElement}, '{sPointerEvents}');");
+                $"document.createPopupRoot('{uid}','{popupRoot.ParentWindow.RootDomElement.UniqueIdentifier}','{sPointerEvents}')");
 
-            AddToGlobalStore(uniqueIdentifier, popupRoot);
+            AddToGlobalStore(uid, popupRoot);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null);
+            return new INTERNAL_HtmlDomElementReference(uid, null);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateTextBlockDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement,
-            bool wrap)
+        internal static INTERNAL_HtmlDomElementReference CreateTextBlockDomElementAndAppendIt(object parentRef, UIElement associatedUIElement)
         {
 #if PERFSTAT
             Performance.Counter("CreateTextBlockDomElementAndAppendIt", t0);
@@ -476,13 +474,13 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             if (parent != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {(wrap ? "true" : "false")})");
+                    $"document.createTextBlock('{uniqueIdentifier}','{parent.UniqueIdentifier}')");
             }
             else
             {
                 string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", {sParentRef}, {(wrap ? "true" : "false")})");
+                    $@"document.createTextBlock('{uniqueIdentifier}',{sParentRef})");
             }
 
             AddToGlobalStore(uniqueIdentifier, associatedUIElement);
@@ -490,24 +488,69 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateImageDomElementAndAppendIt(
-            INTERNAL_HtmlDomElementReference parent,
-            Image image)
+        internal static (INTERNAL_HtmlDomElementReference OuterDiv, INTERNAL_HtmlDomElementReference Image) CreateImageDomElementAndAppendIt(
+            object parentRef, Image image)
         {
 #if PERFSTAT
             Performance.Counter("CreateImageDomElementAndAppendIt", t0);
 #endif
-            Debug.Assert(parent is not null);
+            Debug.Assert(parentRef is not null);
             Debug.Assert(image is not null);
 
-            string uniqueIdentifier = NewId();
+            string uid = NewId();
+            string imgUid = NewId();
 
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $@"document.createImageElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.imgManager.create('{uid}','{imgUid}','{parent.UniqueIdentifier}')");
+            }
+            else
+            {
+                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                   $"document.imgManager.create('{uid}','{imgUid}',{sParentRef})");
+            }
+            
+            AddToGlobalStore(uid, image);
+            AddToGlobalStore(imgUid, image);
 
-            AddToGlobalStore(uniqueIdentifier, image);
+            var outerDiv = new INTERNAL_HtmlDomElementReference(uid, parent);
+            var imgDiv = new INTERNAL_HtmlDomElementReference(imgUid, outerDiv);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+            return (outerDiv, imgDiv);
+        }
+
+        internal static (INTERNAL_HtmlDomElementReference OuterDiv, INTERNAL_HtmlDomElementReference Canvas) CreateInkPresenterDomElementAndAppendIt(
+            object parentRef, InkPresenter inkPresenter)
+        {
+            Debug.Assert(parentRef is not null);
+            Debug.Assert(inkPresenter is not null);
+
+            string uid = NewId();
+            string canvasUid = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent is not null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.createInkPresenter('{uid}','{canvasUid}','{parent.UniqueIdentifier}')");
+            }
+            else
+            {
+                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $@"document.createInkPresenter('{uid}','{canvasUid}',{sParentRef})");
+            }
+
+            AddToGlobalStore(uid, inkPresenter);
+            AddToGlobalStore(canvasUid, inkPresenter);
+
+            var outerDiv = new INTERNAL_HtmlDomElementReference(uid, parent);
+            var canvasDiv = new INTERNAL_HtmlDomElementReference(canvasUid, outerDiv);
+
+            return (outerDiv, canvasDiv);
         }
 
         internal static INTERNAL_HtmlDomElementReference CreateTextElementDomElementAndAppendIt(object parentRef, TextElement textElement)
@@ -518,13 +561,13 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             if (parent != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createTextElement('{uniqueIdentifier}', '{textElement.TagName}', '{parent.UniqueIdentifier}');");
+                    $"document.createText('{textElement.TagName}','{uniqueIdentifier}','{parent.UniqueIdentifier}')");
             }
             else
             {
                 string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createTextElement('{uniqueIdentifier}', '{textElement.TagName}', {sParentRef})");
+                    $"document.createText('{textElement.TagName}','{uniqueIdentifier}',{sParentRef})");
             }
 
             AddToGlobalStore(uniqueIdentifier, textElement);
@@ -542,13 +585,13 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             if (parent != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createBorderElement('{uniqueIdentifier}', '{parent.UniqueIdentifier}')");
+                    $"document.createBorder('{uniqueIdentifier}','{parent.UniqueIdentifier}')");
             }
             else
             {
                 string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.createBorderElement('{uniqueIdentifier}', {sParentRef})");
+                    $"document.createBorder('{uniqueIdentifier}',{sParentRef})");
             }
 
             AddToGlobalStore(uniqueIdentifier, border);
@@ -567,7 +610,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string defsUid = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createShapeElement('{svgUid}', '{shapeUid}', '{defsUid}', '{shape.SvgTagName}', '{parent.UniqueIdentifier}');");
+                $"document.createShape('{shape.SvgTagName}','{svgUid}','{shapeUid}','{defsUid}','{parent.UniqueIdentifier}')");
 
             AddToGlobalStore(svgUid, shape);
             AddToGlobalStore(shapeUid, shape);
@@ -579,14 +622,53 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return (svg, svgShape, svgDefs);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateSvgElementAndAppendIt(
+        internal static INTERNAL_HtmlDomElementReference CreateLinearGradientAndAppendIt(
             INTERNAL_HtmlDomElementReference parent,
-            string tagName)
+            LinearGradientBrush linearGradient)
         {
             string uid = NewId();
 
+            Point start = linearGradient.StartPoint;
+            Point end = linearGradient.EndPoint;
+            string x1 = Math.Round(start.X, 2).ToInvariantString();
+            string y1 = Math.Round(start.Y, 2).ToInvariantString();
+            string x2 = Math.Round(end.X, 2).ToInvariantString();
+            string y2 = Math.Round(end.Y, 2).ToInvariantString();
+            string units = GradientBrush.ConvertBrushMappingModeToString(linearGradient.MappingMode);
+            string spreadMethod = GradientBrush.ConvertSpreadMethodToString(linearGradient.SpreadMethod);
+            string opacity = Math.Round(linearGradient.Opacity, 2).ToInvariantString();
+            string stops = string.Join(",",
+                linearGradient
+                .GetGradientStops()
+                .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
+
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createSvgElement('{uid}', '{tagName}', '{parent.UniqueIdentifier}');");
+                $"document.createSvgLinearGradient('{uid}','{parent.UniqueIdentifier}',{x1},{y1},{x2},{y2},'{units}','{spreadMethod}',{opacity},{stops})");
+
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
+        }
+
+        internal static INTERNAL_HtmlDomElementReference CreateRadialGradientAndAppendIt(
+            INTERNAL_HtmlDomElementReference parent,
+            RadialGradientBrush radialGradient)
+        {
+            string uid = NewId();
+
+            Point center = radialGradient.Center;
+            string cx = Math.Round(center.X, 2).ToInvariantString();
+            string cy = Math.Round(center.Y, 2).ToInvariantString();
+            // TODO: support ellipse shaped radial on SVG using a gradientTransform.
+            string r = Math.Round(0.5 * Math.Max(0, radialGradient.RadiusX + radialGradient.RadiusY), 2).ToInvariantString();
+            string units = GradientBrush.ConvertBrushMappingModeToString(radialGradient.MappingMode);
+            string spreadMethod = GradientBrush.ConvertSpreadMethodToString(radialGradient.SpreadMethod);
+            string opacity = Math.Round(radialGradient.Opacity, 2).ToInvariantString();
+            string stops = string.Join(",",
+                radialGradient
+                .GetGradientStops()
+                .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createSvgRadialGradient('{uid}','{parent.UniqueIdentifier}',{cx},{cy},{r},'{units}','{spreadMethod}',{opacity},{stops})");
 
             return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
@@ -601,7 +683,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string contentId = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.htmlPresenterHelpers.createView('{id}', '{contentId}', '{parent.UniqueIdentifier}');");
+                $"document.htmlPresenterHelpers.createView('{id}','{contentId}','{parent.UniqueIdentifier}')");
 
             AddToGlobalStore(id, htmlPresenter);
 
@@ -624,16 +706,43 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             if (parent is not null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.textboxHelpers.createView('{uid}', '{parent.UniqueIdentifier}');");
+                    $"document.textviewManager.createTextView('{uid}','{parent.UniqueIdentifier}')");
             }
             else
             {
                 string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $@"document.textboxHelpers.createView('{uid}', {sParentRef})");
+                    $"document.textviewManager.createTextView('{uid}',{sParentRef})");
             }
 
             AddToGlobalStore(uid, textBoxView);
+
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
+        }
+
+        internal static INTERNAL_HtmlDomElementReference CreatePasswordBoxViewDomElementAndAppendIt(
+            object parentRef,
+            PasswordBoxView passwordBoxView)
+        {
+            Debug.Assert(parentRef is not null);
+            Debug.Assert(passwordBoxView is not null);
+
+            string uid = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent is not null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.textviewManager.createPasswordView('{uid}','{parent.UniqueIdentifier}')");
+            }
+            else
+            {
+                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.textviewManager.createPasswordView('{uid}',{sParentRef})");
+            }
+
+            AddToGlobalStore(uid, passwordBoxView);
 
             return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
@@ -649,7 +758,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return CreateDomElementAndInsertIt_ForUseByTheSimulator(domElementTag, parentRef, associatedUIElement, insertionIndex, relativePosition);
         }
 
-        private static string NewId() => "id" + _idGenerator.NewId().ToString();
+        private static string NewId() => $"id{_idGenerator.NewId()}";
 
         private static INTERNAL_HtmlDomElementReference CreateDomElementAndInsertIt_ForUseByTheSimulator(string domElementTag,
             object parentRef,
@@ -670,7 +779,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 var newElement = document.createElement(""{domElementTag}"");
 newElement.setAttribute(""id"", ""{uniqueIdentifier}"");
 var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
-    parentElement.children[{insertionIndex}].insertAdjacentElement(""{relativePosition}"", newElement);";
+    parentElement.children[{insertionIndex}].insertAdjacentElement(""{relativePosition}"", newElement)";
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptToExecute);
             AddToGlobalStore(uniqueIdentifier, associatedUIElement);
@@ -690,7 +799,7 @@ tempDiv.innerHTML = ""{domAsString.Replace('\"', '\'').Replace("\r", "").Replace
 var newElement = tempDiv.firstChild;
 newElement.setAttribute(""id"", ""{uniqueIdentifier}"");
 var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
-parentElement.appendChild(newElement);";
+parentElement.appendChild(newElement)";
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptToExecute);
             AddToGlobalStore(uniqueIdentifier, associatedUIElement);
@@ -707,7 +816,7 @@ parentElement.appendChild(newElement);";
             string javaScriptToExecute = $@"
 var child = document.getElementByIdSafe(""{childUniqueIdentifier}"");
 var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
-parentElement.appendChild(child);";
+parentElement.appendChild(child)";
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptToExecute);
             if (_store.TryGetValue(parentUniqueIdentifier, out var parentWeakRef))
@@ -909,7 +1018,7 @@ parentElement.appendChild(child);";
             return OpenSilver.Interop.IsNull(jsObject) || OpenSilver.Interop.IsUndefined(jsObject);
         }
 
-        internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Point offset, Size size, Rect? clip)
+        internal static void ArrangeNative(INTERNAL_HtmlDomStyleReference style, Point offset, Size size, Rect? clip)
         {
             string left = Math.Round(offset.X, 2).ToInvariantString();
             string top = Math.Round(offset.Y, 2).ToInvariantString();
@@ -927,12 +1036,12 @@ parentElement.appendChild(child);";
                 string clipBottom = Math.Round(clipRect.Bottom, 2).ToInvariantString();
 
                 javaScriptCodeToExecute =
-                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom});";
+                    $"document.arrange('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipRight},{clipBottom})";
             }
             else
             {
                 javaScriptCodeToExecute =
-                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},false);";
+                    $"document.arrange('{style.Uid}',{left},{top},{width},{height})";
             }
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(javaScriptCodeToExecute);

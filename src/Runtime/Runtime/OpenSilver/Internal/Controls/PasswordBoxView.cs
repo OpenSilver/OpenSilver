@@ -21,7 +21,7 @@ using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
-internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
+internal sealed class PasswordBoxView : TextViewBase
 {
     static PasswordBoxView()
     {
@@ -69,6 +69,8 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((PasswordBoxView)d).SetForeground(oldValue as Brush, (Brush)newValue),
             });
+
+        IsHitTestableProperty.OverrideMetadata(typeof(PasswordBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
     private WeakEventListener<PasswordBoxView, Brush, EventArgs> _foregroundChangedListener;
@@ -78,8 +80,14 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
     {
     }
 
-    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren) =>
-        AddPasswordInputDomElement(parentRef, out domElementWhereToPlaceChildren);
+    internal new PasswordBox Host => (PasswordBox)base.Host;
+
+    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+    {
+        var div = INTERNAL_HtmlDomManager.CreatePasswordBoxViewDomElementAndAppendIt(parentRef, this);
+        domElementWhereToPlaceChildren = div;
+        return div;
+    }
 
     protected internal override void INTERNAL_OnAttachedToVisualTree()
     {
@@ -104,7 +112,7 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
         int pwdLength = Host.Password.Length;
 
         return ParentWindow.TextMeasurementService.MeasureText(
-            ((INTERNAL_HtmlDomElementReference)OuterDiv).UniqueIdentifier,
+            OuterDiv.UniqueIdentifier,
             "pre",
             string.Empty,
             constraint.Width,
@@ -124,7 +132,7 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
         {
-            INTERNAL_HtmlDomManager.SetDomElementProperty(InputDiv, "maxLength", maxLength);
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(InputDiv, "maxLength", maxLength);
         }
     }
 
@@ -138,34 +146,6 @@ internal sealed class PasswordBoxView : TextViewBase<PasswordBox>
 
             InvalidateMeasure();
         }
-    }
-
-    private object AddPasswordInputDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-    {
-        var passwordField = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt(
-            "input", parentRef, this);
-
-        domElementWhereToPlaceChildren = passwordField;
-
-        var passwordFieldStyle = passwordField.Style;
-
-        passwordFieldStyle.border = "transparent"; // This removes the border. We do not need it since we are templated
-        passwordFieldStyle.outline = "none";
-        passwordFieldStyle.backgroundColor = "transparent";
-        passwordFieldStyle.fontFamily = "inherit"; // Not inherited by default for "input" DOM elements
-        passwordFieldStyle.fontSize = "inherit"; // Not inherited by default for "input" DOM elements
-        passwordFieldStyle.color = "inherit"; //This is to inherit the foreground value from parent div.
-        passwordFieldStyle.letterSpacing = "inherit"; // Not inherited by default for "input" DOM elements
-        passwordFieldStyle.width = "100%";
-        passwordFieldStyle.height = "100%";
-        passwordFieldStyle.padding = "0px";
-
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password");
-
-        // disable native tab navigation
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "tabindex", "-1");
-
-        return passwordField;
     }
 
     private string GetPassword()

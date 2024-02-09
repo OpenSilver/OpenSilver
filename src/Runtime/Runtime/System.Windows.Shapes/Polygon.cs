@@ -84,7 +84,7 @@ namespace System.Windows.Shapes
                         {
                             polygon.SetSvgAttribute(
                                 "points",
-                                string.Join(" ", points.Select(static p => $"{p.X.ToInvariantString()},{p.Y.ToInvariantString()}")));
+                                string.Join(" ", points.Select(static p => $"{Math.Round(p.X, 2).ToInvariantString()},{Math.Round(p.Y, 2).ToInvariantString()}")));
                         }
                         else
                         {

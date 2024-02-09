@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Windows;
 using CSHTML5.Internal;
 using Microsoft.JSInterop;
 
@@ -126,31 +125,11 @@ public static class DumpHelper
 
     private static void AssertDEBUG()
     {
-        bool inDebug = Debugger.IsAttached || IsDebug();
+        bool inDebug = Debugger.IsAttached || Features.DOM.EnableObjectDump;
 
         if (!inDebug)
         {
             throw new InvalidOperationException();
         }
     }
-
-    private static bool IsDebug()
-    {
-        if (_isDebugging.HasValue)
-        {
-            return _isDebugging.Value;
-        }
-
-        Application app = Application.Current;
-        if (app is not null)
-        {
-            DebuggableAttribute attr = app.GetType().Assembly.GetCustomAttribute<DebuggableAttribute>();
-            _isDebugging = attr != null && attr.IsJITTrackingEnabled;
-            return _isDebugging.Value;
-        }
-
-        return false;
-    }
-
-    private static bool? _isDebugging;
 }

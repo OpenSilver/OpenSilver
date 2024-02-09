@@ -203,13 +203,6 @@ internal sealed class InputManager
         }
     }
 
-    internal void AddEventListeners(UIElement uie, bool isFocusable)
-    {
-        Debug.Assert(uie.OuterDiv is not null);
-        OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-            $"document.inputManager.addListeners('{uie.OuterDiv.UniqueIdentifier}', {(isFocusable ? "true" : "false")});");
-    }
-
     internal bool SetFocus(UIElement uie)
     {
         DependencyObject focusScope = FocusManager.GetFocusScope(uie);

@@ -497,7 +497,7 @@ namespace System.Windows
         {
             if (!BypassLayoutPolicies)
             {
-                INTERNAL_HtmlDomManager.SetVisualBounds(OuterDiv.Style, VisualOffset, RenderSize, LayoutClip);
+                INTERNAL_HtmlDomManager.ArrangeNative(OuterDiv.Style, VisualOffset, RenderSize, LayoutClip);
             }
         }
 

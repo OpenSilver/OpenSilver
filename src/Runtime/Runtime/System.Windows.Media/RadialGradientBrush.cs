@@ -203,11 +203,12 @@ namespace System.Windows.Media
                 multiplier = 1;
             }
 
+            Point center = Center;
             string gradientType = SpreadMethod == GradientSpreadMethod.Repeat ? "repeating-radial-gradient" : "radial-gradient";
             string rx = ((int)(RadiusX * multiplier)).ToInvariantString();
             string ry = ((int)(RadiusY * multiplier)).ToInvariantString();
-            string cx = ((int)(Center.X * multiplier)).ToInvariantString();
-            string cy = ((int)(Center.Y * multiplier)).ToInvariantString();
+            string cx = ((int)(center.X * multiplier)).ToInvariantString();
+            string cy = ((int)(center.Y * multiplier)).ToInvariantString();
             return $"{gradientType}({rx}{unit} {ry}{unit} at {cx}{unit} {cy}{unit}, {stops})";
         }
 
@@ -237,27 +238,7 @@ namespace System.Windows.Media
 
             public string GetBrush(Shape shape)
             {
-                if (_gradientRef is null)
-                {
-                    _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(
-                        shape.DefsElement, "radialGradient");
-
-                    // TODO: support ellipse shaped radial on SVG using a gradientTransform.
-                    double radius = (_brush.RadiusX + _brush.RadiusY) / 2d;
-
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "cx", _brush.Center.X.ToInvariantString());
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "cy", _brush.Center.Y.ToInvariantString());
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "r", radius.ToInvariantString());
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "gradientUnits", ConvertBrushMappingModeToString(_brush.MappingMode));
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef, "spreadMethod", ConvertSpreadMethodToString(_brush.SpreadMethod));
-
-                    var stops = _brush.GetGradientStops()
-                        .Select(stop => $"<stop offset=\"{stop.Offset.ToInvariantString()}\" style=\"stop-color:{stop.Color.ToHtmlString(_brush.Opacity)}\" />");
-
-                    string sDiv = OpenSilver.Interop.GetVariableStringForJS(_gradientRef);
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.innerHTML = `{string.Join(Environment.NewLine, stops)}`;");
-                }
-
+                _gradientRef ??= INTERNAL_HtmlDomManager.CreateRadialGradientAndAppendIt(shape.DefsElement, _brush);
                 return $"url(#{_gradientRef.UniqueIdentifier})";
             }
 

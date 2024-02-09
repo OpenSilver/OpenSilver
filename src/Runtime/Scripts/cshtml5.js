@@ -82,13 +82,7 @@ document.createElementSafe = function (tagName, id, parent, index) {
     if (typeof parent === 'string') parent = document.getElementById(parent);
     if (parent == null) return null;
 
-    const element = document.createElement(tagName);
-
-    element.setAttribute('id', id);
-    Object.defineProperty(element, 'xamlid', {
-        value: id,
-        writable: false,
-    });
+    const element = document._createElement(tagName, id);
 
     if (index < 0 || index >= parent.children.length) {
         parent.appendChild(element);
@@ -96,16 +90,34 @@ document.createElementSafe = function (tagName, id, parent, index) {
         parent.insertBefore(element, parent.children[index]);
     }
 
-    Object.defineProperty(element, 'dump', {
-        get() { return document.dumpProperties(id); }
-    });
-
     return element;
 };
 
-document.createLayoutElement = function (tagName, id, parent, index) {
-    const element = document.createElementSafe(tagName, id, parent, index);
-    if (element) element.classList.add('uielement-unarranged');
+document._createElement = function (tagName, id) {
+    const element = document.createElement(tagName);
+    element.setAttribute('id', id);
+    Object.defineProperty(element, 'xamlid', {
+        value: id,
+        writable: false,
+    });
+    Object.defineProperty(element, 'dump', {
+        get() { return document.dumpProperties(id); }
+    });
+    return element;
+};
+
+document.createLayout = function (tagName, id, parentId, isKeyboardFocusable) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+
+    const element = document._createLayout(tagName, id, isKeyboardFocusable);
+    parent.appendChild(element);
+};
+
+document._createLayout = function (tagName, id, isKeyboardFocusable) {
+    const element = document._createElement(tagName, id);
+    element.classList.add('opensilver-uielement', 'uielement-unarranged');
+    document.inputManager.addListeners(element, isKeyboardFocusable);
     return element;
 };
 
@@ -116,68 +128,88 @@ document.dumpProperties = function (id, ...names) {
     return null;
 };
 
-document.createTextBlockElement = function (id, parent, wrap) {
-    const element = document.createLayoutElement('div', id, parent, -1);
-    if (element) {
-        element.style.overflow = 'hidden';
-        element.style.textAlign = 'start';
-        element.style.boxSizing = 'border-box';
-        if (wrap) {
-            element.style.overflowWrap = 'break-word';
-            element.style.whiteSpace = 'pre-wrap';
-        } else {
-            element.style.whiteSpace = 'pre';
-        }
-    }
+document.createTextBlock = function (id, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+
+    const element = document._createLayout('div', id, false);
+    element.style.overflow = 'hidden';
+    element.style.textAlign = 'start';
+    element.style.whiteSpace = 'pre';
+
+    parent.appendChild(element);
 };
 
-document.createBorderElement = function (id, parent) {
-    const element = document.createLayoutElement('div', id, parent, -1);
-    if (element) {
-        element.classList.add('opensilver-border');
-    }
+document.createBorder = function (id, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+
+    const element = document._createLayout('div', id, false);
+    element.classList.add('opensilver-border');
+
+    parent.appendChild(element);
 };
 
-document.createPopupRootElement = function (id, rootElement, pointerEvents) {
+document.createInkPresenter = function (id, canvasId, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+
+    const element = document._createLayout('div', id, false);
+    const canvas = document._createElement('canvas', canvasId);
+    canvas.classList.add('opensilver-inkpresenter');
+
+    element.appendChild(canvas);
+    parent.appendChild(element);
+};
+
+document.createPopupRoot = function (id, rootElementId, pointerEvents) {
+    const rootElement = document.getElementById(rootElementId);
     if (!rootElement) return;
 
-    const popupRoot = document.createElement('div');
-    popupRoot.setAttribute('id', id);
-    Object.defineProperty(popupRoot, 'xamlid', {
-        value: id,
-        writable: false,
-    });
-    popupRoot.style.position = 'absolute';
-    popupRoot.style.width = '100%';
-    popupRoot.style.height = '100%';
-    popupRoot.style.overflow = 'clip';
+    const popupRoot = document._createElement('div', id);
+    popupRoot.classList.add('opensilver-popup');
     popupRoot.style.pointerEvents = pointerEvents;
+
     rootElement.appendChild(popupRoot);
 };
 
-document.createImageElement = function (id, parentElement) {
-    const img = document.createElementSafe('img', id, parentElement, -1);
+document.createImageManager = function (loadCallback, errorCallback) {
+    if (document.imgManager) return;
 
-    if (img) {
-        img.setAttribute('alt', ' ');
-        img.style.display = 'none';
-        img.style.width = 'inherit';
-        img.style.height = 'inherit';
-        img.style.lineHeight = '0px';
-        img.style.objectFit = 'contain';
-        img.style.objectPosition = 'left top';
-        img.addEventListener('load', function (e) {
-            this.style.display = '';
-        })
-        img.addEventListener('error', function (e) {
-            this.style.display = 'none';
-        });
-    }
+    document.imgManager = {
+        create: function (id, imgId, parentId) {
+            const parent = document.getElementById(parentId);
+            if (!parent) return;
+
+            const element = document._createLayout('div', id, false);
+            element.style.lineHeight = '0px';
+
+            const img = document._createElement('img', imgId);
+            img.setAttribute('alt', ' ');
+            img.style.display = 'none';
+            img.style.width = 'inherit';
+            img.style.height = 'inherit';
+            img.style.lineHeight = '0px';
+            img.style.objectFit = 'contain';
+            img.style.objectPosition = 'left top';
+            img.addEventListener('load', function (e) {
+                this.style.display = '';
+                loadCallback(id);
+            })
+            img.addEventListener('error', function (e) {
+                this.style.display = 'none';
+                errorCallback(id);
+            });
+
+            element.appendChild(img);
+            parent.appendChild(element);
+        },
+    };
 };
 
-document.createTextElement = function (id, tagName, parent) {
-    if (typeof parent === 'string') parent = document.getElementById(parent);
-    if (parent === null) return null;
+document.createText = function (tagName, id, parentId) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
 
     const textElement = document.createElement(tagName);
     textElement.setAttribute('id', id);
@@ -185,13 +217,12 @@ document.createTextElement = function (id, tagName, parent) {
     parent.appendChild(textElement);
 };
 
-document.createShapeElement = function (svgId, shapeId, defsId, svgTagName, parentId) {
+document.createShape = function (svgTagName, svgId, shapeId, defsId, parentId) {
     const parent = document.getElementById(parentId);
     if (!parent) return;
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.classList.add('uielement-shape');
-    svg.classList.add('uielement-unarranged');
+    svg.classList.add('opensilver-uielement', 'opensilver-shape', 'uielement-unarranged');
     svg.setAttribute('id', svgId);
     Object.defineProperty(svg, 'xamlid', {
         value: svgId,
@@ -214,14 +245,71 @@ document.createShapeElement = function (svgId, shapeId, defsId, svgTagName, pare
     parent.appendChild(svg);
 };
 
-document.createSvgElement = function (id, tagName, parentId) {
+document.createSvgLinearGradient = function (id, parentId, x1, y1, x2, y2, units, spreadMethod, opacity, ...stops) {
     const parent = document.getElementById(parentId);
     if (!parent) return;
 
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     svg.setAttribute('id', id);
+    svg.setAttribute('x1', x1);
+    svg.setAttribute('y1', y1);
+    svg.setAttribute('x2', x2);
+    svg.setAttribute('y2', y2);
+    svg.setAttribute('gradientUnits', units);
+    svg.setAttribute('spreadMethod', spreadMethod);
+
+    for (let i = 0; i < stops.length; i += 2) {
+        const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop.setAttribute('offset', stops[i]);
+        stop.style.stopColor = stops[i + 1];
+        stop.style.stopOpacity = opacity;
+        svg.appendChild(stop);
+    }
 
     parent.appendChild(svg);
+};
+
+document.createSvgRadialGradient = function (id, parentId, cx, cy, r, units, spreadMethod, opacity, ...stops) {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+    svg.setAttribute('id', id);
+    svg.setAttribute('cx', cx);
+    svg.setAttribute('cy', cy);
+    svg.setAttribute('r', r);
+    svg.setAttribute('gradientUnits', units);
+    svg.setAttribute('spreadMethod', spreadMethod);
+
+    for (let i = 0; i < stops.length; i += 2) {
+        const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop.setAttribute('offset', stops[i]);
+        stop.style.stopColor = stops[i + 1];
+        stop.style.stopOpacity = opacity;
+        svg.appendChild(stop);
+    }
+
+    parent.appendChild(svg);
+};
+
+document.arrangeRectangle = function (id, x, y, width, height) {
+    const rect = document.getElementById(id);
+    if (rect) {
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', width);
+        rect.setAttribute('height', height);
+    }
+};
+
+document.arrangeEllipse = function (id, rx, ry, penThickness) {
+    const ellipse = document.getElementById(id);
+    if (ellipse) {
+        ellipse.setAttribute('rx', rx);
+        ellipse.setAttribute('ry', ry);
+        ellipse.setAttribute('cx', rx + penThickness / 2.0);
+        ellipse.setAttribute('cy', ry + penThickness / 2.0);
+    }
 };
 
 document.getBBox = function (svgElement) {
@@ -250,27 +338,46 @@ document.invoke2dContextMethod = function (id, methodName, args) {
             .filter(i => i.length > 0));
 };
 
-document.setDomStyle = function (id, propertyName, value) {
+document.setCSS = function (id, cssPropertyName, value) {
     const element = document.getElementById(id);
-    if (!element)
-        return;
-
-    element.style[propertyName] = value;
+    if (element) {
+        element.style[cssPropertyName] = value;
+    }
 };
 
-document.setStyleProperty = function (id, propertyName, value, priority) {
+document.setCSSProperty = function (id, propertyName, value, priority) {
     const element = document.getElementById(id);
     if (element) {
         element.style.setProperty(propertyName, value, priority);
     }
 };
 
-document.setDomAttribute = function (id, propertyName, value) {
+document.setAttr = function (id, attributeName, value) {
     const element = document.getElementById(id);
-    if (!element)
-        return;
+    if (element) {
+        element.setAttribute(attributeName, value);
+    }
+};
 
-    element.setAttribute(propertyName, value);
+document.unsetAttr = function (id, attributeName) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.removeAttribute(attributeName);
+    }
+};
+
+document.setProp = function (id, propertyName, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element[propertyName] = value;
+    }
+};
+
+document.detachView = function (id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.remove();
+    }
 };
 
 document.removeEventListenerSafe = function (element, method, func) {
@@ -552,8 +659,7 @@ document.createInputManager = function (callback) {
                 }
             });
         },
-        addListeners: function (element, isFocusable) {
-            const view = typeof element === 'string' ? document.getElementById(element) : element;
+        addListeners: function (view, isFocusable) {
             if (!view) return;
 
             view.addEventListener('mouseenter', function (e) {
@@ -679,14 +785,24 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
     window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
 };
 
-document.setVisualBounds = function (id, left, top, width, height, clip, clipLeft, clipTop, clipRight, clipBottom) {
+document.setVisible = function (id, visible) {
+    const element = document.getElementById(id);
+    if (element) {
+        if (visible) {
+            element.classList.remove('uielement-collapsed')
+        } else {
+            element.classList.add('uielement-collapsed')
+        }
+    }
+};
+
+document.arrange = function (id, left, top, width, height, clip, clipLeft, clipTop, clipRight, clipBottom) {
     const element = document.getElementById(id);
     if (element) {
         element.style.left = left + 'px';
         element.style.top = top + 'px';
         element.style.width = width + 'px';
         element.style.height = height + 'px';
-        element.style.position = 'absolute';
         if (clip) {
             element.style.clip = `rect(${clipTop}px ${clipRight}px ${clipBottom}px ${clipLeft}px)`;
         } else {
@@ -845,7 +961,9 @@ document.getSystemColor = function (color) {
     return '';
 };
 
-document.textboxHelpers = (function () {
+document.createTextviewManager = function (inputCallback, scrollCallback) {
+    if (document.textviewManager) return;
+
     function getSelectionLength(view) {
         return view.selectionEnd - view.selectionStart;
     };
@@ -915,7 +1033,7 @@ document.textboxHelpers = (function () {
             return true;
         }
 
-        const caretIndex = getCaretPosition(view); 
+        const caretIndex = getCaretPosition(view);
         return caretIndex > 0 && (e.ctrlKey || !isNewLineChar(view.value[caretIndex - 1]));
     };
 
@@ -924,7 +1042,7 @@ document.textboxHelpers = (function () {
             return true;
         }
 
-        const caretIndex = getCaretPosition(view); 
+        const caretIndex = getCaretPosition(view);
         return caretIndex < view.value.length && (e.ctrlKey || !isNewLineChar(view.value[caretIndex]));
     };
 
@@ -939,17 +1057,18 @@ document.textboxHelpers = (function () {
         return false;
     };
 
-    return {
-        createView: function (id, parentId) {
-            const view = document.createLayoutElement('textarea', id, parentId, -1);
+    document.textviewManager = {
+        createTextView: function (id, parentId) {
+            const parent = document.getElementById(parentId);
+            if (!parent) return;
+
+            const view = document._createLayout('textarea', id, true);
             view.style.fontSize = 'inherit';
             view.style.fontFamily = 'inherit';
             view.style.color = 'inherit';
             view.style.letterSpacing = 'inherit';
             view.style.resize = 'none';
-            view.style.outline = 'none';
             view.style.border = 'none';
-            view.style.boxSizing = 'border-box';
             view.style.background = 'transparent';
             view.style.cursor = 'text';
             view.style.overflow = 'hidden';
@@ -957,6 +1076,14 @@ document.textboxHelpers = (function () {
             view.style.padding = '0px';
 
             view.setAttribute('tabindex', -1);
+
+            view.addEventListener('input', function (e) {
+                inputCallback(id);
+            });
+
+            view.addEventListener('scroll', function (e) {
+                scrollCallback(id);
+            });
 
             view.addEventListener('paste', function (e) {
                 if (this.getAttribute('data-acceptsreturn') === 'false') {
@@ -968,6 +1095,34 @@ document.textboxHelpers = (function () {
                     document.execCommand('insertText', false, content);
                 }
             }, false);
+
+            parent.appendChild(view);
+        },
+        createPasswordView: function (id, parentId) {
+            const parent = document.getElementById(parentId);
+            if (!parent) return;
+
+            const view = document._createLayout('input', id, true);
+            view.style.border = 'none';
+            view.style.background = 'transparent';
+            view.style.fontFamily = 'inherit';
+            view.style.fontSize = 'inherit';
+            view.style.color = 'inherit';
+            view.style.letterSpacing = 'inherit';
+            view.style.padding = '0px';
+
+            view.setAttribute('type', 'password');
+            view.setAttribute('tabindex', -1);
+
+            view.addEventListener('input', function (e) {
+                inputCallback(id);
+            });
+
+            view.addEventListener('scroll', function (e) {
+                scrollCallback(id);
+            });
+
+            parent.appendChild(view);
         },
         onKeyDownNative: function (view, e) {
             switch (e.key.toLowerCase()) {
@@ -1003,18 +1158,21 @@ document.textboxHelpers = (function () {
             }
         },
     };
-})();
+};
 
 document.htmlPresenterHelpers = (function () {
     return {
         createView: function (id, contentId, parentId) {
-            const view = document.createLayoutElement('div', id, parentId, -1);
-            if (view) {
-                const content = document.createElement('div');
-                content.setAttribute('id', contentId);
-                content.attachShadow({ mode: 'open' });
-                view.appendChild(content);
-            }
+            const parent = document.getElementById(parentId);
+            if (!parent) return;
+
+            const view = document._createLayout('div', id, false);
+            const content = document.createElement('div');
+            content.setAttribute('id', contentId);
+            content.attachShadow({ mode: 'open' });
+
+            view.appendChild(content);
+            parent.appendChild(view);
         },
         onKeyDownNative: function (view, e) {
             if (!view || !e) return false;

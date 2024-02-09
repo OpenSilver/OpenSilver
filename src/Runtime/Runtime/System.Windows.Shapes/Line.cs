@@ -39,7 +39,7 @@ namespace System.Windows.Shapes
                     {
                         Line line = (Line)d;
                         double x1 = (double)newValue;
-                        line.SetSvgAttribute("x1", x1.ToInvariantString());
+                        line.SetSvgAttribute("x1", Math.Round(x1, 2).ToInvariantString());
                     },
                 });
 
@@ -69,7 +69,7 @@ namespace System.Windows.Shapes
                     {
                         Line line = (Line)d;
                         double x2 = (double)newValue;
-                        line.SetSvgAttribute("x2", x2.ToInvariantString());
+                        line.SetSvgAttribute("x2", Math.Round(x2, 2).ToInvariantString());
                     },
                 });
 
@@ -99,7 +99,7 @@ namespace System.Windows.Shapes
                     {
                         Line line = (Line)d;
                         double y1 = (double)newValue;
-                        line.SetSvgAttribute("y1", y1.ToInvariantString());
+                        line.SetSvgAttribute("y1", Math.Round(y1, 2).ToInvariantString());
                     },
                 });
 
@@ -129,7 +129,7 @@ namespace System.Windows.Shapes
                     {
                         Line line = (Line)d;
                         double y2 = (double)newValue;
-                        line.SetSvgAttribute("y2", y2.ToInvariantString());
+                        line.SetSvgAttribute("y2", Math.Round(y2, 2).ToInvariantString());
                     },
                 });
 

@@ -362,7 +362,13 @@ namespace System.Windows.Media
 
         internal string ToHtmlString(double opacity)
         {
-            return $"rgba({R.ToInvariantString()}, {G.ToInvariantString()}, {B.ToInvariantString()}, {(opacity * A / 255d).ToInvariantString()})";
+            if (opacity >= 1.0 && A == 0xff)
+            {
+                return $"rgb({R.ToInvariantString()},{G.ToInvariantString()},{B.ToInvariantString()})";
+            }
+
+            double alpha = Math.Round(Math.Max(0.0, Math.Min(1.0, opacity)) * A / 255.0, 2);
+            return $"rgba({R.ToInvariantString()},{G.ToInvariantString()},{B.ToInvariantString()},{alpha.ToInvariantString()})";
         }
 
         internal static Color Parse(string color)

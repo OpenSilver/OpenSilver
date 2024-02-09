@@ -27,6 +27,11 @@ namespace CSHTML5.Native.Html.Controls
         private INTERNAL_HtmlDomElementReference _jsDiv;
         private ResizeObserverAdapter _resizeObserver;
 
+        static HtmlPresenter()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(HtmlPresenter), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
+
         /// <summary>
         /// Identifies the <see cref="Html"/> dependency property.
         /// </summary>
@@ -42,7 +47,7 @@ namespace CSHTML5.Native.Html.Controls
                         var htmlPresenter = (HtmlPresenter)d;
                         string sDiv = OpenSilver.Interop.GetVariableStringForJS(htmlPresenter._jsDiv);
                         string sContent = OpenSilver.Interop.GetVariableStringForJS((string)newValue ?? string.Empty);
-                        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.shadowRoot.innerHTML = {sContent};");
+                        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.shadowRoot.innerHTML = {sContent}");
                     },
                 });
         
@@ -196,8 +201,6 @@ namespace CSHTML5.Native.Html.Controls
         protected override Size ArrangeOverride(Size finalSize) => finalSize;
 
         internal sealed override bool EnablePointerEventsCore => true;
-
-        internal sealed override void AddEventListeners() => InputManager.Current.AddEventListeners(this, true);
 
         private void OnHtmlContentResized(Size size) => InvalidateMeasure();
     }

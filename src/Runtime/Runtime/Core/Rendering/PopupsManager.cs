@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using CSHTML5;
 using CSHTML5.Internal;
 
 //
@@ -29,82 +28,61 @@ namespace DotNetForHtml5.Core
 {
     internal static class PopupsManager
     {
-        private static int CurrentPopupRootIndentifier = 0;
-        private static readonly HashSet<PopupRoot> PopupRootIdentifierToInstance = new();
+        private static readonly HashSet<PopupRoot> _popupRoots = new();
 
-        public static PopupRoot CreateAndAppendNewPopupRoot(Popup popup, Window parentWindow)
-        {
-            // Generate a unique identifier for the PopupRoot:
-            string uniquePopupRootIdentifier = $"INTERNAL_Cshtml5_PopupRoot_{++CurrentPopupRootIndentifier}";
-
-            var popupRoot = new PopupRoot(uniquePopupRootIdentifier, parentWindow, popup);
-
-            //--------------------------------------
-            // Create a DIV for the PopupRoot in the DOM tree:
-            //--------------------------------------
-
-            var popupRootDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
-            popupRoot.OuterDiv
-                = popupRoot.InnerDiv
-                = popupRootDiv;
-            popupRoot.IsConnectedToLiveTree = true;
-            popupRoot.INTERNAL_AttachToDomEvents();
-            popupRoot.UpdateIsVisible();
-
-            //--------------------------------------
-            // Remember the PopupRoot for later use:
-            //--------------------------------------
-
-            PopupRootIdentifierToInstance.Add(popupRoot);
-
-            return popupRoot;
-        }
-
-        public static void RemovePopupRoot(PopupRoot popupRoot)
-        {
-            if (!PopupRootIdentifierToInstance.Remove(popupRoot))
-            {
-                throw new InvalidOperationException(
-                    $"No PopupRoot with identifier '{popupRoot.UniqueIndentifier}' was found.");
-            }
-
-            //--------------------------------------
-            // Remove from the DOM:
-            //--------------------------------------
-
-            popupRoot.INTERNAL_DetachFromDomEvents();
-
-            string sWindow = OpenSilver.Interop.GetVariableStringForJS(popupRoot.ParentWindow.RootDomElement);
-
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $@"var popupRoot = document.getElementById(""{popupRoot.UniqueIndentifier}"");
-if (popupRoot) {sWindow}.removeChild(popupRoot);");
-
-            popupRoot.OuterDiv = popupRoot.InnerDiv = null;
-            popupRoot.IsConnectedToLiveTree = false;
-            popupRoot.ParentPopup = null;
-        }
-
-        public static IEnumerable GetAllRootUIElements() // IMPORTANT: This is called via reflection from the "Visual Tree Inspector" of the Simulator. If you rename or remove it, be sure to update the Simulator accordingly!
+        // IMPORTANT: This is called via reflection from the "Visual Tree Inspector" of the Simulator.
+        // If you rename or remove it, be sure to update the Simulator accordingly!
+        public static IEnumerable GetAllRootUIElements()
         {
             // Include the main window:
             yield return Window.Current;
 
             // And all the popups:
-            foreach (PopupRoot popupRoot in PopupRootIdentifierToInstance)
+            foreach (PopupRoot popupRoot in _popupRoots)
             {
                 yield return popupRoot;
             }
         }
+
+        internal static PopupRoot CreateAndAppendNewPopupRoot(Popup popup, Window parentWindow)
+        {
+            var popupRoot = new PopupRoot(parentWindow, popup);
+
+            _popupRoots.Add(popupRoot);
+
+            //--------------------------------------
+            // Create a DIV for the PopupRoot in the DOM tree:
+            //--------------------------------------
+
+            popupRoot.OuterDiv = popupRoot.InnerDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
+            popupRoot.IsConnectedToLiveTree = true;
+            popupRoot.UpdateIsVisible();
+
+            return popupRoot;
+        }
+
+        internal static void RemovePopupRoot(PopupRoot popupRoot)
+        {
+            _popupRoots.Remove(popupRoot);
+
+            if (popupRoot.OuterDiv is not null)
+            {
+                INTERNAL_HtmlDomManager.RemoveNodeNative(popupRoot.OuterDiv);
+            }
+
+            popupRoot.OuterDiv = popupRoot.InnerDiv = null;
+            popupRoot.IsConnectedToLiveTree = false;
+            popupRoot.ParentPopup = null;
+        }
         
-        internal static IEnumerable<PopupRoot> GetActivePopupRoots() => PopupRootIdentifierToInstance;
+        internal static IEnumerable<PopupRoot> GetActivePopupRoots() => _popupRoots;
         
         /// <summary>
         /// Returns the coordinates of the UIElement, relative to the Window that contains it.
         /// </summary>
         /// <param name="element">The element of which the position will be returned.</param>
         /// <returns>The position of the element relative to the Window that contains it.</returns>
-        public static Point GetUIElementAbsolutePosition(UIElement element)
+        internal static Point GetUIElementAbsolutePosition(UIElement element)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {

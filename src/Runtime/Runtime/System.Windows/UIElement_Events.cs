@@ -766,19 +766,9 @@ namespace System.Windows
 
         internal virtual INTERNAL_HtmlDomElementReference GetFocusTarget() => OuterDiv;
 
-        public virtual void INTERNAL_AttachToDomEvents()
-        {
-            AddEventListeners();
-        }
+        public virtual void INTERNAL_AttachToDomEvents() { }
 
-        public virtual void INTERNAL_DetachFromDomEvents()
-        {
-        }
-
-        internal virtual void AddEventListeners()
-        {
-            InputManager.Current.AddEventListeners(this, false);
-        }
+        public virtual void INTERNAL_DetachFromDomEvents() { }
 
         internal virtual UIElement MouseTarget => this;
 

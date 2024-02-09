@@ -16,7 +16,6 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using OpenSilver;
@@ -356,13 +355,11 @@ if(nextSibling != undefined) {
             // Create and append the DOM structure of the Child:
             object domElementWhereToPlaceGrandChildren = null;
             INTERNAL_HtmlDomElementReference outerDomElement;
-            bool isChildAControl = child is Control;
             if (child.HtmlRepresentation == null)
             {
-                bool hasTemplate = isChildAControl && ((Control)child).HasTemplate;
-                if (hasTemplate)
+                if (child is Control control && control.HasTemplate)
                 {
-                    outerDomElement = (INTERNAL_HtmlDomElementReference)((Control)child).CreateDomElementForControlTemplate(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
+                    outerDomElement = (INTERNAL_HtmlDomElementReference)control.CreateDomElementForControlTemplate(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
                 }
                 else
                 {
@@ -378,7 +375,10 @@ if(nextSibling != undefined) {
 
             // For debugging purposes (to better read the output html), add a class to the outer DIV
             // that tells us the corresponding type of the element (Border, StackPanel, etc.):
-            INTERNAL_HtmlDomManager.AddCSSClass(outerDomElement, child.GetType().ToString());
+            if (Features.DOM.AssignClass)
+            {
+                INTERNAL_HtmlDomManager.AddCSSClass(outerDomElement, child.GetType().ToString());
+            }
 
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Prepare the child", t2);
@@ -391,12 +391,6 @@ if(nextSibling != undefined) {
             // Remember the DIVs:
             child.OuterDiv = outerDomElement;
             child.InnerDiv = (INTERNAL_HtmlDomElementReference)domElementWhereToPlaceGrandChildren;
-
-            //--------------------------------------------------------
-            // HANDLE SPECIAL CASES:
-            //--------------------------------------------------------
-
-            UIElement.SetPointerEvents(child);
 
             //--------------------------------------------------------
             // HANDLE EVENTS:
@@ -441,17 +435,12 @@ if(nextSibling != undefined) {
                 child.RenderingIsDeferred = true;
                 if (child.Visibility == Visibility.Collapsed)
                 {
-                    INTERNAL_HtmlDomManager.AddCSSClass(child.OuterDiv, "uielement-collapsed");
+                    INTERNAL_HtmlDomManager.SetVisible(child.OuterDiv, false);
                 }
             }
             else
             {
                 RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
-            }
-
-            if (isChildAControl)
-            {
-                ((Control)child).UpdateSystemFocusVisuals();
             }
 
             //--------------------------------------------------------
@@ -583,11 +572,9 @@ if(nextSibling != undefined) {
                 }
             }
 
-            // Silverlight creates a new stacking context for each element, so we need to make sure that
-            // the css z-index value is not 'auto'.
-            if (uie is not TextElement)
+            if (uie.IsHitTestable)
             {
-                uie.SetZIndex(Canvas.GetZIndex(uie));
+                uie.SetPointerEvents(true);
             }
         }
 
