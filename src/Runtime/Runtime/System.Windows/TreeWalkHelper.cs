@@ -61,11 +61,8 @@ namespace System.Windows
 
             if (inheritanceNode)
             {
-                BaseValueSourceInternal oldValueSource = BaseValueSourceInternal.Default;
-                if (DependencyObjectStore.TryGetInheritedPropertyStorage(d, dp, metadata, false, out Storage storage))
-                {
-                    oldValueSource = storage.Entry.BaseValueSourceInternal;
-                }
+                Storage storage = d.GetStorage(dp, metadata, false);
+                BaseValueSourceInternal oldValueSource = storage?.Entry.BaseValueSourceInternal ?? BaseValueSourceInternal.Default;
 
                 // If the oldValueSource is of lower precedence than Inheritance
                 // only then do we need to Invalidate the property
@@ -88,15 +85,8 @@ namespace System.Windows
                 }
                 else
                 {
-                    if (storage == null)
-                    {
-                        // get the storage if we didn't to it ealier.
-                        DependencyObjectStore.TryGetInheritedPropertyStorage(d,
-                            dp,
-                            metadata,
-                            true,
-                            out storage);
-                    }
+                    // get the storage if we didn't to it ealier.
+                    storage ??= d.GetStorage(dp, metadata, true);
 
                     // set the inherited value so that it is known if at some point,
                     // the value of higher precedence that is currently used is removed.

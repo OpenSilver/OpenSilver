@@ -19,98 +19,6 @@ namespace OpenSilver.Internal;
 
 internal static class DependencyObjectStore
 {
-    /// <summary>
-    /// Attempt to get a Property Storage
-    /// </summary>
-    /// <param name="d"></param>
-    /// <param name="dp"></param>
-    /// <param name="metadata"></param>
-    /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
-    /// <param name="storage"></param>
-    /// <returns></returns>
-    public static bool TryGetStorage(
-        DependencyObject d,
-        DependencyProperty dp,
-        PropertyMetadata metadata,
-        bool createIfNotFoud,
-        out Storage storage)
-    {
-        int propertyIndex = dp.GlobalIndex;
-        if (d.EffectiveValues.TryGetValue(propertyIndex, out storage))
-        {
-            return true;
-        }
-
-        if (createIfNotFoud)
-        {
-            //----------------------
-            // CREATE A NEW STORAGE:
-            //----------------------
-
-            metadata ??= dp.GetMetadata(d.DependencyObjectType);
-
-            storage = Storage.CreateDefaultValueEntry(dp, metadata.GetDefaultValue(d, dp));
-
-            d.EffectiveValues.Add(propertyIndex, storage);
-
-            //-----------------------
-            // CHECK IF THE PROPERTY IS INHERITABLE:
-            //-----------------------
-            if (metadata.Inherits)
-            {
-                //-----------------------
-                // ADD THE STORAGE TO "INTERNAL_AllInheritedProperties" IF IT IS NOT ALREADY THERE:
-                //-----------------------
-                d.InheritedValues.Add(propertyIndex, storage);
-            }
-        }
-
-        return createIfNotFoud;
-    }
-
-    /// <summary>
-    /// Attemp to get a Property Storage for an inherited property 
-    /// (faster than generic accessor 'TryGetStorage')
-    /// </summary>
-    /// <param name="d"></param>
-    /// <param name="dp"></param>
-    /// <param name="metadata"></param>
-    /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
-    /// <param name="storage"></param>
-    /// <returns></returns>
-    internal static bool TryGetInheritedPropertyStorage(
-        DependencyObject d,
-        DependencyProperty dp,
-        PropertyMetadata metadata,
-        bool createIfNotFoud,
-        out Storage storage)
-    {
-        int propertyIndex = dp.GlobalIndex;
-        if (d.InheritedValues.TryGetValue(propertyIndex, out storage))
-        {
-            return true;
-        }
-
-        if (createIfNotFoud)
-        {
-            metadata ??= dp.GetMetadata(d.DependencyObjectType);
-
-            Debug.Assert(metadata != null && metadata.Inherits,
-                $"{dp.Name} is not an inherited property.");
-
-            // Create the storage:
-            storage = Storage.CreateDefaultValueEntry(dp, metadata.GetDefaultValue(d, dp));
-
-            //-----------------------
-            // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
-            //-----------------------
-            d.EffectiveValues.Add(propertyIndex, storage);
-            d.InheritedValues.Add(propertyIndex, storage);
-        }
-
-        return createIfNotFoud;
-    }
-
     internal static void SetValueCommon(
         Storage storage,
         DependencyObject d,
@@ -795,7 +703,7 @@ internal static class DependencyObjectStore
 
         if (newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
         {
-            RemoveStorage(d, dp, metadata);
+            d.RemoveStorage(storage);
         }
         else
         {
@@ -840,16 +748,6 @@ internal static class DependencyObjectStore
             }
 
             newEntry.SetCoercedValue(coercedValue, coerceWithCurrentValue);
-        }
-    }
-
-    private static void RemoveStorage(DependencyObject d, DependencyProperty dp, PropertyMetadata metadata)
-    {
-        int propertyIndex = dp.GlobalIndex;
-        d.EffectiveValues.Remove(propertyIndex);
-        if (metadata != null && metadata.Inherits)
-        {
-            d.InheritedValues.Remove(propertyIndex);
         }
     }
 

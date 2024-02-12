@@ -18,19 +18,22 @@ namespace OpenSilver.Internal;
 
 internal sealed class Storage
 {
-    private Storage(DependencyProperty dp, object value)
+    private Storage(DependencyProperty dp, bool inheritable, object value)
     {
         LocalValue = DependencyProperty.UnsetValue;
         LocalStyleValue = DependencyProperty.UnsetValue;
         ThemeStyleValue = DependencyProperty.UnsetValue;
         InheritedValue = DependencyProperty.UnsetValue;
         PropertyIndex = dp.GlobalIndex;
+        Inheritable = inheritable;
         Entry = new EffectiveValueEntry(value);
     }
 
-    internal static Storage CreateDefaultValueEntry(DependencyProperty dp, object value) => new(dp, value);
+    internal static Storage CreateDefaultValueEntry(DependencyProperty dp, bool inheritable, object value) => new(dp, inheritable, value);
 
     internal int PropertyIndex { get; }
+
+    internal bool Inheritable { get; }
 
     internal EffectiveValueEntry Entry { get; set; }
 
