@@ -477,7 +477,7 @@ if(nextSibling != undefined) {
             // no value set by the user are not concerned (their default 
             // state is rendered elsewhere).
 
-            if (uie.EffectiveValues.Count > 0)
+            if (uie.EffectiveValuesCount > 0)
             {
                 // we copy the Dictionary so that the foreach doesn't break when 
                 // we modify a DependencyProperty inside the Changed of another 
@@ -486,7 +486,7 @@ if(nextSibling != undefined) {
                 // it means they have been set at some point, and unset afterward,
                 // so we should not call the PropertyChanged callback.
 
-                Storage[] storages = ArrayPool<Storage>.Shared.Rent(uie.EffectiveValues.Count);
+                Storage[] storages = ArrayPool<Storage>.Shared.Rent(uie.EffectiveValuesCount);
                 int length = 0;
                 foreach (KeyValuePair<int, Storage> kvp in uie.EffectiveValues)
                 {

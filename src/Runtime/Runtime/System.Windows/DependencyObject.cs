@@ -14,7 +14,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -257,10 +256,13 @@ namespace System.Windows
         #endregion
 
         private Dictionary<int, DependentList> _dependentListMap;
+        private Dictionary<int, Storage> _effectiveValues;
         private DependencyObjectType _dType;
         private int _inheritableEffectiveValuesCount;
 
-        internal Dictionary<int, Storage> EffectiveValues { get; }
+        internal Dictionary<int, Storage> EffectiveValues => _effectiveValues ??= new();
+
+        internal int EffectiveValuesCount => _effectiveValues?.Count ?? 0;
 
         /// <summary>
         /// Returns the DType that represents the CLR type of this instance
@@ -274,7 +276,6 @@ namespace System.Windows
         public DependencyObject()
         {
             CanBeInheritanceContext = true;
-            EffectiveValues = new();
         }
 
         /// <summary>
@@ -755,7 +756,7 @@ namespace System.Windows
                 {
                     var storages = new Storage[count];
                     int i = 0;
-                    foreach (KeyValuePair<int, Storage> kvp in d.EffectiveValues)
+                    foreach (KeyValuePair<int, Storage> kvp in d._effectiveValues)
                     {
                         Storage storage = kvp.Value;
                         if (storage.Inheritable)
@@ -986,8 +987,9 @@ namespace System.Windows
 
         internal Storage GetStorage(DependencyProperty dp, PropertyMetadata metadata, bool createIfNotFound)
         {
+            Storage storage = null;
             int propertyIndex = dp.GlobalIndex;
-            if (EffectiveValues.TryGetValue(propertyIndex, out Storage storage))
+            if (_effectiveValues is not null && _effectiveValues.TryGetValue(propertyIndex, out storage))
             {
                 return storage;
             }
@@ -1008,7 +1010,7 @@ namespace System.Windows
 
         internal void RemoveStorage(Storage storage)
         {
-            if (EffectiveValues.Remove(storage.PropertyIndex) && storage.Inheritable)
+            if (_effectiveValues.Remove(storage.PropertyIndex) && storage.Inheritable)
             {
                 _inheritableEffectiveValuesCount--;
             }
