@@ -79,7 +79,7 @@ namespace System.Windows.Media
 
         internal override void ClearOverride()
         {
-            foreach (var segment in this)
+            foreach (var segment in InternalItems)
             {
                 SetParentGeometry(segment, null);
             }
@@ -100,7 +100,7 @@ namespace System.Windows.Media
             if (_parentGeometry == geometry) return;
 
             _parentGeometry = geometry;
-            foreach (var segment in this)
+            foreach (var segment in InternalItems)
             {
                 segment.SetParentGeometry(geometry);
             }

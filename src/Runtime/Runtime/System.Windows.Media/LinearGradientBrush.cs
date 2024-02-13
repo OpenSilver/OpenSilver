@@ -424,7 +424,7 @@ namespace System.Windows.Media
             {
                 string color = null;
                 double biggestOffset = 0;
-                foreach (GradientStop gradientStop in GradientStops)
+                foreach (GradientStop gradientStop in GradientStops.InternalItems)
                 {
                     if (gradientStop.Offset > biggestOffset)
                     {
@@ -470,7 +470,7 @@ namespace System.Windows.Media
             double biggestOffset = double.MinValue;
             string biggestColor = "";
 
-            foreach (GradientStop gradientStop in GradientStops)
+            foreach (GradientStop gradientStop in GradientStops.InternalItems)
             {
                 string currentColor = gradientStop.Color.ToHtmlString(Opacity);
                 string str = currentColor + " " + (startPointPercentage + gradientStop.Offset * startToEndPercentage).ToInvariantString() + percentageSymbol;

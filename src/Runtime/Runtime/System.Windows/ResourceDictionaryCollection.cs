@@ -35,7 +35,7 @@ namespace System.Windows
 
         internal override void ClearOverride()
         {
-            foreach (ResourceDictionary dictionary in this)
+            foreach (ResourceDictionary dictionary in InternalItems)
             {
                 dictionary._parentDictionary = null;
                 this._owner.RemoveParentOwners(dictionary);

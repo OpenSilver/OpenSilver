@@ -39,7 +39,7 @@ namespace System.Windows.Controls
 
             if (_parentGrid != null)
             {
-                foreach (ColumnDefinition column in this)
+                foreach (ColumnDefinition column in InternalItems)
                 {
                     column.SetParent(null);
                 }

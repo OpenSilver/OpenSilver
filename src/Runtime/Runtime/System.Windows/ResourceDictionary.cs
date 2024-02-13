@@ -1105,7 +1105,7 @@ namespace System.Windows
         {
             if (_mergedDictionaries != null)
             {
-                foreach (ResourceDictionary rd in _mergedDictionaries)
+                foreach (ResourceDictionary rd in _mergedDictionaries.InternalItems)
                 {
                     rd.LoadResources();
                 }
@@ -1121,7 +1121,7 @@ namespace System.Windows
         {
             if (_mergedDictionaries != null)
             {
-                foreach (ResourceDictionary rd in _mergedDictionaries)
+                foreach (ResourceDictionary rd in _mergedDictionaries.InternalItems)
                 {
                     rd.UnloadResources();
                 }

@@ -38,7 +38,7 @@ namespace System.Windows.Media
 
         internal override void ClearOverride()
         {
-            foreach (Geometry geometry in this)
+            foreach (Geometry geometry in InternalItems)
             {
                 StopListeningForPathChanges(geometry);
             }

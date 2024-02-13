@@ -148,7 +148,7 @@ namespace System.Windows.Media
         {
             var sb = new StringBuilder();
 
-            foreach (var child in Children)
+            foreach (var child in Children.InternalItems)
             {
                 var childData = child.ToPathData(formatProvider);
                 sb.Append(childData);

@@ -41,7 +41,7 @@ namespace System.Windows.Media
             MappingMode = original.MappingMode;
             SpreadMethod = original.SpreadMethod;
             ColorInterpolationMode = original.ColorInterpolationMode;
-            foreach (GradientStop stop in original.GradientStops)
+            foreach (GradientStop stop in original.GradientStops.InternalItems)
             {
                 GradientStops.Add(new GradientStop { Offset = stop.Offset, Color = stop.Color });
             }

@@ -78,7 +78,7 @@ namespace System.Windows.Media
 
         internal override void ClearOverride()
         {
-            foreach (PathFigure figure in this)
+            foreach (PathFigure figure in InternalItems)
             {
                 SetParentGeometry(figure, null);
             }
@@ -100,7 +100,7 @@ namespace System.Windows.Media
             if (_parentGeometry == geometry) return;
 
             _parentGeometry = geometry;
-            foreach (var figure in this)
+            foreach (var figure in InternalItems)
             {
                 figure.SetParentGeometry(geometry);
             }

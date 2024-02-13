@@ -395,7 +395,7 @@ namespace System.Windows.Controls
                 arranged.Width = 0;
 
             // Arrange our children
-            foreach (UIElement child in Children)
+            foreach (UIElement child in Children.InternalItems)
             {
                 Size size = child.DesiredSize;
                 if (Orientation == Orientation.Vertical)
@@ -728,7 +728,7 @@ namespace System.Windows.Controls
         {
             Rect exposed = new Rect(0, 0, 0, 0);
 
-            foreach (UIElement child in Children)
+            foreach (UIElement child in Children.InternalItems)
             {
                 if (child == visual)
                 {

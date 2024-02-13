@@ -140,7 +140,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
         {            
             ResetCanvas(RenderSize);
 
-            foreach (var stroke in Strokes)
+            foreach (var stroke in Strokes.InternalItems)
             {
                 DrawStroke(stroke);
             }

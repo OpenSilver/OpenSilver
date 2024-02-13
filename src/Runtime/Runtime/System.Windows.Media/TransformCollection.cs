@@ -32,7 +32,7 @@ namespace System.Windows.Media
 
         internal override void ClearOverride()
         {
-            foreach (Transform t in this)
+            foreach (Transform t in InternalItems)
             {
                 UnsubscribeToChangedEvent(t);
             }

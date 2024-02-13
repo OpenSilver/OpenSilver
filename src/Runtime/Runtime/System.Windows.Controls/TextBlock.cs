@@ -534,7 +534,7 @@ namespace System.Windows.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            foreach (Inline child in Inlines)
+            foreach (Inline child in Inlines.InternalItems)
             {
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
             }
@@ -599,7 +599,7 @@ namespace System.Windows.Controls
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            return Inlines[index];
+            return Inlines.InternalItems[index];
         }
 
         internal override string GetPlainText() => Text;

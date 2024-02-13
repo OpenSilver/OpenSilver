@@ -33,7 +33,7 @@ internal sealed class TextContainerRichTextBox : ITextContainer
         if (textElement is Paragraph paragraph)
         {
             string text = "";
-            foreach (var inline in paragraph.Inlines)
+            foreach (var inline in paragraph.Inlines.InternalItems)
             {
                 if (inline is Run run)
                 {

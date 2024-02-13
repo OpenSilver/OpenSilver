@@ -69,7 +69,7 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
-            foreach (var item in this)
+            foreach (var item in InternalItems)
             {
                 ClearModelParent(item);
             }

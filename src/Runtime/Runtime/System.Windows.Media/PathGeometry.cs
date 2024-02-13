@@ -172,12 +172,12 @@ namespace System.Windows.Media
 
             static IEnumerable<string> GenerateDataParts(PathFigureCollection figures, IFormatProvider formatProvider)
             {
-                foreach (var figure in figures)
+                foreach (var figure in figures.InternalItems)
                 {
                     // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#moveto_path_commands
                     yield return $"M {figure.StartPoint.X.ToString(formatProvider)},{figure.StartPoint.Y.ToString(formatProvider)}";
 
-                    foreach (var segment in figure.Segments)
+                    foreach (var segment in figure.Segments.InternalItems)
                     {
                         foreach (var p in segment.ToDataStream(formatProvider))
                         {

@@ -38,7 +38,7 @@ namespace System.Windows.Media
 
         internal override void ClearOverride()
         {
-            foreach (GradientStop gs in this)
+            foreach (GradientStop gs in InternalItems)
             {
                 UnsubscribeToChangedEvent(gs);
             }

@@ -48,7 +48,7 @@ public sealed class Paragraph : Block
     protected internal override void INTERNAL_OnAttachedToVisualTree()
     {
         base.INTERNAL_OnAttachedToVisualTree();
-        foreach (var inline in Inlines)
+        foreach (var inline in Inlines.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(inline, this);
         }

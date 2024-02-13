@@ -59,7 +59,7 @@ public sealed class Section : Block
     protected internal override void INTERNAL_OnAttachedToVisualTree()
     {
         base.INTERNAL_OnAttachedToVisualTree();
-        foreach (var block in Blocks)
+        foreach (var block in Blocks.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);
         }

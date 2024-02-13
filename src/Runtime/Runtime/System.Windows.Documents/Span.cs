@@ -52,7 +52,7 @@ public class Span : Inline
     {
         base.INTERNAL_OnAttachedToVisualTree();
 
-        foreach (Inline child in Inlines)
+        foreach (Inline child in Inlines.InternalItems)
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
         }

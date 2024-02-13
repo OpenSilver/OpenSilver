@@ -39,7 +39,7 @@ namespace System.Windows.Input
                 throw new ArgumentNullException(nameof(stylusPoints));
             }
 
-            foreach (StylusPoint point in stylusPoints)
+            foreach (StylusPoint point in stylusPoints.InternalItems)
             {
                 Add(point);
             }

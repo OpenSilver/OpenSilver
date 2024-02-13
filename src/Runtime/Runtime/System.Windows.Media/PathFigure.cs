@@ -165,7 +165,7 @@ namespace System.Windows.Media
         internal void SetParentGeometry(Geometry geometry)
         {
             _parentGeometry = geometry;
-            foreach (var segment in Segments)
+            foreach (var segment in Segments.InternalItems)
             {
                 segment.SetParentGeometry(geometry);
             }

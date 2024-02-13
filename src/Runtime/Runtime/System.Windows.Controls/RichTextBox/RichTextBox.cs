@@ -635,7 +635,7 @@ namespace System.Windows.Controls
                 return;
             }
 
-            foreach (var block in Blocks)
+            foreach (var block in Blocks.InternalItems)
             {
                 ProcessBlock(block);
             }
@@ -661,7 +661,7 @@ namespace System.Windows.Controls
                     break;
 
                 case Span span:
-                    foreach (var innerSpanBlock in span.Inlines)
+                    foreach (var innerSpanBlock in span.Inlines.InternalItems)
                     {
                         ProcessInlines(innerSpanBlock);
                     }
@@ -678,14 +678,14 @@ namespace System.Windows.Controls
             switch (block)
             {
                 case Section section:
-                    foreach (var currentBlock in section.Blocks)
+                    foreach (var currentBlock in section.Blocks.InternalItems)
                     {
                         ProcessBlock(currentBlock);
                     }
                     break;
 
                 case Paragraph paragraph:
-                    foreach (var currentBlock in paragraph.Inlines)
+                    foreach (var currentBlock in paragraph.Inlines.InternalItems)
                     {
                         ProcessInlines(currentBlock);
                     }
