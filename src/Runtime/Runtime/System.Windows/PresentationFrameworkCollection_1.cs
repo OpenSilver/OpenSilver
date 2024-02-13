@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections;
 using System.Collections.Specialized;
 
@@ -21,29 +20,31 @@ namespace System.Windows
     /// <summary>
     /// Provides a common collection class for Silverlight collections.
     /// </summary>
-    /// <typeparam name="T">Type constraint for type safety of the constrained collection implementation.</typeparam>
-    public abstract class PresentationFrameworkCollection<T> : DependencyObject, IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
+    /// <typeparam name="T">
+    /// Type constraint for type safety of the constrained collection implementation.
+    /// </typeparam>
+    public abstract class PresentationFrameworkCollection<T> : DependencyObject, IList<T>, IList
     {
-        private readonly List<T> _collection;
+        private readonly List<T> _items;
         private readonly bool _processCollectionChanged;
         private int _blockReentrancyCount;
 
         internal PresentationFrameworkCollection(bool processCollectionChanged)
         {
             _processCollectionChanged = processCollectionChanged;
-            _collection = new List<T>();
+            _items = new List<T>();
         }
 
         internal PresentationFrameworkCollection(int capacity, bool processCollectionChanged)
         {
             _processCollectionChanged = processCollectionChanged;
-            _collection = new List<T>(capacity);
+            _items = new List<T>(capacity);
         }
 
         internal PresentationFrameworkCollection(IEnumerable<T> source, bool processCollectionChanged)
         {
             _processCollectionChanged = processCollectionChanged;
-            _collection = new List<T>(source);
+            _items = new List<T>(source);
         }
 
         private static readonly PropertyMetadata _countMetadata = new ReadOnlyPropertyMetadata(0, GetCount);
@@ -78,27 +79,14 @@ namespace System.Windows
         /// </returns>
         public T this[int index]
         {
-            get 
-            {
-                if (index < 0 || index >= CountInternal)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(index));
-                }
-
-                return GetItemOverride(index); 
-            }
-            set 
+            get => GetItemOverride(index);
+            set
             {
                 CheckReentrancy();
 
                 if (value is null)
                 {
                     throw new ArgumentNullException(nameof(value));
-                }
-
-                if (index < 0 || index >= CountInternal)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(index));
                 }
 
                 T originalItem = GetItemOverride(index);
@@ -246,11 +234,6 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(value));
             }
 
-            if (index < 0 || index > CountInternal)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
             InsertOverride(index, value);
 
             OnCollectionChanged(NotifyCollectionChangedAction.Add, value, index);
@@ -281,11 +264,6 @@ namespace System.Windows
         public void RemoveAt(int index)
         {
             CheckReentrancy();
-            
-            if (index < 0 || index >= CountInternal)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
 
             T removedItem = GetItemOverride(index);
 
@@ -345,27 +323,34 @@ namespace System.Windows
         /// This property returns the same value as the Count property and is only here
         /// for performances.
         /// </summary>
-        internal virtual int CountInternal => _collection.Count;
+        internal virtual int CountInternal => _items.Count;
 
         internal virtual void CopyToImpl(Array array, int index)
         {
-            for (int i = 0; i < CountInternal; ++i)
+            if (array is T[] destination)
             {
-                array.SetValue(GetItemOverride(i), index + i);
+                _items.CopyTo(destination, index);
+            }
+            else
+            {
+                for (int i = 0; i < CountInternal; ++i)
+                {
+                    array.SetValue(GetItemOverride(i), index + i);
+                }
             }
         }
 
-        internal virtual bool ContainsImpl(T value) => _collection.Contains(value);
+        internal virtual bool ContainsImpl(T value) => _items.Contains(value);
 
-        internal virtual int IndexOfImpl(T value) => _collection.IndexOf(value);
+        internal virtual int IndexOfImpl(T value) => _items.IndexOf(value);
 
-        internal virtual IEnumerator<T> GetEnumeratorImpl() => _collection.GetEnumerator();
+        internal virtual IEnumerator<T> GetEnumeratorImpl() => _items.GetEnumerator();
 
         #endregion
 
         #region Generic collection manipulation methods
 
-        internal List<T> InternalItems => _collection;
+        internal List<T> InternalItems => _items;
 
         /// <summary>
         /// Call the Add method of underlying <see cref="List{T}"/> collection.
@@ -374,7 +359,7 @@ namespace System.Windows
         internal void AddInternal(T value)
         {
             int previousCount = Count;
-            _collection.Add(value);
+            _items.Add(value);
             UpdateCountProperty(previousCount, Count);
         }
 
@@ -384,7 +369,7 @@ namespace System.Windows
         internal void ClearInternal()
         {
             int previousCount = Count;
-            _collection.Clear();
+            _items.Clear();
             UpdateCountProperty(previousCount, Count);
         }
 
@@ -394,7 +379,7 @@ namespace System.Windows
         internal void InsertInternal(int index, T value)
         {
             int previousCount = Count;
-            _collection.Insert(index, value);
+            _items.Insert(index, value);
             UpdateCountProperty(previousCount, Count);
         }
 
@@ -404,7 +389,7 @@ namespace System.Windows
         internal void RemoveAtInternal(int index)
         {
             int previousCount = Count;
-            _collection.RemoveAt(index);
+            _items.RemoveAt(index);
             UpdateCountProperty(previousCount, Count);
         }
 
@@ -414,7 +399,7 @@ namespace System.Windows
         internal bool RemoveInternal(T value)
         {
             int previousCount = Count;
-            if (_collection.Remove(value))
+            if (_items.Remove(value))
             {
                 UpdateCountProperty(previousCount, Count);
                 return true;
@@ -425,12 +410,12 @@ namespace System.Windows
         /// <summary>
         /// Call the Indexer (getter) property of underlying <see cref="List{T}"/> collection.
         /// </summary>
-        internal T GetItemInternal(int index) => _collection[index];
+        internal T GetItemInternal(int index) => _items[index];
 
         /// <summary>
         /// Call the Indexer (setter) property of underlying <see cref="List{T}"/> collection.
         /// </summary>
-        internal void SetItemInternal(int index, T value) => _collection[index] = value;
+        internal void SetItemInternal(int index, T value) => _items[index] = value;
 
         #endregion
 
@@ -472,8 +457,9 @@ namespace System.Windows
         /// </summary>
         internal void ClearDependencyObjectInternal()
         {
-            foreach (DependencyObject valueDO in this.Select(v => CastDO(v)))
+            foreach (T item in _items)
             {
+                DependencyObject valueDO = CastDO(item);
                 RemoveSelfAsInheritanceContext(valueDO, null);
             }
 
@@ -498,7 +484,7 @@ namespace System.Windows
         /// </summary>
         internal void RemoveAtDependencyObjectInternal(int index)
         {
-            DependencyObject removedDO = CastDO(_collection[index]);
+            DependencyObject removedDO = CastDO(_items[index]);
             RemoveSelfAsInheritanceContext(removedDO, null);
 
             RemoveAtInternal(index);
@@ -510,7 +496,7 @@ namespace System.Windows
         /// </summary>
         internal bool RemoveDependencyObjectInternal(T value)
         {
-            int index = _collection.IndexOf(value);
+            int index = _items.IndexOf(value);
             if (index > -1)
             {
                 RemoveAtDependencyObjectInternal(index);
@@ -526,7 +512,7 @@ namespace System.Windows
         /// </summary>
         internal void SetItemDependencyObjectInternal(int index, T value)
         {
-            DependencyObject originalDO = CastDO(_collection[index]);
+            DependencyObject originalDO = CastDO(_items[index]);
             DependencyObject newDO = CastDO(value);
             RemoveSelfAsInheritanceContext(originalDO, null);
             ProvideSelfAsInheritanceContext(newDO, null);

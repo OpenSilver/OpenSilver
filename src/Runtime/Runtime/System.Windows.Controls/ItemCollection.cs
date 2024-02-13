@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -23,265 +22,173 @@ namespace System.Windows.Controls
 {
     public sealed class ItemCollection : PresentationFrameworkCollection<object>, INotifyCollectionChanged
     {
-        private bool _isUsingItemsSource;
+        private readonly IInternalFrameworkElement _modelParent;
+
         private IEnumerable _itemsSource; // base collection
         private WeakEventListener<ItemCollection, INotifyCollectionChanged, NotifyCollectionChangedEventArgs> _collectionChangedListener;
 
         private bool _isUsingListWrapper;
-        private EnumerableWrapper _listWrapper;
-
-        private IInternalFrameworkElement _modelParent;
+        private ListWrapper _listWrapper;
 
         internal ItemCollection(IInternalFrameworkElement parent) : base(true)
         {
-            this._modelParent = parent;
+            _modelParent = parent;
         }
 
-        internal override bool IsFixedSizeImpl
-        {
-            get { return this.IsUsingItemsSource; }
-        }
+        internal override bool IsFixedSizeImpl => IsUsingItemsSource;
 
-        internal override bool IsReadOnlyImpl
-        {
-            get { return this.IsUsingItemsSource; }
-        }
+        internal override bool IsReadOnlyImpl => IsUsingItemsSource;
 
         internal override void AddOverride(object value)
         {
-            if (this.IsUsingItemsSource)
+            if (IsUsingItemsSource)
             {
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
-            this.SetModelParent(value);
-            this.AddInternal(value);
+            SetModelParent(value);
+            AddInternal(value);
+        }
+
+        internal override void CopyToImpl(Array array, int index)
+        {
+            if (IsUsingItemsSource)
+            {
+                SourceList.CopyTo(array, index);
+            }
+            else
+            {
+                base.CopyToImpl(array, index);
+            }
         }
 
         internal override void ClearOverride()
         {
-            if (this.IsUsingItemsSource)
+            if (IsUsingItemsSource)
             {
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
             foreach (var item in this)
             {
-                this.ClearModelParent(item);
+                ClearModelParent(item);
             }
 
-            this.ClearInternal();
+            ClearInternal();
         }
 
         internal override void InsertOverride(int index, object value)
         {
-            if (this.IsUsingItemsSource)
+            if (IsUsingItemsSource)
             {
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
-            this.SetModelParent(value);
-            this.InsertInternal(index, value);
+            SetModelParent(value);
+            InsertInternal(index, value);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            if (this.IsUsingItemsSource)
+            if (IsUsingItemsSource)
             {
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
-            object removedItem = this.GetItemInternal(index);
-            this.ClearModelParent(removedItem);
-            this.RemoveAtInternal(index);
+            object removedItem = GetItemInternal(index);
+            ClearModelParent(removedItem);
+            RemoveAtInternal(index);
         }
 
-        internal override object GetItemOverride(int index)
-        {
-            if (this.IsUsingItemsSource)
-            {
-                return this.SourceList[index];
-            }
-
-            return this.GetItemInternal(index);
-        }
+        internal override object GetItemOverride(int index) => IsUsingItemsSource ? SourceList[index] : GetItemInternal(index);
 
         internal override void SetItemOverride(int index, object value)
         {
-            if (this.IsUsingItemsSource)
+            if (IsUsingItemsSource)
             {
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
-            object originalItem = this.GetItemInternal(index);
-            this.ClearModelParent(originalItem);
-            this.SetModelParent(value);
-            this.SetItemInternal(index, value);
+            object originalItem = GetItemInternal(index);
+            ClearModelParent(originalItem);
+            SetModelParent(value);
+            SetItemInternal(index, value);
         }
 
-        internal override bool ContainsImpl(object value)
-        {
-            if (this.IsUsingItemsSource)
-            {
-                return this.SourceList.Contains(value);
-            }
+        internal override bool ContainsImpl(object value) => IsUsingItemsSource ? SourceList.Contains(value) : base.ContainsImpl(value);
 
-            return base.ContainsImpl(value);
-        }
+        internal override int IndexOfImpl(object value) => IsUsingItemsSource ? SourceList.IndexOf(value) : base.IndexOfImpl(value);
 
-        internal override int IndexOfImpl(object value)
-        {
-            if (this.IsUsingItemsSource)
-            {
-                return this.SourceList.IndexOf(value);
-            }
-
-            return base.IndexOfImpl(value);
-        }
-
-        internal override IEnumerator<object> GetEnumeratorImpl()
-        {
-            if (this.IsUsingItemsSource)
-            {
-                return this.GetEnumeratorPrivateItemsSourceOnly();
-            }
-
-            return base.GetEnumeratorImpl();
-        }
-
-        private IEnumerator<object> GetEnumeratorPrivateItemsSourceOnly()
-        {
-            IEnumerator enumerator = this.SourceList.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                yield return enumerator.Current;
-            }
-        }
+        internal override IEnumerator<object> GetEnumeratorImpl() => IsUsingItemsSource ? new Enumerator(this) : base.GetEnumeratorImpl();
 
         public new event NotifyCollectionChangedEventHandler CollectionChanged
         {
-            add
-            {
-                base.CollectionChanged += value;
-            }
-            remove
-            {
-                base.CollectionChanged -= value;
-            }
+            add => base.CollectionChanged += value;
+            remove => base.CollectionChanged -= value;
         }
 
-        internal IEnumerator LogicalChildren
-        {
-            get
-            {
-                if (this.IsUsingItemsSource)
-                {
-                    return EmptyEnumerator.Instance;
-                }
+        internal IEnumerator LogicalChildren => IsUsingItemsSource ? EmptyEnumerator.Instance : GetEnumerator();
 
-                return this.GetEnumerator();
-            }
-        }
+        internal bool IsUsingItemsSource { get; private set; }
 
-        internal bool IsUsingItemsSource
-        {
-            get
-            {
-                return this._isUsingItemsSource;
-            }
-        }
+        internal IList SourceList => _isUsingListWrapper ? _listWrapper : (IList)_itemsSource;
 
-        internal IEnumerable SourceCollection
-        {
-            get
-            {
-                return this._itemsSource;
-            }
-        }
-
-        internal IList SourceList
-        {
-            get
-            {
-                if (this._isUsingListWrapper)
-                {
-                    return this._listWrapper;
-                }
-
-                return (IList)this._itemsSource;
-            }
-        }
-
-        internal override int CountInternal
-        {
-            get
-            {
-                if (this.IsUsingItemsSource)
-                {
-                    return this.SourceList.Count;
-                }
-                else
-                {
-                    return base.CountInternal;
-                }
-            }
-        }
+        internal override int CountInternal => IsUsingItemsSource ? SourceList.Count : base.CountInternal;
 
         internal void SetItemsSource(IEnumerable value)
         {
-            if (!this.IsUsingItemsSource && this.CountInternal != 0)
+            if (!IsUsingItemsSource && CountInternal != 0)
             {
                 throw new InvalidOperationException("Items collection must be empty before using ItemsSource.");
             }
 
             int previousCount = Count;
 
-            this.TryUnsubscribeFromCollectionChangedEvent();
+            TryUnsubscribeFromCollectionChangedEvent();
 
-            this._itemsSource = value;
-            this._isUsingItemsSource = true;
+            _itemsSource = value;
+            IsUsingItemsSource = true;
 
-            this.TrySubscribeToCollectionChangedEvent(value);
+            TrySubscribeToCollectionChangedEvent(value);
 
-            this.InitializeSourceList(value);
+            InitializeSourceList(value);
 
-            this.UpdateCountProperty(previousCount, Count);
+            UpdateCountProperty(previousCount, Count);
 
-            this.OnCollectionReset();
+            OnCollectionReset();
         }
 
         internal void ClearItemsSource()
         {
-            if (this.IsUsingItemsSource)
+            if (IsUsingItemsSource)
             {
                 int previousCount = Count;
 
                 // return to normal mode
-                this.TryUnsubscribeFromCollectionChangedEvent();
+                TryUnsubscribeFromCollectionChangedEvent();
 
-                this._itemsSource = null;
-                this._listWrapper = null;
-                this._isUsingItemsSource = false;
-                this._isUsingListWrapper = false;
+                _itemsSource = null;
+                _listWrapper = null;
+                IsUsingItemsSource = false;
+                _isUsingListWrapper = false;
 
-                this.UpdateCountProperty(previousCount, Count);
+                UpdateCountProperty(previousCount, Count);
 
-                this.OnCollectionReset();
+                OnCollectionReset();
             }
         }
 
         private void InitializeSourceList(IEnumerable sourceCollection)
         {
-            IList sourceAsList = sourceCollection as IList;
-            if (sourceAsList == null)
+            if (sourceCollection is not IList)
             {
-                this._listWrapper = new EnumerableWrapper(sourceCollection, this);
-                this._isUsingListWrapper = true;
+                _listWrapper = new ListWrapper(sourceCollection);
+                _isUsingListWrapper = true;
             }
             else
             {
-                this._listWrapper = null;
-                this._isUsingListWrapper = false;
+                _listWrapper = null;
+                _isUsingListWrapper = false;
             }
         }
 
@@ -315,60 +222,48 @@ namespace System.Windows.Controls
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                    throw new NotSupportedException($"Unexpected collection change action '{e.Action}'.");
             }
         }
 
         private void OnSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            this.ValidateCollectionChangedEventArgs(e);
+            ValidateCollectionChangedEventArgs(e);
 
             int previousCount = Count;
 
             // Update list wrapper
-            if (this._isUsingListWrapper)
+            if (_isUsingListWrapper)
             {
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        this._listWrapper.Insert(e.NewStartingIndex, e.NewItems[0]);
+                        _listWrapper.Insert(e.NewStartingIndex, e.NewItems[0]);
                         break;
                     case NotifyCollectionChangedAction.Remove:
-                        this._listWrapper.RemoveAt(e.OldStartingIndex);
+                        _listWrapper.RemoveAt(e.OldStartingIndex);
                         break;
                     case NotifyCollectionChangedAction.Move:
-                        this._listWrapper.Move(e.OldStartingIndex, e.NewStartingIndex);
+                        _listWrapper.Move(e.OldStartingIndex, e.NewStartingIndex);
                         break;
                     case NotifyCollectionChangedAction.Replace:
-                        this._listWrapper[e.OldStartingIndex] = e.NewItems[0];
+                        _listWrapper[e.OldStartingIndex] = e.NewItems[0];
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        this._listWrapper.Refresh();
+                        _listWrapper.Refresh();
                         break;
                 }
             }
 
-            this.UpdateCountProperty(previousCount, Count);
+            UpdateCountProperty(previousCount, Count);
 
             // Raise collection changed
-            this.OnCollectionChanged(e);
+            OnCollectionChanged(e);
         }
 
-        private void SetModelParent(object item)
-        {
-            if (this._modelParent != null)
-            {
-                this._modelParent.AddLogicalChild(item);
-            }
-        }
+        private void SetModelParent(object item) => _modelParent?.AddLogicalChild(item);
 
-        private void ClearModelParent(object item)
-        {
-            if (this._modelParent != null)
-            {
-                this._modelParent.RemoveLogicalChild(item);
-            }
-        }
+        private void ClearModelParent(object item) => _modelParent?.RemoveLogicalChild(item);
 
         private void TrySubscribeToCollectionChangedEvent(IEnumerable collection)
         {
@@ -392,29 +287,26 @@ namespace System.Windows.Controls
             }
         }
 
-        private class EnumerableWrapper : List<object>
+        private sealed class ListWrapper : List<object>
         {
-            private IEnumerable _sourceCollection;
-            private ItemCollection _owner; // unused
+            private readonly IEnumerable _sourceCollection;
 
-            public EnumerableWrapper(IEnumerable source, ItemCollection owner)
+            public ListWrapper(IEnumerable source)
             {
                 Debug.Assert(source != null);
-                Debug.Assert(owner != null);
-                this._sourceCollection = source;
-                this._owner = owner;
+                _sourceCollection = source;
 
-                this.Refresh();
+                Refresh();
             }
 
             public void Refresh()
             {
-                this.Clear();
+                Clear();
 
-                IEnumerator enumerator = this._sourceCollection.GetEnumerator();
+                IEnumerator enumerator = _sourceCollection.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
-                    this.Add(enumerator.Current);
+                    Add(enumerator.Current);
                 }
             }
 
@@ -427,9 +319,27 @@ namespace System.Windows.Controls
 
                 var item = this[oldIndex];
 
-                this.RemoveAt(oldIndex);
-                this.Insert(newIndex, item);
+                RemoveAt(oldIndex);
+                Insert(newIndex, item);
             }
+        }
+
+        private readonly struct Enumerator : IEnumerator<object>
+        {
+            private readonly IEnumerator _enumerator;
+
+            public Enumerator(ItemCollection itemCollection)
+            {
+                _enumerator = itemCollection.SourceList.GetEnumerator();
+            }
+
+            public object Current => _enumerator.Current;
+
+            public void Dispose() { }
+
+            public bool MoveNext() => _enumerator.MoveNext();
+
+            public void Reset() => _enumerator.Reset();
         }
     }
 }
