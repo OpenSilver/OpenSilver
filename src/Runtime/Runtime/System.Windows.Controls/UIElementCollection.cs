@@ -33,7 +33,7 @@ namespace System.Windows.Controls
 
         internal FrameworkElement LogicalParent { get; }
 
-        internal override void AddOverride(UIElement value)
+        internal sealed override void AddOverride(UIElement value)
         {
             if (value == null)
             {
@@ -47,7 +47,7 @@ namespace System.Windows.Controls
             VisualParent.InvalidateMeasure();
         }
 
-        internal override void ClearOverride()
+        internal sealed override void ClearOverride()
         {
             int count = CountInternal;
             if (count > 0)
@@ -70,7 +70,7 @@ namespace System.Windows.Controls
             }
         }
 
-        internal override UIElement GetItemOverride(int index)
+        internal sealed override UIElement GetItemOverride(int index)
         {
             if (index < 0 || index >= CountInternal)
             {
@@ -80,7 +80,7 @@ namespace System.Windows.Controls
             return GetItemInternal(index);
         }
 
-        internal override void InsertOverride(int index, UIElement value)
+        internal sealed override void InsertOverride(int index, UIElement value)
         {
             if (value == null)
             {
@@ -99,7 +99,7 @@ namespace System.Windows.Controls
             VisualParent.InvalidateMeasure();
         }
 
-        internal override void RemoveAtOverride(int index)
+        internal sealed override void RemoveAtOverride(int index)
         {
             if (index < 0 || index >= CountInternal)
             {
@@ -114,7 +114,7 @@ namespace System.Windows.Controls
             VisualParent.InvalidateMeasure();
         }
 
-        internal override void SetItemOverride(int index, UIElement value)
+        internal sealed override void SetItemOverride(int index, UIElement value)
         {
             if (value == null)
             {

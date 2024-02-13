@@ -38,14 +38,14 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
 
     internal ITextContainer TextContainer { get; }
 
-    internal override void AddOverride(T value)
+    internal sealed override void AddOverride(T value)
     {
         AddDependencyObjectInternal(value);
         SetVisualParent(value);
         OnAdd(value, Count);
     }
 
-    internal override void ClearOverride()
+    internal sealed override void ClearOverride()
     {
         if (Count > 0)
         {
@@ -71,16 +71,16 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         }
     }
 
-    internal override T GetItemOverride(int index) => GetItemInternal(index);
+    internal sealed override T GetItemOverride(int index) => GetItemInternal(index);
 
-    internal override void InsertOverride(int index, T value)
+    internal sealed override void InsertOverride(int index, T value)
     {
         InsertDependencyObjectInternal(index, value);
         SetVisualParent(value);
         OnAdd(value, index);
     }
 
-    internal override void RemoveAtOverride(int index)
+    internal sealed override void RemoveAtOverride(int index)
     {
         T item = GetItemInternal(index);
         RemoveAtDependencyObjectInternal(index);
@@ -88,7 +88,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         OnRemove(item);
     }
 
-    internal override void SetItemOverride(int index, T value)
+    internal sealed override void SetItemOverride(int index, T value)
     {
         T oldItem = GetItemInternal(index);
         SetItemDependencyObjectInternal(index, value);

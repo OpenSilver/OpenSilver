@@ -85,8 +85,7 @@ namespace System.Windows
                 }
                 else
                 {
-                    // get the storage if we didn't to it ealier.
-                    storage ??= d.GetStorage(dp, metadata, true);
+                    Debug.Assert(storage is not null);
 
                     // set the inherited value so that it is known if at some point,
                     // the value of higher precedence that is currently used is removed.
