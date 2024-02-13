@@ -183,7 +183,7 @@ namespace System.Windows
         /// true if the object is found in the <see cref="PresentationFrameworkCollection{T}"/>;
         /// otherwise, false.
         /// </returns>
-        public bool Contains(T value) => ContainsImpl(value);
+        public bool Contains(T value) => IndexOf(value) >= 0;
 
         /// <summary>
         /// Copies the elements of the <see cref="PresentationFrameworkCollection{T}"/> to
@@ -340,8 +340,6 @@ namespace System.Windows
             }
         }
 
-        internal virtual bool ContainsImpl(T value) => _items.Contains(value);
-
         internal virtual int IndexOfImpl(T value) => _items.IndexOf(value);
 
         internal virtual IEnumerator<T> GetEnumeratorImpl() => _items.GetEnumerator();
@@ -391,20 +389,6 @@ namespace System.Windows
             int previousCount = Count;
             _items.RemoveAt(index);
             UpdateCountProperty(previousCount, Count);
-        }
-
-        /// <summary>
-        /// Call the Remove method of underlying <see cref="List{T}"/> collection.
-        /// </summary>
-        internal bool RemoveInternal(T value)
-        {
-            int previousCount = Count;
-            if (_items.Remove(value))
-            {
-                UpdateCountProperty(previousCount, Count);
-                return true;
-            }
-            return false;
         }
 
         /// <summary>
@@ -488,22 +472,6 @@ namespace System.Windows
             RemoveSelfAsInheritanceContext(removedDO, null);
 
             RemoveAtInternal(index);
-        }
-
-        /// <summary>
-        /// Call the Remove method of underlying <see cref="List{T}"/> collection
-        /// and update inheritance context to match this object.
-        /// </summary>
-        internal bool RemoveDependencyObjectInternal(T value)
-        {
-            int index = _items.IndexOf(value);
-            if (index > -1)
-            {
-                RemoveAtDependencyObjectInternal(index);
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>

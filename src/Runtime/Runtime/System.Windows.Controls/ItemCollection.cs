@@ -115,8 +115,6 @@ namespace System.Windows.Controls
             SetItemInternal(index, value);
         }
 
-        internal override bool ContainsImpl(object value) => IsUsingItemsSource ? SourceList.Contains(value) : base.ContainsImpl(value);
-
         internal override int IndexOfImpl(object value) => IsUsingItemsSource ? SourceList.IndexOf(value) : base.IndexOfImpl(value);
 
         internal override IEnumerator<object> GetEnumeratorImpl() => IsUsingItemsSource ? new Enumerator(this) : base.GetEnumeratorImpl();
