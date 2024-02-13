@@ -45,7 +45,7 @@ namespace System.Windows.Controls
 
         internal sealed override void ClearOverride()
         {
-            int count = CountInternal;
+            int count = Count;
             if (count > 0)
             {
                 UIElement[] uies = this.ToArray();

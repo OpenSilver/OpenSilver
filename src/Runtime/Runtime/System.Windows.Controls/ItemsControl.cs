@@ -445,7 +445,7 @@ namespace System.Windows.Controls
 
         internal bool HasItems
         {
-            get { return this._items != null && this._items.CountInternal > 0; }
+            get { return this._items != null && this._items.Count > 0; }
         }
 
         private static ControlTemplate DefaultTemplate { get; } =

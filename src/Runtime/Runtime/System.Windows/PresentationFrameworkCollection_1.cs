@@ -159,7 +159,7 @@ namespace System.Windows
 
             AddOverride(value);
 
-            OnCollectionChanged(NotifyCollectionChangedAction.Add, value, CountInternal - 1);
+            OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace System.Windows
         int IList.Add(object value)
         {
             Add((T)value);
-            return CountInternal;
+            return Count;
         }
 
         void IList.Remove(object value) => Remove((T)value);
@@ -333,7 +333,7 @@ namespace System.Windows
             }
             else
             {
-                for (int i = 0; i < CountInternal; ++i)
+                for (int i = 0; i < Count; ++i)
                 {
                     array.SetValue(GetItemOverride(i), index + i);
                 }

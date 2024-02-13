@@ -556,7 +556,7 @@ namespace System.Windows.Controls.Primitives
                     // catastrophic update -- need to resynchronize everything.
 
                     // If we remove all the items we clear the deferred selection
-                    if (Items.CountInternal == 0)
+                    if (Items.Count == 0)
                         SelectionChange.CleanupDeferSelection();
 
                     SelectionChange.Begin();

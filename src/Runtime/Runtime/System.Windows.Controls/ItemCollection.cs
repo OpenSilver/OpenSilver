@@ -137,7 +137,7 @@ namespace System.Windows.Controls
 
         internal void SetItemsSource(IEnumerable value)
         {
-            if (!IsUsingItemsSource && CountInternal != 0)
+            if (!IsUsingItemsSource && Count != 0)
             {
                 throw new InvalidOperationException("Items collection must be empty before using ItemsSource.");
             }

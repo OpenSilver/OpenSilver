@@ -72,7 +72,7 @@ namespace System.Windows
         /// <summary>
         /// Gets the number of objects in the collection.
         /// </summary>
-        public int Count => _collection.CountInternal;
+        public int Count => _collection.Count;
 
         /// <summary>
         /// Gets a value that indicates whether the collection can be modified.
