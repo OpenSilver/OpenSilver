@@ -73,7 +73,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             };
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;
 
-            CookiesHelper.SetCustomCookies(MainWebBrowser, simulatorLaunchParameters?.CookiesData);
             simulatorLaunchParameters?.BrowserCreatedCallback?.Invoke(MainWebBrowser);
 
             //Note: The following line was an attempt to persist the Microsoft login cookies (for use by user applications that required AAD login), but it is no longer necessary because we changed the DotNetBrowser "StorageType" from "MEMORY" to "DISK", so cookies are now automatically persisted.
@@ -143,11 +142,18 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, _browserUserDataDir,
                 new CoreWebView2EnvironmentOptions(string.Join(" ", chromiumSwitches)));
 
-            MainWebBrowser.CoreWebView2InitializationCompleted += (_s, _e) => { Debug.WriteLine("Initialization completed"); };
+            MainWebBrowser.CoreWebView2InitializationCompleted += CoreWebView2_InitializationCompleted;
+            
             await MainWebBrowser.EnsureCoreWebView2Async(environment);
 
             var devToolsHelper = MainWebBrowser.CoreWebView2.GetDevToolsProtocolHelper();
             await devToolsHelper.Emulation.SetTouchEmulationEnabledAsync(true);
+        }
+
+        private void CoreWebView2_InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
+        {
+            Debug.WriteLine("Initialization completed");
+            CookiesHelper.SetCustomCookies(MainWebBrowser, _simulatorLaunchParameters?.CookiesData);
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
