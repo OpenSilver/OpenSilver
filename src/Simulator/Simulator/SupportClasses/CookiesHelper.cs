@@ -46,6 +46,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                         CoreWebView2Cookie coreCookie = cookieManager.CreateCookie(cookie.name, cookie.value, cookie.domain, cookie.path);
                         coreCookie.IsSecure = cookie.secure;
                         coreCookie.IsHttpOnly = cookie.httpOnly;
+                        coreCookie.SameSite = cookie.sameSite;
 
                         if (!cookie.session)
                         {
@@ -108,6 +109,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 CoreWebView2Cookie coreCookie = cookieManager.CreateCookie(cookie.name, cookie.value, cookie.domain, cookie.path);
                 coreCookie.IsSecure = cookie.secure;
                 coreCookie.IsHttpOnly = cookie.httpOnly;
+                coreCookie.SameSite = cookie.sameSite;
+
                 if (!cookie.session)
                 {
                     coreCookie.Expires = cookie.expirationTime;

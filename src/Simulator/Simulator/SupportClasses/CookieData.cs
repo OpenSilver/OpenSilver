@@ -30,6 +30,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         public bool session;
         public string value;
         public DateTime expirationTime;
+        public CoreWebView2CookieSameSiteKind sameSite;
 
         public CookieData(CoreWebView2Cookie cookie, string url)
         {
@@ -42,6 +43,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             this.domain = cookie.Domain;
             this.expirationTime = cookie.Expires;
             this.session = cookie.IsSession;
+            this.sameSite = cookie.SameSite;
         }
     }
 }
