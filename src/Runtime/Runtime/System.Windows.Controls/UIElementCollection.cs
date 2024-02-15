@@ -48,7 +48,7 @@ namespace System.Windows.Controls
             int count = Count;
             if (count > 0)
             {
-                UIElement[] uies = this.ToArray();
+                UIElement[] uies = InternalItems.ToArray();
 
                 for (int i = 0; i < count; ++i)
                 {

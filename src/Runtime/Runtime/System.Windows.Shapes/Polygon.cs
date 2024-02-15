@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Media;
@@ -84,7 +85,8 @@ namespace System.Windows.Shapes
                         {
                             polygon.SetSvgAttribute(
                                 "points",
-                                string.Join(" ", points.Select(static p => $"{Math.Round(p.X, 2).ToInvariantString()},{Math.Round(p.Y, 2).ToInvariantString()}")));
+                                string.Join(" ",
+                                    points.InternalItems.Select(static p => $"{Math.Round(p.X, 2).ToInvariantString()},{Math.Round(p.Y, 2).ToInvariantString()}")));
                         }
                         else
                         {
@@ -155,8 +157,8 @@ namespace System.Windows.Shapes
         /// </summary>
         internal sealed override Rect GetDefiningGeometryBounds()
         {
-            PointCollection points = Points;
-            if (points is null || points.Count == 0)
+            List<Point> points = Points.InternalItems;
+            if (points.Count == 0)
             {
                 return new Rect();
             }

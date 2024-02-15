@@ -49,7 +49,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
     {
         if (Count > 0)
         {
-            T[] oldItems = this.ToArray();
+            T[] oldItems = InternalItems.ToArray();
             ClearDependencyObjectInternal();
 
             foreach (T item in oldItems)

@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -328,9 +327,10 @@ namespace System.Windows
                 // Note: we do the search in reversed order as it is the 
                 // Silverlight and WPF behavior.
                 //
-                for (int i = _mergedDictionaries.Count - 1; (i > -1) && !result; i--)
+                List<ResourceDictionary> mergedDictionaries = _mergedDictionaries.InternalItems;
+                for (int i = mergedDictionaries.Count - 1; (i > -1) && !result; i--)
                 {
-                    result = _mergedDictionaries[i].Contains(key);
+                    result = mergedDictionaries[i].Contains(key);
                 }
             }
 
@@ -823,9 +823,10 @@ namespace System.Windows
         {
             if (_mergedDictionaries != null)
             {
-                for (int i = 0; i < _mergedDictionaries.Count; i++)
+                List<ResourceDictionary> mergedDictionaries = _mergedDictionaries.InternalItems;
+                for (int i = 0; i < mergedDictionaries.Count; i++)
                 {
-                    _mergedDictionaries[i].AddOwner(owner);
+                    mergedDictionaries[i].AddOwner(owner);
                 }
             }
         }
@@ -838,9 +839,10 @@ namespace System.Windows
         {
             if (_mergedDictionaries != null)
             {
-                for (int i = 0; i < _mergedDictionaries.Count; i++)
+                List<ResourceDictionary> mergedDictionaries = _mergedDictionaries.InternalItems;
+                for (int i = 0; i < mergedDictionaries.Count; i++)
                 {
-                    _mergedDictionaries[i].RemoveOwner(owner);
+                    mergedDictionaries[i].RemoveOwner(owner);
                 }
             }
         }
@@ -1036,9 +1038,10 @@ namespace System.Windows
                     // Note: we do the search in reversed order as it is the 
                     // Silverlight and WPF behavior.
                     //
-                    for (int i = _mergedDictionaries.Count - 1; (i > -1); i--)
+                    List<ResourceDictionary> mergedDictionaries = _mergedDictionaries.InternalItems;
+                    for (int i = mergedDictionaries.Count - 1; (i > -1); i--)
                     {
-                        value = _mergedDictionaries[i].GetItem(key);
+                        value = mergedDictionaries[i].GetItem(key);
                         if (value != null)
                         {
                             break;
@@ -1202,9 +1205,10 @@ namespace System.Windows
                     //}
                     if (_mergedDictionaries != null)
                     {
-                        for (int i = 0; i < _mergedDictionaries.Count; i++)
+                        List<ResourceDictionary> mergedDictionaries = _mergedDictionaries.InternalItems;
+                        for (int i = 0; i < mergedDictionaries.Count; i++)
                         {
-                            _mergedDictionaries[i].IsThemeDictionary = value;
+                            mergedDictionaries[i].IsThemeDictionary = value;
                         }
                     }
                 }
@@ -1337,9 +1341,10 @@ namespace System.Windows
                 {
                     if (rd._mergedDictionaries != null)
                     {
-                        for (int i = 0; i < rd._mergedDictionaries.Count; i++)
+                        List<ResourceDictionary> mergedDictionaries = rd._mergedDictionaries.InternalItems;
+                        for (int i = 0; i < mergedDictionaries.Count; i++)
                         {
-                            AddResourcesToCache(rd._mergedDictionaries[i], cache);
+                            AddResourcesToCache(mergedDictionaries[i], cache);
                         }
                     }
 

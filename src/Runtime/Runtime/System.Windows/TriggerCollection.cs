@@ -63,7 +63,7 @@ namespace System.Windows
 
         internal override void RemoveAtOverride(int index)
         {
-            TriggerBase trigger = this[index];
+            TriggerBase trigger = GetItemInternal(index);
             RemoveAtDependencyObjectInternal(index);
 
             if (_owner != null)
@@ -79,7 +79,7 @@ namespace System.Windows
 
         internal override void SetItemOverride(int index, TriggerBase value)
         {
-            TriggerBase oldTrigger = this[index];
+            TriggerBase oldTrigger = GetItemInternal(index);
             SetItemDependencyObjectInternal(index, value);
             
             if (_owner != null)

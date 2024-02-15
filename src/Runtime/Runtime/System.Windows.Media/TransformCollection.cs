@@ -48,7 +48,7 @@ namespace System.Windows.Media
 
         internal override void RemoveAtOverride(int index)
         {
-            UnsubscribeToChangedEvent(this[index]);
+            UnsubscribeToChangedEvent(GetItemInternal(index));
             RemoveAtDependencyObjectInternal(index);
         }
 
@@ -56,7 +56,7 @@ namespace System.Windows.Media
 
         internal override void SetItemOverride(int index, Transform value)
         {
-            UnsubscribeToChangedEvent(this[index]);
+            UnsubscribeToChangedEvent(GetItemInternal(index));
             SubscribeToChangedEvent(value);
             SetItemDependencyObjectInternal(index, value);
         }

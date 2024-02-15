@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Markup;
 using OpenSilver.Internal;
@@ -109,8 +110,8 @@ namespace System.Windows.Media
         {
             get
             {
-                TransformCollection children = Children;
-                if ((children == null) || (children.Count == 0))
+                List<Transform> children = Children.InternalItems;
+                if (children.Count == 0)
                 {
                     return new Matrix();
                 }
@@ -130,8 +131,8 @@ namespace System.Windows.Media
         {
             get
             {
-                TransformCollection children = (TransformCollection)GetValue(ChildrenProperty);
-                if (children == null || children.Count == 0)
+                List<Transform> children = Children.InternalItems;
+                if (children.Count == 0)
                 {
                     return true;
                 }

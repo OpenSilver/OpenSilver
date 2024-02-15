@@ -195,30 +195,32 @@ namespace System.Windows.Controls
 
         internal void OnChildrenReset()
         {
-            if (this.VisualChildrenInformation != null)
+            if (VisualChildrenInformation != null)
             {
-                foreach (var oldChild in this.VisualChildrenInformation.Keys.ToArray())
+                foreach (var oldChild in VisualChildrenInformation.Keys.ToArray())
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
                 }
             }
 
-            if (!this.HasChildren)
+            if (!HasChildren)
             {
                 return;
             }
 
+            List<UIElement> children = InternalChildren;
+
             int chunkSize = ProgressiveRenderingChunkSize;
-            var enableProgressiveRendering = chunkSize > 0 && Children.Count > chunkSize;
+            var enableProgressiveRendering = chunkSize > 0 && children.Count > chunkSize;
             if (enableProgressiveRendering)
             {
-                this.ProgressivelyAttachChildren(this.Children);
+                ProgressivelyAttachChildren(children);
             }
             else
             {
-                for (int i = 0; i < this.Children.Count; ++i)
+                for (int i = 0; i < children.Count; ++i)
                 {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.Children[i], this, i);
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(children[i], this, i);
                 }
             }
         }
@@ -341,6 +343,17 @@ namespace System.Windows.Controls
                 return _uiElementCollection;
             }
         }
+
+        /// <summary>
+        /// Get the underlying <see cref="List{T}"/> used to back the <see cref="Children"/> 
+        /// collection.
+        /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT</b>: This property is dangerous and must be used very carefully. Read
+        /// operations (get accessor, GetEnumerator, Count...) are generally safe to use, but
+        /// write operations (Add, Remove, Clear...) will likely lead to unexpected behaviors.
+        /// </remarks>
+        internal List<UIElement> InternalChildren => Children.InternalItems;
 
         private bool VerifyBoundState()
         {
@@ -687,14 +700,6 @@ namespace System.Windows.Controls
             GenerateChildren();
         }
 
-        internal UIElementCollection InternalChildren
-        {
-            get
-            {
-                return _uiElementCollection;
-            }
-        }
-
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
@@ -708,7 +713,7 @@ namespace System.Windows.Controls
             this.OnChildrenReset();
         }
 
-        private async void ProgressivelyAttachChildren(IList<UIElement> newChildren)
+        private async void ProgressivelyAttachChildren(List<UIElement> newChildren)
         {
             int chunkSize = ProgressiveRenderingChunkSize;
             int from = 0;

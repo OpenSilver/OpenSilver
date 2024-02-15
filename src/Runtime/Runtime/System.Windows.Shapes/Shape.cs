@@ -239,7 +239,7 @@ namespace System.Windows.Shapes
                         {
                             shape.SetSvgAttribute(
                                 "stroke-dasharray",
-                                string.Join(",", dashArray.Select(d => Math.Round(d, 2).ToInvariantString())));
+                                string.Join(",", dashArray.InternalItems.Select(d => Math.Round(d, 2).ToInvariantString())));
                         }
                         else
                         {

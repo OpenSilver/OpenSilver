@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Controls.Primitives;
 using CSHTML5.Internals.Controls;
@@ -168,6 +169,7 @@ namespace System.Windows.Controls
         //
         void RemoveUnusedContainers(int first, int count)
         {
+            List<UIElement> children = InternalChildren;
             IRecyclingItemContainerGenerator generator = ItemContainerGenerator as IRecyclingItemContainerGenerator;
             ItemsControl owner = ItemsControl.GetItemsOwner(this);
             VirtualizationMode mode = GetVirtualizationMode(this);
@@ -176,7 +178,7 @@ namespace System.Windows.Controls
             int item;
 
             //Console.WriteLine ("VSP.RemoveUnusedContainers ({0}, {1});", first, count);
-            pos = new GeneratorPosition(Children.Count - 1, 0);
+            pos = new GeneratorPosition(children.Count - 1, 0);
             while (pos.Index >= 0)
             {
                 item = generator.IndexFromGeneratorPosition(pos);
@@ -186,7 +188,7 @@ namespace System.Windows.Controls
                 // external IScrollInfo which leads to layout issues
                 if ((item < first || item > last) &&
                     /*!((IGeneratorHost)owner).IsItemItsOwnContainer(owner.Items[item]) &&*/ 
-                    NotifyCleanupItem(Children[pos.Index], owner))
+                    NotifyCleanupItem(children[pos.Index], owner))
                 {
                     RemoveInternalChildRange(pos.Index, 1);
 
@@ -256,16 +258,15 @@ namespace System.Windows.Controls
 
                 using (generator.StartAt(start, GeneratorDirection.Forward, true))
                 {
-                    bool isNewlyRealized;
-
+                    List<UIElement> children = InternalChildren;
                     for (int i = index; i < owner.Items.Count && beyond < 2; i++, insertAt++)
                     {
                         // Generate the child container
-                        UIElement child = (UIElement)generator.GenerateNext(out isNewlyRealized);
-                        if (isNewlyRealized || insertAt >= Children.Count || Children[insertAt] != child)
+                        UIElement child = (UIElement)generator.GenerateNext(out bool isNewlyRealized);
+                        if (isNewlyRealized || insertAt >= children.Count || children[insertAt] != child)
                         {
                             // Add newly created children to the panel
-                            if (insertAt < Children.Count)
+                            if (insertAt < children.Count)
                             {
                                 InsertInternalChild(insertAt, child);
                             }
@@ -395,7 +396,7 @@ namespace System.Windows.Controls
                 arranged.Width = 0;
 
             // Arrange our children
-            foreach (UIElement child in Children.InternalItems)
+            foreach (UIElement child in InternalChildren)
             {
                 Size size = child.DesiredSize;
                 if (Orientation == Orientation.Vertical)
@@ -728,7 +729,7 @@ namespace System.Windows.Controls
         {
             Rect exposed = new Rect(0, 0, 0, 0);
 
-            foreach (UIElement child in Children.InternalItems)
+            foreach (UIElement child in InternalChildren)
             {
                 if (child == visual)
                 {

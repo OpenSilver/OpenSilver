@@ -50,7 +50,7 @@ namespace System.Windows.Controls
             AddInternal(value);
         }
 
-        internal override void CopyToImpl(Array array, int index)
+        internal override void CopyToImpl(object[] array, int index)
         {
             if (IsUsingItemsSource)
             {

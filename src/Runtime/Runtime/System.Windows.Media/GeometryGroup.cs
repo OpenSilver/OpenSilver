@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
 using System.Windows.Markup;
@@ -131,8 +132,8 @@ namespace System.Windows.Media
             {
                 Rect boundsRect = Rect.Empty;
 
-                GeometryCollection children = (GeometryCollection)GetValue(ChildrenProperty);
-                if (children != null && children.Count > 0)
+                List<Geometry> children = Children.InternalItems;
+                if (children.Count > 0)
                 {
                     for (int i = 0; i < children.Count; i++)
                     {

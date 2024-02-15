@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 
 namespace System.Windows
@@ -23,14 +22,14 @@ namespace System.Windows
         internal ResourceDictionaryCollection(ResourceDictionary owner) : base(true)
         {
             Debug.Assert(owner != null, "ResourceDictionaryCollection's owner cannot be null");
-            this._owner = owner;
+            _owner = owner;
         }
 
         internal override void AddOverride(ResourceDictionary value)
         {
             CheckValue(value);
-            this.AddInternal(value);
-            value._parentDictionary = this._owner;
+            AddInternal(value);
+            value._parentDictionary = _owner;
         }
 
         internal override void ClearOverride()
@@ -38,38 +37,35 @@ namespace System.Windows
             foreach (ResourceDictionary dictionary in InternalItems)
             {
                 dictionary._parentDictionary = null;
-                this._owner.RemoveParentOwners(dictionary);
+                _owner.RemoveParentOwners(dictionary);
             }
 
-            this.ClearInternal();
+            ClearInternal();
         }
 
         internal override void InsertOverride(int index, ResourceDictionary value)
         {
             CheckValue(value);
-            this.InsertInternal(index, value);
-            value._parentDictionary = this._owner;
+            InsertInternal(index, value);
+            value._parentDictionary = _owner;
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            ResourceDictionary removedItem = this.GetItemInternal(index);
-            this.RemoveAtInternal(index);
+            ResourceDictionary removedItem = GetItemInternal(index);
+            RemoveAtInternal(index);
             removedItem._parentDictionary = null;
         }
 
-        internal override ResourceDictionary GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
+        internal override ResourceDictionary GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, ResourceDictionary value)
         {
             CheckValue(value);
-            ResourceDictionary originalItem = this.GetItemInternal(index);
-            this.SetItemInternal(index, value);
+            ResourceDictionary originalItem = GetItemInternal(index);
+            SetItemInternal(index, value);
             originalItem._parentDictionary = null;
-            value._parentDictionary = this._owner;
+            value._parentDictionary = _owner;
         }
 
         private static void CheckValue(ResourceDictionary value)

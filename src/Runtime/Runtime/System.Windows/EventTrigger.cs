@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
@@ -95,15 +96,15 @@ namespace System.Windows
         // This should be moved to base class if PropertyTrigger support is added.
         internal static void ProcessTriggerCollection(IInternalFrameworkElement triggersHost)
         {
-            TriggerCollection triggerCollection = (TriggerCollection)triggersHost.GetValue(FrameworkElement.TriggersProperty);
-            if (triggerCollection != null)
+            if (triggersHost.GetValue(FrameworkElement.TriggersProperty) is TriggerCollection triggerCollection)
             {
                 // Don't seal the collection, because we allow it to change.  We will,
                 // however, seal each of the triggers.
 
-                for (int i = 0; i < triggerCollection.Count; i++)
+                List<TriggerBase> internalTriggerCollection = triggerCollection.InternalItems;
+                for (int i = 0; i < internalTriggerCollection.Count; i++)
                 {
-                    ProcessOneTrigger(triggersHost, triggerCollection[i]);
+                    ProcessOneTrigger(triggersHost, internalTriggerCollection[i]);
                 }
             }
         }
@@ -147,13 +148,12 @@ namespace System.Windows
         // Call DisconnectOneTrigger for each trigger in the Triggers collection.
         internal static void DisconnectAllTriggers(IInternalFrameworkElement triggersHost)
         {
-            TriggerCollection triggerCollection = (TriggerCollection)triggersHost.GetValue(FrameworkElement.TriggersProperty);
-
-            if (triggerCollection != null)
+            if (triggersHost.GetValue(FrameworkElement.TriggersProperty) is TriggerCollection triggerCollection)
             {
-                for (int i = 0; i < triggerCollection.Count; i++)
+                List<TriggerBase> internalTriggerCollection = triggerCollection.InternalItems;
+                for (int i = 0; i < internalTriggerCollection.Count; i++)
                 {
-                    DisconnectOneTrigger(triggersHost, triggerCollection[i]);
+                    DisconnectOneTrigger(triggersHost, internalTriggerCollection[i]);
                 }
             }
         }
@@ -213,7 +213,7 @@ namespace System.Windows
             internal void Handler(object sender, RoutedEventArgs e)
             {
                 // Invoke all actions of the associated EventTrigger object.
-                TriggerActionCollection actions = _owningTrigger.Actions;
+                List<TriggerAction> actions = _owningTrigger.Actions.InternalItems;
                 for (int j = 0; j < actions.Count; j++)
                 {
                     actions[j].Invoke(_owningTriggerHost);

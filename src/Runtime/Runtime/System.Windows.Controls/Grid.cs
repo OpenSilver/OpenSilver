@@ -558,7 +558,7 @@ namespace System.Windows.Controls
         }
 
         private CellGroups ValidateCells(
-            UIElementCollection children,
+            List<UIElement> children,
             ref StackVector<CellCache> cellCacheVector)
         {
             m_gridFlags = GridFlags.None;
@@ -1474,7 +1474,7 @@ namespace System.Windows.Controls
             {
                 // If this Grid has no user-defined rows or columns, it is possible
                 // to shortcut this MeasureOverride.
-                UIElementCollection children = Children;
+                List<UIElement> children = InternalChildren;
                 for (int i = 0; i < children.Count; i++)
                 {
                     UIElement child = children[i];
@@ -1501,7 +1501,7 @@ namespace System.Windows.Controls
                 innerAvailableSize.Width -= combinedColumnSpacing;
                 innerAvailableSize.Height -= combinedRowSpacing;
 
-                UIElementCollection children = Children;
+                List<UIElement> children = InternalChildren;
                 int childrenCount = children.Count;
 
                 cellCacheVector = new StackVector<CellCache>(16, childrenCount);
@@ -1754,7 +1754,7 @@ namespace System.Windows.Controls
             {
                 // If this Grid has no user-defined rows or columns, it is possible
                 // to shortcut this ArrangeOverride.
-                UIElementCollection children = Children;
+                List<UIElement> children = InternalChildren;
                 for (int i = 0; i < children.Count; i++)
                 {
                     UIElement currentChild = children[i];
@@ -1774,7 +1774,7 @@ namespace System.Windows.Controls
                 SetFinalSize(m_pRows, (double)innerRect.Height - combinedRowSpacing);
                 SetFinalSize(m_pColumns, (double)innerRect.Width - combinedColumnSpacing);
 
-                UIElementCollection children = Children;
+                List<UIElement> children = InternalChildren;
                 for (int i = 0; i < children.Count; i++)
                 {
                     UIElement currentChild = children[i];

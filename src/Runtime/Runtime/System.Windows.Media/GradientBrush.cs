@@ -196,7 +196,7 @@ namespace System.Windows.Media
 
         internal IEnumerable<(double Offset, Color Color)> GetGradientStops()
         {
-            GradientStopCollection stops = GradientStops;
+            List<GradientStop> stops = GradientStops.InternalItems;
             if (stops.Count == 0)
             {
                 yield break;
@@ -209,7 +209,8 @@ namespace System.Windows.Media
                 yield break;
             }
 
-            var orderedStops = GradientStops.OrderBy(gs => gs.Offset).ToArray();
+            var orderedStops = stops.ToArray();
+            Array.Sort(orderedStops, static (l, r) => l.Offset.CompareTo(r.Offset));
 
             int i = 0;
             GradientStop firstStop = null;

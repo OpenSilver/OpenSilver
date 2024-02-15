@@ -195,7 +195,20 @@ namespace System.Windows
         /// have zero-based indexing.
         /// </param>
         /// <param name="index">The zero-based index in array at which copying begins.</param>
-        public void CopyTo(Array array, int index) => CopyToImpl(array, index);
+        public void CopyTo(Array array, int index)
+        {
+            if (array is T[] a)
+            {
+                CopyToImpl(a, index);
+            }
+            else
+            {
+                for (int i = 0; i < Count; ++i)
+                {
+                    array.SetValue(GetItemOverride(i), index + i);
+                }
+            }
+        }
 
         /// <summary>
         /// Copies the elements of the <see cref="PresentationFrameworkCollection{T}"/> to
@@ -325,20 +338,7 @@ namespace System.Windows
         /// </summary>
         internal virtual int CountInternal => _items.Count;
 
-        internal virtual void CopyToImpl(Array array, int index)
-        {
-            if (array is T[] destination)
-            {
-                _items.CopyTo(destination, index);
-            }
-            else
-            {
-                for (int i = 0; i < Count; ++i)
-                {
-                    array.SetValue(GetItemOverride(i), index + i);
-                }
-            }
-        }
+        internal virtual void CopyToImpl(T[] array, int index) => _items.CopyTo(array, index);
 
         internal virtual int IndexOfImpl(T value) => _items.IndexOf(value);
 
@@ -348,6 +348,14 @@ namespace System.Windows
 
         #region Generic collection manipulation methods
 
+        /// <summary>
+        /// Get the underlying <see cref="List{T}"/> used to back this collection.
+        /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT</b>: This property is dangerous and must be used very carefully. Read
+        /// operations (get accessor, GetEnumerator, Count...) are generally safe to use, but
+        /// write operations (Add, Remove, Clear...) will likely lead to unexpected behaviors.
+        /// </remarks>
         internal List<T> InternalItems => _items;
 
         /// <summary>

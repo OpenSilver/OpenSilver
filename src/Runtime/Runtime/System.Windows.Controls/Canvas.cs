@@ -133,8 +133,7 @@ namespace System.Windows.Controls
         {
             var childConstraint = new Size(double.PositiveInfinity, double.PositiveInfinity);
 
-            UIElement[] childrens = Children.ToArray();
-            foreach (UIElement child in childrens)
+            foreach (UIElement child in InternalChildren)
             {
                 child.Measure(childConstraint);
             }
@@ -144,8 +143,7 @@ namespace System.Windows.Controls
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            UIElement[] childrens = Children.ToArray();
-            foreach (UIElement child in childrens)
+            foreach (UIElement child in InternalChildren)
             {
                 double left = GetLeft(child);
                 double top = GetTop(child);
