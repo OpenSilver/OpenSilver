@@ -16,6 +16,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using DotNetForHtml5;
 using OpenSilver.Buffers;
 
@@ -23,11 +24,9 @@ namespace CSHTML5.Internal
 {
     internal interface IPendingJavascript
     {
-        void AppendLine();
+        void AcquireLock();
 
-        void AppendLine(string value);
-
-        void Append(string value);
+        void ReleaseLock();
 
         void Flush();
 
@@ -44,7 +43,7 @@ namespace CSHTML5.Internal
 
         private byte[] _buffer = Array.Empty<byte>();
 
-        public PendingJavascript(int bufferSize, IWebAssemblyExecutionHandler webAssemblyExecutionHandler)
+        public PendingJavascript(IWebAssemblyExecutionHandler webAssemblyExecutionHandler, CharArrayBuilder buffer)
         {
             if (webAssemblyExecutionHandler == null)
             {
@@ -53,20 +52,13 @@ namespace CSHTML5.Internal
 
             CheckWasmExecutionHandler(webAssemblyExecutionHandler);
 
-            if (bufferSize <= 0)
-            {
-                throw new ArgumentException("Buffer size can not be less or equal to 0");
-            }
-
             _webAssemblyExecutionHandler = webAssemblyExecutionHandler ?? throw new ArgumentNullException(nameof(webAssemblyExecutionHandler));
-            _charArrayBuilder = new CharArrayBuilder(bufferSize);
+            _charArrayBuilder = buffer ?? throw new ArgumentNullException(nameof(buffer));
         }
 
-        public void AppendLine() => _charArrayBuilder.AppendLine();
+        public void AcquireLock() { }
 
-        public void AppendLine(string value) => _charArrayBuilder.AppendLine(value);
-
-        public void Append(string value) => _charArrayBuilder.Append(value);
+        public void ReleaseLock() { }
 
         public void Flush()
         {
@@ -120,37 +112,17 @@ namespace CSHTML5.Internal
     {
         private readonly IJavaScriptExecutionHandler _jsExecutionHandler;
         private readonly object _sync = new();
-        private readonly CharArrayBuilder _buffer;
+        private readonly CharArrayBuilder _charArrayBuilder;
 
-        public PendingJavascriptSimulator(IJavaScriptExecutionHandler jsExecutionHandler)
+        public PendingJavascriptSimulator(IJavaScriptExecutionHandler jsExecutionHandler, CharArrayBuilder buffer)
         {
             _jsExecutionHandler = jsExecutionHandler ?? throw new ArgumentNullException(nameof(jsExecutionHandler));
-            _buffer = new CharArrayBuilder();
+            _charArrayBuilder = buffer ?? throw new ArgumentNullException(nameof(buffer));
         }
 
-        public void AppendLine()
-        {
-            lock (_sync)
-            {
-                _buffer.AppendLine();
-            }
-        }
+        public void AcquireLock() => Monitor.Enter(_sync);
 
-        public void AppendLine(string value)
-        {
-            lock (_sync)
-            {
-                _buffer.AppendLine(value);
-            }
-        }
-
-        public void Append(string value)
-        {
-            lock (_sync)
-            {
-                _buffer.Append(value);
-            }
-        }
+        public void ReleaseLock() => Monitor.Exit(_sync);
 
         public void Flush()
         {
@@ -233,9 +205,14 @@ namespace CSHTML5.Internal
 
         internal string ReadAndClearAggregatedPendingJavaScriptCode()
         {
-            lock (_sync)
+            try
             {
-                return _buffer.ToStringAndClear();
+                AcquireLock();
+                return _charArrayBuilder.ToStringAndClear();
+            }
+            finally
+            {
+                ReleaseLock();
             }
         }
     }

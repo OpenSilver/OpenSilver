@@ -20,7 +20,9 @@ using System.Windows;
 using System.Windows.Threading;
 using CSHTML5.Internal;
 using CSHTML5.Types;
+using DotNetForHtml5;
 using DotNetForHtml5.Core;
+using OpenSilver.Buffers;
 using OpenSilver.Internal;
 
 namespace OpenSilver;
@@ -32,6 +34,7 @@ public static partial class Interop
 {
     private static readonly ReferenceIDGenerator _refIdGenerator = new();
     private static readonly SynchronyzedStore<string> _javascriptCallsStore = new();
+    private static readonly CharArrayBuilder _buffer = new();
 
     private static int _dumpAllJavascriptObjectsEveryMs;
     private static bool _isDispatcherPending;
@@ -80,7 +83,21 @@ public static partial class Interop
     /// </summary>
     public static bool IsRunningInTheXamlDesigner { get; private set; }
 
-    internal static IPendingJavascript JavaScriptRuntime { get; set; }
+    internal static IPendingJavascript JavaScriptRuntime { get; private set; }
+
+    internal static void SetRuntime(IJavaScriptExecutionHandler jsRuntime)
+    {
+        Debug.Assert(jsRuntime is not null);
+
+        if (jsRuntime is IWebAssemblyExecutionHandler wasmHandler)
+        {
+            JavaScriptRuntime = new PendingJavascript(wasmHandler, _buffer);
+        }
+        else
+        {
+            JavaScriptRuntime = new PendingJavascriptSimulator(jsRuntime, _buffer);
+        }
+    }
 
     internal static bool EnableInteropLogging { get; set; }
 
@@ -114,13 +131,16 @@ public static partial class Interop
 
     public static void ExecuteJavaScriptVoidAsync(string javascript)
     {
-        JavaScriptRuntime.AppendLine(javascript);
+        JavaScriptRuntime.AcquireLock();
+        _buffer.AppendLine(javascript);
+        JavaScriptRuntime.ReleaseLock();
         BeginInvokeJavaScript();
     }
 
     internal static void ExecuteJavaScriptVoidAsync(ref AppendInterpolatedStringHandler _)
     {
-        JavaScriptRuntime.AppendLine();
+        _buffer.AppendLine();
+        JavaScriptRuntime.ReleaseLock();
         BeginInvokeJavaScript();
     }
 
@@ -485,14 +505,15 @@ public static partial class Interop
     {
         public AppendInterpolatedStringHandler(int literalLength, int formattedCount)
         {
+            JavaScriptRuntime.AcquireLock();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendLiteral(string value) => JavaScriptRuntime.Append(value);
+        public void AppendLiteral(string value) => _buffer.Append(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendFormatted(string value) => JavaScriptRuntime.Append(value);
+        public void AppendFormatted(string value) => _buffer.Append(value);
 
-        public void AppendFormatted<T>(T value) => JavaScriptRuntime.Append(value.ToString());
+        public void AppendFormatted<T>(T value) => _buffer.Append(value.ToString());
     }
 }

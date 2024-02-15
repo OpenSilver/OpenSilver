@@ -75,23 +75,17 @@ namespace DotNetForHtml5.Core
             get => WebAssemblyExecutionHandler;
             set
             {
-                IWebAssemblyExecutionHandler jsRuntime = null;
                 if (value is not null)
                 {
-                    if (value is IWebAssemblyExecutionHandler wasmHandler)
-                    {
-                        jsRuntime = wasmHandler;
-                        OpenSilver.Interop.JavaScriptRuntime =
-                            new PendingJavascript(Cshtml5Initializer.PendingJsBufferSize, wasmHandler);
-                    }
-                    else
-                    {
-                        jsRuntime = new JSRuntimeWrapper(value);
-                        OpenSilver.Interop.JavaScriptRuntime = new PendingJavascriptSimulator(value);
-                    }
+                    OpenSilver.Interop.SetRuntime(value);
                 }
                 
-                WebAssemblyExecutionHandler = jsRuntime;
+                WebAssemblyExecutionHandler = value switch
+                {
+                    IWebAssemblyExecutionHandler wasmHandler => wasmHandler,
+                    IJavaScriptExecutionHandler jsHandler => new JSRuntimeWrapper(jsHandler),
+                    null => null,
+                };
             }
         }
 

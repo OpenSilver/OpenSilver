@@ -20,6 +20,8 @@ namespace DotNetForHtml5
 {
     public static class Cshtml5Initializer
     {
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static int PendingJsBufferSize { get; set; } = 1024 * 1024 * 2; // 2 MB
 
         public static void Initialize(IWebAssemblyExecutionHandler executionHandler)
