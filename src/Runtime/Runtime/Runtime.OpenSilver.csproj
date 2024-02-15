@@ -252,7 +252,7 @@
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TimelineMarker.cs" />
 		<Compile Include="System.Windows.Media\TimelineMarkerCollection.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\VideoBrush.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
+		<Compile Include="System.Windows.Navigation\LoadCompletedEventHandler.cs" />
 		<Compile Include="System.Windows.Navigation\NavigatingCancelEventArgs.cs" />
 		<Compile Include="System.Windows.Navigation\NavigatingCancelEventHandler.cs" />
 		<Compile Include="System.Windows.Navigation\NavigationMode.cs" />
@@ -420,10 +420,9 @@
 		<Compile Include="System.Windows\DependencyObjectCollection_1.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationLifetimeAware.cs" />
 		<Compile Include="System.Windows\IApplicationService.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\INativeCollectionWrapper.cs" />
 		<Compile Include="System.Windows\NullableBoolConverter.cs" />
 		<Compile Include="System.Windows\StyleTypedPropertyAttribute.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\SystemColors.cs" />
+		<Compile Include="System.Windows\SystemColors.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\SystemParameters.cs" />
 		<Compile Include="System.Windows.Automation\AutomationElementIdentifiers.cs" />
 		<Compile Include="System.Windows.Automation\AutomationProperties.cs" />
@@ -823,7 +822,7 @@
 		<Compile Include="System.Windows.Media.Animation\ClockState.cs" />
 		<Compile Include="System.Windows.Media.Imaging\BitmapImage.cs" />
 		<Compile Include="System.Windows.Media.Imaging\BitmapSource.cs" />
-		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\BitmapCreateOptions.cs" />
+		<Compile Include="System.Windows.Media.Imaging\BitmapCreateOptions.cs" />
 		<Compile Include="System.Windows.Media\ArcSegment.cs" />
 		<Compile Include="System.Windows.Media\BezierSegment.cs" />
 		<Compile Include="System.Windows.Media\Brush.cs" />
@@ -948,7 +947,7 @@
 		<Compile Include="System.Windows\WindowSizeChangedEventHandler.cs" />
 		<Compile Include="System.Windows\FontStyle.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Application.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
+		<Compile Include="System.Windows\ApplicationUnhandledExceptionEventArgs.cs" />
 		<Compile Include="System.Windows\EventTrigger.cs" />
 		<Compile Include="System.Windows\FlowDirection.cs" />
 		<Compile Include="System.Windows\FontStretch.cs" />
@@ -966,7 +965,7 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\WindowSettings.cs" />
 		<Compile Include="System.Windows\TemplateBindingExpression.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\DragEventArgs.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\IDataObject.cs" />
+		<Compile Include="System.Windows\IDataObject.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\WindowState.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\WindowResizeEdge.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\AssemblyPart.cs" />

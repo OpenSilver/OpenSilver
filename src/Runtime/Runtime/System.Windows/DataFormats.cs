@@ -18,7 +18,7 @@ namespace System.Windows
 	/// to identify the format of the data that you request from an <see cref="IDataObject"/>
 	/// object.
 	/// </summary>
-	public static partial class DataFormats
+	public static class DataFormats
 	{
 		/// <summary>
 		/// Specifies the Microsoft Windows file drop format.
