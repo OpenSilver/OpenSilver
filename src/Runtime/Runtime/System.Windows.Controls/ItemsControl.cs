@@ -14,6 +14,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows.Markup;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -379,10 +380,6 @@ namespace System.Windows.Controls
 
         #region Protected Methods
 
-        protected virtual void ManageCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-        }
-
         protected virtual void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
         {
             this.ItemContainerGenerator.OnPanelChanged();
@@ -390,12 +387,9 @@ namespace System.Windows.Controls
 
         protected virtual void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
+#pragma warning disable CS0618
             this.OnItemsSourceChanged_BeforeVisualUpdate(oldValue, newValue);
-        }
-
-        protected virtual void OnItemsSourceChanged_BeforeVisualUpdate(IEnumerable oldValue, IEnumerable newValue)
-        {
-            //we do nothing here
+#pragma warning restore CS0618
         }
 
         /// <summary>
@@ -736,8 +730,10 @@ namespace System.Windows.Controls
 
         private void OnItemCollectionChanged2(object sender, NotifyCollectionChangedEventArgs e)
         {
+#pragma warning disable CS0618
             this.ManageCollectionChanged(e);
-            
+#pragma warning restore CS0618
+
             this.OnItemsChanged(e);
         }
 
@@ -929,12 +925,25 @@ namespace System.Windows.Controls
 
         #region Obsolete
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ItemsControl.OnItemsChanged(NotifyCollectionChangedEventArgs) instead.")]
+        protected virtual void ManageCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ItemsControl.OnItemsSourceChanged(IEnumerable, IEnumerable) instead.")]
+        protected virtual void OnItemsSourceChanged_BeforeVisualUpdate(IEnumerable oldValue, IEnumerable newValue)
+        {
+        }
+
         /// <summary>
         /// Derived classes can call this methed in their constructor if they 
         /// want to disable the default rendering of the ItemsControl. It can 
         /// be useful for example to replace the rendering with a custom 
         /// HTML-based one.
         /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage)]
         protected void DisableDefaultRendering()
         {
@@ -951,12 +960,14 @@ namespace System.Windows.Controls
         /// correct type, otherwise it returns null if no container is to be 
         /// created, or it returns the new container otherwise.
         /// </returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage)]
         protected virtual SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return (SelectorItem)this.GetContainerFromItem(item);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage)]
         protected virtual void OnChildItemRemoved(object item)
         {
@@ -971,6 +982,7 @@ namespace System.Windows.Controls
         /// <returns>
         /// The element that is used to display the given item.
         /// </returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage)]
         protected virtual DependencyObject GetContainerFromItem(object item)
         {
