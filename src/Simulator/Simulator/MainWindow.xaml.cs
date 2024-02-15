@@ -142,18 +142,13 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, _browserUserDataDir,
                 new CoreWebView2EnvironmentOptions(string.Join(" ", chromiumSwitches)));
 
-            MainWebBrowser.CoreWebView2InitializationCompleted += CoreWebView2_InitializationCompleted;
+            MainWebBrowser.CoreWebView2InitializationCompleted +=
+                (_, _) => CookiesHelper.SetCustomCookies(MainWebBrowser, _simulatorLaunchParameters?.CookiesData);
             
             await MainWebBrowser.EnsureCoreWebView2Async(environment);
 
             var devToolsHelper = MainWebBrowser.CoreWebView2.GetDevToolsProtocolHelper();
             await devToolsHelper.Emulation.SetTouchEmulationEnabledAsync(true);
-        }
-
-        private void CoreWebView2_InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
-        {
-            Debug.WriteLine("Initialization completed");
-            CookiesHelper.SetCustomCookies(MainWebBrowser, _simulatorLaunchParameters?.CookiesData);
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
