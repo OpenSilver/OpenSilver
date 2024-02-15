@@ -103,22 +103,25 @@ namespace DotNetForHtml5.Core
             set;
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Action<Action> OpenSilverDispatcherBeginInvoke
         {
             set;
             internal get;
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Action<Action, TimeSpan> OpenSilverDispatcherInvoke
         {
             set;
             internal get;
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static Func<bool> OpenSilverDispatcherCheckAccess
         {
             get;
-            internal set;
+            set;
         }
 
     }
