@@ -24,6 +24,8 @@ namespace System.Windows.Documents;
 [OpenSilver.NotImplemented]
 public sealed class Section : Block
 {
+    private BlockCollection _blocks;
+
     public Section()
     {
         SetValueInternal(BlocksProperty, new BlockCollection(this));
@@ -36,14 +38,19 @@ public sealed class Section : Block
             nameof(Blocks),
             typeof(BlockCollection),
             typeof(Section),
-            null);
+            new PropertyMetadata(null, OnBlocksChanged));
 
     /// <summary>
     /// Gets a <see cref="BlockCollection"/> containing the top-level <see cref="Block"/>
     /// elements that comprise the contents of the <see cref="Section"/>.
     /// This property has no default value.
     /// </summary>
-    public BlockCollection Blocks => (BlockCollection)GetValue(BlocksProperty);
+    public BlockCollection Blocks => _blocks;
+
+    private static void OnBlocksChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Section)d)._blocks = (BlockCollection)e.NewValue;
+    }
 
     /// <summary>
     /// Gets or sets a value that indicates whether a trailing paragraph break should

@@ -22,6 +22,8 @@ namespace System.Windows.Documents;
 [ContentProperty(nameof(Inlines))]
 public sealed class Paragraph : Block
 {
+    private InlineCollection _inlines;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Paragraph"/> class.
     /// </summary>
@@ -37,13 +39,18 @@ public sealed class Paragraph : Block
             nameof(Inlines),
             typeof(InlineCollection),
             typeof(Paragraph),
-            null);
+            new PropertyMetadata(null, OnInlinesChanged));
 
     /// <summary>
     /// Gets an <see cref="InlineCollection"/> containing the top-level <see cref="Inline"/>
     /// elements that include the contents of the <see cref="Paragraph"/>.
     /// </summary>
-    public InlineCollection Inlines => (InlineCollection)GetValue(InlinesProperty);
+    public InlineCollection Inlines => _inlines;
+
+    private static void OnInlinesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Paragraph)d)._inlines = (InlineCollection)e.NewValue;
+    }
 
     protected internal override void INTERNAL_OnAttachedToVisualTree()
     {

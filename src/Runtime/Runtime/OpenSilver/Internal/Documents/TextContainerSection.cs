@@ -27,7 +27,7 @@ internal sealed class TextContainerSection : ITextContainer
         _section = section ?? throw new ArgumentNullException(nameof(section));
     }
 
-    public string Text => string.Join("\n", _section.Blocks.Select(b => b.TextContainer.Text));
+    public string Text => string.Join("\n", _section.Blocks.InternalItems.Select(b => b.TextContainer.Text));
 
     public void OnTextAdded(TextElement textElement, int index)
     {

@@ -28,7 +28,7 @@ internal sealed class TextContainerSpan : ITextContainer
         _span = span ?? throw new ArgumentNullException(nameof(span));
     }
 
-    public string Text => string.Join(string.Empty, _span.Inlines.Select(i => i.TextContainer.Text));
+    public string Text => string.Join(string.Empty, _span.Inlines.InternalItems.Select(i => i.TextContainer.Text));
 
     public void OnTextContentChanged()
     {

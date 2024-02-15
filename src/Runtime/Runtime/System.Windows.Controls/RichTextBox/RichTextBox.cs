@@ -28,6 +28,7 @@ namespace System.Windows.Controls
         private const string ContentElementName = "ContentElement";
 
         private readonly TextSelection _selection;
+        private BlockCollection _blocks;
         private FrameworkElement _contentElement;
         private ScrollViewer _scrollViewer;
         private ITextViewHost<RichTextBoxView> _textViewHost;
@@ -174,7 +175,7 @@ namespace System.Windows.Controls
                 nameof(Blocks),
                 typeof(BlockCollection),
                 typeof(RichTextBox),
-                null);
+                new PropertyMetadata(null, OnBlocksChanged));
 
         /// <summary>
         /// Gets the contents of the <see cref="RichTextBox"/>.
@@ -183,7 +184,12 @@ namespace System.Windows.Controls
         /// A <see cref="BlockCollection"/> that contains the contents of the
         /// <see cref="RichTextBox"/>.
         /// </returns>
-        public BlockCollection Blocks => (BlockCollection)GetValue(BlocksProperty);
+        public BlockCollection Blocks => _blocks;
+
+        private static void OnBlocksChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((RichTextBox)d)._blocks = (BlockCollection)e.NewValue;
+        }
 
         /// <summary>
         /// Identifies the <see cref="IsReadOnly"/> dependency property.

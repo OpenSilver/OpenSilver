@@ -51,6 +51,7 @@ namespace System.Windows.Controls
     [ContentProperty(nameof(Child))]
     public class Border : FrameworkElement
     {
+        private UIElement _child;
         private WeakEventListener<Border, Brush, EventArgs> _backgroundChangedListener;
         private WeakEventListener<Border, Brush, EventArgs> _borderBrushChangedListener;
 
@@ -123,7 +124,7 @@ namespace System.Windows.Controls
         /// </summary>
         public UIElement Child
         {
-            get => (UIElement)GetValue(ChildProperty);
+            get => _child;
             set => SetValueInternal(ChildProperty, value);
         }
 
@@ -132,6 +133,8 @@ namespace System.Windows.Controls
             Border border = (Border)d;
             UIElement oldChild = (UIElement)e.OldValue;
             UIElement newChild = (UIElement)e.NewValue;
+
+            border._child = newChild;
 
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, border);
 

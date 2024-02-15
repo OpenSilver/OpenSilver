@@ -11,11 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
 using System.Diagnostics;
+using System.Windows.Markup;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
@@ -36,6 +35,7 @@ namespace System.Windows.Controls
     [ContentProperty(nameof(Inlines))]
     public class TextBlock : FrameworkElement
     {
+        private InlineCollection _inlines;
         private Size _noWrapSize = Size.Empty;
         private bool _textContentChanging;
 
@@ -479,7 +479,7 @@ namespace System.Windows.Controls
                 nameof(Inlines),
                 typeof(InlineCollection),
                 typeof(TextBlock),
-                null);
+                new PropertyMetadata(null, OnInlinesChanged));
 
         /// <summary>
         /// Gets the collection of inline text elements within a <see cref="TextBlock"/>.
@@ -488,7 +488,12 @@ namespace System.Windows.Controls
         /// A collection that holds all inline text elements from the <see cref="TextBlock"/>.The
         /// default is an empty collection.
         /// </returns>
-        public InlineCollection Inlines => (InlineCollection)GetValue(InlinesProperty);
+        public InlineCollection Inlines => _inlines;
+
+        private static void OnInlinesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((TextBlock)d)._inlines = (InlineCollection)e.NewValue;
+        }
 
         /// <summary>
         /// Returns a value by which each line of text is offset from a baseline.

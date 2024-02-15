@@ -30,6 +30,8 @@ namespace System.Windows.Controls
             IsHitTestableProperty.OverrideMetadata(typeof(RichTextBlock), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
 
+        private BlockCollection _blocks;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextBlock"/> class.
         /// </summary>
@@ -45,12 +47,17 @@ namespace System.Windows.Controls
                 nameof(Blocks),
                 typeof(BlockCollection),
                 typeof(RichTextBlock),
-                null);
+                new PropertyMetadata(null, OnBlocksChanged));
 
         /// <summary>
         /// Gets the contents of the <see cref="RichTextBlock"/>.
         /// </summary>
-        public BlockCollection Blocks => (BlockCollection)GetValue(BlocksProperty);
+        public BlockCollection Blocks => _blocks;
+
+        private static void OnBlocksChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((RichTextBlock)d)._blocks = (BlockCollection)e.NewValue;
+        }
 
         /// <summary>
         /// Identifies the <see cref="Padding"/> dependency property.
@@ -400,7 +407,7 @@ namespace System.Windows.Controls
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            return (Block)Blocks[index];
+            return Blocks.InternalItems[index];
         }
     }
 }

@@ -28,7 +28,7 @@ internal sealed class TextContainerTextBlock : ITextContainer
         _textblock = tb ?? throw new ArgumentNullException(nameof(tb));
     }
 
-    public string Text => string.Join(string.Empty, _textblock.Inlines.Select(i => i.TextContainer.Text));
+    public string Text => string.Join(string.Empty, _textblock.Inlines.InternalItems.Select(i => i.TextContainer.Text));
 
     public void OnTextContentChanged() => _textblock.OnTextContentChanged();
 

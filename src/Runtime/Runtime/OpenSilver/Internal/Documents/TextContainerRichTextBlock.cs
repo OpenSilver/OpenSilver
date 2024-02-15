@@ -28,7 +28,7 @@ internal sealed class TextContainerRichTextBlock : ITextContainer
         _rtb = rtb ?? throw new ArgumentNullException(nameof(rtb));
     }
 
-    public string Text => string.Join("\n", _rtb.Blocks.Select(b => b.TextContainer.Text));
+    public string Text => string.Join("\n", _rtb.Blocks.InternalItems.Select(b => b.TextContainer.Text));
 
     public void OnTextAdded(TextElement textElement, int index)
     {

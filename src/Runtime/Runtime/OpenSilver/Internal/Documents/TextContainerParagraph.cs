@@ -27,7 +27,7 @@ internal sealed class TextContainerParagraph : ITextContainer
         _paragraph = paragraph ?? throw new ArgumentNullException(nameof(paragraph));
     }
 
-    public string Text => string.Join(string.Empty, _paragraph.Inlines.Select(i => i.TextContainer.Text));
+    public string Text => string.Join(string.Empty, _paragraph.Inlines.InternalItems.Select(i => i.TextContainer.Text));
 
     public void OnTextAdded(TextElement textElement, int index)
     {

@@ -22,6 +22,8 @@ namespace System.Windows.Documents;
 [ContentProperty(nameof(Inlines))]
 public class Span : Inline
 {
+    private InlineCollection _inlines;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Span"/> class.
     /// </summary>
@@ -35,7 +37,7 @@ public class Span : Inline
             nameof(Inlines),
             typeof(InlineCollection),
             typeof(Span),
-            null);
+            new PropertyMetadata(null, OnInlinesChanged));
 
     /// <summary>
     /// Gets an <see cref="InlineCollection"/> containing the top-level inline
@@ -46,7 +48,12 @@ public class Span : Inline
     /// include the contents of the <see cref="Span"/>. This property has
     /// no default value.
     /// </returns>
-    public InlineCollection Inlines => (InlineCollection)GetValue(InlinesProperty);
+    public InlineCollection Inlines => _inlines;
+
+    private static void OnInlinesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Span)d)._inlines = (InlineCollection)e.NewValue;
+    }
 
     protected internal override void INTERNAL_OnAttachedToVisualTree()
     {
@@ -67,6 +74,6 @@ public class Span : Inline
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        return Inlines[index];
+        return Inlines.InternalItems[index];
     }
 }
