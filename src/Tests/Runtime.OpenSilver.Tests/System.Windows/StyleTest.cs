@@ -100,16 +100,6 @@ namespace System.Windows.Tests
             s1.IsSealed.Should().BeTrue();
             s1.Setters.IsSealed.Should().BeTrue();
 
-            // Check s1.PropertyValues
-            var propertyValues = s1.PropertyValues;
-            propertyValues.Count.Should().Be(3);
-            propertyValues[0].Property.Should().Be(FrameworkElement.HeightProperty);
-            propertyValues[0].ValueInternal.Should().Be(40d);
-            propertyValues[1].Property.Should().Be(FrameworkElement.WidthProperty);
-            propertyValues[1].ValueInternal.Should().Be(20d);
-            propertyValues[2].Property.Should().Be(ContentControl.ContentTemplateProperty);
-            propertyValues[2].ValueInternal.Should().Be(contentTemplate);
-
             // Check s1.EffectiveValues
             var effectiveValues = s1.EffectiveValues;
             effectiveValues.Count.Should().Be(3);
@@ -146,13 +136,6 @@ namespace System.Windows.Tests
             s1.Setters.IsSealed.Should().BeTrue();
             s2.Setters.IsSealed.Should().BeTrue();
             s3.Setters.IsSealed.Should().BeTrue();
-
-            var propertyValues = s1.PropertyValues;
-            propertyValues.Count.Should().Be(2);
-            propertyValues[0].Property.Should().Be(ListBox.SelectionModeProperty);
-            propertyValues[0].ValueInternal.Should().Be(SelectionMode.Extended);
-            propertyValues[1].Property.Should().Be(ItemsControl.DisplayMemberPathProperty);
-            propertyValues[1].ValueInternal.Should().Be("DisplayMemberPathListBox");
 
             var effectiveValues = s1.EffectiveValues;
             effectiveValues.Count.Should().Be(5);

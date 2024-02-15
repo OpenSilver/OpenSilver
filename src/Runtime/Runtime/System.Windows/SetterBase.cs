@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,56 +11,36 @@
 *  
 \*====================================================================================*/
 
+namespace System.Windows;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace System.Windows
+/// <summary>
+/// Represents the base class for value setters.
+/// </summary>
+public abstract class SetterBase : DependencyObject
 {
+    internal SetterBase() { }
+
     /// <summary>
-    /// Represents the base class for value setters.
+    /// Gets a value that indicates whether this object is in an immutable state.
     /// </summary>
-    public abstract partial class SetterBase : DependencyObject
+    /// <returns>
+    /// true if this object is in an immutable state; otherwise, false.
+    /// </returns>
+    public bool IsSealed => _sealed;
+
+    internal virtual void Seal() => _sealed = true;
+
+    /// <summary>
+    /// Subclasses need to call this method before any changes to their state.
+    /// </summary>
+    private protected void CheckSealed()
     {
-        /// <summary>
-        ///     SetterBase construction
-        /// </summary>
-        internal SetterBase()
+        if (_sealed)
         {
+            throw new InvalidOperationException("Cannot modify a 'SetterBase' after it is sealed.");
         }
-
-        /// <summary>
-        ///     Returns the sealed state of this object.  If true, any attempt
-        /// at modifying the state of this object will trigger an exception.
-        /// </summary>
-        public bool IsSealed
-        {
-            get
-            {
-                return _sealed;
-            }
-        }
-
-        internal virtual void Seal()
-        {
-            _sealed = true;
-        }
-
-        /// <summary>
-        ///  Subclasses need to call this method before any changes to their state.
-        /// </summary>
-        private protected void CheckSealed()
-        {
-            if (_sealed)
-            {
-                throw new InvalidOperationException(string.Format("Cannot modify a '{0}' after it is sealed.", "SetterBase"));
-            }
-        }
-
-        // Derived
-        private bool _sealed;
     }
+
+    // Derived
+    private bool _sealed;
 }

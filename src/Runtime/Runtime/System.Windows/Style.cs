@@ -11,254 +11,313 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Markup;
 using System.Xaml.Markup;
-using System.Windows.Data;
+using PropertyValue = (int PropertyIndex, object ValueInternal);
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Contains property setters that can be shared between instances of a type.
+/// </summary>
+[DictionaryKeyProperty(nameof(TargetType))]
+[ContentProperty(nameof(Setters))]
+public class Style : DependencyObject //was sealed but we unsealed it because telerik has xaml files with styles as their roots (and the file we generate from xaml files create a type that inherits the type of the root of the xaml).
 {
+    private bool _sealed;
+    private SetterBaseCollection _setters;
+    private Type _targetType;
+    private Style _basedOn;
+
+    // Style tables (includes based-on data)
+    internal new Dictionary<int, object> EffectiveValues { get; private set; }
+
     /// <summary>
-    /// Contains property setters that can be shared between instances of a type.
+    /// Initializes a new instance of the <see cref="Style"/> class.
     /// </summary>
-    [DictionaryKeyProperty(nameof(TargetType))]
-    [ContentProperty(nameof(Setters))]
-    public class Style : DependencyObject //was sealed but we unsealed it because telerik has xaml files with styles as their roots (and the file we generate from xaml files create a type that inherits the type of the root of the xaml).
+    public Style()
     {
-        #region Data
+        // Note: In WPF, Style inherits from DispatcherObject rather than DependencyObject.
+        // For this reason we explicitly set the two properties below to ensure that a Style
+        // has no inherited context, and can't provide itself as inherited context.
+        CanBeInheritanceContext = false;
+        IsInheritanceContextSealed = true;
+    }
 
-        private bool _sealed;
-        private SetterBaseCollection _setters;
-        private Type _targetType;
-        private Style _basedOn;
-        private int _modified = 0;
-        private const int TargetTypeID = 0x01;
-        internal const int BasedOnID = 0x02;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Style"/> class to use on the specified <see cref="Type"/>.
+    /// </summary>
+    /// <param name="targetType">
+    /// The type to which the style will apply.
+    /// </param>
+    public Style(Type targetType) : this()
+    {
+        TargetType = targetType;
+    }
 
-        // Original Style data (not including based-on data)
-        internal List<PropertyValue> PropertyValues
+    /// <summary>
+    /// Gets a value that indicates whether the style is read-only and cannot be changed.
+    /// </summary>
+    /// <returns>
+    /// true if the style is read-only; otherwise, false.
+    /// </returns>
+    public bool IsSealed => _sealed;
+
+    /// <summary>
+    /// Gets or sets the type for which the style is intended.
+    /// </summary>
+    /// <returns>
+    /// The type of object to which the style is applied.
+    /// </returns>
+    [Ambient]
+    public Type TargetType
+    {
+        get => _targetType;
+        set
         {
-            get;
-            private set;
-        }
-
-        // Style tables (includes based-on data)
-        internal new Dictionary<int, object> EffectiveValues
-        {
-            get;
-            private set;
-        }
-
-        #endregion Data
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the Style class, with no initial TargetType and an empty Setters collection.
-        /// </summary>
-        public Style()
-        {
-            // Note: In WPF, Style inherits from DispatcherObject rather than DependencyObject.
-            // For this reason we explicitly set the two properties below to ensure that a Style
-            // has no inherited context, and can't provide itself as inherited context.
-            CanBeInheritanceContext = false;
-            IsInheritanceContextSealed = true;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Style class, with an initial TargetType and an empty Setters collection.
-        /// </summary>
-        /// <param name="targetType">The type on which the Style will be used.</param>
-        public Style(Type targetType) : this()
-        {
-            TargetType = targetType;
-        }
-
-        #endregion Constructors
-
-        #region Public Properties
-
-        /// <summary>
-        ///     Style mutability state
-        /// </summary>
-        /// <remarks>
-        ///     A style is sealed when another style is basing on it, or,
-        ///     when it's applied
-        /// </remarks>
-        public bool IsSealed
-        {
-            get { return _sealed; }
-        }
-
-        /// <summary>
-        ///     Type that this style is intended
-        /// </summary>
-        /// <remarks>
-        ///     By default, the target type is FrameworkElement
-        /// </remarks>
-        [Ambient]
-        public Type TargetType
-        {
-            get
-            {
-                return _targetType;
-            }
-
-            set
-            {
-                if (_sealed)
-                {
-                    throw new InvalidOperationException(string.Format("Cannot modify a '{0}' after it is sealed.", "Style"));
-                }
-
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
-
-                _targetType = value;
-
-                SetModified(TargetTypeID);
-            }
-        }
-
-        /// <summary>
-        ///     Style to base on
-        /// </summary>
-        public Style BasedOn
-        {
-            get
-            {
-                return _basedOn;
-            }
-            set
-            {
-                if (_sealed)
-                {
-                    throw new InvalidOperationException(string.Format("Cannot modify a '{0}' after it is sealed.", "Style"));
-                }
-
-                if (value == this)
-                {
-                    // Basing on self is not allowed.  This is a degenerate case
-                    //  of circular reference chain, the full check for circular
-                    //  reference is done in Seal().
-                    throw new ArgumentException("A Style cannot be based on itself.");
-                }
-
-                _basedOn = value;
-
-                SetModified(BasedOnID);
-            }
-        }
-
-        /// <summary>
-        ///     The collection of property setters for the target type
-        /// </summary>
-
-        public SetterBaseCollection Setters
-        {
-            get
-            {
-                if (_setters == null)
-                {
-                    _setters = new SetterBaseCollection();
-
-                    // If the style has been sealed prior to this the newly
-                    // created SetterBaseCollection also needs to be sealed
-                    if (_sealed)
-                    {
-                        _setters.Seal();
-                    }
-                }
-                return _setters;
-            }
-        }
-
-        #endregion Public Properties
-
-        #region Public Methods
-
-        /// <summary>
-        /// This Style is now immutable
-        /// </summary>
-        public void Seal()
-        {
-            // 99% case - Style is already sealed.
             if (_sealed)
             {
-                return;
+                throw new InvalidOperationException("Cannot modify a 'Style' after it is sealed.");
             }
 
-            // Most parameter checking is done as "upstream" as possible, but some
-            //  can't be checked until Style is sealed.
-            if (_targetType == null)
+            if (value == null)
             {
-                throw new InvalidOperationException(string.Format("Must have non-null value for '{0}'.", "TargetType"));
+                throw new ArgumentNullException(nameof(value));
             }
 
-            if (_basedOn != null)
+            _targetType = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a defined style that is the basis of the current style.
+    /// </summary>
+    /// <returns>
+    /// A defined style that is the basis of the current style. The default value is null.
+    /// </returns>
+    public Style BasedOn
+    {
+        get => _basedOn;
+        set
+        {
+            if (_sealed)
             {
-                if (_basedOn.TargetType == null ||
-                    !_basedOn.TargetType.IsAssignableFrom(_targetType))
+                throw new InvalidOperationException("Cannot modify a 'Style' after it is sealed.");
+            }
+
+            if (value == this)
+            {
+                // Basing on self is not allowed.  This is a degenerate case
+                // of circular reference chain, the full check for circular
+                // reference is done in Seal().
+                throw new ArgumentException("A Style cannot be based on itself.");
+            }
+
+            _basedOn = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets a collection of <see cref="Setter"/> objects.
+    /// </summary>
+    /// <returns>
+    /// A collection of <see cref="Setter"/> objects. The default is an empty collection.
+    /// </returns>
+    public SetterBaseCollection Setters
+    {
+        get
+        {
+            if (_setters == null)
+            {
+                _setters = new SetterBaseCollection();
+
+                // If the style has been sealed prior to this the newly
+                // created SetterBaseCollection also needs to be sealed
+                if (_sealed)
                 {
-                    throw new InvalidOperationException(string.Format("Can only base on a Style with target type that is base type '{0}'.", _targetType.Name));
+                    _setters.Seal();
+                }
+            }
+            return _setters;
+        }
+    }
+
+    /// <summary>
+    /// Locks the style so that the <see cref="TargetType"/> property or any <see cref="Setter"/>
+    /// in the <see cref="Setters"/> collection cannot be changed.
+    /// </summary>
+    public void Seal()
+    {
+        // 99% case - Style is already sealed.
+        if (_sealed)
+        {
+            return;
+        }
+
+        // Most parameter checking is done as "upstream" as possible, but some
+        //  can't be checked until Style is sealed.
+        if (_targetType == null)
+        {
+            throw new InvalidOperationException("Must have non-null value for 'TargetType'.");
+        }
+
+        if (_basedOn != null)
+        {
+            if (_basedOn.TargetType == null || !_basedOn.TargetType.IsAssignableFrom(_targetType))
+            {
+                throw new InvalidOperationException($"Can only base on a Style with target type that is base type '{_targetType.Name}'.");
+            }
+        }
+
+        // Will throw InvalidOperationException if we find a loop of
+        // BasedOn references.  (A.BasedOn = B, B.BasedOn = C, C.BasedOn = A)
+        CheckForCircularBasedOnReferences();
+
+        // Seal BasedOn Style chain
+        _basedOn?.Seal();
+
+        // Seal setters
+        _setters?.Seal();
+
+        //
+        // Build shared tables
+        //
+
+        // Process all PropertyValues (all are "Self") in the Style
+        // chain (base added first)
+        ProcessSelfStyles();
+
+        // All done, seal self and call it a day.
+        _sealed = true;
+    }
+
+    internal void CheckTargetType(object element)
+    {
+        if (TargetType == null)
+        {
+            throw new InvalidOperationException("Must have non-null value for TargetType.");
+        }
+
+        Type elementType = element.GetType();
+        if (!TargetType.IsAssignableFrom(elementType))
+        {
+            throw new InvalidOperationException(
+                $"'{TargetType.Name}' TargetType does not match type of element '{elementType.Name}'.");
+        }
+    }
+
+    /// <summary>
+    /// This method checks to see if the BasedOn hierarchy contains
+    /// a loop in the chain of references.
+    /// </summary>
+    /// <remarks>
+    /// Classic "when did we enter the cycle" problem where we don't know
+    /// what to start remembering and what to check against.  Brute-
+    /// force approach here is to remember everything with a stack
+    /// and do a linear comparison through everything.  Since the Style
+    /// BasedOn hierarchy is not expected to be large, this should be OK.
+    /// </remarks>
+    private void CheckForCircularBasedOnReferences()
+    {
+        if (HasCircularBasedOnReferences(this))
+        {
+            // Uh-oh.  We've seen this Style before.  This means
+            //  the BasedOn hierarchy contains a loop.
+            throw new InvalidOperationException("This Style's hierarchy of BasedOn references contains a loop.");
+        }
+
+        // This does not really check for circular reference in all circumstances. This is accurate
+        // only if the basedOn styles have no circular references. In our case, it is safe because we
+        // seal basedOn styles first.
+        static bool HasCircularBasedOnReferences(Style s)
+        {
+            for (Style basedOn = s._basedOn; basedOn is not null; basedOn = basedOn._basedOn)
+            {
+                if (basedOn == s)
+                {
+                    return true;
                 }
             }
 
-            // Seal setters
-            if (_setters != null)
-            {
-                _setters.Seal();
-            }
+            return false;
+        }
+    }
 
-            // Will throw InvalidOperationException if we find a loop of
-            //  BasedOn references.  (A.BasedOn = B, B.BasedOn = C, C.BasedOn = A)
-            CheckForCircularBasedOnReferences();
-
-            // Seal BasedOn Style chain
-            if (_basedOn != null)
-            {
-                _basedOn.Seal();
-            }
-
-            //
-            // Build shared tables
-            //
-
-            // Process all Setters set on the selfStyle. This stores all the property
-            // setters on the current styles into PropertyValues list, so it can be used
-            // by ProcessSelfStyle in the next step. The EventSetters for the current
-            // and all the basedOn styles are merged into the EventHandlersStore on the
-            // current style.
-            ProcessSetters(this);
-
-            // Process all PropertyValues (all are "Self") in the Style
-            // chain (base added first)
-            EffectiveValues = new Dictionary<int, object>();
-            ProcessSelfStyles(this);
-
-            // All done, seal self and call it a day.
-            _sealed = true;
+    private void ProcessSelfStyles()
+    {
+        if (Setters.Count == 0)
+        {
+            EffectiveValues = _basedOn?.EffectiveValues ?? new(0);
+            return;
         }
 
-        #endregion Public Methods
+        // Process all Setters set on the selfStyle. This stores all the property
+        // setters on the current styles into PropertyValues list, so it can be used
+        // by ProcessSelfStyle in the next step. The EventSetters for the current
+        // and all the basedOn styles are merged into the EventHandlersStore on the
+        // current style.
+        (PropertyValue[] propertyValues, int length) = ProcessSetters();
 
-        #region Internal Methods
+        int initialCapacity = Math.Max(length, _basedOn?.EffectiveValues.Count ?? 0);
+        Dictionary<int, object> effectiveValues = new(initialCapacity);
 
-        /// <summary>
-        ///     Given a set of values for the PropertyValue struct, put that in
-        /// to the PropertyValueList, overwriting any existing entry.
-        /// </summary>
-        private void UpdatePropertyValueList(DependencyProperty dp, object value)
+        // Walk down to bottom of based-on chain
+
+        if (_basedOn is not null)
+        {
+            foreach (var propertyValue in _basedOn.EffectiveValues)
+            {
+                effectiveValues[propertyValue.Key] = propertyValue.Value;
+            }
+        }
+
+        // Merge in "self" PropertyValues while walking back up the tree
+        // "Based-on" style "self" rules are always added first (lower priority)
+        for (int i = 0; i < length; i++)
+        {
+            PropertyValue propertyValue = propertyValues[i];
+            effectiveValues[propertyValue.PropertyIndex] = propertyValue.ValueInternal;
+        }
+
+        EffectiveValues = effectiveValues;
+    }
+
+    // Iterates through the setters collection and adds the EventSetter information into
+    // an EventHandlersStore for easy and fast retrieval during event routing. Also adds
+    // an entry in the EventDependents list for EventhandlersStore holding the TargetType's
+    // events.
+    private (PropertyValue[] PropertyValues, int Length) ProcessSetters()
+    {
+        Debug.Assert(Setters.Count > 0);
+
+        var setters = Setters.InternalItems;
+
+        int length = 0;
+        var propertyValues = new PropertyValue[setters.Count];
+
+        foreach (var setterBase in setters)
+        {
+            // Setters are folded into the PropertyValues table only for the current style. The
+            // processing of BasedOn Style properties will occur in subsequent call to ProcessSelfStyle
+            if (setterBase is Setter setter)
+            {
+                UpdatePropertyValueList(setter.Property, setter.Value, propertyValues, ref length);
+            }
+        }
+
+        return (propertyValues, length);
+
+        // Given a set of values for the PropertyValue struct, put that in
+        // to the PropertyValueList, overwriting any existing entry.
+        static void UpdatePropertyValueList(DependencyProperty dp, object value, PropertyValue[] propertyValues, ref int length)
         {
             // Check for existing value on dp
             int existingIndex = -1;
-            for (int i = 0; i < PropertyValues.Count; i++)
+            for (int i = 0; i < length; i++)
             {
-                if (PropertyValues[i].Property == dp)
+                if (propertyValues[i].PropertyIndex == dp.GlobalIndex)
                 {
                     existingIndex = i;
                     break;
@@ -268,146 +327,14 @@ namespace System.Windows
             if (existingIndex >= 0)
             {
                 // Overwrite existing value for dp
-                PropertyValue propertyValue = PropertyValues[existingIndex];
+                ref PropertyValue propertyValue = ref propertyValues[existingIndex];
                 propertyValue.ValueInternal = value;
-                // Put back modified struct
-                PropertyValues[existingIndex] = propertyValue;
             }
             else
             {
                 // Store original data
-                PropertyValue propertyValue = new PropertyValue();
-                propertyValue.Property = dp;
-                propertyValue.ValueInternal = value;
-
-                PropertyValues.Add(propertyValue);
+                propertyValues[length++] = (dp.GlobalIndex, value);
             }
         }
-
-        internal void CheckTargetType(object element)
-        {
-            // Note: we do not do this verification in CSHTML5 in order to remain compatible
-            // with old applications created with prior versions of CSHTML5 (eg. Client_FB).
-            if (TargetType == null)
-            {
-                throw new InvalidOperationException("Must have non-null value for TargetType.");
-            }
-
-            Type elementType = element.GetType();
-            if (!TargetType.IsAssignableFrom(elementType))
-            {
-                throw new InvalidOperationException(string.Format("'{0}' TargetType does not match type of element '{1}'.",
-                                                    this.TargetType.Name,
-                                                    elementType.Name));
-            }
-        }
-
-        /// <summary>
-        ///     This method checks to see if the BasedOn hierarchy contains
-        /// a loop in the chain of references.
-        /// </summary>
-        /// <remarks>
-        /// Classic "when did we enter the cycle" problem where we don't know
-        ///  what to start remembering and what to check against.  Brute-
-        ///  force approach here is to remember everything with a stack
-        ///  and do a linear comparison through everything.  Since the Style
-        ///  BasedOn hierarchy is not expected to be large, this should be OK.
-        /// </remarks>
-        private void CheckForCircularBasedOnReferences()
-        {
-            Stack<Style> basedOnHierarchy = new Stack<Style>(10);  // 10 because that's the default value (see MSDN) and the perf team wants us to specify something.
-            Style latestBasedOn = this;
-
-            while (latestBasedOn != null)
-            {
-                if (basedOnHierarchy.Contains(latestBasedOn))
-                {
-                    // Uh-oh.  We've seen this Style before.  This means
-                    //  the BasedOn hierarchy contains a loop.
-                    throw new InvalidOperationException("This Style's hierarchy of BasedOn references contains a loop.");
-
-                    // Debugging note: If we stop here, the basedOnHierarchy
-                    //  object is still alive and we can browse through it to
-                    //  see what we've explored.  (This does not apply if
-                    //  somebody catches this exception and re-throws.)
-                }
-
-                // Haven't seen it, push on stack and go to next level.
-                basedOnHierarchy.Push(latestBasedOn);
-                latestBasedOn = latestBasedOn.BasedOn;
-            }
-
-            return;
-        }
-
-        // Iterates through the setters collection and adds the EventSetter information into
-        // an EventHandlersStore for easy and fast retrieval during event routing. Also adds
-        // an entry in the EventDependents list for EventhandlersStore holding the TargetType's
-        // events.
-        private void ProcessSetters(Style style)
-        {
-            // Walk down to bottom of based-on chain
-            if (style == null)
-            {
-                return;
-            }
-
-            style.Setters.Seal(); // Does not mark individual setters as sealed, that's up to the loop below.
-
-            if (style == this)
-            {
-                // On-demand create the PropertyValues list, so that we can specify the right size.
-                if (PropertyValues == null || PropertyValues.Count == 0)
-                {
-                    PropertyValues = new List<PropertyValue>(style.Setters.Count);
-                }
-
-                for (int i = 0; i < style.Setters.Count; i++)
-                {
-                    SetterBase setterBase = style.Setters[i];
-                    Debug.Assert(setterBase != null, "Setter collection must contain non-null instances of SetterBase");
-
-                    // Setters are folded into the PropertyValues table only for the current style. The
-                    // processing of BasedOn Style properties will occur in subsequent call to ProcessSelfStyle
-                    Setter setter = setterBase as Setter;
-                    if (setter != null)
-                    {
-                        UpdatePropertyValueList(setter.Property, setter.Value);
-                    }
-                }
-            }
-            
-            ProcessSetters(style._basedOn);
-        }
-
-        private void ProcessSelfStyles(Style style)
-        {
-            // Walk down to bottom of based-on chain
-            if (style == null)
-            {
-                return;
-            }
-
-            ProcessSelfStyles(style._basedOn);
-
-            // Merge in "self" PropertyValues while walking back up the tree
-            // "Based-on" style "self" rules are always added first (lower priority)
-            for (int i = 0; i < style.PropertyValues.Count; i++)
-            {
-                PropertyValue propertyValue = style.PropertyValues[i];
-                EffectiveValues[propertyValue.Property.GlobalIndex] = propertyValue.ValueInternal;
-            }
-        }
-
-        private void SetModified(int id) { _modified |= id; }
-        internal bool IsModified(int id) { return (id & _modified) != 0; }
-
-        #endregion Internal Methods
-    }
-
-    internal struct PropertyValue
-    {
-        internal DependencyProperty Property;
-        internal object ValueInternal;
     }
 }

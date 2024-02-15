@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Windows.Markup;
 using System.Xaml.Markup;
@@ -20,194 +18,176 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Applies a value to a property in a <see cref="Style"/>.
+/// </summary>
+public sealed class Setter : SetterBase, ISupportInitialize
 {
+    private DependencyProperty _property;
+    private object _value;
+
+    private object _unresolvedValue = null;
+    private ITypeDescriptorContext _serviceProvider = null;
+    private CultureInfo _cultureInfoForTypeConverter = null;
+
     /// <summary>
-    /// Applies a value to a property in a Style.
+    /// Initializes a new instance of the <see cref="Setter"/> class.
     /// </summary>
-    public sealed class Setter : SetterBase, ISupportInitialize
+    public Setter() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Setter"/> class with the specified
+    /// property and value.
+    /// </summary>
+    /// <param name="property">
+    /// The dependency property to apply the value to.
+    /// </param>
+    /// <param name="value">
+    /// The value to apply to the property.
+    /// </param>
+    public Setter(DependencyProperty property, object value)
     {
-#region Data
+        CheckValidProperty(property);
 
-        private DependencyProperty _property;
-        private object _value;
+        _property = property;
+        _value = value == DependencyProperty.UnsetValue ? null : value;
+    }
 
-        private object _unresolvedValue = null;
-        private ITypeDescriptorContext _serviceProvider = null;
-        private CultureInfo _cultureInfoForTypeConverter = null;
-
-#endregion
-
-#region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the Setter class with no initial Property or
-        /// Value.
-        /// </summary>
-        public Setter()
+    /// <summary>
+    /// Gets or sets the property to apply the <see cref="Value"/> to.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="DependencyProperty"/> to which the <see cref="Value"/>
+    /// will be applied. The default is null.
+    /// </returns>
+    [Ambient]
+    [TypeConverter(typeof(DependencyPropertyConverter))]
+    public DependencyProperty Property
+    {
+        get => _property;
+        set
         {
+            CheckValidProperty(value);
+            CheckSealed();
+            _property = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the value to apply to the property that is specified by the <see cref="Setter"/>.
+    /// </summary>
+    /// <returns>
+    /// The value to apply to the property that is specified by the <see cref="Setter"/>.
+    /// </returns>
+    [TypeConverter(typeof(SetterValueConverter))]
+    public object Value
+    {
+        get => _value;
+        set
+        {
+            CheckSealed();
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                // Silverlight uses a DependencyProperty for Setter.Value,
+                // so in case of DependencyProperty.UnsetValue, we emulate
+                // a call to DependencyObject.ClearValue(...).
+                _value = null;
+                return;
+            }
+
+            if (value is BindingExpression)
+            {
+                throw new ArgumentException("BindingExpression type is not a valid Style value.");
+            }
+
+            _value = value;
+        }
+    }
+
+    /// <summary>
+    /// Seals this setter
+    /// </summary>
+    internal override void Seal()
+    {
+        // Do the validation that can't be done until we know all of the property
+        // values.
+
+        DependencyProperty dp = Property;
+        object value = Value;
+
+        if (dp == null)
+        {
+            throw new ArgumentException("Must have non-null value for 'Setter.Property'.");
         }
 
-        /// <summary>
-        /// Initializes a new instance of the Setter class with initial Property and
-        /// Value information.
-        /// </summary>
-        /// <param name="property">The dependency property identifier for the property that is being styled.</param>
-        /// <param name="value">The value to assign to the value when the Setter applies.</param>
-        public Setter(DependencyProperty property, object value)
+        if (dp.IsObjectType || !dp.IsValidValue(value))
         {
-            CheckValidProperty(property);
-
-            _property = property;
-            _value = value == DependencyProperty.UnsetValue ? null : value;
-        }
-
-#endregion
-
-#region Public Properties
-
-        /// <summary>
-        /// Gets or sets the property to apply the <see cref="Setter.Value"/> to.
-        /// The default is null.
-        /// </summary>
-        [Ambient]
-        [TypeConverter(typeof(DependencyPropertyConverter))]
-        public DependencyProperty Property
-        {
-            get
+            switch (value)
             {
-                return _property;
-            }
-            set
-            {
-                CheckValidProperty(value);
-                CheckSealed();
-                _property = value;
-            }
-        }
+                case Color color:
+                    if (dp.PropertyType == typeof(Brush))
+                        _value = new SolidColorBrush(color);
+                    break;
 
-        /// <summary>
-        /// Gets or sets the value to apply to the property that is specified 
-        /// by the <see cref="Setter"/>.
-        /// </summary>
-        [TypeConverter(typeof(SetterValueConverter))]
-        public object Value
-        {
-            get
-            {
-                return _value;
-            }
-            set
-            {
-                CheckSealed();
+                case Binding:
+                    // Bindings are allowed on setters, it will later be transformed into a BindingExpression
+                    break;
 
-                if (value == DependencyProperty.UnsetValue)
-                {
-                    // Silverlight uses a DependencyProperty for Setter.Value,
-                    // so in case of DependencyProperty.UnsetValue, we emulate
-                    // a call to DependencyObject.ClearValue(...).
-                    _value = null;
-                    return;
-                }
-
-                if (value is BindingExpression)
-                {
-                    throw new ArgumentException("BindingExpression type is not a valid Style value.");
-                }
-
-                _value = value;
-            }
-        }
-
-#endregion
-
-#region Internal Methods
-
-        /// <summary>
-        ///     Seals this setter
-        /// </summary>
-        internal override void Seal()
-        {
-            // Do the validation that can't be done until we know all of the property
-            // values.
-
-            DependencyProperty dp = Property;
-            object value = Value;
-
-            if (dp == null)
-            {
-                throw new ArgumentException(string.Format("Must have non-null value for '{0}'.", "Setter.Property"));
-            }
-
-            if (dp.IsObjectType || !dp.IsValidValue(value))
-            {
-                switch (value)
-                {
-                    case Color color:
-                        if (dp.PropertyType == typeof(Brush))
-                            _value = new SolidColorBrush(color);
-                        break;
-
-                    case Binding:
-                        // Bindings are allowed on setters, it will later be transformed into a BindingExpression
-                        break;
-
-                    default:
-                        if (!dp.IsObjectType)
-                            throw new ArgumentException(
-                                $"'{value}' is not a valid value for the '{dp.OwnerType}.{dp.Name}' property on a Setter.");
-                        break;
-                }
-            }
-
-            base.Seal();
-        }
-
-        private void CheckValidProperty(DependencyProperty property)
-        {
-            if (property == null)
-            {
-                throw new ArgumentNullException("property");
-            }
-
-            if (property == FrameworkElement.NameProperty)
-            {
-                // Note: Silverlight allows this, but will crash as soon as
-                // the style is used 2 times in the visual tree.
-                throw new InvalidOperationException(
-                    string.Format("'{0}' property cannot be set in the current element's Style.", 
-                                  FrameworkElement.NameProperty.Name));
+                default:
+                    if (!dp.IsObjectType)
+                        throw new ArgumentException(
+                            $"'{value}' is not a valid value for the '{dp.OwnerType}.{dp.Name}' property on a Setter.");
+                    break;
             }
         }
 
-#endregion        
+        base.Seal();
+    }
 
-        internal void ReceiveTypeConverter(ITypeDescriptorContext serviceProvider, CultureInfo culture, object unresolvedValue)
+    private void CheckValidProperty(DependencyProperty property)
+    {
+        if (property == null)
         {
-            _serviceProvider = serviceProvider;
-            _cultureInfoForTypeConverter = culture;
-            _unresolvedValue = unresolvedValue;
+            throw new ArgumentNullException(nameof(property));
         }
 
-        void ISupportInitialize.BeginInit() { }
-
-        void ISupportInitialize.EndInit()
+        if (property == FrameworkElement.NameProperty)
         {
-            if (_unresolvedValue != null)
+            // Note: Silverlight allows this, but will crash as soon as
+            // the style is used 2 times in the visual tree.
+            throw new InvalidOperationException(
+                $"'{FrameworkElement.NameProperty.Name}' property cannot be set in the current element's Style.");
+        }
+    }
+
+    internal void ReceiveTypeConverter(ITypeDescriptorContext serviceProvider, CultureInfo culture, object unresolvedValue)
+    {
+        _serviceProvider = serviceProvider;
+        _cultureInfoForTypeConverter = culture;
+        _unresolvedValue = unresolvedValue;
+    }
+
+    void ISupportInitialize.BeginInit() { }
+
+    void ISupportInitialize.EndInit()
+    {
+        if (_unresolvedValue != null)
+        {
+            try
             {
-                try
-                {
-                    Value = SetterValueConverter.ResolveValue(_serviceProvider,
-                        Property, _cultureInfoForTypeConverter, _unresolvedValue);
-                }
-                finally
-                {
-                    _unresolvedValue = null;
-                }
+                Value = SetterValueConverter.ResolveValue(_serviceProvider,
+                    Property, _cultureInfoForTypeConverter, _unresolvedValue);
             }
-
-            _serviceProvider = null;
-            _cultureInfoForTypeConverter = null;
+            finally
+            {
+                _unresolvedValue = null;
+            }
         }
+
+        _serviceProvider = null;
+        _cultureInfoForTypeConverter = null;
     }
 }
