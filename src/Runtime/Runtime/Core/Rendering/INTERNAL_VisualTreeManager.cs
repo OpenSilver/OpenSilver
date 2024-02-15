@@ -14,6 +14,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -149,6 +150,8 @@ namespace CSHTML5.Internal
             element.RenderingIsDeferred = false;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
         {
             if (oldIndex < 0)
@@ -206,6 +209,8 @@ namespace CSHTML5.Internal
             }
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int index)
         {
             if (parent.VisualChildrenInformation.ContainsKey(child))
@@ -237,7 +242,6 @@ if(nextSibling != undefined) {
                 }
             }
         }
-
 
         public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent, int index = -1)
         {
@@ -296,12 +300,16 @@ if(nextSibling != undefined) {
             // Prepare the parent DOM structure so that it is ready to contain the child (for example, in case of a grid, we need to (re)create the rows and columns where to place the elements).
             //parent.INTERNAL_UpdateDomStructureIfNecessary();
 
+#pragma warning disable CS0618
             object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.InnerDiv);
+#pragma warning restore CS0618
 
             // A "wrapper for child" is sometimes needed between the child and the parent (for example in case of a grid).
             // It is usually one or more DIVs that fit in-between the child and the parent, and that are used to position
             // the child within the parent.
+#pragma warning disable CS0618
             object wrapperForChild = parent.CreateDomChildWrapper(domElementWhereToPlaceChildStuff, out object innerDivOfWrapperForChild, index);
+#pragma warning restore CS0618
             bool doesParentRequireToCreateAWrapperForEachChild = wrapperForChild is not null && innerDivOfWrapperForChild is not null;
 
             // Remember the information about the "VisualChildren"

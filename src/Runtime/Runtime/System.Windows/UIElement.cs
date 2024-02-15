@@ -409,17 +409,23 @@ namespace System.Windows
         /// <param name="domElementWhereToPlaceChild"></param>
         /// <param name="index">The index for the position in which to add the child.</param>
         /// <returns></returns>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
             domElementWhereToPlaceChild = null;
             return null;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual object GetDomElementWhereToPlaceChild(UIElement child)
         {
             return null;
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public object GetChildsWrapper(UIElement child)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_VisualTreeManager.IsElementInVisualTree(child))

@@ -15,13 +15,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using CSHTML5.Internal;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls.Primitives
 {
     /// <summary>
     /// Provides an abstract class for controls that allow multiple items to be selected.
     /// </summary>
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class MultiSelector : Selector
     {
         /// <summary>
@@ -120,7 +123,7 @@ namespace System.Windows.Controls.Primitives
 
         protected abstract void SetItemVisualSelectionState(object item, bool newState);
 
-
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         protected override void OnItemsSourceChanged_BeforeVisualUpdate(IEnumerable oldValue, IEnumerable newValue)
         {
             base.OnItemsSourceChanged_BeforeVisualUpdate(oldValue, newValue);
