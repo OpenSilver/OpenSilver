@@ -37,7 +37,7 @@ public sealed class PointAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
     /// The collection of <see cref="PointKeyFrame"/> objects that define
     /// the animation. The default is an empty collection.
     /// </returns>
-    public PointKeyFrameCollection KeyFrames => _frames ??= new PointKeyFrameCollection();
+    public PointKeyFrameCollection KeyFrames => _frames ??= new PointKeyFrameCollection(this);
 
     IKeyFrameCollection<Point> IKeyFrameAnimation<Point>.KeyFrames => _frames;
 
