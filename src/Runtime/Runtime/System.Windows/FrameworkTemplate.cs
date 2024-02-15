@@ -40,13 +40,30 @@ namespace System.Windows
             set { CheckSealed(); _template = value; }
         }
 
+        internal bool ApplyTemplateContent(FrameworkElement container)
+        {
+            Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
+
+            if (Template != null)
+            {
+                FrameworkElement visualTree = (FrameworkElement)Template.LoadContent(container);
+                container.TemplateChild = visualTree;
+
+                return visualTree != null;
+            }
+            else
+            {
+                return BuildVisualTree(container);
+            }
+        }
+
         internal bool ApplyTemplateContent(IInternalFrameworkElement container)
         {
             Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
 
             if (Template != null)
             {
-                IInternalFrameworkElement visualTree = Template.LoadContent(container);
+                IFrameworkElement visualTree = Template.LoadContent(container);
                 container.TemplateChild = visualTree;
                 
                 return visualTree != null;
@@ -57,7 +74,7 @@ namespace System.Windows
             }
         }
 
-        internal virtual bool BuildVisualTree(IInternalFrameworkElement container)
+        internal virtual bool BuildVisualTree(IFrameworkElement container)
         {
             return false;
         }
@@ -118,7 +135,7 @@ namespace System.Windows
                 typeof(FrameworkTemplate),
                 null);
 
-        internal static INameScope GetTemplateNameScope(IInternalFrameworkElement fe)
+        internal static INameScope GetTemplateNameScope(IFrameworkElement fe)
         {
             if (fe is null)
             {
@@ -128,7 +145,7 @@ namespace System.Windows
             return (INameScope)fe.GetValue(TemplateNameScopeProperty);
         }
 
-        internal static void SetTemplateNameScope(IInternalFrameworkElement fe, INameScope namescope)
+        internal static void SetTemplateNameScope(IFrameworkElement fe, INameScope namescope)
         {
             if (fe is null)
             {
@@ -142,9 +159,9 @@ namespace System.Windows
     internal sealed class TemplateContent
     {
         private readonly XamlContext _xamlContext;
-        private readonly Func<IInternalFrameworkElement, XamlContext, IInternalFrameworkElement> _factory;
+        private readonly Func<IFrameworkElement, XamlContext, IFrameworkElement> _factory;
 
-        internal TemplateContent(XamlContext xamlContext, Func<IInternalFrameworkElement, XamlContext, IInternalFrameworkElement> factory)
+        internal TemplateContent(XamlContext xamlContext, Func<IFrameworkElement, XamlContext, IFrameworkElement> factory)
         {
             if (xamlContext == null)
             {
@@ -155,14 +172,14 @@ namespace System.Windows
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        internal IInternalFrameworkElement LoadContent(IInternalFrameworkElement owner)
+        internal IFrameworkElement LoadContent(IFrameworkElement owner)
         {
             XamlContext context = new XamlContext(_xamlContext)
             {
                 ExternalNameScope = new NameScope(),
             };
 
-            IInternalFrameworkElement rootElement = _factory(owner, context);
+            IFrameworkElement rootElement = _factory(owner, context);
             
             if (owner == null)
             {

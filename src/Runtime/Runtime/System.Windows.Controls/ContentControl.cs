@@ -214,8 +214,8 @@ namespace System.Windows.Controls
                     new XamlContext(),
                     static (owner, context) =>
                     {
-                        var grid = new Grid { TemplatedParent = owner.AsDependencyObject() };
-                        var tb = new TextBlock { TemplatedParent = owner.AsDependencyObject() };
+                        var grid = new Grid { TemplatedParent = (DependencyObject)owner };
+                        var tb = new TextBlock { TemplatedParent = (DependencyObject)owner };
                         tb.SetBinding(TextBlock.TextProperty, new Binding());
                         grid.Children.Add(tb);
                         return grid;
@@ -226,18 +226,18 @@ namespace System.Windows.Controls
                 Seal();
             }
 
-            internal override bool BuildVisualTree(IInternalFrameworkElement container)
+            internal override bool BuildVisualTree(IFrameworkElement container)
             {
                 var cc = (ContentControl)container;
                 object content = cc.Content;
                 if (content is FrameworkElement fe)
                 {
-                    container.TemplateChild = fe;
+                    cc.TemplateChild = fe;
                     return true;
                 }
                 else if (content is not null && (content is not string s || s.Length > 0))
                 {
-                    container.TemplateChild = _defaultTemplate.LoadContent(cc);
+                    cc.TemplateChild = (FrameworkElement)_defaultTemplate.LoadContent(cc);
                     return true;
                 }
 

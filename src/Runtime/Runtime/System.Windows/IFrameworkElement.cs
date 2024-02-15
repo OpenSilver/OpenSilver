@@ -51,7 +51,7 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     DependencyObject TemplatedParent { get; set; }
 
-    IInternalFrameworkElement TemplateChild { get; set; }
+    IFrameworkElement TemplateChild { get; set; }
 
     void AddLogicalChild(object child);
 

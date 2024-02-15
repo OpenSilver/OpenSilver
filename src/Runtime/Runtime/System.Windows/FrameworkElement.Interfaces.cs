@@ -48,7 +48,7 @@ public partial class FrameworkElement : IInternalFrameworkElement
         set => TemplatedParent = value;
     }
 
-    IInternalFrameworkElement IInternalFrameworkElement.TemplateChild
+    IFrameworkElement IInternalFrameworkElement.TemplateChild
     {
         get => TemplateChild;
         set => TemplateChild = (FrameworkElement)value;

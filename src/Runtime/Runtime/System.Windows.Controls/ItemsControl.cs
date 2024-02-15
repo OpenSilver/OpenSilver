@@ -135,7 +135,7 @@ namespace System.Windows.Controls
             {
                 Template = new TemplateContent(
                     new XamlContext(),
-                    (owner, context) => new StackPanel { TemplatedParent = owner.AsDependencyObject() }                    
+                    (owner, context) => new StackPanel { TemplatedParent = (DependencyObject)owner }                    
                 )
             };
 
@@ -448,7 +448,7 @@ namespace System.Windows.Controls
                 TargetType = typeof(ItemsControl),
                 Template = new TemplateContent(
                     new XamlContext(),
-                    static (owner, context) => new ItemsPresenter { TemplatedParent = owner.AsDependencyObject() }
+                    static (owner, context) => new ItemsPresenter { TemplatedParent = (DependencyObject)owner }
                 ),
             };
 
@@ -853,7 +853,7 @@ namespace System.Windows.Controls
                     {
                         TextBlock textBlock = new TextBlock();
                         textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
-                        textBlock.TemplatedParent = control.AsDependencyObject();
+                        textBlock.TemplatedParent = (DependencyObject)control;
 
                         return textBlock;
                     }                    

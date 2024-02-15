@@ -490,19 +490,19 @@ namespace System.Windows.Controls
 
         private class UseContentTemplate : DataTemplate
         {
-            internal override bool BuildVisualTree(IInternalFrameworkElement container)
+            internal override bool BuildVisualTree(IFrameworkElement container)
             {
-                FrameworkElement child = ((ContentPresenter)container).Content as FrameworkElement;
+                ContentPresenter cp = (ContentPresenter)container;
+                FrameworkElement child = cp.Content as FrameworkElement;
                 if (child != null)
                 {
-                    FrameworkElement parent = VisualTreeHelper.GetParent(child) as FrameworkElement;
-                    if (parent != null)
+                    if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
                     {
                         parent.TemplateChild = null;
                     }
                 }
 
-                container.TemplateChild = child;
+                cp.TemplateChild = child;
 
                 return true;
             }
@@ -510,12 +510,12 @@ namespace System.Windows.Controls
 
         private class DefaultTemplate : DataTemplate
         {
-            internal override bool BuildVisualTree(IInternalFrameworkElement container)
+            internal override bool BuildVisualTree(IFrameworkElement container)
             {
                 ContentPresenter cp = (ContentPresenter)container;
                 FrameworkElement result = DefaultExpansion(cp.Content, cp);
 
-                container.TemplateChild = result;
+                cp.TemplateChild = result;
 
                 return result != null;
             }
