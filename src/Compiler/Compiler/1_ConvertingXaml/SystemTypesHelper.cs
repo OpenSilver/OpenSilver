@@ -14,13 +14,25 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 
 namespace OpenSilver.Compiler
 {
     internal abstract class SystemTypesHelper
     {
+        private const string mscorlib = "mscorlib";
+        private const string system_runtime = "System.Runtime";
+        private const string system_private_corelib = "System.Private.CoreLib";
+        private const string netstandard = "netstandard";
+
+        public static bool IsCoreLibraryOrNull(string assemblyName)
+        {
+            return assemblyName == null ||
+                   assemblyName.Equals(mscorlib, StringComparison.OrdinalIgnoreCase) ||
+                   assemblyName.Equals(system_runtime, StringComparison.OrdinalIgnoreCase) ||
+                   assemblyName.Equals(system_private_corelib, StringComparison.OrdinalIgnoreCase) ||
+                   assemblyName.Equals(netstandard, StringComparison.OrdinalIgnoreCase);
+        }
+
         public abstract bool IsSupportedSystemType(string typeFullName, string assemblyIfAny);
 
         public abstract string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny);
@@ -47,10 +59,23 @@ namespace OpenSilver.Compiler
 
         internal abstract string ConvertToInt64(string source);
 
-        internal abstract bool IsMscorlibOrNull(string assemblyName);
-
-        internal abstract string GetKey(string namespaceName, string typeName);
-
         internal abstract string Escape(string s);
+
+        internal sealed class StringTupleComparer : IEqualityComparer<(string Namespace, string Type)>
+        {
+            public static StringTupleComparer Instance { get; } = new();
+
+            public bool Equals((string Namespace, string Type) x, (string Namespace, string Type) y)
+            {
+                return StringComparer.OrdinalIgnoreCase.Equals(x.Namespace, y.Namespace) &&
+                       StringComparer.OrdinalIgnoreCase.Equals(x.Type, y.Type);
+            }
+
+            public int GetHashCode((string Namespace, string Type) obj)
+            {
+                return StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Namespace) ^
+                       StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Type);
+            }
+        }
     }
 }

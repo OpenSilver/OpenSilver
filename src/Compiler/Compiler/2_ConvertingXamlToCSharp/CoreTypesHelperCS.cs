@@ -177,7 +177,7 @@ namespace OpenSilver.Compiler
             const int s_aLower = (int)'a';
             const int s_aUpper = (int)'A';
 
-            string MatchColor(string colorString, out bool isKnownColor, out bool isNumericColor, out bool isScRgbColor)
+            static string MatchColor(string colorString, out bool isKnownColor, out bool isNumericColor, out bool isScRgbColor)
             {
                 string trimmedString = colorString.Trim();
 
@@ -207,7 +207,7 @@ namespace OpenSilver.Compiler
                 return trimmedString;
             }
 
-            int ParseHexChar(char c)
+            static int ParseHexChar(char c)
             {
                 int intChar = (int)c;
 
@@ -228,7 +228,7 @@ namespace OpenSilver.Compiler
                 throw new FormatException("Token is not valid.");
             }
 
-            string ParseHexColor(string trimmedColor)
+            static string ParseHexColor(string trimmedColor, string colorType)
             {
                 int a, r, g, b;
                 a = 255;
@@ -270,11 +270,11 @@ namespace OpenSilver.Compiler
                 return string.Format(
                     CultureInfo.InvariantCulture,
                     "{0}.FromArgb((byte){1}, (byte){2}, (byte){3}, (byte){4})",
-                    destinationType, a, r, g, b
+                    colorType, a, r, g, b
                 );
             }
 
-            string ParseScRgbColor(string trimmedColor)
+            static string ParseScRgbColor(string trimmedColor, string colorType)
             {
                 if (!trimmedColor.StartsWith("sc#", StringComparison.Ordinal))
                 {
@@ -291,7 +291,7 @@ namespace OpenSilver.Compiler
                     return string.Format(
                         CultureInfo.InvariantCulture,
                         "{0}.FromScRgb({1}F, {2}F, {3}F, {4}F)",
-                        destinationType,
+                        colorType,
                         1.0f,
                         Convert.ToSingle(split[0], CultureInfo.InvariantCulture),
                         Convert.ToSingle(split[1], CultureInfo.InvariantCulture),
@@ -303,7 +303,7 @@ namespace OpenSilver.Compiler
                     return string.Format(
                         CultureInfo.InvariantCulture,
                         "{0}.FromScRgb({1}F, {2}F, {3}F, {4}F)",
-                        destinationType,
+                        colorType,
                         Convert.ToSingle(split[0], CultureInfo.InvariantCulture),
                         Convert.ToSingle(split[1], CultureInfo.InvariantCulture),
                         Convert.ToSingle(split[2], CultureInfo.InvariantCulture),
@@ -314,7 +314,7 @@ namespace OpenSilver.Compiler
                 throw new FormatException("Token is not valid.");
             }
 
-            string ParseColor(string colorString)
+            static string ParseColor(string colorString, string colorType)
             {
                 string trimmedColor = MatchColor(
                     colorString, out bool isPossibleKnowColor, out bool isNumericColor, out bool isScRgbColor
@@ -323,11 +323,11 @@ namespace OpenSilver.Compiler
                 //Is it a number?
                 if (isNumericColor)
                 {
-                    return ParseHexColor(trimmedColor);
+                    return ParseHexColor(trimmedColor, colorType);
                 }
                 else if (isScRgbColor)
                 {
-                    return ParseScRgbColor(trimmedColor);
+                    return ParseScRgbColor(trimmedColor, colorType);
                 }
                 else
                 {
@@ -340,7 +340,7 @@ namespace OpenSilver.Compiler
                         return string.Format(
                             CultureInfo.InvariantCulture,
                             "{0}.FromArgb((byte){1}, (byte){2}, (byte){3}, (byte){4})",
-                            destinationType,
+                            colorType,
                             (color >> 0x18) & 0xff,
                             (color >> 0x10) & 0xff,
                             (color >> 8) & 0xff,
@@ -349,10 +349,10 @@ namespace OpenSilver.Compiler
                     }
                 }
 
-                throw GetConvertException(colorString, destinationType);
+                throw GetConvertException(colorString, colorType);
             }
 
-            return ParseColor(source);
+            return ParseColor(source, destinationType);
         }
 
         internal static string ConvertToDoubleCollection(string source, string destinationType)
