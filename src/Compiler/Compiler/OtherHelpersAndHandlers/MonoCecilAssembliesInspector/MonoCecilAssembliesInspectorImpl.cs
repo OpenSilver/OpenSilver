@@ -62,17 +62,17 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             if (CompilerType == SupportedLanguage.CSharp)
             {
                 _metadata = MetadatasCS.Silverlight;
-                _systemTypesHelper = new SystemTypesHelperCS();
+                _systemTypesHelper = SystemTypesHelper.CSharp;
             }
             else if (CompilerType == SupportedLanguage.VBNet)
             {
                 _metadata = MetadatasVB.Silverlight;
-                _systemTypesHelper = new SystemTypesHelperVB();
+                _systemTypesHelper = SystemTypesHelper.VisualBasic;
             }
             else if (CompilerType == SupportedLanguage.FSharp)
             {
                 _metadata = MetadatasFS.Silverlight;
-                _systemTypesHelper = new SystemTypesHelperFS();
+                _systemTypesHelper = SystemTypesHelper.FSharp;
             }
             else
             {
@@ -455,27 +455,25 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName,
             out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName,
-            out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
+            out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
         {
             var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName,
                 assemblyNameIfAny, isAttached);
             propertyNamespaceName = typeRef.BuildFullPath();
             propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false, CompilerType);
             propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;
-            isTypeString = typeRef.IsString();
             isTypeEnum = typeRef.ResolveOrThrow().IsEnum || (CompilerType == SupportedLanguage.FSharp && typeRef.ResolveOrThrow().CustomAttributes.Any(attr => attr.AttributeType.FullName == "Microsoft.FSharp.Core.CompilationMappingAttribute"));
         }
 
         public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName,
             out string returnValueNamespaceName, out string returnValueLocalTypeName,
-            out string returnValueAssemblyName, out bool isTypeString, out bool isTypeEnum,
+            out string returnValueAssemblyName, out bool isTypeEnum,
             string assemblyNameIfAny = null)
         {
             var typeDef = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
             returnValueNamespaceName = typeDef.BuildFullPath();
             returnValueLocalTypeName = typeDef.GetTypeNameIncludingGenericArguments(false, CompilerType);
             returnValueAssemblyName = typeDef.ResolveOrThrow().Module.Assembly.Name.Name;
-            isTypeString = typeDef.IsString();
             isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
         }
 
@@ -690,7 +688,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName,
             out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName,
-            out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
+            string assemblyNameIfAny = null, bool isAttached = false)
         {
             var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
             var propertyInfo = FindPropertyDeep(elementType, propertyOrFieldName, out var ownerElementType);
@@ -717,11 +715,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             memberDeclaringTypeName = propertyOrFieldDeclaringType.GetTypeNameIncludingGenericArguments(true, CompilerType);
             memberTypeNamespace = propertyOrFieldType.BuildFullPath();
             memberTypeName = propertyOrFieldType.GetTypeNameIncludingGenericArguments(false, CompilerType);
-            isTypeString = propertyOrFieldType.IsString();
-            isTypeEnum = propertyOrFieldType.ResolveOrThrow().IsEnum;
         }
 
-        public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+        public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, string assemblyNameIfAny = null)
         {
             var dependencyObjectType = GetDependencyObjectType();
 
@@ -739,8 +735,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     var returnType = method.ReturnType.PopulateGeneric(elementType, currentType);
                     returnValueNamespaceName = returnType.BuildFullPath();
                     returnValueLocalTypeName = returnType.GetTypeNameIncludingGenericArguments(false, CompilerType);
-                    isTypeString = returnType.IsString();
-                    isTypeEnum = returnType.ResolveOrThrow().IsEnum;
                     return;
                 }
                 currentType = resolved.BaseType?.PopulateGeneric(elementType, currentType);

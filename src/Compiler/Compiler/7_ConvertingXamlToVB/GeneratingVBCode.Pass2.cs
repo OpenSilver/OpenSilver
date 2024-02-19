@@ -179,7 +179,7 @@ namespace OpenSilver.Compiler
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
-            private SystemTypesHelperVB _systemTypesHelper = new SystemTypesHelperVB();
+            private SystemTypesHelper _systemTypesHelper = SystemTypesHelper.VisualBasic;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -900,7 +900,6 @@ End Sub
                                         out propertyLocalTypeName,
                                         out _,
                                         out _,
-                                        out _,
                                         assemblyNameIfAny,
                                         isAttached: true
                                     );
@@ -926,7 +925,6 @@ End Sub
                                         parent.Name.LocalName,
                                         out propertyNamespaceName,
                                         out propertyLocalTypeName,
-                                        out _,
                                         out _,
                                         out _,
                                         assemblyNameIfAny,
@@ -962,8 +960,6 @@ End Sub
                                 string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
                                 string propertyTypeName;
-                                bool isTypeString;
-                                bool isTypeEnum;
                                 if (!isAttachedProperty)
                                 {
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
@@ -972,8 +968,6 @@ End Sub
                                                                                          out propertyDeclaringTypeName,
                                                                                          out propertyTypeNamespace,
                                                                                          out propertyTypeName,
-                                                                                         out isTypeString,
-                                                                                         out isTypeEnum,
                                                                                          assemblyNameIfAny,
                                                                                          false);
                                 }
@@ -985,8 +979,6 @@ End Sub
                                         out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
-                                        out isTypeString,
-                                        out isTypeEnum,
                                         assemblyNameIfAny);
                                 }
                                 string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
@@ -1069,9 +1061,8 @@ End Sub
                                         splittedLocalName[0],
                                         out string propertyNamespaceName,
                                         out string propertyLocalTypeName,
-                                        out string propertyAssemblyName,
-                                        out bool isTypeString,
-                                        out bool isTypeEnum,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny,
                                         true
                                     );
@@ -1109,10 +1100,8 @@ End Sub
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
                                         out string propertyDeclaringTypeName,
-                                        out string propertyTypeNamespace,
-                                        out string propertyTypeName,
-                                        out bool isTypeString,
-                                        out bool isTypeEnum,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny,
                                         false
                                     );
@@ -1123,9 +1112,8 @@ End Sub
                                         parent.Name.LocalName,
                                         out string propertyNamespaceName,
                                         out string propertyLocalTypeName,
-                                        out string propertyAssemblyName,
-                                        out isTypeString,
-                                        out isTypeEnum,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny
                                     );
 
@@ -1448,7 +1436,7 @@ End If",
                     out string assemblyNameIfAny);
 
                 string valueNamespaceName, valueLocalTypeName, valueAssemblyName;
-                bool isValueString, isValueEnum;
+                bool isValueEnum;
 
                 if (isAttachedProperty)
                 {
@@ -1459,7 +1447,6 @@ End If",
                         out valueNamespaceName,
                         out valueLocalTypeName,
                         out valueAssemblyName,
-                        out isValueString,
                         out isValueEnum,
                         assemblyNameIfAny);
                 }
@@ -1472,7 +1459,6 @@ End If",
                         out valueNamespaceName,
                         out valueLocalTypeName,
                         out valueAssemblyName,
-                        out isValueString,
                         out isValueEnum,
                         assemblyNameIfAny);
                 }
@@ -1485,14 +1471,7 @@ End If",
                 );
 
                 // Generate the code or instantiating the attribute
-                if (isValueString)
-                {
-                    //----------------------------
-                    // PROPERTY IS OF TYPE STRING
-                    //----------------------------
-                    return ConvertingStringToValue.PrepareStringForString(value);
-                }
-                else if (isValueEnum)
+                if (isValueEnum)
                 {
                     //----------------------------
                     // PROPERTY IS AN ENUM

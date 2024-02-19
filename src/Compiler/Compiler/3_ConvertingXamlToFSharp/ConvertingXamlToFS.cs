@@ -47,7 +47,7 @@ namespace OpenSilver.Compiler
             // Insert implicit nodes in XAML:
             if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
             {
-                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global.", new SystemTypesHelperFS());
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global.", SystemTypesHelper.FSharp);
 
                 FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
 

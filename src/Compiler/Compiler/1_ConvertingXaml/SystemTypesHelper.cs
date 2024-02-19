@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace OpenSilver.Compiler
 {
@@ -24,6 +25,35 @@ namespace OpenSilver.Compiler
         private const string system_private_corelib = "System.Private.CoreLib";
         private const string netstandard = "netstandard";
 
+        private readonly Dictionary<string, Func<string, string>> _supportedIntrinsicTypes;
+
+        public static SystemTypesHelper CSharp { get; } = new SystemTypesHelperCS();
+        public static SystemTypesHelper VisualBasic { get; } = new SystemTypesHelperVB();
+        public static SystemTypesHelper FSharp { get; } = new SystemTypesHelperFS();
+
+        protected SystemTypesHelper()
+        {
+            _supportedIntrinsicTypes = new(16, StringComparer.OrdinalIgnoreCase)
+            {
+                ["system.double"] = s => ConvertToDouble(s),
+                ["system.single"] = s => ConvertToSingle(s),
+                ["system.timespan"] = s => ConvertToTimeSpan(s),
+                ["system.string"] = s => ConvertToString(s),
+                ["system.boolean"] = s => ConvertToBoolean(s),
+                ["system.byte"] = s => ConvertToByte(s),
+                ["system.int16"] = s => ConvertToInt16(s),
+                ["system.int32"] = s => ConvertToInt32(s),
+                ["system.int64"] = s => ConvertToInt64(s),
+                ["system.uint16"] = s => ConvertToUInt16(s),
+                ["system.uint32"] = s => ConvertToUInt32(s),
+                ["system.uint64"] = s => ConvertToUInt64(s),
+                ["system.sbyte"] = s => ConvertToSByte(s),
+                ["system.char"] = s => ConvertToChar(s),
+                ["system.decimal"] = s => ConvertToDecimal(s),
+                ["system.object"] = s => ConvertToObject(s),
+            };
+        }
+
         public static bool IsCoreLibraryOrNull(string assemblyName)
         {
             return assemblyName == null ||
@@ -33,33 +63,64 @@ namespace OpenSilver.Compiler
                    assemblyName.Equals(netstandard, StringComparison.OrdinalIgnoreCase);
         }
 
-        public abstract bool IsSupportedSystemType(string typeFullName, string assemblyIfAny);
+        public bool IsSupportedSystemType(string typeFullName, string assemblyIfAny)
+        {
+            if (IsCoreLibraryOrNull(assemblyIfAny))
+            {
+                return _supportedIntrinsicTypes.ContainsKey(typeFullName);
+            }
 
-        public abstract string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny);
+            return false;
+        }
 
-        public abstract string ConvertFromInvariantString(string source, string typeFullName);
+        public string ConvertFromInvariantString(string source, string typeFullName)
+        {
+            if (_supportedIntrinsicTypes.TryGetValue(typeFullName, out var converter))
+            {
+                Debug.Assert(converter != null);
+                return converter(source);
+            }
+
+            throw new InvalidOperationException(
+                $"'{typeFullName}' is not a supported system type."
+            );
+        }
 
         public abstract string GetDefaultValue(string namespaceName, string typeName, string assemblyIfAny);
 
-        internal abstract string ConvertToDouble(string source);
+        public abstract string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny);
 
-        internal abstract string ConvertToSingle(string source);
+        protected abstract string ConvertToDouble(string source);
 
-        internal abstract string ConvertToTimeSpan(string source);
+        protected abstract string ConvertToSingle(string source);
 
-        internal abstract string ConvertToString(string source);
+        protected abstract string ConvertToTimeSpan(string source);
 
-        internal abstract string ConvertToBoolean(string source);
+        protected abstract string ConvertToString(string source);
 
-        internal abstract string ConvertToByte(string source);
+        protected abstract string ConvertToBoolean(string source);
 
-        internal abstract string ConvertToInt16(string source);
+        protected abstract string ConvertToByte(string source);
 
-        internal abstract string ConvertToInt32(string source);
+        protected abstract string ConvertToInt16(string source);
 
-        internal abstract string ConvertToInt64(string source);
+        protected abstract string ConvertToInt32(string source);
 
-        internal abstract string Escape(string s);
+        protected abstract string ConvertToInt64(string source);
+
+        protected abstract string ConvertToUInt16(string source);
+
+        protected abstract string ConvertToUInt32(string source);
+
+        protected abstract string ConvertToUInt64(string source);
+
+        protected abstract string ConvertToSByte(string source);
+
+        protected abstract string ConvertToChar(string source);
+
+        protected abstract string ConvertToDecimal(string source);
+
+        protected abstract string ConvertToObject(string source);
 
         internal sealed class StringTupleComparer : IEqualityComparer<(string Namespace, string Type)>
         {

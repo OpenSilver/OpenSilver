@@ -29,58 +29,12 @@ namespace OpenSilver.Compiler
                     return "null";
                 }
             }
-            
-            string result;
-            
-            switch (underlyingType)
-            {
-                case "global::System.SByte":
-                case "global::System.UInt16":
-                case "global::System.UInt32":
-                case "global::System.UInt64":
-                    // Note: for numeric types, removing the quotation marks is sufficient
-                    // (+ potential additional letter to tell the actual type because casts
-                    // from int to double for example causes an exception).
-                    result = value;
-                    break;
 
-                case "global::System.Decimal":
-                    result = PrepareStringForDecimal(value);
-                    break;
-
-                case "global::System.Char":
-                    result = PrepareStringForChar(value);
-                    break;
-
-                case "global::System.Object":
-                    result = PrepareStringForString(source);
-                    break;
-
-                default:
-                    // return after escaping (note: we use value and not stringValue
-                    // because it can be a string that starts or ends with spaces)
-                    result = CoreTypesHelper.ConvertFromInvariantStringHelper(
-                        source,
-                        underlyingType
-                    );
-                    break;
-            }
-
-            return result;
-        }
-
-        internal override string PrepareStringForChar(string source)
-        {
-            if (source != null && source.Length == 1)
-            {
-                return $"'{source}'";
-            }
-
-            return "'\\0'";
+            return CoreTypesHelper.ConvertFromInvariantStringHelper(source, underlyingType);
         }
 
 
-        internal override bool IsNullableType(string type, out string underlyingType)
+        private static bool IsNullableType(string type, out string underlyingType)
         {
             if (type.StartsWith("global::System.Nullable<"))
             {
@@ -93,11 +47,5 @@ namespace OpenSilver.Compiler
             underlyingType = type;
             return false;
         }
-
-        internal override string GetQuotedVerbatimString(string s)
-        {
-            return "@\"" + s.Replace("\"", "\"\"") + "\"";
-        }
     }
-
 }

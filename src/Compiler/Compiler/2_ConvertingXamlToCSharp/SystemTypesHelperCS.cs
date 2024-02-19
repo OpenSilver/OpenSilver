@@ -19,28 +19,12 @@ using System.Globalization;
 
 namespace OpenSilver.Compiler
 {
-    internal class SystemTypesHelperCS : SystemTypesHelper
+    internal sealed class SystemTypesHelperCS : SystemTypesHelper
     {
         private const string InvariantCulture = "global::System.Globalization.CultureInfo.InvariantCulture";
 
-        private static SystemTypesHelperCS systemTypesHelper = new SystemTypesHelperCS();
-
-        private static Dictionary<string, Func<string, string>> SupportedIntrinsicTypes { get; } =
-            new Dictionary<string, Func<string, string>>(9, StringComparer.OrdinalIgnoreCase)
-            {
-                ["system.double"] = s => systemTypesHelper.ConvertToDouble(s),
-                ["system.single"] = s => systemTypesHelper.ConvertToSingle(s),
-                ["system.timespan"] = s => systemTypesHelper.ConvertToTimeSpan(s),
-                ["system.string"] = s => systemTypesHelper.ConvertToString(s),
-                ["system.boolean"] = s => systemTypesHelper.ConvertToBoolean(s),
-                ["system.byte"] = s => systemTypesHelper.ConvertToByte(s),
-                ["system.int16"] = s => systemTypesHelper.ConvertToInt16(s),
-                ["system.int32"] = s => systemTypesHelper.ConvertToInt32(s),
-                ["system.int64"] = s => systemTypesHelper.ConvertToInt64(s),
-            };
-
-        private static Dictionary<(string Namespace, string Type), string> SupportIntrinsicTypesDefaultValues { get; } =
-            new Dictionary<(string Namespace, string Type), string>(9, StringTupleComparer.Instance)
+        private static readonly Dictionary<(string Namespace, string Type), string> _supportIntrinsicTypesDefaultValues =
+            new(16, StringTupleComparer.Instance)
             {
                 [("system", "double")] = "0D",
                 [("system", "single")] = "0F",
@@ -51,16 +35,26 @@ namespace OpenSilver.Compiler
                 [("system", "int16")] = "(global::System.Int16)0",
                 [("system", "int32")] = "0",
                 [("system", "int64")] = "0L",
+                [("system", "uint16")] = "(global::System.UInt16)0",
+                [("system", "uint32")] = "0U",
+                [("system", "uint64")] = "0UL",
+                [("system", "sbyte")] = "(global::System.SByte)0",
+                [("system", "char")] = "(global::System.Char)0",
+                [("system", "decimal")] = "0M",
+                [("system", "object")] = "null",
             };
 
-        public override bool IsSupportedSystemType(string typeFullName, string assemblyIfAny)
+        public override string GetDefaultValue(string namespaceName, string typeName, string assemblyIfAny)
         {
             if (IsCoreLibraryOrNull(assemblyIfAny))
             {
-                return SupportedIntrinsicTypes.ContainsKey(typeFullName);
+                if (_supportIntrinsicTypesDefaultValues.TryGetValue((namespaceName, typeName), out string value))
+                {
+                    return value;
+                }
             }
-            
-            return false;
+
+            return null;
         }
 
         public override string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny)
@@ -71,33 +65,7 @@ namespace OpenSilver.Compiler
             return $"global::{namespaceName}.{typeName}";
         }
 
-        public override string ConvertFromInvariantString(string source, string typeFullName)
-        {
-            if (SupportedIntrinsicTypes.TryGetValue(typeFullName, out var converter))
-            {
-                Debug.Assert(converter != null);
-                return converter(source);
-            }
-
-            throw new InvalidOperationException(
-                $"'{typeFullName}' is not a supported system type."
-            );
-        }
-
-        public override string GetDefaultValue(string namespaceName, string typeName, string assemblyIfAny)
-        {
-            if (IsCoreLibraryOrNull(assemblyIfAny))
-            {
-                if (SupportIntrinsicTypesDefaultValues.TryGetValue((namespaceName, typeName), out string value))
-                {
-                    return value;
-                }
-            }
-
-            return null;
-        }
-
-        internal override string ConvertToDouble(string source)
+        protected override string ConvertToDouble(string source)
         {
             string value = source.Trim().ToLower();
 
@@ -133,7 +101,7 @@ namespace OpenSilver.Compiler
             return $"{value}D";
         }
 
-        internal override string ConvertToSingle(string source)
+        protected override string ConvertToSingle(string source)
         {
             string value = source.Trim().ToLower();
 
@@ -169,13 +137,13 @@ namespace OpenSilver.Compiler
             return $"{value}F";
         }
 
-        internal override string ConvertToTimeSpan(string source)
+        protected override string ConvertToTimeSpan(string source)
         {
             string value = source.Trim();
 
             if (value.Length == 0)
             {
-                return SupportIntrinsicTypesDefaultValues[("system", "timespan")];
+                return _supportIntrinsicTypesDefaultValues[("system", "timespan")];
             }
 
             // Optimization to avoid parsing at runtime
@@ -187,74 +155,161 @@ namespace OpenSilver.Compiler
             return $"global::System.TimeSpan.Parse({Escape(value)}, {InvariantCulture})";
         }
 
-        internal override string ConvertToString(string source)
+        protected override string ConvertToString(string source)
         {
             return Escape(source);
         }
 
-        internal override string ConvertToBoolean(string source)
+        protected override string ConvertToBoolean(string source)
         {
             string value = source.Trim();
             
             if (value.Length == 0)
             {
-                return SupportIntrinsicTypesDefaultValues[("system", "boolean")];
+                return _supportIntrinsicTypesDefaultValues[("system", "boolean")];
             }
 
             return value.ToLower();
         }
 
-        internal override string ConvertToByte(string source)
+        protected override string ConvertToByte(string source)
         {
             string value = source.Trim();
         
             if (value.Length == 0)
             {
-                return SupportIntrinsicTypesDefaultValues[("system", "byte")];
+                return _supportIntrinsicTypesDefaultValues[("system", "byte")];
             }
 
             return $"(global::System.Byte){value}";
         }
 
-        internal override string ConvertToInt16(string source)
+        protected override string ConvertToInt16(string source)
         {
             string value = source.Trim();
 
             if (value.Length == 0)
             {
-                return SupportIntrinsicTypesDefaultValues[("system", "int16")];
+                return _supportIntrinsicTypesDefaultValues[("system", "int16")];
             }
 
             return $"(global::System.Int16){value}";
         }
 
-        internal override string ConvertToInt32(string source)
+        protected override string ConvertToInt32(string source)
         {
             string value = source.Trim();
 
             if (value.Length == 0)
             {
-                return SupportIntrinsicTypesDefaultValues[("system", "int32")];
+                return _supportIntrinsicTypesDefaultValues[("system", "int32")];
             }
 
             return value;
         }
 
-        internal override string ConvertToInt64(string source)
+        protected override string ConvertToInt64(string source)
         {
             string value = source.Trim();
         
             if (value.Length == 0)
             {
-                return SupportIntrinsicTypesDefaultValues[("system", "int64")];
+                return _supportIntrinsicTypesDefaultValues[("system", "int64")];
             }
 
             return $"{value}L";
         }
 
-        internal override string Escape(string s)
+        protected override string ConvertToUInt16(string source)
         {
-            return string.Concat("@\"", s.Replace("\"", "\"\""), "\"");
+            string value = source.Trim();
+
+            if (value.Length == 0)
+            {
+                return _supportIntrinsicTypesDefaultValues[("system", "uint16")];
+            }
+
+            return $"(global::System.UInt16){value}";
         }
+
+        protected override string ConvertToUInt32(string source)
+        {
+            string value = source.Trim();
+
+            if (value.Length == 0)
+            {
+                return _supportIntrinsicTypesDefaultValues[("system", "uint32")];
+            }
+
+            return $"{value}U";
+        }
+
+        protected override string ConvertToUInt64(string source)
+        {
+            string value = source.Trim();
+
+            if (value.Length == 0)
+            {
+                return _supportIntrinsicTypesDefaultValues[("system", "uint64")];
+            }
+
+            return $"{value}UL";
+        }
+
+        protected override string ConvertToSByte(string source)
+        {
+            string value = source.Trim();
+
+            if (value.Length == 0)
+            {
+                return _supportIntrinsicTypesDefaultValues[("system", "sbyte")];
+            }
+
+            return $"(global::System.SByte){value}";
+        }
+
+        protected override string ConvertToChar(string source)
+        {
+            if (source.Length == 1)
+            {
+                return $"'{source}'";
+            }
+
+            return _supportIntrinsicTypesDefaultValues[("system", "char")];
+        }
+
+        protected override string ConvertToDecimal(string source)
+        {
+            string value = source.ToLower();
+
+            if (value.EndsWith("m"))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            if (value.EndsWith("."))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            if (value.Length == 0)
+            {
+                return _supportIntrinsicTypesDefaultValues[("system", "decimal")];
+            }
+
+            return $"{value}M";
+        }
+
+        protected override string ConvertToObject(string source)
+        {
+            if (string.IsNullOrEmpty(source))
+            {
+                return _supportIntrinsicTypesDefaultValues[("system", "object")];
+            }
+
+            return Escape(source);
+        }
+
+        private static string Escape(string s) => string.Concat("@\"", s.Replace("\"", "\"\""), "\"");
     }
 }

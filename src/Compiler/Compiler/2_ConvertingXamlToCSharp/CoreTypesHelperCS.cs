@@ -87,8 +87,6 @@ namespace OpenSilver.Compiler
     {
         public const string TypeFromStringConvertersFullName = "global::DotNetForHtml5.Core.TypeFromStringConverters";
 
-        private static SystemTypesHelper SystemTypesHelperCS = new SystemTypesHelperCS();
-
         public static string ConvertFromInvariantStringHelper(string source, string destinationType)
         {
             return string.Format(
@@ -125,7 +123,7 @@ namespace OpenSilver.Compiler
             }
             else
             {
-                return $"{destinationType}.FromTimeSpan({SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan")})";
+                return $"{destinationType}.FromTimeSpan({SystemTypesHelper.CSharp.ConvertFromInvariantString(stringValue, "system.timespan")})";
             }
         }
 
@@ -147,7 +145,7 @@ namespace OpenSilver.Compiler
                 return $"new {destinationType}({stringDoubleValue.TrimEnd()})";
             }
 
-            return SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan");
+            return SystemTypesHelper.CSharp.ConvertFromInvariantString(stringValue, "system.timespan");
         }
 
         internal static string ConvertToKeySpline(string source, string destinationType, string pointTypeName)
@@ -481,7 +479,7 @@ namespace OpenSilver.Compiler
             }
             else
             {
-                return SystemTypesHelperCS.ConvertFromInvariantString(stringValue, "system.timespan");
+                return SystemTypesHelper.CSharp.ConvertFromInvariantString(stringValue, "system.timespan");
             }
         }
 

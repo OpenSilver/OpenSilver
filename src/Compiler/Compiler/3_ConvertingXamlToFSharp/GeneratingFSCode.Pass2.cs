@@ -197,7 +197,7 @@ namespace OpenSilver.Compiler
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
-            private SystemTypesHelperFS _systemTypesHelper = new SystemTypesHelperFS();
+            private SystemTypesHelper _systemTypesHelper = SystemTypesHelper.FSharp;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -966,7 +966,6 @@ namespace GlobalResource
                                         out propertyLocalTypeName,
                                         out _,
                                         out _,
-                                        out _,
                                         assemblyNameIfAny,
                                         isAttached: true
                                     );
@@ -992,7 +991,6 @@ namespace GlobalResource
                                         parent.Name.LocalName,
                                         out propertyNamespaceName,
                                         out propertyLocalTypeName,
-                                        out _,
                                         out _,
                                         out _,
                                         assemblyNameIfAny,
@@ -1028,8 +1026,6 @@ namespace GlobalResource
                                 string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
                                 string propertyTypeName;
-                                bool isTypeString;
-                                bool isTypeEnum;
                                 if (!isAttachedProperty)
                                 {
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
@@ -1038,8 +1034,6 @@ namespace GlobalResource
                                                                                          out propertyDeclaringTypeName,
                                                                                          out propertyTypeNamespace,
                                                                                          out propertyTypeName,
-                                                                                         out isTypeString,
-                                                                                         out isTypeEnum,
                                                                                          assemblyNameIfAny,
                                                                                          false);
                                 }
@@ -1051,8 +1045,6 @@ namespace GlobalResource
                                         out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
-                                        out isTypeString,
-                                        out isTypeEnum,
                                         assemblyNameIfAny);
                                 }
                                 string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
@@ -1135,9 +1127,8 @@ namespace GlobalResource
                                         splittedLocalName[0],
                                         out string propertyNamespaceName,
                                         out string propertyLocalTypeName,
-                                        out string propertyAssemblyName,
-                                        out bool isTypeString,
-                                        out bool isTypeEnum,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny,
                                         true
                                     );
@@ -1175,10 +1166,8 @@ namespace GlobalResource
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
                                         out string propertyDeclaringTypeName,
-                                        out string propertyTypeNamespace,
-                                        out string propertyTypeName,
-                                        out bool isTypeString,
-                                        out bool isTypeEnum,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny,
                                         false
                                     );
@@ -1189,9 +1178,8 @@ namespace GlobalResource
                                         parent.Name.LocalName,
                                         out string propertyNamespaceName,
                                         out string propertyLocalTypeName,
-                                        out string propertyAssemblyName,
-                                        out isTypeString,
-                                        out isTypeEnum,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny
                                     );
 
@@ -1518,7 +1506,7 @@ match {0} with
                     out string assemblyNameIfAny);
 
                 string valueNamespaceName, valueLocalTypeName, valueAssemblyName;
-                bool isValueString, isValueEnum;
+                bool isValueEnum;
 
                 if (isAttachedProperty)
                 {
@@ -1529,7 +1517,6 @@ match {0} with
                         out valueNamespaceName,
                         out valueLocalTypeName,
                         out valueAssemblyName,
-                        out isValueString,
                         out isValueEnum,
                         assemblyNameIfAny);
                 }
@@ -1542,7 +1529,6 @@ match {0} with
                         out valueNamespaceName,
                         out valueLocalTypeName,
                         out valueAssemblyName,
-                        out isValueString,
                         out isValueEnum,
                         assemblyNameIfAny);
                 }
@@ -1555,14 +1541,7 @@ match {0} with
                 );
 
                 // Generate the code or instantiating the attribute
-                if (isValueString)
-                {
-                    //----------------------------
-                    // PROPERTY IS OF TYPE STRING
-                    //----------------------------
-                    return ConvertingStringToValue.PrepareStringForString(value);
-                }
-                else if (isValueEnum)
+                if (isValueEnum)
                 {
                     //----------------------------
                     // PROPERTY IS AN ENUM

@@ -12,67 +12,11 @@
 *  
 \*====================================================================================*/
 
-using System;
-
 namespace OpenSilver.Compiler
 {
     internal abstract class ConvertingStringToValue
     {
         public abstract string ConvertFromInvariantString(string type, string source);
-
-        internal abstract string PrepareStringForChar(string source);
-
-        internal virtual string PrepareStringForDecimal(string source)
-        {
-            string value = source.ToLower();
-
-            if (value.EndsWith("m"))
-            {
-                value = value.Substring(0, value.Length - 1);
-            }
-
-            if (value.EndsWith("."))
-            {
-                value = value.Substring(0, value.Length - 1);
-            }
-
-            if (value.Length == 0)
-            {
-                value = "0";
-            }
-
-            return $"{value}M";
-        }
-
-        internal virtual string PrepareStringForString(string source)
-        {
-            // Note: we use verbatim string (ie. a string that starts with "@") so
-            // that the only character we have to escape is the quote (we need to
-            // double it).
-            return GetQuotedVerbatimString(source);
-        }
-
-        internal abstract bool IsNullableType(string type, out string underlyingType);
-
-        /// <summary>
-        /// Adds @" at the beginning of the string and a " at the end, and escapes the 
-        /// quotation marks within by doubling them (turns the content of the string 
-        /// into a Verbatim string)
-        /// Transforming strings from: "stringContent with a \" in it." into: 
-        /// "@\"stringContent with a \"\" in it.\""
-        /// </summary>
-        internal abstract string GetQuotedVerbatimString(string s);
-
-        //Types to add to the switch (probably):
-        //
-        //  **Types that seem to appear often :
-        //  - Geometry                              <------------ Geometry feels like it could make for quite a big improvement on performance on each call if we could make the parsing at compilation time + it is not rarely used so it would be pretty nice to have it.
-        //
-        //  **Types that do not seem to appear as often :
-        //  - Guid ?
-        //  - DateTime
-        //  - TimeSpan
-        //  - Alignments seem to already be dealt with (maybe it's enums in general).
     }
 
     internal enum ColorsEnum : int
