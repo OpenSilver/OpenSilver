@@ -11,12 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows;
 using System.Windows.Media;
@@ -27,23 +27,21 @@ namespace System.ComponentModel
     internal static class TypeConverterHelper
     {
         // sentinel value used to specify we were not able to find a TypeConverter
-        internal static readonly TypeConverter NullConverter = new TypeConverter();
+        internal static readonly TypeConverter NullConverter = new();
 
         // key associated with NullConverter
-        private static readonly object _nullConverterKey = new object();
+        private static readonly object _nullConverterKey = new();
 
         // key for nullable types
-        private static readonly object _intrinsicNullableKey = new object();
+        private static readonly object _intrinsicNullableKey = new();
 
         private static readonly Assembly _openSilverAssembly = typeof(DependencyObject).Assembly;
         
-        private static readonly object _internalSyncObject = new object();
+        private static readonly object _internalSyncObject = new();
         
-        private static Dictionary<Type, ReflectedTypeData> TypeData { get; } =
-            new Dictionary<Type, ReflectedTypeData>();
+        private static Dictionary<Type, ReflectedTypeData> TypeData { get; } = new(256);
 
-        private static Dictionary<Type, ReflectedPropertyData[]> PropertyCache { get; } =
-            new Dictionary<Type, ReflectedPropertyData[]>();
+        private static Dictionary<Type, ReflectedPropertyData[]> PropertyCache { get; } = new(256);
 
         private static Dictionary<object, IntrinsicTypeConverterData> IntrinsicTypeConverters { get; } =
             GetIntrinsicTypeConvertersData();
@@ -66,11 +64,8 @@ namespace System.ComponentModel
                 converter = GetCoreTypeConverter(type);
             }
 
-            if (converter == null)
-            {
-                // Normal lookup
-                converter = GetTypeConverterFromTypeData(type);
-            }
+            // Normal lookup
+            converter ??= GetTypeConverterFromTypeData(type);
 
             return converter;
         }
@@ -84,9 +79,9 @@ namespace System.ComponentModel
         // Helper method for TemplateBindingExpression
         internal static TypeConverter GetBuiltInConverter(Type type)
         {
-            if (IsNullableType(type))
+            if (IsNullableType(type, out Type underlyingType))
             {
-                type = Nullable.GetUnderlyingType(type);
+                type = underlyingType;
             }
 
             TypeConverter converter = null;
@@ -137,7 +132,7 @@ namespace System.ComponentModel
                 {
                     converterData = IntrinsicTypeConverters[typeof(Enum)];
                 }
-                else if (IsNullableType(type))
+                else if (IsNullableType(type, out _))
                 {
                     converterData = IntrinsicTypeConverters[_intrinsicNullableKey];
                 }
@@ -163,10 +158,7 @@ namespace System.ComponentModel
                         baseType = baseType.BaseType;
                     }
 
-                    if (key == null)
-                    {
-                        key = _nullConverterKey;
-                    }
+                    key ??= _nullConverterKey;
 
                     converterData = IntrinsicTypeConverters[key];
                 }
@@ -175,9 +167,10 @@ namespace System.ComponentModel
             return converterData.GetOrCreateConverterInstance(type);
         }
 
-        private static bool IsNullableType(Type type)
+        private static bool IsNullableType(Type type, out Type underlyingType)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            underlyingType = Nullable.GetUnderlyingType(type);
+            return underlyingType is not null;
         }
 
         private static TypeConverter GetTypeConverterFromTypeData(Type type)
@@ -210,13 +203,14 @@ namespace System.ComponentModel
             return td;
         }
 
-        internal static Attribute FindAttributeByType(Type attrType, Attribute[] attributes)
+        internal static T FindAttributeByType<T>(Attribute[] attributes)
+            where T : Attribute
         {
             foreach (Attribute attr in attributes)
             {
-                if (attr.GetType() == attrType)
+                if (attr.GetType() == typeof(T))
                 {
-                    return attr;
+                    return Unsafe.As<T>(attr);
                 }
             }
 
@@ -232,7 +226,7 @@ namespace System.ComponentModel
             {
                 if (!propertyCache.TryGetValue(type, out properties))
                 {
-                    BindingFlags bindingFlags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance;
+                    const BindingFlags bindingFlags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance;
 
                     // Get the type's properties. Properties may have their
                     // get and set methods individually overridden in a derived
@@ -399,37 +393,19 @@ namespace System.ComponentModel
             }
 
             /// <devdoc>
-            ///     Retrieves custom attributes.
+            /// Retrieves custom attributes.
             /// </devdoc>
-            internal Attribute[] GetAttributes()
-            {
-                if (_attributes == null)
-                {
-                    object[] attrs = _type.GetCustomAttributes(false);
-                    if (attrs == null || attrs.Length == 0)
-                    {
-                        _attributes = new Attribute[0];
-                    }
-                    else
-                    {
-                        _attributes = new Attribute[attrs.Length];
-                        attrs.CopyTo(_attributes, 0);
-                    }
-                }
-
-                return _attributes;
-            }
+            internal Attribute[] GetAttributes() => _attributes ??= Attribute.GetCustomAttributes(_type, false);
 
             internal TypeConverter GetConverter()
             {
-                if (_converter == null)
+                if (_converter is null)
                 {
                     _converter = GetOverriddenTypeConverter(_type);
 
-                    if (_converter == null)
+                    if (_converter is null)
                     {
-                        TypeConverterAttribute typeAttr = (TypeConverterAttribute)FindAttributeByType(typeof(TypeConverterAttribute), GetAttributes());
-                        if (typeAttr != null)
+                        if (FindAttributeByType<TypeConverterAttribute>(GetAttributes()) is TypeConverterAttribute typeAttr)
                         {
                             Type converterType = GetTypeFromName(typeAttr.ConverterTypeName);
                             if (converterType != null && typeof(TypeConverter).IsAssignableFrom(converterType))
@@ -438,11 +414,8 @@ namespace System.ComponentModel
                             }
                         }
 
-                        if (_converter == null)
-                        {
-                            // We did not get a converter. Traverse up the base class chain.
-                            _converter = GetIntrinsicTypeConverter(_type);
-                        }
+                        // We did not get a converter. Traverse up the base class chain.
+                        _converter ??= GetIntrinsicTypeConverter(_type);
                     }
 
                     Debug.Assert(_converter != null, $"'{nameof(NullConverter)}' is null or '{nameof(OverriddenTypeConverters)}' contains null values.");
@@ -453,17 +426,15 @@ namespace System.ComponentModel
 
             internal ReflectedPropertyCollection GetProperties()
             {
-                if (_properties == null)
+                if (_properties is null)
                 {
-                    ReflectedPropertyData[] propertyArray;
-                    Dictionary<string, ReflectedPropertyData> propertyList = new Dictionary<string, ReflectedPropertyData>(10);
+                    var propertyList = new Dictionary<string, ReflectedPropertyData>(10);
                     Type baseType = _type;
                     Type objType = typeof(object);
 
                     do
                     {
-                        propertyArray = ReflectGetProperties(baseType);
-                        foreach (ReflectedPropertyData p in propertyArray)
+                        foreach (ReflectedPropertyData p in ReflectGetProperties(baseType))
                         {
                             if (!propertyList.ContainsKey(p.Name))
                             {
@@ -472,7 +443,7 @@ namespace System.ComponentModel
                         }
                         baseType = baseType.BaseType;
                     }
-                    while (baseType != null && baseType != objType);
+                    while (baseType is not null && baseType != objType);
 
                     _properties = new ReflectedPropertyCollection(propertyList);
                 }
@@ -487,7 +458,6 @@ namespace System.ComponentModel
             /// </devdoc>
             private Type GetTypeFromName(string typeName)
             {
-
                 if (typeName == null || typeName.Length == 0)
                 {
                     return null;
@@ -530,9 +500,7 @@ namespace System.ComponentModel
         private sealed class IntrinsicTypeConverterData
         {
             private readonly Func<Type, TypeConverter> _constructionFunc;
-
             private readonly bool _cacheConverterInstance;
-
             private TypeConverter _converterInstance;
 
             /// <summary>
@@ -558,12 +526,7 @@ namespace System.ComponentModel
                     return _constructionFunc(innerType);
                 }
 
-                if (_converterInstance == null)
-                {
-                    _converterInstance = _constructionFunc(innerType);
-                }
-
-                return _converterInstance;
+                return _converterInstance ??= _constructionFunc(innerType);
             }
         }
 

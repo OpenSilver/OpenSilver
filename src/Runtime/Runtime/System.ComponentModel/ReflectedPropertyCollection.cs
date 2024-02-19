@@ -18,7 +18,7 @@ namespace System.ComponentModel
 {
     internal sealed class ReflectedPropertyCollection : IReadOnlyList<ReflectedPropertyData>
     {
-        private IDictionary<string, ReflectedPropertyData> _cachedFoundProperties;
+        private Dictionary<string, ReflectedPropertyData> _cachedFoundProperties;
         private readonly ReflectedPropertyData[] _properties;
 
         private readonly object _internalSyncObject = new object();
@@ -43,7 +43,7 @@ namespace System.ComponentModel
         /// Initializes a new instance of the <see cref="ReflectedPropertyCollection"/>
         /// class with an ordered list of properties.
         /// </summary>
-        internal ReflectedPropertyCollection(IDictionary<string, ReflectedPropertyData> orderedProperties)
+        internal ReflectedPropertyCollection(Dictionary<string, ReflectedPropertyData> orderedProperties)
         {
             _cachedFoundProperties = orderedProperties;
             
@@ -87,7 +87,9 @@ namespace System.ComponentModel
         /// <summary>
         /// Gets an enumerator for this <see cref="ReflectedPropertyCollection"/>.
         /// </summary>
-        public IEnumerator<ReflectedPropertyData> GetEnumerator() => new ReflectedPropertyCollectionEnumerator(this);
+        public ReflectedPropertyCollectionEnumerator GetEnumerator() => new(this);
+
+        IEnumerator<ReflectedPropertyData> IEnumerable<ReflectedPropertyData>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -95,11 +97,7 @@ namespace System.ComponentModel
         {
             lock (_internalSyncObject)
             {
-
-                if (_cachedFoundProperties == null)
-                {
-                    _cachedFoundProperties = new Dictionary<string, ReflectedPropertyData>();
-                }
+                _cachedFoundProperties ??= new(_properties.Length);
 
                 // first try to find it in the cache
                 //
@@ -127,7 +125,7 @@ namespace System.ComponentModel
             }
         }
 
-        private struct ReflectedPropertyCollectionEnumerator : IEnumerator<ReflectedPropertyData>
+        public struct ReflectedPropertyCollectionEnumerator : IEnumerator<ReflectedPropertyData>
         {
             private readonly ReflectedPropertyCollection _collection;
             private int _index;

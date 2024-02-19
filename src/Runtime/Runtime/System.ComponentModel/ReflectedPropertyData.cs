@@ -86,16 +86,7 @@ namespace System.ComponentModel
                 {
                     lock (lockCookie)
                     {
-                        object[] attrs = _propInfo.GetCustomAttributes(false);
-                        if (attrs == null || attrs.Length == 0)
-                        {
-                            _attributes = new Attribute[0];
-                        }
-                        else
-                        {
-                            _attributes = new Attribute[attrs.Length];
-                            attrs.CopyTo(_attributes, 0);
-                        }
+                        _attributes = Attribute.GetCustomAttributes(_propInfo, false);
                     }
                 }
 
@@ -116,17 +107,9 @@ namespace System.ComponentModel
                     return converter;
                 }
 
-                if (_propertyTypeConverter == null)
-                {
-                    _propertyTypeConverter = TypeConverterHelper.GetConverter(PropertyType) ?? TypeConverterHelper.NullConverter;
-                }
+                _propertyTypeConverter ??= TypeConverterHelper.GetConverter(PropertyType) ?? TypeConverterHelper.NullConverter;
 
-                if (_propertyTypeConverter == TypeConverterHelper.NullConverter)
-                {
-                    return null;
-                }
-
-                return _propertyTypeConverter;
+                return _propertyTypeConverter == TypeConverterHelper.NullConverter ? null : _propertyTypeConverter;
             }
         }
 
@@ -145,8 +128,7 @@ namespace System.ComponentModel
             {
                 if (_converter == null)
                 {
-                    TypeConverterAttribute typeAttr = (TypeConverterAttribute)TypeConverterHelper.FindAttributeByType(typeof(TypeConverterAttribute), Attributes);
-                    if (typeAttr != null)
+                    if (TypeConverterHelper.FindAttributeByType<TypeConverterAttribute>(Attributes) is TypeConverterAttribute typeAttr)
                     {
                         Type converterType = GetTypeFromName(typeAttr.ConverterTypeName);
                         if (converterType != null && typeof(TypeConverter).IsAssignableFrom(converterType))
@@ -155,18 +137,10 @@ namespace System.ComponentModel
                         }
                     }
 
-                    if (_converter == null)
-                    {
-                        _converter = TypeConverterHelper.NullConverter;
-                    }
+                    _converter ??= TypeConverterHelper.NullConverter;
                 }
 
-                if (_converter == TypeConverterHelper.NullConverter)
-                {
-                    return null;
-                }
-
-                return _converter;
+                return _converter == TypeConverterHelper.NullConverter ? null : _converter;
             }
         }
 
