@@ -14,11 +14,6 @@
 
 namespace OpenSilver.Compiler
 {
-    internal abstract class ConvertingStringToValue
-    {
-        public abstract string ConvertFromInvariantString(string type, string source);
-    }
-
     internal enum ColorsEnum : int
     {
         AliceBlue = unchecked((int)0xFFF0F8FF),

@@ -165,8 +165,6 @@ namespace OpenSilver.Compiler
                 public string CurrentXamlContext => CurrentScope.XamlContext;
             }
 
-            private ConvertingStringToValue ConvertingStringToValue = new ConvertingStringToValueVB();
-
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
 
             private readonly XamlReader _reader;
@@ -394,8 +392,7 @@ End Sub
                         );
 
                         string preparedValue = ConvertFromInvariantString(
-                            stringValue, elementTypeInCSharp, isKnownCoreType, isKnownSystemType
-                        );
+                            stringValue, elementTypeInCSharp, isKnownCoreType, isKnownSystemType);
 
                         parameters.StringBuilder.AppendLine(
                             string.Format("Dim {0} = {2}.XamlContext_WriteStartObject({3}, {1})", 
@@ -1528,28 +1525,23 @@ End If",
                         xName);
 
                     bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
-                        valueTypeFullName.Substring("Global.".Length), valueAssemblyName
-                    );
+                        valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
 
                     bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
-                        valueTypeFullName.Substring("Global.".Length), valueAssemblyName
-                    );
-
-                    string declaringTypeName = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                        namespaceName, localTypeName, assemblyNameIfAny
-                    );
+                        valueTypeFullName.Substring("Global.".Length), valueAssemblyName);
 
                     if (isAttachedProperty)
                     {
                         return ConvertFromInvariantString(
-                            value, valueTypeFullName, isKnownCoreType, isKnownSystemType
-                        );
+                            value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
                     }
                     else
                     {
+                        string declaringTypeName = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                            namespaceName, localTypeName, assemblyNameIfAny);
+
                         return ConvertFromInvariantString(
-                            declaringTypeName, propertyName, value, valueTypeFullName, isKnownCoreType, isKnownSystemType
-                        );
+                            declaringTypeName, propertyName, value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
                     }
                 }
             }
@@ -1761,23 +1753,43 @@ End If",
 
             private string ConvertFromInvariantString(string value, string type, bool isKnownCoreType, bool isKnownSystemType)
             {
+                if (_systemTypesHelper.IsNullableType(type.Substring("Global.".Length), null, out string underlyingType))
+                {
+                    string typeName = underlyingType.Substring("Global.".Length);
+
+                    return ConvertFromInvariantStringHelper(value,
+                        underlyingType,
+                        _settings.CoreTypesConverter.IsSupportedCoreType(typeName, null),
+                        _systemTypesHelper.IsSupportedSystemType(typeName, null),
+                        true);
+                }
+                else
+                {
+                    return ConvertFromInvariantStringHelper(value, type, isKnownCoreType, isKnownSystemType, false);
+                }
+            }
+
+            private string ConvertFromInvariantStringHelper(string value, string type, bool isKnownCoreType, bool isKnownSystemType, bool isNullable)
+            {
                 string preparedValue;
 
-                if (isKnownCoreType)
+                if (isNullable && string.IsNullOrEmpty(value))
+                {
+                    preparedValue = "Nothing";
+                }
+                else if (isKnownCoreType)
                 {
                     preparedValue = _settings.CoreTypesConverter.ConvertFromInvariantString(
-                        value, type.Substring("Global.".Length)
-                    );
+                        value, type.Substring("Global.".Length));
                 }
                 else if (isKnownSystemType)
                 {
                     preparedValue = _systemTypesHelper.ConvertFromInvariantString(
-                        value, type.Substring("Global.".Length)
-                    );
+                        value, type.Substring("Global.".Length));
                 }
                 else
                 {
-                    preparedValue = ConvertingStringToValue.ConvertFromInvariantString(type, value);
+                    preparedValue = CoreTypesHelperVB.ConvertFromInvariantStringHelper(value, type);
                 }
 
                 return preparedValue;
@@ -1798,8 +1810,7 @@ End If",
                     propertyDeclaringType,
                     EscapeString(propertyName),
                     EscapeString(value),
-                    ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType)
-                );
+                    ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType));
             }
 
             private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)

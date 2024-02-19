@@ -47,7 +47,6 @@
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass1.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\IMetadataCS.cs" />
-    <Compile Include="3_ConvertingXamlToFSharp\ConvertingStringToValueFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\ConvertingXamlToFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\CoreTypesHelperFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.cs" />
@@ -65,7 +64,6 @@
     <Compile Include="OtherHelpersAndHandlers\OpenSilverSettings.cs" />
     <Compile Include="OtherHelpersAndHandlers\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValueCS.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\CoreTypesHelperCS.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\SystemTypesHelperCS.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.cs" />
@@ -73,7 +71,6 @@
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.Pass1.cs" />
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.Pass2.cs" />
     <Compile Include="7_ConvertingXamlToVB\IMetadataVB.cs" />
-    <Compile Include="7_ConvertingXamlToVB\ConvertingStringToValueVB.cs" />
     <Compile Include="7_ConvertingXamlToVB\CoreTypesHelperVB.cs" />
     <Compile Include="7_ConvertingXamlToVB\SystemTypesHelperVB.cs" />
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.cs" />

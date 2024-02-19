@@ -42,34 +42,27 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private const string StaticResExtension = "StaticResourceExtension";
         private const string DependencyObj = "DependencyObject";
 
+        private readonly MonoCecilAssemblyStorage _storage = new();
         private readonly Dictionary<string, TypeDefinition> _typeNameToType = new();
 
+        private readonly SupportedLanguage _compilerType;
         private readonly IMetadata _metadata;
+        private readonly SystemTypesHelper _systemTypesHelper;
 
-        private readonly MonoCecilAssemblyStorage _storage = new();
-
-        private SupportedLanguage _compilerType;
-        public SupportedLanguage CompilerType  // read-write instance property
-        {
-            get => _compilerType;
-            set => _compilerType = value;
-        }
-
-        private SystemTypesHelper _systemTypesHelper;
         public MonoCecilAssembliesInspectorImpl(SupportedLanguage compilerType)
         {
-            CompilerType = compilerType;
-            if (CompilerType == SupportedLanguage.CSharp)
+            _compilerType = compilerType;
+            if (_compilerType == SupportedLanguage.CSharp)
             {
                 _metadata = MetadatasCS.Silverlight;
                 _systemTypesHelper = SystemTypesHelper.CSharp;
             }
-            else if (CompilerType == SupportedLanguage.VBNet)
+            else if (_compilerType == SupportedLanguage.VBNet)
             {
                 _metadata = MetadatasVB.Silverlight;
                 _systemTypesHelper = SystemTypesHelper.VisualBasic;
             }
-            else if (CompilerType == SupportedLanguage.FSharp)
+            else if (_compilerType == SupportedLanguage.FSharp)
             {
                 _metadata = MetadatasFS.Silverlight;
                 _systemTypesHelper = SystemTypesHelper.FSharp;
@@ -78,7 +71,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 throw new InvalidCompilerTypeException();
             }
-            
         }
 
         public void Dispose()
@@ -88,15 +80,15 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private string GetGlobalPrefixFromCompilerType()
         {
-            if (CompilerType == SupportedLanguage.CSharp)
+            if (_compilerType == SupportedLanguage.CSharp)
             {
                 return GlobalPrefix_CS;
             }
-            else if (CompilerType == SupportedLanguage.VBNet)
+            else if (_compilerType == SupportedLanguage.VBNet)
             {
                 return GlobalPrefix_VB;
             }
-            else if (CompilerType == SupportedLanguage.FSharp)
+            else if (_compilerType == SupportedLanguage.FSharp)
             {
                 return GlobalPrefix_FS;
             }
@@ -419,7 +411,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (type != null)
             {
-                return type.ConvertToString(CompilerType) + ", " + type.Module.Assembly.Name.Name;
+                return type.ConvertToString(_compilerType) + ", " + type.Module.Assembly.Name.Name;
             }
 
             return null;
@@ -460,9 +452,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName,
                 assemblyNameIfAny, isAttached);
             propertyNamespaceName = typeRef.BuildFullPath();
-            propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false, CompilerType);
+            propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false, _compilerType);
             propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;
-            isTypeEnum = typeRef.ResolveOrThrow().IsEnum || (CompilerType == SupportedLanguage.FSharp && typeRef.ResolveOrThrow().CustomAttributes.Any(attr => attr.AttributeType.FullName == "Microsoft.FSharp.Core.CompilationMappingAttribute"));
+            isTypeEnum = typeRef.ResolveOrThrow().IsEnum || (_compilerType == SupportedLanguage.FSharp && typeRef.ResolveOrThrow().CustomAttributes.Any(attr => attr.AttributeType.FullName == "Microsoft.FSharp.Core.CompilationMappingAttribute"));
         }
 
         public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName,
@@ -472,7 +464,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             var typeDef = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
             returnValueNamespaceName = typeDef.BuildFullPath();
-            returnValueLocalTypeName = typeDef.GetTypeNameIncludingGenericArguments(false, CompilerType);
+            returnValueLocalTypeName = typeDef.GetTypeNameIncludingGenericArguments(false, _compilerType);
             returnValueAssemblyName = typeDef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
         }
@@ -661,7 +653,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var field = FindFieldDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
             if (field != null &&
                 (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
-                return $"{type.GetTypeNameIncludingGenericArguments(true, CompilerType)}.{field.Name}";
+                return $"{type.GetTypeNameIncludingGenericArguments(true, _compilerType)}.{field.Name}";
 
             return null;
         }
@@ -712,9 +704,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
 
-            memberDeclaringTypeName = propertyOrFieldDeclaringType.GetTypeNameIncludingGenericArguments(true, CompilerType);
+            memberDeclaringTypeName = propertyOrFieldDeclaringType.GetTypeNameIncludingGenericArguments(true, _compilerType);
             memberTypeNamespace = propertyOrFieldType.BuildFullPath();
-            memberTypeName = propertyOrFieldType.GetTypeNameIncludingGenericArguments(false, CompilerType);
+            memberTypeName = propertyOrFieldType.GetTypeNameIncludingGenericArguments(false, _compilerType);
         }
 
         public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, string assemblyNameIfAny = null)
@@ -731,10 +723,10 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     dependencyObjectType.IsAssignableFrom(m.Parameters[0].ParameterType.ResolveOrThrow()));
                 if (method != null)
                 {
-                    declaringTypeName = currentType.GetTypeNameIncludingGenericArguments(true, CompilerType);
+                    declaringTypeName = currentType.GetTypeNameIncludingGenericArguments(true, _compilerType);
                     var returnType = method.ReturnType.PopulateGeneric(elementType, currentType);
                     returnValueNamespaceName = returnType.BuildFullPath();
-                    returnValueLocalTypeName = returnType.GetTypeNameIncludingGenericArguments(false, CompilerType);
+                    returnValueLocalTypeName = returnType.GetTypeNameIncludingGenericArguments(false, _compilerType);
                     return;
                 }
                 currentType = resolved.BaseType?.PopulateGeneric(elementType, currentType);
@@ -758,65 +750,65 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string prefix = GetGlobalPrefixFromCompilerType();
             var field = FindFieldDeep(type, name, out _, ignoreCase, true, true);
 
-            if (CompilerType == SupportedLanguage.CSharp)
+            if (_compilerType == SupportedLanguage.CSharp)
             {
                 if (field is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(CompilerType)}.{field.Name}";
+                    return $"{prefix}{type.ConvertToString(_compilerType)}.{field.Name}";
                 }
                 if (allowIntegerValue)
                 {
                     if (long.TryParse(name, out var l))
                     {
-                        return $"({prefix}{type.ConvertToString(CompilerType)}){l}";
+                        return $"({prefix}{type.ConvertToString(_compilerType)}){l}";
                     }
                     if (ulong.TryParse(name, out var ul))
                     {
-                        return $"({prefix}{type.ConvertToString(CompilerType)}){ul}";
+                        return $"({prefix}{type.ConvertToString(_compilerType)}){ul}";
                     }
                 }
             }
-            else if (CompilerType == SupportedLanguage.VBNet)
+            else if (_compilerType == SupportedLanguage.VBNet)
             {
                 if (field is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(CompilerType)}.{field.Name}";
+                    return $"{prefix}{type.ConvertToString(_compilerType)}.{field.Name}";
                 }
                 if (allowIntegerValue)
                 {
                     if (long.TryParse(name, out var l))
                     {
-                        return $"CType({l}, {prefix}{type.ConvertToString(CompilerType)})";
+                        return $"CType({l}, {prefix}{type.ConvertToString(_compilerType)})";
                     }
                     if (ulong.TryParse(name, out var ul))
                     {
-                        return $"CType({ul}, {prefix}{type.ConvertToString(CompilerType)})";
+                        return $"CType({ul}, {prefix}{type.ConvertToString(_compilerType)})";
                     }
                 }
             }
-            else if (CompilerType == SupportedLanguage.FSharp)
+            else if (_compilerType == SupportedLanguage.FSharp)
             {
                 if (field is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(CompilerType)}.{field.Name}";
+                    return $"{prefix}{type.ConvertToString(_compilerType)}.{field.Name}";
                 }
 
                 // At F#, Enum works like property
                 var property = FindPropertyDeep(type, name, out _);
                 if (property is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(CompilerType)}.{property.Name}";
+                    return $"{prefix}{type.ConvertToString(_compilerType)}.{property.Name}";
                 }
 
                 if (allowIntegerValue)
                 {
                     if (long.TryParse(name, out var l))
                     {
-                        return $"enum<{prefix}{type.ConvertToString(CompilerType)}> {1}";
+                        return $"enum<{prefix}{type.ConvertToString(_compilerType)}> {1}";
                     }
                     if (ulong.TryParse(name, out var ul))
                     {
-                        return $"enum<{prefix}{type.ConvertToString(CompilerType)}> {ul}";
+                        return $"enum<{prefix}{type.ConvertToString(_compilerType)}> {ul}";
                     }
                 }
             }

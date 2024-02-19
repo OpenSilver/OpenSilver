@@ -44,6 +44,20 @@ namespace OpenSilver.Compiler
                 [("system", "object")] = "Nothing",
             };
 
+        public override bool IsNullableType(string fullTypeName, string assembly, out string underlyingType)
+        {
+            const string Nullable = "System.Nullable(Of ";
+
+            if (fullTypeName.StartsWith(Nullable) && IsCoreLibraryOrNull(assembly))
+            {
+                underlyingType = fullTypeName.Substring(Nullable.Length, fullTypeName.Length - Nullable.Length - 1);
+                return true;
+            }
+
+            underlyingType = null;
+            return false;
+        }
+
         public override string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny)
         {
             Debug.Assert(IsCoreLibraryOrNull(assemblyIfAny));

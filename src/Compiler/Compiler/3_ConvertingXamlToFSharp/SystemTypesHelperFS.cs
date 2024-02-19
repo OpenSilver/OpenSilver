@@ -44,6 +44,20 @@ namespace OpenSilver.Compiler
                 [("system", "object")] = "null",
             };
 
+        public override bool IsNullableType(string fullTypeName, string assembly, out string underlyingType)
+        {
+            const string Nullable = "System.Nullable<";
+
+            if (fullTypeName.StartsWith(Nullable) && IsCoreLibraryOrNull(assembly))
+            {
+                underlyingType = fullTypeName.Substring(Nullable.Length, fullTypeName.Length - Nullable.Length - 1);
+                return true;
+            }
+
+            underlyingType = null;
+            return false;
+        }
+
         public override string GetFullTypeName(string namespaceName, string typeName, string assemblyIfAny)
         {
             Debug.Assert(IsCoreLibraryOrNull(assemblyIfAny));
@@ -88,17 +102,19 @@ namespace OpenSilver.Compiler
                 value = value.Substring(0, value.Length - 1);
             }
 
-            if (value.EndsWith("."))
+            int i = value.IndexOf('.');
+            if (i == -1)
             {
-                value = value.Substring(0, value.Length - 1);
+                return $"{value}.0";
             }
-
-            if (value.Length == 0)
+            else if (i == value.Length - 1)
             {
-                value = "0";
+                return $"{value}0";
             }
-
-            return $"{value}";
+            else
+            {
+                return value;
+            }
         }
 
         protected override string ConvertToSingle(string source)
@@ -124,17 +140,19 @@ namespace OpenSilver.Compiler
                 value = value.Substring(0, value.Length - 1);
             }
 
-            if (value.EndsWith("."))
+            int i = value.IndexOf('.');
+            if (i == -1)
             {
-                value = value.Substring(0, value.Length - 1);
+                return $"{value}.0F";
             }
-
-            if (value.Length == 0)
+            else if (i == value.Length - 1)
             {
-                value = "0";
+                return $"{value}0F";
             }
-
-            return $"{value}F";
+            else
+            {
+                return $"{value}F";
+            }
         }
 
         protected override string ConvertToTimeSpan(string source)
@@ -307,6 +325,6 @@ namespace OpenSilver.Compiler
             return Escape(source);
         }
 
-        private static string Escape(string s) => string.Concat("\"", s.Replace("\"", "\"\""), "\"");
+        private static string Escape(string s) => string.Concat("@\"", s.Replace("\"", "\"\""), "\"");
     }
 }
