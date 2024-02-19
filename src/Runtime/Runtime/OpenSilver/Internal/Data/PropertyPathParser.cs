@@ -23,21 +23,23 @@ namespace OpenSilver.Internal.Data
         Property = 3,
     }
 
-    //Property path syntax: http://msdn.microsoft.com/en-us/library/cc645024(v=vs.95).aspx
     internal ref struct PropertyPathParser
     {
-        private ReadOnlySpan<char> _path;
+        private readonly string _originalPath;
         private readonly bool _isParsingBinding;
+
+        private ReadOnlySpan<char> _path;
 
         internal PropertyPathParser(string path, bool isParsingBinding)
         {
+            _originalPath = path;
             _path = path.AsSpan();
             _isParsingBinding = isParsingBinding;
         }
 
         internal PropertyNodeType Step(out string typeName, out string propertyName, out string index)
         {
-            var path = _path;
+            ReadOnlySpan<char> path = _path;
 
             if (path.Length == 0 || (path.Length == 1 && path[0] == '.'))
             {
@@ -102,10 +104,10 @@ namespace OpenSilver.Internal.Data
             else
             {
                 type = PropertyNodeType.Property;
-                int end = path.IndexOfAny(Splitters.Chars);
+                int end = path.IndexOfAny('.', '[');
                 if (end == -1)
                 {
-                    propertyName = path.ToString();
+                    propertyName = _originalPath.Length == _path.Length ? _originalPath : path.ToString();
                     path = ReadOnlySpan<char>.Empty;
                 }
                 else
@@ -128,11 +130,6 @@ namespace OpenSilver.Internal.Data
             _path = path;
 
             return type;
-        }
-
-        private static class Splitters
-        {
-            public static readonly char[] Chars = { '.', '[' };
         }
     }
 }
