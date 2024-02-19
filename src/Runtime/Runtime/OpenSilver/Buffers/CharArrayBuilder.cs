@@ -100,7 +100,10 @@ internal sealed class CharArrayBuilder
 
         nextCapacity = Math.Max(nextCapacity, minimum);
 
+        char[] newBuffer = ArrayPool<char>.Shared.Rent(nextCapacity);
+        Array.Copy(_buffer, newBuffer, _length);
+
         ArrayPool<char>.Shared.Return(_buffer);
-        _buffer = ArrayPool<char>.Shared.Rent(nextCapacity);
+        _buffer = newBuffer;
     }
 }
