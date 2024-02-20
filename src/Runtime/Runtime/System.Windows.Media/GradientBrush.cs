@@ -14,9 +14,9 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Markup;
 using OpenSilver.Internal;
+using Stop = (double Offset, System.Windows.Media.Color Color);
 
 namespace System.Windows.Media
 {
@@ -194,58 +194,54 @@ namespace System.Windows.Media
             set => SetValueInternal(ColorInterpolationModeProperty, value);
         }
 
-        internal IEnumerable<(double Offset, Color Color)> GetGradientStops()
+        internal IEnumerable<Stop> GetGradientStops()
         {
-            List<GradientStop> stops = GradientStops.InternalItems;
-            if (stops.Count == 0)
+            Stop[] stops = GradientStops.GetSortedCollection();
+            if (stops.Length == 0)
             {
                 yield break;
             }
 
-            if (stops.Count == 1)
+            if (stops.Length == 1)
             {
-                GradientStop stop = stops[0];
-                yield return (stop.Offset, stop.Color);
+                yield return stops[0];
                 yield break;
             }
-
-            var orderedStops = stops.ToArray();
-            Array.Sort(orderedStops, static (l, r) => l.Offset.CompareTo(r.Offset));
 
             int i = 0;
-            GradientStop firstStop = null;
-            while (i < orderedStops.Length)
+            int firstStop = -1;
+            while (i < stops.Length)
             {
-                GradientStop stop = orderedStops[i];
+                var stop = stops[i];
                 if (stop.Offset >= 0) break;
 
-                firstStop = stop;
+                firstStop = i;
                 i++;
             }
 
-            if (firstStop is not null)
+            if (firstStop >= 0)
             {
-                if (i == orderedStops.Length)
+                if (i == stops.Length)
                 {
                     // All stops have negative offset
-                    yield return (firstStop.Offset, firstStop.Color);
+                    yield return stops[firstStop];
                     yield break;
                 }
 
-                yield return (0, InterpolateGradientStopsArgbColor(firstStop, orderedStops[i], 0.0));
+                yield return (0, InterpolateGradientStopsArgbColor(stops[firstStop], stops[i], 0.0));
             }
 
-            while (i < orderedStops.Length)
+            while (i < stops.Length)
             {
-                GradientStop stop = orderedStops[i];
+                var stop = stops[i];
                 if (stop.Offset > 1) break;
 
-                yield return (stop.Offset, stop.Color);
+                yield return stop;
                 i++;
             }
 
             // No more stops, exit
-            if (i == orderedStops.Length)
+            if (i == stops.Length)
             {
                 yield break;
             }
@@ -254,17 +250,17 @@ namespace System.Windows.Media
             // We just want to take the first one and interpolate the Color
             // if it is not the first stop.
 
-            GradientStop finalStop = orderedStops[i];
+            var finalStop = stops[i];
             if (i == 0)
             {
                 // First relevant stop, no need to interpolate
-                yield return (finalStop.Offset, finalStop.Color);
+                yield return finalStop;
                 yield break;
             }
 
-            yield return (1.0, InterpolateGradientStopsArgbColor(orderedStops[i - 1], finalStop, 1.0));
+            yield return (1.0, InterpolateGradientStopsArgbColor(stops[i - 1], finalStop, 1.0));
 
-            static Color InterpolateGradientStopsArgbColor(GradientStop from, GradientStop to, double midPoint)
+            static Color InterpolateGradientStopsArgbColor(Stop from, Stop to, double midPoint)
             {
                 Debug.Assert(from.Offset <= midPoint && to.Offset >= midPoint);
 

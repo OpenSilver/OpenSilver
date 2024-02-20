@@ -21,6 +21,7 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
 using OpenSilver.Internal.Media.Animation;
+using Stop = (double Offset, System.Windows.Media.Color Color);
 
 namespace System.Windows.Media
 {
@@ -449,45 +450,20 @@ namespace System.Windows.Media
 
         private string GetOffsetsString(double start, double end, string unit)
         {
-            List<GradientStop> gradientStops = GradientStops.InternalItems;
-            Debug.Assert(gradientStops.Count > 0);
+            Debug.Assert(GradientStops.Count > 0);
 
-            (double Offset, Color Color)[] stops = new (double Offset, Color Color)[gradientStops.Count];
-            for (int i = 0; i < gradientStops.Count; i++)
-            {
-                GradientStop stop = gradientStops[i];
-                stops[i] = (stop.Offset, stop.Color);
-            }
+            Stop[] stops = GradientStops.GetSortedCollection();
 
             double distance = end - start;
-
-            double minOffset, maxOffset;
-            Color minColor, maxColor;
-
-            if (distance > 0)
-            {
-                Array.Sort(stops, static (l, r) => l.Offset.CompareTo(r.Offset));
-                (minOffset, minColor) = (stops[0].Offset, stops[0].Color);
-                (maxOffset, maxColor) = (stops[stops.Length - 1].Offset, stops[stops.Length - 1].Color);
-            }
-            else
-            {
-                Array.Sort(stops, static (l, r) => r.Offset.CompareTo(l.Offset));
-                (minOffset, minColor) = (stops[stops.Length - 1].Offset, stops[stops.Length - 1].Color);
-                (maxOffset, maxColor) = (stops[0].Offset, stops[0].Color);
-            }
-
+            double minOffset = stops[0].Offset;
+            Color minColor = stops[0].Color;
+            double maxOffset = stops[stops.Length - 1].Offset;
+            Color maxColor = stops[stops.Length - 1].Color;
             double opacity = Opacity;
-
-            StringBuilder sb = StringBuilderCache.Acquire();
-
             bool isFirst = true;
 
-            // Note: the expected behaviour in repeating gradient brushes is to repeat what is
-            // between startPoint and endPoint.
-            // In the browsers, they repeat what is between the first offset (percentage) to the
-            // last, so we need one for offset 0 and offset 1.
-            // This is why we have the test below (and its content):
+            StringBuilder sb = StringBuilderCache.Acquire();
+            
             if (distance > 0)
             {
                 if (minOffset != 0)
@@ -495,34 +471,22 @@ namespace System.Windows.Media
                     sb.Append($"{minColor.ToHtmlString(opacity)} {start.ToInvariantString()}{unit}");
                     isFirst = false;
                 }
-            }
-            else // the end percentage is smaller than the start one so we want the biggest offset for the start and the smallest at the end.
-            {
-                if (maxOffset != 1)
+
+                int index = 0;
+                if (isFirst)
                 {
-                    sb.Append($"{maxColor.ToHtmlString(opacity)} {end.ToInvariantString()}{unit}");
-                    isFirst = false;
+                    Stop stop = stops[index];
+                    sb.Append($"{stop.Color.ToHtmlString(opacity)} {(start + stop.Offset * distance).ToInvariantString()}{unit}");
+                    index++;
                 }
-            }
 
-            int index = 0;
-            if (isFirst)
-            {
-                (double offset, Color color) = stops[index];
-                sb.Append($"{color.ToHtmlString(opacity)} {(start + offset * distance).ToInvariantString()}{unit}");
-                index++;
-            }
+                for (; index < stops.Length; index++)
+                {
+                    Stop stop = stops[index];
+                    sb.Append(',');
+                    sb.Append($"{stop.Color.ToHtmlString(opacity)} {(start + stop.Offset * distance).ToInvariantString()}{unit}");
+                }
 
-            for (; index < stops.Length; index++)
-            {
-                (double offset, Color color) = stops[index];
-                sb.Append(',');
-                sb.Append($"{color.ToHtmlString(opacity)} {(start + offset * distance).ToInvariantString()}{unit}");
-            }
-
-            // same as mentionned above, this is required to repeat the correct area:
-            if (distance > 0)
-            {
                 if (maxOffset != 1)
                 {
                     sb.Append($", {maxColor.ToHtmlString(opacity)} {end.ToInvariantString()}{unit}");
@@ -530,6 +494,27 @@ namespace System.Windows.Media
             }
             else
             {
+                if (maxOffset != 1)
+                {
+                    sb.Append($"{maxColor.ToHtmlString(opacity)} {end.ToInvariantString()}{unit}");
+                    isFirst = false;
+                }
+
+                int index = stops.Length - 1;
+                if (isFirst)
+                {
+                    Stop stop = stops[index];
+                    sb.Append($"{stop.Color.ToHtmlString(opacity)} {(start + stop.Offset * distance).ToInvariantString()}{unit}");
+                    index--;
+                }
+
+                for (; index > -1; index--)
+                {
+                    Stop stop = stops[index];
+                    sb.Append(',');
+                    sb.Append($"{stop.Color.ToHtmlString(opacity)} {(start + stop.Offset * distance).ToInvariantString()}{unit}");
+                }
+
                 if (minOffset != 0)
                 {
                     sb.Append($", {minColor.ToHtmlString(opacity)} {distance.ToInvariantString()}{unit}");

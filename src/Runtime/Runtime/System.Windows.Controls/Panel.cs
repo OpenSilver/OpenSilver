@@ -37,6 +37,7 @@ namespace System.Windows.Controls
         private UIElementCollection _uiElementCollection;
         private ItemContainerGenerator _itemContainerGenerator;
         private WeakEventListener<Panel, Brush, EventArgs> _backgroundChangedListener;
+        private bool _refreshBackgroundOnSizeChange;
 
         /// <summary> 
         /// Returns enumerator to logical children.
@@ -277,11 +278,8 @@ namespace System.Windows.Controls
         private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Panel panel = (Panel)d;
-            panel.SizeChanged -= OnSizeChanged;
-            if (e.NewValue is LinearGradientBrush)
-            {
-                panel.SizeChanged += OnSizeChanged;
-            }
+
+            panel._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
             if (panel._backgroundChangedListener != null)
             {
@@ -311,12 +309,13 @@ namespace System.Windows.Controls
             }
         }
 
-        private static void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        internal sealed override void OnRenderSizeChanged(SizeChangedInfo info)
         {
-            var p = (Panel)sender;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(p))
+            base.OnRenderSizeChanged(info);
+
+            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                _ = p.SetBackgroundAsync(p.Background);
+                _ = this.SetBackgroundAsync(Background);
             }
         }
 

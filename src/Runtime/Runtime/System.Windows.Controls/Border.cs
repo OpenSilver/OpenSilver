@@ -54,6 +54,7 @@ namespace System.Windows.Controls
         private UIElement _child;
         private WeakEventListener<Border, Brush, EventArgs> _backgroundChangedListener;
         private WeakEventListener<Border, Brush, EventArgs> _borderBrushChangedListener;
+        private bool _refreshBackgroundOnSizeChange;
 
         /// <summary>
         /// Returns the Visual children count.
@@ -182,11 +183,8 @@ namespace System.Windows.Controls
         private static void OnBackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Border border = (Border)d;
-            border.SizeChanged -= OnSizeChanged;
-            if (e.NewValue is LinearGradientBrush)
-            {
-                border.SizeChanged += OnSizeChanged;
-            }
+
+            border._refreshBackgroundOnSizeChange = e.NewValue is LinearGradientBrush;
 
             if (border._backgroundChangedListener != null)
             {
@@ -216,12 +214,13 @@ namespace System.Windows.Controls
             }
         }
 
-        private static void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        internal override void OnRenderSizeChanged(SizeChangedInfo info)
         {
-            var b = (Border)sender;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(b))
+            base.OnRenderSizeChanged(info);
+
+            if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                _ = b.SetBackgroundAsync(b.Background);
+                _ = this.SetBackgroundAsync(Background);
             }
         }
 

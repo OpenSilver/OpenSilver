@@ -565,7 +565,7 @@ namespace System.Windows
         /// </summary>
         public event SizeChangedEventHandler SizeChanged;
 
-        internal sealed override void OnRenderSizeChanged(SizeChangedInfo info)
+        internal override void OnRenderSizeChanged(SizeChangedInfo info)
         {
             //first, invalidate ActualWidth and/or ActualHeight
             //Note: if any handler of invalidation will dirtyfy layout,

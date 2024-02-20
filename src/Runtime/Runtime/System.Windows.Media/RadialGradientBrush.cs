@@ -184,9 +184,10 @@ namespace System.Windows.Media
 
         private string GetGradientStopsString()
         {
-            return string.Join(", ", 
-                GradientStops.OrderBy(gs => gs.Offset)
-                             .Select(gs => $"{gs.Color.ToHtmlString(Opacity)} {(gs.Offset * 100).ToInvariantString()}%"));
+            return string.Join(", ",
+                GradientStops
+                .GetSortedCollection()
+                .Select(gs => $"{gs.Color.ToHtmlString(Opacity)} {(gs.Offset * 100).ToInvariantString()}%"));
         }
 
         internal string ToHtmlString(DependencyObject parent)

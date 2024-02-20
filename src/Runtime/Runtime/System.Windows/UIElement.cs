@@ -275,13 +275,11 @@ namespace System.Windows
 
         public UIElement()
         {
-            PreviousAvailableSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
-            
             NeverMeasured = true;
             NeverArranged = true;
 
-            VisibilityCache = (Visibility)VisibilityProperty.GetMetadata(GetType()).DefaultValue;
-            ClipToBoundsCache = (bool)ClipToBoundsProperty.GetMetadata(GetType()).DefaultValue;
+            VisibilityCache = (Visibility)VisibilityProperty.GetMetadata(DependencyObjectType).DefaultValue;
+            ClipToBoundsCache = (bool)ClipToBoundsProperty.GetMetadata(DependencyObjectType).DefaultValue;
             
             WriteVisualFlag(VisualFlags.IsUIElement, true);
         }
