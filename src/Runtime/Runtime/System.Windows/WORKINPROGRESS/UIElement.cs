@@ -15,32 +15,7 @@ namespace System.Windows
 
         [OpenSilver.NotImplemented]
         public event DragEventHandler DragOver;
-
-        /// <summary>
-        /// Gets or sets the brush used to alter the opacity of 
-        /// regions of this object.
-        /// </summary>
-        /// <returns>
-        /// A brush that describes the opacity applied to this 
-        /// object. The default is null.
-        /// </returns>
-		[OpenSilver.NotImplemented]
-        public Brush OpacityMask
-        {
-            get { return (Brush)GetValue(OpacityMaskProperty); }
-            set { SetValueInternal(OpacityMaskProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the OpacityMask dependency property.
-        /// </summary>
-		[OpenSilver.NotImplemented]
-        public static readonly DependencyProperty OpacityMaskProperty = 
-            DependencyProperty.Register("OpacityMask", 
-                                        typeof(Brush), 
-                                        typeof(UIElement), 
-                                        null);
-
+        
         /// <summary>
         /// Gets or sets a value that indicates that rendered 
         /// content should be cached when possible.

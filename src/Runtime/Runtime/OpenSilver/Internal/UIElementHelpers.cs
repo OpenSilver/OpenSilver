@@ -185,6 +185,37 @@ internal static class UIElementHelpers
         uie.OuterDiv.Style.opacity = Math.Round(opacity, 2).ToInvariantString();
     }
 
+    internal static async Task SetMaskImageAsync(this UIElement uie, Brush mask)
+    {
+        string maskImage;
+
+        switch (mask)
+        {
+            case SolidColorBrush scb:
+                string color = scb.ToHtmlString();
+                maskImage = $"linear-gradient({color}, {color})";
+                break;
+
+            case LinearGradientBrush lgb:
+                maskImage = lgb.ToHtmlString(uie);
+                break;
+
+            case RadialGradientBrush rgb:
+                maskImage = rgb.ToHtmlString(uie);
+                break;
+
+            case ImageBrush ib:
+                maskImage = await ib.GetDataStringAsync(uie);
+                break;
+
+            default:
+                maskImage = string.Empty;
+                break;
+        }
+
+        uie.OuterDiv.Style.maskImage = maskImage;
+    }
+
     internal static void SetOutline(this UIElement uie, bool enable)
     {
         // Every UIElement has a css class that sets 'outline' to 'none'. 'revert' will

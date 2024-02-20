@@ -923,6 +923,19 @@ namespace System.Windows
         #region Opacity
 
         /// <summary>
+        /// Identifies the <see cref="Opacity"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OpacityProperty =
+            DependencyProperty.Register(
+                nameof(Opacity),
+                typeof(double),
+                typeof(UIElement),
+                new PropertyMetadata(1.0)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetOpacity((double)newValue),
+                });
+
+        /// <summary>
         /// Gets or sets the degree of the object's opacity.
         /// </summary>
         /// <returns>
@@ -936,21 +949,33 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Identifies the <see cref="Opacity"/> dependency property.
+        /// Identifies the <see cref="OpacityMask"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty OpacityProperty =
+        public static readonly DependencyProperty OpacityMaskProperty =
             DependencyProperty.Register(
-                nameof(Opacity),
-                typeof(double),
+                nameof(OpacityMask),
+                typeof(Brush),
                 typeof(UIElement),
-                new PropertyMetadata(1.0)
+                new PropertyMetadata((object)null)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetOpacity((double)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => _ = ((UIElement)d).SetMaskImageAsync((Brush)newValue),
                 });
 
-#endregion
+        /// <summary>
+        /// Gets or sets the brush used to alter the opacity of regions of this object.
+        /// </summary>
+        /// <returns>
+        /// A brush that describes the opacity applied to this object. The default is null.
+        /// </returns>
+        public Brush OpacityMask
+        {
+            get => (Brush)GetValue(OpacityMaskProperty);
+            set => SetValueInternal(OpacityMaskProperty, value);
+        }
 
-#region IsHitTestVisible
+        #endregion
+
+        #region IsHitTestVisible
 
         /// <summary>
         /// Gets or sets whether the contained area of this UIElement can return true

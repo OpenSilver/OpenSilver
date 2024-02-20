@@ -87,6 +87,7 @@ namespace CSHTML5.Internal
         public string marginInlineEnd { set { SetStylePropertyValue("marginInlineEnd", value); } }
         public string minHeight { set { SetStylePropertyValue("minHeight", value); } }
         public string minWidth { set { SetStylePropertyValue("minWidth", value); } }
+        public string maskImage { set { SetStylePropertyValue("maskImage", value); } }
         public string maxHeight { get { return GetCSSProperty("maxHeight"); } set { SetStylePropertyValue("maxHeight", value); } }
         public string maxWidth { get { return GetCSSProperty("maxWidth"); } set { SetStylePropertyValue("maxWidth", value); } }
         public string msGridColumn { set { SetStylePropertyValue("msGridColumn", value); } }
