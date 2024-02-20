@@ -857,7 +857,7 @@ parentElement.appendChild(child)";
 
             int i;
             int len = s.Length;
-            StringBuilder sb = StringBuilderFactory.Get();
+            StringBuilder sb = StringBuilderCache.Acquire();
 
             for (i = 0; i < len; i += 1)
             {
@@ -905,10 +905,7 @@ parentElement.appendChild(child)";
                 }
             }
 
-            string ret = sb.ToString();
-            StringBuilderFactory.Return(sb);
-
-            return ret;
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public static string ConvertToStringToUseInJavaScriptCode(object obj)

@@ -15,9 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using CSHTML5;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
 
 namespace OpenSilver
 {
@@ -28,7 +25,7 @@ namespace OpenSilver
 
         public BulkExecuteJavascriptAsync()
         {
-            _javascript = StringBuilderFactory.Get();
+            _javascript = new StringBuilder();
         }
 
         public IDisposable AddJavascriptAsync(string javascript, params object[] variables)
@@ -78,8 +75,6 @@ namespace OpenSilver
                     Console.WriteLine($"error executing Javascript: {e}");
                 }
             }
-
-            StringBuilderFactory.Return(_javascript);
 
             // Console.WriteLine($"disposed of JS Obj Refs: {string.Join(",", _disposables.OfType<INTERNAL_JSObjectReference>().Select(js => js.ReferenceId))}");
             foreach (var d in _disposables)
