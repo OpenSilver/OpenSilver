@@ -312,6 +312,6 @@ internal static class UIElementHelpers
             (true, true) when cr.TopLeft == cr.BottomLeft => $"{cr.TopLeft.ToInvariantString()}px",
             (true, true) => $"{cr.TopLeft.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px",
             (false, true) => $"{cr.TopLeft.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px {cr.BottomRight.ToInvariantString()}px",
-            _ => $"{cr.TopLeft.ToInvariantString()}px {cr.TopRight.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px {cr.BottomRight.ToInvariantString()}px",
+            _ => $"{cr.TopLeft.ToInvariantString()}px {cr.TopRight.ToInvariantString()}px {cr.BottomRight.ToInvariantString()}px {cr.BottomLeft.ToInvariantString()}px",
         };
 }
