@@ -278,12 +278,12 @@ namespace System.Windows.Tests
                                 Border name4 = new Border 
                                 { 
                                     Name = "name4",
-                                    TemplatedParent = owner.AsDependencyObject(),
+                                    TemplatedParent = (DependencyObject)owner,
                                 };
                                 Border name5 = new Border
                                 {
                                     Name = "name5",
-                                    TemplatedParent = owner.AsDependencyObject(),
+                                    TemplatedParent = (DependencyObject)owner,
                                 };
                                 name4.Child = name5;
                                 RuntimeHelpers.XamlContext_RegisterName(context, "name4", name4);
@@ -296,7 +296,7 @@ namespace System.Windows.Tests
 
                 UserControl2 name6 = new UserControl2
                 {
-                    Name = "name6",                    
+                    Name = "name6",
                 };
                 ContentControl name7 = new ContentControl
                 {
@@ -320,17 +320,17 @@ namespace System.Windows.Tests
                                 Border name8 = new Border
                                 {
                                     Name = "name8",
-                                    TemplatedParent = owner.AsDependencyObject(),
+                                    TemplatedParent = (DependencyObject)owner,
                                 };
                                 UserControl2 name9 = new UserControl2
                                 {
                                     Name = "name9",
-                                    TemplatedParent = owner.AsDependencyObject(),
+                                    TemplatedParent = (DependencyObject)owner,
                                 };
                                 ContentControl name10 = new ContentControl
                                 {
                                     Name = "name10",
-                                    TemplatedParent = owner.AsDependencyObject(),
+                                    TemplatedParent = (DependencyObject)owner,
                                 };
                                 name9.Children.Add(name10);
                                 name8.Child = name9;
@@ -356,7 +356,7 @@ namespace System.Windows.Tests
                             Border border = new Border
                             {
                                 Name = "border",
-                                TemplatedParent = owner.AsDependencyObject(),
+                                TemplatedParent = (DependencyObject)owner,
                             };
 
                             RuntimeHelpers.XamlContext_RegisterName(context, "border", border);

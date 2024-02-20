@@ -19,9 +19,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.ref }}
-      - name: Restore teamdev.licenses
-        run: 'echo "FAKE TEAMDEV LICENSE TO PREVENT BUILDING ERROR. WE DO NOT USE REAL FOR PULL REQUESTS" > ./src/Simulator/Simulator/teamdev.licenses'
-        shell: bash
       - name: Restore Packages
         run: |
           ./restore-packages-opensilver.bat
