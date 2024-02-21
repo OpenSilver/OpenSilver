@@ -29,6 +29,8 @@
 		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
 		<Compile Include="Core\Events\DOMEventManager.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
+		<Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_BinaryRequestCompletedEventArgs.cs" />
+		<Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_BinaryRequestCompletedEventHandler.cs" />
 		<Compile Include="OpenSilver\Features.cs" />
 		<Compile Include="OpenSilver\Buffers\StackVector.cs" />
 		<Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />

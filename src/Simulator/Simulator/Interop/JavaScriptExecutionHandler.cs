@@ -114,6 +114,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             return execScriptTaskResultAsJson;
         }
 
+        public void SetPropertyValue(string javaScriptObject, string propertyName, object newValue)
+            => throw new NotImplementedException();
+
         private static void WaitTaskCompleted(Task execScriptTask)
         {
             SpinWait.SpinUntil(() =>

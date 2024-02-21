@@ -134,19 +134,33 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     }
     else if (result == null) {
         return null;
+    } else if (result instanceof ArrayBuffer) {
+        return BINDING.js_to_mono_obj(new Uint8Array(result));
     } else {
         return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
 };
 
+window.setOSPropertyValue = function (javaScriptObject, propertyName, newValue) {
+
+    if (!javaScriptObject || javaScriptObject.length == 0) return;
+    if (!propertyName || propertyName.length == 0) return;
+
+    javaScriptObject = eval(javaScriptObject);
+
+    if (javaScriptObject)
+        javaScriptObject[propertyName] = newValue;
+}
+
 window.callJSUnmarshalled_v2 = function (javaScriptToExecute, referenceId, wantsResult) {
+
     javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
     var result = eval(javaScriptToExecute);
 
     if (referenceId >= 0)
         document.jsObjRef[referenceId.toString()] = result;
 
-    if (!wantsResult) 
+    if (!wantsResult)
         return;
 
     var resultType = typeof result;
@@ -154,9 +168,12 @@ window.callJSUnmarshalled_v2 = function (javaScriptToExecute, referenceId, wants
         return BINDING.js_to_mono_obj(result);
     } else if (result == null) {
         return null;
+    } else if (result instanceof ArrayBuffer) {
+        return BINDING.js_to_mono_obj(new Uint8Array(result));
     } else {
         return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
+
 };
 
 // IMPORTANT: this doesn't return anything (this just executes the pending async JS)

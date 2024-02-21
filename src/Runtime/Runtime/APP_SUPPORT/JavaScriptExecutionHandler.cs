@@ -33,5 +33,8 @@ namespace DotNetForHtml5
             object result = ((JSInProcessRuntime)JSRuntime).Invoke<object>("callJS", javaScriptToExecute);
             return result;
         }
+
+        public void SetPropertyValue(string javaScriptObject, string propertyName, object newValue)
+            => JSRuntime.InvokeVoidAsync("setOSPropertyValue", javaScriptObject, propertyName, newValue);
     }
 }

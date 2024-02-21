@@ -22,6 +22,8 @@ namespace DotNetForHtml5
         void ExecuteJavaScript(string javaScriptToExecute);
 
         object ExecuteJavaScriptWithResult(string javaScriptToExecute);
+
+        void SetPropertyValue(string javaScriptObject, string propertyName, object newValue);
     }
 
     public interface IWebAssemblyExecutionHandler : IJavaScriptExecutionHandler
@@ -61,6 +63,9 @@ namespace DotNetForHtml5
 
         public TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2)
             => throw new NotSupportedException();
+
+        public void SetPropertyValue(string javaScriptObject, string propertyName, object newValue)
+            => _jsRuntime.SetPropertyValue(javaScriptObject, propertyName, newValue);
     }
 
     internal sealed class SimulatorDynamicJSRuntime : IWebAssemblyExecutionHandler
@@ -85,6 +90,9 @@ namespace DotNetForHtml5
             => throw new NotImplementedException();
 
         public TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2)
+            => throw new NotImplementedException();
+
+        public void SetPropertyValue(string javaScriptObject, string propertyName, object newValue)
             => throw new NotImplementedException();
     }
 }

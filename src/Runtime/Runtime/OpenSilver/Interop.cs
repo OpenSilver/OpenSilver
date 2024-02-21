@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -232,6 +233,12 @@ public static partial class Interop
         return ConvertJSResultToString(value);
     }
 
+    internal static byte[] ExecuteJavaScriptByteArray(string javascript, bool flushQueue = true)
+    {
+        object value = ExecuteJavaScriptSync(javascript, -1, true, flushQueue);
+        return ConvertJSResultToByteArray(value);
+    }
+
     internal static bool ExecuteJavaScriptBoolean(string javascript, bool flushQueue = true)
     {
         object value = ExecuteJavaScriptSync(javascript, -1, true, flushQueue);
@@ -384,6 +391,21 @@ public static partial class Interop
     private static DateTime ConvertJSResultToDateTime(object value) =>
         IsRunningInTheSimulator ? JSObjectRef.ToDateTime(value) : Convert.ToDateTime(value);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static byte[] ConvertJSResultToByteArray(object value) =>
+         IsRunningInTheSimulator
+            ? (byte[]) JSObjectRef.ToType(typeof(byte[]), value)
+            : GetBytesFromObject(value);
+
+    private static MethodInfo _uint8ArrayToArrayMethod;
+    private static byte[] GetBytesFromObject(object value)
+    {
+        // System.Runtime.InteropServices.JavaScript.Uint8Array.ToArray()
+        _uint8ArrayToArrayMethod ??= value.GetType().GetMethod("ToArray");
+
+        return (byte[])_uint8ArrayToArrayMethod?.Invoke(value, null) ?? Array.Empty<byte>();
+    }
+
     internal static string FormatArguments(string format, params object[] variables)
     {
         // If the javascript code has references to previously obtained JavaScript objects,
@@ -400,6 +422,9 @@ public static partial class Interop
 
         return format;
     }
+
+    public static void SetPropertyValue(string javascriptObject, string propertyName, object newValue)
+        => JavaScriptRuntime.SetPropertyValue(javascriptObject, propertyName, newValue);
 
     internal static string GetVariableStringForJS(object variable)
     {

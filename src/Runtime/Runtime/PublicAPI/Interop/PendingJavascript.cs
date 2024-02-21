@@ -31,6 +31,8 @@ namespace CSHTML5.Internal
         void Flush();
 
         object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult);
+
+        void SetPropertyValue(string javascripObject, string propertyName, object newValue);
     }
 
     internal sealed class PendingJavascript : IPendingJavascript
@@ -106,6 +108,10 @@ namespace CSHTML5.Internal
                 throw new ArgumentException($"Change UnmarshalledJavaScriptExecutionHandler.MethodName to '{CallJSMethodNameSync}'");
             }
         }
+
+        public void SetPropertyValue(string javascripObject, string propertyName, object newValue)
+            => _webAssemblyExecutionHandler.SetPropertyValue(javascripObject, propertyName, newValue);
+
     }
 
     internal sealed class PendingJavascriptSimulator : IPendingJavascript
@@ -215,5 +221,8 @@ namespace CSHTML5.Internal
                 ReleaseLock();
             }
         }
+
+        public void SetPropertyValue(string javascriptObject, string propertyName, object newValue)
+            => throw new NotImplementedException();
     }
 }

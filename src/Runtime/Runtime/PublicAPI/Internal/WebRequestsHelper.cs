@@ -15,7 +15,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace CSHTML5.Internal
 {
@@ -23,7 +25,12 @@ namespace CSHTML5.Internal
     {
         public static string MakeRequest(string address, string method, string body, Dictionary<string, string> headers = null, bool isAsync = false)
         {
-            return new INTERNAL_WebRequestHelper_JSOnly().MakeRequest(new Uri(address), method,  null, headers, body, null, isAsync);
+            return new INTERNAL_WebRequestHelper_JSOnly().MakeRequest(new Uri(address), method, null, headers, body, null, isAsync);
+        }
+
+        public static Task<byte[]> MakeBinaryRequest(string address, string method, byte[] body, Dictionary<string, string> headers = null, CredentialsMode mode = CredentialsMode.Disabled)
+        {
+            return new INTERNAL_WebRequestHelper_JSOnly().MakeBinaryRequest(new Uri(address), method, sender: null, headers, body, callbackMethod: null, mode);
         }
     }
 }
