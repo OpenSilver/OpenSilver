@@ -1099,11 +1099,6 @@ namespace System.Windows.Controls
         /// </summary>
         private void AlignDescriptionColumns()
         {
-            if (!_parentDataForm.ForceAlignment)
-            {
-                return;
-            }
-
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
@@ -1147,11 +1142,6 @@ namespace System.Windows.Controls
         /// </summary>
         private void AlignLabelColumns()
         {
-            if (!_parentDataForm.ForceAlignment)
-            {
-                return;
-            }
-
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
@@ -1588,11 +1578,6 @@ namespace System.Windows.Controls
         /// </summary>
         private void RemoveDescriptionColumnAlignment()
         {
-            if (!_parentDataForm.ForceAlignment)
-            {
-                return;
-            }
-
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
@@ -1613,11 +1598,6 @@ namespace System.Windows.Controls
         /// </summary>
         private void RemoveLabelColumnAlignment()
         {
-            if (!_parentDataForm.ForceAlignment)
-            {
-                return;
-            }
-
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
