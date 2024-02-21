@@ -24,6 +24,11 @@ namespace TestApplication.OpenSilver.Browser.Interop
             return _runtime.InvokeUnmarshalled<string, object>(MethodName, javaScriptToExecute);
         }
 
+        public void SetPropertyValue(string javaScriptObject, string propertyName, object newValue)
+        {
+            _runtime.Invoke<string>("setOSPropertyValue", javaScriptObject, propertyName, newValue);
+        }
+
         public TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0)
         {
             return _runtime.InvokeUnmarshalled<T0, TResult>(identifier, arg0);
