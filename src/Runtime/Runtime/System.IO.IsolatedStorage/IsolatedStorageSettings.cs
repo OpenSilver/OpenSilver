@@ -16,11 +16,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using OpenSilver;
+using OpenSilver.Internal;
 
 namespace System.IO.IsolatedStorage
 {
     /// <summary>
-    /// Provides a System.Collections.Generic.Dictionary&lt;TKey,TValue&gt; that stores
+    /// Provides a System.Collections.Generic.Dictionary<TKey,TValue> that stores
     /// key-value pairs in isolated storage.
     /// </summary>
     /// <example>
@@ -35,43 +36,30 @@ namespace System.IO.IsolatedStorage
     /// </example>
     public sealed partial class IsolatedStorageSettings : IEnumerable, IEnumerable<KeyValuePair<string, object>>
     {
-        string _fullApplicationName = null;
+        private static IsolatedStorageSettings _applicationSettings;
 
-        dynamic GetLocalStorage()
-        {
-            return Interop.ExecuteJavaScript("window.localStorage");
-        } 
+        private readonly string _fullApplicationName;
+        private readonly string _keyPrefix;
 
-        string GetKeysFirstPart()
-        {
-            return "storage_" + _fullApplicationName + "_settings_";
-        }
+        private int GetLength() => Interop.ExecuteJavaScriptInt32("window.localStorage.length");
+
+        private string GetKey(int index) => Interop.ExecuteJavaScriptString($"window.localStorage.key({index.ToInvariantString()})");
+
+        private string GetKeysPrefix() => _keyPrefix;
 
         IsolatedStorageSettings()
         {
             _fullApplicationName = Application.Current.ToString();
+            _keyPrefix = $"storage_{_fullApplicationName}_settings_";
         }
 
-        static IsolatedStorageSettings _applicationSettings = null;
         /// <summary>
         /// Gets an instance of System.IO.IsolatedStorage.IsolatedStorageSettings that
         /// contains the contents of the application's System.IO.IsolatedStorage.IsolatedStorageFile,
         /// scoped at the application level, or creates a new instance of System.IO.IsolatedStorage.IsolatedStorageSettings
         /// if one does not exist.
         /// </summary>
-        public static IsolatedStorageSettings ApplicationSettings
-        {
-            get
-            {
-                if (_applicationSettings == null)
-                {
-                    _applicationSettings = new IsolatedStorageSettings();
-                }
-                return _applicationSettings;
-            }
-        }
-
-
+        public static IsolatedStorageSettings ApplicationSettings => _applicationSettings ??= new IsolatedStorageSettings();
 
         /// <summary>
         /// Gets the number of key-value pairs that are stored in the dictionary.
@@ -82,12 +70,12 @@ namespace System.IO.IsolatedStorage
             {
                 if (!Interop.IsRunningInTheSimulator)
                 {
-                    dynamic localStorage = GetLocalStorage();
-                    int length = localStorage.length;
+                    int length = GetLength();
+
                     int count = 0;
                     for (int i = 0; i < length; ++i)
                     {
-                        if (localStorage.key(i).startsWith(GetKeysFirstPart()))
+                        if (GetKey(i).StartsWith(GetKeysPrefix()))
                         {
                             ++count;
                         }
@@ -101,9 +89,6 @@ namespace System.IO.IsolatedStorage
             }
         }
 
-
-
-
         /// <summary>
         /// Gets a collection that contains the keys in the dictionary.
         /// </summary>
@@ -113,15 +98,16 @@ namespace System.IO.IsolatedStorage
             {
                 if (!Interop.IsRunningInTheSimulator)
                 {
-                    dynamic localStorage = GetLocalStorage();
-                    List<string> keysList = new List<string>();
-                    int length = localStorage.length;
-                    int lengthOfPartToRemoveFromKey = (GetKeysFirstPart()).Length;
+                    var keysList = new List<string>();
+                    int length = GetLength();
+
+                    int lengthOfPartToRemoveFromKey = GetKeysPrefix().Length;
                     for (int i = 0; i < length; ++i)
                     {
-                        if (localStorage.key(i).startsWith(GetKeysFirstPart()))
+                        string key = GetKey(i);
+                        if (key.StartsWith(GetKeysPrefix()))
                         {
-                            keysList.Add(localStorage.key(i).substring(lengthOfPartToRemoveFromKey));
+                            keysList.Add(key.Substring(lengthOfPartToRemoveFromKey));
                         }
                     }
                     return keysList;
@@ -156,15 +142,14 @@ namespace System.IO.IsolatedStorage
             {
                 if (!Interop.IsRunningInTheSimulator)
                 {
-                    dynamic localStorage = GetLocalStorage();
-                    List<object> valuesList = new List<object>();
-                    int length = localStorage.length;
+                    var valuesList = new List<object>();
+                    int length = GetLength();
                     for (int i = 0; i < length; ++i)
                     {
-                        string str = localStorage.key(i);
-                        if (str.StartsWith(GetKeysFirstPart()))
+                        string key = GetKey(i);
+                        if (key.StartsWith(GetKeysPrefix()))
                         {
-                            valuesList.Add(localStorage[str]);
+                            valuesList.Add(this[key].ToString());
                         }
                     }
                     return valuesList;
@@ -191,8 +176,7 @@ namespace System.IO.IsolatedStorage
             {
                 if (!Interop.IsRunningInTheSimulator)
                 {
-                    dynamic localStorage = GetLocalStorage();
-                    return Convert.ChangeType((Interop.ExecuteJavaScript("$0[$1]", localStorage, GetKeysFirstPart() + key)), typeof(object));
+                    return Interop.ExecuteJavaScriptString($"window.localStorage['{GetKeysPrefix() + key}']");
                 }
                 else
                 {
@@ -203,9 +187,8 @@ namespace System.IO.IsolatedStorage
             {
                 if (!Interop.IsRunningInTheSimulator)
                 {
-                    dynamic localStorage = GetLocalStorage();
-                    string applicationSpecificKey = GetKeysFirstPart() + key;
-                    Interop.ExecuteJavaScriptVoid("$0[$1] = $2", false,  localStorage, applicationSpecificKey, value);
+                    string sValue = Interop.GetVariableStringForJS(value);
+                    Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = {sValue}", false);
                 }
                 else
                 {
@@ -223,8 +206,8 @@ namespace System.IO.IsolatedStorage
         {
             if (!Interop.IsRunningInTheSimulator)
             {
-                dynamic localStorage = GetLocalStorage();
-                localStorage[GetKeysFirstPart() + key] = value;
+                string sValue = Interop.GetVariableStringForJS(value);
+                Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = {sValue}");
             }
             else
             {
@@ -241,11 +224,10 @@ namespace System.IO.IsolatedStorage
         {
             if (!Interop.IsRunningInTheSimulator)
             {
-                dynamic localStorage = GetLocalStorage();
                 List<string> keys = (List<string>)Keys;
                 foreach (string key in keys)
                 {
-                    localStorage.removeItem(GetKeysFirstPart() + key);
+                    Interop.ExecuteJavaScriptVoid($"window.localStorage.removeItem('{GetKeysPrefix() + key}')");
                 }
             }
             else
@@ -264,8 +246,7 @@ namespace System.IO.IsolatedStorage
         {
             if (!Interop.IsRunningInTheSimulator)
             {
-                dynamic localStorage = GetLocalStorage();
-                return (localStorage.getItem(GetKeysFirstPart() + key) != null);
+                return Interop.ExecuteJavaScriptBoolean($"!!window.localStorage.getItem('{GetKeysPrefix() + key}')");
             }
             else
             {
@@ -282,14 +263,13 @@ namespace System.IO.IsolatedStorage
         {
             if (!Interop.IsRunningInTheSimulator)
             {
-                dynamic localStorage = GetLocalStorage();
-                bool result = Convert.ToBoolean(Interop.ExecuteJavaScript(@"(function() {
-var res = $0.getItem($1) != null;
-$0.removeItem($1);
-return res;
-})()", localStorage, GetKeysFirstPart() + key)
-                    );
-                return result;
+                if (Contains(key))
+                {
+                    Interop.ExecuteJavaScriptVoid($"window.localStorage.removeItem('{GetKeysPrefix() + key}')");
+                    return true;
+                }
+
+                return false;
             }
             else
             {
@@ -325,23 +305,18 @@ return res;
         {
             if (!Interop.IsRunningInTheSimulator)
             {
-                dynamic localStorage = GetLocalStorage();
-                using(var temp = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key))
-                    if (Convert.ToBoolean(Interop.ExecuteJavaScript("$0 == null",temp)))
-                    {
-                        value = default(T);
-                        return false;
-                    }
-                    else
-                    {
-                        value = Convert.ChangeType(temp, typeof(T));
-                        return true;
-                    }
+                if (Contains(key))
+                {
+                    value = (T)Convert.ChangeType(this[key], typeof(T));
+                    return true;
+                }
+
+                value = default;
+                return false;
             }
             else
             {
-                object temp;
-                bool ret = IsolatedStorageSettingsForCSharp.Instance.TryGetValue(key, out temp);
+                bool ret = IsolatedStorageSettingsForCSharp.Instance.TryGetValue(key, out object temp);
                 value = (T)temp;
                 return ret;
             }
@@ -367,11 +342,10 @@ return res;
         {
             if (!Interop.IsRunningInTheSimulator)
             {
-                dynamic localStorage = GetLocalStorage();
                 List<string> keys = (List<string>)Keys;
                 foreach (string key in keys)
                 {
-                    string item = localStorage.getItem(GetKeysFirstPart() + key);
+                    object item = this[key];
                     yield return new KeyValuePair<string, object>(key, item);
                 }
             }
