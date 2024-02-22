@@ -21,8 +21,7 @@ using OpenSilver.Internal;
 namespace System.IO.IsolatedStorage
 {
     /// <summary>
-    /// Provides a System.Collections.Generic.Dictionary<TKey,TValue> that stores
-    /// key-value pairs in isolated storage.
+    /// Provides a <see cref="Dictionary{TKey, TValue}"/> that stores key-value pairs in isolated storage.
     /// </summary>
     /// <example>
     /// Here is how to use the IsolatedStorageSettings:
