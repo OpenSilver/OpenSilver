@@ -41,7 +41,7 @@ namespace OpenSilver.Compiler
                 [("system", "sbyte")] = "(global::System.SByte)0",
                 [("system", "char")] = "(global::System.Char)0",
                 [("system", "decimal")] = "0M",
-                [("system", "object")] = "null",
+                [("system", "object")] = "\"\"",
             };
 
         public override bool IsNullableType(string fullTypeName, string assembly, out string underlyingType)
