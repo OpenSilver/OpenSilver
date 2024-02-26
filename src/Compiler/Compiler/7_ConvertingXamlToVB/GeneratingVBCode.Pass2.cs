@@ -51,7 +51,7 @@ namespace OpenSilver.Compiler
                 public sealed override string ToString() => ToStringCore();
             }
 
-            private class RootScope : GeneratorScope
+            private sealed class RootScope : GeneratorScope
             {
                 private readonly Dictionary<string, string> _namescope;
 
@@ -96,7 +96,38 @@ namespace OpenSilver.Compiler
                 }
             }
 
-            private class FrameworkTemplateScope : GeneratorScope
+            private sealed class NewObjectScope : GeneratorScope
+            {
+                public NewObjectScope(string objectName, string objectType)
+                    : base(objectName)
+                {
+                    ObjectType = objectType;
+                    MethodName = $"New_{objectName}";
+                }
+
+                public string MethodName { get; }
+
+                public string ObjectType { get; }
+
+                public override void RegisterName(string name, string scopedElement)
+                {
+                    throw new NotSupportedException();
+                }
+
+                protected override string ToStringCore()
+                {
+                    StringBuilder builder = new StringBuilder();
+
+                    builder.AppendLine($"Private Shared Function {MethodName}({XamlContext} As {XamlContextClass}) As {ObjectType}")
+                        .Append(StringBuilder.ToString());
+                    builder.AppendLine($"Return {Root}")
+                        .AppendLine("End Function");
+
+                    return builder.ToString();
+                }
+            }
+
+            private sealed class FrameworkTemplateScope : GeneratorScope
             {
                 private readonly IMetadata _metadata;
 
@@ -135,7 +166,7 @@ namespace OpenSilver.Compiler
 
             private class GeneratorContext
             {
-                private readonly Stack<GeneratorScope> _scopes = new Stack<GeneratorScope>();
+                private readonly Stack<GeneratorScope> _scopes = new();
 
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
@@ -347,10 +378,15 @@ End Sub
                 // (unless this is the root element)
                 string elementUniqueNameOrThisKeyword = GeneratingCode.GetUniqueName(element);
 
-                bool flag = false;
-                if (!isRootElement)
+                bool isInNewScope = false;
+                GeneratorScope rootScope = parameters.CurrentScope;
+
+                if (isRootElement)
                 {
-                    flag = true;
+                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword})");
+                }
+                else
+                {
                     if (isKnownSystemType)
                     {
                         //------------------------------------------------
@@ -395,8 +431,8 @@ End Sub
                             stringValue, elementTypeInCSharp, isKnownCoreType, isKnownSystemType);
 
                         parameters.StringBuilder.AppendLine(
-                            string.Format("Dim {0} = {2}.XamlContext_WriteStartObject({3}, {1})", 
-                                elementUniqueNameOrThisKeyword, 
+                            string.Format("Dim {0} = {2}.XamlContext_WriteStartObject({3}, {1})",
+                                elementUniqueNameOrThisKeyword,
                                 preparedValue,
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
@@ -429,28 +465,26 @@ End Sub
                     }
                     else
                     {
-                        //------------------------------------------------
-                        // Add the type constructor:
-                        //------------------------------------------------
-                        parameters.StringBuilder.AppendLine(string.Format("Dim {0} = {2}.XamlContext_WriteStartObject({3}, New {1}())", 
-                            elementUniqueNameOrThisKeyword, 
-                            elementTypeInCSharp,
-                            RuntimeHelperClass,
-                            parameters.CurrentXamlContext));
+                        isInNewScope = true;
+
+                        var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
+
+                        parameters.StringBuilder.AppendLine(
+                            $"Dim {elementUniqueNameOrThisKeyword} = {objectScope.MethodName}({parameters.CurrentXamlContext})");
+
+                        parameters.PushScope(objectScope);
+
+                        parameters.StringBuilder.AppendLine(
+                            $"Dim {elementUniqueNameOrThisKeyword} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, New {elementTypeInCSharp}())");
                     }
-                }
-                
-                if (!flag)
-                {
-                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword})");
                 }
 
                 // Set templated parent if any
-                if (parameters.CurrentScope is FrameworkTemplateScope scope)
+                if (rootScope is FrameworkTemplateScope templateScope)
                 {
                     if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                     {
-                        parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {scope.TemplateOwner})");
+                        templateScope.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {templateScope.TemplateOwner})");
                     }
                 }
 
@@ -528,7 +562,7 @@ End Sub
                                     }
                                 }
 
-                                parameters.CurrentScope.RegisterName(name, elementUniqueNameOrThisKeyword);
+                                rootScope.RegisterName(name, elementUniqueNameOrThisKeyword);
                                 //todo: throw an exception when both "x:Name" and "Name" are specified in the XAML.
 
                             }
@@ -720,6 +754,11 @@ End Sub
                             parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2},{3})", classFullNameForAttachedProperty, propertyName, elementUniqueNameOrThisKeyword, codeForInstantiatingTheAttributeValue));
                         }
                     }
+                }
+
+                if (isInNewScope)
+                {
+                    parameters.PopScope();
                 }
             }
 
