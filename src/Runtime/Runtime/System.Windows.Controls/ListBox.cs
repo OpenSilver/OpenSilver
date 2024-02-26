@@ -325,7 +325,7 @@ namespace System.Windows.Controls
             // Base will actually focus the item
             bool returnValue = base.FocusItem(info);
 
-            if (info.Container is ListBoxItem listItem)
+            if ((info.Container ?? ItemContainerGenerator.ContainerFromIndex(info.Index)) is ListBoxItem listItem)
             {
                 MakeKeyboardSelection(listItem);
             }

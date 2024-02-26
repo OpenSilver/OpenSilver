@@ -42,7 +42,7 @@ public partial class Selector
         }
 
         ScrollIntoViewImpl(info.Index);
-
+        
         return FocusItemInternal(info.Index);
     }
 
@@ -402,20 +402,22 @@ public partial class Selector
                         {
                             scrollHost.ScrollToVerticalOffset(index - scrollHost.ViewportHeight + 1);
                         }
-                        return;
                     }
-                    // Scroll into view vertically (first make the right bound visible, then the left)                    
-                    double verticalDelta = 0;
-                    if (itemsHostRect.Bottom < listBoxItemRect.Bottom)
+                    else
                     {
-                        verticalDelta = listBoxItemRect.Bottom - itemsHostRect.Bottom;
-                        verticalOffset += verticalDelta;
+                        // Scroll into view vertically (first make the right bound visible, then the left)                    
+                        double verticalDelta = 0;
+                        if (itemsHostRect.Bottom < listBoxItemRect.Bottom)
+                        {
+                            verticalDelta = listBoxItemRect.Bottom - itemsHostRect.Bottom;
+                            verticalOffset += verticalDelta;
+                        }
+                        if (listBoxItemRect.Top - verticalDelta < itemsHostRect.Top)
+                        {
+                            verticalOffset -= itemsHostRect.Top - (listBoxItemRect.Top - verticalDelta);
+                        }
+                        scrollHost.ScrollToVerticalOffset(verticalOffset);
                     }
-                    if (listBoxItemRect.Top - verticalDelta < itemsHostRect.Top)
-                    {
-                        verticalOffset -= itemsHostRect.Top - (listBoxItemRect.Top - verticalDelta);
-                    }
-                    scrollHost.ScrollToVerticalOffset(verticalOffset);
                 }
                 else
                 {
@@ -430,21 +432,24 @@ public partial class Selector
                         {
                             scrollHost.ScrollToHorizontalOffset(index - scrollHost.ViewportWidth + 1);
                         }
-                        return;
                     }
-                    // Scroll into view horizontally (first make the bottom bound visible, then the top) 
-                    double horizontalDelta = 0;
-                    if (itemsHostRect.Right < listBoxItemRect.Right)
+                    else
                     {
-                        horizontalDelta = listBoxItemRect.Right - itemsHostRect.Right;
-                        horizontalOffset += horizontalDelta;
+                        // Scroll into view horizontally (first make the bottom bound visible, then the top) 
+                        double horizontalDelta = 0;
+                        if (itemsHostRect.Right < listBoxItemRect.Right)
+                        {
+                            horizontalDelta = listBoxItemRect.Right - itemsHostRect.Right;
+                            horizontalOffset += horizontalDelta;
+                        }
+                        if (listBoxItemRect.Left - horizontalDelta < itemsHostRect.Left)
+                        {
+                            horizontalOffset -= itemsHostRect.Left - (listBoxItemRect.Left - horizontalDelta);
+                        }
+                        scrollHost.ScrollToHorizontalOffset(horizontalOffset);
                     }
-                    if (listBoxItemRect.Left - horizontalDelta < itemsHostRect.Left)
-                    {
-                        horizontalOffset -= itemsHostRect.Left - (listBoxItemRect.Left - horizontalDelta);
-                    }
-                    scrollHost.ScrollToHorizontalOffset(horizontalOffset);
                 }
+                scrollHost.UpdateLayout();
             }
         }
     }
