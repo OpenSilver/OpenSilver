@@ -259,15 +259,15 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string attributeName,
             object attributeValue,
             bool forceSimulatorExecuteImmediately = false) =>
-            SetDomElementAttributeImpl((INTERNAL_HtmlDomElementReference)domElementRef,
+            SetDomElementPropertyImpl((INTERNAL_HtmlDomElementReference)domElementRef,
                 attributeName,
                 ConvertToStringToUseInJavaScriptCode(attributeValue));
 
         internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, double value)
-            => SetDomElementAttributeImpl(element, propertyName, value.ToInvariantString());
+            => SetDomElementPropertyImpl(element, propertyName, value.ToInvariantString());
 
         internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, int value)
-            => SetDomElementAttributeImpl(element, propertyName, value.ToInvariantString());
+            => SetDomElementPropertyImpl(element, propertyName, value.ToInvariantString());
 
         internal static void SetDomElementProperty(INTERNAL_HtmlDomElementReference element, string propertyName, string value, bool escape = false)
             => SetDomElementPropertyImpl(element, propertyName, $"\"{(escape ? EscapeStringForUseInJavaScript(value) : value)}\"");
