@@ -70,9 +70,14 @@ try {
     taskkill /fi "imagename eq msbuild.exe" /f
     Write-Output "Building Compiler" | Green
     Invoke-Expression "&'$MSBUILD' .\src\Compiler\Compiler\Compiler.OpenSilver.csproj /p:Configuration=$OS_CONFIGURATION /consoleloggerparameters:ErrorsOnly $BUILD_PARAMS"
+    if ($LASTEXITCODE -ne 0) {
+        throw "MSBuild failed with exit code $LASTEXITCODE"
+    }
     Write-Output "Building ResourcesExtractor" | Green
     Invoke-Expression "&'$MSBUILD' .\src\Compiler\Compiler.ResourcesExtractor\Compiler.ResourcesExtractor.OpenSilver.csproj /p:Configuration=Release /consoleloggerparameters:ErrorsOnly $BUILD_PARAMS"
-
+    if ($LASTEXITCODE -ne 0) {
+        throw "MSBuild failed with exit code $LASTEXITCODE"
+    }
     # Compiler
     Write-Output "Copying OpenSilver.Compiler.* files to local packages folder" | Green
     xcopy /y "src\Compiler\Compiler\bin\$OS_CONFIGURATION\net461\OpenSilver.Compiler.*" "src\packages\$OS_NAME.$OS_BUILD_VERSION\tools\"

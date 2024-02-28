@@ -12,14 +12,11 @@
 \*====================================================================================*/
 
 using System;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Browser;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using DotNetForHtml5.Core;
 using OpenSilver.Internal;
 using System.ComponentModel;
 
@@ -86,12 +83,6 @@ namespace CSHTML5.Internal
                 // Add the above relative path to the beginning of the path:
                 html5Path = outputResourcesPath + html5Path;
 
-                if (OpenSilver.Interop.IsRunningInTheSimulator) // Checks that we are in the Simulator as opposed to running in WebAssembly.
-                {
-                    // Support running in the simulator:
-                    html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
-                }
-                
                 return html5Path;
             }
             else if (originalStringLowercase.StartsWith(@"http://") || originalStringLowercase.StartsWith(@"https://"))
@@ -137,11 +128,6 @@ namespace CSHTML5.Internal
                 // Add the above relative path to the beginning of the path:
                 html5Path = outputResourcesPath + html5Path;
 
-                if (OpenSilver.Interop.IsRunningInTheSimulator)
-                {
-                    html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
-                }
-
                 return html5Path;
             }
             else if (originalStringLowercase.Contains(@";component/"))
@@ -165,11 +151,6 @@ namespace CSHTML5.Internal
 
                 // Combine the path:
                 string html5Path = outputResourcesPath + assemblyName + "/" + relativeFolderAndFileName.ToLower();
-
-                if (OpenSilver.Interop.IsRunningInTheSimulator)
-                {
-                    html5Path = GetAbsolutePathIfRunningInCSharp(html5Path);
-                }
 
                 return html5Path;
             }
@@ -349,44 +330,6 @@ namespace CSHTML5.Internal
         {
             return AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
         }
-
-        //we use this function in order to get the assembly to Bridge
-        private static string GetAssemblyName(string fullName)
-        {
-            //syntax is "assemblyName,version,..."
-            //we want assemblyName
-
-            int tmpIndex = fullName.IndexOf(',');
-
-            if (tmpIndex == -1)
-                return fullName;
-            else
-                return fullName.Substring(0, tmpIndex);
-        }
-
-        static string GetAbsolutePathIfRunningInCSharp(string relativePath) //todo: test what happens if the path is very long.
-        {
-            // This method is skipped when translated to JavaScript (due to the attributes above).
-            // Therefore it is used only in the simulator.
-            // Note: in this method we sometimes use the "dynamic" keyword so that the code can be compiled also on the environments that do not have those methods.
-            var assembly = (StartupAssemblyInfo.StartupAssembly ?? Assembly.GetExecutingAssembly());
-
-            string assemblyLocation = Path.GetDirectoryName((((dynamic)assembly).Location)).Replace('/', '\\');
-
-            if (!assemblyLocation.EndsWith("\\") && assemblyLocation != "")
-                assemblyLocation = assemblyLocation + '\\';
-
-            string outputRootPath = StartupAssemblyInfo.OutputRootPath.Replace('/', '\\');  // Note: this is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
-
-            if (!outputRootPath.EndsWith("\\") && outputRootPath != "")
-                outputRootPath = outputRootPath + '\\';
-
-            string outputAbsolutePath = Path.Combine(assemblyLocation, outputRootPath);
-            string finalAbsolutePath = Path.Combine(outputAbsolutePath, relativePath);
-            finalAbsolutePath = @"file:///" + finalAbsolutePath.Replace('\\', '/');
-            return finalAbsolutePath;
-        }
-//#endif
 
         public static Uri EnsureAbsoluteUri(string uriString)
         {
