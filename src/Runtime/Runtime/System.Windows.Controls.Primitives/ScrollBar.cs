@@ -34,30 +34,57 @@ namespace System.Windows.Controls.Primitives
     {
         private DebounceDispatcher _debounceDispatcher;
 
+        internal static TimeSpan DefaultDebounceInterval { get; set; } = TimeSpan.Zero;
+
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static readonly DependencyProperty DebounceProperty =
             DependencyProperty.RegisterAttached(
                 nameof(Debounce),
-                typeof(TimeSpan),
+                typeof(TimeSpan?),
                 typeof(ScrollBar),
-                new PropertyMetadata(GetDefaultDebounce()));
-
-        private static TimeSpan GetDefaultDebounce()
-        {
-            Application app = Application.Current;
-            if (app != null)
-            {
-                return app.Host.Settings.ScrollDebounce;
-            }
-
-            return TimeSpan.Zero;
-        }
+                new PropertyMetadata((TimeSpan?)null));
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public TimeSpan Debounce
         {
-            get => (TimeSpan)GetValue(DebounceProperty);
+            get => (TimeSpan?)GetValue(DebounceProperty) ?? DefaultDebounceInterval;
             set => SetValueInternal(DebounceProperty, value);
+        }
+
+        private TimeSpan DebounceInterval
+        {
+            get
+            {
+                // We attempt to get a debounce interval in 3 steps
+                // 1 - From the ScrollBar.
+                // 2 - From the ScrollBar's Templated parent (usually a ScrollViewer)
+                // 3 - Attempt to get interval from the ScrollViewer's templated parent
+                TimeSpan? debounce = (TimeSpan?)GetValue(DebounceProperty);
+                if (debounce.HasValue)
+                {
+                    return debounce.Value;
+                }
+
+                if (TemplatedParent is FrameworkElement parent1)
+                {
+                    debounce = (TimeSpan?)parent1.GetValue(DebounceProperty);
+                    if (debounce.HasValue)
+                    {
+                        return debounce.Value;
+                    }
+
+                    if (parent1.TemplatedParent is FrameworkElement parent2)
+                    {
+                        debounce = (TimeSpan?)parent2.GetValue(DebounceProperty);
+                        if (debounce.HasValue)
+                        {
+                            return debounce.Value;
+                        }
+                    }
+                }
+
+                return DefaultDebounceInterval;
+            }
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -68,7 +95,7 @@ namespace System.Windows.Controls.Primitives
                 throw new ArgumentNullException(nameof(fe));
             }
 
-            return (TimeSpan)fe.GetValue(DebounceProperty);
+            return (TimeSpan?)fe.GetValue(DebounceProperty) ?? DefaultDebounceInterval;
         }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -79,7 +106,7 @@ namespace System.Windows.Controls.Primitives
                 throw new ArgumentNullException(nameof(fe));
             }
 
-            fe.SetValueInternal(DebounceProperty, debounce);
+            fe.SetValueInternal(DebounceProperty, (TimeSpan?)debounce);
         }
 
         /// <summary> 
@@ -450,7 +477,7 @@ namespace System.Windows.Controls.Primitives
         /// <param name="scrollEventType">ScrollEventType</param>
         internal void RaiseScrollEvent(ScrollEventType scrollEventType)
         {
-            TimeSpan debounce = Debounce;
+            TimeSpan debounce = DebounceInterval;
             if (debounce > TimeSpan.Zero && scrollEventType != ScrollEventType.EndScroll)
             {
                 _debounceDispatcher ??= new DebounceDispatcher();

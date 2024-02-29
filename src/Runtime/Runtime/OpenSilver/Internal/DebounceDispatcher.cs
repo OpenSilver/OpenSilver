@@ -12,36 +12,40 @@
 \*====================================================================================*/
 
 using System;
+using System.Threading;
 using System.Windows.Threading;
 
 namespace OpenSilver.Internal
 {
     internal sealed class DebounceDispatcher
     {
-        private DispatcherTimer _timer;
+        private readonly DispatcherTimer _timer;
+        private Action _action;
+
+        public DebounceDispatcher()
+        {
+            _timer = new DispatcherTimer();
+            _timer.Tick += new EventHandler(OnTimerTick);
+        }
 
         public void Debounce(TimeSpan interval, Action action)
         {
-            _timer?.Stop();
-            _timer = null;
+            _timer.Stop();
 
-            // timer is recreated for each event and effectively resets the timeout. 
-            // Action only fires after timeout has fully elapsed without other events firing in between
-            _timer = new DispatcherTimer
-            {
-                Interval = interval
-            };
-
-            _timer.Tick += (s, e) =>
-            {
-                if (_timer == null)
-                    return;
-                _timer?.Stop();
-                _timer = null;
-                action.Invoke();
-            };
+            _action = action;
+            _timer.Interval = interval;
 
             _timer.Start();
+        }
+
+        private void OnTimerTick(object sender, EventArgs e)
+        {
+            _timer.Stop();
+
+            if (Interlocked.Exchange(ref _action, null) is Action action)
+            {
+                action();
+            }
         }
     }
 }

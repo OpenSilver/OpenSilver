@@ -65,7 +65,11 @@ namespace System
 
         public InheritanceBehavior DefaultResourceLookupMode { get; set; }
 
-        public TimeSpan ScrollDebounce { get; set; }
+        public TimeSpan ScrollDebounce
+        {
+            get => ScrollBar.DefaultDebounceInterval;
+            set => ScrollBar.DefaultDebounceInterval = value;
+        }
 
         public CredentialsMode DefaultSoapCredentialsMode { get; set; }
 
