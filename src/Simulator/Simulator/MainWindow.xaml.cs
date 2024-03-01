@@ -46,6 +46,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         const string NAME_FOR_STORING_COOKIES = "ms_cookies_for_user_application"; // This is an arbitrary name used to store the cookies in the registry
         const string NAME_OF_TEMP_CACHE_FOLDER = "simulator-temp-cache";
 
+        //https is used because of XR# requirement to host on https.
+        private const string OpenSilverSimulator = "https://simulator.opensilver/";
+        private const string OutputRootPath = "wwwroot";
+        private const string OutputResourcesPath = "resources";
+
         internal static MainWindow Instance { get; private set; }
 
         public MainWindow(Action appCreationDelegate, Assembly appAssembly, SimulatorLaunchParameters simulatorLaunchParameters)
@@ -144,7 +149,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
             MainWebBrowser.CoreWebView2InitializationCompleted +=
                 (_, _) => CookiesHelper.SetCustomCookies(MainWebBrowser, _simulatorLaunchParameters?.CookiesData);
-            
+
             await MainWebBrowser.EnsureCoreWebView2Async(environment);
 
             var devToolsHelper = MainWebBrowser.CoreWebView2.GetDevToolsProtocolHelper();
@@ -199,15 +204,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             catch { }
         }
 
-        void LoadIndexFile(string urlFragment = null)
+        private string PrepareIndexFile()
         {
-            var absolutePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "simulator_root.html");
-
-            string simulatorRootHtml = File.ReadAllText(absolutePath);
+            string simulatorRootHtml = File.ReadAllText("simulator_root.html");
 
             string outputPathAbsolute = GetOutputPathAbsoluteAndReadAssemblyAttributes();
-
-            //string outputPathAbsolute = PathsHelper.GetOutputPathAbsolute(pathOfAssemblyThatContainsEntryPoint, outputRootPath);
 
             // Read the "App.Config" file for future use by the ClientBase.
             string relativePathToAppConfigFolder = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(_outputResourcesPath, _entryPointAssembly.GetName().Name);
@@ -237,18 +238,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
             simulatorRootHtml = simulatorRootHtml.Replace("..", "[PARENT]");
 
-            // Set the base URL (it defaults to the Simulator exe location, but it can be specified in the command line arguments):
-            string baseURL;
-            string customBaseUrl;
-            if (ReflectionInUserAssembliesHelper.TryGetCustomBaseUrl(out customBaseUrl))
-            {
-                baseURL = customBaseUrl;
-            }
-            else
-            {
-                baseURL = "file:///" + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace('\\', '/');
-            }
-
             if (_simulatorLaunchParameters?.InitParams != null)
             {
                 simulatorRootHtml = simulatorRootHtml.Replace(
@@ -260,20 +249,16 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 simulatorRootHtml = simulatorRootHtml.Replace("[PARAM_INITPARAMS_GOES_HERE]", string.Empty);
             }
 
-            string modifiedHtmlAbsolutePath = Path.Combine(Path.GetDirectoryName(absolutePath), "simulator_root_final.html");
-            File.WriteAllText(modifiedHtmlAbsolutePath, simulatorRootHtml);
-            // Load the page:
-            MainWebBrowser.CoreWebView2.AddWebResourceRequestedFilter("*.js", CoreWebView2WebResourceContext.Script);
-            MainWebBrowser.CoreWebView2.AddWebResourceRequestedFilter("*.css", CoreWebView2WebResourceContext.Stylesheet);
-            MainWebBrowser.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
-            MainWebBrowser.CoreWebView2.SetVirtualHostNameToFolderMapping("opensilver-simulator", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), CoreWebView2HostResourceAccessKind.Allow);
+            return simulatorRootHtml;
+        }
 
-            MainWebBrowser.CoreWebView2.Navigate(modifiedHtmlAbsolutePath);
-            
-            //new LoadHTMLParams(simulatorRootHtml, "UTF-8", "http://cshtml5-simulator/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
-            //Note: (see commit c1f98763) the following line of commented code was in a #else (and the one above in a #if OPENSILVER) to fix an issue in FBC MM2 where Interop calls would return null or undefined when they shouldn't. It is probably a case where we are redirected to another context (for example when signing in a Microsoft account before being brought back).
-            //      It seemed to fix it but it causes the SOAP calls to fail in the simulator (tried in the Showcase) and retrying with FBC MM2 shows that the issue was not actually fixed (or it is missing another change that was mistakenly considered to not be part of the fix).
-            //MainWebBrowser.Browser.LoadHTML(new LoadHTMLParams(simulatorRootHtml, "UTF-8", baseURL + "/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
+        private void LoadIndexFile()
+        {
+            // Load the page:
+            MainWebBrowser.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+            MainWebBrowser.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
+
+            MainWebBrowser.CoreWebView2.Navigate(OpenSilverSimulator);
         }
 
         private void SyncXamlInspectorVisibility()
@@ -291,45 +276,63 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             }
         }
 
+        private string GetHeaders(string fileName)
+        {
+            return $"Content-Type:{MimeTypesMap.GetMimeType(fileName)}";
+        }
+
         private void CoreWebView2_WebResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs e)
         {
-            string uriString = e.Request?.Uri?.Replace("[PARENT]", "..");
-            if (!string.IsNullOrEmpty(uriString))
+            var environment = MainWebBrowser.CoreWebView2.Environment;
+            var uriString = e.Request?.Uri;
+
+            if (string.IsNullOrEmpty(uriString))
             {
-                bool isCss = uriString.EndsWith(".css", StringComparison.InvariantCultureIgnoreCase);
-                bool isJs = uriString.EndsWith(".js", StringComparison.InvariantCultureIgnoreCase);
-                if ((isCss || isJs) && Uri.TryCreate(uriString, UriKind.RelativeOrAbsolute, out Uri uri))
+                return;
+            }
+
+            if (!uriString.StartsWith(OpenSilverSimulator))
+            {
+                return;
+            }
+
+            if (uriString == OpenSilverSimulator)
+            {
+                var response = environment.CreateWebResourceResponse(
+                    new MemoryStream(Encoding.UTF8.GetBytes(PrepareIndexFile())),
+                    200, "OK", GetHeaders("index.html"));
+                e.Response = response;
+                return;
+            }
+
+            // Attempts to parse the provided URL string into a Uri object
+            // to extract the local path, excluding any query parameters.
+            if (Uri.TryCreate(uriString, UriKind.Absolute, out var uri))
+            {
+                var localPath = uri.LocalPath.Trim('/');
+
+                if (localPath.StartsWith(OutputResourcesPath))
                 {
-                    string filePath = Uri.UnescapeDataString(uri.AbsolutePath);
-                    if (uri.Scheme == Uri.UriSchemeFile && File.Exists(filePath))
-                    {
-                        string content = File.ReadAllText(filePath);
-                        
-                        string contentType = "Encoding:utf8\n";
-                        if (isCss)
-                        {
-                            contentType += "Content-Type:text/css";
-                        }
-                        else if (isJs)
-                        {
-                            contentType += "Content-Type:application/javascript";
-                        }
+                    localPath = Path.Combine(OutputRootPath, localPath);
+                }
 
-                        //System.Diagnostics.Debug.WriteLine(e.RequestedSourceKind);
-                        //System.Diagnostics.Debug.WriteLine(e.ResourceContext);
-                        //System.Diagnostics.Debug.WriteLine(e.Request.Uri);
-
-                        e.Response = (sender as CoreWebView2).Environment.CreateWebResourceResponse(
-                            new MemoryStream(Encoding.UTF8.GetBytes(content)), 200, "OK", contentType);
-                    }
+                if (File.Exists(localPath))
+                {
+                    var response = environment.CreateWebResourceResponse(
+                        new MemoryStream(File.ReadAllBytes(localPath)),
+                        200, "OK", GetHeaders(localPath));
+                    e.Response = response;
+                    return;
                 }
             }
 
-            if (e.Response == null)
-            {
-                e.Response = (sender as CoreWebView2).Environment.CreateWebResourceResponse(
-                    new MemoryStream(), 200, "OK", "");
-            }
+            var notFound = environment.CreateWebResourceResponse(
+                new MemoryStream(Encoding.UTF8.GetBytes("" +
+                "<html>" +
+                    "<head><title>404 Not Found</title></head>" +
+                    "<body><center><h1>404 Not Found</h1></center></body>" +
+                "</html>")), 404, "Not Found", GetHeaders("index.html"));
+            e.Response = notFound;
         }
 
         private async Task OnLoadedAsync()
