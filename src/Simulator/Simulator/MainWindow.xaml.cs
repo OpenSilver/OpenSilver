@@ -7,7 +7,6 @@ using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Win32;
 using OpenSilver;
 using OpenSilver.Simulator;
-using OpenSilver.Simulator.SupportClasses;
 using OpenSilver.Simulator.XamlInspection;
 using System.Diagnostics;
 using System.Globalization;
@@ -20,7 +19,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-
 using Path = System.IO.Path;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript

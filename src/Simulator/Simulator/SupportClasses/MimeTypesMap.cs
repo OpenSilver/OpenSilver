@@ -1,11 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
-namespace OpenSilver.Simulator.SupportClasses
+using System.IO;
+
+namespace OpenSilver.Simulator
 {
-    internal class MimeTypesMap
+    internal static class MimeTypesMap
     {
         private static readonly Dictionary<string, string> MimeTypes = new (StringComparer.InvariantCultureIgnoreCase)
         {
@@ -64,7 +74,7 @@ namespace OpenSilver.Simulator.SupportClasses
 
         public static string GetMimeType(string fileName)
         {
-            if (MimeTypes.TryGetValue(Path.GetExtension(fileName).ToLowerInvariant(), out var mimeType))
+            if (MimeTypes.TryGetValue(Path.GetExtension(fileName), out var mimeType))
             {
                 return mimeType;
             }
