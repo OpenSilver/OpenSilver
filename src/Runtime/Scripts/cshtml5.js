@@ -1162,14 +1162,16 @@ document.createTextviewManager = function (inputCallback, scrollCallback) {
 
 document.htmlPresenterHelpers = (function () {
     return {
-        createView: function (id, contentId, parentId) {
+        createView: function (id, contentId, parentId, useShadowDom) {
             const parent = document.getElementById(parentId);
             if (!parent) return;
 
             const view = document._createLayout('div', id, false);
             const content = document.createElement('div');
             content.setAttribute('id', contentId);
-            content.attachShadow({ mode: 'open' });
+            if (useShadowDom) {
+                content.attachShadow({ mode: 'open' });
+            }
 
             view.appendChild(content);
             parent.appendChild(view);

@@ -683,7 +683,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             string contentId = NewId();
 
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.htmlPresenterHelpers.createView('{id}','{contentId}','{parent.UniqueIdentifier}')");
+                $"document.htmlPresenterHelpers.createView('{id}','{contentId}','{parent.UniqueIdentifier}',{(htmlPresenter.IsUsingShadowDOM ? "true" : "false")})");
 
             AddToGlobalStore(id, htmlPresenter);
 

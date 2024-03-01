@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -47,7 +48,14 @@ namespace CSHTML5.Native.Html.Controls
                         var htmlPresenter = (HtmlPresenter)d;
                         string sDiv = OpenSilver.Interop.GetVariableStringForJS(htmlPresenter._jsDiv);
                         string sContent = OpenSilver.Interop.GetVariableStringForJS((string)newValue ?? string.Empty);
-                        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.shadowRoot.innerHTML = {sContent}");
+                        if (htmlPresenter.IsUsingShadowDOM)
+                        {
+                            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.shadowRoot.innerHTML = {sContent}");
+                        }
+                        else
+                        {
+                            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.innerHTML = {sContent}");
+                        }
                     },
                 });
         
@@ -107,6 +115,33 @@ namespace CSHTML5.Native.Html.Controls
             return mode == ScrollMode.Disabled || mode == ScrollMode.Enabled || mode == ScrollMode.Auto;
         }
 
+        /// <summary>
+        /// Identifies the <see cref="UseShadowDom" /> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty UseShadowDomProperty =
+            DependencyProperty.Register(
+                nameof(UseShadowDom),
+                typeof(bool),
+                typeof(HtmlPresenter),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
+        /// <summary>
+        /// Get or set a value that indicates if the <see cref="HtmlPresenter"/> should create 
+        /// a shadow DOM to isolate its content from the rest of the DOM.
+        /// </summary>
+        /// <returns>
+        /// true to create a shadow DOM, false otherwise.
+        /// </returns>
+        public bool UseShadowDom
+        {
+            get => (bool)GetValue(UseShadowDomProperty);
+            set => SetValue(UseShadowDomProperty, value);
+        }
+
+        internal bool IsUsingShadowDOM { get; private set; }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public object DomElement
         {
             get
@@ -116,9 +151,19 @@ namespace CSHTML5.Native.Html.Controls
                     if (_jsDiv is not null)
                     {
                         string sDiv = OpenSilver.Interop.GetVariableStringForJS(_jsDiv);
-                        if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.shadowRoot && {sDiv}.shadowRoot.hasChildNodes()"))
+                        if (IsUsingShadowDOM)
                         {
-                            return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.shadowRoot.firstChild");
+                            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.shadowRoot && {sDiv}.shadowRoot.hasChildNodes()"))
+                            {
+                                return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.shadowRoot.firstChild");
+                            }
+                        }
+                        else
+                        {
+                            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.hasChildNodes()"))
+                            {
+                                return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.firstChild");
+                            }
                         }
                     }
                 }
@@ -129,6 +174,7 @@ namespace CSHTML5.Native.Html.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            IsUsingShadowDOM = UseShadowDom;
             (var outerDiv, _jsDiv) = INTERNAL_HtmlDomManager.CreateHtmlPresenterElementAndAppendIt(
                 (INTERNAL_HtmlDomElementReference)parentRef, this);
 
@@ -157,6 +203,7 @@ namespace CSHTML5.Native.Html.Controls
             }
 
             _jsDiv = null;
+            IsUsingShadowDOM = false;
         }
 
         /// <inheritdoc />
