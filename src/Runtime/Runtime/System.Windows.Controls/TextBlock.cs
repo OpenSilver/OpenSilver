@@ -38,6 +38,7 @@ namespace System.Windows.Controls
         private InlineCollection _inlines;
         private Size _noWrapSize = Size.Empty;
         private bool _textContentChanging;
+        private WeakEventListener<TextBlock, Brush, EventArgs> _foregroundChangedListener;
 
         static TextBlock()
         {
@@ -196,7 +197,11 @@ namespace System.Windows.Controls
                 typeof(TextBlock),
                 new FrameworkPropertyMetadata(
                     TextElement.ForegroundProperty.DefaultMetadata.DefaultValue,
-                    FrameworkPropertyMetadataOptions.Inherits));
+                    FrameworkPropertyMetadataOptions.Inherits,
+                    OnForegroundChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBlock)d).SetForeground(oldValue as Brush, (Brush)newValue),
+                });
 
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> to apply to the text contents of
@@ -210,6 +215,36 @@ namespace System.Windows.Controls
         {
             get => (Brush)GetValue(ForegroundProperty);
             set => SetValueInternal(ForegroundProperty, value);
+        }
+
+        private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var tb = (TextBlock)d;
+
+            if (tb._foregroundChangedListener != null)
+            {
+                tb._foregroundChangedListener.Detach();
+                tb._foregroundChangedListener = null;
+            }
+
+            if (e.NewValue is Brush newBrush)
+            {
+                tb._foregroundChangedListener = new(tb, newBrush)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnForegroundChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newBrush.Changed += tb._foregroundChangedListener.OnEvent;
+            }
+        }
+
+        private void OnForegroundChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                var foreground = (Brush)sender;
+                this.SetForeground(foreground, foreground);
+            }
         }
 
         /// <summary>
