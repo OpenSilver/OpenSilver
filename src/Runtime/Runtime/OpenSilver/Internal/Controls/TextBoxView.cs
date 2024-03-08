@@ -421,8 +421,8 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
     protected sealed override Size MeasureContent(Size constraint)
     {
-        return ParentWindow.TextMeasurementService.MeasureText(
-            ((INTERNAL_HtmlDomElementReference)OuterDiv).UniqueIdentifier,
+        return ParentWindow.TextMeasurementService.MeasureView(
+            OuterDiv.UniqueIdentifier,
             Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
             Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
             constraint.Width,

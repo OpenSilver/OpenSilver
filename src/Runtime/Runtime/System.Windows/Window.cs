@@ -55,7 +55,7 @@ namespace System.Windows
             GotFocus += new RoutedEventHandler(OnGotFocus);
         }
 
-        internal ITextMeasurementService TextMeasurementService { get; private set; }
+        internal TextMeasurementService TextMeasurementService { get; private set; }
 
         internal override int VisualChildrenCount
         {

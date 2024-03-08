@@ -37,6 +37,7 @@ namespace System.Windows.Controls
     {
         private InlineCollection _inlines;
         private Size _noWrapSize = Size.Empty;
+        private Size? _textSize;
         private bool _textContentChanging;
         private WeakEventListener<TextBlock, Brush, EventArgs> _foregroundChangedListener;
 
@@ -591,9 +592,9 @@ namespace System.Windows.Controls
                 return new Size(paddingWidth, paddingHeight);
             }
 
-            if (_noWrapSize == Size.Empty)
+            if (_noWrapSize.IsEmpty)
             {
-                _noWrapSize = ParentWindow.TextMeasurementService.MeasureText(
+                _noWrapSize = ParentWindow.TextMeasurementService.MeasureView(
                     OuterDiv.UniqueIdentifier,
                     "pre",
                     string.Empty,
@@ -616,7 +617,7 @@ namespace System.Windows.Controls
                 return desiredSize;
             }
 
-            Size textSize = ParentWindow.TextMeasurementService.MeasureText(
+            Size textSize = ParentWindow.TextMeasurementService.MeasureView(
                 OuterDiv.UniqueIdentifier,
                 "pre-wrap",
                 "break-word",
@@ -671,6 +672,7 @@ namespace System.Windows.Controls
                 if (metadata.AffectsMeasure)
                 {
                     _noWrapSize = Size.Empty;
+                    _textSize = null;
                 }
             }
         }
@@ -678,7 +680,43 @@ namespace System.Windows.Controls
         internal void InvalidateCacheAndMeasure()
         {
             _noWrapSize = Size.Empty;
+            _textSize = null;
             InvalidateMeasure();
+        }
+
+        internal sealed override double ActualWidthInternal =>
+            NeverMeasured ? GetTextSizeSlow().Width : base.ActualWidthInternal;
+
+        internal sealed override double ActualHeightInternal =>
+            NeverMeasured ? GetTextSizeSlow().Height : base.ActualHeightInternal;
+
+        private Size GetTextSizeSlow()
+        {
+            return _textSize ??= Application.Current.MainWindow.TextMeasurementService.MeasureText(
+                Text,
+                GetWidthConstraint(this),
+                FontSize,
+                FontFamily,
+                FontStyle,
+                FontWeight,
+                LineHeight,
+                CharacterSpacing,
+                TextWrapping);
+
+            static double GetWidthConstraint(TextBlock tb)
+            {
+                if (tb.TextWrapping == TextWrapping.Wrap)
+                {
+                    double width = tb.Width;
+                    if (!double.IsNaN(width))
+                    {
+                        Thickness padding = tb.Padding;
+                        return Math.Max(0, width - padding.Left - padding.Right);
+                    }
+                }
+
+                return double.PositiveInfinity;
+            }
         }
     }
 }

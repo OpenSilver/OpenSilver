@@ -117,5 +117,13 @@ namespace System.Windows
             Debug.Assert(_style == 2);
             return "Italic";
         }
+
+        internal string ToCssString() =>
+            _style switch
+            {
+                0 => "normal",
+                1 => "oblique",
+                _ => "italic",
+            };
     }
 }

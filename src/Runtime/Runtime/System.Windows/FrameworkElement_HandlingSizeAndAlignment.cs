@@ -308,11 +308,7 @@ namespace System.Windows
                 typeof(FrameworkElement),
                 _actualWidthMetadata);
 
-        private static object GetActualWidth(DependencyObject d)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-            return fe.HasWidthEverChanged ? fe.RenderSize.Width : 0d;
-        }
+        private static object GetActualWidth(DependencyObject d) => ((FrameworkElement)d).ActualWidth;
 
         /// <summary>
         /// Identifies the <see cref="ActualWidth"/> dependency property.
@@ -326,7 +322,9 @@ namespace System.Windows
         /// The width, in pixels, of the object. The default is 0. The default might be 
         /// encountered if the object has not been loaded and undergone a layout pass.
         /// </returns>
-        public double ActualWidth => RenderSize.Width;
+        public double ActualWidth => ActualWidthInternal;
+
+        internal virtual double ActualWidthInternal => HasWidthEverChanged ? RenderSize.Width : 0d;
 
         private static readonly PropertyMetadata _actualHeightMetadata = new ReadOnlyPropertyMetadata(0d, GetActualHeight);
 
@@ -337,11 +335,7 @@ namespace System.Windows
                 typeof(FrameworkElement),
                 _actualHeightMetadata);
 
-        private static object GetActualHeight(DependencyObject d)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-            return fe.HasHeightEverChanged ? fe.RenderSize.Height : 0d;
-        }
+        private static object GetActualHeight(DependencyObject d) => ((FrameworkElement)d).ActualHeight;
 
         /// <summary>
         /// Identifies the <see cref="ActualHeight"/> dependency property.
@@ -355,7 +349,9 @@ namespace System.Windows
         /// The height, in pixels, of the object. The default is 0. The default might be
         /// encountered if the object has not been loaded and undergone a layout pass.
         /// </returns>
-        public double ActualHeight => RenderSize.Height;
+        public double ActualHeight => ActualHeightInternal;
+
+        internal virtual double ActualHeightInternal => HasHeightEverChanged ? RenderSize.Height : 0d;
 
         /// <summary>
         /// Gets the rendered size of a FrameworkElement.

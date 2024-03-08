@@ -80,6 +80,8 @@ namespace System.Windows.Media
         /// </returns>
         public override string ToString() => Source ?? string.Empty;
 
+        internal string ToCssString(UIElement uie) => GetFontFace(uie).CssFontName;
+
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Task<bool> LoadFontAsync(FontFamily font)
         {

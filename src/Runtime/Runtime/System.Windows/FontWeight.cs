@@ -166,6 +166,8 @@ namespace System.Windows
         /// </returns>
         internal int ToOpenTypeWeight() => RealWeight;
 
+        internal string ToCssString() => RealWeight.ToInvariantString();
+
         /// <summary>
         /// Creates a string representation of this object based on the format string 
         /// and IFormatProvider passed in.  

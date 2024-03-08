@@ -829,6 +829,31 @@ document.createMeasurementService = function (parent) {
     return measurer.id;
 };
 
+document.measureText = function (measureElementId, text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap) {
+    const textMeasurer = document.getElementById(measureElementId);
+    if (textMeasurer) {
+        textMeasurer.innerText = text;
+        textMeasurer.style.fontSize = fontSize;
+        textMeasurer.style.fontWeight = fontWeight;
+        textMeasurer.style.fontFamily = fontFamily;
+        textMeasurer.style.fontStyle = fontStyle;
+        textMeasurer.style.lineHeight = lineHeight;
+        textMeasurer.style.letterSpacing = spacing;
+        textMeasurer.style.whiteSpace = whitespace;
+        textMeasurer.style.overflowWrap = overflowWrap;
+        textMeasurer.style.maxWidth = maxWidth;
+
+        const rect = textMeasurer.getBoundingClientRect();
+        const size = rect.width + '|' + rect.height;
+
+        textMeasurer.innerText = '';
+
+        return size;
+    }
+
+    return '0|0';
+};
+
 document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflowWrap, maxWidth, emptyVal) {
     const element = document.getElementById(measureElementId);
     const elToMeasure = document.getElementById(uid);
@@ -854,14 +879,14 @@ document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflo
         element.style.maxWidth = maxWidth;
 
         const rect = element.getBoundingClientRect();
-        const size = Math.ceil(rect.width) + "|" + Math.ceil(rect.height);
+        const size = Math.ceil(rect.width) + '|' + Math.ceil(rect.height);
 
         element.innerHTML = '';
 
         return size;
     }
 
-    return "0|0";
+    return '0|0';
 };
 
 document.getBaseLineOffset = (function () {

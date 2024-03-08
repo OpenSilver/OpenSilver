@@ -386,7 +386,7 @@ namespace System.Windows.Controls
             double paddingHeight = padding.Top + padding.Bottom;
             bool wrap = TextWrapping == TextWrapping.Wrap;
 
-            Size textSize = ParentWindow.TextMeasurementService.MeasureText(
+            Size textSize = ParentWindow.TextMeasurementService.MeasureView(
                 OuterDiv.UniqueIdentifier,
                 wrap ? "pre-wrap" : "pre",
                 wrap ? "break-word" : string.Empty,

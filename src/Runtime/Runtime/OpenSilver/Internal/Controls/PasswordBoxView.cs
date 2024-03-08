@@ -111,7 +111,7 @@ internal sealed class PasswordBoxView : TextViewBase
     {
         int pwdLength = Host.Password.Length;
 
-        return ParentWindow.TextMeasurementService.MeasureText(
+        return ParentWindow.TextMeasurementService.MeasureView(
             OuterDiv.UniqueIdentifier,
             "pre",
             string.Empty,

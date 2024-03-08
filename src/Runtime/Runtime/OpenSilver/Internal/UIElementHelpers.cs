@@ -27,23 +27,28 @@ internal static class UIElementHelpers
 {
     internal static void SetCharacterSpacing(this UIElement uie, int cSpacing)
     {
-        double value = cSpacing / 1000.0;
-        uie.OuterDiv.Style.letterSpacing = $"{value.ToInvariantString()}em";
+        uie.OuterDiv.Style.letterSpacing = ToCssLetterSpacing(cSpacing);
+    }
+
+    internal static string ToCssLetterSpacing(int spacing)
+    {
+        double value = spacing / 1000.0;
+        return $"{value.ToInvariantString()}em";
     }
 
     internal static void SetFontFamily(this UIElement uie, FontFamily font)
     {
-        uie.OuterDiv.Style.fontFamily = font.GetFontFace(uie).CssFontName;
+        uie.OuterDiv.Style.fontFamily = font.ToCssString(uie);
     }
 
     internal static void SetFontStyle(this UIElement uie, FontStyle fontStyle)
     {
-        uie.OuterDiv.Style.fontStyle = fontStyle.ToString().ToLower();
+        uie.OuterDiv.Style.fontStyle = fontStyle.ToCssString();
     }
 
     internal static void SetFontWeight(this UIElement uie, FontWeight fontWeight)
     {
-        uie.OuterDiv.Style.fontWeight = fontWeight.ToOpenTypeWeight().ToInvariantString();
+        uie.OuterDiv.Style.fontWeight = fontWeight.ToCssString();
     }
 
     internal static void SetForeground(this UIElement uie, Brush oldForeground, Brush newForeground)
@@ -108,12 +113,15 @@ internal static class UIElementHelpers
 
     internal static void SetLineHeight(this UIElement uie, double lineHeight)
     {
-        uie.OuterDiv.Style.lineHeight = lineHeight switch
+        uie.OuterDiv.Style.lineHeight = ToCssLineHeight(lineHeight);
+    }
+
+    internal static string ToCssLineHeight(double lineHeight) =>
+        lineHeight switch
         {
             0.0 => "normal",
             _ => $"{lineHeight.ToInvariantString()}px",
         };
-    }
 
     internal static void SetPadding(this UIElement uie, Thickness padding)
     {
@@ -148,25 +156,22 @@ internal static class UIElementHelpers
     internal static void SetTextWrapping(this UIElement uie, TextWrapping textWrapping)
     {
         var style = uie.OuterDiv.Style;
-        switch (textWrapping)
-        {
-            case TextWrapping.Wrap:
-                style.whiteSpace = "pre-wrap";
-                style.overflowWrap = "break-word";
-                break;
-
-            case TextWrapping.NoWrap:
-            default:
-                style.whiteSpace = "pre";
-                style.overflowWrap = string.Empty;
-                break;
-        }
+        (style.whiteSpace, style.overflowWrap) = ToCssTextWrapping(textWrapping);
     }
+
+    internal static (string WhiteSpace, string OverflowWrap) ToCssTextWrapping(TextWrapping textWrapping) =>
+        textWrapping switch
+        {
+            TextWrapping.Wrap => ("pre-wrap", "break-word"),
+            _ => ("pre", string.Empty),
+        };
 
     internal static void SetFontSize(this UIElement uie, double fontSize)
     {
-        uie.OuterDiv.Style.fontSize = $"{fontSize.ToInvariantString()}px";
+        uie.OuterDiv.Style.fontSize = ToCssPxFontSize(fontSize);
     }
+
+    internal static string ToCssPxFontSize(double fontSize) => $"{fontSize.ToInvariantString()}px";
 
     internal static void SetTextSelection(this UIElement uie, bool enabled)
     {
