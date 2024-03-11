@@ -324,7 +324,7 @@ namespace System.Windows
         /// </returns>
         public double ActualWidth => ActualWidthInternal;
 
-        internal virtual double ActualWidthInternal => HasWidthEverChanged ? RenderSize.Width : 0d;
+        internal virtual double ActualWidthInternal => RenderSize.Width;
 
         private static readonly PropertyMetadata _actualHeightMetadata = new ReadOnlyPropertyMetadata(0d, GetActualHeight);
 
@@ -351,7 +351,7 @@ namespace System.Windows
         /// </returns>
         public double ActualHeight => ActualHeightInternal;
 
-        internal virtual double ActualHeightInternal => HasHeightEverChanged ? RenderSize.Height : 0d;
+        internal virtual double ActualHeightInternal => RenderSize.Height;
 
         /// <summary>
         /// Gets the rendered size of a FrameworkElement.

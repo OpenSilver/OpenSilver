@@ -573,7 +573,6 @@ namespace System.Windows
             //we only guarantee cleaning between elements, not between handlers here
             if (info.WidthChanged)
             {
-                HasWidthEverChanged = true;
                 NotifyPropertyChange(
                     new DependencyPropertyChangedEventArgs(
                         info.PreviousSize.Width,
@@ -584,7 +583,6 @@ namespace System.Windows
 
             if (info.HeightChanged)
             {
-                HasHeightEverChanged = true;
                 NotifyPropertyChange(
                     new DependencyPropertyChangedEventArgs(
                         info.PreviousSize.Height,
@@ -663,18 +661,6 @@ namespace System.Windows
         {
             get { return ReadInternalFlag(InternalFlags.NeedsClipBounds); }
             set { WriteInternalFlag(InternalFlags.NeedsClipBounds, value); }
-        }
-
-        private bool HasWidthEverChanged
-        {
-            get { return ReadInternalFlag(InternalFlags.HasWidthEverChanged); }
-            set { WriteInternalFlag(InternalFlags.HasWidthEverChanged, value); }
-        }
-
-        private bool HasHeightEverChanged
-        {
-            get { return ReadInternalFlag(InternalFlags.HasHeightEverChanged); }
-            set { WriteInternalFlag(InternalFlags.HasHeightEverChanged, value); }
         }
 
         private Size _unclippedDesiredSize;
