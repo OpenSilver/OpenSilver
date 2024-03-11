@@ -645,24 +645,6 @@ namespace System.Windows.Controls
 
         internal override string GetPlainText() => Text;
 
-        internal static void ApplyTextWrapping(INTERNAL_HtmlDomStyleReference cssStyle, TextWrapping textWrapping)
-        {
-            Debug.Assert(cssStyle != null);
-            switch (textWrapping)
-            {
-                case TextWrapping.Wrap:
-                    cssStyle.whiteSpace = "pre-wrap";
-                    cssStyle.overflowWrap = "break-word";
-                    break;
-
-                case TextWrapping.NoWrap:
-                default:
-                    cssStyle.whiteSpace = "pre";
-                    cssStyle.overflowWrap = string.Empty;
-                    break;
-            }
-        }
-
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             base.OnPropertyChanged(e);

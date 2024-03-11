@@ -62,7 +62,7 @@ namespace System.Windows.Controls
         }
 
         internal sealed override INTERNAL_HtmlDomElementReference GetFocusTarget()
-            => _textViewHost?.View?.InputDiv ?? base.GetFocusTarget();
+            => _textViewHost?.View?.OuterDiv ?? base.GetFocusTarget();
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -215,36 +215,48 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets or sets the brush that is used to render the vertical bar that indicates
-        /// the insertion point.
-        /// </summary>
-        public Brush CaretBrush
-        {
-            get { return (Brush)GetValue(CaretBrushProperty); }
-            set { SetValueInternal(CaretBrushProperty, value); }
-        }
-
-        /// <summary>
-        /// Identify the CaretBrush dependency property
+        /// Identify the <see cref="CaretBrush"/> dependency property
         /// </summary>
         public static readonly DependencyProperty CaretBrushProperty =
             DependencyProperty.Register(
                 nameof(CaretBrush),
                 typeof(Brush),
                 typeof(TextBox),
-                new PropertyMetadata(new SolidColorBrush(Colors.Black)));
+                new PropertyMetadata(new SolidColorBrush(Colors.Black), OnCaretBrushChanged));
 
         /// <summary>
-        /// Gets or sets how the TextBow wraps text.
+        /// Gets or sets the brush that is used to render the vertical bar that indicates the
+        /// insertion point.
         /// </summary>
-        public TextWrapping TextWrapping
+        /// <returns>
+        /// A brush that is used to render the vertical bar that indicates the insertion point.
+        /// </returns>
+        public Brush CaretBrush
         {
-            get { return (TextWrapping)GetValue(TextWrappingProperty); }
-            set { SetValueInternal(TextWrappingProperty, value); }
+            get => (Brush)GetValue(CaretBrushProperty);
+            set => SetValueInternal(CaretBrushProperty, value);
+        }
+
+        private static void OnCaretBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((TextBox)d)._textViewHost?.View.SetCaretBrush((Brush)e.NewValue);
         }
 
         /// <summary>
-        /// Identifies the TextWrapping dependency property.
+        /// Gets or sets how line breaking occurs if a line of text extends beyond the available width of 
+        /// the text box.
+        /// </summary>
+        /// <returns>
+        /// One of the <see cref="TextWrapping"/> values. The default is <see cref="TextWrapping.NoWrap"/>.
+        /// </returns>
+        public TextWrapping TextWrapping
+        {
+            get => (TextWrapping)GetValue(TextWrappingProperty);
+            set => SetValueInternal(TextWrappingProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TextWrapping"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register(

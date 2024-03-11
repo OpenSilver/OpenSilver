@@ -50,7 +50,7 @@ namespace System.Windows.Controls
         }
 
         internal sealed override INTERNAL_HtmlDomElementReference GetFocusTarget()
-            => _textViewHost?.View?.InputDiv ?? base.GetFocusTarget();
+            => _textViewHost?.View?.OuterDiv ?? base.GetFocusTarget();
 
         /// <summary>
         /// Identifies the <see cref="PasswordChar"/> dependency property.
@@ -103,6 +103,34 @@ namespace System.Windows.Controls
         }
 
         private static bool MaxLengthValidateValue(object value) => (int)value >= 0;
+
+        /// <summary>
+        /// Identifies the <see cref="CaretBrush"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CaretBrushProperty =
+            DependencyProperty.Register(
+                nameof(CaretBrush),
+                typeof(Brush),
+                typeof(PasswordBox),
+                new PropertyMetadata(new SolidColorBrush(Colors.Black), OnCaretBrushChanged));
+
+        /// <summary>
+        /// Gets or sets the brush that is used to render the vertical bar that indicates the
+        /// insertion point.
+        /// </summary>
+        /// <returns>
+        /// The brush that is used to render the vertical bar that indicates the insertion point.
+        /// </returns>
+        public Brush CaretBrush
+        {
+            get => (Brush)GetValue(CaretBrushProperty);
+            set => SetValueInternal(CaretBrushProperty, value);
+        }
+
+        private static void OnCaretBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((PasswordBox)d)._textViewHost?.View.SetCaretBrush((Brush)e.NewValue);
+        }
 
         /// <summary>
         /// Gets or sets the password currently held by the <see cref="PasswordBox"/>.
@@ -313,24 +341,6 @@ namespace System.Windows.Controls
         }
 
         #region Not supported yet
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty CaretBrushProperty =
-            DependencyProperty.Register(
-                nameof(CaretBrush),
-                typeof(Brush),
-                typeof(PasswordBox),
-                null);
-
-        /// <summary>
-        /// Gets or sets the brush that is used to render the vertical bar that indicates the insertion point.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public Brush CaretBrush
-        {
-            get => (Brush)GetValue(CaretBrushProperty);
-            set => SetValueInternal(CaretBrushProperty, value);
-        }
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionBackgroundProperty =

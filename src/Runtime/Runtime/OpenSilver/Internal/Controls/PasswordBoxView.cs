@@ -93,11 +93,11 @@ internal sealed class PasswordBoxView : TextViewBase
     {
         base.INTERNAL_OnAttachedToVisualTree();
 
-        SetPasswordNative(Host.Password);
+        SetProperties();
 
         if (FocusManager.GetFocusedElement() == Host)
         {
-            InputManager.SetFocusNative(InputDiv);
+            InputManager.SetFocusNative(OuterDiv);
         }
     }
 
@@ -121,26 +121,34 @@ internal sealed class PasswordBoxView : TextViewBase
 
     internal void SelectNative()
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
         {
-            string sElement = Interop.GetVariableStringForJS(InputDiv);
+            string sElement = Interop.GetVariableStringForJS(OuterDiv);
             Interop.ExecuteJavaScriptVoid($"{sElement}.select();");
         }
     }
 
     internal void OnMaxLengthChanged(int maxLength)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(InputDiv, "maxLength", maxLength);
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxLength", maxLength);
+        }
+    }
+
+    internal void SetCaretBrush(Brush brush)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        {
+            this.SetCaretColor(brush);
         }
     }
 
     internal void SetPasswordNative(string text)
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
         {
-            string sElement = Interop.GetVariableStringForJS(InputDiv);
+            string sElement = Interop.GetVariableStringForJS(OuterDiv);
             Interop.ExecuteJavaScriptVoid(
                 $"{sElement}.value = \"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\";");
 
@@ -150,13 +158,22 @@ internal sealed class PasswordBoxView : TextViewBase
 
     private string GetPassword()
     {
-        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && InputDiv is not null)
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
         {
-            string sElement = Interop.GetVariableStringForJS(InputDiv);
+            string sElement = Interop.GetVariableStringForJS(OuterDiv);
             return Interop.ExecuteJavaScriptString($"{sElement}.value;") ?? string.Empty;
         }
 
         return string.Empty;
+    }
+
+    private void SetProperties()
+    {
+        PasswordBox host = Host;
+
+        this.SetCaretColor(host.CaretBrush);
+        INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxlength", host.MaxLength);
+        SetPasswordNative(host.Password);
     }
 
     private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

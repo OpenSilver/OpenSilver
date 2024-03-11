@@ -285,6 +285,16 @@ internal static class UIElementHelpers
         uie.OuterDiv.Style.touchAction = value;
     }
 
+    internal static void SetCaretColor(this UIElement uie, Brush brush)
+    {
+        Debug.Assert(uie is not null);
+        uie.OuterDiv.Style.caretColor = brush switch
+        {
+            SolidColorBrush scb => scb.ToHtmlString(),
+            _ => string.Empty,
+        };
+    }
+
     internal static double GetBaseLineOffset(this UIElement uie)
     {
         Debug.Assert(uie is not null);

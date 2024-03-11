@@ -60,6 +60,7 @@ namespace CSHTML5.Internal
         public string borderImageSlice { set { SetStylePropertyValue("borderImageSlice", value); } }
         public string boxSizing { set { SetStylePropertyValue("boxSizing", value); } }
         public string boxShadow { set { SetStylePropertyValue("boxShadow", value); } }
+        public string caretColor { set { SetStylePropertyValue("caretColor", value); } }
         public string color { set { SetStylePropertyValue("color", value); } }
         public string cursor { set { SetStylePropertyValue("cursor", value); } }
         public string display { get { return GetCSSProperty("display"); } set { SetStylePropertyValue("display", value); } }

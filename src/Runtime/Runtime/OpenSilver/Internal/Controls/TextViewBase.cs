@@ -44,8 +44,6 @@ internal abstract partial class TextViewBase : FrameworkElement
 
     internal UIElement Host { get; }
 
-    internal INTERNAL_HtmlDomElementReference InputDiv => OuterDiv;
-
     internal sealed override UIElement KeyboardTarget => Host;
 
     internal sealed override bool EnablePointerEventsCore => true;
