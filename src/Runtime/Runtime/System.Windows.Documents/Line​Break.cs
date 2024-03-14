@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.Text;
+
 namespace System.Windows.Documents;
 
 /// <summary>
@@ -20,4 +22,6 @@ namespace System.Windows.Documents;
 public sealed class LineBreak : Inline
 {
     internal override string TagName => "br";
+
+    internal override void AppendHtml(StringBuilder builder) => builder.Append("<br />");
 }

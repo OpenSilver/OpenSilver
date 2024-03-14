@@ -707,31 +707,12 @@ namespace System.Windows.Controls
 
         private Size GetTextSizeSlow()
         {
-            return _textSize ??= Application.Current.MainWindow.TextMeasurementService.MeasureText(
-                Text,
-                GetWidthConstraint(this),
-                FontSize,
-                FontFamily,
-                FontStyle,
-                FontWeight,
-                LineHeight,
-                CharacterSpacing,
-                TextWrapping);
-
-            static double GetWidthConstraint(TextBlock tb)
+            if (Application.Current is Application app)
             {
-                if (tb.TextWrapping == TextWrapping.Wrap)
-                {
-                    double width = tb.Width;
-                    if (!double.IsNaN(width))
-                    {
-                        Thickness padding = tb.Padding;
-                        return Math.Max(0, width - padding.Left - padding.Right);
-                    }
-                }
-
-                return double.PositiveInfinity;
+                return _textSize ??= app.MainWindow.TextMeasurementService.MeasureTextBlock(this);
             }
+
+            return new Size(0, 0);
         }
     }
 }

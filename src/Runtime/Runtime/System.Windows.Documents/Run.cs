@@ -11,10 +11,13 @@
 *  
 \*====================================================================================*/
 
+using System.Text;
+using System.Web;
 using System.Windows.Markup;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Documents;
 
@@ -167,5 +170,14 @@ public sealed class Run : Inline
             var foreground = (Brush)sender;
             this.SetForeground(foreground, foreground);
         }
+    }
+
+    internal override void AppendHtml(StringBuilder builder)
+    {
+        builder.Append("<span style=\"font: ");
+        FontProperties.AppendCssFontAsHtml(builder, FontStyle, FontWeight, FontSize, 0.0, FontFamily);
+        builder.Append($"; letter-spacing: {FontProperties.ToCssLetterSpacing(CharacterSpacing)}\">")
+               .Append(HttpUtility.HtmlEncode(Text))
+               .Append("</span>");
     }
 }

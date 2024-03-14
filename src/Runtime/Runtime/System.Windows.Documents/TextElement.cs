@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Text;
 using System.Windows.Markup;
 using System.Windows.Media;
 using CSHTML5.Internal;
@@ -303,6 +304,8 @@ public abstract class TextElement : UIElement
     public TextPointer ElementStart { get; }
 
     internal virtual string TagName => "span";
+
+    internal virtual void AppendHtml(StringBuilder builder) { }
 
     internal sealed override UIElement MouseTarget => null;
 

@@ -11,13 +11,14 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using System.Web;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal;
@@ -61,34 +62,46 @@ internal sealed class TextMeasurementService
             double.Parse(strTextSize.Substring(index + 1), CultureInfo.InvariantCulture));
     }
 
-    public Size MeasureText(string text,
-                            double maxWidth,
-                            double fontSize,
-                            FontFamily fontFamily,
-                            FontStyle fontStyle,
-                            FontWeight fontWeight,
-                            double lineHeight,
-                            int characterSpacing,
-                            TextWrapping textWrapping)
+    public Size MeasureTextBlock(TextBlock textblock)
     {
-        string escapedText = HttpUtility.JavaScriptStringEncode(text, true);
-        string sMaxWidth = double.IsPositiveInfinity(maxWidth) ? string.Empty : $"{maxWidth.ToInvariantString()}px";
-        string sFontSize = FontProperties.ToCssPxFontSize(fontSize);
-        string sFontFamily = FontProperties.ToCssFontFamily(fontFamily);
-        string sFontStyle = FontProperties.ToCssFontStyle(fontStyle);
-        string sFontWeight = FontProperties.ToCssFontWeight(fontWeight);
-        string sLineHeight = FontProperties.ToCssLineHeight(lineHeight);
-        string sSpacing = FontProperties.ToCssLetterSpacing(characterSpacing);
-        (string sWhiteSpace, string sOverflowWrap) = UIElementHelpers.ToCssTextWrapping(textWrapping);
+        (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(textblock.TextWrapping);
+        string lineHeight = FontProperties.ToCssLineHeight(textblock.LineHeight);
+        string maxWidth = GetWidthConstraint(textblock);
+        string innerHTML = BuildInnerHtml(textblock);
 
         string size = Interop.ExecuteJavaScriptString(
-            $"document.measureText('{_window.OuterDiv.UniqueIdentifier}',{escapedText},'{sMaxWidth}','{sFontSize}','{sFontFamily}','{sFontStyle}','{sFontWeight}','{sLineHeight}','{sSpacing}','{sWhiteSpace}','{sOverflowWrap}')",
+            $"document.measureTextBlock('{_window.OuterDiv.UniqueIdentifier}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{maxWidth}')",
             false);
 
         int index = size.IndexOf('|');
         return new Size(
             double.Parse(size.Substring(0, index), CultureInfo.InvariantCulture),
             double.Parse(size.Substring(index + 1), CultureInfo.InvariantCulture));
+
+        static string BuildInnerHtml(TextBlock tb)
+        {
+            StringBuilder builder = StringBuilderCache.Acquire();
+            foreach (Inline inline in tb.Inlines.InternalItems)
+            {
+                inline.AppendHtml(builder);
+            }
+            return StringBuilderCache.GetStringAndRelease(builder);
+        }
+
+        static string GetWidthConstraint(TextBlock tb)
+        {
+            if (tb.TextWrapping == TextWrapping.Wrap)
+            {
+                double width = tb.Width;
+                if (!double.IsNaN(width))
+                {
+                    Thickness padding = tb.Padding;
+                    return $"{Math.Max(0, width - padding.Left - padding.Right).ToInvariantString()}px";
+                }
+            }
+
+            return string.Empty;
+        }
     }
 
     public double MeasureBaseline(IEnumerable<FontProperties> fonts)

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Text;
+using System.Web;
 using System.Windows.Media;
 using System.Windows;
 
@@ -31,29 +32,38 @@ internal readonly struct FontProperties
 
     public int CharacterSpacing { get; init; }
 
-    internal string ToCssFont()
-    {
-        StringBuilder builder = StringBuilderCache.Acquire();
-        AppendCssFont(builder);
-        return StringBuilderCache.GetStringAndRelease(builder);
-    }
+    internal void AppendCssFont(StringBuilder builder) =>
+        AppendCssFont(builder, FontStyle, FontWeight, FontSize, LineHeight, FontFamily, false);
 
-    internal void AppendCssFont(StringBuilder builder)
-    {
-        builder.Append(ToCssFontStyle(FontStyle))
-               .Append(' ')
-               .Append(ToCssFontWeight(FontWeight))
-               .Append(' ')
-               .Append(ToCssPxFontSize(FontSize));
+    internal static void AppendCssFontAsHtml(StringBuilder builder,
+        FontStyle fontStyle,
+        FontWeight fontWeight,
+        double fontSize,
+        double lineHeight,
+        FontFamily fontFamily) => AppendCssFont(builder, fontStyle, fontWeight, fontSize, lineHeight, fontFamily, true);
 
-        if (LineHeight != 0.0)
+    private static void AppendCssFont(StringBuilder builder,
+        FontStyle fontStyle,
+        FontWeight fontWeight,
+        double fontSize,
+        double lineHeight,
+        FontFamily fontFamily,
+        bool htmlEncode)
+    {
+        builder.Append(ToCssFontStyle(fontStyle))
+               .Append(' ')
+               .Append(ToCssFontWeight(fontWeight))
+               .Append(' ')
+               .Append(ToCssPxFontSize(fontSize));
+
+        if (lineHeight != 0.0)
         {
             builder.Append(" / ")
-                   .Append(ToCssLineHeight(LineHeight));
+                   .Append(ToCssLineHeight(lineHeight));
         }
 
         builder.Append(' ')
-               .Append(ToCssFontFamily(FontFamily));
+               .Append(ToCssFontFamily(fontFamily, htmlEncode));
     }
 
     internal static string ToCssFontStyle(FontStyle fontStyle) =>
@@ -75,8 +85,18 @@ internal readonly struct FontProperties
             _ => $"{lineHeight.ToInvariantString()}px",
         };
 
-    internal static string ToCssFontFamily(FontFamily family) => family.GetFontFace().CssFontName;
+    internal static string ToCssFontFamily(FontFamily family) => ToCssFontFamily(family, false);
 
+    internal static string ToCssFontFamily(FontFamily family, bool htmlEncode)
+    {
+        string font = family.GetFontFace().CssFontName;
+        if (htmlEncode)
+        {
+            font = HttpUtility.HtmlEncode(font);
+        }
+        return font;
+    }
+    
     internal static string ToCssLetterSpacing(int spacing)
     {
         double value = spacing / 1000.0;

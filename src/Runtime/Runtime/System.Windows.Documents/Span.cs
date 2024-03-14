@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Text;
 using System.Windows.Markup;
 using CSHTML5.Internal;
 
@@ -75,5 +76,15 @@ public class Span : Inline
         }
 
         return Inlines.InternalItems[index];
+    }
+
+    internal sealed override void AppendHtml(StringBuilder builder)
+    {
+        builder.Append($"<{TagName}>");
+        foreach (Inline inline in Inlines.InternalItems)
+        {
+            inline.AppendHtml(builder);
+        }
+        builder.Append($"</{TagName}>");
     }
 }

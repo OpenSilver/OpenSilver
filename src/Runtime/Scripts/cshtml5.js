@@ -858,22 +858,22 @@ document.attachMeasurementService = function (owner) {
 
             return size;
         },
-        measureText: function (text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap) {
-            htmlMeasurer.innerText = text;
-            htmlMeasurer.style.fontSize = fontSize;
-            htmlMeasurer.style.fontWeight = fontWeight;
-            htmlMeasurer.style.fontFamily = fontFamily;
-            htmlMeasurer.style.fontStyle = fontStyle;
+        measureTextBlock: function (innerHTML, whiteSpace, overflowWrap, lineHeight, maxWidth) {
+            htmlMeasurer.innerHTML = innerHTML;
+            htmlMeasurer.style.fontSize = '';
+            htmlMeasurer.style.fontWeight = '';
+            htmlMeasurer.style.fontFamily = '';
+            htmlMeasurer.style.fontStyle = '';
             htmlMeasurer.style.lineHeight = lineHeight;
-            htmlMeasurer.style.letterSpacing = spacing;
-            htmlMeasurer.style.whiteSpace = whitespace;
+            htmlMeasurer.style.letterSpacing = '';
+            htmlMeasurer.style.whiteSpace = whiteSpace;
             htmlMeasurer.style.overflowWrap = overflowWrap;
             htmlMeasurer.style.maxWidth = maxWidth;
 
             const rect = htmlMeasurer.getBoundingClientRect();
             const size = rect.width + '|' + rect.height;
 
-            htmlMeasurer.innerText = '';
+            htmlMeasurer.innerHTML = '';
 
             return size;
         },
@@ -888,10 +888,10 @@ document.attachMeasurementService = function (owner) {
     };
 };
 
-document.measureText = function (measurerId, text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap) {
+document.measureTextBlock = function (measurerId, innerHTML, whiteSpace, overflowWrap, lineHeight, maxWidth) {
     const owner = document.getElementById(measurerId);
     if (owner && owner._measurementService) {
-        return owner._measurementService.measureText(text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap);
+        return owner._measurementService.measureTextBlock(innerHTML, whiteSpace, overflowWrap, lineHeight, maxWidth);
     }
     return '0|0';
 };
