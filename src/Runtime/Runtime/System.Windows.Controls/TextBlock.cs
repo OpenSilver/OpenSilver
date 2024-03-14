@@ -11,13 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Controls
 {
@@ -540,16 +541,48 @@ namespace System.Windows.Controls
         /// is automatically calculated from the current font characteristics. The default
         /// is 0.0.
         /// </returns>
-        public double BaselineOffset => GetBaseLineOffset(this);
-
-        private static double GetBaseLineOffset(TextBlock tb)
+        public double BaselineOffset
         {
-            if (!string.IsNullOrEmpty(tb.Text))
+            get
             {
-                return tb.GetBaseLineOffset();
-            }
+                if (!string.IsNullOrEmpty(Text))
+                {
+                    return Application.Current.MainWindow.TextMeasurementService.MeasureBaseLineOffset(GetFonts(this, this));
+                }
 
-            return 0.0;
+                return 0.0;
+
+                static IEnumerable<FontProperties> GetFonts(TextBlock textblock, UIElement current)
+                {
+                    int count = current.VisualChildrenCount;
+                    for (int i = 0; i < count; i++)
+                    {
+                        switch (current.GetVisualChild(i))
+                        {
+                            case Run run:
+                                if (!string.IsNullOrEmpty(run.Text))
+                                {
+                                    yield return new FontProperties
+                                    {
+                                        FontStyle = run.FontStyle,
+                                        FontWeight = run.FontWeight,
+                                        FontSize = run.FontSize,
+                                        LineHeight = textblock.LineHeight,
+                                        FontFamily = run.FontFamily,
+                                    };
+                                }
+                                break;
+
+                            case TextElement textElement:
+                                foreach (FontProperties font in GetFonts(textblock, textElement))
+                                {
+                                    yield return font;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

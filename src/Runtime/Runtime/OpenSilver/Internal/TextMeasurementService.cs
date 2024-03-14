@@ -12,11 +12,14 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Web;
 using System.Windows;
 using System.Windows.Media;
+using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal;
 
@@ -78,20 +81,42 @@ internal sealed class TextMeasurementService
     {
         string escapedText = HttpUtility.JavaScriptStringEncode(text, true);
         string sMaxWidth = double.IsPositiveInfinity(maxWidth) ? string.Empty : $"{maxWidth.ToInvariantString()}px";
-        string sFontSize = UIElementHelpers.ToCssPxFontSize(fontSize);
-        string sFontFamily = fontFamily.ToCssString(null);
-        string sFontStyle = fontStyle.ToCssString();
-        string sFontWeight = fontWeight.ToCssString();
-        string sLineHeight = UIElementHelpers.ToCssLineHeight(lineHeight);
-        string sSpacing = UIElementHelpers.ToCssLetterSpacing(characterSpacing);
+        string sFontSize = FontProperties.ToCssPxFontSize(fontSize);
+        string sFontFamily = FontProperties.ToCssFontFamily(fontFamily);
+        string sFontStyle = FontProperties.ToCssFontStyle(fontStyle);
+        string sFontWeight = FontProperties.ToCssFontWeight(fontWeight);
+        string sLineHeight = FontProperties.ToCssLineHeight(lineHeight);
+        string sSpacing = FontProperties.ToCssLetterSpacing(characterSpacing);
         (string sWhiteSpace, string sOverflowWrap) = UIElementHelpers.ToCssTextWrapping(textWrapping);
 
         string size = Interop.ExecuteJavaScriptString(
-            $"document.measureText('{_measurerId}',{escapedText},'{sMaxWidth}','{sFontSize}','{sFontFamily}','{sFontStyle}','{sFontWeight}','{sLineHeight}','{sSpacing}','{sWhiteSpace}','{sOverflowWrap}')");
+            $"document.measureText('{_measurerId}',{escapedText},'{sMaxWidth}','{sFontSize}','{sFontFamily}','{sFontStyle}','{sFontWeight}','{sLineHeight}','{sSpacing}','{sWhiteSpace}','{sOverflowWrap}')",
+            false);
 
         int index = size.IndexOf('|');
         return new Size(
             double.Parse(size.Substring(0, index), CultureInfo.InvariantCulture),
             double.Parse(size.Substring(index + 1), CultureInfo.InvariantCulture));
+    }
+
+    public double MeasureBaseLineOffset(IEnumerable<FontProperties> fonts)
+    {
+        bool isFirst = true;
+        StringBuilder builder = StringBuilderCache.Acquire();
+        foreach (FontProperties font in fonts)
+        {
+            if (!isFirst)
+            {
+                builder.Append(',');
+            }
+
+            isFirst = false;
+            builder.Append('\'');
+            font.AppendCssFont(builder);
+            builder.Append('\'');
+        }
+
+        return Interop.ExecuteJavaScriptDouble(
+            $"document.getBaseLineOffset({StringBuilderCache.GetStringAndRelease(builder)})", false);
     }
 }

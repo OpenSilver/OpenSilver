@@ -20,6 +20,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal;
 
@@ -27,28 +28,22 @@ internal static class UIElementHelpers
 {
     internal static void SetCharacterSpacing(this UIElement uie, int cSpacing)
     {
-        uie.OuterDiv.Style.letterSpacing = ToCssLetterSpacing(cSpacing);
-    }
-
-    internal static string ToCssLetterSpacing(int spacing)
-    {
-        double value = spacing / 1000.0;
-        return $"{value.ToInvariantString()}em";
+        uie.OuterDiv.Style.letterSpacing = FontProperties.ToCssLetterSpacing(cSpacing);
     }
 
     internal static void SetFontFamily(this UIElement uie, FontFamily font)
     {
-        uie.OuterDiv.Style.fontFamily = font.ToCssString(uie);
+        uie.OuterDiv.Style.fontFamily = FontProperties.ToCssFontFamily(font);
     }
 
     internal static void SetFontStyle(this UIElement uie, FontStyle fontStyle)
     {
-        uie.OuterDiv.Style.fontStyle = fontStyle.ToCssString();
+        uie.OuterDiv.Style.fontStyle = FontProperties.ToCssFontStyle(fontStyle);
     }
 
     internal static void SetFontWeight(this UIElement uie, FontWeight fontWeight)
     {
-        uie.OuterDiv.Style.fontWeight = fontWeight.ToCssString();
+        uie.OuterDiv.Style.fontWeight = FontProperties.ToCssFontWeight(fontWeight);
     }
 
     internal static void SetForeground(this UIElement uie, Brush oldForeground, Brush newForeground)
@@ -113,15 +108,8 @@ internal static class UIElementHelpers
 
     internal static void SetLineHeight(this UIElement uie, double lineHeight)
     {
-        uie.OuterDiv.Style.lineHeight = ToCssLineHeight(lineHeight);
+        uie.OuterDiv.Style.lineHeight = FontProperties.ToCssLineHeight(lineHeight);
     }
-
-    internal static string ToCssLineHeight(double lineHeight) =>
-        lineHeight switch
-        {
-            0.0 => "normal",
-            _ => $"{lineHeight.ToInvariantString()}px",
-        };
 
     internal static void SetPadding(this UIElement uie, Thickness padding)
     {
@@ -168,10 +156,8 @@ internal static class UIElementHelpers
 
     internal static void SetFontSize(this UIElement uie, double fontSize)
     {
-        uie.OuterDiv.Style.fontSize = ToCssPxFontSize(fontSize);
+        uie.OuterDiv.Style.fontSize = FontProperties.ToCssPxFontSize(fontSize);
     }
-
-    internal static string ToCssPxFontSize(double fontSize) => $"{fontSize.ToInvariantString()}px";
 
     internal static void SetTextSelection(this UIElement uie, bool enabled)
     {
@@ -295,21 +281,9 @@ internal static class UIElementHelpers
         };
     }
 
-    internal static double GetBaseLineOffset(this UIElement uie)
-    {
-        Debug.Assert(uie is not null);
-        if (uie.OuterDiv is not null)
-        {
-            string sDiv = Interop.GetVariableStringForJS(uie.OuterDiv);
-            return Interop.ExecuteJavaScriptDouble($"document.getBaseLineOffset({sDiv});");
-        }
-
-        return 0.0;
-    }
-
     internal static void InvalidateMeasureOnFontFamilyChanged(UIElement uie, FontFamily font)
     {
-        var face = font.GetFontFace(uie);
+        var face = font.GetFontFace();
         if (face.IsLoaded)
         {
             InvalidateMeasure(uie);

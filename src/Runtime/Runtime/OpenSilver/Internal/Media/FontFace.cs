@@ -48,9 +48,9 @@ internal sealed class FontFace
         }
     }
 
-    internal static FontFace GetFontFace(string source, UIElement relativeTo)
+    internal static FontFace GetFontFace(string source)
     {
-        (string fontName, string fontUrl) = ParseFontSource(source, relativeTo);
+        (string fontName, string fontUrl) = ParseFontSource(source);
 
         if (!_fontFacesCache.TryGetValue(fontName, out FontFace face))
         {
@@ -128,7 +128,7 @@ internal sealed class FontFace
         _measureList = null;
     }
 
-    private static (string CssFontName, string CssFontUrl) ParseFontSource(string fontSource, UIElement relativeTo)
+    private static (string CssFontName, string CssFontUrl) ParseFontSource(string fontSource)
     {
         string fontPath = fontSource.Trim().ToLower();
 
@@ -161,7 +161,7 @@ internal sealed class FontFace
         }
 
         // Get a path that will lead to the position of the file
-        string relativeFontPath = INTERNAL_UriHelper.ConvertToHtml5Path(fontUrl, relativeTo);
+        string relativeFontPath = INTERNAL_UriHelper.ConvertToHtml5Path(fontUrl, null);
         relativeFontPath = relativeFontPath.Replace('\\', '/');
         if (relativeFontPath.StartsWith("/"))
         {

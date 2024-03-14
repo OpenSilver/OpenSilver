@@ -17,8 +17,8 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Input;
 using CSHTML5.Internal;
-using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Controls
 {
@@ -474,16 +474,28 @@ namespace System.Windows.Controls
         /// is automatically calculated from the current font characteristics. The default
         /// is <see cref="double.NaN"/>.
         /// </returns>
-        public double BaselineOffset => GetBaseLineOffset(this);
-
-        private static double GetBaseLineOffset(TextBox textbox)
+        public double BaselineOffset
         {
-            if (textbox._textViewHost?.View is TextBoxView view)
+            get
             {
-                return view.GetBaseLineOffset();
-            }
+                if (!string.IsNullOrEmpty(Text) && _textViewHost?.View is TextBoxView view)
+                {
+                    return Application.Current.MainWindow.TextMeasurementService.MeasureBaseLineOffset(
+                        new FontProperties[1]
+                        {
+                            new FontProperties
+                            {
+                                FontStyle = (FontStyle)view.GetValue(FontStyleProperty),
+                                FontWeight = (FontWeight)view.GetValue(FontWeightProperty),
+                                FontSize = (double)view.GetValue(FontSizeProperty),
+                                LineHeight = (double)view.GetValue(LineHeightProperty),
+                                FontFamily = (FontFamily)view.GetValue(FontFamilyProperty),
+                            },
+                        });
+                }
 
-            return 0.0;
+                return 0.0;
+            }
         }
 
         public string SelectedText

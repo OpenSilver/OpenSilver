@@ -890,11 +890,16 @@ document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflo
 };
 
 document.getBaseLineOffset = (function () {
+    const baseLineString = "’'`\"\\@#$%^&*()+=-_/|:].,!~abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     const ctx = document.createElement('canvas').getContext('2d');
-    return function (element) {
-        if (!element) return 0.0;
-        ctx.font = getComputedStyle(element).font;
-        return ctx.measureText('').fontBoundingBoxAscent;
+
+    return function (...fonts) {
+        let baselineOffset = 0;
+        for (const font of fonts) {
+            ctx.font = font;
+            baselineOffset = Math.max(baselineOffset, ctx.measureText(baseLineString).fontBoundingBoxAscent);
+        }
+        return baselineOffset;
     };
 })();
 

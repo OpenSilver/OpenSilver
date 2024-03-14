@@ -11,11 +11,13 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Windows.Documents;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Controls
 {
@@ -351,16 +353,66 @@ namespace System.Windows.Controls
         /// The computed baseline for the first paragraph, or 0 if the <see cref="RichTextBlock"/>
         /// is empty.
         /// </returns>
-        public double BaselineOffset => GetBaseLineOffset(this);
-
-        private static double GetBaseLineOffset(RichTextBlock rtb)
+        public double BaselineOffset
         {
-            if (rtb.Blocks.Count > 0)
+            get
             {
-                return rtb.GetBaseLineOffset();
-            }
+                if (Blocks.Count > 0)
+                {
+                    return Application.Current.MainWindow.TextMeasurementService.MeasureBaseLineOffset(GetFonts(this));
+                }
 
-            return 0.0;
+                return 0.0;
+
+                static IEnumerable<FontProperties> GetFonts(RichTextBlock richtextblock)
+                {
+                    foreach (Block block in richtextblock.Blocks.InternalItems)
+                    {
+                        foreach (FontProperties font in GetFontsRecursive(block, block))
+                        {
+                            yield return font;
+                        }
+                    }
+
+                    static IEnumerable<FontProperties> GetFontsRecursive(Block block, UIElement current)
+                    {
+                        int count = current.VisualChildrenCount;
+                        for (int i = 0; i < count; i++)
+                        {
+                            switch (current.GetVisualChild(i))
+                            {
+                                case Run run:
+                                    if (!string.IsNullOrEmpty(run.Text))
+                                    {
+                                        yield return new FontProperties
+                                        {
+                                            FontStyle = run.FontStyle,
+                                            FontWeight = run.FontWeight,
+                                            FontSize = run.FontSize,
+                                            LineHeight = block.LineHeight,
+                                            FontFamily = run.FontFamily,
+                                        };
+                                    }
+                                    break;
+
+                                case Block b:
+                                    foreach (FontProperties font in GetFontsRecursive(b, b))
+                                    {
+                                        yield return font;
+                                    }
+                                    break;
+
+                                case TextElement textElement:
+                                    foreach (FontProperties font in GetFontsRecursive(block, textElement))
+                                    {
+                                        yield return font;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)

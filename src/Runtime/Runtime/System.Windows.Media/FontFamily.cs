@@ -80,8 +80,6 @@ namespace System.Windows.Media
         /// </returns>
         public override string ToString() => Source ?? string.Empty;
 
-        internal string ToCssString(UIElement uie) => GetFontFace(uie).CssFontName;
-
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static Task<bool> LoadFontAsync(FontFamily font)
         {
@@ -101,10 +99,10 @@ namespace System.Windows.Media
                 return Task.FromResult(true);
             }
 
-            return FontFace.GetFontFace(fontSource, null).LoadAsync();
+            return FontFace.GetFontFace(fontSource).LoadAsync();
         }
 
-        internal FontFace GetFontFace(UIElement relativeTo) => _face ??= FontFace.GetFontFace(Source, relativeTo);
+        internal FontFace GetFontFace() => _face ??= FontFace.GetFontFace(Source);
 
         private FontFace _face;
     }
