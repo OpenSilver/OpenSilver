@@ -812,96 +812,108 @@ document.arrange = function (id, left, top, width, height, clip, clipLeft, clipT
     }
 };
 
-document.createMeasurementService = function (parent) {
-    if (!parent) return null;
-    const measurer = document.createElement('div');
-    measurer.id = `${parent.id}-msr`; 
-    measurer.style.position = 'absolute';
-    measurer.style.visibility = 'hidden';
-    measurer.style.height = '';
-    measurer.style.width = '';
-    measurer.style.boxSizing = 'border-box';
-    measurer.style.whiteSpace = 'pre';
-    measurer.style.left = '-100000px';
-    measurer.style.top = '-100000px';
-    measurer.style.textAlign = 'left';
-    parent.appendChild(measurer);
-    return measurer.id;
-};
+document.attachMeasurementService = function (owner) {
+    if (!owner || owner._measurementService) return;
 
-document.measureText = function (measureElementId, text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap) {
-    const textMeasurer = document.getElementById(measureElementId);
-    if (textMeasurer) {
-        textMeasurer.innerText = text;
-        textMeasurer.style.fontSize = fontSize;
-        textMeasurer.style.fontWeight = fontWeight;
-        textMeasurer.style.fontFamily = fontFamily;
-        textMeasurer.style.fontStyle = fontStyle;
-        textMeasurer.style.lineHeight = lineHeight;
-        textMeasurer.style.letterSpacing = spacing;
-        textMeasurer.style.whiteSpace = whitespace;
-        textMeasurer.style.overflowWrap = overflowWrap;
-        textMeasurer.style.maxWidth = maxWidth;
+    const htmlMeasurer = document.createElement('div');
+    htmlMeasurer.style.position = 'absolute';
+    htmlMeasurer.style.visibility = 'hidden';
+    htmlMeasurer.style.height = '';
+    htmlMeasurer.style.width = '';
+    htmlMeasurer.style.boxSizing = 'border-box';
+    htmlMeasurer.style.whiteSpace = 'pre';
+    htmlMeasurer.style.left = '-100000px';
+    htmlMeasurer.style.top = '-100000px';
+    htmlMeasurer.style.textAlign = 'left';
+    owner.appendChild(htmlMeasurer);
 
-        const rect = textMeasurer.getBoundingClientRect();
-        const size = rect.width + '|' + rect.height;
+    const canvasMeasurer = document.createElement('canvas').getContext('2d');
 
-        textMeasurer.innerText = '';
+    owner._measurementService = {
+        measureTextView: function (element, whiteSpace, overflowWrap, maxWidth, emptyVal) {
+            if (element instanceof HTMLTextAreaElement) {
+                let text = element.value.length == 0 ? emptyVal : element.value;
+                // if the text ends with a new line, we need to add one more or it will not be measured
+                if (text.endsWith('\n')) text += '\n';
+                htmlMeasurer.textContent = text;
+            } else {
+                htmlMeasurer.innerHTML = element.innerHTML.length == 0 ? emptyVal : element.innerHTML;
+            }
 
-        return size;
-    }
+            htmlMeasurer.style.fontSize = element.style.fontSize;
+            htmlMeasurer.style.fontWeight = element.style.fontWeight;
+            htmlMeasurer.style.fontFamily = element.style.fontFamily;
+            htmlMeasurer.style.fontStyle = element.style.fontStyle;
+            htmlMeasurer.style.lineHeight = element.style.lineHeight;
+            htmlMeasurer.style.letterSpacing = element.style.letterSpacing;
 
-    return '0|0';
-};
+            htmlMeasurer.style.whiteSpace = whiteSpace;
+            htmlMeasurer.style.overflowWrap = overflowWrap;
+            htmlMeasurer.style.maxWidth = maxWidth;
 
-document.measureTextBlock = function (measureElementId, uid, whiteSpace, overflowWrap, maxWidth, emptyVal) {
-    const element = document.getElementById(measureElementId);
-    const elToMeasure = document.getElementById(uid);
-    if (element && elToMeasure) {
-        if (elToMeasure instanceof HTMLTextAreaElement) {
-            let text = elToMeasure.value.length == 0 ? emptyVal : elToMeasure.value;
-            // if the text ends with a new line, we need to add one more or it will not be measured
-            if (text.endsWith('\n')) text += '\n';
-            element.textContent = text;
-        } else {
-            element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
-        }
+            const rect = htmlMeasurer.getBoundingClientRect();
+            const size = Math.ceil(rect.width) + '|' + Math.ceil(rect.height);
 
-        element.style.fontSize = elToMeasure.style.fontSize;
-        element.style.fontWeight = elToMeasure.style.fontWeight;
-        element.style.fontFamily = elToMeasure.style.fontFamily;
-        element.style.fontStyle = elToMeasure.style.fontStyle;
-        element.style.lineHeight = elToMeasure.style.lineHeight;
-        element.style.letterSpacing = elToMeasure.style.letterSpacing;
+            htmlMeasurer.innerHTML = '';
 
-        element.style.whiteSpace = whiteSpace;
-        element.style.overflowWrap = overflowWrap;
-        element.style.maxWidth = maxWidth;
+            return size;
+        },
+        measureText: function (text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap) {
+            htmlMeasurer.innerText = text;
+            htmlMeasurer.style.fontSize = fontSize;
+            htmlMeasurer.style.fontWeight = fontWeight;
+            htmlMeasurer.style.fontFamily = fontFamily;
+            htmlMeasurer.style.fontStyle = fontStyle;
+            htmlMeasurer.style.lineHeight = lineHeight;
+            htmlMeasurer.style.letterSpacing = spacing;
+            htmlMeasurer.style.whiteSpace = whitespace;
+            htmlMeasurer.style.overflowWrap = overflowWrap;
+            htmlMeasurer.style.maxWidth = maxWidth;
 
-        const rect = element.getBoundingClientRect();
-        const size = Math.ceil(rect.width) + '|' + Math.ceil(rect.height);
+            const rect = htmlMeasurer.getBoundingClientRect();
+            const size = rect.width + '|' + rect.height;
 
-        element.innerHTML = '';
+            htmlMeasurer.innerText = '';
 
-        return size;
-    }
-
-    return '0|0';
-};
-
-document.getBaseLineOffset = (function () {
-    const baseLineString = "’'`\"\\@#$%^&*()+=-_/|:].,!~abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    const ctx = document.createElement('canvas').getContext('2d');
-
-    return function (...fonts) {
-        let baselineOffset = 0;
-        for (const font of fonts) {
-            ctx.font = font;
-            baselineOffset = Math.max(baselineOffset, ctx.measureText(baseLineString).fontBoundingBoxAscent);
-        }
-        return baselineOffset;
+            return size;
+        },
+        measureBaseline: function (fonts) {
+            let baselineOffset = 0.0;
+            for (const font of fonts) {
+                canvasMeasurer.font = font;
+                baselineOffset = Math.max(baselineOffset, canvasMeasurer.measureText('').fontBoundingBoxAscent);
+            }
+            return baselineOffset;
+        },
     };
-})();
+};
+
+document.measureText = function (measurerId, text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap) {
+    const owner = document.getElementById(measurerId);
+    if (owner && owner._measurementService) {
+        return owner._measurementService.measureText(text, maxWidth, fontSize, fontFamily, fontStyle, fontWeight, lineHeight, spacing, whitespace, overflowWrap);
+    }
+    return '0|0';
+};
+
+document.measureTextView = function (measurerId, id, whiteSpace, overflowWrap, maxWidth, emptyVal) {
+    const owner = document.getElementById(measurerId);
+    if (owner && owner._measurementService) {
+        const element = document.getElementById(id);
+        if (element) {
+            return owner._measurementService.measureTextView(element, whiteSpace, overflowWrap, maxWidth, emptyVal);
+        }
+    }
+    return '0|0';
+};
+
+document.measureBaseline = function (measurerId, ...fonts) {
+    const owner = document.getElementById(measurerId);
+    if (owner && owner._measurementService) {
+        return owner._measurementService.measureBaseline(fonts);
+    }
+    return 0.0;
+};
 
 document.setContentString = function (id, text, removeTextWrapping) {
     var el = document.getElementById(id);

@@ -478,9 +478,11 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (!string.IsNullOrEmpty(Text) && _textViewHost?.View is TextBoxView view)
+                if (!string.IsNullOrEmpty(Text) &&
+                    _textViewHost?.View is TextBoxView view &&
+                    Application.Current is Application app)
                 {
-                    return Application.Current.MainWindow.TextMeasurementService.MeasureBaseLineOffset(
+                    return app.MainWindow.TextMeasurementService.MeasureBaseline(
                         new FontProperties[1]
                         {
                             new FontProperties

@@ -357,9 +357,9 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (Blocks.Count > 0)
+                if (Blocks.Count > 0 && Application.Current is Application app)
                 {
-                    return Application.Current.MainWindow.TextMeasurementService.MeasureBaseLineOffset(GetFonts(this));
+                    return app.MainWindow.TextMeasurementService.MeasureBaseline(GetFonts(this));
                 }
 
                 return 0.0;

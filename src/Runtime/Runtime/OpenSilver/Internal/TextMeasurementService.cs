@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -23,35 +22,28 @@ using OpenSilver.Internal.Media;
 
 namespace OpenSilver.Internal;
 
-/// <summary>
-/// Measure Text Block width and height from html element.
-/// </summary>
 internal sealed class TextMeasurementService
 {
-    private readonly string _measurerId;
+    private readonly Window _window;
 
-    public TextMeasurementService(Window parent)
+    public TextMeasurementService(Window owner)
     {
-        Debug.Assert(parent is not null);
+        Debug.Assert(owner is not null);
 
-        string id = CreateMeasurementText(parent);
-        if (string.IsNullOrEmpty(id))
-        {
-            throw new InvalidOperationException();
-        }
+        _window = owner;
 
-        _measurerId = id;
+        AttachMeasurementService(owner);
     }
 
-    private string CreateMeasurementText(Window parent)
+    private void AttachMeasurementService(Window owner)
     {
-        Debug.Assert(parent.OuterDiv is not null);
+        Debug.Assert(owner.OuterDiv is not null);
 
-        string sParent = Interop.GetVariableStringForJS(parent.OuterDiv);
-        return Interop.ExecuteJavaScriptString($"document.createMeasurementService({sParent});");
+        string sOwner = Interop.GetVariableStringForJS(owner.OuterDiv);
+        Interop.ExecuteJavaScriptVoid($"document.attachMeasurementService({sOwner});");
     }
 
-    public Size MeasureView(string uid,
+    public Size MeasureView(string id,
                             string whiteSpace,
                             string overflowWrap,
                             double maxWidth,
@@ -61,7 +53,7 @@ internal sealed class TextMeasurementService
             ? string.Empty : $"{maxWidth.ToInvariantString()}px";
 
         string strTextSize = Interop.ExecuteJavaScriptString(
-            $"document.measureTextBlock('{_measurerId}','{uid}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
+            $"document.measureTextView('{_window.OuterDiv.UniqueIdentifier}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
 
         int index = strTextSize.IndexOf('|');
         return new Size(
@@ -90,7 +82,7 @@ internal sealed class TextMeasurementService
         (string sWhiteSpace, string sOverflowWrap) = UIElementHelpers.ToCssTextWrapping(textWrapping);
 
         string size = Interop.ExecuteJavaScriptString(
-            $"document.measureText('{_measurerId}',{escapedText},'{sMaxWidth}','{sFontSize}','{sFontFamily}','{sFontStyle}','{sFontWeight}','{sLineHeight}','{sSpacing}','{sWhiteSpace}','{sOverflowWrap}')",
+            $"document.measureText('{_window.OuterDiv.UniqueIdentifier}',{escapedText},'{sMaxWidth}','{sFontSize}','{sFontFamily}','{sFontStyle}','{sFontWeight}','{sLineHeight}','{sSpacing}','{sWhiteSpace}','{sOverflowWrap}')",
             false);
 
         int index = size.IndexOf('|');
@@ -99,7 +91,7 @@ internal sealed class TextMeasurementService
             double.Parse(size.Substring(index + 1), CultureInfo.InvariantCulture));
     }
 
-    public double MeasureBaseLineOffset(IEnumerable<FontProperties> fonts)
+    public double MeasureBaseline(IEnumerable<FontProperties> fonts)
     {
         bool isFirst = true;
         StringBuilder builder = StringBuilderCache.Acquire();
@@ -111,12 +103,13 @@ internal sealed class TextMeasurementService
             }
 
             isFirst = false;
+
             builder.Append('\'');
             font.AppendCssFont(builder);
             builder.Append('\'');
         }
 
         return Interop.ExecuteJavaScriptDouble(
-            $"document.getBaseLineOffset({StringBuilderCache.GetStringAndRelease(builder)})", false);
+            $"document.measureBaseline('{_window.OuterDiv.UniqueIdentifier}',{StringBuilderCache.GetStringAndRelease(builder)})", false);
     }
 }

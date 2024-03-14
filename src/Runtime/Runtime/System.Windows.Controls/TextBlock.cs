@@ -545,9 +545,9 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (!string.IsNullOrEmpty(Text))
+                if (!string.IsNullOrEmpty(Text) && Application.Current is Application app)
                 {
-                    return Application.Current.MainWindow.TextMeasurementService.MeasureBaseLineOffset(GetFonts(this, this));
+                    return app.MainWindow.TextMeasurementService.MeasureBaseline(GetFonts(this, this));
                 }
 
                 return 0.0;
