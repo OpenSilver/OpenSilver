@@ -132,7 +132,14 @@ internal sealed class PasswordBoxView : TextViewBase
     {
         if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
         {
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxLength", maxLength);
+            if (maxLength > 0)
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxLength", maxLength);
+            }
+            else
+            {
+                INTERNAL_HtmlDomManager.RemoveAttribute(OuterDiv, "maxlength");
+            }
         }
     }
 
@@ -172,7 +179,11 @@ internal sealed class PasswordBoxView : TextViewBase
         PasswordBox host = Host;
 
         this.SetCaretColor(host.CaretBrush);
-        INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxlength", host.MaxLength);
+        int maxLength = host.MaxLength;
+        if (maxLength > 0)
+        {
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "maxlength", maxLength);
+        }
         SetPasswordNative(host.Password);
     }
 
