@@ -57,9 +57,13 @@ internal sealed class TextMeasurementService
             $"document.measureTextView('{_window.OuterDiv.UniqueIdentifier}','{id}','{whiteSpace}','{overflowWrap}','{strMaxWidth}','{emptyVal}')");
 
         int index = strTextSize.IndexOf('|');
-        return new Size(
-            double.Parse(strTextSize.Substring(0, index), CultureInfo.InvariantCulture),
-            double.Parse(strTextSize.Substring(index + 1), CultureInfo.InvariantCulture));
+        if (index > -1)
+        {
+            return new Size(
+                double.Parse(strTextSize.Substring(0, index), CultureInfo.InvariantCulture),
+                double.Parse(strTextSize.Substring(index + 1), CultureInfo.InvariantCulture));
+        }
+        return new Size(0, 0);
     }
 
     public Size MeasureTextBlock(TextBlock textblock)
@@ -74,9 +78,13 @@ internal sealed class TextMeasurementService
             false);
 
         int index = size.IndexOf('|');
-        return new Size(
-            double.Parse(size.Substring(0, index), CultureInfo.InvariantCulture),
-            double.Parse(size.Substring(index + 1), CultureInfo.InvariantCulture));
+        if (index > -1)
+        {
+            return new Size(
+                double.Parse(size.Substring(0, index), CultureInfo.InvariantCulture),
+                double.Parse(size.Substring(index + 1), CultureInfo.InvariantCulture));
+        }
+        return new Size(0, 0);
 
         static string BuildInnerHtml(TextBlock tb)
         {
