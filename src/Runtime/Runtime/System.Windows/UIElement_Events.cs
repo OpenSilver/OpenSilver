@@ -41,6 +41,7 @@ namespace System.Windows
             RoutedEvent.RegisterClassHandler(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnMouseLeftButtonUpThunk));
             RoutedEvent.RegisterClassHandler(MouseEnterEvent, new MouseEventHandler(OnMouseEnterThunk));
             RoutedEvent.RegisterClassHandler(MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk));
+            RoutedEvent.RegisterClassHandler(TextInputStartEvent, new TextCompositionEventHandler(OnTextInputStartThunk));
             RoutedEvent.RegisterClassHandler(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk));
             RoutedEvent.RegisterClassHandler(TappedEvent, new TappedEventHandler(OnTappedThunk));
             RoutedEvent.RegisterClassHandler(MouseRightButtonUpEvent, new MouseButtonEventHandler(OnMouseRightButtonUpThunk));
@@ -64,6 +65,8 @@ namespace System.Windows
         private static void OnMouseEnterThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseEnter(e);
 
         private static void OnMouseLeaveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseLeave(e);
+
+        private static void OnTextInputStartThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInputStart(e);
 
         private static void OnTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInput(e);
 
@@ -503,6 +506,36 @@ namespace System.Windows
         #region Text events
 
         /// <summary>
+        /// Identifies the <see cref="TextInputStart"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent TextInputStartEvent;
+
+        /// <summary>
+        /// Occurs when a UI element initially gets text in a device-independent manner.
+        /// </summary>
+        public event TextCompositionEventHandler TextInputStart
+        {
+            add
+            {
+                AddHandler(TextInputStartEvent, value, false);
+            }
+            remove
+            {
+                RemoveHandler(TextInputStartEvent, value);
+            }
+        }
+
+        /// <summary>
+        /// Called before the <see cref="TextInputStart"/> event occurs.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="TextCompositionEventArgs"/> that contains the event data.
+        /// </param>
+        protected virtual void OnTextInputStart(TextCompositionEventArgs e)
+        {
+        }
+
+        /// <summary>
         /// Identifies the <see cref="TextInput"/> routed event.
         /// </summary>
         public static readonly RoutedEvent TextInputEvent;
@@ -526,30 +559,20 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Raises the TextInput event
+        /// Called before the <see cref="TextInput"/> event occurs.
         /// </summary>
-        /// <param name="eventArgs">The arguments for the event.</param>
+        /// <param name="eventArgs">
+        /// A <see cref="TextCompositionEventArgs"/> that contains the event data.
+        /// </param>
         protected virtual void OnTextInput(TextCompositionEventArgs eventArgs)
         {
         }
-
-        /// <summary>
-        /// Identifies the <see cref="TextInputStart"/> routed event.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly RoutedEvent TextInputStartEvent;
 
         /// <summary>
         /// Identifies the <see cref="TextInputUpdate"/> routed event.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputUpdateEvent;
-
-        /// <summary>
-        /// Occurs when a UI element initially gets text in a device-independent manner.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public event TextCompositionEventHandler TextInputStart;
 
         /// <summary>
         /// Occurs when text continues to be composed via an input method editor (IME).

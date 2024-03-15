@@ -19,7 +19,9 @@ namespace System.Windows.Input
 	/// </summary>
 	public sealed class TextComposition
 	{
-		internal TextComposition(string compositionText)
+        internal static TextComposition Empty { get; } = new TextComposition(string.Empty);
+
+        internal TextComposition(string compositionText)
         {
 			CompositionText = compositionText;
 		}

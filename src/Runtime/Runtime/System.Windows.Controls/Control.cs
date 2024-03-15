@@ -618,12 +618,6 @@ namespace System.Windows.Controls
         }
 
         [OpenSilver.NotImplemented]
-        protected virtual void OnTextInputStart(TextCompositionEventArgs e)
-        {
-
-        }
-
-        [OpenSilver.NotImplemented]
         protected virtual void OnTextInputUpdate(TextCompositionEventArgs e)
         {
 

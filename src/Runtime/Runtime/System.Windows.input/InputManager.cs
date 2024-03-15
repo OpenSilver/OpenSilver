@@ -723,20 +723,33 @@ internal sealed class InputManager
             return;
         }
 
-        var e = new TextCompositionEventArgs
+        string text = ((char)keyCode).ToString();
+
+        var textInputStartArgs = new TextCompositionEventArgs
         {
-            RoutedEvent = UIElement.TextInputEvent,
+            RoutedEvent = UIElement.TextInputStartEvent,
             OriginalSource = keyboardTarget,
-            Text = ((char)keyCode).ToString(),
-            TextComposition = new TextComposition(string.Empty),
+            Text = text,
+            TextComposition = TextComposition.Empty,
             UIEventArg = jsEventArg,
         };
 
-        keyboardTarget.RaiseEvent(e);
+        keyboardTarget.RaiseEvent(textInputStartArgs);
 
-        if (e.Cancel)
+        var textInputArgs = new TextCompositionEventArgs
         {
-            e.PreventDefault();
+            RoutedEvent = UIElement.TextInputEvent,
+            OriginalSource = keyboardTarget,
+            Text = text,
+            TextComposition = TextComposition.Empty,
+            UIEventArg = jsEventArg,
+        };
+
+        keyboardTarget.RaiseEvent(textInputArgs);
+
+        if (textInputArgs.Cancel)
+        {
+            textInputArgs.PreventDefault();
         }
     }
 
