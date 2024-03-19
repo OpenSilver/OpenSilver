@@ -206,7 +206,9 @@ public abstract class TextElement : UIElement
     /// Identifies the <see cref="Language"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty LanguageProperty =
-        FrameworkElement.LanguageProperty.AddOwner(typeof(TextElement));
+        FrameworkElement.LanguageProperty.AddOwner(
+            typeof(TextElement),
+            new FrameworkPropertyMetadata(XmlLanguage.GetLanguage("en-US"), FrameworkPropertyMetadataOptions.Inherits));
 
     /// <summary>
     /// Gets or sets the language of the content within an <see cref="TextElement"/> element.

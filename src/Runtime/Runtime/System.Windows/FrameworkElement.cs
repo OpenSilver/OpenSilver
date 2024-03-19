@@ -904,7 +904,7 @@ namespace System.Windows
                 nameof(Language),
                 typeof(XmlLanguage),
                 typeof(FrameworkElement),
-                new PropertyMetadata(XmlLanguage.GetLanguage("en-US")));
+                new FrameworkPropertyMetadata(XmlLanguage.GetLanguage("en-US"), FrameworkPropertyMetadataOptions.Inherits));
 
         /// <summary>
         /// Gets or sets localization/globalization language information that applies to
