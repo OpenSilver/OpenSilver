@@ -49,10 +49,6 @@ body {
     display: none !important;
 }
 
-.uielement-unarranged {
-    opacity: 0 !important;
-}
-
 .opensilver-hyperlink {
     cursor: pointer;
 }
