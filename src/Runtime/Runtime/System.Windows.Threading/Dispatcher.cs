@@ -12,8 +12,10 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using DotNetForHtml5.Core;
 
 namespace System.Windows.Threading;
@@ -26,13 +28,14 @@ public class Dispatcher
     private static Dispatcher _currentDispatcher;
 
     private readonly PriorityQueue<DispatcherOperation> _queue;
+    private readonly object _sync = new();
     private readonly IDisposable _disableProcessingToken;
     private int _disableProcessingRequests;
     private bool _isProcessQueueScheduled;
 
     public Dispatcher()
     {
-        _queue = new PriorityQueue<DispatcherOperation>((int)DispatcherPriority.Send - (int)DispatcherPriority.Invalid);
+        _queue = new PriorityQueue<DispatcherOperation>((int)DispatcherPriority.Send - (int)DispatcherPriority.Inactive + 1);
         _disableProcessingToken = new DispatcherProcessingDisabled(this);
     }
 
@@ -98,6 +101,8 @@ public class Dispatcher
 
     public DispatcherOperation InvokeAsync(Action a, DispatcherPriority priority = DispatcherPriority.Normal)
     {
+        ValidatePriority(priority);
+
         return EnqueueOperation(a, priority);
     }
 
@@ -156,7 +161,12 @@ public class Dispatcher
     private DispatcherOperation EnqueueOperation(Action a, DispatcherPriority priority)
     {
         var operation = new DispatcherOperation(a, priority);
-        _queue.Enqueue((int)operation.Priority + 1, operation);
+
+        lock (_sync)
+        {
+            _queue.Enqueue((int)operation.Priority, operation);
+        }
+
         ScheduleProcessQueue();
 
         return operation;
@@ -164,9 +174,17 @@ public class Dispatcher
 
     private bool TryDequeue(out DispatcherOperation operation)
     {
-        while (_disableProcessingRequests == 0 && _queue.MaxPriority - 1 > (int)DispatcherPriority.Inactive)
+        while (_disableProcessingRequests == 0)
         {
-            operation = _queue.Dequeue();
+            lock (_sync)
+            {
+                if (_queue.MaxPriority == (int)DispatcherPriority.Inactive)
+                {
+                    break;
+                }
+
+                operation = _queue.Dequeue();
+            }
 
             if (operation.Status != DispatcherOperationStatus.Pending) continue;
 
@@ -175,6 +193,14 @@ public class Dispatcher
 
         operation = null;
         return false;
+    }
+
+    private static void ValidatePriority(DispatcherPriority priority, [CallerArgumentExpression(nameof(priority))] string paramName = null)
+    {
+        if (priority < DispatcherPriority.Inactive || priority > DispatcherPriority.Send)
+        {
+            throw new InvalidEnumArgumentException(paramName, (int)priority, typeof(DispatcherPriority));
+        }
     }
 
     private sealed class DispatcherProcessingDisabled : IDisposable

@@ -19,9 +19,9 @@ public class PriorityQueue<TValue>
     private int _count;
     private int _topPriority;
 
-    public PriorityQueue(int maxPriotiry)
+    public PriorityQueue(int maxPriority)
     {
-        _queues = new Queue<TValue>[maxPriotiry];
+        _queues = new Queue<TValue>[maxPriority];
     }
 
     public int Count => _count;
