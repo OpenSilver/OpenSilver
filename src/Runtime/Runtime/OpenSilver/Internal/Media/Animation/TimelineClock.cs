@@ -205,37 +205,19 @@ internal abstract class TimelineClock
 
     public void OnFrame(TimeSpan frameTime)
     {
-        if (IsCompleted)
-        {
-            return;
-        }
-
         if (frameTime < BeginTime)
         {
             ResetCachedStateToStopped();
             return;
         }
 
-        bool raiseCompleted = false;
-
-        Duration effectiveDuration = EffectiveDuration;
-        TimeSpan currentTime = GetAdjustedTime(frameTime);
-
-        if (effectiveDuration.HasTimeSpan && currentTime >= effectiveDuration.TimeSpan)
-        {
-            raiseCompleted = true;
-            currentTime = effectiveDuration.TimeSpan;
-        }
-
-        CurrentState = ClockState.Active;
-        CurrentTime = GetIterationCurrentTime(currentTime);
-        CurrentIteration = GetCurrentIteration(currentTime);
+        UpdateLocalState(frameTime);
 
         OnFrameCore();
 
-        if (raiseCompleted)
+        if (IsCompleted)
         {
-            OnCompleted();
+            RaiseCompletedForRoot();
         }
     }
 
@@ -299,7 +281,7 @@ internal abstract class TimelineClock
 
     private void InternalSeek(TimeSpan offset, bool align)
     {
-        SetFlagRecursive(ClockFlags.IsCompleted, false);
+        IsCompleted = false;
         Clock.Seek(offset);
         RequestNextFrames(true);
         if (align)
@@ -321,61 +303,52 @@ internal abstract class TimelineClock
 
     private TimeSpan GetAdjustedTime(TimeSpan currentTime) => currentTime - BeginTime;
 
-    private TimeSpan GetIterationCurrentTime(TimeSpan localTime)
+    private void UpdateLocalState(TimeSpan frameTime)
     {
-        if (localTime == TimeSpan.Zero)
+        TimeSpan localTime = GetAdjustedTime(frameTime);
+
+        Duration effectiveDuration = EffectiveDuration;
+        if (effectiveDuration.HasTimeSpan && localTime >= effectiveDuration.TimeSpan)
         {
-            return TimeSpan.Zero;
+            SetCompletedForRoot();
+
+            CurrentState = ClockState.Filling;
+
+            localTime = effectiveDuration.TimeSpan;
+        }
+        else
+        {
+            CurrentState = ClockState.Active;
         }
 
         Duration iterationDuration = IterationDuration;
         if (iterationDuration == Duration.Forever)
         {
-            return localTime;
+            CurrentIteration = 1;
+            CurrentTime = localTime;
+            return;
         }
 
         Debug.Assert(iterationDuration.HasTimeSpan);
 
-        if (iterationDuration.TimeSpan == TimeSpan.Zero)
+        if (iterationDuration.TimeSpan == TimeSpan.Zero || localTime == TimeSpan.Zero)
         {
-            return TimeSpan.Zero;
+            CurrentIteration = 1; // Arbitrary value
+            CurrentTime = TimeSpan.Zero;
+            return;
         }
 
-        TimeSpan currentTime = TimeSpan.FromTicks(localTime.Ticks % iterationDuration.TimeSpan.Ticks);
-        if (currentTime == TimeSpan.Zero)
+        int nbIterations = (int)Math.DivRem(localTime.Ticks, iterationDuration.TimeSpan.Ticks, out long currentTimeTicks);
+        if (CurrentState == ClockState.Filling && currentTimeTicks == 0)
         {
-            return iterationDuration.TimeSpan;
+            CurrentIteration = nbIterations;
+            CurrentTime = iterationDuration.TimeSpan;
         }
-        return currentTime;
-    }
-
-    private int GetCurrentIteration(TimeSpan localTime)
-    {
-        if (localTime == TimeSpan.Zero)
+        else
         {
-            return 1;
+            CurrentIteration = nbIterations + 1;
+            CurrentTime = TimeSpan.FromTicks(currentTimeTicks);
         }
-
-        Duration iterationDuration = IterationDuration;
-        if (iterationDuration == Duration.Forever)
-        {
-            return 1;
-        }
-
-        Debug.Assert(iterationDuration.HasTimeSpan);
-
-        if (iterationDuration.TimeSpan == TimeSpan.Zero)
-        {
-            // Arbitrary value
-            return 1;
-        }
-
-        long nbIterations = Math.DivRem(localTime.Ticks, iterationDuration.TimeSpan.Ticks, out long currentIterationTicks);
-        if (currentIterationTicks > 0)
-        {
-            nbIterations++;
-        }
-        return (int)nbIterations;
     }
 
     private void ResetCachedStateToStopped()
@@ -385,16 +358,33 @@ internal abstract class TimelineClock
         CurrentState = ClockState.Stopped;
     }
 
-    private void OnCompleted()
+    private void SetCompletedForRoot()
     {
         if (IsRoot)
         {
+            IsCompleted = true;
             RequestNextFrames(false);
         }
+    }
 
-        CurrentState = ClockState.Filling;
-        IsCompleted = true;
+    private void RaiseCompletedForRoot()
+    {
+        Debug.Assert(IsRoot);
+        RaiseCompletedRecursively(this);
 
+        static void RaiseCompletedRecursively(TimelineClock rootClock)
+        {
+            rootClock.RaiseCompleted();
+
+            foreach (TimelineClock clock in rootClock.Children)
+            {
+                RaiseCompletedRecursively(clock);
+            }
+        }
+    }
+
+    private void RaiseCompleted()
+    {
         if (!CompletedEventRaised)
         {
             CompletedEventRaised = true;
@@ -419,16 +409,6 @@ internal abstract class TimelineClock
         else
         {
             _flags &= ~flag;
-        }
-    }
-
-    private void SetFlagRecursive(ClockFlags flag, bool value)
-    {
-        SetFlag(flag, value);
-
-        foreach (TimelineClock child in Children)
-        {
-            child.SetFlagRecursive(flag, value);
         }
     }
 
