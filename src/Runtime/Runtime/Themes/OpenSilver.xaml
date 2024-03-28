@@ -2436,7 +2436,7 @@
                                 <VisualState x:Name="Indeterminate">
                                     <Storyboard RepeatBehavior="Forever">
                                         <DoubleAnimation Storyboard.TargetName="IndeterminateGradientFill"
-                                                         Storyboard.TargetProperty="(Border.Background).(LinearGradientBrush.Transform).(TransformGroup.Children)[0].X"
+                                                         Storyboard.TargetProperty="(Rectangle.Fill).(LinearGradientBrush.Transform).(TransformGroup.Children)[0].X"
                                                          Duration="00:00:.5"
                                                          From="0"
                                                          To="20" />
@@ -2509,12 +2509,13 @@
                                         Background="{TemplateBinding Foreground}"
                                         Opacity="1"
                                         RenderTransformOrigin="0.5,0.5" />
-                                <Border x:Name="IndeterminateGradientFill"
-                                        CornerRadius="2"
-                                        BorderThickness="1"
-                                        Margin="{TemplateBinding BorderThickness}"
-                                        Opacity="0.7">
-                                    <Border.Background>
+                                <Rectangle x:Name="IndeterminateGradientFill"
+                                           RadiusX="2"
+                                           RadiusY="2"
+                                           StrokeThickness="1"
+                                           Margin="{TemplateBinding BorderThickness}"
+                                           Opacity="0.7">
+                                    <Rectangle.Fill>
                                         <LinearGradientBrush SpreadMethod="Repeat"
                                                              MappingMode="Absolute"
                                                              EndPoint="0,1"
@@ -2532,8 +2533,8 @@
                                             <GradientStop Color="#FFFFFFFF"
                                                           Offset="0.85" />
                                         </LinearGradientBrush>
-                                    </Border.Background>
-                                </Border>
+                                    </Rectangle.Fill>
+                                </Rectangle>
                             </Grid>
                             <!-- Beginning of Determinate Progress Bar Visuals-->
                             <Grid x:Name="DeterminateRoot"
