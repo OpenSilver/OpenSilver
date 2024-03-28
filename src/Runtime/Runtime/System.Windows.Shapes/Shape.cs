@@ -99,7 +99,11 @@ namespace System.Windows.Shapes
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                SetFill(this, (Brush)sender);
+                if (_fillBrush is ISvgBrush svgBrush)
+                {
+                    svgBrush.RenderBrush();
+                    SetSvgAttribute("fill", svgBrush.GetBrush(this));
+                }
             }
         }
 
@@ -112,7 +116,7 @@ namespace System.Windows.Shapes
                 shape.RemoveSvgAttribute("fill");
             }
 
-            if (fill is Brush brush && brush.GetSvgElement() is ISvgBrush svgBrush)
+            if (fill is Brush brush && brush.GetSvgElement(shape) is ISvgBrush svgBrush)
             {
                 shape._fillBrush = svgBrush;
                 shape.SetSvgAttribute("fill", svgBrush.GetBrush(shape));
@@ -197,7 +201,11 @@ namespace System.Windows.Shapes
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                SetStroke(this, (Brush)sender);
+                if (_strokeBrush is ISvgBrush svgBrush)
+                {
+                    svgBrush.RenderBrush();
+                    SetSvgAttribute("stroke", svgBrush.GetBrush(this));
+                }
             }
         }
 
@@ -210,7 +218,7 @@ namespace System.Windows.Shapes
                 shape.RemoveSvgAttribute("stroke");
             }
 
-            if (stroke is Brush brush && brush.GetSvgElement() is ISvgBrush svgBrush)
+            if (stroke is Brush brush && brush.GetSvgElement(shape) is ISvgBrush svgBrush)
             {
                 shape._strokeBrush = svgBrush;
                 shape.SetSvgAttribute("stroke", svgBrush.GetBrush(shape));

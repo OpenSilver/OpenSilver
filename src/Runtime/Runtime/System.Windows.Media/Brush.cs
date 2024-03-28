@@ -25,6 +25,8 @@ namespace System.Windows.Media
     /// </summary>
     public class Brush : DependencyObject
     {
+        private WeakEventListener<Brush, Transform, EventArgs> _transformChangedListener;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Brush"/> class.
         /// </summary>
@@ -90,13 +92,12 @@ namespace System.Windows.Media
         /// <summary>
         /// Identifies the <see cref="Transform"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TransformProperty =
             DependencyProperty.Register(
                 nameof(Transform),
                 typeof(Transform),
                 typeof(Brush),
-                null);
+                new PropertyMetadata(null, OnTransformChanged));
 
         /// <summary>
         /// Gets or sets the transformation that is applied to the brush.
@@ -104,26 +105,54 @@ namespace System.Windows.Media
         /// <returns>
         /// The transformation to apply to the brush.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public Transform Transform
         {
             get => (Transform)GetValue(TransformProperty);
             set => SetValueInternal(TransformProperty, value);
         }
 
+        private static void OnTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Brush brush = (Brush)d;
+
+            if (brush._transformChangedListener != null)
+            {
+                brush._transformChangedListener.Detach();
+                brush._transformChangedListener = null;
+            }
+
+            if (e.NewValue is Transform newTransform)
+            {
+                brush._transformChangedListener = new(brush, newTransform)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newTransform.Changed += brush._transformChangedListener.OnEvent;
+            }
+
+            brush.RaiseTransformChanged();
+        }
+
+        private void OnTransformChanged(object sender, EventArgs e) => RaiseTransformChanged();
+
         internal virtual Task<string> GetDataStringAsync(UIElement parent) =>
             Task.FromResult(string.Empty);
 
         internal event EventHandler Changed;
 
-        internal void RaiseBrushChanged() => Changed?.Invoke(this, EventArgs.Empty);
+        internal void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
+
+        internal event EventHandler TransformChanged;
+
+        internal void RaiseTransformChanged() => TransformChanged?.Invoke(this, EventArgs.Empty);
 
         internal static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((Brush)d).RaiseBrushChanged();
+            ((Brush)d).RaiseChanged();
         }
 
-        internal virtual ISvgBrush GetSvgElement() => DefaultSvgBrush.Instance;
+        internal virtual ISvgBrush GetSvgElement(Shape shape) => DefaultSvgBrush.Instance;
 
         private sealed class DefaultSvgBrush : ISvgBrush
         {
@@ -134,6 +163,8 @@ namespace System.Windows.Media
             public void DestroyBrush(Shape shape) { }
 
             public string GetBrush(Shape shape) => "none";
+
+            public void RenderBrush() { }
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]

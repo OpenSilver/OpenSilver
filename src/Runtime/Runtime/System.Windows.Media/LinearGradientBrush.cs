@@ -14,6 +14,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
@@ -125,7 +126,7 @@ namespace System.Windows.Media
         internal override Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(ToHtmlString(parent));
 
-        internal override ISvgBrush GetSvgElement() => new SvgLinearGradient(this);
+        internal override ISvgBrush GetSvgElement(Shape shape) => new SvgLinearGradient(shape, this);
 
         private (string Stops, double Alpha) ToHtmlStringForAbsoluteMappingMode(DependencyObject parent)
         {
@@ -540,26 +541,70 @@ namespace System.Windows.Media
 
         private sealed class SvgLinearGradient : ISvgBrush
         {
-            private readonly LinearGradientBrush _brush;
-            private INTERNAL_HtmlDomElementReference _gradientRef;
+            private readonly LinearGradientBrush _linearGradient;
+            private readonly INTERNAL_HtmlDomElementReference _gradientRef;
+            private readonly WeakEventListener<SvgLinearGradient, Brush, EventArgs> _transformChangedListener;
 
-            public SvgLinearGradient(LinearGradientBrush lgb)
+            public SvgLinearGradient(Shape shape, LinearGradientBrush lgb)
             {
-                _brush = lgb ?? throw new ArgumentNullException(nameof(lgb));
+                _linearGradient = lgb;
+                _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(shape.DefsElement, "linearGradient");
+                DrawLinearGradient();
+
+                _transformChangedListener = new(this, lgb)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                lgb.TransformChanged += _transformChangedListener.OnEvent;
             }
 
-            public string GetBrush(Shape shape)
-            {
-                _gradientRef ??= INTERNAL_HtmlDomManager.CreateLinearGradientAndAppendIt(shape.DefsElement, _brush);
-                return $"url(#{_gradientRef.UniqueIdentifier})";
-            }
+            public string GetBrush(Shape shape) => $"url(#{_gradientRef.UniqueIdentifier})";
+
+            public void RenderBrush() => DrawLinearGradient();
 
             public void DestroyBrush(Shape shape)
             {
-                Debug.Assert(_gradientRef is not null);
-
+                _transformChangedListener.Detach();
                 INTERNAL_HtmlDomManager.RemoveNodeNative(_gradientRef);
-                _gradientRef = null;
+            }
+
+            private void OnTransformChanged(object sender, EventArgs e)
+            {
+                Transform transform = ((Brush)sender).Transform;
+
+                if (transform is null || transform.IsIdentity)
+                {
+                    INTERNAL_HtmlDomManager.RemoveAttribute(_gradientRef, "gradientTransform");
+                }
+                else
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef,
+                        "gradientTransform",
+                        MatrixTransform.MatrixToHtmlString(transform.ValueInternal));
+                }
+            }
+
+            private void DrawLinearGradient()
+            {
+                Point start = _linearGradient.StartPoint;
+                Point end = _linearGradient.EndPoint;
+                string x1 = Math.Round(start.X, 2).ToInvariantString();
+                string y1 = Math.Round(start.Y, 2).ToInvariantString();
+                string x2 = Math.Round(end.X, 2).ToInvariantString();
+                string y2 = Math.Round(end.Y, 2).ToInvariantString();
+                string units = ConvertBrushMappingModeToString(_linearGradient.MappingMode);
+                string spreadMethod = ConvertSpreadMethodToString(_linearGradient.SpreadMethod);
+                string transform = _linearGradient.Transform is Transform t && !t.IsIdentity ?
+                    MatrixTransform.MatrixToHtmlString(t.ValueInternal) : string.Empty;
+                string opacity = Math.Round(_linearGradient.Opacity, 2).ToInvariantString();
+                string stops = string.Join(",",
+                    _linearGradient
+                    .GetGradientStops()
+                    .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
+
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.drawSvgLinearGradient('{_gradientRef.UniqueIdentifier}',{x1},{y1},{x2},{y2},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
             }
         }
     }

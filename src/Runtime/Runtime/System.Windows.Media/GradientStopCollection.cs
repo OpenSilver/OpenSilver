@@ -121,7 +121,7 @@ namespace System.Windows.Media
             _sortedStops = null;
             if (_ownerWeakRef.TryGetTarget(out GradientBrush owner))
             {
-                owner.RaiseBrushChanged();
+                owner.RaiseChanged();
             }
         }
     }

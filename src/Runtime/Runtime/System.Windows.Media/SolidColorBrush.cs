@@ -85,7 +85,7 @@ namespace System.Windows.Media
 
         internal string ToHtmlString() => Color.ToHtmlString(Opacity);
 
-        internal override ISvgBrush GetSvgElement() => new SvgSolidColorBrush(this);
+        internal override ISvgBrush GetSvgElement(Shape shape) => new SvgSolidColorBrush(this);
 
         private sealed class SvgSolidColorBrush : ISvgBrush
         {
@@ -99,6 +99,8 @@ namespace System.Windows.Media
             public string GetBrush(Shape shape) => _brush.ToHtmlString();
 
             public void DestroyBrush(Shape shape) { }
+
+            public void RenderBrush() { }
         }
 
         SolidColorBrush ICloneOnAnimation<SolidColorBrush>.Clone() => new SolidColorBrush(this);

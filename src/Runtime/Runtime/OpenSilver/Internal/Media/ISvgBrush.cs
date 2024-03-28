@@ -19,5 +19,7 @@ internal interface ISvgBrush
 {
     string GetBrush(Shape shape);
 
+    void RenderBrush();
+
     void DestroyBrush(Shape shape);
 }

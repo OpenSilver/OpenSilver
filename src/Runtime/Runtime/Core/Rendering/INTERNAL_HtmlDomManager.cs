@@ -622,53 +622,12 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return (svg, svgShape, svgDefs);
         }
 
-        internal static INTERNAL_HtmlDomElementReference CreateLinearGradientAndAppendIt(
-            INTERNAL_HtmlDomElementReference parent,
-            LinearGradientBrush linearGradient)
+        internal static INTERNAL_HtmlDomElementReference CreateSvgElementAndAppendIt(INTERNAL_HtmlDomElementReference parent, string tagName)
         {
             string uid = NewId();
-
-            Point start = linearGradient.StartPoint;
-            Point end = linearGradient.EndPoint;
-            string x1 = Math.Round(start.X, 2).ToInvariantString();
-            string y1 = Math.Round(start.Y, 2).ToInvariantString();
-            string x2 = Math.Round(end.X, 2).ToInvariantString();
-            string y2 = Math.Round(end.Y, 2).ToInvariantString();
-            string units = GradientBrush.ConvertBrushMappingModeToString(linearGradient.MappingMode);
-            string spreadMethod = GradientBrush.ConvertSpreadMethodToString(linearGradient.SpreadMethod);
-            string opacity = Math.Round(linearGradient.Opacity, 2).ToInvariantString();
-            string stops = string.Join(",",
-                linearGradient
-                .GetGradientStops()
-                .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
-
+            
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createSvgLinearGradient('{uid}','{parent.UniqueIdentifier}',{x1},{y1},{x2},{y2},'{units}','{spreadMethod}',{opacity},{stops})");
-
-            return new INTERNAL_HtmlDomElementReference(uid, parent);
-        }
-
-        internal static INTERNAL_HtmlDomElementReference CreateRadialGradientAndAppendIt(
-            INTERNAL_HtmlDomElementReference parent,
-            RadialGradientBrush radialGradient)
-        {
-            string uid = NewId();
-
-            Point center = radialGradient.Center;
-            string cx = Math.Round(center.X, 2).ToInvariantString();
-            string cy = Math.Round(center.Y, 2).ToInvariantString();
-            // TODO: support ellipse shaped radial on SVG using a gradientTransform.
-            string r = Math.Round(0.5 * Math.Max(0, radialGradient.RadiusX + radialGradient.RadiusY), 2).ToInvariantString();
-            string units = GradientBrush.ConvertBrushMappingModeToString(radialGradient.MappingMode);
-            string spreadMethod = GradientBrush.ConvertSpreadMethodToString(radialGradient.SpreadMethod);
-            string opacity = Math.Round(radialGradient.Opacity, 2).ToInvariantString();
-            string stops = string.Join(",",
-                radialGradient
-                .GetGradientStops()
-                .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
-
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"document.createSvgRadialGradient('{uid}','{parent.UniqueIdentifier}',{cx},{cy},{r},'{units}','{spreadMethod}',{opacity},{stops})");
+                $"document.createSvg('{uid}','{parent.UniqueIdentifier}','{tagName}')");
 
             return new INTERNAL_HtmlDomElementReference(uid, parent);
         }

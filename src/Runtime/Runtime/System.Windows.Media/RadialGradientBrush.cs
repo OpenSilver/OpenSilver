@@ -13,8 +13,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
@@ -180,7 +178,7 @@ namespace System.Windows.Media
         internal override Task<string> GetDataStringAsync(UIElement parent)
             => Task.FromResult(ToHtmlString(parent));
 
-        internal override ISvgBrush GetSvgElement() => new SvgRadialGradient(this);
+        internal override ISvgBrush GetSvgElement(Shape shape) => new SvgRadialGradient(shape, this);
 
         private string GetGradientStopsString()
         {
@@ -229,26 +227,69 @@ namespace System.Windows.Media
 
         private sealed class SvgRadialGradient : ISvgBrush
         {
-            private readonly RadialGradientBrush _brush;
-            private INTERNAL_HtmlDomElementReference _gradientRef;
+            private readonly RadialGradientBrush _radialGradient;
+            private readonly INTERNAL_HtmlDomElementReference _gradientRef;
+            private readonly WeakEventListener<SvgRadialGradient, Brush, EventArgs> _transformChangedListener;
 
-            public SvgRadialGradient(RadialGradientBrush rgb)
+            public SvgRadialGradient(Shape shape, RadialGradientBrush rgb)
             {
-                _brush = rgb ?? throw new ArgumentNullException(nameof(rgb));
+                _radialGradient = rgb;
+                _gradientRef = INTERNAL_HtmlDomManager.CreateSvgElementAndAppendIt(shape.DefsElement, "radialGradient");
+                DrawRadialGradient();
+
+                _transformChangedListener = new(this, rgb)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                rgb.TransformChanged += _transformChangedListener.OnEvent;
             }
 
-            public string GetBrush(Shape shape)
-            {
-                _gradientRef ??= INTERNAL_HtmlDomManager.CreateRadialGradientAndAppendIt(shape.DefsElement, _brush);
-                return $"url(#{_gradientRef.UniqueIdentifier})";
-            }
+            public string GetBrush(Shape shape) => $"url(#{_gradientRef.UniqueIdentifier})";
+
+            public void RenderBrush() => DrawRadialGradient();
 
             public void DestroyBrush(Shape shape)
             {
-                Debug.Assert(_gradientRef is not null);
-
+                _transformChangedListener.Detach();
                 INTERNAL_HtmlDomManager.RemoveNodeNative(_gradientRef);
-                _gradientRef = null;
+            }
+
+            private void OnTransformChanged(object sender, EventArgs e)
+            {
+                Transform transform = ((Brush)sender).Transform;
+
+                if (transform is null || transform.IsIdentity)
+                {
+                    INTERNAL_HtmlDomManager.RemoveAttribute(_gradientRef, "gradientTransform");
+                }
+                else
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef,
+                        "gradientTransform",
+                        MatrixTransform.MatrixToHtmlString(transform.ValueInternal));
+                }
+            }
+
+            private void DrawRadialGradient()
+            {
+                Point center = _radialGradient.Center;
+                string cx = Math.Round(center.X, 2).ToInvariantString();
+                string cy = Math.Round(center.Y, 2).ToInvariantString();
+                // TODO: support ellipse shaped radial on SVG using a gradientTransform.
+                string r = Math.Round(0.5 * Math.Max(0, _radialGradient.RadiusX + _radialGradient.RadiusY), 2).ToInvariantString();
+                string units = ConvertBrushMappingModeToString(_radialGradient.MappingMode);
+                string spreadMethod = ConvertSpreadMethodToString(_radialGradient.SpreadMethod);
+                string transform = _radialGradient.Transform is Transform t && !t.IsIdentity ?
+                    MatrixTransform.MatrixToHtmlString(t.ValueInternal) : string.Empty;
+                string opacity = Math.Round(_radialGradient.Opacity, 2).ToInvariantString();
+                string stops = string.Join(",",
+                    _radialGradient
+                    .GetGradientStops()
+                    .Select(s => $"{Math.Round(s.Offset, 2).ToInvariantString()},'{s.Color.ToHtmlString(1.0)}'"));
+
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                    $"document.drawSvgRadialGradient('{_gradientRef.UniqueIdentifier}',{cx},{cy},{r},'{units}','{spreadMethod}','{transform}',{opacity},{stops})");
             }
         }
     }

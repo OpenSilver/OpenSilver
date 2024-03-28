@@ -86,10 +86,10 @@ namespace System.Windows.Media
         {
             GradientBrush brush = (GradientBrush)d;
             brush.OnGradientStopsChanged((GradientStopCollection)e.OldValue, (GradientStopCollection)e.NewValue);
-            brush.RaiseBrushChanged();
+            brush.RaiseChanged();
         }
 
-        private void OnGradientStopCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaiseBrushChanged();
+        private void OnGradientStopCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaiseChanged();
 
         private void OnGradientStopsChanged(GradientStopCollection oldStops, GradientStopCollection newStops)
         {

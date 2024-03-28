@@ -245,51 +245,56 @@ document.createShape = function (svgTagName, svgId, shapeId, defsId, parentId) {
     parent.appendChild(svg);
 };
 
-document.createSvgLinearGradient = function (id, parentId, x1, y1, x2, y2, units, spreadMethod, opacity, ...stops) {
+document.createSvg = function (id, parentId, tagName) {
     const parent = document.getElementById(parentId);
     if (!parent) return;
 
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', tagName);
     svg.setAttribute('id', id);
-    svg.setAttribute('x1', x1);
-    svg.setAttribute('y1', y1);
-    svg.setAttribute('x2', x2);
-    svg.setAttribute('y2', y2);
-    svg.setAttribute('gradientUnits', units);
-    svg.setAttribute('spreadMethod', spreadMethod);
-
-    for (let i = 0; i < stops.length; i += 2) {
-        const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        stop.setAttribute('offset', stops[i]);
-        stop.style.stopColor = stops[i + 1];
-        stop.style.stopOpacity = opacity;
-        svg.appendChild(stop);
-    }
-
     parent.appendChild(svg);
 };
 
-document.createSvgRadialGradient = function (id, parentId, cx, cy, r, units, spreadMethod, opacity, ...stops) {
-    const parent = document.getElementById(parentId);
-    if (!parent) return;
+document.drawSvgLinearGradient = function (id, x1, y1, x2, y2, units, spreadMethod, transform, opacity, ...stops) {
+    const linearGradient = document.getElementById(id);
+    if (linearGradient) {
+        linearGradient.setAttribute('x1', x1);
+        linearGradient.setAttribute('y1', y1);
+        linearGradient.setAttribute('x2', x2);
+        linearGradient.setAttribute('y2', y2);
+        linearGradient.setAttribute('gradientUnits', units);
+        linearGradient.setAttribute('spreadMethod', spreadMethod);
+        linearGradient.setAttribute('gradientTransform', transform);
 
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
-    svg.setAttribute('id', id);
-    svg.setAttribute('cx', cx);
-    svg.setAttribute('cy', cy);
-    svg.setAttribute('r', r);
-    svg.setAttribute('gradientUnits', units);
-    svg.setAttribute('spreadMethod', spreadMethod);
-
-    for (let i = 0; i < stops.length; i += 2) {
-        const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        stop.setAttribute('offset', stops[i]);
-        stop.style.stopColor = stops[i + 1];
-        stop.style.stopOpacity = opacity;
-        svg.appendChild(stop);
+        linearGradient.innerHTML = '';
+        for (let i = 0; i < stops.length; i += 2) {
+            const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop.setAttribute('offset', stops[i]);
+            stop.style.stopColor = stops[i + 1];
+            stop.style.stopOpacity = opacity;
+            linearGradient.appendChild(stop);
+        }
     }
+};
 
-    parent.appendChild(svg);
+document.drawSvgRadialGradient = function (id, cx, cy, r, units, spreadMethod, transform, opacity, ...stops) {
+    const radialGradient = document.getElementById(id);
+    if (radialGradient) {
+        radialGradient.setAttribute('cx', cx);
+        radialGradient.setAttribute('cy', cy);
+        radialGradient.setAttribute('r', r);
+        radialGradient.setAttribute('gradientUnits', units);
+        radialGradient.setAttribute('spreadMethod', spreadMethod);
+        radialGradient.setAttribute('gradientTransform', transform);
+
+        radialGradient.innerHTML = '';
+        for (let i = 0; i < stops.length; i += 2) {
+            const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop.setAttribute('offset', stops[i]);
+            stop.style.stopColor = stops[i + 1];
+            stop.style.stopOpacity = opacity;
+            radialGradient.appendChild(stop);
+        }
+    }
 };
 
 document.arrangeRectangle = function (id, x, y, width, height) {
