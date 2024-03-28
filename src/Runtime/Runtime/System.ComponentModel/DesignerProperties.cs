@@ -67,7 +67,7 @@ namespace System.ComponentModel
         /// Gets a value that indicates whether the element is running in the context
         /// of a designer.
         /// </summary>
-        public static bool IsInDesignTool { get { return false; } } //Note: In SL, it seems that there is an accessible "set" but I don't see the point so I removed it for now.
+        public static bool IsInDesignTool { get; set; }
 
         ///// <summary>
         ///// Gets or sets a value that indicates whether all the metadata associated with
