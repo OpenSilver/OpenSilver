@@ -13,49 +13,53 @@
 *
 \*====================================================================================*/
 
-promises = [];
+window.getOSFilesLoadedPromise = (function () {
+    const styleheets = ['libs/cshtml5.css', 'libs/quill.core.css'];
+    const scripts = ['libs/cshtml5.js', 'libs/ResizeObserver.js', 'libs/quill.min.js', 'libs/html2canvas.js'];
 
-// Load all css and js files
-(function (names) {
-    names.forEach((name) => {
-        var extension = name.split('.').pop();
-        var url = name + "?date=" + new Date().toISOString();
-        if (extension == 'js') {
-            //create a new promise to load the file, which wil help us know when the loading is done.
-            promises.push(new Promise((resolve, reject) => {
-                var el = document.createElement('script');
-                el.setAttribute('type', 'application/javascript');
-                el.setAttribute('src', url);
-                //register to the events of the script loading to settle the promise:
-                el.onload = function () {
-                    resolve(url);
-                };
-                // if it fails, return reject
-                el.onerror = function () {
-                    reject(url);
-                }
-                //attach the script tag.
-                document.getElementsByTagName('head')[0].appendChild(el);
+    const _promises = [];
+    const _timestamp = '?date=' + new Date().toISOString();
 
-            }));
-        }
-        else if (extension == 'css') {
-            var el = document.createElement('link');
-            el.setAttribute('rel', 'stylesheet');
-            el.setAttribute('type', 'text/css');
-            el.setAttribute('href', url);
-            document.getElementsByTagName('head')[0].appendChild(el);
-        }
+    styleheets.forEach((name) => {
+        _promises.push(new Promise((resolve, reject) => {
+            const url = name + _timestamp;
+            const stylesheet = document.createElement('link');
+            stylesheet.setAttribute('rel', 'stylesheet');
+            stylesheet.setAttribute('type', 'text/css');
+            stylesheet.setAttribute('href', url);
+            stylesheet.onload = function () { resolve(url); }
+            stylesheet.onerror = function () {
+                console.error('Failed to load ' + name);
+                reject(url);
+            }
+            document.getElementsByTagName('head')[0].appendChild(stylesheet);
+        }));
     });
-}(['libs/cshtml5.css',
-    'libs/quill.core.css',
-    'libs/cshtml5.js',
-    'libs/ResizeObserver.js',
-    'libs/quill.min.js',
-    'libs/html2canvas.js']));
 
-//the function defined below returns a promise that can be awaited so we know the js files above have all been loaded (or failed, but we went through all of them).
-window.getOSFilesLoadedPromise = () => { return Promise.allSettled(promises); };
+    scripts.forEach((name) => {
+        _promises.push(new Promise((resolve, reject) => {
+            const url = name + _timestamp;
+            const script = document.createElement('script');
+            script.setAttribute('type', 'application/javascript');
+            script.setAttribute('src', url);
+            script.onload = function () { resolve(url); };
+            script.onerror = function () {
+                console.error('Failed to load ' + name);
+                reject(url);
+            };
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }));
+    });
+
+    return async function () {
+        try {
+            await Promise.all(_promises);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
+})();
 
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";
