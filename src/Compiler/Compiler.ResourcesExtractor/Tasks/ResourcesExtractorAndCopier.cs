@@ -165,19 +165,19 @@ namespace OpenSilver.Compiler.Resources
                 // Process JavaScript, CSS, Image, Video, Audio files:
                 //-----------------------------------------------
 
-                Dictionary<string, byte[]> jsAndCssFiles = new ResourcesExtractor().GetManifestResources(storage, assemblySimpleName);
+                Dictionary<string, byte[]> resourceFiles = new ResourcesExtractor().GetManifestResources(storage, assemblySimpleName);
 
                 // Copy files:
-                foreach (KeyValuePair<string, byte[]> file in jsAndCssFiles)
+                foreach (KeyValuePair<string, byte[]> file in resourceFiles)
                 {
-                    string fileName = file.Key;
+                    string fileName = file.Key.ToLowerInvariant();
                     byte[] fileContent = file.Value;
 
                     // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
                     string absoluteOutputResourcesPath = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(outputPathAbsolute, outputResourcesPath);
 
                     // Create the destination folders hierarchy if it does not already exist:
-                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName + Path.DirectorySeparatorChar, fileName);
+                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName.ToLowerInvariant(), fileName);
                     if (destinationFile.Length < 256)
                     {
                         string destinationDirectory = Path.GetDirectoryName(destinationFile);
