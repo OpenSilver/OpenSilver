@@ -116,7 +116,7 @@ document.createLayout = function (tagName, id, parentId, isKeyboardFocusable) {
 
 document._createLayout = function (tagName, id, isKeyboardFocusable) {
     const element = document._createElement(tagName, id);
-    element.classList.add('opensilver-uielement');
+    element.classList.add('opensilver-uielement', 'uielement-unarranged');
     document.inputManager.addListeners(element, isKeyboardFocusable);
     return element;
 };
@@ -222,7 +222,7 @@ document.createShape = function (svgTagName, svgId, shapeId, defsId, parentId) {
     if (!parent) return;
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.classList.add('opensilver-uielement', 'opensilver-shape');
+    svg.classList.add('opensilver-uielement', 'opensilver-shape', 'uielement-unarranged');
     svg.setAttribute('id', svgId);
     Object.defineProperty(svg, 'xamlid', {
         value: svgId,
@@ -813,6 +813,7 @@ document.arrange = function (id, left, top, width, height, clip, clipLeft, clipT
         } else {
             element.style.clip = '';
         }
+        element.classList.remove('uielement-unarranged');
     }
 };
 
