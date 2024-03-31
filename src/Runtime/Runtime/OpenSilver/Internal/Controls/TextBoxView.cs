@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Linq;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
@@ -342,8 +343,12 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
+                //save selection length before change
+                int selectionEnd = SelectionLength - value;
                 string sElement = Interop.GetVariableStringForJS(OuterDiv);
                 Interop.ExecuteJavaScriptVoid($"{sElement}.selectionStart = {value.ToInvariantString()};");
+                //in javascript changing selectionStart value will change selectionEnd value to text.length, in SilverLight selectionLength remains the same, we need to make sure we have the same behavior as Silverlight
+                Interop.ExecuteJavaScriptVoid($"{sElement}.selectionEnd = {selectionEnd.ToInvariantString()};");
             }
         }
     }
