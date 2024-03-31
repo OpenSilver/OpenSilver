@@ -26,28 +26,16 @@ jobs:
         run: ./restore-packages-opensilver.bat
       - name: Update compiler
         run: ./build/update-compiler.bat
-      - name: Build OpenSilver
-        working-directory: build
-        run: msbuild slnf/OpenSilver.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Format Version Suffix
         id: format-suffix
         run: echo "suffix=$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}" >> $env:GITHUB_OUTPUT
       - name: Format Package Version
         id: format-version
         run: echo "version=${{ env.next-release-version }}-preview-${{ steps.format-suffix.outputs.suffix }}" >> $env:GITHUB_OUTPUT
-      - name: Build Simulator
-        working-directory: build
-        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
-      - name: Pack OpenSilver
-        working-directory: build
-        run: |
-          mkdir temp; echo "OpenSilver ${{ steps.format-version.outputs.version }}" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release;RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
-      - name: Pack Simulator
-        working-directory: build
-        run: |
-          echo "OpenSilver.Simulator ${{ steps.format-version.outputs.version }}" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver"  -BasePath ".\" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release;RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
+      - name: Build OpenSilver NuGet package
+        run: ./build/build-nuget-package-OpenSilver.bat ${{ steps.format-version.outputs.version }}
+      - name: Build OpenSilver.Simulator NuGet package
+        run: ./build/build-nuget-package-OpenSilver.Simulator.bat ${{ steps.format-version.outputs.version }}
       - uses: actions/upload-artifact@v2
         with:
           name: OpenSilver

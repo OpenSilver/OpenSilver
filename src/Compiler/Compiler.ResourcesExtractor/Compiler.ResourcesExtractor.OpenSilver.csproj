@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <AssemblyName>OpenSilver.Compiler.Resources</AssemblyName>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' == ''">OpenSilver.Compiler.Resources</AssemblyName>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' != ''">OpenSilver.Compiler.Resources.$(OpenSilverBuildUUID)</AssemblyName>
     <RootNamespace>OpenSilver.Compiler.Resources</RootNamespace>
   </PropertyGroup>
 

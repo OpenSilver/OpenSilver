@@ -20,42 +20,20 @@ jobs:
         with:
           ref: ${{ github.ref }}
       - name: Restore Packages
-        run: |
-          ./restore-packages-opensilver.bat
-          nuget restore src/OpenSilver.sln -v quiet
-      - name: Build Compiler
-        run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore
-      - name: Build ResourcesExtractor
-        run: msbuild src/Compiler/Compiler.ResourcesExtractor/Compiler.ResourcesExtractor.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore;
-      - name: Copy Compiler Assemblies
-        run: |
-          cp src/Compiler/Compiler/bin/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
-          cp src/Compiler/Compiler/bin/Release/net461/Mono.Cecil*dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
-          cp src/Compiler/Compiler.ResourcesExtractor/bin/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
-      - name: Copy Targets
-        run: |
-          cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
-          cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
-          cp src/Targets/OpenSilver.GenerateAssemblyInfo.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
+        run: ./restore-packages-opensilver.bat
+      - name: Update compiler
+        run: ./build/update-compiler.bat
       # There is the TestApplication for SL version in the Solution, so we need to build the latest SL package
-      - name: Build OpenSilver
-        working-directory: build
-        run: msbuild slnf/OpenSilver.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
-      - name: Build Simulator
-        working-directory: build
-        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Format Version Suffix
         id: format-suffix
         run: echo "suffix=$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}" >> $env:GITHUB_OUTPUT
       - name: Format Package Version
         id: format-version
         run: echo "version=${{ env.next-release-version }}-preview-${{ steps.format-suffix.outputs.suffix }}" >> $env:GITHUB_OUTPUT
-      - name: Pack OpenSilver
-        working-directory: build
-        run: |
-          mkdir temp; echo "OpenSilver ${{ steps.format-version.outputs.version }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release;"
-          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -BasePath "$pwd" -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};Configuration=Release"
+      - name: Build OpenSilver NuGet package
+        run: ./build/build-nuget-package-OpenSilver.bat ${{ steps.format-version.outputs.version }}
+      - name: Build OpenSilver.Simulator NuGet package
+        run: ./build/build-nuget-package-OpenSilver.Simulator.bat ${{ steps.format-version.outputs.version }}
       - name: Replace existing package with actual one
         run: |
           nuget sources Add -Name localbuild -Source "$(Get-Location)\build\output\OpenSilver"

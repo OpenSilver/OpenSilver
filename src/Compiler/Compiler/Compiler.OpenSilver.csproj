@@ -4,7 +4,8 @@
     <TargetFramework>net461</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>OpenSilver.Compiler</AssemblyName>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' == ''">OpenSilver.Compiler</AssemblyName>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' != ''">OpenSilver.Compiler.$(OpenSilverBuildUUID)</AssemblyName>
     <RootNamespace>OpenSilver.Compiler</RootNamespace>
     <DefineTrace>true</DefineTrace>
   </PropertyGroup>
@@ -55,14 +56,12 @@
     <Compile Include="3_ConvertingXamlToFSharp\IMetadataFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\SystemTypesHelperFS.cs" />
     <Compile Include="EntryPoints\ChangeInPlaceXamlToGenerated.cs" />
-    <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferencesVB.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssembliesInspectorImpl.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeDefinitionExtensions.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeReferenceExtensions.cs" />
     <Compile Include="EntryPoints\Updates.cs" />
     <Compile Include="OtherHelpersAndHandlers\OpenSilverSettings.cs" />
-    <Compile Include="OtherHelpersAndHandlers\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\CoreTypesHelperCS.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\SystemTypesHelperCS.cs" />
@@ -96,5 +95,38 @@
   <ItemGroup>
     <None Include="Compiler.licenseheader" />
   </ItemGroup>
+
+  <Target Name="GenerateOpenSilverTargets" AfterTargets="PostBuildEvent" Condition="'$(OpenSilverBuildUUID)' != ''">
+
+    <PropertyGroup>
+      <_OpenSilverTargets>
+&lt;!--
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+--&gt;
+
+&lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;_OpenSilverCompilerAssemblyName&gt;OpenSilver.Compiler.$(OpenSilverBuildUUID)&lt;/_OpenSilverCompilerAssemblyName&gt;
+    &lt;_OpenSilverCompilerResourcesAssemblyName&gt;OpenSilver.Compiler.Resources.$(OpenSilverBuildUUID)&lt;/_OpenSilverCompilerResourcesAssemblyName&gt;
+  &lt;/PropertyGroup&gt;
+  
+&lt;/Project&gt;
+      </_OpenSilverTargets>
+    </PropertyGroup>
+    
+    <WriteLinesToFile File="$(OutputPath)OpenSilver.Common.Config.targets" Lines="$(_OpenSilverTargets)" Overwrite="true" />
+
+  </Target>
 
 </Project>

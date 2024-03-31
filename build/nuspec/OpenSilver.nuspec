@@ -74,15 +74,16 @@
     <file src="../../src/Targets/OpenSilver.targets" target="build/OpenSilver.targets" />
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
     <file src="../../src/Targets/OpenSilver.GenerateAssemblyInfo.targets" target="build/OpenSilver.GenerateAssemblyInfo.targets" />
+    <file src="../../src/Compiler/Compiler/bin/$Configuration$/net461/OpenSilver.Common.Config.targets" target="build/OpenSilver.Common.Config.targets" />
 
     <!-- OpenSilver compiler -->
     <file src="../../src/Compiler/Compiler/bin/$Configuration$/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
     <file src="../../src/Compiler/Compiler/bin/$Configuration$/net461/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
-    <file src="../../src/Compiler/Compiler/bin/$Configuration$/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
-    <file src="../../src/Compiler/Compiler.Common/bin/$Configuration$/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
-    <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/$Configuration$/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
-    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/$Configuration$/net461/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
-    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/$Configuration$/net461/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
+    <file src="../../src/Compiler/Compiler/bin/$Configuration$/net461/OpenSilver.Compiler.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.$OpenSilverBuildUUID$.dll" />
+    <file src="../../src/Compiler/Compiler.Common/bin/$Configuration$/net461/OpenSilver.Compiler.Common.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.Common.$OpenSilverBuildUUID$.dll" />
+    <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/$Configuration$/net461/OpenSilver.Compiler.Resources.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.Resources.$OpenSilverBuildUUID$.dll" />
+    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/$Configuration$/net461/OpenSilver.Compiler.ProgressDialog.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.ProgressDialog.$OpenSilverBuildUUID$.dll" />
+    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/$Configuration$/net461/OpenSilver.Compiler.TypeScriptDefToCSharp.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.$OpenSilverBuildUUID$.dll" />
 
     <!-- OpenSilver analyzers -->
     <file src="../../src/Analyzers/NotImplemented/bin/$Configuration$/netstandard2.0/OpenSilver.Analyzers.dll" target="analyzers/dotnet/cs/OpenSilver.Analyzers.dll" />
@@ -92,8 +93,8 @@
     <file src="../../src/Runtime/Scripts/cshtml5.css" target="js_css/cshtml5.css" />
     <file src="../../src/Runtime/Scripts/cshtml5.js" target="js_css/cshtml5.js" />
     <file src="../../src/Runtime/Scripts/ResizeObserver.js" target="js_css/ResizeObserver.js" />
-	  <file src="../../src/Runtime/Scripts/quill.min.js" target="js_css/quill.min.js" />
-	  <file src="../../src/Runtime/Scripts/quill.core.css" target="js_css/quill.core.css" />
+    <file src="../../src/Runtime/Scripts/quill.min.js" target="js_css/quill.min.js" />
+    <file src="../../src/Runtime/Scripts/quill.core.css" target="js_css/quill.core.css" />
     <file src="../../src/Runtime/Scripts/html2canvas.js" target="js_css/html2canvas.js" />
 
     <!-- OpenSilver icon -->

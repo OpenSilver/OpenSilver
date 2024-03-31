@@ -5,7 +5,8 @@
     <UseWPF>true</UseWPF>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' == ''">OpenSilver.Compiler.TypeScriptDefToCSharp</AssemblyName>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' != ''">OpenSilver.Compiler.TypeScriptDefToCSharp.$(OpenSilverBuildUUID)</AssemblyName>
     <RootNamespace>DotNetForHtml5.Compiler.TypeScriptDefToCSharp</RootNamespace>
   </PropertyGroup>
 

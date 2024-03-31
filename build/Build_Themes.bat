@@ -23,11 +23,6 @@ IF "%PKG_VER%" == "" (
 SET PROPERTIES="PackageVersion=%PKG_VER%;OpenSilverPackageVersion=%OPENSILVER_PKG_VER%;Configuration=Release;RepositoryUrl=https://github.com/OpenSilver/OpenSilver"
 SET OUTPUT_DIR="%BUILD_DIR%\output\OpenSilver"
 
-ECHO.
-ECHO %ESC%[95mRestoring NuGet packages%ESC%[0m
-ECHO. 
-%BUILD_DIR%\nuget restore %SRC_DIR%\OpenSilver.sln -v quiet
-
 echo. 
 echo %ESC%[95mBuilding %ESC%[0mRelease %ESC%[95mconfiguration%ESC%[0m
 echo. 

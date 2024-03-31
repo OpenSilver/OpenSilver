@@ -1,7 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<!-- 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+-->
+
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildThisFileDirectory)\OpenSilver.Common.Config.targets" />
 	
-	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.Resources.dll" TaskName="OpenSilver.Compiler.Resources.ResourcesExtractorAndCopier" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerResourcesAssemblyName).dll" TaskName="OpenSilver.Compiler.Resources.ResourcesExtractorAndCopier" />
 
 	<PropertyGroup>
 		<CoreBuildDependsOn>
