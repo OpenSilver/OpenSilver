@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Threading;
@@ -24,10 +23,7 @@ namespace System.Windows
         private UIElement _forceLayoutElement; //set in extreme situations, forces the update of the whole tree containing the element
         private UIElement _lastExceptionElement; //set on exception in Measure or Arrange.
 
-        private InternalMeasureQueue _measureQueue;
-        private InternalArrangeQueue _arrangeQueue;
         private SizeChangedInfo _sizeChangedChain;
-        private LayoutEventList _layoutEvents;
 
         private int _arrangesOnStack;
         private int _measuresOnStack;
@@ -54,11 +50,11 @@ namespace System.Windows
 
         internal UIRenderer UIRenderer { get; }
 
-        internal InternalMeasureQueue MeasureQueue => _measureQueue ??= new InternalMeasureQueue();
+        internal InternalMeasureQueue MeasureQueue { get; } = new InternalMeasureQueue();
 
-        internal InternalArrangeQueue ArrangeQueue => _arrangeQueue ??= new InternalArrangeQueue();
+        internal InternalArrangeQueue ArrangeQueue { get; } = new InternalArrangeQueue();
 
-        internal LayoutEventList LayoutEvents => _layoutEvents ??= new LayoutEventList();
+        internal LayoutEventList LayoutEvents { get; } = new LayoutEventList();
 
         private bool HasDirtiness => !MeasureQueue.IsEmpty || !ArrangeQueue.IsEmpty;
 
