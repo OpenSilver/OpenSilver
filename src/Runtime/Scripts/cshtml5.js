@@ -1263,16 +1263,15 @@ document.htmlPresenterHelpers = (function () {
     };
 })();
 
-document.createAnimationManager = function (callback) {
-    if (document.animationManager) return;
+document.createUIDispatcher = function (callback) {
+    if (document.UIDispatcher) return;
 
     let _frameDelay = 1 / 60;
-    let _isRunning = false;
     let _frameRequestId = null;
     let _previousTimeStamp = 0;
 
     function scheduleAnimationFrame() {
-        if (!_isRunning || _frameRequestId !== null) return;
+        if (_frameRequestId !== null) return;
 
         _frameRequestId = window.requestAnimationFrame(onFrame);
     };
@@ -1298,25 +1297,14 @@ document.createAnimationManager = function (callback) {
         return elapsed < _frameDelay;
     };
 
-    document.animationManager = {
-        resume: function () {
-            if (!_isRunning) {
-                _isRunning = true;
-                scheduleAnimationFrame();
-            }
-        },
-        pause: function () {
-            _isRunning = false;
-            if (_frameRequestId) {
-                window.cancelAnimationFrame(_frameRequestId);
-                _frameRequestId = null;
-            }
-        },
-        setFrameRate: function (frameRate) {
-            if (frameRate <= 0) {
+    scheduleAnimationFrame();
+
+    document.UIDispatcher = {
+        setTickRate: function (tickRate) {
+            if (tickRate <= 0) {
                 _frameDelay = 0;
             } else {
-                _frameDelay = 1000 / frameRate;
+                _frameDelay = 1000 / tickRate;
             }
         },
     };

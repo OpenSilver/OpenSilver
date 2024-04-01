@@ -22,8 +22,6 @@ public sealed class DispatcherOperation
 {
     private readonly Action _action;
 
-    internal DispatcherOperation() { }
-
     [EditorBrowsable(EditorBrowsableState.Never)]
     public DispatcherOperation(Action action, DispatcherPriority priority)
     {

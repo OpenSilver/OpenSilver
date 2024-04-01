@@ -263,6 +263,7 @@
 		<Compile Include="System.Windows.Printing\PrintPageEventArgs.cs" />
 		<Compile Include="System.Windows.Threading\DispatcherPriority.cs" />
 		<Compile Include="System.Windows.Threading\DispatcherOperationStatus.cs" />
+		<Compile Include="System.Windows.Threading\DispatcherProcessingDisabled.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows.input\CursorConverter.cs" />
 		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />

@@ -16,9 +16,9 @@ using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-using OpenSilver.Internal.Media.Animation;
 
 namespace System
 {
@@ -196,8 +196,8 @@ namespace System
         /// </returns>
         public int MaxFrameRate
         {
-            get => AnimationManager.Current.FrameRate;
-            set => AnimationManager.Current.FrameRate = value;
+            get => Dispatcher.CurrentDispatcher.TickRate;
+            set => Dispatcher.CurrentDispatcher.TickRate = value;
         }
 
         /// <summary>

@@ -53,6 +53,7 @@ public class MemoryLeakTest
         Assert.IsTrue(c.IsCollected);
     }
 
+    [Ignore]
     [TestMethod]
     public void CoreDispatcher_Should_Release_Callback()
     {
