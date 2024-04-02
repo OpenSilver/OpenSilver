@@ -1204,6 +1204,39 @@ document.createTextviewManager = function (inputCallback, scrollCallback) {
                     return false;
             }
         },
+        getSelectionStart: function (view) {
+            if (view) {
+                return view.selectionStart;
+            }
+            return 0;
+        },
+        setSelectionStart: function (view, start) {
+            if (view) {
+                view.setSelectionRange(start, start + view.selectionEnd - view.selectionStart, 'forward');
+            }
+        },
+        getSelectionLength: function (view) {
+            if (view) {
+                return view.selectionEnd - view.selectionStart;
+            }
+            return 0;
+        },
+        setSelectionLength: function (view, length) {
+            if (view) {
+                view.setSelectionRange(view.selectionStart, view.selectionStart + length, 'forward');
+            }
+        },
+        getSelectedText: function (view) {
+            if (view) {
+                return view.value.substring(view.selectionStart, view.selectionEnd);
+            }
+            return '';
+        },
+        setSelectedText: function (view, text) {
+            if (view) {
+                view.setRangeText(text, view.selectionStart, view.selectionEnd, 'end');
+            }
+        },
     };
 };
 
