@@ -333,7 +333,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
                 string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                return Interop.ExecuteJavaScriptInt32($"{sElement}.selectionStart;");
+                return Interop.ExecuteJavaScriptInt32($"document.textviewManager.getSelectionStart({sElement})");
             }
 
             return 0;
@@ -342,12 +342,8 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
-                //save selection length before change
-                int selectionEnd = SelectionLength - value;
                 string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                Interop.ExecuteJavaScriptVoid($"{sElement}.selectionStart = {value.ToInvariantString()};");
-                //in javascript changing selectionStart value will change selectionEnd value to text.length, in SilverLight selectionLength remains the same, we need to make sure we have the same behavior as Silverlight
-                Interop.ExecuteJavaScriptVoid($"{sElement}.selectionEnd = {selectionEnd.ToInvariantString()};");
+                Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectionStart({sElement}, {value.ToInvariantString()})");
             }
         }
     }
@@ -359,7 +355,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
                 string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                return Interop.ExecuteJavaScriptInt32($"{sElement}.selectionEnd - {sElement}.selectionStart;");
+                return Interop.ExecuteJavaScriptInt32($"document.textviewManager.getSelectionLength({sElement})");
             }
 
             return 0;
@@ -369,7 +365,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
                 string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                Interop.ExecuteJavaScriptVoid($"{sElement}.selectionEnd = {sElement}.selectionStart + {value.ToInvariantString()};");
+                Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectionLength({sElement}, {value.ToInvariantString()})");
             }
         }
     }
@@ -381,8 +377,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
                 string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                return Interop.ExecuteJavaScriptString(
-                    $"{sElement}.value.substring({sElement}.selectionStart, {sElement}.selectionEnd);") ?? string.Empty;
+                return Interop.ExecuteJavaScriptString($"document.textviewManager.getSelectedText({sElement})");
             }
 
             return string.Empty;
@@ -393,9 +388,8 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             {
                 string sElement = Interop.GetVariableStringForJS(OuterDiv);
                 string sText = Interop.GetVariableStringForJS(value);
-                Interop.ExecuteJavaScriptVoid(
-                    $"{sElement}.setRangeText({sText}, {sElement}.selectionStart, {sElement}.selectionEnd, 'end');");
-
+                Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectedText({sElement}, {sText})");
+                
                 Host.UpdateTextProperty(GetText());
                 InvalidateMeasure();
             }
