@@ -102,9 +102,10 @@ namespace System.Windows.Threading
             var timer = (DispatcherTimer)state;
             if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
+                var internalTimer = timer._timer;
                 INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(() =>
                 {
-                    if (timer.IsEnabled)
+                    if (internalTimer == timer._timer)
                     {
                         timer.OnTick();
                     }
