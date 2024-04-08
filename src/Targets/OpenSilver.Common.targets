@@ -167,11 +167,7 @@
     <Message
       Condition="'$(IsSecondPass)'!='True'"
       Text="OpenSilver Compiler"
-      Importance="high"/>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="     To enable detailed logging, set the 'MSBuild project build output verbosity' to 'Normal' or higher. The option is located in the Visual Studio IDE under Tools -> Options -> Projects and solutions -> Build and Run."
-      Importance="high"/>
+      Importance="normal"/>
     <Message
       Condition="'$(IsSecondPass)'!='True'"
       Text="Visual Studio version: $(VisualStudioVersion)"
