@@ -31,13 +31,35 @@ namespace System.Windows
     /// </summary>
     public class DependencyObject : IDependencyObject
     {
-        #region Inheritance Context
+        private Dictionary<int, DependentList> _dependentListMap;
+        private Dictionary<int, Storage> _effectiveValues;
+        private DependencyObjectType _dType;
+        private int _inheritableEffectiveValuesCount;
+        private ContextStorage _contextStorage;
 
-        private HashSet<DependencyObject> _contextListeners;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DependencyObject"/> class.
+        /// </summary>
+        public DependencyObject()
+        {
+            CanBeInheritanceContext = true;
+        }
 
         internal event EventHandler InheritedContextChanged;
 
-        private ContextStorage _contextStorage;
+        internal Dictionary<int, Storage> EffectiveValues => _effectiveValues ??= new();
+
+        internal int EffectiveValuesCount => _effectiveValues?.Count ?? 0;
+
+        /// <summary>
+        /// Returns the DType that represents the CLR type of this instance
+        /// </summary>
+        internal DependencyObjectType DependencyObjectType =>
+            _dType ??= DependencyObjectType.FromSystemTypeInternal(GetType());
+
+        internal bool CanBeInheritanceContext { get; set; }
+
+        internal bool IsInheritanceContextSealed { get; set; }
 
         internal DependencyObject InheritanceContext
         {
@@ -45,67 +67,23 @@ namespace System.Windows
             set => (_contextStorage ??= new ContextStorage()).SetContext(value);
         }
 
-        private sealed class ContextStorage
-        {
-            private object _context;
-            private bool _useWeakRef;
-
-            public DependencyObject GetContext()
-            {
-                if (_useWeakRef)
-                {
-                    var wr = (WeakReference<DependencyObject>)_context;
-                    if (!wr.TryGetTarget(out DependencyObject context))
-                    {
-                        SetContext(null);
-                    }
-
-                    return context;
-                }
-
-                return (DependencyObject)_context;
-            }
-
-            public void SetContext(DependencyObject context)
-            {
-                _useWeakRef = context is FrameworkElement;
-                _context = _useWeakRef ? new WeakReference<DependencyObject>(context) : (object)context;
-            }
-        }
-
-        internal bool CanBeInheritanceContext { get; set; }
-
-        internal bool IsInheritanceContextSealed { get; set; }
-
-        internal virtual bool ShouldProvideInheritanceContext(DependencyObject target, DependencyProperty property)
-        {
-            // We never provide an inherited context for a FrameworkElement because the DataContext takes
-            // priority over inherited context.
-            return target is not FrameworkElement;
-        }
+        // We never provide an inherited context for a FrameworkElement because the DataContext takes
+        // priority over inherited context.
+        internal virtual bool ShouldProvideInheritanceContext(DependencyObject target, DependencyProperty property) =>
+            target is not FrameworkElement;
 
         // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
         // implementation and is not used here
-        internal bool RemoveSelfAsInheritanceContext(object value, DependencyProperty dp)
-        {
-            DependencyObject doValue = value as DependencyObject;
-            if (doValue != null)
-            {
-                return RemoveSelfAsInheritanceContext(doValue, dp);
-            }
-            else
-            {
-                return false;
-            }
-        }
+        internal bool RemoveSelfAsInheritanceContext(object value, DependencyProperty dp) =>
+            value is DependencyObject doValue && RemoveSelfAsInheritanceContext(doValue, dp);
 
         // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
         // implementation and is not used here
         internal bool RemoveSelfAsInheritanceContext(DependencyObject doValue, DependencyProperty dp)
         {
-            if (doValue != null
-                && this.ShouldProvideInheritanceContext(doValue, dp)
-                && this.CanBeInheritanceContext
+            if (doValue is not null
+                && ShouldProvideInheritanceContext(doValue, dp)
+                && CanBeInheritanceContext
                 && !doValue.IsInheritanceContextSealed)
             {
                 DependencyObject oldInheritanceContext = doValue.InheritanceContext;
@@ -132,41 +110,31 @@ namespace System.Windows
         private void RemoveInheritanceContext(DependencyObject context, DependencyProperty property)
         {
             // Stop listening for context changes
-            context.StopListeningToInheritanceContextChanges(this);
+            context.InheritedContextChanged -= OnInheritedContextChanged;
 
             // Reset inheritance context
-            this.InheritanceContext = null;
+            InheritanceContext = null;
 
             // Notify listeners that inheritance context changed
-            this.OnInheritedContextChanged(EventArgs.Empty);
+            OnInheritedContextChanged(EventArgs.Empty);
         }
 
         // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
         // implementation and is not used here
-        internal bool ProvideSelfAsInheritanceContext(object value, DependencyProperty dp)
-        {
-            DependencyObject doValue = value as DependencyObject;
-            if (doValue != null)
-            {
-                return ProvideSelfAsInheritanceContext(doValue, dp);
-            }
-            else
-            {
-                return false;
-            }
-        }
+        internal bool ProvideSelfAsInheritanceContext(object value, DependencyProperty dp) =>
+            value is DependencyObject doValue && ProvideSelfAsInheritanceContext(doValue, dp);
 
         // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
         // implementation and is not used here
         internal bool ProvideSelfAsInheritanceContext(DependencyObject doValue, DependencyProperty dp)
         {
-            if (doValue != null
-                && this.ShouldProvideInheritanceContext(doValue, dp)
-                && this.CanBeInheritanceContext
+            if (doValue is not null
+                && ShouldProvideInheritanceContext(doValue, dp)
+                && CanBeInheritanceContext
                 && !doValue.IsInheritanceContextSealed)
 
             {
-                if (doValue.InheritanceContext != null)
+                if (doValue.InheritanceContext is not null)
                 {
                     // In silverlight, there is only one inherited context for a given DependencyObject.
                     // We can only set an inherited context if there is no inherited context for the
@@ -192,90 +160,32 @@ namespace System.Windows
         private void AddInheritanceContext(DependencyObject context, DependencyProperty property)
         {
             // Start listening for context changes
-            context.ListenToInheritanceContextChanges(this);
+            context.InheritedContextChanged += OnInheritedContextChanged;
 
             // Set the new context
-            this.InheritanceContext = context;
+            InheritanceContext = context;
 
             // Notify listeners that inheritance context changed
-            this.OnInheritedContextChanged(EventArgs.Empty);
+            OnInheritedContextChanged(EventArgs.Empty);
         }
+
+        private void OnInheritedContextChanged(object sender, EventArgs args) => OnInheritedContextChanged(args);
 
         private void OnInheritedContextChanged(EventArgs args)
         {
-            if (this.InheritedContextChanged != null)
-            {
-                this.InheritedContextChanged(this, args);
-            }
-
-            if (this._contextListeners != null)
-            {
-                foreach (DependencyObject listener in this._contextListeners)
-                {
-                    listener.OnInheritedContextChanged(args);
-                }
-            }
+            InheritedContextChanged?.Invoke(this, args);
 
             // Let sub-classes do their own thing
-            this.OnInheritanceContextChangedCore(args);
+            OnInheritanceContextChangedCore(args);
         }
 
         /// <summary>
-        ///     This is a means for subclasses to get notification
-        ///     of InheritanceContext changes and then they can do
-        ///     their own thing.
+        /// This is a means for subclasses to get notification
+        /// of InheritanceContext changes and then they can do
+        /// their own thing.
         /// </summary>
         internal virtual void OnInheritanceContextChangedCore(EventArgs args)
         {
-        }
-
-        private void ListenToInheritanceContextChanges(DependencyObject listener)
-        {
-            if (this._contextListeners == null)
-            {
-                this._contextListeners = new HashSet<DependencyObject>();
-            }
-
-            this._contextListeners.Add(listener);
-        }
-
-        private void StopListeningToInheritanceContextChanges(DependencyObject listener)
-        {
-            if (this._contextListeners == null)
-            {
-                return;
-            }
-
-            bool isListening = this._contextListeners.Contains(listener);
-            if (isListening)
-            {
-                this._contextListeners.Remove(listener);
-            }
-        }
-
-        #endregion
-
-        private Dictionary<int, DependentList> _dependentListMap;
-        private Dictionary<int, Storage> _effectiveValues;
-        private DependencyObjectType _dType;
-        private int _inheritableEffectiveValuesCount;
-
-        internal Dictionary<int, Storage> EffectiveValues => _effectiveValues ??= new();
-
-        internal int EffectiveValuesCount => _effectiveValues?.Count ?? 0;
-
-        /// <summary>
-        /// Returns the DType that represents the CLR type of this instance
-        /// </summary>
-        internal DependencyObjectType DependencyObjectType
-            => _dType ??= DependencyObjectType.FromSystemTypeInternal(GetType());
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DependencyObject"/> class.
-        /// </summary>
-        public DependencyObject()
-        {
-            CanBeInheritanceContext = true;
         }
 
         /// <summary>
@@ -618,7 +528,7 @@ namespace System.Windows
         {
             // fire change notifications
             OnPropertyChanged(e);
-            
+
             // update bindings
             InvalidateDependents(e);
         }
@@ -669,7 +579,7 @@ namespace System.Windows
             Debug.Assert(metadata is not null);
 
             Storage storage = GetStorage(dp, metadata, true);
-            
+
             return DependencyObjectStore.SetInheritedValue(storage,
                 this,
                 dp,
@@ -710,7 +620,7 @@ namespace System.Windows
             PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
 
             Storage storage = GetStorage(dp, metadata, true);
-            
+
             DependencyObjectStore.CoerceValueCommon(storage,
                 this,
                 dp,
@@ -783,9 +693,6 @@ namespace System.Windows
         /// </returns>
         public Dispatcher Dispatcher => Dispatcher.CurrentDispatcher;
 
-
-        #region Binding related elements
-
         internal void ApplyExpression(DependencyProperty dp, Expression expression)
         {
             Debug.Assert(dp != null);
@@ -812,8 +719,6 @@ namespace System.Windows
         {
             // This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
         }
-
-        #endregion
 
         /// <summary>
         /// Clears the local value of a dependency property.
@@ -975,7 +880,7 @@ namespace System.Windows
         private PropertyMetadata SetupPropertyChange(DependencyPropertyKey key, out DependencyProperty dp)
         {
             Debug.Assert(key != null);
-            
+
             dp = key.DependencyProperty;
             Debug.Assert(dp != null);
 
@@ -1013,6 +918,34 @@ namespace System.Windows
             if (_effectiveValues.Remove(storage.PropertyIndex) && storage.Inheritable)
             {
                 _inheritableEffectiveValuesCount--;
+            }
+        }
+
+        private sealed class ContextStorage
+        {
+            private object _context;
+            private bool _useWeakRef;
+
+            public DependencyObject GetContext()
+            {
+                if (_useWeakRef)
+                {
+                    var wr = (WeakReference<DependencyObject>)_context;
+                    if (!wr.TryGetTarget(out DependencyObject context))
+                    {
+                        SetContext(null);
+                    }
+
+                    return context;
+                }
+
+                return (DependencyObject)_context;
+            }
+
+            public void SetContext(DependencyObject context)
+            {
+                _useWeakRef = context is FrameworkElement;
+                _context = _useWeakRef ? new WeakReference<DependencyObject>(context) : context;
             }
         }
     }
