@@ -83,6 +83,17 @@ namespace System.Windows.Media
         }
 
         /// <summary>
+        /// Returns an object's parent object in the visual tree.
+        /// </summary>
+        /// <param name="reference">
+        /// The object for which to get the parent object.
+        /// </param>
+        /// <returns>
+        /// The parent object of the reference object in the visual tree.
+        /// </returns>
+        public static DependencyObject GetParent(UIElement reference) => reference?.VisualParent;
+
+        /// <summary>
         /// Returns the number of children that exist in an object's child collection in the visual tree.
         /// </summary>
         /// <param name="reference">The source visual.</param>
@@ -95,6 +106,25 @@ namespace System.Windows.Media
             }
 
             throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+        }
+
+        /// <summary>
+        /// Returns the number of children that exist in an object's child collection in the visual tree.
+        /// </summary>
+        /// <param name="reference">
+        /// The source visual.
+        /// </param>
+        /// <returns>
+        /// The number of visual children for the provided source visual.
+        /// </returns>
+        public static int GetChildrenCount(UIElement reference)
+        {
+            if (reference is null)
+            {
+                throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+            }
+
+            return reference.VisualChildrenCount;
         }
 
         /// <summary>
@@ -111,6 +141,16 @@ namespace System.Windows.Media
             }
             
             throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+        }
+
+        public static DependencyObject GetChild(UIElement reference, int childIndex)
+        {
+            if (reference is null)
+            {
+                throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+            }
+
+            return reference.GetVisualChild(childIndex);
         }
 
         /// <summary>
