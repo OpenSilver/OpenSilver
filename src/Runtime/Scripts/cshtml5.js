@@ -1299,45 +1299,26 @@ document.htmlPresenterHelpers = (function () {
 document.createUIDispatcher = function (callback) {
     if (document.UIDispatcher) return;
 
-    let _frameDelay = 1 / 60;
-    let _frameRequestId = null;
-    let _previousTimeStamp = 0;
-
-    function scheduleAnimationFrame() {
-        if (_frameRequestId !== null) return;
-
-        _frameRequestId = window.requestAnimationFrame(onFrame);
-    };
-
-    function onFrame(timeStamp) {
-        _frameRequestId = null;
-
-        if (skipFrame(timeStamp)) {
-            scheduleAnimationFrame();
-            return;
+    function computeDelay(tickRate) {
+        if (tickRate > 0) {
+            return 1000 / tickRate;
+        } else if (tickRate === 0) {
+            return 1000;
+        } else {
+            return 1;
         }
+    }
 
-        _previousTimeStamp = timeStamp;
-        try {
-            callback();
-        } finally {
-            scheduleAnimationFrame();
-        }
-    };
-
-    function skipFrame(timeStamp) {
-        const elapsed = timeStamp - _previousTimeStamp;
-        return elapsed < _frameDelay;
-    };
-
-    scheduleAnimationFrame();
+    let _delay = computeDelay(60);
+    let _intervalID = setInterval(callback, _delay);
 
     document.UIDispatcher = {
         setTickRate: function (tickRate) {
-            if (tickRate <= 0) {
-                _frameDelay = 0;
-            } else {
-                _frameDelay = 1000 / tickRate;
+            const delay = computeDelay(tickRate);
+            if (_delay !== delay) {
+                _delay = delay;
+                clearInterval(_intervalID);
+                _intervalID = setInterval(callback, _delay);
             }
         },
     };
