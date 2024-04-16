@@ -204,6 +204,18 @@ document.createImageManager = function (loadCallback, errorCallback) {
             element.appendChild(img);
             parent.appendChild(element);
         },
+        getNaturalWidth: function (img) {
+            if (img) {
+                return img.naturalWidth;
+            }
+            return 0.0;
+        },
+        getNaturalHeight: function (img) {
+            if (img) {
+                return img.naturalHeight;
+            }
+            return 0.0;
+        },
     };
 };
 

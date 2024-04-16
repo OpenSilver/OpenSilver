@@ -31,6 +31,8 @@
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
 		<Compile Include="OpenSilver\Features.cs" />
 		<Compile Include="OpenSilver\Buffers\StackVector.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\ImageManager.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\TextViewManager.cs" />
 		<Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
 		<Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
 		<Compile Include="OpenSilver\Internal\Storage.cs" />

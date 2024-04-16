@@ -84,7 +84,7 @@ internal sealed class PasswordBoxView : TextViewBase
 
     public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
     {
-        var div = INTERNAL_HtmlDomManager.CreatePasswordBoxViewDomElementAndAppendIt(parentRef, this);
+        var div = INTERNAL_HtmlDomManager.CreatePasswordBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
         domElementWhereToPlaceChildren = div;
         return div;
     }
@@ -101,7 +101,7 @@ internal sealed class PasswordBoxView : TextViewBase
         }
     }
 
-    protected sealed override void OnInput()
+    internal protected sealed override void OnInput()
     {
         Host.UpdatePasswordProperty(GetPassword());
         InvalidateMeasure();

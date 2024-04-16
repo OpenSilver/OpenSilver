@@ -211,7 +211,7 @@ internal partial class TextViewBase : IScrollInfo
         }
     }
 
-    private void UpdateOffsets(Point offset)
+    internal void UpdateOffsets(Point offset)
     {
         Debug.Assert(IsScrollClient);
 

@@ -98,7 +98,7 @@ internal sealed class TextBoxView : TextViewBase
 
     public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
     {
-        var textarea = INTERNAL_HtmlDomManager.CreateTextBoxViewDomElementAndAppendIt(parentRef, this);
+        var textarea = INTERNAL_HtmlDomManager.CreateTextBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
         domElementWhereToPlaceChildren = textarea;
         return textarea;
     }
@@ -115,7 +115,7 @@ internal sealed class TextBoxView : TextViewBase
         }
     }
 
-    protected sealed override void OnInput()
+    internal protected sealed override void OnInput()
     {
         Host.UpdateTextProperty(GetText());
         InvalidateMeasure();
@@ -245,9 +245,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
     {
         if (OuterDiv is null) return;
 
-        string sElement = Interop.GetVariableStringForJS(OuterDiv);
-        string sArgs = Interop.GetVariableStringForJS(e.UIEventArg);
-        if (Interop.ExecuteJavaScriptBoolean($"document.textviewManager.onKeyDownNative({sElement}, {sArgs});"))
+        if (TextViewManager.Instance.OnKeyDown(this, e))
         {
             e.Handled = true;
             e.Cancellable = false;
@@ -332,8 +330,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
-                string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                return Interop.ExecuteJavaScriptInt32($"document.textviewManager.getSelectionStart({sElement})");
+                return TextViewManager.Instance.GetSelectionStart(this);
             }
 
             return 0;
@@ -342,8 +339,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
-                string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectionStart({sElement}, {value.ToInvariantString()})");
+                TextViewManager.Instance.SetSelectionStart(this, value);
             }
         }
     }
@@ -354,8 +350,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
-                string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                return Interop.ExecuteJavaScriptInt32($"document.textviewManager.getSelectionLength({sElement})");
+                return TextViewManager.Instance.GetSelectionLength(this);
             }
 
             return 0;
@@ -364,8 +359,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
-                string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectionLength({sElement}, {value.ToInvariantString()})");
+                TextViewManager.Instance.SetSelectionLength(this, value);
             }
         }
     }
@@ -376,8 +370,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
-                string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                return Interop.ExecuteJavaScriptString($"document.textviewManager.getSelectedText({sElement})");
+                return TextViewManager.Instance.GetSelectedText(this);
             }
 
             return string.Empty;
@@ -386,9 +379,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
             {
-                string sElement = Interop.GetVariableStringForJS(OuterDiv);
-                string sText = Interop.GetVariableStringForJS(value);
-                Interop.ExecuteJavaScriptVoid($"document.textviewManager.setSelectedText({sElement}, {sText})");
+                TextViewManager.Instance.SetSelectedText(this, value);
                 
                 Host.UpdateTextProperty(GetText());
                 InvalidateMeasure();

@@ -15,25 +15,12 @@ using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Controls;
 
 internal abstract partial class TextViewBase : FrameworkElement
 {
-    private static readonly JavaScriptCallback _inputHandler;
-    private static readonly JavaScriptCallback _scrollHandler;
-
     private Size _contentSize;
-
-    static TextViewBase()
-    {
-        _inputHandler = JavaScriptCallback.Create(OnInputNative, true);
-        _scrollHandler = JavaScriptCallback.Create(OnScrollNative, true);
-        string sInputHandler = Interop.GetVariableStringForJS(_inputHandler);
-        string sScrollHandler = Interop.GetVariableStringForJS(_scrollHandler);
-        Interop.ExecuteJavaScriptVoidAsync($"document.createTextviewManager({sInputHandler},{sScrollHandler});");
-    }
 
     internal TextViewBase(UIElement host)
     {
@@ -50,29 +37,7 @@ internal abstract partial class TextViewBase : FrameworkElement
 
     protected abstract Size MeasureContent(Size constraint);
 
-    protected abstract void OnInput();
-
-    private static void OnInputNative(string id)
-    {
-        if (INTERNAL_HtmlDomManager.GetElementById(id) is TextViewBase textview)
-        {
-            textview.OnInput();
-        }
-    }
-
-    private static void OnScrollNative(string id)
-    {
-        if (INTERNAL_HtmlDomManager.GetElementById(id) is TextViewBase textview)
-        {
-            if (!textview.IsScrollClient) return;
-
-            string sDiv = Interop.GetVariableStringForJS(textview.OuterDiv);
-            double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft;");
-            double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop;");
-
-            textview.UpdateOffsets(new Point(scrollLeft, scrollTop));
-        }
-    }
+    internal protected abstract void OnInput();
 
     protected sealed override Size MeasureOverride(Size availableSize)
     {

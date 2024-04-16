@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
-using System.Linq;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
@@ -23,7 +22,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Shapes;
-using System.Windows.Media;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using HtmlPresenter = CSHTML5.Native.Html.Controls.HtmlPresenter;
@@ -489,30 +487,16 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
         internal static (INTERNAL_HtmlDomElementReference OuterDiv, INTERNAL_HtmlDomElementReference Image) CreateImageDomElementAndAppendIt(
-            object parentRef, Image image)
+            INTERNAL_HtmlDomElementReference parent, Image image)
         {
-#if PERFSTAT
-            Performance.Counter("CreateImageDomElementAndAppendIt", t0);
-#endif
-            Debug.Assert(parentRef is not null);
+            Debug.Assert(parent is not null);
             Debug.Assert(image is not null);
 
             string uid = NewId();
             string imgUid = NewId();
 
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.imgManager.create('{uid}','{imgUid}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                   $"document.imgManager.create('{uid}','{imgUid}',{sParentRef})");
-            }
-            
+            ImageManager.Instance.CreateImage(uid, imgUid, parent.UniqueIdentifier);
+
             AddToGlobalStore(uid, image);
             AddToGlobalStore(imgUid, image);
 
@@ -653,54 +637,32 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         }
 
         internal static INTERNAL_HtmlDomElementReference CreateTextBoxViewDomElementAndAppendIt(
-            object parentRef,
+            INTERNAL_HtmlDomElementReference parent,
             TextBoxView textBoxView)
         {
-            Debug.Assert(parentRef is not null);
+            Debug.Assert(parent is not null);
             Debug.Assert(textBoxView is not null);
 
             string uid = NewId();
 
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent is not null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.textviewManager.createTextView('{uid}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.textviewManager.createTextView('{uid}',{sParentRef})");
-            }
-
+            TextViewManager.Instance.CreateTextView(uid, parent.UniqueIdentifier);
+            
             AddToGlobalStore(uid, textBoxView);
 
             return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
         internal static INTERNAL_HtmlDomElementReference CreatePasswordBoxViewDomElementAndAppendIt(
-            object parentRef,
+            INTERNAL_HtmlDomElementReference parent,
             PasswordBoxView passwordBoxView)
         {
-            Debug.Assert(parentRef is not null);
+            Debug.Assert(parent is not null);
             Debug.Assert(passwordBoxView is not null);
 
             string uid = NewId();
 
-            var parent = parentRef as INTERNAL_HtmlDomElementReference;
-            if (parent is not null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.textviewManager.createPasswordView('{uid}','{parent.UniqueIdentifier}')");
-            }
-            else
-            {
-                string sParentRef = OpenSilver.Interop.GetVariableStringForJS(parentRef);
-                OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                    $"document.textviewManager.createPasswordView('{uid}',{sParentRef})");
-            }
-
+            TextViewManager.Instance.CreatePasswordView(uid, parent.UniqueIdentifier);
+            
             AddToGlobalStore(uid, passwordBoxView);
 
             return new INTERNAL_HtmlDomElementReference(uid, parent);
