@@ -95,8 +95,6 @@ namespace OpenSilver.Compiler
 
         public static bool IsParagraph(XElement element) => IsXElementOfType(element, "Paragraph");
 
-        public static bool IsColorAnimation(XElement element) => IsXElementOfType(element, "ColorAnimation");
-
         private static bool IsXElementOfType(XElement element, string typeName)
         {
             XName name = element.Name;

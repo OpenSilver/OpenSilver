@@ -39,7 +39,6 @@
     <Compile Include="1_ConvertingXaml\InsertingImplicitNodes.cs" />
     <Compile Include="1_ConvertingXaml\InsertingMarkupNodesInXaml.cs" />
     <Compile Include="1_ConvertingXaml\SupportedLanguage.cs" />
-    <Compile Include="1_ConvertingXaml\ProcessingColorAnimationNodes.cs" />
     <Compile Include="1_ConvertingXaml\ProcessingContentPresenterNodes.cs" />
     <Compile Include="1_ConvertingXaml\ProcessingHtmlPresenterNodes.cs" />
     <Compile Include="1_ConvertingXaml\ProcessingTextBlockNodes.cs" />

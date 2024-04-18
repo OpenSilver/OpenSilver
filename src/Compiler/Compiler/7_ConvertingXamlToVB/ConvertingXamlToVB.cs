@@ -54,9 +54,6 @@ namespace OpenSilver.Compiler
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
                 ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain);
 
-                // Process the "ColorAnimation" nodes in order to transform "Storyboard.TargetProperty="XXX"" into "Storyboard.TargetProperty="XXX.Color"" if XXX doesn't end on ".Color" or ".Color)"
-                ProcessingColorAnimationNodes.Process(doc, reflectionOnSeparateAppDomain);
-
                 // Convert markup extensions into XDocument nodes:
                 InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain, settings);
             }
