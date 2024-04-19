@@ -12,9 +12,11 @@
 \*====================================================================================*/
 
 
+using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Compiler.Common.Helpers;
+using OpenSilver.Compiler.Resources;
 
 namespace Compiler.Tests.ResourcesExtractor
 {
@@ -25,12 +27,11 @@ namespace Compiler.Tests.ResourcesExtractor
         private const string ExperimentalSubjectDll = ExperimentalSubjectName + ".dll";
         
         private static readonly MonoCecilAssemblyStorage Storage = new();
-        private static readonly OpenSilver.Compiler.Resources.Helpers.ResourcesExtractor ResourcesExtractor = new();
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext _)
         {
-            Storage.LoadAssembly(ExperimentalSubjectDll, true);
+            Storage.LoadAssembly(ExperimentalSubjectDll);
         }
 
         [ClassCleanup]
@@ -42,8 +43,8 @@ namespace Compiler.Tests.ResourcesExtractor
         [TestMethod]
         public void GetManifestResources_Should_Include_File_Js()
         {
-            var res = ResourcesExtractor.GetManifestResources(Storage, ExperimentalSubjectName);
-            res.ContainsKey("Experimental.file.js").Should().BeTrue();
+            var resources = ResourcesExtractorAndCopier.GetManifestResources(Storage.Assemblies[0]);
+            resources.Any(r => r.Name == "Experimental.file.js").Should().BeTrue();
         }
     }
 }

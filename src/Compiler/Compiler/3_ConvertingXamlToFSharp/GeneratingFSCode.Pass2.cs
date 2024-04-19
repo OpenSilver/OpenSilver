@@ -227,7 +227,6 @@ namespace OpenSilver.Compiler
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
-            private SystemTypesHelper _systemTypesHelper = SystemTypesHelper.FSharp;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -424,7 +423,7 @@ namespace GlobalResource
                     out string assemblyNameIfAny);
 
                 bool isRootElement = IsElementTheRootElement(element);
-                bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
+                bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
                     elementTypeInCSharp.Substring("global.".Length), assemblyNameIfAny
                 );
                 bool isInitializeTypeFromString =
@@ -458,7 +457,7 @@ namespace GlobalResource
                         {
                             // If the direct content is not specified, we use the type's
                             // default value (ex: <sys:String></sys:String>)
-                            directContent = _systemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
+                            directContent = _settings.SystemTypes.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
                         parameters.StringBuilder.AppendLine(
@@ -466,7 +465,7 @@ namespace GlobalResource
                                 "let {0}: {1} = {3}.XamlContext_WriteStartObject({4}, {2})",
                                 elementUniqueNameOrThisKeyword,
                                 elementTypeInCSharp,
-                                _systemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global.".Length)),
+                                _settings.SystemTypes.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global.".Length)),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
                             )
@@ -480,7 +479,7 @@ namespace GlobalResource
 
                         string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
 
-                        bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
+                        bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
                             elementTypeInCSharp.Substring("global.".Length), assemblyNameIfAny
                         );
 
@@ -723,7 +722,7 @@ namespace GlobalResource
                                                     parameters.StringBuilder.AppendLine(
                                                         string.Format("{0}.XamlPath <- {1}",
                                                             elementUniqueNameOrThisKeyword,
-                                                            _systemTypesHelper.ConvertFromInvariantString(resolvedPath, "System.String")
+                                                            _settings.SystemTypes.ConvertFromInvariantString(resolvedPath, "System.String")
                                                         )
                                                     );
                                                 }
@@ -747,7 +746,7 @@ namespace GlobalResource
                                                 parameters.StringBuilder.AppendLine(
                                                     string.Format("{0}.DependencyPropertyName <- {1}",
                                                         elementUniqueNameOrThisKeyword,
-                                                        _systemTypesHelper.ConvertFromInvariantString(propertyName, "System.String")));
+                                                        _settings.SystemTypes.ConvertFromInvariantString(propertyName, "System.String")));
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
@@ -893,7 +892,7 @@ namespace GlobalResource
                     if (IsPropertyOrFieldACollection(element, isAttachedProperty)
                         && (element.Elements().Count() != 1
                         || (!IsTypeAssignableFrom(element.Elements().First().Name, element.Name, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
-                        && !GeneratingCode.IsBinding(element.Elements().First())
+                        && !GeneratingCode.IsBinding(element.Elements().First(), _settings)
                         && element.Elements().First().Name.LocalName != "StaticResourceExtension"
                         && element.Elements().First().Name.LocalName != "StaticResource"
                         && element.Elements().First().Name.LocalName != "TemplateBinding"
@@ -1513,12 +1512,12 @@ match {0} with
                 {
                     return element.Attribute(GeneratingCode.xNamespace + "Name").Value;
                 }
-                else if (GeneratingCode.IsStyle(element))
+                else if (GeneratingCode.IsStyle(element, _settings))
                 {
                     isImplicitStyle = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element);
                 }
-                else if (GeneratingCode.IsDataTemplate(element) && element.Attribute("DataType") != null)
+                else if (GeneratingCode.IsDataTemplate(element, _settings) && element.Attribute("DataType") != null)
                 {
                     isImplicitDataTemplate = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true);
@@ -1634,10 +1633,10 @@ match {0} with
                         propertyName,
                         xName);
 
-                    bool isKnownSystemType = _systemTypesHelper.IsSupportedSystemType(
+                    bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
                         valueTypeFullName.Substring("global.".Length), valueAssemblyName);
 
-                    bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
+                    bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
                         valueTypeFullName.Substring("global.".Length), valueAssemblyName);
                     
                     if (isAttachedProperty)
@@ -1863,14 +1862,14 @@ match {0} with
 
             private string ConvertFromInvariantString(string value, string type, bool isKnownCoreType, bool isKnownSystemType)
             {
-                if (_systemTypesHelper.IsNullableType(type.Substring("global.".Length), null, out string underlyingType))
+                if (_settings.SystemTypes.IsNullableType(type.Substring("global.".Length), null, out string underlyingType))
                 {
                     string typeName = underlyingType.Substring("global.".Length);
 
                     return ConvertFromInvariantStringHelper(value,
                         underlyingType,
-                        _settings.CoreTypesConverter.IsSupportedCoreType(typeName, null),
-                        _systemTypesHelper.IsSupportedSystemType(typeName, null),
+                        _settings.CoreTypes.IsSupportedCoreType(typeName, null),
+                        _settings.SystemTypes.IsSupportedSystemType(typeName, null),
                         true);
                 }
                 else
@@ -1889,12 +1888,12 @@ match {0} with
                 }
                 else if (isKnownCoreType)
                 {
-                    preparedValue = _settings.CoreTypesConverter.ConvertFromInvariantString(
+                    preparedValue = _settings.CoreTypes.ConvertFromInvariantString(
                         value, type.Substring("global.".Length));
                 }
                 else if (isKnownSystemType)
                 {
-                    preparedValue = _systemTypesHelper.ConvertFromInvariantString(
+                    preparedValue = _settings.SystemTypes.ConvertFromInvariantString(
                         value, type.Substring("global.".Length));
                 }
                 else

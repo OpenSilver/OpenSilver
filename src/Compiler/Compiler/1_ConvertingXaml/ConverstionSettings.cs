@@ -16,43 +16,37 @@ namespace OpenSilver.Compiler
 {
     internal sealed class ConversionSettings
     {
-        public IMetadata Metadata { get; set; }
+        private ConversionSettings(
+            string assemblyName,
+            IMetadata metadata,
+            ICoreTypesConverter coreTypes,
+            SystemTypesHelper systemTypes,
+            bool enableImplicitAssemblyRedirection)
+        {
+            AssemblyName = assemblyName;
+            Metadata = metadata;
+            CoreTypes = coreTypes;
+            SystemTypes = systemTypes;
+            EnableImplicitAssemblyRedirection = enableImplicitAssemblyRedirection;
+        }
 
-        public ICoreTypesConverter CoreTypesConverter { get; set; }
+        public static ConversionSettings CreateCSharpSettings(string assembly) =>
+            new(assembly, MetadatasCS.Silverlight, CoreTypesConverters.CSharp, SystemTypesHelper.CSharp, true);
 
-        public bool EnableImplicitAssemblyRedirection { get; set; }
-    }
+        public static ConversionSettings CreateVisualBasicSettings(string assembly) =>
+            new(assembly, MetadatasVB.Silverlight, CoreTypesConverters.VisualBasic, SystemTypesHelper.VisualBasic, true);
 
-    internal static class ConversionSettingsCS
-    {
-        public static ConversionSettings Silverlight { get; } =
-            new ConversionSettings
-            {
-                Metadata = MetadatasCS.Silverlight,
-                CoreTypesConverter = CoreTypesConvertersCS.Silverlight,
-                EnableImplicitAssemblyRedirection = true,
-            };
-    }
+        public static ConversionSettings CreateFSharpSettings(string assembly) =>
+            new(assembly, MetadatasFS.Silverlight, CoreTypesConverters.FSharp, SystemTypesHelper.FSharp, true);
 
-    internal static class ConversionSettingsVB
-    {
-        public static ConversionSettings Silverlight { get; } =
-            new ConversionSettings
-            {
-                Metadata = MetadatasVB.Silverlight,
-                CoreTypesConverter = CoreTypesConvertersVB.Silverlight,
-                EnableImplicitAssemblyRedirection = true,
-            };
-    }
+        public string AssemblyName { get; }
 
-    internal static class ConversionSettingsFS
-    {
-        public static ConversionSettings Silverlight { get; } =
-            new ConversionSettings
-            {
-                Metadata = MetadatasFS.Silverlight,
-                CoreTypesConverter = CoreTypesConvertersFS.Silverlight,
-                EnableImplicitAssemblyRedirection = true,
-            };
+        public IMetadata Metadata { get; }
+
+        public ICoreTypesConverter CoreTypes { get; }
+
+        public SystemTypesHelper SystemTypes { get; }
+
+        public bool EnableImplicitAssemblyRedirection { get; }
     }
 }

@@ -21,6 +21,7 @@ namespace OpenSilver.Compiler
         CSharp,
         VBNet,
         FSharp,
+        Unknown,
     }
 
     internal static class LanguageHelpers
@@ -41,7 +42,7 @@ namespace OpenSilver.Compiler
             }
             else
             {
-                throw new NotSupportedException($"'{language}' is not a supported language (C# and Visual Basic).");
+                return SupportedLanguage.Unknown;
             }
         }
     }

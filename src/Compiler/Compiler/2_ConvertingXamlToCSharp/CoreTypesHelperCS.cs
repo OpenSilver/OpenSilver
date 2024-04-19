@@ -21,11 +21,6 @@ using OpenSilver.Compiler.Common;
 
 namespace OpenSilver.Compiler
 {
-    internal static class CoreTypesConvertersCS
-    {
-        public static ICoreTypesConverter Silverlight { get; } = new SLCoreTypesConverterCS();
-    }
-
     internal sealed class SLCoreTypesConverterCS : CoreTypesConverterBase
     {
         protected override Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }

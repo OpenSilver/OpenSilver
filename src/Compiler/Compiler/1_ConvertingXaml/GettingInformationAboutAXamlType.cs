@@ -20,6 +20,10 @@ namespace OpenSilver.Compiler
 {
     internal static class GettingInformationAboutXamlTypes
     {
+        private const string Using = "using:";
+        private const string ClrNamespace = "clr-namespace:";
+        private const string Assembly = ";assembly=";
+
         internal static void FixNamespaceForCompatibility(ref string assemblyName, ref string namespaceName)
         {
             if (assemblyName == null)
@@ -117,6 +121,31 @@ namespace OpenSilver.Compiler
             }
         }
 
+        public static (string NamespaceName, string AssemblyName) GetClrNamespaceAndAssembly(string ns, bool enableImplicitAssemblyRedirect)
+        {
+            if (ns.StartsWith(Using, StringComparison.OrdinalIgnoreCase))
+            {
+                return (ns.Substring(Using.Length), null);
+            }
+            else if (ns.StartsWith(ClrNamespace, StringComparison.OrdinalIgnoreCase))
+            {
+                ParseClrNamespaceDeclaration(ns, out string clrNamespace, out string assemblyName);
+                if (enableImplicitAssemblyRedirect)
+                {
+                    FixNamespaceForCompatibility(ref assemblyName, ref clrNamespace);
+                }
+                return (clrNamespace, assemblyName);
+            }
+            else if (string.IsNullOrEmpty(ns))
+            {
+                return ("http://schemas.microsoft.com/winfx/2006/xaml/presentation", null);
+            }
+            else
+            {
+                return (ns, null);
+            }
+        }
+
         public static void GetClrNamespaceAndLocalName(
             XName xName,
             bool enableImplicitAssemblyRedirect,
@@ -124,42 +153,21 @@ namespace OpenSilver.Compiler
             out string localName,
             out string assemblyNameIfAny)
         {
-            namespaceName = xName.Namespace.NamespaceName;
             localName = xName.LocalName;
-            assemblyNameIfAny = null;
-            if (namespaceName.ToLower().StartsWith("using:"))
-            {
-                string ns = namespaceName.Substring("using:".Length);
-                namespaceName = ns;
-            }
-            else if (namespaceName.ToLower().StartsWith("clr-namespace:"))
-            {
-                ParseClrNamespaceDeclaration(namespaceName, out string ns, out assemblyNameIfAny);
-                namespaceName = ns;
-                if (enableImplicitAssemblyRedirect)
-                {
-                    FixNamespaceForCompatibility(ref assemblyNameIfAny, ref namespaceName);
-                }
-            }
-            else
-            {
-                // If namespace is empty, use the default XAML namespace:
-                if (string.IsNullOrEmpty(namespaceName))
-                    namespaceName = "http://schemas.microsoft.com/winfx/2006/xaml/presentation"; //todo: instead of hard-coding this, use the default namespace that applies to the current XML node.
-            }
+            (namespaceName, assemblyNameIfAny) = GetClrNamespaceAndAssembly(xName.NamespaceName, enableImplicitAssemblyRedirect);
         }
 
         public static void ParseClrNamespaceDeclaration(string input, out string ns, out string assemblyNameIfAny)
         {
             assemblyNameIfAny = null;
-            var str = input.Substring("clr-namespace:".Length);
+            var str = input.Substring(ClrNamespace.Length);
             int indexOfSemiColons = str.IndexOf(';');
             if (indexOfSemiColons > -1)
             {
                 ns = str.Substring(0, indexOfSemiColons);
                 var str2 = str.Substring(indexOfSemiColons);
-                if (str2.StartsWith(";assembly="))
-                    assemblyNameIfAny = str2.Substring(";assembly=".Length);
+                if (str2.StartsWith(Assembly))
+                    assemblyNameIfAny = str2.Substring(Assembly.Length);
             }
             else
             {

@@ -32,32 +32,29 @@ namespace OpenSilver.Compiler
             string outputResourcesPath,
             ILogger logger)
         {
-            ConversionSettings settings = ConversionSettingsCS.Silverlight;
+            ConversionSettings settings = ConversionSettings.CreateCSharpSettings(assemblyNameWithoutExtension);
 
-            // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it could be badly formatted and not be parsable using XDocument.Parse.
+            // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it
+            // could be badly formatted and not be parsable using XDocument.Parse.
             xaml = ProcessingHtmlPresenterNodes.Process(xaml);
 
-            // Parse the XML:
             XDocument doc = XDocument.Parse(xaml, LoadOptions.SetLineInfo);
 
             if (!isFirstPass)
             {
                 // Generate paths for XAML elements before any manipulations:
                 GeneratingPathInXaml.ProcessDocument(doc);
-            }
 
-            // Process the "TextBlock" and "Span" nodes in order to surround direct text content with "<Run>" tags:
-            ProcessingTextBlockNodes.Process(doc, reflectionOnSeparateAppDomain);
+                // Process the "TextBlock" and "Span" nodes in order to surround direct text content with "<Run>" tags:
+                ProcessingTextBlockNodes.Process(doc, reflectionOnSeparateAppDomain, settings);
 
-            // Insert implicit nodes in XAML:
-            if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
-            {
-                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global::", SystemTypesHelper.CSharp);
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global::");
 
                 FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
 
-                // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
-                ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain);
+                // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into
+                // "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
+                ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain, settings);
 
                 // Convert markup extensions into XDocument nodes:
                 InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain, settings);
@@ -66,13 +63,14 @@ namespace OpenSilver.Compiler
             // Generate unique names for XAML elements:
             GeneratingUniqueNames.ProcessDocument(doc);
 
-            // Prepare the code that will be put in the "InitializeComponent" of the Application class, which means that it will be executed when the application is launched:
-            string codeToPutInTheInitializeComponentOfTheApplicationClass = string.Format(@"
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputRootPath = @""{0}"";
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputAppFilesPath = @""{1}"";
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputLibrariesPath = @""{2}"";
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
-", outputRootPath, outputAppFilesPath, outputLibrariesPath, outputResourcesPath);
+            // Prepare the code that will be put in the "InitializeComponent" of the Application class,
+            // which means that it will be executed when the application is launched:
+            string codeToPutInTheInitializeComponentOfTheApplicationClass = $@"
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputRootPath = @""{outputRootPath}"";
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputAppFilesPath = @""{outputAppFilesPath}"";
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputLibrariesPath = @""{outputLibrariesPath}"";
+global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{outputResourcesPath}"";
+";
 
             // Generate C# code from the tree:
             return GeneratingCSCode.GenerateCode(
@@ -85,7 +83,6 @@ global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
                 settings,
                 codeToPutInTheInitializeComponentOfTheApplicationClass,
                 logger);
-
         }
     }
 }

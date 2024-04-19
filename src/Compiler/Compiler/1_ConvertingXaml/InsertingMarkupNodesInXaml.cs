@@ -86,7 +86,7 @@ namespace OpenSilver.Compiler
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
                                 reflectionOnSeparateAppDomain,
-                                currentElement.GetNamespaceOfPrefix,
+                                currentElement,
                                 settings));
                         }
                         else // currentAttribute is an attached property
@@ -96,7 +96,7 @@ namespace OpenSilver.Compiler
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
                                 reflectionOnSeparateAppDomain,
-                                currentElement.GetNamespaceOfPrefix,
+                                currentElement,
                                 settings));
                         }
                         currentAttribute.Remove();
@@ -158,7 +158,7 @@ namespace OpenSilver.Compiler
             string attributeValue,
             XNamespace lastDefaultNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
-            Func<string, XNamespace> getNamespaceOfPrefix,
+            XElement currentElement,
             ConversionSettings settings)
         {
             Dictionary<string, string> listOfSubAttributes = GenerateListOfAttributesFromString(attributeValue);
@@ -202,7 +202,7 @@ namespace OpenSilver.Compiler
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(currentSubAttributeWithoutUselessPart.Length - 1, 1); //to remove the '}' at the end
 
                         // We add the suffix "Extension" to the markup extension name (unless it is a Binding or RelativeSource). For example, "StaticResource" becomes "StaticResourceExtension":
-                        if (nextClassName != "Binding" && nextClassName != "RelativeSource" && !nextClassName.EndsWith("Extension"))
+                        if (ShouldAddExtension(nextClassName, currentElement, reflectionOnSeparateAppDomain, settings))
                         {
                             // this is a trick, we need to check if :
                             // - type named 'MyCurrentMarkupExtensionName' exist.
@@ -215,7 +215,7 @@ namespace OpenSilver.Compiler
                         // Determine the namespace and local name:
                         XNamespace ns;
                         string localName;
-                        if (!TryGetNamespaceFromNameThatMayHaveAPrefix(nextClassName, getNamespaceOfPrefix, out ns, out localName))
+                        if (!TryGetNamespaceFromNameThatMayHaveAPrefix(nextClassName, currentElement, out ns, out localName))
                         {
                             ns = lastDefaultNamespace;
                             localName = nextClassName;
@@ -227,7 +227,7 @@ namespace OpenSilver.Compiler
                             currentSubAttributeWithoutUselessPart,
                             lastDefaultNamespace,
                             reflectionOnSeparateAppDomain,
-                            getNamespaceOfPrefix,
+                            currentElement,
                             settings);
                         XElement subXElement1 = subXElement;
                         if (!nodeName.LocalName.Contains('.'))
@@ -296,7 +296,11 @@ namespace OpenSilver.Compiler
             return xElement;
         }
 
-        static bool TryGetNamespaceFromNameThatMayHaveAPrefix(string nameThatMayHaveAPrefix, Func<string, XNamespace> getNamespaceOfPrefix, out XNamespace ns, out string localName)
+        static bool TryGetNamespaceFromNameThatMayHaveAPrefix(
+            string nameThatMayHaveAPrefix,
+            XElement currentElement,
+            out XNamespace ns,
+            out string localName)
         {
             int indexOfColons = nameThatMayHaveAPrefix.IndexOf(':');
             if (indexOfColons != -1)
@@ -305,7 +309,7 @@ namespace OpenSilver.Compiler
                 if (!string.IsNullOrEmpty(prefix))
                 {
                     localName = nameThatMayHaveAPrefix.Substring(indexOfColons + 1);
-                    ns = getNamespaceOfPrefix(prefix);
+                    ns = currentElement.GetNamespaceOfPrefix(prefix);
                     if (ns != null)
                     {
                         return true;
@@ -488,6 +492,38 @@ namespace OpenSilver.Compiler
                 string value = match.ToString();
                 return value.Replace(",", "<COMMA>");
             });
+        }
+
+        private static bool ShouldAddExtension(
+            string name,
+            XElement currentElement,
+            AssembliesInspector reflectionOnSeparateAppDomain,
+            ConversionSettings settings)
+        {
+            string typeName;
+            XNamespace xmlns;
+
+            int index = name.IndexOf(':');
+            if (index > -1)
+            {
+                typeName = name.Substring(index + 1);
+                xmlns = currentElement.GetNamespaceOfPrefix(name.Substring(0, index));
+            }
+            else
+            {
+                typeName = name;
+                xmlns = currentElement.GetDefaultNamespace();
+            }
+
+            if (xmlns != null)
+            {
+                (string clrNS, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                    xmlns.NamespaceName, settings.EnableImplicitAssemblyRedirection);
+
+                return reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(clrNS, typeName, assemblyName) == null;
+            }
+
+            return false;
         }
     }
 }

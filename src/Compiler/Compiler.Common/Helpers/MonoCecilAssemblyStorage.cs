@@ -11,159 +11,61 @@
 *
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Collections.ObjectModel;
 using Mono.Cecil;
 
 namespace OpenSilver.Compiler.Common.Helpers
 {
     public class MonoCecilAssemblyStorage : IDisposable
     {
-        private readonly DefaultAssemblyResolver _defaultResolver = new();
-        private const string XmlnsDefinitionAttributeFullName = "System.Windows.Markup.XmlnsDefinitionAttribute";
-
-        private readonly Dictionary<string, Dictionary<string, HashSet<string>>>
-            _assemblyNameToXmlNamespaceToClrNamespaces = new();
-
-        private Dictionary<string, AssemblyDefinition> _loadedAssemblySimpleNameToAssembly =
-            new();
-
-        private CustomAssemblyDefinitionResolver _customAssemblyDefinitionResolver;
+        private readonly List<AssemblyDefinition> _assemblies = new();
+        private readonly IAssemblyResolver _resolver;
 
         public MonoCecilAssemblyStorage()
         {
-            _customAssemblyDefinitionResolver = new CustomAssemblyDefinitionResolver(assemblyName =>
+            Assemblies = new(_assemblies);
+            _resolver = new AssemblyDefinitionResolver(GetCachedAssembly);
+        }
+
+        public ReadOnlyCollection<AssemblyDefinition> Assemblies { get; }
+
+        public AssemblyDefinition LoadAssembly(string assemblyPath)
+        {
+            var assembly = AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters
             {
-                if (!_loadedAssemblySimpleNameToAssembly.ContainsKey(assemblyName))
-                {
-                    return null;
-                }
-                var res = _loadedAssemblySimpleNameToAssembly[assemblyName];
-                return res;
+                AssemblyResolver = _resolver,
             });
+
+            _assemblies.Add(assembly);
+
+            return assembly;
         }
 
         public void Dispose()
         {
-            foreach (var kvp in _loadedAssemblySimpleNameToAssembly) kvp.Value.Dispose();
-
-            _loadedAssemblySimpleNameToAssembly.Clear();
-            _customAssemblyDefinitionResolver.Dispose();
-            _loadedAssemblySimpleNameToAssembly = null;
-            _customAssemblyDefinitionResolver = null;
-        }
-
-        public AssemblyDefinition ReadAssembly(string assemblyPath)
-        {
-            return AssemblyDefinition.ReadAssembly(assemblyPath, new ReaderParameters
+            foreach (AssemblyDefinition assembly in _assemblies)
             {
-                AssemblyResolver = _customAssemblyDefinitionResolver
-            });
-        }
-
-        public Dictionary<string, AssemblyDefinition> LoadedAssemblySimpleNameToAssembly => _loadedAssemblySimpleNameToAssembly;
-
-        public Dictionary<string, Dictionary<string, HashSet<string>>> AssemblyNameToXmlNamespaceToClrNamespaces =>
-            _assemblyNameToXmlNamespaceToClrNamespaces;
-
-        private void ReadXmlnsDefinitionAttributes(AssemblyDefinition assembly)
-        {
-            var assemblySimpleName = assembly.Name.Name;
-
-            // Extract the "XmlnsDefinition" attributes defined in the "AssemblyInfo.cs" files, for use with XAML namespace mappings:
-            Dictionary<string, HashSet<string>> xmlNamespaceToClrNamespaces = null;
-            if (_assemblyNameToXmlNamespaceToClrNamespaces.ContainsKey(assemblySimpleName))
-                xmlNamespaceToClrNamespaces = _assemblyNameToXmlNamespaceToClrNamespaces[assemblySimpleName];
-
-            var attributes = assembly.CustomAttributes.Where(x =>
-                x.AttributeType.FullName == XmlnsDefinitionAttributeFullName).ToList();
-
-            foreach (var attribute in attributes)
-            {
-                var xmlNamespace = (attribute.ConstructorArguments[0].Value ?? "").ToString();
-                var clrNamespace = (attribute.ConstructorArguments[1].Value ?? "").ToString();
-
-                if (string.IsNullOrEmpty(xmlNamespace) || string.IsNullOrEmpty(clrNamespace)) continue;
-
-                if (xmlNamespaceToClrNamespaces == null)
-                {
-                    xmlNamespaceToClrNamespaces = new Dictionary<string, HashSet<string>>();
-                    _assemblyNameToXmlNamespaceToClrNamespaces.Add(assemblySimpleName,
-                        xmlNamespaceToClrNamespaces);
-                }
-
-                HashSet<string> clrNamespacesAssociatedToThisXmlNamespace;
-                if (xmlNamespaceToClrNamespaces.ContainsKey(xmlNamespace))
-                {
-                    clrNamespacesAssociatedToThisXmlNamespace = xmlNamespaceToClrNamespaces[xmlNamespace];
-                }
-                else
-                {
-                    clrNamespacesAssociatedToThisXmlNamespace = new HashSet<string>();
-                    xmlNamespaceToClrNamespaces.Add(xmlNamespace, clrNamespacesAssociatedToThisXmlNamespace);
-                }
-
-                if (!clrNamespacesAssociatedToThisXmlNamespace.Contains(clrNamespace))
-                    clrNamespacesAssociatedToThisXmlNamespace.Add(clrNamespace);
-            }
-        }
-
-        public HashSet<string> LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo = false,
-            bool skipReadingAttributesFromAssemblies = false)
-        {
-            var loadedAssemblyNames = new HashSet<string>();
-            var queue = new Queue<AssemblyDefinition>();
-            queue.Enqueue(ReadAssembly(assemblyPath));
-            while (queue.Any())
-            {
-                var assembly = queue.Dequeue();
-                _loadedAssemblySimpleNameToAssembly[assembly.Name.Name] = assembly;
-                loadedAssemblyNames.Add(assembly.Name.Name);
-                if (!skipReadingAttributesFromAssemblies)
-                {
-                    ReadXmlnsDefinitionAttributes(assembly);
-                }
-
-                if (!loadReferencedAssembliesToo)
-                {
-                    return loadedAssemblyNames;
-                }
-                var referencedAssemblies = assembly.MainModule.AssemblyReferences;
-
-                foreach (var referencedAssembly in referencedAssemblies)
-                {
-                    if (_loadedAssemblySimpleNameToAssembly.ContainsKey(referencedAssembly.Name))
-                    {
-                        continue;
-                    }
-
-                    var assemblyFullPath = Path.Combine(Path.GetDirectoryName(assemblyPath) ?? "",
-                        referencedAssembly.Name + ".dll");
-                    if (File.Exists(assemblyFullPath))
-                    {
-                        queue.Enqueue(ReadAssembly(assemblyFullPath));
-                    }
-                    else
-                    {
-                        //There is not the assembly in the output folder.
-                        //Maybe it is netstandard.dll or any another core library.
-                        //Let's try to load via default resolver.
-                        try
-                        {
-                            var ns = _defaultResolver.Resolve(referencedAssembly);
-                            if (ns != null)
-                            {
-                                queue.Enqueue(ns);
-                            }
-                        } catch (AssemblyResolutionException) { }
-                    }
-                }
+                assembly.Dispose();
             }
 
-            return loadedAssemblyNames;
+            _assemblies.Clear();
+        }
+
+        private AssemblyDefinition GetCachedAssembly(AssemblyNameReference name) =>
+            _assemblies.Find(asm => asm.Name.Name == name.Name);
+
+        private sealed class AssemblyDefinitionResolver : DefaultAssemblyResolver
+        {
+            private readonly Func<AssemblyNameReference, AssemblyDefinition> _resolvingStrategy;
+
+            public AssemblyDefinitionResolver(Func<AssemblyNameReference, AssemblyDefinition> resolvingStrategy)
+            {
+                _resolvingStrategy = resolvingStrategy;
+            }
+
+            public override AssemblyDefinition Resolve(AssemblyNameReference name) => _resolvingStrategy(name) ?? base.Resolve(name);
         }
     }
 }

@@ -29,31 +29,25 @@ namespace OpenSilver.Compiler
         public string ProjectPath { get; set; }
 
         [Required]
-        public string AllItemsAsString { get; set; }
-
-        [Required]
-        public string IntermediateOutputPath { get; set; }
-
-        [Required]
-        public bool IsSecondPass { get; set; }
+        public ITaskItem[] AllItems { get; set; }
 
         [Output]
-        public string[] UpdatedItems { get; set; }
+        public ITaskItem[] UpdatedItems { get; set; }
 
         public override bool Execute()
         {
-            var results = new List<string>();
+            var results = new List<ITaskItem>();
 
-            foreach (var item in GetIncludes())
+            foreach (ITaskItem item in GetIncludes())
             {
-                if (item.EndsWith(".xaml"))
+                if (string.Equals(item.GetMetadata("Extension"), ".xaml", StringComparison.OrdinalIgnoreCase))
                 {
-                    var fileName = item.Substring(0, item.Length - 5);
-                    results.Add($"{IntermediateOutputPath}{fileName}.xaml.{(IsSecondPass ? "True" : "False")}.g.fs");
+                    string compiledXamlFilePath = item.GetMetadata(XamlPreprocessor.CompiledXamlFilePathMetadata);
+                    results.Add(new TaskItem(compiledXamlFilePath));
                 }
                 else
                 {
-                    results.Add(item);
+                    results.Add(new TaskItem(item));
                 }
             }
 
@@ -61,21 +55,19 @@ namespace OpenSilver.Compiler
             return true;
         }
 
-        private List<string> GetIncludes()
+        private IEnumerable<ITaskItem> GetIncludes()
         {
-            var includes = new List<string>();
-
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(ProjectPath);
 
             var topLevelItemGroupChildren = xmlDoc.SelectNodes(_xpathExpression);
 
             // When project file uses "<Choose>, <When>" tags, it needs to check include files that passed conditions.
-            var passedItems = AllItemsAsString.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var itemsMap = CreateItemsMap(AllItems);
 
             if (topLevelItemGroupChildren == null)
             {
-                return includes;
+                yield break;
             }
 
             // Extract the "Include" attribute value for each selected XmlElement
@@ -83,17 +75,24 @@ namespace OpenSilver.Compiler
             {
                 if (ProcessElement(element, out string filePath))
                 {
-                    if (passedItems.Contains(filePath))
+                    if (itemsMap.TryGetValue(filePath, out ITaskItem item))
                     {
-                        Log.LogMessage("Custom message: " + filePath);
-
                         // Add the value of the "Include" attribute to the result list
-                        includes.Add(filePath);
+                        yield return item;
                     }
                 }
             }
+        }
 
-            return includes;
+        private static Dictionary<string, ITaskItem> CreateItemsMap(ITaskItem[] items)
+        {
+            var d = new Dictionary<string, ITaskItem>();
+            foreach (ITaskItem item in items)
+            {
+                string path = item.GetMetadata("Identity");
+                d[path] = item;
+            }
+            return d;
         }
 
         private static bool ProcessElement(XmlElement element, out string filePath)

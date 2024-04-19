@@ -24,6 +24,7 @@ namespace OpenSilver.Compiler
 
         string SystemWindowsNS { get; }
         string SystemWindowsDataNS { get; }
+        string SystemWindowsDocumentsNS { get; }
         string SystemWindowsControlsNS { get; }
         string SystemWindowsMediaNS { get; }
         string SystemWindowsMediaAnimationNS { get; }

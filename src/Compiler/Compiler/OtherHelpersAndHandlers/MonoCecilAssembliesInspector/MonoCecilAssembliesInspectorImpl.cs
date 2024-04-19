@@ -25,6 +25,67 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 {
     internal class MonoCecilAssembliesInspectorImpl : IDisposable
     {
+        private sealed class AssemblyData
+        {
+            private const string XmlnsDefinitionAttributeFullName = "System.Windows.Markup.XmlnsDefinitionAttribute";
+
+            private readonly Dictionary<string, List<string>> _xmlToClrNamespaces;
+
+            public AssemblyData(AssemblyDefinition assembly)
+            {
+                Assembly = assembly;
+                _xmlToClrNamespaces = ReadXmlnsDefinitionAttributes(assembly);
+            }
+
+            public AssemblyDefinition Assembly { get; }
+
+            public IEnumerable<string> GetClrNamespacesFromXmlNamespace(string xmlNamespace)
+            {
+                if (_xmlToClrNamespaces.TryGetValue(xmlNamespace, out List<string> clrNamespaces))
+                {
+                    return clrNamespaces;
+                }
+
+                return Enumerable.Empty<string>();
+            }
+
+            private Dictionary<string, List<string>> ReadXmlnsDefinitionAttributes(AssemblyDefinition assembly)
+            {
+                var map = new Dictionary<string, List<string>>();
+
+                foreach (CustomAttribute attribute in assembly.CustomAttributes)
+                {
+                    if (!IsXmlnsDefinitionAttribute(attribute))
+                    {
+                        continue;
+                    }
+
+                    string xmlNamespace = (attribute.ConstructorArguments[0].Value ?? string.Empty).ToString();
+                    string clrNamespace = (attribute.ConstructorArguments[1].Value ?? string.Empty).ToString();
+
+                    if (string.IsNullOrEmpty(xmlNamespace) || string.IsNullOrEmpty(clrNamespace))
+                    {
+                        continue;
+                    }
+
+                    if (!map.TryGetValue(xmlNamespace, out List<string> clrNamespaces))
+                    {
+                        map[xmlNamespace] = clrNamespaces = new List<string>();
+                    }
+
+                    if (!clrNamespaces.Contains(clrNamespace))
+                    {
+                        clrNamespaces.Add(clrNamespace);
+                    }
+                }
+
+                return map;
+            }
+
+            private static bool IsXmlnsDefinitionAttribute(CustomAttribute attribute) =>
+                attribute.AttributeType.FullName == XmlnsDefinitionAttributeFullName;
+        }
+
         private const string GlobalPrefix_CS = "global::";
         private const string GlobalPrefix_VB = "Global.";
         private const string GlobalPrefix_FS = "global.";
@@ -42,7 +103,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private const string StaticResExtension = "StaticResourceExtension";
         private const string DependencyObj = "DependencyObject";
 
-        private readonly MonoCecilAssemblyStorage _storage = new();
+        private readonly MonoCecilAssemblyStorage _storage;
+        private readonly List<AssemblyData> _assemblies = new();
         private readonly Dictionary<string, TypeDefinition> _typeNameToType = new();
 
         private readonly SupportedLanguage _compilerType;
@@ -71,11 +133,21 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 throw new InvalidCompilerTypeException();
             }
+
+            _storage = new MonoCecilAssemblyStorage();
+        }
+
+        public AssemblyDefinition LoadAssembly(string assemblyPath)
+        {
+            var assembly = _storage.LoadAssembly(assemblyPath);
+            _assemblies.Add(new AssemblyData(assembly));
+            return assembly;
         }
 
         public void Dispose()
         {
             _storage.Dispose();
+            _assemblies.Clear();
         }
 
         private string GetGlobalPrefixFromCompilerType()
@@ -98,8 +170,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
         }
 
-        private TypeDefinition FindType(string namespaceName, string localTypeName,
-            string filterAssembliesAndRetainOnlyThoseThatHaveThisName = null,
+        private TypeDefinition FindType(string namespaceName, string localTypeName, string assemblyName = null,
             bool doNotRaiseExceptionIfNotFound = false)
         {
             // Fix the namespace:
@@ -109,93 +180,93 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
             else if (namespaceName.StartsWith(ClrNamespace, StringComparison.CurrentCultureIgnoreCase))
             {
-                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(namespaceName, out var ns,
-                    out var assemblyNameIfAny);
+                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(namespaceName, out string ns, out string assemblyNameIfAny);
                 namespaceName = ns;
                 GettingInformationAboutXamlTypes.FixNamespaceForCompatibility(ref assemblyNameIfAny, ref namespaceName);
             }
 
-            if (namespaceName.StartsWith(GlobalPrefix_CS,
-                    StringComparison
-                        .CurrentCultureIgnoreCase)) // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style namespace (cf. section that handles Binding in "GeneratingCSharpCode.cs")
-                namespaceName = namespaceName.Substring(GlobalPrefix_CS.Length);
-
-            if (namespaceName.StartsWith(GlobalPrefix_VB,
-                    StringComparison
-                        .CurrentCultureIgnoreCase)) // Note: normally in XAML there is no "Global.", but we may enter this method passing a VB.Net-style namespace
-                namespaceName = namespaceName.Substring(GlobalPrefix_VB.Length);
+            // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style
+            // namespace (cf. section that handles Binding in "GeneratingCSharpCode.cs")
+            string globalPrefix = GetGlobalPrefixFromCompilerType();
+            if (namespaceName.StartsWith(globalPrefix, StringComparison.CurrentCultureIgnoreCase))
+            {
+                namespaceName = namespaceName.Substring(globalPrefix.Length);
+            }
 
             // Handle special cases:
-            if (localTypeName == StaticRes) localTypeName = StaticResExtension;
+            if (localTypeName == StaticRes)
+            {
+                localTypeName = StaticResExtension;
+            }
 
             // Generate string representing the type:
-            var fullTypeNameWithNamespaceInsideBraces = !string.IsNullOrEmpty(namespaceName)
+            string fullTypeNameWithNamespaceInsideBraces = !string.IsNullOrEmpty(namespaceName)
                 ? "{" + namespaceName + "}" + localTypeName
                 : localTypeName;
 
+            TypeDefinition type;
+
             // Start by looking in the cache dictionary:
-            if (_typeNameToType.TryGetValue(fullTypeNameWithNamespaceInsideBraces, out var type)) return type;
+            if (_typeNameToType.TryGetValue(fullTypeNameWithNamespaceInsideBraces, out type))
+            {
+                return type;
+            }
 
             // Look for the type in all loaded assemblies:
-            foreach (var assemblyKeyValuePair in _storage.LoadedAssemblySimpleNameToAssembly)
+            foreach (AssemblyData asmData in _assemblies)
             {
-                var assemblySimpleName = assemblyKeyValuePair.Key;
-                var assembly = assemblyKeyValuePair.Value;
-                if (filterAssembliesAndRetainOnlyThoseThatHaveThisName == null
-                    || assemblySimpleName == filterAssembliesAndRetainOnlyThoseThatHaveThisName)
+                AssemblyDefinition assembly = asmData.Assembly;
+
+                if (assemblyName != null && assembly.Name.Name != assemblyName)
                 {
-                    var namespacesToLookInto = new List<string>();
+                    continue;
+                }
 
-                    // If the namespace is a XML namespace (eg. "{http://schemas.microsoft.com/winfx/2006/xaml/presentation}"), we should iterate through all the corresponding CLR namespaces:
-                    if (IsNamespaceAnXmlNamespace(namespaceName))
-                        namespacesToLookInto.AddRange(
-                            GetClrNamespacesFromXmlNamespace(assemblySimpleName, namespaceName));
-                    else
-                        namespacesToLookInto.Add(namespaceName);
+                IEnumerable<string> namespacesToLookInto;
 
-                    // Search for the type:
-                    foreach (var namespaceToLookInto in namespacesToLookInto)
+                // If the namespace is a XML namespace (eg. "{http://schemas.microsoft.com/winfx/2006/xaml/presentation}"),
+                // we should iterate through all the corresponding CLR namespaces:
+                if (IsNamespaceAnXmlNamespace(namespaceName))
+                {
+                    namespacesToLookInto = asmData.GetClrNamespacesFromXmlNamespace(namespaceName);
+                }
+                else
+                {
+                    namespacesToLookInto = new string[1] { namespaceName };
+                }
+
+                // Search for the type:
+                foreach (string namespaceToLookInto in namespacesToLookInto)
+                {
+                    string fullName = string.IsNullOrEmpty(namespaceToLookInto) ? localTypeName : $"{namespaceToLookInto}.{localTypeName}";
+
+                    type = assembly.MainModule.Types.FirstOrDefault(x => x.FullName == fullName);
+                    if (type == null)
                     {
-                        var fullTypeNameToFind = string.IsNullOrEmpty(namespaceToLookInto) ? localTypeName : $"{namespaceToLookInto}.{localTypeName}";
+                        //try to find a matching nested type.
+                        TypeDefinition containerType = assembly.MainModule.Types.FirstOrDefault(x => x.FullName == namespaceToLookInto);
+                        type = containerType?.NestedTypes.FirstOrDefault(x => x.Name == localTypeName);
+                    }
 
-                        var typeIfFound =
-                            assembly.MainModule.Types.FirstOrDefault(x => x.FullName == fullTypeNameToFind);
-                        if (typeIfFound == null)
-                        {
-                            //try to find a matching nested type.
-                            var containerType = assembly.MainModule.Types.FirstOrDefault(x => x.FullName == namespaceToLookInto);
-                            typeIfFound = containerType?.NestedTypes.FirstOrDefault(x => x.Name == localTypeName);
-                        }
-
-                        if (typeIfFound != null)
-                        {
-                            _typeNameToType[fullTypeNameWithNamespaceInsideBraces] = typeIfFound;
-                            return typeIfFound;
-                        }
+                    if (type != null)
+                    {
+                        _typeNameToType[fullTypeNameWithNamespaceInsideBraces] = type;
+                        return type;
                     }
                 }
             }
 
             if (doNotRaiseExceptionIfNotFound)
+            {
                 return null;
-            throw new Exception("Type not found: " + fullTypeNameWithNamespaceInsideBraces);
+            }
+
+            throw new Exception($"Type not found: {fullTypeNameWithNamespaceInsideBraces}");
         }
 
         private static bool IsNamespaceAnXmlNamespace(string namespaceName)
         {
             return namespaceName.StartsWith("http://"); //todo: are there other conditions possible for XML namespaces declared with xmlnsDefinitionAttribute?
-        }
-
-        private IEnumerable<string> GetClrNamespacesFromXmlNamespace(string assemblySimpleName, string xmlNamespace)
-        {
-            // Note: This method returns an empty enumeration if no result was found.
-            if (!_storage.AssemblyNameToXmlNamespaceToClrNamespaces.ContainsKey(assemblySimpleName))
-                return Enumerable.Empty<string>();
-
-            var xmlNamespaceToClrNamespaces = _storage.AssemblyNameToXmlNamespaceToClrNamespaces[assemblySimpleName];
-            return xmlNamespaceToClrNamespaces.ContainsKey(xmlNamespace)
-                ? xmlNamespaceToClrNamespaces[xmlNamespace]
-                : Enumerable.Empty<string>();
         }
 
         private IMemberDefinition GetMemberInfo(string memberName, string namespaceName, string localTypeName,
@@ -223,7 +294,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             if (returnNullIfNotFoundInsteadOfException)
                 return null;
 
-            throw new XamlParseException("Member \"" + memberName + "\" not found in type \"" + elementType);
+            throw new XamlParseException($"Member \"{memberName}\" not found in type \"{elementType}\"");
         }
 
         private static PropertyDefinition FindPropertyDeep(TypeDefinition elementType, string propertyName, out TypeReference ownerElementType)
@@ -290,8 +361,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 var fieldInfo = FindFieldDeep(elementType, propertyName, out var fieldOwnerElementType);
                 if (fieldInfo == null)
-                    throw new XamlParseException("Property or field \"" + propertyName + "\" not found in type \"" +
-                                                 elementType + "\".");
+                {
+                    throw new XamlParseException($"Property or field \"{propertyName}\" not found in type \"{elementType}\".");
+                }
 
                 var fieldType = fieldInfo.FieldType;
                 return fieldType.PopulateGeneric(elementType, fieldOwnerElementType);
@@ -310,8 +382,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (methodInfo == null)
             {
-                throw new XamlParseException("Method \"" + methodName + "\" not found in type \"" +
-                                             elementType + "\".");
+                throw new XamlParseException($"Method \"{methodName}\" not found in type \"{elementType}\".");
             }
 
             return methodInfo.ReturnType.PopulateGeneric(elementType, ownerElementType);
@@ -361,12 +432,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return FindType(_metadata.SystemWindowsNS, DependencyObj, Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR);
         }
 
-        public HashSet<string> LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo = false,
-            bool skipReadingAttributesFromAssemblies = false)
-        {
-            return _storage.LoadAssembly(assemblyPath, loadReferencedAssembliesToo, skipReadingAttributesFromAssemblies);
-        }
-
         public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName,
             string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
         {
@@ -397,9 +462,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 return $"{prefix}{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
             }
 
-            throw new XamlParseException(
-                $"Type '{localTypeName}' not found in namespace '{namespaceName}'."
-            );
+            throw new XamlParseException($"Type '{localTypeName}' not found in namespace '{namespaceName}'.");
         }
 
         public string GetAssemblyQualifiedNameOfXamlType(
@@ -407,7 +470,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string localTypeName,
             string assemblyNameIfAny)
         {
-            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny, true);
 
             if (type != null)
             {
@@ -531,16 +594,22 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             if (contentPropertyAttr == null &&
                 !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny) &&
                 !IsDictionary(namespaceName, localTypeName, assemblyNameIfAny))
+            {
                 //if the element is a collection, it is possible to add the children directly to this element.
-                throw new XamlParseException("No default content property exists for element: " + localTypeName);
+                throw new XamlParseException($"No default content property exists for element: {localTypeName}");
+            }
 
             if (contentPropertyAttr == null)
+            {
                 return null;
+            }
 
             var value = contentPropertyAttr.ConstructorArguments[0].Value.ToString();
 
             if (string.IsNullOrEmpty(value))
+            {
                 throw new Exception("The ContentPropertyAttribute must have a non-empty Name.");
+            }
 
             return value;
         }
@@ -608,8 +677,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             // Find the type:
             var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
             if (type == null)
-                throw new XamlParseException(
-                    $"Type \"{localTypeName}\" not found in namespace \"{namespaceName}\".");
+                throw new XamlParseException($"Type \"{localTypeName}\" not found in namespace \"{namespaceName}\".");
 
             // Use information from the type:
             return XName.Get(type.Name, namespaceName);
@@ -691,8 +759,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 var fieldInfo = FindFieldDeep(elementType, propertyOrFieldName, out var fieldOwnerElementType);
                 if (fieldInfo == null)
-                    throw new XamlParseException("Property or field \"" + propertyOrFieldName +
-                                                 "\" not found in type \"" + elementType + "\".");
+                {
+                    throw new XamlParseException($"Property or field \"{propertyOrFieldName}\" not found in type \"{elementType}\".");
+                }
 
                 propertyOrFieldType = fieldInfo.FieldType.PopulateGeneric(elementType, fieldOwnerElementType);
                 propertyOrFieldDeclaringType = fieldOwnerElementType;
@@ -731,7 +800,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 }
                 currentType = resolved.BaseType?.PopulateGeneric(elementType, currentType);
             }
-            throw new XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType + "\".");
+            throw new XamlParseException($"Method \"{methodName}\" not found in type \"{elementType}\".");
         }
 
         public bool IsElementADictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
@@ -745,7 +814,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             name = name.Trim();
 
             var type = FindType(namespaceName, enumName, assembly)
-                        ?? throw new XamlParseException($"Type '{enumName}' not found in namespace '{namespaceName}'.");
+                ?? throw new XamlParseException($"Type '{enumName}' not found in namespace '{namespaceName}'.");
 
             string prefix = GetGlobalPrefixFromCompilerType();
             var field = FindFieldDeep(type, name, out _, ignoreCase, true, true);

@@ -20,9 +20,7 @@
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ServiceReferenceFixer" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResXProcessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.BeforeXamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.XamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.AfterXamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.TypeScriptDefToCSharp" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ChangeInPlaceXamlToGenerated" />
@@ -66,74 +64,32 @@
   </PropertyGroup>
 
   <!--============================================================
-  Add the Compilation directive "OPENSILVER":
+  Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
   ============================================================-->
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
-
-  <!--============================================================
-  Tell the SplittedXamlEditor to use our xaml designer
-  (see file EditorFactory.cs in DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor) 
-  ============================================================-->
-  <PropertyGroup>
     <IsOpenSilver>true</IsOpenSilver>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <IsSecondPass Condition="'$(IsSecondPass)'==''">False</IsSecondPass>
+    <OutputExtension Condition="'$(Language)' == 'C#'">cs</OutputExtension>
+    <OutputExtension Condition="'$(Language)' == 'VB'">vb</OutputExtension>
+    <OutputExtension Condition="'$(Language)' == 'F#'">fs</OutputExtension>
     <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
     <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
     <IsRazorProject  Condition="'$(UsingMicrosoftNETSdkRazor)'=='true'">True</IsRazorProject>
     <SkipResourcesExtractorAndCopier Condition="'$(SkipResourcesExtractorAndCopier)' == '' And '$(IsBrowserProject)' != 'True'">true</SkipResourcesExtractorAndCopier>
-  </PropertyGroup>
-  
-  <!--============================================================
-  Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
-  ============================================================-->
-  <PropertyGroup Condition="'$(IsSecondPass)'==''">
-    <IsSecondPass>False</IsSecondPass>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Flags)'==''">
-    <Flags>noflags</Flags>
-  </PropertyGroup>
-  <PropertyGroup>
-    <OutputExtension Condition="'$(Language)' == 'C#'">cs</OutputExtension>
-    <OutputExtension Condition="'$(Language)' == 'VB'">vb</OutputExtension>
-    <OutputExtension Condition="'$(Language)' == 'F#'">fs</OutputExtension>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputRootPath)'==''">
     <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
-    <Cshtml5OutputRootPath>wwwroot\</Cshtml5OutputRootPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputAppFilesPath)'==''">
+    <Cshtml5OutputRootPath Condition="'$(Cshtml5OutputRootPath)'==''">wwwroot\</Cshtml5OutputRootPath>
     <!-- Default sub-path for output application files. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputAppFilesPath>app\</Cshtml5OutputAppFilesPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputLibrariesPath)'==''">
+    <Cshtml5OutputAppFilesPath Condition="'$(Cshtml5OutputAppFilesPath)'==''">app\</Cshtml5OutputAppFilesPath>
     <!-- Default sub-path for output libraries. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputLibrariesPath>libs\</Cshtml5OutputLibrariesPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputResourcesPath)'==''">
+    <Cshtml5OutputLibrariesPath Condition="'$(Cshtml5OutputLibrariesPath)'==''">libs\</Cshtml5OutputLibrariesPath>
     <!-- Default sub-path for output resources. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputResourcesPath>resources\</Cshtml5OutputResourcesPath>
-  </PropertyGroup>
-  <PropertyGroup>
+    <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)'==''">resources\</Cshtml5OutputResourcesPath>
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
     <EnableTypeScriptDefToCSharp Condition="'$(EnableTypeScriptDefToCSharp)' == ''">true</EnableTypeScriptDefToCSharp>
     <EnableTypeScriptDefToCSharp Condition="'$(Language)' == 'F#'">false</EnableTypeScriptDefToCSharp>
-  </PropertyGroup>
-
-  <!--============================================================
-  Declare some local properties to make this file more concise:
-  ============================================================-->
-  <PropertyGroup>
-    <IsProcessingCSHTML5Itself Condition="'$(NoCSHTML5Reference)'=='true'">True</IsProcessingCSHTML5Itself>
-    <IsFirstPassAndProcessingCSHTML5Itself Condition="'$(IsSecondPass)'!='True' And '$(IsProcessingCSHTML5Itself)'=='True'">True</IsFirstPassAndProcessingCSHTML5Itself>
   </PropertyGroup>
 
   <!--============================================================
@@ -368,77 +324,28 @@
     <!--============================================================
       XamlPreprocessor (during Pass 1 and Pass 2)
       ============================================================-->
-
-    <!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved references/projectReferences -->
-    <!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
-    <BeforeXamlPreprocessor
-      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-      IsSecondPass="$(IsSecondPass)"
-      Flags="$(Flags)"
-      Language="$(Language)"
-      ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
-      SourceAssemblyForPass2="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
-      IsProcessingCSHTML5Itself="$(NoCSHTML5Reference)"
-      />
-
-    <!--============================================================
-      Process files which have been added as link to project.
-      ============================================================-->
     <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.$(OutputExtension)"
-    FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    IsSecondPass="$(IsSecondPass)"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    RootNamespace="$(RootNamespace)"
-    Language="$(Language)"
-    />
-    <!--============================================================
-      Process files which have been added directly to the project.
-      ============================================================-->
-    <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.$(OutputExtension)"
-    FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    IsSecondPass="$(IsSecondPass)"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    RootNamespace="$(RootNamespace)"
-    Language="$(Language)"
-    />
-    <AfterXamlPreprocessor
-      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(NoXamlPreprocessor)'!='True'"
+      SourceFiles="@(Content)"
+      ResolvedReferences="@(ReferencePath)"
+      IntermediateOutputPath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
+      OutputPath="$(MSBuildProjectDirectory)\$(OutputPath)"
+      AssemblyName="$(AssemblyName)"
       IsSecondPass="$(IsSecondPass)"
-      Flags="$(Flags)"
-      />
+      VerifyHash="false"
+      OutputRootPath="$(Cshtml5OutputRootPath)"
+      OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
+      OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
+      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+      RootNamespace="$(RootNamespace)"
+      Language="$(Language)">
+      <Output TaskParameter="GeneratedFiles" ItemName="CompiledXamlFiles" />
+      <Output TaskParameter="RemovedFiles" ItemName="RemovedXamlFiles" />
+    </XamlPreprocessor>
 
     <ItemGroup Condition="'$(Language)' == 'C#' Or '$(Language)' == 'VB'">
-      <!--============================================================
-      Make the list of XAML files to convert to CS that are defined in the project.
-      ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.$(OutputExtension)')"
-                      Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
-      <!--============================================================
-      Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
-      ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.$(OutputExtension)')"
-                       Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
-      <Compile Include="@(ProcessedFiles)" />
-      <Compile Include="@(ProcessedFiles2)" />
+      <Content Remove="@(RemovedXamlFiles)" />
+      <Compile Include="@(CompiledXamlFiles)" />
     </ItemGroup>
 
     <!--============================================================
@@ -447,15 +354,13 @@
       as Include itemgroup later.
       ============================================================-->
     <ChangeInPlaceXamlToGenerated ProjectPath="$(MSBuildProjectFullPath)"
-                                  AllItemsAsString="@(Compile);@(Content)"
-                                  IntermediateOutputPath="$(IntermediateOutputPath)"
-                                  IsSecondPass="$(IsSecondPass)"
+                                  AllItems="@(Compile);@(RemovedXamlFiles)"
                                   Condition="'$(Language)' == 'F#'">
       <Output TaskParameter="UpdatedItems" ItemName="UpdatedItems" />
     </ChangeInPlaceXamlToGenerated>
     
     <ItemGroup Condition="'$(Language)' == 'F#'">
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
+      <Content Remove="@(RemovedXamlFiles)" />
       <Compile Remove="@(Compile)" />
       <Compile Include="@(UpdatedItems)" />
     </ItemGroup>
@@ -522,14 +427,9 @@
     <ResourcesExtractorAndCopier
       Condition="'$(IsSecondPass)'!='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
       SourceAssembly="$(ResourcesSourceLocation)\$(AssemblyName).dll"
+      ResolvedReferences="@(ReferencePath)"
       OutputRootPath="$(ResourcesRootOutput)"
-      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-      AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp"
-      CoreAssemblyFiles="$(MSBuildThisFileDirectory)..\lib\netstandard2.0\OpenSilver.dll"
-      >
-      <Output TaskParameter="CopiedResXFiles" PropertyName="CopiedResXFiles"/>
-      <Output TaskParameter="IsSuccess" PropertyName="ResourceExtractorAndCopierIsSuccess"/>
-    </ResourcesExtractorAndCopier>
+      OutputResourcesPath="$(Cshtml5OutputResourcesPath)" />
 
     <!--============================================================
       Launch the second pass (only during Pass 1)
@@ -617,75 +517,28 @@
     <!--============================================================
       XamlPreprocessor
       ============================================================-->
-    <!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved assemblies references/project references -->
-    <!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
-    <BeforeXamlPreprocessor
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-      IsSecondPass="false"
-      Flags="$(Flags)"
-      Language="$(Language)"
-      ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
-      />
-
-    <!--============================================================
-      Process files which have been added as link to project.
-      ============================================================-->
     <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.$(OutputExtension)"
-    FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    IsSecondPass="false"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    RootNamespace="$(RootNamespace)"
-    Language="$(Language)"
-    />
-    <!--============================================================
-      Process files which have been added directly to the project.
-      ============================================================-->
-    <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.$(OutputExtension)"
-    FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    IsSecondPass="false"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    RootNamespace="$(RootNamespace)"
-    Language="$(Language)"
-    />
-
-    <AfterXamlPreprocessor
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+      SourceFiles="@(Content)"
+      ResolvedReferences="@(ReferencePath)"
+      IntermediateOutputPath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
+      OutputPath="$(MSBuildProjectDirectory)\$(OutputPath)"
+      AssemblyName="$(AssemblyName)"
       IsSecondPass="false"
-      Flags="$(Flags)"
-      />
+      VerifyHash="false"
+      OutputRootPath="$(Cshtml5OutputRootPath)"
+      OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
+      OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
+      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+      RootNamespace="$(RootNamespace)"
+      Language="$(Language)">
+      <Output TaskParameter="GeneratedFiles" ItemName="CompiledXamlFiles"/>
+      <Output TaskParameter="RemovedFiles" ItemName="RemovedXamlFiles"/>
+    </XamlPreprocessor>
 
     <ItemGroup Condition="'$(Language)' == 'C#' Or '$(Language)' == 'VB'">
-      <!--============================================================
-      Make the list of XAML files to convert to CS that are defined in the project.
-      ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.$(OutputExtension)')"
-                      Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
-      <!--============================================================
-      Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
-      ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.$(OutputExtension)')"
-                       Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
-      <Compile Include="@(ProcessedFiles)" />
-      <Compile Include="@(ProcessedFiles2)" />
+      <Content Remove="@(RemovedXamlFiles)" />
+      <Compile Include="@(CompiledXamlFiles)" />
     </ItemGroup>
 
     <!--============================================================
@@ -694,15 +547,13 @@
       as Include itemgroup later.
       ============================================================-->
     <ChangeInPlaceXamlToGenerated ProjectPath="$(MSBuildProjectFullPath)"
-                                  AllItemsAsString="@(Compile);@(Content)"
-                                  IntermediateOutputPath="$(IntermediateOutputPath)"
-                                  IsSecondPass="$(IsSecondPass)"
+                                  AllItems="@(Compile);@(RemovedXamlFiles)"
                                   Condition="'$(Language)' == 'F#'">
       <Output TaskParameter="UpdatedItems" ItemName="UpdatedItems" />
     </ChangeInPlaceXamlToGenerated>
     
     <ItemGroup Condition="'$(Language)' == 'F#'">
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
+      <Content Remove="@(RemovedXamlFiles)" />
       <Compile Remove="@(Compile)" />
       <Compile Include="@(UpdatedItems)" />
     </ItemGroup>

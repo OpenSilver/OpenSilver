@@ -35,13 +35,9 @@
 	<Target Name="ResourcesExtractor">
 		<ResourcesExtractorAndCopier
 			SourceAssembly="$(_SourceAssemblyFilePath)"
+			ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
 			OutputRootPath="wwwroot\"
-			OutputResourcesPath="resources\"
-			AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp"
-			CoreAssemblyFiles="$(OutputPath)\OpenSilver.dll">
-			<Output TaskParameter="CopiedResXFiles" PropertyName="CopiedResXFiles"/>
-			<Output TaskParameter="IsSuccess" PropertyName="ResourceExtractorAndCopierIsSuccess"/>
-		</ResourcesExtractorAndCopier>
+			OutputResourcesPath="resources\" />
 	</Target>
 	
 </Project>

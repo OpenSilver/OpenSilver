@@ -29,6 +29,7 @@
     </Compile>
     <Compile Include="1_ConvertingXaml\ConvertingStringToValue.cs" />
     <Compile Include="1_ConvertingXaml\ConverstionSettings.cs" />
+    <Compile Include="1_ConvertingXaml\CoreTypesConverters.cs" />
     <Compile Include="1_ConvertingXaml\CoreTypesHelper.cs" />
     <Compile Include="1_ConvertingXaml\FixingPropertiesOrder.cs" />
     <Compile Include="1_ConvertingXaml\GeneratingCode.cs" />
@@ -74,13 +75,10 @@
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.cs" />
     <Compile Include="7_ConvertingXamlToVB\ConvertingXamlToVB.cs" />
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
-    <Compile Include="EntryPoints\BeforeXamlPreprocessor.cs" />
-    <Compile Include="EntryPoints\AfterXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\ResXProcessor.cs" />
     <Compile Include="EntryPoints\ResourcesProcessor.cs" />
     <Compile Include="EntryPoints\ServiceReferenceFixer.cs" />
     <Compile Include="EntryPoints\TypeScriptDefToCSharp.cs" />
-    <Compile Include="OtherHelpersAndHandlers\OpenSilverHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferences.cs" />
     <Compile Include="OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" />

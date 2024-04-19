@@ -37,22 +37,27 @@ namespace OpenSilver.Compiler
         // we do not surround it with a <Run> for performance optimization.
         //------------------------------------------------------------
 
-        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain)
+        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain, ConversionSettings settings)
         {
-            TraverseNextNode(doc.Root, 1, null, reflectionOnSeparateAppDomain);
+            TraverseNextNode(doc.Root, 1, null, reflectionOnSeparateAppDomain, settings);
         }
 
-        static void TraverseNextNode(XNode currentNode, int siblingNodesCount, XElement parentElement, AssembliesInspector reflectionOnSeparateAppDomain)
+        static void TraverseNextNode(
+            XNode currentNode,
+            int siblingNodesCount,
+            XElement parentElement,
+            AssembliesInspector reflectionOnSeparateAppDomain,
+            ConversionSettings settings)
         {
             if (currentNode is XText)
             {
-                if ((GeneratingCode.IsTextBlock(parentElement) && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
-                    || GeneratingCode.IsSpan(parentElement)
-                    || GeneratingCode.IsItalic(parentElement)
-                    || GeneratingCode.IsUnderline(parentElement)
-                    || GeneratingCode.IsBold(parentElement)
-                    || GeneratingCode.IsHyperlink(parentElement)
-                    || GeneratingCode.IsParagraph(parentElement))
+                if ((GeneratingCode.IsTextBlock(parentElement, settings) && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
+                    || GeneratingCode.IsSpan(parentElement, settings)
+                    || GeneratingCode.IsItalic(parentElement, settings)
+                    || GeneratingCode.IsUnderline(parentElement, settings)
+                    || GeneratingCode.IsBold(parentElement, settings)
+                    || GeneratingCode.IsHyperlink(parentElement, settings)
+                    || GeneratingCode.IsParagraph(parentElement, settings))
                 {
                     // Surround with a <Run>:
                     XElement contentWrapper = new XElement(XName.Get("Run", GeneratingCode.DefaultXamlNamespace)); //todo: read the "ContentWrapperAttribute" of the collection (cf. InlineCollection.cs) instead of hard-coding this.
@@ -69,7 +74,7 @@ namespace OpenSilver.Compiler
                 int childNodesCount = childNodes.Count;
                 for (int i = 0; i < childNodesCount; i++)
                 {
-                    TraverseNextNode(childNodes[i], childNodesCount, ((XElement)currentNode), reflectionOnSeparateAppDomain);
+                    TraverseNextNode(childNodes[i], childNodesCount, ((XElement)currentNode), reflectionOnSeparateAppDomain, settings);
                 }
             }
         }

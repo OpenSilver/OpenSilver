@@ -7,7 +7,6 @@
     <AssemblyVersion>2.1.0</AssemblyVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);CS1591;CS0067</NoWarn>
-		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems>
     <DefineTrace>true</DefineTrace>
     <LangVersion>latest</LangVersion>

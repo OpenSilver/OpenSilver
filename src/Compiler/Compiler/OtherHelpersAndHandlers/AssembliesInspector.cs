@@ -20,14 +20,6 @@ namespace OpenSilver.Compiler
 {
     public class AssembliesInspector : IDisposable
     {
-
-        //----------------------------------------------------------------------
-        // We create a static instance in the "BeforeXamlPreprocessor" task.
-        // The static instance avoids reloading the assemblies for each XAML file.
-        // We dispose it in the "AfterXamlPreprocessor" task.
-        //----------------------------------------------------------------------
-        public static AssembliesInspector Current;
-
         private readonly MonoCecilAssembliesInspectorImpl _monoCecilVersion;
 
         public AssembliesInspector(SupportedLanguage compilerType)
@@ -35,19 +27,9 @@ namespace OpenSilver.Compiler
             _monoCecilVersion = new MonoCecilAssembliesInspectorImpl(compilerType);
         }
 
-        public void Dispose()
-        {
-            // Unload everything:
-            _monoCecilVersion.Dispose();
-            GC.Collect(); // Collects all unused memory
-            GC.WaitForPendingFinalizers(); // Waits until GC has finished its work
-            GC.Collect();
-        }
+        public void Dispose() => _monoCecilVersion.Dispose();
 
-        public void LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo, bool skipReadingAttributesFromAssemblies)
-        {
-            _monoCecilVersion.LoadAssembly(assemblyPath, loadReferencedAssembliesToo, skipReadingAttributesFromAssemblies);
-        }
+        public void LoadAssembly(string assemblyPath) => _monoCecilVersion.LoadAssembly(assemblyPath);
 
         public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
             => _monoCecilVersion.GetContentPropertyName(namespaceName, localTypeName, assemblyNameIfAny);

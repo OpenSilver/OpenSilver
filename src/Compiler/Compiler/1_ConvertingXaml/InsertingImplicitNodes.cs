@@ -29,11 +29,10 @@ namespace OpenSilver.Compiler
         public static void InsertImplicitNodes(XDocument doc,
             AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettings settings,
-            string globalPrefix,
-            SystemTypesHelper systemTypesHelper)
+            string globalPrefix)
         {
             var indexesMapper = new Stack<List<int>>();
-            TraverseNextElement(doc.Root, 0, indexesMapper, reflectionOnSeparateAppDomain, settings, globalPrefix, systemTypesHelper);
+            TraverseNextElement(doc.Root, 0, indexesMapper, reflectionOnSeparateAppDomain, settings, globalPrefix);
         }
 
         private static void TraverseNextElement(
@@ -42,8 +41,7 @@ namespace OpenSilver.Compiler
             /*Stack<Dictionary<int, int>> indexesMapper*/ Stack<List<int>> indexesMapper,
             AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettings settings,
-            string globalPrefix,
-            SystemTypesHelper systemTypesHelper)
+            string globalPrefix)
         {
             bool skipTraversalOfChildren = false;
 
@@ -152,14 +150,14 @@ namespace OpenSilver.Compiler
                                     
 
                     // Distinguish system types (string, double, etc.) to other types
-                    if (systemTypesHelper.IsSupportedSystemType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
+                    if (settings.SystemTypes.IsSupportedSystemType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
                     {
                         // In this case we do nothing because system types are handled
                         // later in the process. Example: "<sys:Double>50</sys:Double>"
                         // becomes "Double x = 50;"
                     }
                     else if (reflectionOnSeparateAppDomain.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny) ||
-                             settings.CoreTypesConverter.IsSupportedCoreType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
+                             settings.CoreTypes.IsSupportedCoreType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
                     {
                         // Add the attribute that will tell the compiler to later
                         // intialize the type by converting from the string using the
@@ -209,7 +207,7 @@ namespace OpenSilver.Compiler
 
                                 // SPECIAL CASE: If we are in a TextBlock, we want to set the
                                 // property "TextBlock.Text" instead of "TextBlock.Inlines"
-                                if (GeneratingCode.IsTextBlock(currentElement) || GeneratingCode.IsRun(currentElement))
+                                if (GeneratingCode.IsTextBlock(currentElement, settings) || GeneratingCode.IsRun(currentElement, settings))
                                 {
                                     contentPropertyName = "Text";
                                 }
@@ -306,7 +304,7 @@ namespace OpenSilver.Compiler
                 int i = 0;
                 foreach (var childElements in children)
                 {
-                    TraverseNextElement(childElements, i, indexesMapper, reflectionOnSeparateAppDomain, settings, globalPrefix, systemTypesHelper);
+                    TraverseNextElement(childElements, i, indexesMapper, reflectionOnSeparateAppDomain, settings, globalPrefix);
                     ++i;
                 }
                 indexesMapper.Pop();

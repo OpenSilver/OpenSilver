@@ -12,16 +12,14 @@
 *  
 \*====================================================================================*/
 
-using Microsoft.Build.Framework;
-
-namespace OpenSilver.Compiler.Common
+namespace OpenSilver.Compiler
 {
-    public interface ILogger
+    internal static class CoreTypesConverters
     {
-        void WriteError(string message, string file = "", int lineNumber = 0, int columnNumber = 0);
-        void WriteMessage(string message, MessageImportance messageImportance = MessageImportance.Normal);
-        void WriteWarning(string message, string file = "", int lineNumber = 0, int columnNumber = 0);
-        bool HasErrors { get; }
-        int ErrorsCount { get; }
+        public static ICoreTypesConverter CSharp { get; } = new SLCoreTypesConverterCS();
+
+        public static ICoreTypesConverter VisualBasic { get; } = new SLCoreTypesConverterVB();
+
+        public static ICoreTypesConverter FSharp { get; } = new SLCoreTypesConverterFS();
     }
 }

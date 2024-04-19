@@ -18,8 +18,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Experimental;
 using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 using OpenSilver.Compiler;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using Mono.Cecil;
 
 namespace Compiler.Tests
 {
@@ -33,11 +36,12 @@ namespace Compiler.Tests
         private const string Content = "Content";
 
         private static readonly MonoCecilAssembliesInspectorImpl MonoCecilVersion = new(SupportedLanguage.CSharp);
+        private static readonly DefaultAssemblyResolver DefaultResolver = new();
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext _)
         {
-            MonoCecilVersion.LoadAssembly(ExperimentalSubjectDll, true);
+            LoadAssemblyAndDependencies(ExperimentalSubjectDll);
         }
 
         [ClassCleanup]
@@ -234,6 +238,53 @@ namespace Compiler.Tests
             var res = MonoCecilVersion.IsPropertyOrFieldACollection(nameof(DerivedClassGenericType.MyField),
                 ExperimentalNamespace, nameof(DerivedClassGenericType));
             res.Should().BeFalse();
+        }
+
+        private static void LoadAssemblyAndDependencies(string assemblyPath)
+        {
+            var loadedAssemblyNames = new HashSet<string>();
+            var queue = new Queue<AssemblyDefinition>();
+            queue.Enqueue(MonoCecilVersion.LoadAssembly(assemblyPath));
+            while (queue.Count > 0)
+            {
+                var assembly = queue.Dequeue();
+                loadedAssemblyNames.Add(assembly.Name.Name);
+
+                var referencedAssemblies = assembly.MainModule.AssemblyReferences;
+
+                foreach (var referencedAssembly in referencedAssemblies)
+                {
+                    if (loadedAssemblyNames.Contains(referencedAssembly.Name))
+                    {
+                        continue;
+                    }
+
+                    var assemblyFullPath = Path.Combine(Path.GetDirectoryName(assemblyPath) ?? "", referencedAssembly.Name + ".dll");
+                    if (File.Exists(assemblyFullPath))
+                    {
+                        queue.Enqueue(MonoCecilVersion.LoadAssembly(assemblyFullPath));
+                    }
+                    else
+                    {
+                        //There is not the assembly in the output folder.
+                        //Maybe it is netstandard.dll or any another core library.
+                        //Let's try to load via default resolver.
+                        try
+                        {
+                            var ns = DefaultResolver.Resolve(referencedAssembly);
+                            if (ns != null)
+                            {
+                                ns = MonoCecilVersion.LoadAssembly(ns.MainModule.FileName);
+                                if (ns != null)
+                                {
+                                    queue.Enqueue(ns);
+                                }
+                            }
+                        }
+                        catch (AssemblyResolutionException) { }
+                    }
+                }
+            }
         }
     }
 }

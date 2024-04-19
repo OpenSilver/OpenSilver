@@ -32,14 +32,18 @@ namespace OpenSilver.Compiler
         // ContentTemplate="{TemplateBinding ContentTemplate}" />"
         //------------------------------------------------------------
 
-        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain)
+        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain, ConversionSettings settings)
         {
-            TraverseNextElement(doc.Root, false, reflectionOnSeparateAppDomain);
+            TraverseNextElement(doc.Root, false, reflectionOnSeparateAppDomain, settings);
         }
 
-        static void TraverseNextElement(XElement currentElement, bool isInsideControlTemplate, AssembliesInspector reflectionOnSeparateAppDomain)
+        static void TraverseNextElement(
+            XElement currentElement,
+            bool isInsideControlTemplate,
+            AssembliesInspector reflectionOnSeparateAppDomain,
+            ConversionSettings settings)
         {
-            if (GeneratingCode.IsControlTemplate(currentElement))
+            if (GeneratingCode.IsControlTemplate(currentElement, settings))
             {
                 isInsideControlTemplate = true;
             }
@@ -47,18 +51,18 @@ namespace OpenSilver.Compiler
             if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains("."))
             {
                 bool isContentPresenter = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                    GeneratingCode.DefaultXamlNamespace,
+                    settings.Metadata.SystemWindowsControlsNS,
                     "ContentPresenter",
                     currentElement.Name.NamespaceName,
                     currentElement.Name.LocalName);
 
                 if (isContentPresenter)
                 {
-                    if (!HasAttribute(currentElement, "Content", reflectionOnSeparateAppDomain))
+                    if (!HasAttribute(currentElement, "Content", reflectionOnSeparateAppDomain, settings))
                     {
                         currentElement.Add(new XAttribute("Content", "{TemplateBinding Content}"));
                     }
-                    if (!HasAttribute(currentElement, "ContentTemplate", reflectionOnSeparateAppDomain))
+                    if (!HasAttribute(currentElement, "ContentTemplate", reflectionOnSeparateAppDomain, settings))
                     {
                         currentElement.Add(new XAttribute("ContentTemplate", "{TemplateBinding ContentTemplate}"));
                     }
@@ -68,11 +72,11 @@ namespace OpenSilver.Compiler
             // Recursion:
             foreach (var childElements in currentElement.Elements())
             {
-                TraverseNextElement(childElements, isInsideControlTemplate, reflectionOnSeparateAppDomain);
+                TraverseNextElement(childElements, isInsideControlTemplate, reflectionOnSeparateAppDomain, settings);
             }
         }
 
-        private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector reflectionOnSeparateAppDomain)
+        private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector reflectionOnSeparateAppDomain, ConversionSettings settings)
         {
             bool found = cp.Attribute(attributeName) != null;
             if (!found)
@@ -89,7 +93,7 @@ namespace OpenSilver.Compiler
                         {
                             // Then make sure this is not an attached property.
                             bool isProperty = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                                GeneratingCode.DefaultXamlNamespace,
+                                settings.Metadata.SystemWindowsControlsNS,
                                 "ContentPresenter",
                                 namespaceName,
                                 typeAndProperty[0]);

@@ -20,7 +20,7 @@ namespace OpenSilver.Compiler.Common
     public sealed class LoggerThatUsesTaskOutput : ILogger
     {
         private readonly Task _task;
-        private bool _hasErrors;
+        private int _errorsCount;
 
         public LoggerThatUsesTaskOutput(Task task)
         {
@@ -29,7 +29,7 @@ namespace OpenSilver.Compiler.Common
 
         public void WriteError(string message, string file = "", int lineNumber = 0, int columnNumber = 0)
         {
-            _hasErrors = true;
+            _errorsCount++;
             var args = new BuildErrorEventArgs(
                 string.Empty,
                 string.Empty,
@@ -70,12 +70,8 @@ namespace OpenSilver.Compiler.Common
             _task.BuildEngine.LogWarningEvent(args);
         }
 
-        public bool HasErrors
-        {
-            get
-            {
-                return _hasErrors;
-            }
-        }
+        public bool HasErrors => _errorsCount > 0;
+
+        public int ErrorsCount => _errorsCount;
     }
 }
