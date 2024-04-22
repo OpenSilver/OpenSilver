@@ -760,6 +760,8 @@ namespace System.Windows.Controls
                 {
                     X = position.X,
                     Y = position.Y,
+                    HorizontalOffset = ScrollInfo.HorizontalOffset,
+                    VerticalOffset = ScrollInfo.VerticalOffset,
                 };
             }
         }
@@ -785,13 +787,15 @@ namespace System.Windows.Controls
             if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
             {
                 double deltaX = _touchInfo.X - position.X;
-                ScrollToHorizontalOffset(ScrollInfo.HorizontalOffset + deltaX * TouchInfo.ScrollMultiplier);
+                _touchInfo.HorizontalOffset += deltaX;
+                ScrollToHorizontalOffset(_touchInfo.HorizontalOffset);
             }
 
             if (ComputedVerticalScrollBarVisibility == Visibility.Visible)
             {
                 double deltaY = _touchInfo.Y - position.Y;
-                ScrollToVerticalOffset(ScrollInfo.VerticalOffset + deltaY * TouchInfo.ScrollMultiplier);
+                _touchInfo.VerticalOffset += deltaY;
+                ScrollToVerticalOffset(_touchInfo.VerticalOffset);
             }
 
             _touchInfo.X = position.X;
@@ -1048,9 +1052,10 @@ namespace System.Windows.Controls
 
         private sealed class TouchInfo
         {
-            public const int ScrollMultiplier = 5; // scrolling is very slow if do not increase the delta
             public double X;
             public double Y;
+            public double HorizontalOffset;
+            public double VerticalOffset;
         }
     }
 }
