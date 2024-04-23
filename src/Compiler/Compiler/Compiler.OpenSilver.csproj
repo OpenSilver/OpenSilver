@@ -75,7 +75,6 @@
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.cs" />
     <Compile Include="7_ConvertingXamlToVB\ConvertingXamlToVB.cs" />
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
-    <Compile Include="EntryPoints\ResXProcessor.cs" />
     <Compile Include="EntryPoints\ResourcesProcessor.cs" />
     <Compile Include="EntryPoints\ServiceReferenceFixer.cs" />
     <Compile Include="EntryPoints\TypeScriptDefToCSharp.cs" />

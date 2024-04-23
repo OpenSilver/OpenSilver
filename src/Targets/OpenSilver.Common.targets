@@ -19,7 +19,6 @@
   ============================================================-->
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ServiceReferenceFixer" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesProcessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResXProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.XamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.TypeScriptDefToCSharp" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
@@ -258,27 +257,6 @@
       <Resource Remove="@(Resource)" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
       <Resource Include="@(ResourcesProcessorProcessedFiles)" />
       <FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
-    </ItemGroup>
-
-    <!--============================================================
-      ResXProcessor (only during Pass 2)
-      ============================================================-->
-    <Message
-      Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
-      Text="Starting processing .resx files"
-      Importance="normal"/>
-    <ResXProcessor
-      Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
-      SourceFile="%(Resource.FullPath)"
-      RootNamespace="$(RootNamespace)"
-      SourceFileRelativePath="%(Resource.RelativeDir)%(Resource.Filename)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).js"
-      />
-    <ItemGroup>
-      <ResXProcessorProcessedFiles Include="@(Resource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).js')" Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'" />
-      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'" />
-      <Resource Include="@(ResXProcessorProcessedFiles)" />
-      <FileWrites Include="@(ResXProcessorProcessedFiles)"/>
     </ItemGroup>
 
     <!--============================================================
