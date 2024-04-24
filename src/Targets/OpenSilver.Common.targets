@@ -67,8 +67,6 @@
   ============================================================-->
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <IsOpenSilver>true</IsOpenSilver>
     <IsSecondPass Condition="'$(IsSecondPass)'==''">False</IsSecondPass>
     <OutputExtension Condition="'$(Language)' == 'C#'">cs</OutputExtension>
     <OutputExtension Condition="'$(Language)' == 'VB'">vb</OutputExtension>
@@ -320,6 +318,10 @@
       <Output TaskParameter="GeneratedFiles" ItemName="CompiledXamlFiles" />
       <Output TaskParameter="RemovedFiles" ItemName="RemovedXamlFiles" />
     </XamlPreprocessor>
+
+    <ItemGroup>
+      <FileWrites Include="@(CompiledXamlFiles)" />
+    </ItemGroup>
 
     <ItemGroup Condition="'$(Language)' == 'C#' Or '$(Language)' == 'VB'">
       <Content Remove="@(RemovedXamlFiles)" />
