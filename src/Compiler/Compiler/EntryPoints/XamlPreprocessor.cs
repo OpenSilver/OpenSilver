@@ -68,7 +68,6 @@ namespace OpenSilver.Compiler
         [Required]
         public string OutputPath { get; set; }
 
-        [Required]
         public string RootNamespace { get; set; }
 
         [Required]
