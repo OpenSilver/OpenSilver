@@ -498,7 +498,7 @@ if(nextSibling != undefined) {
                 int length = 0;
                 foreach (KeyValuePair<int, Storage> kvp in uie.EffectiveValues)
                 {
-                    if (kvp.Value.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default)
+                    if (kvp.Value.Entry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
                     {
                         continue;
                     }
