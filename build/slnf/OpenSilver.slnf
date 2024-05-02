@@ -5,24 +5,22 @@
       "Analyzers\\NotImplemented.Tests\\NotImplemented.Analyzer.Tests.csproj",
       "Analyzers\\NotImplemented\\NotImplemented.Analyzer.csproj",
       "Compiler\\Compiler.Common\\Compiler.Common.OpenSilver.csproj",
-	  "Compiler\\Compiler.ResourcesExtractor\\Compiler.ResourcesExtractor.OpenSilver.csproj",
-      "Compiler\\Compiler.ProgressDialog\\Compiler.ProgressDialog.OpenSilver.csproj",
-      "Compiler\\Compiler.TypeScriptDefToCSharp\\Compiler.TypeScriptDefToCSharp.OpenSilver.csproj",
+      "Compiler\\Compiler.ResourcesExtractor\\Compiler.ResourcesExtractor.OpenSilver.csproj",
       "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
       "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",
       "Runtime\\Controls.Data.Input\\Controls.Data.Input.OpenSilver.csproj",
       "Runtime\\Controls.DataVisualization\\Controls.DataVisualization.OpenSilver.csproj",
-	  "Runtime\\Controls.Input\\Controls.Input.OpenSilver.csproj",
-	  "Runtime\\Controls.Navigation\\Controls.Navigation.OpenSilver.csproj",
-	  "Runtime\\Controls.Data\\Controls.Data.OpenSilver.csproj",
-	  "Runtime\\Controls.Data.Toolkit\\Controls.Data.Toolkit.OpenSilver.csproj",
-	  "Runtime\\Controls.Layout.Toolkit\\Controls.Layout.Toolkit.OpenSilver.csproj",
-	  "Runtime\\Controls.Theming.Toolkit\\Controls.Theming.Toolkit.OpenSilver.csproj",
+      "Runtime\\Controls.Input\\Controls.Input.OpenSilver.csproj",
+      "Runtime\\Controls.Navigation\\Controls.Navigation.OpenSilver.csproj",
+      "Runtime\\Controls.Data\\Controls.Data.OpenSilver.csproj",
+      "Runtime\\Controls.Data.Toolkit\\Controls.Data.Toolkit.OpenSilver.csproj",
+      "Runtime\\Controls.Layout.Toolkit\\Controls.Layout.Toolkit.OpenSilver.csproj",
+      "Runtime\\Controls.Theming.Toolkit\\Controls.Theming.Toolkit.OpenSilver.csproj",
       "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
-	  "Runtime\\Blend\\Interactivity\\Interactivity.OpenSilver.csproj",
-	  "Runtime\\Blend\\Interactions\\Expression.Interactions.OpenSilver.csproj",
-	  "Runtime\\Blend\\Effects\\Expression.Effects.OpenSilver.csproj",
-	  "Runtime\\MEF\\System.ComponentModel.Composition.Initialization\\System.ComponentModel.Composition.Initialization.csproj"
-	]
+      "Runtime\\Blend\\Interactivity\\Interactivity.OpenSilver.csproj",
+      "Runtime\\Blend\\Interactions\\Expression.Interactions.OpenSilver.csproj",
+      "Runtime\\Blend\\Effects\\Expression.Effects.OpenSilver.csproj",
+      "Runtime\\MEF\\System.ComponentModel.Composition.Initialization\\System.ComponentModel.Composition.Initialization.csproj"
+    ]
   }
 }

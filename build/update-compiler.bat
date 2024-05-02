@@ -45,8 +45,6 @@ ECHO.
 
 CALL :copyDll Compiler OpenSilver.Compiler.%BUILD_UUID%
 CALL :copyDll Compiler.Common OpenSilver.Compiler.Common.%BUILD_UUID%
-CALL :copyDll Compiler.ProgressDialog OpenSilver.Compiler.ProgressDialog.%BUILD_UUID%
-CALL :copyDll Compiler.TypeScriptDefToCSharp OpenSilver.Compiler.TypeScriptDefToCSharp.%BUILD_UUID%
 CALL :copyDll Compiler.ResourcesExtractor OpenSilver.Compiler.Resources.%BUILD_UUID%
 CALL :copyDll Compiler Mono.Cecil
 CALL :copyDll Compiler Mono.Cecil.Mdb

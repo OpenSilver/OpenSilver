@@ -646,16 +646,6 @@
 		<Compile Include="ToBeReviewed\GroupedEnumerable_3.cs" />
 		<Compile Include="ToBeReviewed\GroupedEnumerable_4.cs" />
 		<Compile Include="ToBeReviewed\Grouping_2.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\EmptyNamespaceDefinition.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\JSArray_1.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\JSObject.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\Promise_1.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\ToJavaScriptObjectExtender.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\UnionType.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_2.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_3.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_4.cs" />
-		<Compile Include="TypeScriptDefinitionsSupportFiles\UnionType_5.cs" />
 		<Compile Include="System.Windows.Input\PointerDeviceType.cs" />
 		<Compile Include="System.Windows\Point.cs" />
 		<Compile Include="System.Windows\Rect.cs" />

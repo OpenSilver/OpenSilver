@@ -20,7 +20,6 @@
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ServiceReferenceFixer" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.XamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.TypeScriptDefToCSharp" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ChangeInPlaceXamlToGenerated" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerResourcesAssemblyName).dll" TaskName="OpenSilver.Compiler.Resources.ResourcesExtractorAndCopier" />
@@ -87,8 +86,6 @@
     <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)'==''">resources\</Cshtml5OutputResourcesPath>
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
-    <EnableTypeScriptDefToCSharp Condition="'$(EnableTypeScriptDefToCSharp)' == ''">true</EnableTypeScriptDefToCSharp>
-    <EnableTypeScriptDefToCSharp Condition="'$(Language)' == 'F#'">false</EnableTypeScriptDefToCSharp>
   </PropertyGroup>
 
   <!--============================================================
@@ -176,7 +173,7 @@
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-2.2/"/>
 	  
     <!--============================================================
-      Change the Build Action of XAML and TypeScript files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition", "TypeScriptCompile"] to "Content" in case the developer has not already done so.
+      Change the Build Action of XAML files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition"] to "Content" in case the developer has not already done so.
       ============================================================-->
     <ItemGroup>
       <Content Include="@(Page)"/>
@@ -189,10 +186,6 @@
     <ItemGroup>
       <Content Include="@(ApplicationDefinition)"/>
       <ApplicationDefinition Remove="@(ApplicationDefinition)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(TypeScriptCompile)"/>
-      <TypeScriptCompile Remove="@(TypeScriptCompile)"/>
     </ItemGroup>
     <!--============================================================
       Change the Build Action of JS/CSS/Image/Video/Audio/Text/Xml/Font files from ["Content", "Resource"] to "EmbeddedResource" in case the developer has not already done so.
@@ -253,28 +246,6 @@
       <Resource Remove="@(Resource)" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
       <Resource Include="@(ResourcesProcessorProcessedFiles)" />
       <FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
-    </ItemGroup>
-
-    <!--============================================================
-      TypeScriptDefToCSharp
-      ============================================================-->
-    <ItemGroup Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'">
-      <TypeScriptDefFiles Include="@(Content)"
-                          Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.+\.d\.ts'))"/>
-    </ItemGroup>
-    <Message Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
-             Importance="normal"
-             Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'"/>
-    <TypeScriptDefToCSharp InputFiles="@(TypeScriptDefFiles)"
-                           OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
-                           Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'">
-      <Output TaskParameter="GeneratedFiles" PropertyName="GeneratedFiles"/>
-    </TypeScriptDefToCSharp>
-    <Message Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
-             Importance="normal"
-             Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'"/>
-    <ItemGroup Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'">
-      <Compile Include="$(GeneratedFiles)"/>
     </ItemGroup>
 
   </Target>
@@ -446,7 +417,7 @@
       Importance="normal"/>
 
     <!--============================================================
-      Change the Build Action of XAML and TypeScript files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition"] to "Content" in case the developer has not already done so.
+      Change the Build Action of XAML files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition"] to "Content" in case the developer has not already done so.
       ============================================================-->
     <ItemGroup>
       <Content Include="@(Page)"/>
@@ -459,33 +430,6 @@
     <ItemGroup>
       <Content Include="@(ApplicationDefinition)"/>
       <ApplicationDefinition Remove="@(ApplicationDefinition)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(TypeScriptCompile)"/>
-      <TypeScriptCompile Remove="@(TypeScriptCompile)"/>
-    </ItemGroup>
-
-    <!--============================================================
-      TypeScriptDefToCSharp
-      ============================================================-->
-    <ItemGroup Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'">
-      <TypeScriptDefFiles Include="@(Content)"
-                          Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.+\.d\.ts'))"/>
-    </ItemGroup>
-    <Message Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
-             Importance="normal"
-             Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'" />
-    <TypeScriptDefToCSharp InputFiles="@(TypeScriptDefFiles)"
-                           OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
-                           NoRecompile="true"
-                           Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'">
-      <Output TaskParameter="GeneratedFiles" PropertyName="GeneratedFiles"/>
-    </TypeScriptDefToCSharp>
-    <Message Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
-             Importance="normal"
-             Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'" />
-    <ItemGroup Condition="'$(EnableTypeScriptDefToCSharp)' == 'true'">
-      <Compile Include="$(GeneratedFiles)"/>
     </ItemGroup>
 
     <!--============================================================
