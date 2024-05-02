@@ -37,7 +37,7 @@ ECHO.
 COPY "%SRC_DIR%\Targets\OpenSilver.targets" "%COMPILER_DIR%\build"
 COPY "%SRC_DIR%\Targets\OpenSilver.Common.targets" "%COMPILER_DIR%\build"
 COPY "%SRC_DIR%\Targets\OpenSilver.GenerateAssemblyInfo.targets" "%COMPILER_DIR%\build"
-COPY "%SRC_DIR%\Compiler\Compiler\bin\%CFG%\net461\OpenSilver.Common.Config.targets" "%COMPILER_DIR%\build"
+COPY "%SRC_DIR%\Compiler\Compiler\bin\%CFG%\netstandard2.0\OpenSilver.Common.Config.targets" "%COMPILER_DIR%\build"
 
 ECHO. 
 ECHO %ESC%[95mCopying Compiler DLLs.%ESC%[0m
@@ -53,7 +53,7 @@ CALL :copyDll Compiler Mono.Cecil.Rocks
 
 EXIT /B 0
 :copyDll
-COPY "%SRC_DIR%\Compiler\%~1\bin\%CFG%\net461\%~2.dll" "%COMPILER_DIR%\tools"
+COPY "%SRC_DIR%\Compiler\%~1\bin\%CFG%\netstandard2.0\%~2.dll" "%COMPILER_DIR%\tools"
 EXIT /B 0
 
 ENDLOCAL

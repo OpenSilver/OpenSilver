@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName Condition="'$(OpenSilverBuildUUID)' == ''">OpenSilver.Compiler.Resources</AssemblyName>
     <AssemblyName Condition="'$(OpenSilverBuildUUID)' != ''">OpenSilver.Compiler.Resources.$(OpenSilverBuildUUID)</AssemblyName>
     <RootNamespace>OpenSilver.Compiler.Resources</RootNamespace>
