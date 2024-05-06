@@ -77,7 +77,7 @@ namespace OpenSilver.Compiler.Resources
                     {
                         foreach (ITaskItem reference in ResolvedReferences)
                         {
-                            storage.LoadAssembly(reference.GetMetadata("Identity"));
+                            storage.LoadAssembly(reference.ItemSpec);
                         }
 
                         // Do the extraction and copy:
@@ -96,7 +96,7 @@ namespace OpenSilver.Compiler.Resources
                 }
                 catch (Exception ex)
                 {
-                    _logger.WriteMessage(
+                    _logger.WriteError(
                         $"{operationName} failed after {executionTimeMeasuring.StopAndGetElapsedTime().TotalMilliseconds} ms: {ex}");
 
                     return false;
@@ -126,29 +126,34 @@ namespace OpenSilver.Compiler.Resources
                 // Copy files:
                 foreach (EmbeddedResource resource in GetManifestResources(asm))
                 {
-                    string fileName = resource.Name.ToLowerInvariant();
+                    string fileRelativePath = resource.Name.ToLowerInvariant();
                     byte[] fileContent = resource.GetResourceData();
 
                     // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
-                    string absoluteOutputResourcesPath = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(outputPathAbsolute, outputResourcesPath);
+                    string resourcesRootDir = Path.GetFullPath(Path.Combine(outputPathAbsolute, outputResourcesPath, assemblyName.ToLowerInvariant()));
 
                     // Create the destination folders hierarchy if it does not already exist:
-                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblyName.ToLowerInvariant(), fileName);
-                    if (destinationFile.Length < 256)
-                    {
-                        string destinationDirectory = Path.GetDirectoryName(destinationFile);
-                        if (!Directory.Exists(destinationDirectory))
-                        {
-                            Directory.CreateDirectory(destinationDirectory);
-                        }
+                    string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, fileRelativePath));
 
-                        // Create the file:
-                        File.WriteAllBytes(destinationFile, fileContent);
-                    }
-                    else
+                    if (destinationFile.Length >= 256)
                     {
-                        logger.WriteWarning("Could not create the following output file because its path is too long: " + destinationFile);
+                        logger.WriteWarning($"Could not create the following output file because its path is too long: {destinationFile}");
+                        continue;
                     }
+
+                    if (!destinationFile.StartsWith(resourcesRootDir, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    string destinationDir = Path.GetDirectoryName(destinationFile);
+                    if (!Directory.Exists(destinationDir))
+                    {
+                        Directory.CreateDirectory(destinationDir);
+                    }
+
+                    // Create the file:
+                    File.WriteAllBytes(destinationFile, fileContent);
                 }
             }
         }
