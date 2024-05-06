@@ -211,7 +211,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             string outputPathAbsolute = GetOutputPathAbsoluteAndReadAssemblyAttributes();
 
             // Read the "App.Config" file for future use by the ClientBase.
-            string relativePathToAppConfigFolder = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(_outputResourcesPath, _entryPointAssembly.GetName().Name);
+            string relativePathToAppConfigFolder = CombinePathsWhileEnsuringEndingBackslashAndMore(_outputResourcesPath, _entryPointAssembly.GetName().Name);
             string relativePathToAppConfig = Path.Combine(relativePathToAppConfigFolder, "app.config.g.js");
             if (File.Exists(Path.Combine(outputPathAbsolute, relativePathToAppConfig)))
             {
@@ -250,6 +250,32 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             }
 
             return simulatorRootHtml;
+        }
+
+        /// <summary>
+        /// This method combines two paths while ensuring that no forward slash is used and that the combined path ends with a backslash.
+        /// </summary>
+        /// <param name="path1">First path</param>
+        /// <param name="path2">Second path</param>
+        /// <returns>The combined path</returns>
+        private static string CombinePathsWhileEnsuringEndingBackslashAndMore(string path1, string path2)
+        {
+            var separator = Path.DirectorySeparatorChar;
+
+            // Replace any incorrect path separators with the correct one:
+            path1 = path1.Replace('/', separator).Replace('\\', separator);
+            path2 = path2.Replace('/', separator).Replace('\\', separator);
+
+            // Combine the paths:
+            var combinedPath = Path.Combine(path1, path2);
+
+            // Make sure that the combined path ends with the correct separator:
+            if (!combinedPath.EndsWith(separator.ToString()))
+            {
+                combinedPath += separator;
+            }
+
+            return combinedPath;
         }
 
         private void LoadIndexFile()

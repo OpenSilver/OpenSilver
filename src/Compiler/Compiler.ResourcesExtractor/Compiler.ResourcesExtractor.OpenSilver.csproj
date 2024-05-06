@@ -5,7 +5,14 @@
     <AssemblyName Condition="'$(OpenSilverBuildUUID)' == ''">OpenSilver.Compiler.Resources</AssemblyName>
     <AssemblyName Condition="'$(OpenSilverBuildUUID)' != ''">OpenSilver.Compiler.Resources.$(OpenSilverBuildUUID)</AssemblyName>
     <RootNamespace>OpenSilver.Compiler.Resources</RootNamespace>
+    <DefineConstants>$(DefineConstants);RESOURCESEXTRACTOR</DefineConstants>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.0.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+  </ItemGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
@@ -14,11 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Compiler.Common\Compiler.Common.OpenSilver.csproj" />
+    <Compile Include="..\Compiler\OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssemblyStorage.cs">
+      <Link>MonoCecilAssemblyStorage.cs</Link>
+    </Compile>
   </ItemGroup>
 
 </Project>

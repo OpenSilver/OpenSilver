@@ -18,7 +18,6 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using OpenSilver.Internal;
-using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
@@ -88,8 +87,7 @@ namespace OpenSilver.Compiler
             AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
             ConversionSettings settings,
-            string codeToPutInTheInitializeComponentOfTheApplicationClass,
-            ILogger logger)
+            string codeToPutInTheInitializeComponentOfTheApplicationClass)
         {
             ICodeGenerator generator;
             if (isFirstPass)
@@ -110,8 +108,7 @@ namespace OpenSilver.Compiler
                     rootNamespace,
                     reflectionOnSeparateAppDomain,
                     settings,
-                    codeToPutInTheInitializeComponentOfTheApplicationClass,
-                    logger);
+                    codeToPutInTheInitializeComponentOfTheApplicationClass);
             }
 
             return generator.Generate();

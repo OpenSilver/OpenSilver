@@ -4,7 +4,6 @@
     "projects": [
       "Analyzers\\NotImplemented.Tests\\NotImplemented.Analyzer.Tests.csproj",
       "Analyzers\\NotImplemented\\NotImplemented.Analyzer.csproj",
-      "Compiler\\Compiler.Common\\Compiler.Common.OpenSilver.csproj",
       "Compiler\\Compiler.ResourcesExtractor\\Compiler.ResourcesExtractor.OpenSilver.csproj",
       "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
       "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",

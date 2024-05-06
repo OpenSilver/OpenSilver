@@ -18,8 +18,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-using OpenSilver.Compiler.Common;
-using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
@@ -35,47 +33,61 @@ namespace OpenSilver.Compiler
         {
             foreach (ITaskItem item in SourceFile)
             {
-                if (!Execute(item, OutputFile, new LoggerThatUsesTaskOutput(this)))
+                if (!ProcessItem(item))
+                {
                     return false;
+                }
             }
+
             return true;
         }
 
-        public static bool Execute(ITaskItem item, string outputFile, ILogger logger)
+        public bool ProcessItem(ITaskItem item)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             string sourceFile = item.ItemSpec;
-            string operationName = "";
-            if (outputFile.EndsWith(".cs"))
+            string operationName;
+            if (OutputFile.EndsWith(".cs"))
+            {
                 operationName = "C#/XAML for HTML5: ServiceReferenceFixer";
-            else if (outputFile.EndsWith(".vb"))
+            }
+            else if (OutputFile.EndsWith(".vb"))
+            {
                 operationName = "VB.Net/XAML for HTML5: ServiceReferenceFixer";
+            }
             else
+            {
                 operationName = "F#/XAML for HTML5: ServiceReferenceFixer";
+            }
 
             try
             {
                 // Validate input strings:
                 if (string.IsNullOrEmpty(sourceFile))
-                    throw new Exception(operationName + " failed because the source file argument is invalid.");
-                if (string.IsNullOrEmpty(outputFile))
-                    throw new Exception(operationName + " failed because the output file argument is invalid.");
+                {
+                    Log.LogError($"{operationName} failed because the source file argument is invalid.");
+                    return false;
+                }
+                if (string.IsNullOrEmpty(OutputFile))
+                {
+                    Log.LogError($"{operationName} failed because the '{nameof(OutputFile)}' argument is invalid.");
+                    return false;
+                }
 
                 //------- DISPLAY THE PROGRESS -------
-                logger.WriteMessage(operationName + " started for file \"" + sourceFile + "\". Output file: \"" + outputFile + "\"");
+                Log.LogMessage($"{operationName} started for file \"{sourceFile}\". Output file: \"{OutputFile}\"");
                 //todo: do not display the output file location?
 
-
                 // Read file:
-                using (StreamReader sr = new StreamReader(sourceFile))
+                using (var sr = new StreamReader(sourceFile))
                 {
-                    String sourceCode = sr.ReadToEnd();
+                    string sourceCode = sr.ReadToEnd();
                     bool wasAnythingFixed;
 
                     // Process the code:
-                    if (outputFile.EndsWith(".cs"))
+                    if (OutputFile.EndsWith(".cs"))
                     {
                         sourceCode = FixingServiceReferences.Fix(
                             sourceCode,
@@ -85,7 +97,7 @@ namespace OpenSilver.Compiler
                             item.GetMetadata("SoapVersion"),
                             out wasAnythingFixed);
                     }
-                    else if (outputFile.EndsWith(".vb"))
+                    else if (OutputFile.EndsWith(".vb"))
                     {
                         sourceCode = FixingServiceReferencesVB.Fix(
                             sourceCode,
@@ -97,14 +109,15 @@ namespace OpenSilver.Compiler
                     }
                     else
                     {
-                        throw new Exception("The compiler doesn't support this file.");
+                        Log.LogError("The compiler doesn't support this file.");
+                        return false;
                     }
 
                     // Create output directory:
-                    Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
+                    Directory.CreateDirectory(Path.GetDirectoryName(OutputFile));
 
                     // Save output:
-                    using (StreamWriter outfile = new StreamWriter(outputFile))
+                    using (var outfile = new StreamWriter(OutputFile))
                     {
                         outfile.Write(sourceCode);
                     }
@@ -113,18 +126,20 @@ namespace OpenSilver.Compiler
                     if (!wasAnythingFixed)
                     {
                         //todo: the following message dates back to when the version without the [XmlSerializerFormat] attribute was not supported. We should update this message.
-                        logger.WriteWarning("The WCF service may not work as expected when run in the browser. To fix the issue, please add the attribute [XmlSerializerFormat] to the WCF contract class on the server, and then update the Service Reference on the client. Please read the following page for details: http://cshtml5.com/links/wcf-limitations-and-tutorials.aspx");
+                        Log.LogWarning(
+                            "The WCF service may not work as expected when run in the browser. To fix the issue, please add the attribute [XmlSerializerFormat] to the WCF contract class on the server, and then update the Service Reference on the client. Please read the following page for details: http://cshtml5.com/links/wcf-limitations-and-tutorials.aspx");
                     }
                 }
 
                 //------- DISPLAY THE PROGRESS -------
-                logger.WriteMessage(operationName + " completed.");
+                Log.LogMessage($"{operationName} completed.");
 
                 return true;
             }
             catch (Exception ex)
             {
-                logger.WriteError(operationName + " failed: " + ex.Message, file: sourceFile);
+                Log.LogMessage(MessageImportance.High, $"{operationName} failed.");
+                Log.LogErrorFromException(ex, true, false, sourceFile);
                 return false;
             }
         }

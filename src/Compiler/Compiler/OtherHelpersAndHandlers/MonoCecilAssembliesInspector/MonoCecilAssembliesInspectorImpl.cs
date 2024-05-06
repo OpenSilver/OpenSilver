@@ -18,8 +18,6 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using Mono.Cecil;
-using OpenSilver.Compiler.Common;
-using OpenSilver.Compiler.Common.Helpers;
 
 namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector
 {

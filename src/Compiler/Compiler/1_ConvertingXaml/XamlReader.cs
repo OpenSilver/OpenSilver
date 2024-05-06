@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using OpenSilver.Compiler.Common;
 
 namespace OpenSilver.Compiler
 {

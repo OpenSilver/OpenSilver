@@ -20,8 +20,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using OpenSilver.Compiler.Common;
-using ILogger = OpenSilver.Compiler.Common.ILogger;
 using System.Linq;
 using System.Diagnostics;
 
@@ -39,14 +37,12 @@ namespace OpenSilver.Compiler
 
         private static MD5 Hash => _hash ??= MD5.Create();
 
-        private readonly ILogger _logger;
         private readonly Stopwatch _watch;
         private AssembliesInspector _assembliesInspector;
         private SupportedLanguage _language;
 
         public XamlPreprocessor()
         {
-            _logger = new LoggerThatUsesTaskOutput(this);
             _watch = new Stopwatch();
         }
 
@@ -102,14 +98,14 @@ namespace OpenSilver.Compiler
             _language = LanguageHelpers.GetLanguage(Language);
             if (_language == SupportedLanguage.Unknown)
             {
-                _logger.WriteError($"'{Language}' is not a supported language (C#, Visual Basic and F#).");
+                Log.LogError($"'{Language}' is not a supported language (C#, Visual Basic and F#).");
                 return false;
             }
 
             _watch.Start();
 
             string operationName = $"OpenSilver: XamlPreprocessor (pass {(IsSecondPass ? "2" : "1")})";
-            _logger.WriteMessage($"{operationName} starting...");
+            Log.LogMessage($"{operationName} starting...");
 
             var generatedFiles = new List<ITaskItem>();
             var removedFiles = new List<ITaskItem>();
@@ -138,17 +134,16 @@ namespace OpenSilver.Compiler
                     }
                     catch (Exception ex)
                     {
-                        string message = $"{string.Join(Environment.NewLine, GetInnerExceptions(ex).Select(e => e.Message))}";
-
                         if (ex is XamlParseException xamlException)
                         {
                             int lineNumber = xamlException.LineNumber;
                             int columnNumber = xamlException.LinePosition;
-                            _logger.WriteError(message, sourceFile, lineNumber, columnNumber);
+                            string message = $"{string.Join(Environment.NewLine, GetInnerExceptions(ex).Select(e => e.Message))}";
+                            Log.LogError(string.Empty, string.Empty, string.Empty, sourceFile, lineNumber, columnNumber, 0, 0, message);
                         }
                         else
                         {
-                            _logger.WriteError(message, sourceFile);
+                            Log.LogErrorFromException(ex, true, true, sourceFile);
                         }
                     }
                 }
@@ -159,17 +154,17 @@ namespace OpenSilver.Compiler
             GeneratedFiles = generatedFiles.ToArray();
             RemovedFiles = removedFiles.ToArray();
 
-            if (_logger.HasErrors)
+            if (Log.HasLoggedErrors)
             {
-                _logger.WriteError($"{operationName} failed after {_watch.ElapsedMilliseconds} ms with {_logger.ErrorsCount} errors.");
-                _logger.WriteError("Note: the XAML editor sometimes raises errors that are misleading. To see only real non-misleading errors, make sure to close all the XAML editor windows/tabs before compiling.");
+                Log.LogMessage(MessageImportance.High, $"{operationName} failed after {_watch.ElapsedMilliseconds} ms.");
+                Log.LogMessage(MessageImportance.High, "Note: the XAML editor sometimes raises errors that are misleading. To see only real non-misleading errors, make sure to close all the XAML editor windows/tabs before compiling.");
             }
             else
             {
-                _logger.WriteMessage($"{operationName} finished after {_watch.ElapsedMilliseconds} ms.");
+                Log.LogMessage($"{operationName} finished after {_watch.ElapsedMilliseconds} ms.");
             }
 
-            return !_logger.HasErrors;
+            return !Log.HasLoggedErrors;
         }
 
         private AssembliesInspector LoadAssemblies()
@@ -196,7 +191,7 @@ namespace OpenSilver.Compiler
                 }
                 catch (Exception ex)
                 {
-                    _logger.WriteWarning($"Failed to load '{assemblyPath}': {ex.Message}");
+                    Log.LogWarning($"Failed to load '{assemblyPath}': {ex.Message}");
                 }
             }
         }
@@ -217,8 +212,7 @@ namespace OpenSilver.Compiler
                         OutputRootPath,
                         OutputAppFilesPath,
                         OutputLibrariesPath,
-                        OutputResourcesPath,
-                        _logger);
+                        OutputResourcesPath);
 
                     generatedCode = CreateCSHeaderContainingHash(xaml)
                         + Environment.NewLine
@@ -238,8 +232,7 @@ namespace OpenSilver.Compiler
                         OutputRootPath,
                         OutputAppFilesPath,
                         OutputLibrariesPath,
-                        OutputResourcesPath,
-                        _logger);
+                        OutputResourcesPath);
 
                     generatedCode = CreateVBHeaderContainingHash(xaml)
                         + Environment.NewLine
@@ -259,8 +252,7 @@ namespace OpenSilver.Compiler
                         OutputRootPath,
                         OutputAppFilesPath,
                         OutputLibrariesPath,
-                        OutputResourcesPath,
-                        _logger);
+                        OutputResourcesPath);
 
                     generatedCode = CreateFSHeaderContainingHash(xaml)
                         + Environment.NewLine
@@ -290,11 +282,11 @@ namespace OpenSilver.Compiler
                     sw.Write(generatedCode);
                 }
 
-                _logger.WriteMessage($"  {fileIdentity} -> {outputFilePath} ({(_watch.Elapsed - start).TotalMilliseconds} ms).");
+                Log.LogMessage($"  {fileIdentity} -> {outputFilePath} ({(_watch.Elapsed - start).TotalMilliseconds} ms).");
             }
             else
             {
-                _logger.WriteMessage($"  '{outputFilePath}' is up to date.");
+                Log.LogMessage($"  '{outputFilePath}' is up to date.");
             }
 
             return new TaskItem(outputFilePath);

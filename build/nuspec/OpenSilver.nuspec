@@ -80,7 +80,6 @@
     <file src="../../src/Compiler/Compiler/bin/$Configuration$/netstandard2.0/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
     <file src="../../src/Compiler/Compiler/bin/$Configuration$/netstandard2.0/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
     <file src="../../src/Compiler/Compiler/bin/$Configuration$/netstandard2.0/OpenSilver.Compiler.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.$OpenSilverBuildUUID$.dll" />
-    <file src="../../src/Compiler/Compiler.Common/bin/$Configuration$/netstandard2.0/OpenSilver.Compiler.Common.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.Common.$OpenSilverBuildUUID$.dll" />
     <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/$Configuration$/netstandard2.0/OpenSilver.Compiler.Resources.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.Resources.$OpenSilverBuildUUID$.dll" />
 
     <!-- OpenSilver analyzers -->

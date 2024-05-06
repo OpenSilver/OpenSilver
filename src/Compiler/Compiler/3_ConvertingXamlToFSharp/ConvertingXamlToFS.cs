@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 using System.Xml.Linq;
-using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
@@ -30,8 +29,7 @@ namespace OpenSilver.Compiler
             string outputRootPath,
             string outputAppFilesPath,
             string outputLibrariesPath,
-            string outputResourcesPath,
-            ILogger logger)
+            string outputResourcesPath)
         {
             ConversionSettings settings = ConversionSettings.CreateFSharpSettings(assemblyNameWithoutExtension);
 
@@ -83,8 +81,7 @@ namespace OpenSilver.Compiler
                 reflectionOnSeparateAppDomain,
                 isFirstPass,
                 settings,
-                codeToPutInTheInitializeComponentOfTheApplicationClass,
-                logger);
+                codeToPutInTheInitializeComponentOfTheApplicationClass);
         }
     }
 }

@@ -15,7 +15,6 @@
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenSilver.Compiler.Common.Helpers;
 using OpenSilver.Compiler.Resources;
 
 namespace Compiler.Tests.ResourcesExtractor

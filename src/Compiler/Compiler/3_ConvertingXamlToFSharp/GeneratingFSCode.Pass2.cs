@@ -21,8 +21,6 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using OpenSilver.Internal;
-using OpenSilver.Compiler.Common;
-using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace OpenSilver.Compiler
 {
@@ -226,7 +224,6 @@ namespace OpenSilver.Compiler
             private readonly string _assemblyNameWithoutExtension;
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
-            private readonly ILogger _logger;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -234,8 +231,7 @@ namespace OpenSilver.Compiler
                 string assemblyNameWithoutExtension,
                 AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings,
-                string codeToPutInTheInitializeComponentOfTheApplicationClass,
-                ILogger logger)
+                string codeToPutInTheInitializeComponentOfTheApplicationClass)
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
@@ -244,7 +240,6 @@ namespace OpenSilver.Compiler
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
                 _codeToPutInTheInitializeComponentOfTheApplicationClass = codeToPutInTheInitializeComponentOfTheApplicationClass;
-                _logger = logger;
             }
 
             public string Generate() => GenerateImpl(new GeneratorContext());

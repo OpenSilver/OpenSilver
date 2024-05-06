@@ -16,26 +16,17 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using OpenSilver.Compiler.Common;
-using OpenSilver.Compiler.Common.Helpers;
-using ILogger = OpenSilver.Compiler.Common.ILogger;
 using Mono.Cecil;
 
 namespace OpenSilver.Compiler.Resources
 {
     public class ResourcesExtractorAndCopier : Task
     {
-        public readonly ILogger _logger;
-
-        public ResourcesExtractorAndCopier()
-        {
-            _logger = new LoggerThatUsesTaskOutput(this);
-        }
-
         [Required]
         public string SourceAssembly { get; set; }
 
@@ -55,61 +46,55 @@ namespace OpenSilver.Compiler.Resources
             // Validate input strings:
             if (string.IsNullOrEmpty(SourceAssembly))
             {
-                _logger.WriteMessage($"{operationName} failed: '{nameof(SourceAssembly)}' cannot be null or empty.");
+                Log.LogMessage($"{operationName} failed: '{nameof(SourceAssembly)}' cannot be null or empty.");
                 return false;
             }
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
-            using (var executionTimeMeasuring = new ExecutionTimeMeasuring())
+            Stopwatch watch = Stopwatch.StartNew();
+
+            try
             {
-                try
+                //------- DISPLAY THE PROGRESS -------
+                Log.LogMessage($"{operationName} started for assembly '{SourceAssembly}'.");
+
+                // Create a separate AppDomain so that the types loaded for reflection can be unloaded when done.
+                using (var storage = new MonoCecilAssemblyStorage())
                 {
-                    //------- DISPLAY THE PROGRESS -------
-                    _logger.WriteMessage($"{operationName} started for assembly '{SourceAssembly}'.");
-
-                    // Determine the absolute output path:
-                    string outputPathAbsolute = PathsHelper.GetOutputPathAbsolute(SourceAssembly, OutputRootPath);
-
-                    // Create a separate AppDomain so that the types loaded for reflection can be unloaded when done.
-                    using (var storage = new MonoCecilAssemblyStorage())
+                    foreach (ITaskItem reference in ResolvedReferences)
                     {
-                        foreach (ITaskItem reference in ResolvedReferences)
-                        {
-                            storage.LoadAssembly(reference.ItemSpec);
-                        }
-
-                        // Do the extraction and copy:
-                        ExtractResources(
-                            outputPathAbsolute,
-                            OutputResourcesPath,
-                            _logger,
-                            storage);
+                        storage.LoadAssembly(reference.ItemSpec);
                     }
 
-                    //------- DISPLAY THE PROGRESS -------
-                    _logger.WriteMessage(
-                        $"{operationName} completed in {executionTimeMeasuring.StopAndGetElapsedTime().TotalMilliseconds} ms.");
-
-                    return true;
+                    // Do the extraction and copy:
+                    ExtractResources(storage);
                 }
-                catch (Exception ex)
-                {
-                    _logger.WriteError(
-                        $"{operationName} failed after {executionTimeMeasuring.StopAndGetElapsedTime().TotalMilliseconds} ms: {ex}");
 
-                    return false;
-                }
+                //------- DISPLAY THE PROGRESS -------
+                Log.LogMessage(
+                    $"{operationName} completed in {watch.ElapsedMilliseconds} ms.");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.LogMessage(
+                    MessageImportance.High,
+                    $"{operationName} failed after {watch.ElapsedMilliseconds} ms.");
+                
+                Log.LogErrorFromException(ex, true);
+
+                return false;
             }
         }
 
-        private static void ExtractResources(
-            string outputPathAbsolute,
-            string outputResourcesPath,
-            ILogger logger,
-            MonoCecilAssemblyStorage storage)
+        private void ExtractResources(MonoCecilAssemblyStorage storage)
         {
+            // Determine the absolute output path:
+            string outputPathAbsolute = GetOutputPathAbsolute(SourceAssembly, OutputRootPath);
+
             foreach (AssemblyDefinition asm in storage.Assemblies)
             {
                 if (!ShouldExtractResourcesFromAssembly(asm))
@@ -130,14 +115,14 @@ namespace OpenSilver.Compiler.Resources
                     byte[] fileContent = resource.GetResourceData();
 
                     // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
-                    string resourcesRootDir = Path.GetFullPath(Path.Combine(outputPathAbsolute, outputResourcesPath, assemblyName.ToLowerInvariant()));
+                    string resourcesRootDir = Path.GetFullPath(Path.Combine(outputPathAbsolute, OutputResourcesPath, assemblyName.ToLowerInvariant()));
 
                     // Create the destination folders hierarchy if it does not already exist:
                     string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, fileRelativePath));
 
                     if (destinationFile.Length >= 256)
                     {
-                        logger.WriteWarning($"Could not create the following output file because its path is too long: {destinationFile}");
+                        Log.LogWarning($"Could not create the following output file because its path is too long: {destinationFile}");
                         continue;
                     }
 
@@ -174,6 +159,41 @@ namespace OpenSilver.Compiler.Resources
             }
 
             return resources;
+        }
+
+        private static string GetOutputPathAbsolute(string assemblyFullNameAndPath, string outputRootPath)
+        {
+            //--------------------------
+            // Note: this method is similar to the one in the Simulator.
+            // IMPORTANT: If you update this method, make sure to update the other one as well.
+            //--------------------------
+
+            var separator = Path.DirectorySeparatorChar;
+            var outputRootPathFixed = outputRootPath.Replace('/', separator).Replace('\\', separator);
+            if (!outputRootPathFixed.EndsWith(separator.ToString()) && outputRootPathFixed != "")
+            {
+                outputRootPathFixed += separator;
+            }
+
+            // If the path is already ABSOLUTE, we return it directly, otherwise we concatenate it to the path of the assembly:
+            string outputPathAbsolute;
+            if (Path.IsPathRooted(outputRootPathFixed))
+            {
+                outputPathAbsolute = outputRootPathFixed;
+            }
+            else
+            {
+                outputPathAbsolute = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(assemblyFullNameAndPath)), outputRootPathFixed);
+
+                outputPathAbsolute = outputPathAbsolute.Replace('/', separator).Replace('\\', separator);
+
+                if (!outputPathAbsolute.EndsWith(separator.ToString()) && outputPathAbsolute != "")
+                {
+                    outputPathAbsolute += separator;
+                }
+            }
+
+            return outputPathAbsolute;
         }
 
         private static bool ShouldExtractResourcesFromAssembly(AssemblyDefinition asm)

@@ -18,7 +18,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using OpenSilver.Compiler.Common;
 
 namespace OpenSilver.Compiler
 {
