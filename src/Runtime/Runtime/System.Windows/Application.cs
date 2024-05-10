@@ -35,11 +35,11 @@ namespace System.Windows
     /// </summary>
     public partial class Application
     {
-        private static Dictionary<string, string> _resourcesCache = null;
+        private static readonly Dictionary<string, string> _resourcesCache = new(StringComparer.OrdinalIgnoreCase);
 
         private readonly Window _mainWindow;
         private readonly INTERNAL_HtmlDomElementReference _rootDiv;
-        
+
         private ApplicationLifetimeObjectsCollection _lifetimeObjects;
         private ResourceDictionary _resources;
         private Dictionary<object, object> _implicitResourcesCache;
@@ -327,60 +327,55 @@ namespace System.Windows
         /// </returns>
         public static Task<string> GetResourceString(Uri uriResource)
         {
-            if (_resourcesCache == null)
+            if (_resourcesCache.TryGetValue(uriResource.OriginalString, out string content))
             {
-                _resourcesCache = new Dictionary<string, string>();
+                return Task.FromResult(content);
             }
-            TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
-            if (_resourcesCache.ContainsKey(uriResource.OriginalString.ToLower()))
-            {
-                tcs.SetResult(_resourcesCache[uriResource.OriginalString.ToLower()]);
-                return tcs.Task;
-            }
-            HashSet<string> supportedExtensions = new HashSet<string>(new string[] { ".txt", ".xml", ".config", ".json", ".clientconfig" });
 
             string uriAsString = uriResource.OriginalString;
             string extension = uriAsString.Substring(uriAsString.LastIndexOf('.'));
-            if (!supportedExtensions.Contains(extension.ToLower())) //todo: when we will be able to handle more extensions, add them to supportedExtensions and do not forget to update GetResourceStream as well.
+
+            if (string.Equals(extension, ".txt", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".xml", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".config", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".json", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".clientconfig", StringComparison.OrdinalIgnoreCase))
             {
-                throw new NotSupportedException("Application.GetResourceString is currently not supported for files with an extension different than .txt, .xml, .json, .config, or .clientconfig.");
+                var tcs = new TaskCompletionSource<string>();
+
+                var uris = new List<string>(1)
+                {
+                    uriAsString + ".g.js"
+                };
+
+                if (string.Equals(uriResource.OriginalString, "ms-appx://app.config", StringComparison.OrdinalIgnoreCase))
+                {
+                    OpenSilver.Interop.LoadJavaScriptFilesAsync(
+                        uris,
+                        () => tcs.SetResult(OpenSilver.Interop.ExecuteJavaScriptString("window.AppConfig")));
+                }
+                else if (string.Equals(uriResource.OriginalString, "ms-appx://servicereferences.clientconfig", StringComparison.OrdinalIgnoreCase))
+                {
+                    OpenSilver.Interop.LoadJavaScriptFilesAsync(
+                        uris,
+                        () => tcs.SetResult(OpenSilver.Interop.ExecuteJavaScriptString("window.ServiceReferencesClientConfig")));
+                }
+                else
+                {
+                    OpenSilver.Interop.LoadJavaScriptFilesAsync(
+                        uris,
+                        () =>
+                        {
+                            string result = OpenSilver.Interop.ExecuteJavaScriptString("window.FileContent");
+                            _resourcesCache.Add(uriResource.OriginalString.ToLower(), result);
+                            tcs.SetResult(result);
+                        });
+                }
+
+                return tcs.Task;
             }
-            List<string> uris = new List<string>();
-            uris.Add(uriAsString + ".g.js");
-            if (uriResource.OriginalString.ToLower() == "ms-appx://app.config")
-            {
-                OpenSilver.Interop.LoadJavaScriptFilesAsync(
-                    uris,
-                    (Action)(() =>
-                    {
-                        tcs.SetResult(OpenSilver.Interop.ExecuteJavaScriptString("window.AppConfig"));
-                    })
-                    );
-            }
-            else if (uriResource.OriginalString.ToLower() == "ms-appx://servicereferences.clientconfig")
-            {
-                OpenSilver.Interop.LoadJavaScriptFilesAsync(
-                    uris,
-                    (Action)(() =>
-                    {
-                        tcs.SetResult(OpenSilver.Interop.ExecuteJavaScriptString("window.ServiceReferencesClientConfig"));
-                    })
-                    );
-            }
-            else
-            {
-                OpenSilver.Interop.LoadJavaScriptFilesAsync(
-                    uris,
-                    (Action)(() =>
-                    {
-                        string result = OpenSilver.Interop.ExecuteJavaScriptString("window.FileContent");
-                        _resourcesCache.Add(uriResource.OriginalString.ToLower(), result);
-                        tcs.SetResult(result);
-                    })
-                    );
-            }
-            //return Convert.ToString(Interop.ExecuteJavaScript("window.FileContent"));
-            return tcs.Task;
+
+            return Task.FromResult(string.Empty);
         }
 
         /// <summary>
@@ -507,23 +502,28 @@ namespace System.Windows
         {
             string resourceString = await GetResourceString(uriResource);
             string uriAsString = uriResource.OriginalString;
-            string extensionLowercase = uriAsString.Substring(uriAsString.LastIndexOf('.')).ToLower();
+            string extension = uriAsString.Substring(uriAsString.LastIndexOf('.'));
 
-            byte[] byteArray = Encoding.ASCII.GetBytes(resourceString);
-            MemoryStream stream = new MemoryStream(byteArray);
+            string mimeType;
 
-            string mimeType = "text/plain";
-            if (extensionLowercase == ".xml" || extensionLowercase == ".config" || extensionLowercase == ".clientconfig")
+            if (string.Equals(extension, ".xml", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".config", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(extension, ".clientconfig", StringComparison.OrdinalIgnoreCase))
             {
                 mimeType = "application/xml";
             }
-            else if (extensionLowercase == ".json")
+            else if (string.Equals(extension, ".json", StringComparison.OrdinalIgnoreCase))
             {
                 mimeType = "application/json";
+            }
+            else
+            {
+                mimeType = "text/plain";
             } //todo: update this when more extensions will be handled
 
-            StreamResourceInfo resourceInfo = new StreamResourceInfo(stream, mimeType);
-            return resourceInfo;
+            return new StreamResourceInfo(
+                new MemoryStream(Encoding.ASCII.GetBytes(resourceString)),
+                mimeType);
         }
 
         public static event EventHandler INTERNAL_Reloaded;
