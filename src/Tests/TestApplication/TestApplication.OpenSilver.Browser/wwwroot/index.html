@@ -2,20 +2,49 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>TestApplication.OpenSilver</title>
     <base href="/" />
+    <script>
+        (function () {
+            const style = document.createElement('link');
+            style.setAttribute('rel', 'stylesheet');
+            style.setAttribute('type', 'text/css');
+            style.setAttribute('href', 'loading-indicator.css?date=' + new Date().toISOString());
+            document.head.appendChild(style);
+            const script = document.createElement('script');
+            script.setAttribute('type', 'application/javascript');
+            script.setAttribute('src', 'libs/opensilver.js?date=' + new Date().toISOString());
+            document.head.appendChild(script);
+        })();
+    </script>
 </head>
 <body>
-    <div id="app" style="position:absolute;width:100%;height:100%;"></div>
+    <div id="app">
+        <div class="loading-indicator-wrapper">
+            <div class="loading-indicator">
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-ball"></div>
+                <div class="loading-indicator-text"></div>
+            </div>
+        </div>
+    </div>
     <div id="opensilver-root" style="position: relative; width: 100%; height: 100%; overflow-x: hidden; overflow-y: hidden"></div>
 
-    <!-- loading indicator -->
-    <!-- modify these files to change the loading animation -->
-    <link rel="stylesheet" type="text/css" href="loading-indicator.css" />
-    <script type="text/javascript" src="loading-indicator.js"></script>
-
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
-    <script type="text/javascript" src="libs/opensilver.js"></script>
-    <script type="text/javascript" src="BlazorLoader.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>
