@@ -145,9 +145,7 @@ namespace System.Windows.Controls.Primitives
                 CaptureMouse();
                 IsDragging = true;
 
-                Debug.Assert(Parent is UIElement);
-
-                _origin = _previousPosition = e.GetPosition((UIElement)Parent);
+                _origin = _previousPosition = e.GetPosition(null);
 
                 // Raise the DragStarted event 
                 bool success = false;
@@ -217,9 +215,7 @@ namespace System.Windows.Controls.Primitives
 
             if (IsDragging)
             {
-                Debug.Assert(Parent is UIElement);
-
-                Point position = e.GetPosition((UIElement)Parent);
+                Point position = e.GetPosition(null);
 
                 if (position != _previousPosition)
                 {
