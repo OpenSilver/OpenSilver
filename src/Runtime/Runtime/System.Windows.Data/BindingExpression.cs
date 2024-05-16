@@ -134,7 +134,7 @@ namespace System.Windows.Data
             // in the remark.
             if (_status == BindingStatus.None && ParentBinding.Mode == BindingMode.TwoWay)
             {
-                UpdateSourceObject(Target.GetValue(TargetProperty));
+                UpdateSourceObject();
             }
         }
 
@@ -652,7 +652,7 @@ namespace System.Windows.Data
             //--------------
         }
 
-        internal void UpdateSourceObject(object value)
+        internal void UpdateSourceObject()
         {
             if (_propertyPathWalker.IsPathBroken)
             {
@@ -663,7 +663,7 @@ namespace System.Windows.Data
 
             IPropertyPathNode node = _propertyPathWalker.FinalNode;
 
-            object convertedValue = value;
+            object convertedValue = Target.GetValue(TargetProperty);
             Type expectedType = node.Type;
 
             ValidationError vError = null;
@@ -672,7 +672,7 @@ namespace System.Windows.Data
             {
                 if (expectedType != null && ParentBinding.Converter != null)
                 {
-                    convertedValue = ParentBinding.Converter.ConvertBack(value,
+                    convertedValue = ParentBinding.Converter.ConvertBack(convertedValue,
                         expectedType,
                         ParentBinding.ConverterParameter,
                         ParentBinding.ConverterCulture);
@@ -762,7 +762,7 @@ namespace System.Windows.Data
             if (_needsUpdate)
             {
                 _needsUpdate = false;
-                UpdateSourceObject(Target.GetValue(TargetProperty));
+                UpdateSourceObject();
             }
         }
 
@@ -1140,7 +1140,7 @@ namespace System.Windows.Data
             
             try
             {
-                UpdateSourceObject(args.NewValue);
+                UpdateSourceObject();
             }
             catch (Exception ex)
             {
