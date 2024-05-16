@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <NoXamlPreprocessor>True</NoXamlPreprocessor>
-    <OpenSilverType>5</OpenSilverType>
+    <OpenSilverType>6</OpenSilverType>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0" PrivateAssets="all" />
-    <PackageReference Include="OpenSilver" Version="1.1.0" />
+    <PackageReference Include="OpenSilver" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
