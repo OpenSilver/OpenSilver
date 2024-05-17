@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 
 namespace System.Windows
@@ -19,7 +18,7 @@ namespace System.Windows
     /// <summary>
     /// Describes the visual structure of a data object.
     /// </summary>
-    public partial class DataTemplate : FrameworkTemplate
+    public class DataTemplate : FrameworkTemplate
     {
         private Type _dataType;
 
@@ -40,33 +39,21 @@ namespace System.Windows
         /// </exception>
         public Type DataType
         {
-            get
-            {
-                return this._dataType;
-            }
+            get => _dataType;
             set
             {
-                Exception ex = System.Windows.DataTemplateKey.ValidateDataType(value, nameof(value));
-                
-                if (ex != null)
+                if (Windows.DataTemplateKey.ValidateDataType(value) is Exception ex)
                 {
                     throw ex;
                 }
 
-                this._dataType = value;
+                CheckSealed();
+                _dataType = value;
             }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public object DataTemplateKey
-        {
-            get
-            {
-                return this.DataType != null ?
-                       new DataTemplateKey(this.DataType) :
-                       null;
-            }
-        }
+        public object DataTemplateKey => DataType is not null ? new DataTemplateKey(DataType) : null;
 
         /// <summary>
         /// Creates the <see cref="UIElement"/> objects in the <see cref="DataTemplate"/>.
@@ -76,7 +63,7 @@ namespace System.Windows
         /// </returns>
         public DependencyObject LoadContent()
         {
-            if (Template != null)
+            if (Template is not null)
             {
                 return Template.LoadContent(null) as DependencyObject;
             }

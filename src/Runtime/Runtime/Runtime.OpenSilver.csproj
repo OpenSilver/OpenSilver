@@ -34,6 +34,7 @@
 		<Compile Include="OpenSilver\Internal\Controls\TextViewManager.cs" />
 		<Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
 		<Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
+		<Compile Include="OpenSilver\Internal\ITemplateContent.cs" />
 		<Compile Include="OpenSilver\Internal\Storage.cs" />
 		<Compile Include="OpenSilver\Internal\DependencyObjectStore.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\EmptyEnumerator.cs" />
@@ -71,6 +72,7 @@
 		<Compile Include="OpenSilver\Internal\Media\ISvgBrush.cs" />
 		<Compile Include="OpenSilver\Internal\NamedObject.cs" />
 		<Compile Include="OpenSilver\Internal\SynchronyzedStore.cs" />
+		<Compile Include="OpenSilver\Internal\TemplateContent.cs" />
 		<Compile Include="OpenSilver\Internal\UIElementHelpers.cs" />
 		<Compile Include="OpenSilver\Internal\ValidateValueCallback.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />

@@ -100,6 +100,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private const string StaticRes = "StaticResource";
         private const string StaticResExtension = "StaticResourceExtension";
         private const string DependencyObj = "DependencyObject";
+        private const string FrameworkTemplateName = "FrameworkTemplate";
 
         private readonly MonoCecilAssemblyStorage _storage;
         private readonly List<AssemblyData> _assemblies = new();
@@ -485,6 +486,23 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var fromType = FindType(fromNamespaceName, fromTypeName);
 
             return type.IsAssignableFrom(fromType);
+        }
+
+        public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName)
+        {
+            const string TemplatePropertyName = "Template";
+
+            if (propertyName != TemplatePropertyName)
+            {
+                return false;
+            }
+
+            var type = FindType(namespaceName, typeName);
+
+            return FindPropertyDeep(type, TemplatePropertyName, out _) is PropertyDefinition prop &&
+                prop.DeclaringType.Name == FrameworkTemplateName &&
+                prop.DeclaringType.Namespace == _metadata.SystemWindowsNS &&
+                prop.DeclaringType.Module.Assembly.Name.Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
         }
 
         public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName,

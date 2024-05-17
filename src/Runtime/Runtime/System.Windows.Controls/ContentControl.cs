@@ -14,6 +14,7 @@
 using System.Collections;
 using System.Windows.Markup;
 using System.Windows.Data;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Xaml.Context;
 

@@ -11,22 +11,20 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal;
-using OpenSilver.Internal.Xaml.Context;
 
 namespace System.Windows
 {
     /// <summary>
     /// Creates an element tree of elements.
     /// </summary>
-    [ContentProperty(nameof(ContentPropertyUsefulOnlyDuringTheCompilation))]
+    [ContentProperty(nameof(Template))]
     public abstract class FrameworkTemplate : DependencyObject
     {
-        private TemplateContent _template;
+        private ITemplateContent _template;
         private bool _isSealed;
 
         protected FrameworkTemplate()
@@ -34,22 +32,23 @@ namespace System.Windows
             CanBeInheritanceContext = false;
         }
 
-        internal TemplateContent Template
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ITemplateContent Template
         {
-            get { return _template; }
+            get => _template;
             set { CheckSealed(); _template = value; }
         }
 
         internal bool ApplyTemplateContent(FrameworkElement container)
         {
-            Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
+            Debug.Assert(container is not null, "Must have a non-null TemplatedParent.");
 
-            if (Template != null)
+            if (Template is not null)
             {
                 FrameworkElement visualTree = (FrameworkElement)Template.LoadContent(container);
                 container.TemplateChild = visualTree;
 
-                return visualTree != null;
+                return visualTree is not null;
             }
             else
             {
@@ -59,14 +58,14 @@ namespace System.Windows
 
         internal bool ApplyTemplateContent(IInternalFrameworkElement container)
         {
-            Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
+            Debug.Assert(container is not null, "Must have a non-null TemplatedParent.");
 
-            if (Template != null)
+            if (Template is not null)
             {
                 IFrameworkElement visualTree = Template.LoadContent(container);
                 container.TemplateChild = visualTree;
                 
-                return visualTree != null;
+                return visualTree is not null;
             }
             else
             {
@@ -74,10 +73,7 @@ namespace System.Windows
             }
         }
 
-        internal virtual bool BuildVisualTree(IFrameworkElement container)
-        {
-            return false;
-        }
+        internal virtual bool BuildVisualTree(IFrameworkElement container) => false;
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Please use the Template property instead.", true)]
         public void SetMethodToInstantiateFrameworkTemplate(Func<FrameworkElement, TemplateInstance> methodToInstantiateFrameworkTemplate)
@@ -87,6 +83,7 @@ namespace System.Windows
 
         // The following property is used during the "InsertImplicitNodes" step of the compilation,
         // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IUIElement ContentPropertyUsefulOnlyDuringTheCompilation
         {
@@ -94,6 +91,7 @@ namespace System.Windows
             set { SetValueInternal(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
             DependencyProperty.Register(
@@ -105,26 +103,20 @@ namespace System.Windows
         /// <summary>
         /// Locks the template so it cannot be changed.
         /// </summary>
-        public void Seal()
-        {
-            _isSealed = true;
-        }
+        public void Seal() => _isSealed = true;
 
         /// <summary>
         /// Gets a value that indicates whether this object is in an immutable state
         /// so it cannot be changed.
         /// </summary>
         /// <returns>true if this object is in an immutable state; otherwise, false.</returns>
-        public bool IsSealed()
-        {
-            return _isSealed;
-        }
+        public bool IsSealed() => _isSealed;
 
-        private void CheckSealed()
+        private protected void CheckSealed()
         {
             if (IsSealed())
             {
-                throw new InvalidOperationException($"Cannot modify a sealed '{GetType().Name}'. Please create a new one instead.");
+                throw new InvalidOperationException($"Cannot modify a '{GetType().Name}' after it is sealed.");
             }
         }
 
@@ -153,47 +145,6 @@ namespace System.Windows
             }
             
             fe.SetValue(TemplateNameScopeProperty, namescope);
-        }
-    }
-
-    internal sealed class TemplateContent
-    {
-        private readonly XamlContext _xamlContext;
-        private readonly Func<IFrameworkElement, XamlContext, IFrameworkElement> _factory;
-
-        internal TemplateContent(XamlContext xamlContext, Func<IFrameworkElement, XamlContext, IFrameworkElement> factory)
-        {
-            if (xamlContext == null)
-            {
-                throw new ArgumentNullException(nameof(xamlContext));
-            }
-
-            _xamlContext = new XamlContext(xamlContext);
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
-        }
-
-        internal IFrameworkElement LoadContent(IFrameworkElement owner)
-        {
-            XamlContext context = new XamlContext(_xamlContext)
-            {
-                ExternalNameScope = new NameScope(),
-            };
-
-            IFrameworkElement rootElement = _factory(owner, context);
-            
-            if (owner == null)
-            {
-                if (NameScope.GetNameScope(rootElement) == null)
-                {
-                    NameScope.SetNameScope(rootElement, context.ExternalNameScope);
-                }
-            }
-            else
-            {
-                FrameworkTemplate.SetTemplateNameScope(owner, context.ExternalNameScope);
-            }
-
-            return rootElement;
         }
     }
 }

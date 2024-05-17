@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.Runtime.CompilerServices;
 
 namespace System.Windows
 {
@@ -40,7 +40,7 @@ namespace System.Windows
         /// </exception>
         public DataTemplateKey(object dataType)
         {
-            this.DataType = dataType;
+            DataType = dataType;
         }
 
         /// <summary>
@@ -57,26 +57,21 @@ namespace System.Windows
         /// </exception>
         public object DataType
         {
-            get
-            {
-                return this._dataType;
-            }
+            get => _dataType;
             set
             {
-                Exception ex = ValidateDataType(value, nameof(value));
-                if (ex != null)
+                if (ValidateDataType(value) is Exception ex)
                 {
                     throw ex;
                 }
 
-                this._dataType = value;
+                _dataType = value;
             }
-        }            
+        }
 
         /// <summary>
         /// Returns a value that indicates whether the specified object is a <see cref="DataTemplateKey"/>
-        /// that has the same <see cref="DataTemplateKey.DataType"/> property value as the
-        /// current <see cref="DataTemplateKey"/>.
+        /// that has the same <see cref="DataType"/> property value as the current <see cref="DataTemplateKey"/>.
         /// </summary>
         /// <param name="o">
         /// The object to compare to the current object.
@@ -84,16 +79,7 @@ namespace System.Windows
         /// <returns>
         /// true if o is equivalent to the current object; otherwise, false.
         /// </returns>
-        public override bool Equals(object o)
-        {
-            DataTemplateKey key = o as DataTemplateKey;
-            if (key != null)
-            {
-                return key._dataType == this._dataType;
-            }
-
-            return false;
-        }
+        public override bool Equals(object o) => o is DataTemplateKey key && key._dataType == _dataType;
 
         /// <summary>
         /// Returns the hash code of the <see cref="DataType"/> property
@@ -103,20 +89,12 @@ namespace System.Windows
         /// The hash code of the <see cref="DataType"/> property value,
         /// or 0 if <see cref="DataType"/> is null.
         /// </returns>
-        public override int GetHashCode()
-        {
-            if (this._dataType != null)
-            {
-                return this._dataType.GetHashCode();
-            }
-
-            return 0;
-        }
+        public override int GetHashCode() => _dataType?.GetHashCode() ?? 0;
 
         // Validate against these rules
         //  1. dataType must not be null (except at initialization)
         //  2. dataType must be a Type (object data)
-        internal static Exception ValidateDataType(object dataType, string argName)
+        internal static Exception ValidateDataType(object dataType, [CallerArgumentExpression(nameof(dataType))] string argName = null)
         {
             Exception result = null;
 
@@ -124,12 +102,11 @@ namespace System.Windows
             {
                 result = new ArgumentNullException(argName);
             }
-            else if (!(dataType is Type))
+            else if (dataType is not Type)
             {
                 result = new ArgumentException(
-                    string.Format("'{0}' is not a valid type for DataTemplate.DataType; it must be 'Type'.", dataType.GetType().Name), 
-                    argName
-                );
+                    $"'{dataType.GetType().Name}' is not a valid type for DataTemplate.DataType; it must be 'Type'.",
+                    argName);
             }
 
             return result;

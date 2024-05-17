@@ -11,16 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
-
 namespace System.Windows.Controls
 {
     /// <summary>
     /// Defines the element tree that is applied as the control template for a control.
     /// </summary>
-    [ContentProperty(nameof(ContentPropertyUsefulOnlyDuringTheCompilation))]
     public sealed class ControlTemplate : FrameworkTemplate
     {
+        private Type _targetType;
+
         /// <summary>
         /// Initializes a new instance of the ControlTemplate class.
         /// </summary>
@@ -29,6 +28,10 @@ namespace System.Windows.Controls
         /// <summary>
         /// Gets or sets the type to which the ControlTemplate is applied.
         /// </summary>
-        public Type TargetType { get; set; }
+        public Type TargetType
+        {
+            get => _targetType;
+            set { CheckSealed(); _targetType = value; }
+        }
     }
 }

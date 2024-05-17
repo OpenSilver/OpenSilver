@@ -834,8 +834,7 @@ namespace GlobalResource
                 string typeName = member.Name.LocalName.Substring(0, idx);
                 string propertyName = member.Name.LocalName.Substring(idx + 1);
 
-                if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                    _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkTemplate", member.Name.NamespaceName, typeName))
+                if (_reflectionOnSeparateAppDomain.IsFrameworkTemplateTemplateProperty(propertyName, member.Name.NamespaceName, typeName))
                 {
                     if (member.Elements().Count() > 1)
                     {
@@ -869,12 +868,9 @@ namespace GlobalResource
                 string propertyName = element.Name.LocalName.Split('.')[1];
                 XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
 
-                bool isFrameworkTemplateContentProperty = propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                   _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkTemplate", element.Name.NamespaceName, typeName);
-
-                if (isFrameworkTemplateContentProperty)
+                if (_reflectionOnSeparateAppDomain.IsFrameworkTemplateTemplateProperty(propertyName, element.Name.NamespaceName, typeName))
                 {
-                    // TODO move call to FrameworkTemplate.SetMethodToInstantiateFrameworkTemplate(...) here
+                    // TODO move call to RuntimeHelpers.SetTemplateContent(...) here
                     parameters.PopScope();
                 }
                 else
@@ -1335,9 +1331,7 @@ match {0} with
                         string typeName = currentElement.Parent.Name.LocalName.Substring(0, index);
                         string propertyName = currentElement.Parent.Name.LocalName.Substring(index + 1);
 
-                        if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                            _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkTemplate",
-                            namespaceName, typeName))
+                        if (_reflectionOnSeparateAppDomain.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName))
                         {
                             return currentElement;
                         }
