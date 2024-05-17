@@ -115,7 +115,37 @@ namespace System.Xaml
 
 		object IProvideValueTarget.TargetObject => object_states.Peek().Value;
 
-		object IProvideValueTarget.TargetProperty => CurrentMember?.UnderlyingMember;
+		object IProvideValueTarget.TargetProperty => GetTargetProperty(this);
+
+		private static object GetTargetProperty(XamlWriterInternalBase intl)
+		{
+			if (intl.CurrentMember is IProvideValueTarget ipvt)
+			{
+				return ipvt.TargetProperty;
+			}
+
+			//
+			// We should never have a null ParentProperty here but
+			// protect against null refs since we are going to dereference it
+			if (intl.CurrentMember is not XamlMember parentProperty)
+			{
+				return null;
+			}
+
+			if (parentProperty.IsAttachable)
+			{
+				//
+				// IPVT returns the static Set method for attached properties in 3.0
+				return parentProperty.UnderlyingSetter;
+			}
+			else
+			{
+				//
+				// This branch cover regular property (will return non null)
+				// and items in a collection/diction (will return null - IPVT returns null in 3.0 for collections/dictionaries).
+				return parentProperty.UnderlyingMember;
+			}
+		}
 
 		object IRootObjectProvider.RootObject => root_state.Value;
 

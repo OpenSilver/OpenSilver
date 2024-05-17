@@ -121,8 +121,14 @@
 		<Compile Include="OpenSilver\Internal\Xaml\Context\XamlObjectFrame.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\IComponentConnector.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\IXamlComponentLoader.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\OpenSilverMemberInvoker.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\OpenSilverXamlMember.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\OpenSilverXamlSchemaContext.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\OpenSilverXamlType.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\ServiceProviderContext.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\TemplateContentLoader.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\XamlDesignerBridge.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\XamlTemplateContent.cs" />
 		<Compile Include="OpenSilver\IO\MemoryFileInfo.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
 		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverAssemblyAttribute.cs" />

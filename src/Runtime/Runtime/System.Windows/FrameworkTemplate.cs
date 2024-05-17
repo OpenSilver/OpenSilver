@@ -14,7 +14,9 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
+using System.Xaml.Markup;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml;
 
 namespace System.Windows
 {
@@ -33,6 +35,7 @@ namespace System.Windows
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [XamlDeferLoad(typeof(TemplateContentLoader), typeof(IFrameworkElement))]
         public ITemplateContent Template
         {
             get => _template;

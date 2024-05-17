@@ -11,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.IO;
 using System.Xaml;
+using OpenSilver.Internal.Xaml;
 
 namespace System.Windows.Markup
 {
@@ -22,9 +22,9 @@ namespace System.Windows.Markup
     /// </summary>
     public static class XamlReader
     {
-        private static readonly Lazy<XamlSchemaContext> _xamlSharedContext = new(() => new XamlSchemaContext());
+        private static readonly Lazy<XamlSchemaContext> _sharedXamlContext = new(() => new OpenSilverXamlSchemaContext());
 
-        internal static XamlSchemaContext XamlSharedContext => _xamlSharedContext.Value;
+        internal static XamlSchemaContext SharedXamlContext => _sharedXamlContext.Value;
 
         /// <summary>
         /// Parses a well-formed XAML fragment and creates a corresponding Silverlight object tree, 
@@ -36,11 +36,13 @@ namespace System.Windows.Markup
         {
             var textReader = new StringReader(xaml);
 
-            var xamlReader = new XamlXmlReader(textReader, XamlSharedContext);
+            var xamlReader = new XamlXmlReader(textReader, SharedXamlContext);
             var xamlWriter = new XamlObjectWriter(xamlReader.SchemaContext);
 
             if (xamlReader.NodeType == XamlNodeType.None)
+            {
                 xamlReader.Read();
+            }
 
             var xamlLineInfo = xamlReader as IXamlLineInfo;
             var xamlLineConsumer = xamlWriter as IXamlLineInfoConsumer;
