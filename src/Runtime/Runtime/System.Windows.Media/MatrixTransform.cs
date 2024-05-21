@@ -51,13 +51,13 @@ namespace System.Windows.Media
         /// value of 1 in coefficients [1,1], [2,2], and [3,3]; and a value of 0 in the rest
         /// of the coefficients.
         /// </returns>
-        public Matrix Matrix
+        public new Matrix Matrix
         {
             get => (Matrix)GetValue(MatrixProperty);
             set => SetValueInternal(MatrixProperty, value);
         }
 
-        internal override Matrix ValueInternal => Matrix;
+        private protected override Matrix GetMatrixCore() => Matrix;
 
         internal override bool IsIdentity => Matrix.IsIdentity;
 

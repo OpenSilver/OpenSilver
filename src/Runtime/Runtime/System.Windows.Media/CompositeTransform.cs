@@ -227,39 +227,36 @@ namespace System.Windows.Media
             set => SetValueInternal(CenterYProperty, value);
         }
 
-        internal override Matrix ValueInternal
+        private protected override Matrix GetMatrixCore()
         {
-            get
+            double centerX = CenterX;
+            double centerY = CenterY;
+            bool hasCenter = centerX != 0 || centerY != 0;
+
+            // 1. Scale
+            Matrix transform = new Matrix();
+            transform.ScaleAt(ScaleX, ScaleY, centerX, centerY);
+
+            // 2. Skew
+            if (hasCenter)
             {
-                double centerX = CenterX;
-                double centerY = CenterY;
-                bool hasCenter = centerX != 0 || centerY != 0;
-
-                // 1. Scale
-                Matrix transform = new Matrix();
-                transform.ScaleAt(ScaleX, ScaleY, centerX, centerY);
-
-                // 2. Skew
-                if (hasCenter)
-                {
-                    transform.Translate(-centerX, -centerY);
-                }
-
-                transform.Skew(SkewX, SkewY);
-
-                if (hasCenter)
-                {
-                    transform.Translate(centerX, centerY);
-                }
-
-                // 3. Rotate
-                transform.RotateAt(Rotation, centerX, centerY);
-
-                // 4. Translate
-                transform.Translate(TranslateX, TranslateY);
-
-                return transform;
+                transform.Translate(-centerX, -centerY);
             }
+
+            transform.Skew(SkewX, SkewY);
+
+            if (hasCenter)
+            {
+                transform.Translate(centerX, centerY);
+            }
+
+            // 3. Rotate
+            transform.RotateAt(Rotation, centerX, centerY);
+
+            // 4. Translate
+            transform.Translate(TranslateX, TranslateY);
+
+            return transform;
         }
 
         internal override bool IsIdentity =>

@@ -18,12 +18,13 @@ namespace System.Windows.Media
     /// </summary>
     public abstract class Transform : GeneralTransform
     {
+        private Matrix? _matrix;
+
         internal Transform() { }
 
-        /// <summary>
-        /// Return the current transformation value.
-        /// </summary>
-        internal abstract Matrix ValueInternal { get; }
+        internal Matrix Matrix => _matrix ??= GetMatrixCore();
+
+        private protected abstract Matrix GetMatrixCore();
 
         ///<summary>
         /// Returns true if transformation if the transformation is definitely an identity.  There are cases where it will
@@ -48,7 +49,7 @@ namespace System.Windows.Media
         /// </returns>
         public override bool TryTransform(Point inPoint, out Point outPoint)
         {
-            Matrix m = ValueInternal;
+            Matrix m = Matrix;
             outPoint = m.Transform(inPoint);
             return true;
         }
@@ -65,7 +66,7 @@ namespace System.Windows.Media
         /// </returns>
         public override Rect TransformBounds(Rect rect)
         {
-            Matrix matrix = ValueInternal;
+            Matrix matrix = Matrix;
             MatrixUtil.TransformRect(ref rect, ref matrix);
             return rect;
         }
@@ -80,7 +81,7 @@ namespace System.Windows.Media
         {
             get
             {
-                Matrix matrix = ValueInternal;
+                Matrix matrix = Matrix;
                 if (!matrix.HasInverse)
                 {
                     return null;
@@ -105,11 +106,15 @@ namespace System.Windows.Media
 
         internal event EventHandler Changed;
 
-        internal void RaiseTransformChanged() => Changed?.Invoke(this, EventArgs.Empty);
-
         internal static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((Transform)d).RaiseTransformChanged();
+            ((Transform)d).OnTransformChanged();
+        }
+
+        internal void OnTransformChanged()
+        {
+            _matrix = null;
+            Changed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

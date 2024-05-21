@@ -64,14 +64,11 @@ namespace System.Windows.Media
             set => SetValueInternal(YProperty, value);
         }
 
-        internal override Matrix ValueInternal
+        private protected override Matrix GetMatrixCore()
         {
-            get
-            {
-                Matrix matrix = Matrix.Identity;
-                matrix.Translate(X, Y);
-                return matrix;
-            }
+            Matrix matrix = Matrix.Identity;
+            matrix.Translate(X, Y);
+            return matrix;
         }
 
         internal override bool IsIdentity => X == 0 && Y == 0;

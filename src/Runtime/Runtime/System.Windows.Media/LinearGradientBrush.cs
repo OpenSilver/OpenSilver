@@ -581,7 +581,7 @@ namespace System.Windows.Media
                 {
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(_gradientRef,
                         "gradientTransform",
-                        MatrixTransform.MatrixToHtmlString(transform.ValueInternal));
+                        MatrixTransform.MatrixToHtmlString(transform.Matrix));
                 }
             }
 
@@ -596,7 +596,7 @@ namespace System.Windows.Media
                 string units = ConvertBrushMappingModeToString(_linearGradient.MappingMode);
                 string spreadMethod = ConvertSpreadMethodToString(_linearGradient.SpreadMethod);
                 string transform = _linearGradient.Transform is Transform t && !t.IsIdentity ?
-                    MatrixTransform.MatrixToHtmlString(t.ValueInternal) : string.Empty;
+                    MatrixTransform.MatrixToHtmlString(t.Matrix) : string.Empty;
                 string opacity = Math.Round(_linearGradient.Opacity, 2).ToInvariantString();
                 string stops = string.Join(",",
                     _linearGradient

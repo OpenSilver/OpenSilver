@@ -80,7 +80,7 @@ namespace System.Windows.Media
         {
             if (_ownerWeakRef.TryGetTarget(out TransformGroup owner))
             {
-                owner.RaiseTransformChanged();
+                owner.OnTransformChanged();
             }
         }
     }

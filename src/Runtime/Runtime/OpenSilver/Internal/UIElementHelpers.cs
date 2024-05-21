@@ -221,7 +221,7 @@ internal static class UIElementHelpers
     {
         uie.OuterDiv.Style.transform = transform switch
         {
-            Transform when !transform.IsIdentity => MatrixTransform.MatrixToHtmlString(transform.ValueInternal),
+            Transform when !transform.IsIdentity => MatrixTransform.MatrixToHtmlString(transform.Matrix),
             _ => string.Empty,
         };
     }

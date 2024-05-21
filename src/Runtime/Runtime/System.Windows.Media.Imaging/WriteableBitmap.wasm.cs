@@ -156,7 +156,7 @@ element.style.transform = currentTransform;
                 }
                 else
                 {
-                    Matrix m = transform.ValueInternal;
+                    Matrix m = transform.Matrix;
                     data.Transform = $"matrix({m.M11}, {m.M12}, {m.M21}, {m.M22}, {m.OffsetX}, {m.OffsetY})";
                 }
 

@@ -110,33 +110,30 @@ namespace System.Windows.Media
             set => SetValueInternal(CenterYProperty, value);
         }
 
-        internal override Matrix ValueInternal
+        private protected override Matrix GetMatrixCore()
         {
-            get
+            Matrix matrix = new Matrix();
+
+            double angleX = AngleX;
+            double angleY = AngleY;
+            double centerX = CenterX;
+            double centerY = CenterY;
+
+            bool hasCenter = centerX != 0 || centerY != 0;
+
+            if (hasCenter)
             {
-                Matrix matrix = new Matrix();
-
-                double angleX = AngleX;
-                double angleY = AngleY;
-                double centerX = CenterX;
-                double centerY = CenterY;
-
-                bool hasCenter = centerX != 0 || centerY != 0;
-
-                if (hasCenter)
-                {
-                    matrix.Translate(-centerX, -centerY);
-                }
-
-                matrix.Skew(angleX, angleY);
-
-                if (hasCenter)
-                {
-                    matrix.Translate(centerX, centerY);
-                }
-
-                return matrix;
+                matrix.Translate(-centerX, -centerY);
             }
+
+            matrix.Skew(angleX, angleY);
+
+            if (hasCenter)
+            {
+                matrix.Translate(centerX, centerY);
+            }
+
+            return matrix;
         }
 
         internal override bool IsIdentity => AngleX == 0 && AngleY == 0;

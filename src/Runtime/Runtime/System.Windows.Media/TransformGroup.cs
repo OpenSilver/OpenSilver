@@ -64,10 +64,10 @@ namespace System.Windows.Media
         {
             TransformGroup tg = (TransformGroup)d;
             tg.OnChildrenChanged((TransformCollection)e.OldValue, (TransformCollection)e.NewValue);
-            tg.RaiseTransformChanged();
+            tg.OnTransformChanged();
         }
 
-        private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaiseTransformChanged();
+        private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnTransformChanged();
 
         private void OnChildrenChanged(TransformCollection oldChildren, TransformCollection newChildren)
         {
@@ -104,27 +104,24 @@ namespace System.Windows.Media
         /// <returns>
         /// A composite of the <see cref="Transform"/> objects in this <see cref="TransformGroup"/>.
         /// </returns>
-        public Matrix Value => ValueInternal;
+        public Matrix Value => Matrix;
 
-        internal override Matrix ValueInternal
+        private protected override Matrix GetMatrixCore()
         {
-            get
+            List<Transform> children = Children.InternalItems;
+            if (children.Count == 0)
             {
-                List<Transform> children = Children.InternalItems;
-                if (children.Count == 0)
-                {
-                    return new Matrix();
-                }
-
-                Matrix transform = children[0].ValueInternal;
-
-                for (int i = 1; i < children.Count; i++)
-                {
-                    transform = Matrix.Multiply(transform, children[i].ValueInternal);
-                }
-
-                return transform;
+                return new Matrix();
             }
+
+            Matrix transform = children[0].Matrix;
+
+            for (int i = 1; i < children.Count; i++)
+            {
+                transform = Matrix.Multiply(transform, children[i].Matrix);
+            }
+
+            return transform;
         }
 
         internal override bool IsIdentity
