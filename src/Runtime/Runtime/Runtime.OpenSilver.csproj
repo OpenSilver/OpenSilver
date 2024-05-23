@@ -222,6 +222,7 @@
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
+		<Compile Include="System.Windows.Documents\Glyphs.cs" />
 		<Compile Include="System.Windows.input\KeyboardNavigation.cs" />
 		<Compile Include="System.Windows.input\TraversalRequest.cs" />
 		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
@@ -245,7 +246,7 @@
 		<Compile Include="OpenSilver\Internal\Xaml\IXamlComponentFactory.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowserBrush.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
+		<Compile Include="System.Windows.Documents\FontSource.cs" />
 		<Compile Include="System.Windows.Ink\Stroke.cs" />
 		<Compile Include="System.Windows.Ink\StrokeCollection.cs" />
 		<Compile Include="System.Windows.Ink\DrawingAttributes.cs" />
@@ -256,6 +257,7 @@
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\RenderingEventArgs.cs" />
+		<Compile Include="System.Windows.Media\StyleSimulations.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Media\ColorConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\DiscreteColorKeyFrame.cs" />
@@ -523,7 +525,7 @@
 		<Compile Include="System.Windows.Media\AlignmentY.cs" />
 		<Compile Include="System.Windows.Media\CompositionTarget.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\Fonts.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\GlyphTypeface.cs" />
+		<Compile Include="System.Windows.Media\GlyphTypeface.cs" />
 		<Compile Include="System.Windows.Media\ImageBrush.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\Matrix3DProjection.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\PlaneProjection.cs" />

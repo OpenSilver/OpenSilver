@@ -11,25 +11,30 @@
 *  
 \*====================================================================================*/
 
-using System.IO;
+namespace System.Windows.Media;
 
-namespace System.Windows.Documents
+/// <summary>
+/// Describes the simulation style of a font.
+/// </summary>
+public enum StyleSimulations
 {
     /// <summary>
-    /// Represents one or more fonts created from a stream.
+    /// No font style simulation.
     /// </summary>
-    [OpenSilver.NotImplemented]
-    public class FontSource
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FontSource"/> class.
-        /// </summary>
-        /// <param name="stream">
-        /// The stream that contains the font source.
-        /// </param>
-        [OpenSilver.NotImplemented]
-        public FontSource(Stream stream)
-        {
-        }
-    }
+    None = 0,
+
+    /// <summary>
+    /// Bold style simulation.
+    /// </summary>
+    BoldSimulation = 1,
+
+    /// <summary>
+    /// Italic style simulation.
+    /// </summary>
+    ItalicSimulation = 2,
+
+    /// <summary>
+    /// Bold and Italic style simulation.
+    /// </summary>
+    BoldItalicSimulation = 3
 }
