@@ -1143,38 +1143,23 @@ End Sub
                                         assemblyNameIfAny
                                     );
 
-
-                                    string customMarkupValueName = "customMarkupValue_" + Guid.NewGuid().ToString("N");
-
-                                    bool isDependencyProperty = _reflectionOnSeparateAppDomain.GetField(
+                                    string dpName = _reflectionOnSeparateAppDomain.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _assemblyNameWithoutExtension) != null;
+                                        _assemblyNameWithoutExtension);
 
-                                    if (isDependencyProperty)
+                                    if (dpName != null)
                                     {
-                                        string bindingBaseTypeString = $"Global.{_settings.Metadata.SystemWindowsDataNS}.Binding";
+                                        string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
+                                        string propertyTypeFullName = string.IsNullOrEmpty(propertyNamespaceName) ?
+                                            $"Global.{propertyLocalTypeName}" :
+                                            $"Global.{propertyNamespaceName}.{propertyLocalTypeName}";
 
-                                        //todo: make this more readable by cutting it into parts ?
-                                        parameters.StringBuilder.AppendLine(
-                                            string.Format(@"Dim {0} = CType({1},{10}).ProvideValue(New Global.System.ServiceProvider({2}, {3}))
-If TypeOf {0} Is {4} Then
-    Global.{9}.BindingOperations.SetBinding({7}, {8}, CType({0}, {4}))
-Else
-    {2}.{5} = CType({0}, {6})
-End If",
-                                                          customMarkupValueName, //0
-                                                          childUniqueName,//1
-                                                          GeneratingCode.GetUniqueName(parent),//2
-                                                          propertyKeyString,//3
-                                                          bindingBaseTypeString,//4
-                                                          propertyName,//5
-                                                          "Global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
-                                                          parentElementUniqueNameOrThisKeyword,//7
-                                                          propertyDeclaringTypeName + "." + propertyName + "Property", //8
-                                                          _settings.Metadata.SystemWindowsDataNS, //9
-                                                          IMarkupExtensionClass));
+                                        parameters.StringBuilder.AppendLine($@"Dim {markupValue} As Object = Nothing
+If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dpName}, {childUniqueName}, {markupValue})
+    {parentElementUniqueNameOrThisKeyword}.{propertyName} = CType({markupValue}, {propertyTypeFullName})
+End If");
                                     }
                                     else
                                     {

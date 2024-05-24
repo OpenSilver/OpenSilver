@@ -170,6 +170,30 @@ public sealed class Setter : SetterBase, ISupportInitialize
         _unresolvedValue = unresolvedValue;
     }
 
+    internal static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
+    {
+        if (targetObject is null)
+        {
+            throw new ArgumentNullException(nameof(targetObject));
+        }
+
+        if (eventArgs is null)
+        {
+            throw new ArgumentNullException(nameof(eventArgs));
+        }
+
+        if (targetObject is not Setter setter || eventArgs.Member.Name != "Value")
+        {
+            return;
+        }
+
+        if (eventArgs.MarkupExtension is BindingBase binding)
+        {
+            setter.Value = binding;
+            eventArgs.Handled = true;
+        }
+    }
+
     void ISupportInitialize.BeginInit() { }
 
     void ISupportInitialize.EndInit()

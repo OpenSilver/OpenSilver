@@ -1137,41 +1137,24 @@ namespace OpenSilver.Compiler
                                         assemblyNameIfAny
                                     );
 
-
-                                    string customMarkupValueName = "customMarkupValue_" + Guid.NewGuid().ToString("N");
-
-                                    bool isDependencyProperty = _reflectionOnSeparateAppDomain.GetField(
+                                    string dpName = _reflectionOnSeparateAppDomain.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _assemblyNameWithoutExtension) != null;
+                                        _assemblyNameWithoutExtension);
 
-                                    if (isDependencyProperty)
+                                    if (dpName != null)
                                     {
-                                        string bindingBaseTypeString = $"global::{_settings.Metadata.SystemWindowsDataNS}.Binding";
-
-                                        //todo: make this more readable by cutting it into parts ?
-                                        parameters.StringBuilder.AppendLine(
-                                            string.Format(@"object {0} = (({10}){1}).ProvideValue(new global::System.ServiceProvider({2}, {3}));
-if ({0} is {4})
+                                        string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
+                                        string propertyTypeFullName = string.IsNullOrEmpty(propertyNamespaceName) ?
+                                            $"global::{propertyLocalTypeName}" :
+                                            $"global::{propertyNamespaceName}.{propertyLocalTypeName}";
+                                        
+                                        parameters.StringBuilder.AppendLine($@"object {markupValue};
+if (!{RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dpName}, {childUniqueName}, out {markupValue}))
 {{
-    global::{9}.BindingOperations.SetBinding({7}, {8}, ({4}){0});
-}}
-else
-{{
-    {2}.{5} = ({6}){0};
-}}",
-                                                          customMarkupValueName, //0
-                                                          childUniqueName,//1
-                                                          GeneratingCode.GetUniqueName(parent),//2
-                                                          propertyKeyString,//3
-                                                          bindingBaseTypeString,//4
-                                                          propertyName,//5
-                                                          "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
-                                                          parentElementUniqueNameOrThisKeyword,//7
-                                                          propertyDeclaringTypeName + "." + propertyName + "Property", //8
-                                                          _settings.Metadata.SystemWindowsDataNS, //9
-                                                          IMarkupExtensionClass));
+    {parentElementUniqueNameOrThisKeyword}.{propertyName} = ({propertyTypeFullName}){markupValue};
+}}");
                                     }
                                     else
                                     {

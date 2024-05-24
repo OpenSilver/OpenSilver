@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Xaml;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
 using OpenSilver.Internal.Xaml.Context;
@@ -271,6 +272,31 @@ namespace OpenSilver.Internal.Xaml
             Debug.Assert(markupExtension != null);
 
             return markupExtension.ProvideValue(new ServiceProviderContext(context));
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static bool TrySetMarkupExtension(object target, DependencyProperty dp, IMarkupExtension<object> markupExtension, out object value)
+        {
+            Debug.Assert(target is not null);
+            Debug.Assert(dp is not null);
+            Debug.Assert(markupExtension is not null);
+
+            var serviceProvider = new ServiceProvider(target, dp);
+
+            value = markupExtension.ProvideValue(serviceProvider);
+
+            if (value is Binding binding)
+            {
+                value = binding.ProvideValue(serviceProvider);
+            }
+
+            if (value is BindingExpression bindingExpression && target is DependencyObject d)
+            {
+                d.SetValue(dp, bindingExpression);
+                return true;
+            }
+
+            return false;
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

@@ -1210,39 +1210,22 @@ namespace GlobalResource
                                         assemblyNameIfAny
                                     );
 
-
-                                    string customMarkupValueName = "customMarkupValue_" + Guid.NewGuid().ToString("N");
-
-                                    bool isDependencyProperty = _reflectionOnSeparateAppDomain.GetField(
+                                    string dpName = _reflectionOnSeparateAppDomain.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _assemblyNameWithoutExtension) != null;
+                                        _assemblyNameWithoutExtension);
 
-                                    if (isDependencyProperty)
+                                    if (dpName != null)
                                     {
-                                        string bindingBaseTypeString = $"global.{_settings.Metadata.SystemWindowsDataNS}.Binding";
+                                        string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
+                                        string propertyTypeFullName = string.IsNullOrEmpty(propertyNamespaceName) ?
+                                            $"global.{propertyLocalTypeName}" :
+                                            $"global.{propertyNamespaceName}.{propertyLocalTypeName}";
 
-                                        //todo: make this more readable by cutting it into parts ?
-                                        parameters.StringBuilder.AppendLine(
-                                            string.Format(@"let {0} = ({1} :> {10}).ProvideValue(new global.System.ServiceProvider({2}, {3}))
-match {0} with
-| :? {4} as binding ->
-    global.{9}.BindingOperations.SetBinding({7}, {8}, binding) |> ignore
-| :? {6} as objVal ->
-    {2}.{5} <- objVal
-| _ -> ()",
-                                                            customMarkupValueName, //0
-                                                            childUniqueName,//1
-                                                            GeneratingCode.GetUniqueName(parent),//2
-                                                            propertyKeyString,//3
-                                                            bindingBaseTypeString,//4
-                                                            propertyName,//5
-                                                            "global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
-                                                            parentElementUniqueNameOrThisKeyword,//7
-                                                            propertyDeclaringTypeName + "." + propertyName + "Property", //8
-                                                            _settings.Metadata.SystemWindowsDataNS, //9
-                                                            IMarkupExtensionClass));                                        
+                                        parameters.StringBuilder.AppendLine($@"let mutable {markupValue}: obj = null
+if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dpName}, {childUniqueName}, ref {markupValue})) then
+    {parentElementUniqueNameOrThisKeyword}.{propertyName} <- unbox<{propertyTypeFullName}> {markupValue}");
                                     }
                                     else
                                     {

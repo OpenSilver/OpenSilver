@@ -26,7 +26,7 @@ namespace System.Windows.Data
     /// <summary>
     /// Contains information about a single instance of a <see cref="Binding" />.
     /// </summary>
-    public class BindingExpression : BindingExpressionBase
+    public sealed class BindingExpression : BindingExpressionBase
     {
         [Flags]
         private enum BindingStatus
@@ -88,12 +88,28 @@ namespace System.Windows.Data
 
         private bool ReadFlag(BindingStatus flag) => (flag & _status) != 0;
 
-        internal BindingExpression(Binding binding, DependencyProperty property)
+        private BindingExpression(Binding binding)
         {
             ParentBinding = binding;
-            TargetProperty = property;
 
             _propertyPathWalker = new PropertyPathWalker(this);
+        }
+
+        // Create a new BindingExpression from the given Bind description
+        internal static BindingExpression CreateBindingExpression(DependencyProperty dp, Binding binding)
+        {
+            if (dp.ReadOnly)
+            {
+                throw new ArgumentException($"'{dp.Name}' property cannot be data-bound.", nameof(dp));
+            }
+
+            if (binding.Mode == BindingMode.TwoWay && (binding.Path.Path == string.Empty || binding.Path.Path == "."))
+            {
+                throw new InvalidOperationException("Two-way binding requires Path.");
+            }
+
+            // create the BindingExpression
+            return new BindingExpression(binding);
         }
 
         private void OnDataContextChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
@@ -220,6 +236,7 @@ namespace System.Windows.Data
             IsAttaching = IsAttached = true;
 
             Target = d;
+            TargetProperty = dp;
 
             AttachToContext(false);
 
@@ -246,8 +263,7 @@ namespace System.Windows.Data
 
         internal override void OnDetach(DependencyObject d, DependencyProperty dp)
         {
-            if (!IsAttached)
-                return;
+            if (!IsAttached) return;
 
             IsAttached = false;
 
@@ -297,6 +313,9 @@ namespace System.Windows.Data
 
             Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
             Target = null;
+            TargetProperty = null;
+
+            _status = BindingStatus.None;
         }
 
         internal void ValueChanged()

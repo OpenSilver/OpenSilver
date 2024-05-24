@@ -44,10 +44,8 @@ namespace System.Windows.Data
             }
 
             // Create the BindingExpression from the Binding
-            var expr = new BindingExpression(binding, dp)
-            {
-                IsUpdatingValue = true
-            };
+            var expr = (BindingExpression)binding.CreateBindingExpression(target, dp);
+            expr.IsUpdatingValue = true;
 
             try
             {

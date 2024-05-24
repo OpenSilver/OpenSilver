@@ -342,5 +342,8 @@ namespace System.Windows.Data
         }
 
         #endregion
+
+        internal sealed override BindingExpressionBase CreateBindingExpressionOverride(DependencyObject target, DependencyProperty dp) =>
+            BindingExpression.CreateBindingExpression(dp, this);
     }
 }

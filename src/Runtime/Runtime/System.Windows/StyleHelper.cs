@@ -101,7 +101,7 @@ namespace System.Windows
                 {
                     DependencyProperty dp = DependencyProperty.RegisteredPropertyList[pValue.Key];
                     object value = pValue.Value is Binding binding ?
-                        new BindingExpression(binding, dp) :
+                        binding.CreateBindingExpression(fe, dp) :
                         pValue.Value;
 
                     setValue(fe, dp, value);
