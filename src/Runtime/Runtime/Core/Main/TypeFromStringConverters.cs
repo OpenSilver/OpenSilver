@@ -30,6 +30,7 @@ namespace DotNetForHtml5.Core
     /// code into the correct type for the properties setted
     /// </summary>
     /// <exclude/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class TypeFromStringConverters
     {
         private static readonly Type _objectType = typeof(object);

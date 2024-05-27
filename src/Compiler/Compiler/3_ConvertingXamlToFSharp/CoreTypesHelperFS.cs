@@ -79,14 +79,11 @@ namespace OpenSilver.Compiler
 
     internal static class CoreTypesHelperFS
     {
-        public const string TypeFromStringConvertersFullName = "global.DotNetForHtml5.Core.TypeFromStringConverters";
+        public const string RuntimeHelperClass = "global.OpenSilver.Internal.Xaml.RuntimeHelpers";
 
         public static string ConvertFromInvariantStringHelper(string source, string destinationType)
         {
-            return string.Format(
-                "({1}.ConvertFromInvariantString(typeof<{0}>, {2}) :?> {0})",
-                destinationType, TypeFromStringConvertersFullName, Escape(source)
-            );
+            return $"{RuntimeHelperClass}.ConvertFromInvariantString<{destinationType}>({Escape(source)})";
         }
 
         internal static string ConvertToCursor(string source, string destinationType, string cursorsTypeFullName)

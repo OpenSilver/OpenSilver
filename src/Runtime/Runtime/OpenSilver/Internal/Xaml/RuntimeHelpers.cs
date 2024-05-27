@@ -96,6 +96,24 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static T ConvertFromInvariantString<T>(string value)
+        {
+            Debug.Assert(value is not null);
+
+            if (TypeConverterHelper.GetConverter(typeof(T)) is TypeConverter converter)
+            {
+                return (T)converter.ConvertFromInvariantString(value);
+            }
+
+            if (value is T t)
+            {
+                return t;
+            }
+
+            throw new XamlParseException($"Failed to create a '{typeof(T)}' from the text '{value}'.");
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static TypeConverter GetTypeConverter(Type forType)
         {
             Debug.Assert(forType is not null);
