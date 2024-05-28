@@ -17,7 +17,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -75,7 +74,7 @@ namespace System.Windows
         public ResourceDictionary()
         {
             _baseDictionary = new Dictionary<object, object>();
-            IsThemeDictionary = XamlResourcesHandler.IsSystemResourcesParsing;
+            IsThemeDictionary = XamlResources.IsSystemResourcesParsing;
 
             // Note: we want to handle the InheritanceContext here, so
             // we explicitly set these flags to make sur the Inheritance

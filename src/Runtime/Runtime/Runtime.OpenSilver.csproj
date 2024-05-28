@@ -554,7 +554,7 @@
 		<Compile Include="Core\Main\TypeFromStringConverters.cs" />
 		<Compile Include="Core\Other\HashSet2_1.cs" />
 		<Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
-		<Compile Include="Core\Other\XamlResourcesHandler.cs" />
+		<Compile Include="OpenSilver\Internal\XamlResources.cs" />
 		<Compile Include="Core\Other\ISet2_1.cs" />
 		<Compile Include="Core\Other\Performance.cs" />
 		<Compile Include="Core\Other\ServiceProvider.cs" />

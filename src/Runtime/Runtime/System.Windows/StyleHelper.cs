@@ -11,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Windows.Data;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -132,7 +132,7 @@ namespace System.Windows
 
                 if (themeStyleKey is Type typeKey)
                 {
-                    styleLookup = Application.Current?.XamlResourcesHandler.FindStyleResourceInGenericXaml(typeKey);
+                    styleLookup = XamlResources.FindStyleResourceInGenericXaml(typeKey);
                 }
                 else
                 {

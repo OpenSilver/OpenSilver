@@ -53,8 +53,6 @@ namespace System.Windows
         /// </summary>
         public static Application Current { get; private set; }
 
-        internal XamlResourcesHandler XamlResourcesHandler { get; } = new XamlResourcesHandler();
-
         public Application()
             : this("opensilver-root")
         {
@@ -388,7 +386,20 @@ namespace System.Windows
         /// </returns>
         public object TryFindResource(object resourceKey)
         {
-            return XamlResourcesHandler.TryFindResource(resourceKey);
+            if (resourceKey is Type typeKey)
+            {
+                if (XamlResources.FindStyleResourceInGenericXaml(typeKey) is object resource1)
+                {
+                    return resource1;
+                }
+            }
+
+            if (HasResources && Resources.TryGetResource(resourceKey, out object resource2))
+            {
+                return resource2;
+            }
+
+            return XamlResources.FindBuiltInResource(resourceKey);
         }
 
         /// <summary>
