@@ -150,7 +150,7 @@ namespace OpenSilver.Internal
                     throw new FormatException("Token is not valid.");
                 }
 
-                return Color.FromInt32((int)kc);
+                return Color.FromUInt32((uint)kc);
             }
         }
     }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using System;
 using System.Collections.Generic;
@@ -302,11 +300,11 @@ namespace CSHTML5.Internal
             _defaultResources["ContentControlThemeFontFamily"] = new FontFamily("Segoe UI");
             _defaultResources["SymbolThemeFontFamily"] = new FontFamily("Segoe UI Symbol");
             _defaultResources["ControlContentThemeFontSize"] = 14.667;
-            _defaultResources["ThumbBorderThemeBrush"] = new SolidColorBrush(Color.Parse("#3B555555"));
-            _defaultResources["SystemAccentColor"] = Color.Parse("#FF0078D7");// this is the default blue value but it can be changed in windows so yeah...
-            _defaultResources["SystemColorButtonFaceColor"] = Color.Parse("#FF000000");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
-            _defaultResources["ScrollBarThumbBackgroundColor"] = Color.Parse("#FF333333");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
-            _defaultResources["ScrollBarPanningThumbBackgroundColor"] = Color.Parse("#00333333");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
+            _defaultResources["ThumbBorderThemeBrush"] = new SolidColorBrush(Color.FromUInt32(0x3B555555));
+            _defaultResources["SystemAccentColor"] = Color.FromUInt32(0xFF0078D7);// this is the default blue value but it can be changed in windows so yeah...
+            _defaultResources["SystemColorButtonFaceColor"] = Color.FromUInt32(0xFF000000);// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
+            _defaultResources["ScrollBarThumbBackgroundColor"] = Color.FromUInt32(0xFF333333);// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
+            _defaultResources["ScrollBarPanningThumbBackgroundColor"] = Color.FromUInt32(0x00333333);// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
         }
 
         void EnsureDefaultThemeResources()
@@ -330,122 +328,122 @@ namespace CSHTML5.Internal
 
             #region setting light default values
             #region AltHigh Light
-            Color color = Color.Parse("#FFFFFFFF");
+            Color color = Color.FromUInt32(0xFFFFFFFF);
             resourceDictionary.Add("SystemAltHighColor", color);
             #endregion
 
             #region AltLow Light
-            color = Color.Parse("#33FFFFFF");
+            color = Color.FromUInt32(0x33FFFFFF);
             resourceDictionary.Add("SystemAltLowColor", color);
             #endregion
 
             #region AltMedium Light
-            color = Color.Parse("#99FFFFFF");
+            color = Color.FromUInt32(0x99FFFFFF);
             resourceDictionary.Add("SystemAltMediumColor", color);
             #endregion
 
             #region AltMediumHigh Light
-            color = Color.Parse("#CCFFFFFF");
+            color = Color.FromUInt32(0xCCFFFFFF);
             resourceDictionary.Add("SystemAltMediumHighColor", color);
             #endregion
 
             #region AltMediumLow Light
-            color = Color.Parse("#66FFFFFF");
+            color = Color.FromUInt32(0x66FFFFFF);
             resourceDictionary.Add("SystemAltMediumLowColor", color);
             #endregion
 
             #region BaseHigh Light
-            color = Color.Parse("#FF000000");
+            color = Color.FromUInt32(0xFF000000);
             resourceDictionary.Add("SystemBaseHighColor", color);
             #endregion
 
             #region BaseLow Light
-            color = Color.Parse("#33000000");
+            color = Color.FromUInt32(0x33000000);
             resourceDictionary.Add("SystemBaseLowColor", color);
             #endregion
 
             #region BaseMedium Light
-            color = Color.Parse("#99000000");
+            color = Color.FromUInt32(0x99000000);
             resourceDictionary.Add("SystemBaseMediumColor", color);
             #endregion
 
             #region BaseMediumHigh Light
-            color = Color.Parse("#CC000000");
+            color = Color.FromUInt32(0xCC000000);
             resourceDictionary.Add("SystemBaseMediumHighColor", color);
             #endregion
 
             #region BaseMediumLow Light
-            color = Color.Parse("#66000000");
+            color = Color.FromUInt32(0x66000000);
             resourceDictionary.Add("SystemBaseMediumLowColor", color);
             #endregion
 
             #region ChromeAltLow Light
-            color = Color.Parse("#FF171717");
+            color = Color.FromUInt32(0xFF171717);
             resourceDictionary.Add("SystemChromeAltLowColor", color);
             #endregion
 
             #region ChromeBlackHigh Light
-            color = Color.Parse("#FF000000");
+            color = Color.FromUInt32(0xFF000000);
             resourceDictionary.Add("SystemChromeBlackHighColor", color);
             #endregion
 
             #region ChromeBlackLow Light
-            color = Color.Parse("#33000000");
+            color = Color.FromUInt32(0x33000000);
             resourceDictionary.Add("SystemChromeBlackLowColor", color);
             #endregion
 
             #region ChromeBlackMediumLow Light
-            color = Color.Parse("#66000000");
+            color = Color.FromUInt32(0x66000000);
             resourceDictionary.Add("SystemChromeBlackMediumLowColor", color);
             #endregion
 
             #region ChromeBlackMedium Light
-            color = Color.Parse("#CC000000");
+            color = Color.FromUInt32(0xCC000000);
             resourceDictionary.Add("SystemChromeBlackMediumColor", color);
             #endregion
 
             #region ChromeDisabledHigh Light
-            color = Color.Parse("#FFCCCCCC");
+            color = Color.FromUInt32(0xFFCCCCCC);
             resourceDictionary.Add("SystemChromeDisabledHighColor", color);
             #endregion
 
             #region ChromeDisabledLow Light
-            color = Color.Parse("#FF7A7A7A");
+            color = Color.FromUInt32(0xFF7A7A7A);
             resourceDictionary.Add("SystemChromeDisabledLowColor", color);
             #endregion
 
             #region ChromeHigh Light
-            color = Color.Parse("#FFCCCCCC");
+            color = Color.FromUInt32(0xFFCCCCCC);
             resourceDictionary.Add("SystemChromeHighColor", color);
             #endregion
 
             #region ChromeLow Light
-            color = Color.Parse("#FFF2F2F2");
+            color = Color.FromUInt32(0xFFF2F2F2);
             resourceDictionary.Add("SystemChromeLowColor", color);
             #endregion
 
             #region ChromeMedium Light
-            color = Color.Parse("#FFE6E6E6");
+            color = Color.FromUInt32(0xFFE6E6E6);
             resourceDictionary.Add("SystemChromeMediumColor", color);
             #endregion
 
             #region ChromeMediumLow Light
-            color = Color.Parse("#FFF2F2F2");
+            color = Color.FromUInt32(0xFFF2F2F2);
             resourceDictionary.Add("SystemChromeMediumLowColor", color);
             #endregion
 
             #region ChromeWhite Light
-            color = Color.Parse("#FFFFFFFF");
+            color = Color.FromUInt32(0xFFFFFFFF);
             resourceDictionary.Add("SystemChromeWhiteColor", color);
             #endregion
 
             #region ListLow Light
-            color = Color.Parse("#19000000");
+            color = Color.FromUInt32(0x19000000);
             resourceDictionary.Add("SystemListLowColor", color);
             #endregion
 
             #region ListMedium Light
-            color = Color.Parse("#33000000");
+            color = Color.FromUInt32(0x33000000);
             resourceDictionary.Add("SystemListMediumColor", color);
             #endregion
 
@@ -458,122 +456,122 @@ namespace CSHTML5.Internal
             #region setting dark default values
 
             #region AltHigh Dark
-            color = Color.Parse("#FF000000");
+            color = Color.FromUInt32(0xFF000000);
             resourceDictionary.Add("SystemAltHighColor", color);
             #endregion
 
             #region AltLow Dark
-            color = Color.Parse("#33000000");
+            color = Color.FromUInt32(0x33000000);
             resourceDictionary.Add("SystemAltLowColor", color);
             #endregion
 
             #region AltMedium Dark
-            color = Color.Parse("#99000000");
+            color = Color.FromUInt32(0x99000000);
             resourceDictionary.Add("SystemAltMediumColor", color);
             #endregion
 
             #region AltMediumHigh Dark
-            color = Color.Parse("#CC000000");
+            color = Color.FromUInt32(0xCC000000);
             resourceDictionary.Add("SystemAltMediumHighColor", color);
             #endregion
 
             #region AltMediumLow Dark
-            color = Color.Parse("#66000000");
+            color = Color.FromUInt32(0x66000000);
             resourceDictionary.Add("SystemAltMediumLowColor", color);
             #endregion
 
             #region BaseHigh Dark
-            color = Color.Parse("#FFFFFFFF");
+            color = Color.FromUInt32(0xFFFFFFFF);
             resourceDictionary.Add("SystemBaseHighColor", color);
             #endregion
 
             #region BaseLow Dark
-            color = Color.Parse("#33FFFFFF");
+            color = Color.FromUInt32(0x33FFFFFF);
             resourceDictionary.Add("SystemBaseLowColor", color);
             #endregion
 
             #region BaseMedium Dark
-            color = Color.Parse("#99FFFFFF");
+            color = Color.FromUInt32(0x99FFFFFF);
             resourceDictionary.Add("SystemBaseMediumColor", color);
             #endregion
 
             #region BaseMediumHigh Dark
-            color = Color.Parse("#CCFFFFFF");
+            color = Color.FromUInt32(0xCCFFFFFF);
             resourceDictionary.Add("SystemBaseMediumHighColor", color);
             #endregion
 
             #region BaseMediumLow Dark
-            color = Color.Parse("#66FFFFFF");
+            color = Color.FromUInt32(0x66FFFFFF);
             resourceDictionary.Add("SystemBaseMediumLowColor", color);
             #endregion
 
             #region ChromeAltLow Dark
-            color = Color.Parse("#FFF2F2F2");
+            color = Color.FromUInt32(0xFFF2F2F2);
             resourceDictionary.Add("SystemChromeAltLowColor", color);
             #endregion
 
             #region ChromeBlackHigh Dark
-            color = Color.Parse("#FF000000");
+            color = Color.FromUInt32(0xFF000000);
             resourceDictionary.Add("SystemChromeBlackHighColor", color);
             #endregion
 
             #region ChromeBlackLow Dark
-            color = Color.Parse("#33000000");
+            color = Color.FromUInt32(0x33000000);
             resourceDictionary.Add("SystemChromeBlackLowColor", color);
             #endregion
 
             #region ChromeBlackMediumLow Dark
-            color = Color.Parse("#66000000");
+            color = Color.FromUInt32(0x66000000);
             resourceDictionary.Add("SystemChromeBlackMediumLowColor", color);
             #endregion
 
             #region ChromeBlackMedium Dark
-            color = Color.Parse("#CC000000");
+            color = Color.FromUInt32(0xCC000000);
             resourceDictionary.Add("SystemChromeBlackMediumColor", color);
             #endregion
 
             #region ChromeDisabledHigh Dark
-            color = Color.Parse("#FF333333");
+            color = Color.FromUInt32(0xFF333333);
             resourceDictionary.Add("SystemChromeDisabledHighColor", color);
             #endregion
 
             #region ChromeDisabledLow Dark
-            color = Color.Parse("#FF858585");
+            color = Color.FromUInt32(0xFF858585);
             resourceDictionary.Add("SystemChromeDisabledLowColor", color);
             #endregion
 
             #region ChromeHigh Dark
-            color = Color.Parse("#FF767676");
+            color = Color.FromUInt32(0xFF767676);
             resourceDictionary.Add("SystemChromeHighColor", color);
             #endregion
 
             #region ChromeLow Dark
-            color = Color.Parse("#FF171717");
+            color = Color.FromUInt32(0xFF171717);
             resourceDictionary.Add("SystemChromeLowColor", color);
             #endregion
 
             #region ChromeMedium Dark
-            color = Color.Parse("#FF1F1F1F");
+            color = Color.FromUInt32(0xFF1F1F1F);
             resourceDictionary.Add("SystemChromeMediumColor", color);
             #endregion
 
             #region ChromeMediumLow Dark
-            color = Color.Parse("#FF2B2B2B");
+            color = Color.FromUInt32(0xFF2B2B2B);
             resourceDictionary.Add("SystemChromeMediumLowColor", color);
             #endregion
 
             #region ChromeWhite Dark
-            color = Color.Parse("#FFFFFFFF");
+            color = Color.FromUInt32(0xFFFFFFFF);
             resourceDictionary.Add("SystemChromeWhiteColor", color);
             #endregion
 
             #region ListLow Dark
-            color = Color.Parse("#19FFFFFF");
+            color = Color.FromUInt32(0x19FFFFFF);
             resourceDictionary.Add("SystemListLowColor", color);
             #endregion
 
             #region ListMedium Dark
-            color = Color.Parse("#33FFFFFF");
+            color = Color.FromUInt32(0x33FFFFFF);
             resourceDictionary.Add("SystemListMediumColor", color);
             #endregion
 
@@ -588,49 +586,49 @@ namespace CSHTML5.Internal
 
             #region Button Text (background) HighContrast
             //simple name: Background
-            color = Color.Parse("#FFF0F0F0");
+            color = Color.FromUInt32(0xFFF0F0F0);
             resourceDictionary.Add("SystemColorButtonFaceColor", color);
             #endregion
 
             #region Button Text (foreground) HighContrast
             //simple name: Foreground
-            color = Color.Parse("#FF000000");
+            color = Color.FromUInt32(0xFF000000);
             resourceDictionary.Add("SystemColorButtonTextColor", color);
             #endregion
 
             #region Disabled Text HighContrast
             //simple name: Disabled
-            color = Color.Parse("#FF6D6D6D");
+            color = Color.FromUInt32(0xFF6D6D6D);
             resourceDictionary.Add("SystemColorGrayTextColor", color);
             #endregion
 
             #region Selected Text (background) HighContrast
             //simple name: Highlight
-            color = Color.Parse("#FF3399FF");
+            color = Color.FromUInt32(0xFF3399FF);
             resourceDictionary.Add("SystemColorHighlightColor", color);
             #endregion
 
             #region Selected Text (foreground) HighContrast
             //simple name: HighlightAlt
-            color = Color.Parse("#FFFFFFFF");
+            color = Color.FromUInt32(0xFFFFFFFF);
             resourceDictionary.Add("SystemColorHighlightTextColor", color);
             #endregion
 
             #region Hyperlinks HighContrast
             //simple name: Hyperlink
-            color = Color.Parse("#FF0066CC");
+            color = Color.FromUInt32(0xFF0066CC);
             resourceDictionary.Add("SystemColorHotlightColor", color);
             #endregion
 
             #region Background HighContrast
             //simple name: PageBackground
-            color = Color.Parse("#FFFFFFFF");
+            color = Color.FromUInt32(0xFFFFFFFF);
             resourceDictionary.Add("SystemColorWindowColor", color);
             #endregion
 
             #region Text HighContrast
             //simple name: PageText
-            color = Color.Parse("#FF000000");
+            color = Color.FromUInt32(0xFF000000);
             resourceDictionary.Add("SystemColorWindowTextColor", color);
             #endregion
 
@@ -638,12 +636,6 @@ namespace CSHTML5.Internal
 
             _defaultThemeResourcesDictionary.ThemeDictionaries.Add(HIGH_CONSTRAST_RESOURCE_THEME_KEY, resourceDictionary);
             #endregion
-            #region colors in brushes (not what we wanted)
-
-            #endregion
-
-            //todo: Add others ?:
-
         }
     }
 }

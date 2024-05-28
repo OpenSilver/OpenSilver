@@ -324,7 +324,7 @@ namespace OpenSilver.Compiler
 
                     if (Enum.TryParse(trimmedColor, true, out ColorsEnum namedColor))
                     {
-                        int color = (int)namedColor;
+                        uint color = (uint)namedColor;
 
                         return string.Format(
                             CultureInfo.InvariantCulture,

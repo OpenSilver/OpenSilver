@@ -1434,7 +1434,7 @@ namespace System.Windows.Controls.Primitives
                 "SelectedItemBackground",
                 typeof(Brush),
                 typeof(Selector),
-                new PropertyMetadata(new SolidColorBrush(Color.Parse("#FFBADDE9"))));
+                new PropertyMetadata(new SolidColorBrush(Color.FromUInt32(0xFFBADDE9))));
 
         /// <summary>
         /// Gets or sets the foreground color of the selected Items.

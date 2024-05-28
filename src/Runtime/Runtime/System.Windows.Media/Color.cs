@@ -21,7 +21,7 @@ namespace System.Windows.Media
     /// </summary>
     public struct Color : IFormattable
     {
-        internal static Color FromInt32(int argb)
+        internal static Color FromUInt32(uint argb)
         {
             Color c1 = new Color();
 
