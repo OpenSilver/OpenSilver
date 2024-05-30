@@ -11,10 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.ComponentModel;
@@ -33,6 +31,7 @@ namespace System.Windows
     /// programmatic layout. FrameworkElement also defines APIs related to data binding,
     /// object tree, and object lifetime feature areas.
     /// </summary>
+    [RuntimeNameProperty(nameof(Name))]
     public abstract partial class FrameworkElement : UIElement
     {
         #region Inheritance Context

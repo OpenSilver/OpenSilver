@@ -12,10 +12,11 @@
 \*====================================================================================*/
 
 using System.Collections;
-using System.Windows.Markup;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Markup;
+using System.Xaml.Markup;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -25,6 +26,7 @@ namespace System.Windows
     /// objects that are used to go from one state to another.
     /// </summary>
     [ContentProperty(nameof(States))]
+    [RuntimeNameProperty(nameof(Name))]
     public sealed class VisualStateGroup : DependencyObject
     {
         private Collection<VisualState> _states;

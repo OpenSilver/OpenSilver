@@ -14,6 +14,7 @@
 using System.ComponentModel;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
+using System.Xaml.Markup;
 
 namespace System.Windows
 {
@@ -21,6 +22,7 @@ namespace System.Windows
     /// Represents the visual appearance of the control when it is in a specific state.
     /// </summary>
     [ContentProperty(nameof(Storyboard))]
+    [RuntimeNameProperty(nameof(Name))]
     public sealed class VisualState : DependencyObject
     {
         /// <summary>

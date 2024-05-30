@@ -14,6 +14,7 @@
 using System.Text;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Xaml.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Documents;
 using OpenSilver.Internal;
@@ -24,6 +25,7 @@ namespace System.Windows.Documents;
 /// An abstract class used as the base class for the abstract <see cref="Block"/>
 /// and <see cref="Inline"/> classes.
 /// </summary>
+[RuntimeNameProperty(nameof(Name))]
 public abstract class TextElement : UIElement
 {
     private ITextContainer _textContainer;
