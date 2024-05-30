@@ -345,6 +345,33 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="LineStackingStrategy"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LineStackingStrategyProperty =
+            Block.LineStackingStrategyProperty.AddOwner(
+                typeof(RichTextBlock),
+                new FrameworkPropertyMetadata(
+                    LineStackingStrategy.MaxHeight,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetLineStackingStrategy((LineStackingStrategy)newValue),
+                });
+
+        /// <summary>
+        /// Gets or sets a value that indicates how a line box is determined for each line
+        /// of text in the <see cref="RichTextBlock"/>.
+        /// </summary>
+        /// <returns>
+        /// A value that indicates how a line box is determined for each line of text in
+        /// the <see cref="RichTextBlock"/>. The default is <see cref="LineStackingStrategy.MaxHeight"/>.
+        /// </returns>
+        public LineStackingStrategy LineStackingStrategy
+        {
+            get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
+            set => SetValueInternal(LineStackingStrategyProperty, value);
+        }
+
+        /// <summary>
         /// Gets a value that represents the offset in pixels from the top of the content
         /// to the baseline of the first paragraph. The baseline of the paragraph is the
         /// baseline of the first line in it.

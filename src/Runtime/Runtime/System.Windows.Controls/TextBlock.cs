@@ -280,13 +280,15 @@ namespace System.Windows.Controls
         /// <summary>
         /// Identifies the <see cref="LineStackingStrategy"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LineStackingStrategyProperty =
-            DependencyProperty.Register(
-                nameof(LineStackingStrategy),
-                typeof(LineStackingStrategy),
+            Block.LineStackingStrategyProperty.AddOwner(
                 typeof(TextBlock),
-                new PropertyMetadata(LineStackingStrategy.MaxHeight));
+                new FrameworkPropertyMetadata(
+                    LineStackingStrategy.MaxHeight,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBlock)d).SetLineStackingStrategy((LineStackingStrategy)newValue),
+                });
 
         /// <summary>
         /// Gets or sets a value that indicates how a line box is determined for each line
@@ -296,7 +298,6 @@ namespace System.Windows.Controls
         /// A value that indicates how a line box is determined for each line of text in
         /// the <see cref="TextBlock"/>. The default is <see cref="LineStackingStrategy.MaxHeight"/>.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public LineStackingStrategy LineStackingStrategy
         {
             get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);

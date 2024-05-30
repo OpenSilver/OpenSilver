@@ -111,6 +111,12 @@ internal static class UIElementHelpers
         uie.OuterDiv.Style.lineHeight = FontProperties.ToCssLineHeight(lineHeight);
     }
 
+    internal static void SetLineStackingStrategy(this UIElement uie, LineStackingStrategy strategy)
+    {
+        const string LineStackingStrategyProperty = "--line-stacking-strategy";
+        uie.OuterDiv.Style.setProperty(LineStackingStrategyProperty, FontProperties.ToCssLineStackingStrategy(strategy));
+    }
+
     internal static void SetPadding(this UIElement uie, Thickness padding)
     {
         uie.OuterDiv.Style.padding = CollapseThicknessHelper(padding);

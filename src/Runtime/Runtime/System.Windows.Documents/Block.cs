@@ -29,6 +29,15 @@ public abstract class Block : TextElement
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Block)d).SetLineHeight((double)newValue),
             });
 
+        LineStackingStrategyProperty.OverrideMetadata(
+            typeof(Block),
+            new FrameworkPropertyMetadata(
+                LineStackingStrategy.MaxHeight,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Block)d).SetLineStackingStrategy((LineStackingStrategy)newValue),
+            });
+
         TextAlignmentProperty.OverrideMetadata(
             typeof(Block),
             new FrameworkPropertyMetadata(TextAlignment.Left, FrameworkPropertyMetadataOptions.Inherits)
@@ -76,20 +85,18 @@ public abstract class Block : TextElement
     /// <summary>
     /// Identifies the <see cref="LineStackingStrategy" /> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty LineStackingStrategyProperty =
-        DependencyProperty.Register(
+        DependencyProperty.RegisterAttached(
             nameof(LineStackingStrategy),
             typeof(LineStackingStrategy),
             typeof(Block),
-            new PropertyMetadata(LineStackingStrategy.MaxHeight));
+            new PropertyMetadata(LineStackingStrategy.MaxHeight) { Inherits = true, });
 
     /// <summary>
     /// Gets or sets a value that indicates how a line box is determined for each 
     /// line of text in a <see cref="Block" />.
     /// The default is <see cref="LineStackingStrategy.MaxHeight" />.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public LineStackingStrategy LineStackingStrategy
     {
         get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);

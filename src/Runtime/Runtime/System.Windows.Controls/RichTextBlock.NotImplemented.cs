@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 
@@ -86,32 +87,6 @@ namespace System.Windows.Controls
         {
             get => (RichTextBlockOverflow)GetValue(OverflowContentTargetProperty);
             set => SetValueInternal(OverflowContentTargetProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="LineStackingStrategy"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty LineStackingStrategyProperty =
-            DependencyProperty.Register(
-                nameof(LineStackingStrategy),
-                typeof(LineStackingStrategy),
-                typeof(RichTextBlock),
-                new PropertyMetadata(LineStackingStrategy.MaxHeight));
-
-        /// <summary>
-        /// Gets or sets a value that indicates how a line box is determined for each line
-        /// of text in the <see cref="RichTextBlock"/>.
-        /// </summary>
-        /// <returns>
-        /// A value that indicates how a line box is determined for each line of text in
-        /// the <see cref="RichTextBlock"/>. The default is <see cref="LineStackingStrategy.MaxHeight"/>.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public LineStackingStrategy LineStackingStrategy
-        {
-            get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
-            set => SetValueInternal(LineStackingStrategyProperty, value);
         }
 
         private static readonly DependencyPropertyKey SelectedTextPropertyKey =

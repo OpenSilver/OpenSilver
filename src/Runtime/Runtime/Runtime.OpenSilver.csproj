@@ -431,7 +431,7 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\FontNumeralStyle.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontVariants.cs" />
 		<Compile Include="OpenSilver\Internal\TextMeasurementService.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
+		<Compile Include="System.Windows\LineStackingStrategy.cs" />
 		<Compile Include="System.Windows\FrameworkPropertyMetadata.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="System.Collections.Generic\WORKINPROGRESS\SynchronizedReadOnlyCollection.cs" />

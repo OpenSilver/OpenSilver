@@ -98,6 +98,10 @@ body {
     pointer-events: none;
 }
 
+.opensilver-textelement {
+    line-height: var(--line-stacking-strategy, normal);
+}
+
 /* Media query used for printing (cf. "CSHTML5.Native.Html.Printing.PrintManager") */
 @media print {
     body {

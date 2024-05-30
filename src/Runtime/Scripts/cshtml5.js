@@ -133,7 +133,6 @@ document.createTextBlock = function (id, parentId) {
     if (!parent) return;
 
     const element = document._createLayout('div', id, false);
-    element.style.overflow = 'hidden';
     element.style.textAlign = 'start';
     element.style.whiteSpace = 'pre';
 
@@ -225,6 +224,7 @@ document.createText = function (tagName, id, parentId) {
 
     const textElement = document.createElement(tagName);
     textElement.setAttribute('id', id);
+    textElement.classList.add('opensilver-textelement');
 
     parent.appendChild(textElement);
 };
@@ -861,8 +861,9 @@ document.attachMeasurementService = function (owner) {
             htmlMeasurer.style.fontWeight = element.style.fontWeight;
             htmlMeasurer.style.fontFamily = element.style.fontFamily;
             htmlMeasurer.style.fontStyle = element.style.fontStyle;
-            htmlMeasurer.style.lineHeight = element.style.lineHeight;
             htmlMeasurer.style.letterSpacing = element.style.letterSpacing;
+            htmlMeasurer.style.lineHeight = element.style.lineHeight;
+            htmlMeasurer.style.setProperty('--line-stacking-strategy', element.style.getPropertyValue('--line-stacking-strategy'));
 
             htmlMeasurer.style.whiteSpace = whiteSpace;
             htmlMeasurer.style.overflowWrap = overflowWrap;
@@ -875,13 +876,14 @@ document.attachMeasurementService = function (owner) {
 
             return size;
         },
-        measureTextBlock: function (innerHTML, whiteSpace, overflowWrap, lineHeight, maxWidth) {
+        measureTextBlock: function (innerHTML, whiteSpace, overflowWrap, lineHeight, lineStackingStrategy, maxWidth) {
             htmlMeasurer.innerHTML = innerHTML;
             htmlMeasurer.style.fontSize = '';
             htmlMeasurer.style.fontWeight = '';
             htmlMeasurer.style.fontFamily = '';
             htmlMeasurer.style.fontStyle = '';
             htmlMeasurer.style.lineHeight = lineHeight;
+            htmlMeasurer.style.setProperty('--line-stacking-strategy', lineStackingStrategy);
             htmlMeasurer.style.letterSpacing = '';
             htmlMeasurer.style.whiteSpace = whiteSpace;
             htmlMeasurer.style.overflowWrap = overflowWrap;
@@ -905,10 +907,10 @@ document.attachMeasurementService = function (owner) {
     };
 };
 
-document.measureTextBlock = function (measurerId, innerHTML, whiteSpace, overflowWrap, lineHeight, maxWidth) {
+document.measureTextBlock = function (measurerId, innerHTML, whiteSpace, overflowWrap, lineHeight, lineStackingStrategy, maxWidth) {
     const owner = document.getElementById(measurerId);
     if (owner && owner._measurementService) {
-        return owner._measurementService.measureTextBlock(innerHTML, whiteSpace, overflowWrap, lineHeight, maxWidth);
+        return owner._measurementService.measureTextBlock(innerHTML, whiteSpace, overflowWrap, lineHeight, lineStackingStrategy, maxWidth);
     }
     return '0|0';
 };

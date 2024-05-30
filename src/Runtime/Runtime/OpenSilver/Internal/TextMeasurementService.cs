@@ -70,11 +70,12 @@ internal sealed class TextMeasurementService
     {
         (string whiteSpace, string overflowWrap) = UIElementHelpers.ToCssTextWrapping(textblock.TextWrapping);
         string lineHeight = FontProperties.ToCssLineHeight(textblock.LineHeight);
+        string lineStackingStrategy = FontProperties.ToCssLineStackingStrategy(textblock.LineStackingStrategy);
         string maxWidth = GetWidthConstraint(textblock);
         string innerHTML = BuildInnerHtml(textblock);
 
         string size = Interop.ExecuteJavaScriptString(
-            $"document.measureTextBlock('{_window.OuterDiv.UniqueIdentifier}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{maxWidth}')",
+            $"document.measureTextBlock('{_window.OuterDiv.UniqueIdentifier}','{innerHTML}','{whiteSpace}','{overflowWrap}','{lineHeight}','{lineStackingStrategy}','{maxWidth}')",
             false);
 
         int index = size.IndexOf('|');

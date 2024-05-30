@@ -85,6 +85,13 @@ internal readonly struct FontProperties
             _ => $"{lineHeight.ToInvariantString()}px",
         };
 
+    internal static string ToCssLineStackingStrategy(LineStackingStrategy strategy) =>
+        strategy switch
+        {
+            LineStackingStrategy.BlockLineHeight or LineStackingStrategy.BaselineToBaseline => "0",
+            _ => "normal",
+        };
+
     internal static string ToCssFontFamily(FontFamily family) => ToCssFontFamily(family, false);
 
     internal static string ToCssFontFamily(FontFamily family, bool htmlEncode)

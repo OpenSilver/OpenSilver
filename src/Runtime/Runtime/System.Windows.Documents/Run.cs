@@ -174,7 +174,7 @@ public sealed class Run : Inline
 
     internal override void AppendHtml(StringBuilder builder)
     {
-        builder.Append("<span style=\"font: ");
+        builder.Append("<span class=\"opensilver-textelement\" style=\"font: ");
         FontProperties.AppendCssFontAsHtml(builder, FontStyle, FontWeight, FontSize, 0.0, FontFamily);
         builder.Append($"; letter-spacing: {FontProperties.ToCssLetterSpacing(CharacterSpacing)}\">")
                .Append(HttpUtility.HtmlEncode(Text))

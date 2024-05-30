@@ -80,7 +80,7 @@ public class Span : Inline
 
     internal sealed override void AppendHtml(StringBuilder builder)
     {
-        builder.Append($"<{TagName}>");
+        builder.Append($"<{TagName} class=\"opensilver-textelement\">");
         foreach (Inline inline in Inlines.InternalItems)
         {
             inline.AppendHtml(builder);
