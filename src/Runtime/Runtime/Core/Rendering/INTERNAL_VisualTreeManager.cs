@@ -54,7 +54,7 @@ namespace CSHTML5.Internal
                         parent.VisualChildrenInformation.Remove(child);
 
                         //Detach Element  
-                        DetachVisualChildren(child);
+                        UnloadSubTree(child);
                     }
                     else
                     {
@@ -69,7 +69,7 @@ namespace CSHTML5.Internal
                 {
                     // Remove the element from the parent's children collection:
                     parent.VisualChildrenInformation.Remove(child);
-                    DetachElement(child);
+                    UnloadVisual(child);
                 }
             }
 #if PERFSTAT
@@ -77,26 +77,10 @@ namespace CSHTML5.Internal
 #endif
         }
 
-        private static void DetachVisualChildren(UIElement element)
+        private static void UnloadSubTree(UIElement element)
         {
             PropagateIsUnloading(element);
-
-            var queue = new Queue<UIElement>();
-            queue.Enqueue(element);
-
-            while (queue.Count > 0)
-            {
-                UIElement e = queue.Dequeue();
-                if (e.VisualChildrenInformation is not null)
-                {
-                    foreach (UIElement child in e.VisualChildrenInformation.Keys)
-                    {
-                        queue.Enqueue(child);
-                    }
-                }
-
-                DetachElement(e);
-            }
+            UnloadVisualRec(element);
 
             static void PropagateIsUnloading(UIElement element)
             {
@@ -109,9 +93,22 @@ namespace CSHTML5.Internal
                     }
                 }
             }
+
+            static void UnloadVisualRec(UIElement element)
+            {
+                var children = element.VisualChildrenInformation;
+                UnloadVisual(element);
+                if (children is not null)
+                {
+                    foreach (UIElement child in children.Keys)
+                    {
+                        UnloadVisualRec(child);
+                    }
+                }
+            }
         }
 
-        private static void DetachElement(UIElement element)
+        private static void UnloadVisual(UIElement element)
         {
             element.IsUnloading = true;
 
