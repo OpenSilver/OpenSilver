@@ -17,6 +17,7 @@ using OpenSilver.Internal.Xaml;
 using System.Windows.Markup;
 using System.Windows.Controls;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows.Tests
 {
