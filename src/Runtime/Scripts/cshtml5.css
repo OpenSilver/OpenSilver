@@ -98,6 +98,13 @@ body {
     pointer-events: none;
 }
 
+.opensilver-textblock {
+    text-overflow: ellipsis;
+    text-align: start;
+    white-space: pre;
+    overflow: visible;
+}
+
 .opensilver-textelement {
     line-height: var(--line-stacking-strategy, normal);
 }

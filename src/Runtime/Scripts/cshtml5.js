@@ -133,8 +133,7 @@ document.createTextBlock = function (id, parentId) {
     if (!parent) return;
 
     const element = document._createLayout('div', id, false);
-    element.style.textAlign = 'start';
-    element.style.whiteSpace = 'pre';
+    element.classList.add('opensilver-textblock');
 
     parent.appendChild(element);
 };

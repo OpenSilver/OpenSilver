@@ -140,10 +140,10 @@ internal static class UIElementHelpers
 
     internal static void SetTextTrimming(this UIElement uie, TextTrimming textTrimming)
     {
-        uie.OuterDiv.Style.textOverflow = textTrimming switch
+        uie.OuterDiv.Style.overflow = textTrimming switch
         {
-            TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "ellipsis",
-            _ => "clip",
+            TextTrimming.WordEllipsis or TextTrimming.CharacterEllipsis => "clip",
+            _ => string.Empty,
         };
     }
 
