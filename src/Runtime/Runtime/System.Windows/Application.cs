@@ -537,11 +537,12 @@ namespace System.Windows
                 mimeType);
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static event EventHandler INTERNAL_Reloaded;
 
-        /// <summary>
-        /// Intended to be called by the Simulator when navigating back from an external page.
-        /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void INTERNAL_RaiseReloadedEvent()
         {
             EventHandler handler = INTERNAL_Reloaded;
