@@ -31,7 +31,7 @@ namespace System.Windows.Interop
         {
             if (app is not null)
             {
-                _fullscreenchangeCallback = JavaScriptCallback.Create(FullScreenChangedCallback, true);
+                _fullscreenchangeCallback = JavaScriptCallback.Create(FullScreenChangedCallback);
 
                 // Hooks the FullScreenChanged event
                 OpenSilver.Interop.ExecuteJavaScriptVoid(

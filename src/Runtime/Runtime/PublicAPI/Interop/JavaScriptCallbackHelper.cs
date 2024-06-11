@@ -17,25 +17,25 @@ namespace CSHTML5.Internal
 {
     internal static class JavaScriptCallbackHelper
     {
-        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback(Action action, bool sync = false)
-            => new SelfDisposedJavaScriptCallback(action, sync).JSCallback;
+        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback(Action action)
+            => new SelfDisposedJavaScriptCallback(action).JSCallback;
 
-        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback<T>(Action<T> action, bool sync = false)
-            => new SelfDisposedJavaScriptCallback<T>(action, sync).JSCallback;
+        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback<T>(Action<T> action)
+            => new SelfDisposedJavaScriptCallback<T>(action).JSCallback;
 
-        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback<T1, T2>(Action<T1, T2> action, bool sync = false)
-           => new SelfDisposedJavaScriptCallback<T1, T2>(action, sync).JSCallback;
+        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback<T1, T2>(Action<T1, T2> action)
+           => new SelfDisposedJavaScriptCallback<T1, T2>(action).JSCallback;
 
         private sealed class SelfDisposedJavaScriptCallback
         {
             private readonly Action _action;
             public readonly JavaScriptCallback JSCallback;
 
-            public SelfDisposedJavaScriptCallback(Action action, bool sync)
+            public SelfDisposedJavaScriptCallback(Action action)
             {
                 _action = action ?? throw new ArgumentNullException(nameof(action));
 
-                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose, sync);
+                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose);
             }
 
             private void RunCallbackAndDispose()
@@ -50,11 +50,11 @@ namespace CSHTML5.Internal
             private readonly Action<T> _action;
             public readonly JavaScriptCallback JSCallback;
 
-            public SelfDisposedJavaScriptCallback(Action<T> action, bool sync)
+            public SelfDisposedJavaScriptCallback(Action<T> action)
             {
                 _action = action ?? throw new ArgumentNullException(nameof(action));
 
-                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose, sync);
+                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose);
             }
 
             private void RunCallbackAndDispose(T arg0)
@@ -69,11 +69,11 @@ namespace CSHTML5.Internal
             private readonly Action<T1, T2> _action;
             public readonly JavaScriptCallback JSCallback;
 
-            public SelfDisposedJavaScriptCallback(Action<T1, T2> action, bool sync)
+            public SelfDisposedJavaScriptCallback(Action<T1, T2> action)
             {
                 _action = action ?? throw new ArgumentNullException(nameof(action));
 
-                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose, sync);
+                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose);
             }
 
             private void RunCallbackAndDispose(T1 arg1, T2 arg2)

@@ -35,13 +35,13 @@ namespace System.Windows.Browser
         static ScriptObject()
         {
             string getMemberCallback = OpenSilver.Interop.GetVariableStringForJS(
-                JavaScriptCallback.Create(GetMemberFromJS, true));
+                JavaScriptCallback.Create(GetMemberFromJS));
             string setPropertyCallback = OpenSilver.Interop.GetVariableStringForJS(
-                JavaScriptCallback.Create(SetPropertyFromJS, true));
+                JavaScriptCallback.Create(SetPropertyFromJS));
             string invokeMethodCallback = OpenSilver.Interop.GetVariableStringForJS(
-                JavaScriptCallback.Create(InvokeMethodFromJS, true));
+                JavaScriptCallback.Create(InvokeMethodFromJS));
             string addEventListenerCallback = OpenSilver.Interop.GetVariableStringForJS(
-                JavaScriptCallback.Create(AddEventListenerFromJS, true));
+                JavaScriptCallback.Create(AddEventListenerFromJS));
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
                 $"document.browserService.initialize({getMemberCallback}, {setPropertyCallback}, {invokeMethodCallback}, {addEventListenerCallback});");

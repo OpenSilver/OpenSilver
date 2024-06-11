@@ -54,7 +54,7 @@ internal sealed class ResizeObserverAdapter
         if (!_isObserved)
         {
             _isObserved = true;
-            _sizeChangedCallback = JavaScriptCallback.Create((string arg) => callback(ParseSize(arg)), true);
+            _sizeChangedCallback = JavaScriptCallback.Create((string arg) => callback(ParseSize(arg)));
 
             string sReference = Interop.GetVariableStringForJS(_observerJsReference);
             string sElement = Interop.GetVariableStringForJS(elementReference);

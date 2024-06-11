@@ -25,8 +25,8 @@ internal sealed class TextViewManager
 
     private TextViewManager()
     {
-        _inputHandler = JavaScriptCallback.Create(OnInputNative, true);
-        _scrollHandler = JavaScriptCallback.Create(OnScrollNative, true);
+        _inputHandler = JavaScriptCallback.Create(OnInputNative);
+        _scrollHandler = JavaScriptCallback.Create(OnScrollNative);
         string sInputHandler = Interop.GetVariableStringForJS(_inputHandler);
         string sScrollHandler = Interop.GetVariableStringForJS(_scrollHandler);
         Interop.ExecuteJavaScriptVoidAsync($"document.createTextviewManager({sInputHandler},{sScrollHandler})");

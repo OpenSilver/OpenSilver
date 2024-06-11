@@ -51,7 +51,7 @@ namespace System.Windows.Controls
             _iFrame.Style.border = "none";
 
             DisposeJsCallbacks();
-            _jsCallbackOnIframeLoaded = JavaScriptCallback.Create(OnIframeLoad, true);
+            _jsCallbackOnIframeLoaded = JavaScriptCallback.Create(OnIframeLoad);
 
             string sIFrame = OpenSilver.Interop.GetVariableStringForJS(_iFrame);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(

@@ -34,7 +34,7 @@ namespace System.Windows
         {
             _app = app;
             _navigationState = GetBrowserNavigationState();
-            _hashChangeCallback = JavaScriptCallback.Create(OnNavigationChanged, true);
+            _hashChangeCallback = JavaScriptCallback.Create(OnNavigationChanged);
             OpenSilver.Interop.ExecuteJavaScriptVoid(
                 $"window.addEventListener('hashchange', {OpenSilver.Interop.GetVariableStringForJS(_hashChangeCallback)}, false)");
         }

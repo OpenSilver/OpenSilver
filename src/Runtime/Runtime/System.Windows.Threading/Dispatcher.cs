@@ -40,7 +40,7 @@ public sealed class Dispatcher
         _queue = new((int)DispatcherPriority.Send - (int)DispatcherPriority.Inactive + 1);
         _pendingOperations = new();
 
-        var jsCallback = JavaScriptCallback.Create(OnDispatcherTickNative, true);
+        var jsCallback = JavaScriptCallback.Create(OnDispatcherTickNative);
         string sHandler = OpenSilver.Interop.GetVariableStringForJS(jsCallback);
         OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createUIDispatcher({sHandler})", false);
         SetTickRate(DefaultTickRate);

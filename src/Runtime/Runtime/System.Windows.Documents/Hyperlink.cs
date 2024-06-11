@@ -213,7 +213,7 @@ public sealed class Hyperlink : Span
     {
         base.INTERNAL_AttachToDomEvents();
 
-        _clickCallback = JavaScriptCallback.Create(OnClickNative, true);
+        _clickCallback = JavaScriptCallback.Create(OnClickNative);
 
         string sDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
         string sClickCallback = OpenSilver.Interop.GetVariableStringForJS(_clickCallback);

@@ -25,8 +25,8 @@ internal sealed class ImageManager
 
     private ImageManager()
     {
-        _loadHandler = JavaScriptCallback.Create(ProcessLoadEvent, true);
-        _errorHandler = JavaScriptCallback.Create(ProcessErrorEvent, true);
+        _loadHandler = JavaScriptCallback.Create(ProcessLoadEvent);
+        _errorHandler = JavaScriptCallback.Create(ProcessErrorEvent);
         string sLoadHandler = Interop.GetVariableStringForJS(_loadHandler);
         string sErrorHandler = Interop.GetVariableStringForJS(_errorHandler);
         Interop.ExecuteJavaScriptVoid($"document.createImageManager({sLoadHandler}, {sErrorHandler})");

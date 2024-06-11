@@ -148,7 +148,7 @@ internal sealed class InputManager
 
     private InputManager()
     {
-        _handler = JavaScriptCallback.Create(ProcessInput, true);
+        _handler = JavaScriptCallback.Create(ProcessInput);
 
         if (Current == null)
         {

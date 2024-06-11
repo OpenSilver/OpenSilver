@@ -22,25 +22,23 @@ namespace CSHTML5.Internal
         private static readonly SynchronyzedStore<JavaScriptCallback> _store = new();
 
         private readonly int _id;
-        private readonly bool _sync;
         private readonly Delegate _callback;
 
-        private JavaScriptCallback(Delegate callback, bool sync)
+        private JavaScriptCallback(Delegate callback)
         {
             Debug.Assert(callback != null);
             _callback = callback;
-            _sync = sync;
             _id = _store.Add(this);
         }
 
-        public static JavaScriptCallback Create(Delegate callback, bool sync)
+        public static JavaScriptCallback Create(Delegate callback)
         {
             if (callback is null)
             {
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            return new JavaScriptCallback(callback, sync);
+            return new JavaScriptCallback(callback);
         }
 
         public static JavaScriptCallback Get(int index) => _store.Get(index);
@@ -56,17 +54,6 @@ namespace CSHTML5.Internal
 
         string IJavaScriptConvertible.ToJavaScriptString() => ToJavaScriptStringImpl();
 
-        private string GetSyncString()
-        {
-            const string TrueString = "true";
-            const string FalseString = "false";
-
-            if (!_sync || OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                return FalseString;
-            }
-
-            return TrueString;
-        }
+        private static string GetSyncString() => OpenSilver.Interop.IsRunningInTheSimulator ? "false" : "true" ;
     }
 }

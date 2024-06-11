@@ -256,7 +256,7 @@ public static partial class Interop
     /// An <see cref="IDisposable"/> object that must be disposed after it has been used.
     /// If the object is not disposed, it will be leaked.
     /// </returns>
-    public static IDisposable CreateJavascriptCallback(Delegate d) => JavaScriptCallback.Create(d, true);
+    public static IDisposable CreateJavascriptCallback(Delegate d) => JavaScriptCallback.Create(d);
 
     private static T ConvertJavascriptResult<T>(object value)
     {
@@ -405,7 +405,7 @@ public static partial class Interop
     {
         if (variable is Delegate d)
         {
-            variable = JavaScriptCallback.Create(d, d.Method.ReturnType == typeof(void));
+            variable = JavaScriptCallback.Create(d);
         }
 
         if (variable is IJavaScriptConvertible jsConvertible)

@@ -63,7 +63,7 @@ document.WB_SmoothCanvasContext = function (ctx) {
             public Task CreateFromBitmapSourceAsync(BitmapSource source)
             {
                 _taskCompletion = new TaskCompletionSource<object>();
-                _imageRenderedCallback = JavaScriptCallback.Create(OnImageDataLoadedCallback, true);
+                _imageRenderedCallback = JavaScriptCallback.Create(OnImageDataLoadedCallback);
 
                 source.GetDataStringAsync(source.InheritanceContext as UIElement).ContinueWith(t =>
                 {
@@ -118,7 +118,7 @@ imageView.onload = function() {
                 }
 
                 _taskCompletion = new TaskCompletionSource<object>();
-                _imageRenderedCallback = JavaScriptCallback.Create(callback, true);
+                _imageRenderedCallback = JavaScriptCallback.Create(callback);
 
                 INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], int>(
                     "document.WB_Copy32Buffer", _bitmap._pixels);
