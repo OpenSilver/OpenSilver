@@ -97,7 +97,7 @@ internal static class UIElementHelpers
         }
     }
 
-    internal static async Task SetBackgroundAsync(this UIElement uie, Brush brush)
+    internal static async ValueTask SetBackgroundAsync(this UIElement uie, Brush brush)
     {
         uie.OuterDiv.Style.background = brush switch
         {
@@ -182,7 +182,7 @@ internal static class UIElementHelpers
         uie.OuterDiv.Style.opacity = Math.Round(opacity, 2).ToInvariantString();
     }
 
-    internal static async Task SetMaskImageAsync(this UIElement uie, Brush mask)
+    internal static async ValueTask SetMaskImageAsync(this UIElement uie, Brush mask)
     {
         string maskImage;
 

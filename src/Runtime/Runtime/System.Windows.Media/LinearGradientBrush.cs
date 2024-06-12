@@ -123,8 +123,7 @@ namespace System.Windows.Media
             return (new Point(Math.Cos(angle), Math.Sin(angle)));
         }
 
-        internal override Task<string> GetDataStringAsync(UIElement parent)
-            => Task.FromResult(ToHtmlString(parent));
+        internal override ValueTask<string> GetDataStringAsync(UIElement parent) => new(ToHtmlString(parent));
 
         internal override ISvgBrush GetSvgElement(Shape shape) => new SvgLinearGradient(shape, this);
 

@@ -82,7 +82,7 @@ internal sealed class FontFace
         _measureList.Add(new WeakReference<UIElement>(uie));
     }
 
-    internal async Task<bool> LoadAsync()
+    internal async ValueTask<bool> LoadAsync()
     {
         if (IsLoaded) return true;
 

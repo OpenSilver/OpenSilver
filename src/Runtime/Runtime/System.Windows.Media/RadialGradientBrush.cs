@@ -175,8 +175,7 @@ namespace System.Windows.Media
 
         RadialGradientBrush ICloneOnAnimation<RadialGradientBrush>.Clone() => new RadialGradientBrush(this);
 
-        internal override Task<string> GetDataStringAsync(UIElement parent)
-            => Task.FromResult(ToHtmlString(parent));
+        internal override ValueTask<string> GetDataStringAsync(UIElement parent) => new(ToHtmlString(parent));
 
         internal override ISvgBrush GetSvgElement(Shape shape) => new SvgRadialGradient(shape, this);
 

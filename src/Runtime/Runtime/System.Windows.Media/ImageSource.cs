@@ -24,6 +24,6 @@ namespace System.Windows.Media
     {
         internal ImageSource() { }
 
-        internal abstract Task<string> GetDataStringAsync(UIElement parent);
+        internal abstract ValueTask<string> GetDataStringAsync(UIElement parent);
     }
 }

@@ -80,8 +80,7 @@ namespace System.Windows.Media
         /// <inheritdoc />
         public override string ToString() => Color.ToString();
 
-        internal override Task<string> GetDataStringAsync(UIElement parent)
-            => Task.FromResult(ToHtmlString());
+        internal override ValueTask<string> GetDataStringAsync(UIElement parent) => new(ToHtmlString());
 
         internal string ToHtmlString() => Color.ToHtmlString(Opacity);
 

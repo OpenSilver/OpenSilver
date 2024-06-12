@@ -136,8 +136,7 @@ namespace System.Windows.Media
 
         private void OnTransformChanged(object sender, EventArgs e) => RaiseTransformChanged();
 
-        internal virtual Task<string> GetDataStringAsync(UIElement parent) =>
-            Task.FromResult(string.Empty);
+        internal virtual ValueTask<string> GetDataStringAsync(UIElement parent) => new(string.Empty);
 
         internal event EventHandler Changed;
 

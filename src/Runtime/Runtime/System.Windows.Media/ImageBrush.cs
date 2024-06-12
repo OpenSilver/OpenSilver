@@ -63,7 +63,7 @@ namespace System.Windows.Media
         [OpenSilver.NotImplemented]
         public event EventHandler<RoutedEventArgs> ImageOpened;
 
-        internal async override Task<string> GetDataStringAsync(UIElement parent)
+        internal async override ValueTask<string> GetDataStringAsync(UIElement parent)
         {
             ImageSource source = ImageSource;
             if (source != null)

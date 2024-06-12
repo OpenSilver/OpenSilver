@@ -65,7 +65,7 @@ document.WB_SmoothCanvasContext = function (ctx) {
                 _taskCompletion = new TaskCompletionSource<object>();
                 _imageRenderedCallback = JavaScriptCallback.Create(OnImageDataLoadedCallback);
 
-                source.GetDataStringAsync(source.InheritanceContext as UIElement).ContinueWith(t =>
+                source.GetDataStringAsync(source.InheritanceContext as UIElement).AsTask().ContinueWith(t =>
                 {
                     var data = t.Result;
                     var javascript = @"

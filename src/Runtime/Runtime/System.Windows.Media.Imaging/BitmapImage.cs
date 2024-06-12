@@ -36,14 +36,11 @@ namespace System.Windows.Media.Imaging
             UriSource = uriSource;
         }
 
-        internal override Task<string> GetDataStringAsync(UIElement parent)
+        internal override ValueTask<string> GetDataStringAsync(UIElement parent)
         {
             if (UriSource != null)
             {
-                return Task.FromResult(
-                    INTERNAL_UriHelper.ConvertToHtml5Path(
-                        UriSource.OriginalString,
-                        parent));
+                return new(INTERNAL_UriHelper.ConvertToHtml5Path(UriSource.OriginalString, parent));
             }
 
             return base.GetDataStringAsync(parent);

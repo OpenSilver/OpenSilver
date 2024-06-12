@@ -99,7 +99,7 @@ namespace System.Windows.Media
                 return Task.FromResult(true);
             }
 
-            return FontFace.GetFontFace(fontSource).LoadAsync();
+            return FontFace.GetFontFace(fontSource).LoadAsync().AsTask();
         }
 
         internal FontFace GetFontFace() => _face ??= FontFace.GetFontFace(Source);

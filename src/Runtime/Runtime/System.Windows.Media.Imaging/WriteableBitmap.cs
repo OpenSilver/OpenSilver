@@ -214,7 +214,7 @@ namespace System.Windows.Media.Imaging
 
         internal override int PixelWidthInternal => _pixelWidth;
 
-        internal override async Task<string> GetDataStringAsync(UIElement parent)
+        internal override async ValueTask<string> GetDataStringAsync(UIElement parent)
         {
             await WaitToInitialize();
             return await base.GetDataStringAsync(parent);

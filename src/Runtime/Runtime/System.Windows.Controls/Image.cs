@@ -249,7 +249,7 @@ namespace System.Windows.Controls
             _ = RefreshSource();
         }
 
-        private async Task RefreshSource()
+        private async ValueTask RefreshSource()
         {
             _naturalSize = new Size();
 

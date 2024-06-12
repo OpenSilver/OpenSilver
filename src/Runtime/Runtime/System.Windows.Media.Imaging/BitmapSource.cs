@@ -102,7 +102,7 @@ namespace System.Windows.Media.Imaging
             INTERNAL_DataURL = dataUrl;
         }
 
-        internal override Task<string> GetDataStringAsync(UIElement parent)
+        internal override ValueTask<string> GetDataStringAsync(UIElement parent)
         {
             string data = string.Empty;
             if (INTERNAL_StreamSource != null)
@@ -114,7 +114,7 @@ namespace System.Windows.Media.Imaging
                 data = INTERNAL_DataURL;
             }
 
-            return Task.FromResult(data);
+            return new(data);
         }
 
         #region Not supported yet
