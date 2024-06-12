@@ -82,6 +82,7 @@ body {
     border-style: solid;
     border-color: transparent; /* CSS default value matches the color property (currentcolor) */
     border-width: 0px; /* CSS default value is medium */
+    background-clip: padding-box !important;
 }
 
 .opensilver-popup {
