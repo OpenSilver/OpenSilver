@@ -610,6 +610,7 @@ namespace System.Windows.Controls.Primitives
                 // Force layout update to prevent the popup content from briefly appearing in
                 // the top left corner of the screen.
                 UpdateLayout();
+                OpenSilver.Interop.JavaScriptRuntime.Flush();
             }
         }
 
