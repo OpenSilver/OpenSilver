@@ -995,19 +995,19 @@ namespace System.ServiceModel
                 return (typedResponseBody, incomingMessageHeaders);
             }
 
-            private static MethodInfo ResolveMethod(Type interfaceType, string webMethodName, params string[] methodNames)
+            private static MethodInfo ResolveMethod(Type interfaceType, string webMethodName, string methodName1, string methodName2 = null)
             {
-                MethodInfo method = null;
-                if (methodNames != null)
+                if (interfaceType.GetMethod(methodName1) is MethodInfo method1)
                 {
-                    for (int i = 0; i < methodNames.Length; i++)
-                    {
-                        if ((method = interfaceType.GetMethod(methodNames[i])) != null)
-                            break;
-                    }
+                    return method1;
                 }
-                return method ?? throw new MissingMethodException(
-                    string.Format("Cannot find an operation named '{0}'.", webMethodName));
+
+                if (methodName2 is not null && interfaceType.GetMethod(methodName2) is MethodInfo method2)
+                {
+                    return method2;
+                }
+
+                throw new MissingMethodException($"Cannot find an operation named '{webMethodName}'.");
             }
 
             private static bool IsXmlSerializer(
@@ -1092,21 +1092,13 @@ namespace System.ServiceModel
                 out string request)
             {
                 headers = new Dictionary<string, string>();
-                string requestFormat = null;
 
                 string interfaceTypeName = interfaceType.Name; // default value
                 string interfaceTypeNamespace = "http://tempuri.org/"; // default value
-                string soapAction = string.Empty;
 
-
-                ServiceContractAttribute serviceContractAttr =
-                    (ServiceContractAttribute)interfaceType.GetCustomAttributes(typeof(ServiceContractAttribute), false)
-                                                           .FirstOrDefault(); // note: there should never be more than one.
-
-                if (serviceContractAttr != null)
+                if (interfaceType.GetCustomAttributes<ServiceContractAttribute>(false).FirstOrDefault() is ServiceContractAttribute serviceContractAttr)
                 {
-                    if (serviceContractAttr.Namespace != null &&
-                        serviceContractAttr.Namespace != "http://tempuri.org") // default value if namespace is not set explicitly.
+                    if (!string.IsNullOrEmpty(serviceContractAttr.Namespace))
                     {
                         interfaceTypeNamespace = serviceContractAttr.Namespace;
                     }
@@ -1116,57 +1108,8 @@ namespace System.ServiceModel
                     }
                 }
 
-                switch (soapVersion)
-                {
-                    case "1.1":
-                        // Look for the soapAction.
-                        OperationContractAttribute operationContractAttr =
-                            (OperationContractAttribute)method.GetCustomAttributes(typeof(OperationContractAttribute), false)
-                                                              .FirstOrDefault(); // note: there should never be more than one.
-
-                        if (operationContractAttr != null)
-                        {
-                            soapAction = operationContractAttr.Action;
-                        }
-
-                        if (string.IsNullOrEmpty(soapAction))
-                        {
-                            soapAction = string.Format("{0}/{1}/{2}",
-                                                       interfaceTypeNamespace.Trim('/'),
-                                                       interfaceTypeName.Trim('/'),
-                                                       webMethodName);
-                        }
-
-                        headers.Add("Content-Type", @"text/xml; charset=utf-8");
-                        headers.Add("SOAPAction", soapAction);
-
-                        if (!string.IsNullOrEmpty(envelopeHeaders))
-                        {
-                            envelopeHeaders = "<s:Header>" + envelopeHeaders + "</s:Header>";
-                        }
-                        requestFormat = string.Format("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">{0}<s:Body>{{0}}</s:Body></s:Envelope>",
-                            envelopeHeaders ?? "");
-                        break;
-
-                    case "1.2":
-                        headers.Add("Content-Type", @"application/soap+xml; charset=utf-8");
-
-                        soapAction = string.Format("http://tempuri.org/ServiceHost/{0}",
-                                                   webMethodName);
-                        requestFormat = string.Format("<s:Envelope xmlns:a=\"http://www.w3.org/2005/08/addressing\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Header><a:Action>{0}</a:Action>{1}</s:Header><s:Body>{{0}}</s:Body></s:Envelope>",
-                            soapAction, envelopeHeaders ?? "");
-                        break;
-
-                    default:
-                        throw new InvalidOperationException(
-                            string.Format("SOAP version not supported: {0}",
-                                          soapVersion));
-                }
-
                 // in every case, we want the name of the method as a XElement
-                XElement methodNameElement =
-                    new XElement(XNamespace.Get(interfaceTypeNamespace)
-                                           .GetName(webMethodName));
+                var methodNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(webMethodName));
 
                 // Note: now we want to add the parameters of the method
                 // to do that, we basically get the serialized version of the objects, 
@@ -1184,23 +1127,19 @@ namespace System.ServiceModel
                         if (requestBody != null)
                         {
                             var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
-                            types.AddRange(
-                                interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true)
-                                             .Select(o => ((ServiceKnownTypeAttribute)o).Type));
+                            types.AddRange(interfaceType.GetCustomAttributes<ServiceKnownTypeAttribute>(true).Select(o => o.Type));
 
-                            DataContractSerializerCustom dataContractSerializer =
-                                new DataContractSerializerCustom(
-                                    parameterInfos[i].ParameterType.IsByRef ? parameterInfos[i].ParameterType.GetElementType(): parameterInfos[i].ParameterType,
-                                    types,
-                                    isXmlSerializer);
+                            var dataContractSerializer = new DataContractSerializerCustom(
+                                parameterInfos[i].ParameterType.IsByRef ? parameterInfos[i].ParameterType.GetElementType(): parameterInfos[i].ParameterType,
+                                types,
+                                isXmlSerializer);
 
                             XDocument xdoc = dataContractSerializer.SerializeToXDocument(requestBody);
 
-                            XElement paramNameElement =
-                                new XElement(XNamespace.Get(interfaceTypeNamespace)
-                                                       .GetName(parameterInfos[i].Name));
                             if (!isXmlSerializer)
                             {
+                                var paramNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(parameterInfos[i].Name));
+
                                 // we don't want to add this in the case of an XmlSerializer 
                                 // because it would be <request> which is not what we want. 
                                 // The correct parameter name is alread in the Request body.
@@ -1213,7 +1152,7 @@ namespace System.ServiceModel
                                 {
                                     // we don't want to keep the "xmlns="http://schemas.microsoft.com/2003/10/Serialization/" 
                                     // because it breaks the request.
-                                    if (currentAttribute.Name.LocalName != "xmlns")
+                                    if (!currentAttribute.IsNamespaceDeclaration)
                                     {
                                         paramNameElement.Add(currentAttribute);
                                     }
@@ -1227,19 +1166,15 @@ namespace System.ServiceModel
                                 //      <Body>
                                 //         <toDoItem
                                 // so we want to go to xdoc.Root.Nodes()[0].Nodes()
-                                foreach (XNode currentNode in xdoc.Root.Nodes())
+                                foreach (XElement xElement in xdoc.Root.Nodes().OfType<XElement>())
                                 {
-                                    XElement xElement = currentNode as XElement;
-                                    if (xElement != null)
+                                    foreach (XElement node in xElement.Elements())
                                     {
-                                        foreach (XElement node in xElement.Elements())
-                                        {
-                                            ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ?
-                                                                                           interfaceTypeNamespace :
-                                                                                           x.Name.NamespaceName)
-                                                                                      .GetName(x.Name.LocalName));
-                                            methodNameElement.Add(node);
-                                        }
+                                        ProcessNode(node, x => x.Name = XNamespace.Get(string.IsNullOrEmpty(x.Name.NamespaceName) ?
+                                                                                       interfaceTypeNamespace :
+                                                                                       x.Name.NamespaceName)
+                                                                                  .GetName(x.Name.LocalName));
+                                        methodNameElement.Add(node);
                                     }
                                 }
                             }
@@ -1247,18 +1182,52 @@ namespace System.ServiceModel
                         else
                         {
                             // the value is null so we simply need to put the parameter name with i:nil="true" and we're good
-                            XElement paramNameElement =
-                                new XElement(XNamespace.Get(interfaceTypeNamespace)
-                                                       .GetName(parameterInfos[i].Name));
-                            XAttribute attribute =
-                                new XAttribute(XNamespace.Get(XMLSCHEMA_NAMESPACE).GetName("nil"), "true");
+                            var paramNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(parameterInfos[i].Name));
+                            var attribute = new XAttribute(XNamespace.Get(XMLSCHEMA_NAMESPACE).GetName("nil"), "true");
                             paramNameElement.Add(attribute);
                             methodNameElement.Add(paramNameElement);
                         }
                     }
                 }
 
-                request = string.Format(requestFormat, DataContractSerializerCustom.XElementToString(methodNameElement));
+                string elementAsString = DataContractSerializerCustom.XElementToString(methodNameElement);
+
+                // Look for the soapAction.
+                string soapAction = string.Empty;
+
+                if (method.GetCustomAttributes<OperationContractAttribute>(false).FirstOrDefault() is OperationContractAttribute operationContractAttr)
+                {
+                    soapAction = operationContractAttr.Action;
+                }
+
+                if (string.IsNullOrEmpty(soapAction))
+                {
+                    soapAction = $"{interfaceTypeNamespace.Trim('/')}/{interfaceTypeName.Trim('/')}/{webMethodName}";
+                }
+
+                switch (soapVersion)
+                {
+                    case "1.1":
+                        headers.Add("Content-Type", "text/xml; charset=utf-8");
+                        headers.Add("SOAPAction", soapAction);
+
+                        if (!string.IsNullOrEmpty(envelopeHeaders))
+                        {
+                            envelopeHeaders = "<s:Header>" + envelopeHeaders + "</s:Header>";
+                        }
+
+                        request = $"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">{(envelopeHeaders ?? string.Empty)}<s:Body>{elementAsString}</s:Body></s:Envelope>";
+                        break;
+
+                    case "1.2":
+                        headers.Add("Content-Type", "application/soap+xml; charset=utf-8");
+
+                        request = $"<s:Envelope xmlns:a=\"http://www.w3.org/2005/08/addressing\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Header><a:Action>{soapAction}</a:Action>{(envelopeHeaders ?? string.Empty)}</s:Header><s:Body>{elementAsString}</s:Body></s:Envelope>";
+                        break;
+
+                    default:
+                        throw new InvalidOperationException($"SOAP version not supported: {soapVersion}");
+                }
             }
 
             private void ReadAndPrepareResponseGeneric_JSVersion<T>(
@@ -1409,7 +1378,7 @@ namespace System.ServiceModel
                     }
                 }
 
-                throw new InvalidOperationException(string.Format("Could not resolve type {0}", name));
+                throw new InvalidOperationException($"Could not resolve type {name}");
             }
 
             private object ReadAndPrepareResponse(
@@ -1466,8 +1435,7 @@ namespace System.ServiceModel
                 }
                 else
                 {
-                    Debug.Assert(soapVersion == "1.2",
-                                    string.Format("Unexpected soap version ({0}) !", soapVersion));
+                    Debug.Assert(soapVersion == "1.2", $"Unexpected soap version ({soapVersion}) !");
                     NS = "http://www.w3.org/2003/05/soap-envelope";
                 }
 
@@ -1511,7 +1479,7 @@ namespace System.ServiceModel
                         return null;
                     }
 
-                    object ParseException(XElement exceptionElement, string exceptionTypeName)
+                    static object ParseException(XElement exceptionElement, string exceptionTypeName)
                     {
                         Type exceptionType = ResolveType(exceptionTypeName);
 
@@ -1538,7 +1506,7 @@ namespace System.ServiceModel
                         return exception;
                     }
 
-                    Type ResolveType(string name)
+                    static Type ResolveType(string name)
                     {
                         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
                         int asemblyCount = assemblies.Length;
@@ -1553,7 +1521,7 @@ namespace System.ServiceModel
                             }
                         }
 
-                        throw new InvalidOperationException(string.Format("Could not resolve type {0}", name));
+                        throw new InvalidOperationException($"Could not resolve type {name}");
                     }
                 }
                 else
@@ -1587,7 +1555,7 @@ namespace System.ServiceModel
                     // to allow passing it as Generic type argument when calling CallWebMethod.
                     if (requestResponseType == typeof(object))
                     {
-                        if (bodyElement != null && bodyElement.Nodes().Count() == 0)
+                        if (bodyElement != null && !bodyElement.Nodes().Any())
                         {
                             // Note: there might be a more efficient way of checking if the method has a return 
                             // type (possibly through a smart use of responseAsString.IndexOf but it seems 
@@ -1606,17 +1574,10 @@ namespace System.ServiceModel
                     }
 
                     // get the known types from the interface type
-                    IEnumerable<Type> serviceKnownTypes =
-                        interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true)
-                                     .Select(o => ((ServiceKnownTypeAttribute)o).Type);
+                    var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
+                    types.AddRange(interfaceType.GetCustomAttributes<ServiceKnownTypeAttribute>(true).Select(o => o.Type));
 
-                    List<Type> types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
-                    foreach (Type t in serviceKnownTypes)
-                    {
-                        types.Add(t);
-                    }
-
-                    DataContractSerializerCustom deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
+                    var deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
                     XElement xElement = envelopeElement;
 
                     //exclude the parts that are <Enveloppe><Body>... since they are useless 
@@ -1728,8 +1689,10 @@ namespace System.ServiceModel
                             // Do nothing so null object will be returned
                         }
                         else
-                            throw new NotSupportedException($"The following type is not supported in the current WCF implementation: '{requestResponseType}', string value is {responseAsString}. " +
-                                $"\nPlease report this issue to support@cshtml5.com");
+                        {
+                            throw new NotSupportedException(
+                                $"The type '{requestResponseType}' is not supported in the current WCF implementation, string value is {responseAsString}.");
+                        }
                     }
                     else
                     {
