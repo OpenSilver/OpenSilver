@@ -1222,7 +1222,7 @@ namespace System.ServiceModel
                     case "1.2":
                         headers.Add("Content-Type", "application/soap+xml; charset=utf-8");
 
-                        request = $"<s:Envelope xmlns:a=\"http://www.w3.org/2005/08/addressing\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Header><a:Action>{soapAction}</a:Action>{(envelopeHeaders ?? string.Empty)}</s:Header><s:Body>{elementAsString}</s:Body></s:Envelope>";
+                        request = $"<s:Envelope xmlns:a=\"http://www.w3.org/2005/08/addressing\" xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Header><a:Action>{soapAction}</a:Action>{(envelopeHeaders ?? string.Empty)}<a:To>{_addressOfService}</a:To></s:Header><s:Body>{elementAsString}</s:Body></s:Envelope>";
                         break;
 
                     default:
