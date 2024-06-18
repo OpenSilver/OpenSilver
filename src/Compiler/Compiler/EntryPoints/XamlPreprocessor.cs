@@ -41,6 +41,8 @@ namespace OpenSilver.Compiler
         private AssembliesInspector _assembliesInspector;
         private SupportedLanguage _language;
 
+        private AssembliesInspector AssembliesInspector => _assembliesInspector ??= LoadAssemblies();
+
         public XamlPreprocessor()
         {
             _watch = new Stopwatch();
@@ -50,7 +52,13 @@ namespace OpenSilver.Compiler
         public string Language { get; set; }
 
         [Required]
-        public ITaskItem[] SourceFiles { get; set; }
+        public ITaskItem[] PageFiles { get; set; }
+
+        [Required]
+        public ITaskItem[] ApplicationDefinitionFiles { get; set; }
+
+        [Required]
+        public ITaskItem[] ContentFiles { get; set; }
 
         [Required]
         public ITaskItem[] ResolvedReferences { get; set; }
@@ -88,7 +96,13 @@ namespace OpenSilver.Compiler
         public ITaskItem[] GeneratedFiles { get; set; }
 
         [Output]
-        public ITaskItem[] RemovedFiles { get; set; }
+        public ITaskItem[] ProcessedPageFiles { get; set; }
+
+        [Output]
+        public ITaskItem[] ProcessedApplicationDefinitionFiles { get; set; }
+
+        [Output]
+        public ITaskItem[] ProcessedContentFiles { get; set; }
 
         public override bool Execute()
         {
@@ -108,13 +122,43 @@ namespace OpenSilver.Compiler
             Log.LogMessage($"{operationName} starting...");
 
             var generatedFiles = new List<ITaskItem>();
-            var removedFiles = new List<ITaskItem>();
 
-            if (SourceFiles.Length > 0)
+            (var generatedPageFiles, var processedPageFiles) = ProcessFiles(PageFiles);
+            (var generatedApplicationDefinitionFiles, var processedApplicationDefinitionFiles) = ProcessFiles(ApplicationDefinitionFiles);
+            (var generatedContentFiles, var processedContentFiles) = ProcessFiles(ContentFiles);
+
+            _assembliesInspector?.Dispose();
+
+            generatedFiles.AddRange(generatedPageFiles);
+            generatedFiles.AddRange(generatedApplicationDefinitionFiles);
+            generatedFiles.AddRange(generatedContentFiles);
+
+            GeneratedFiles = generatedFiles.ToArray();
+            ProcessedPageFiles = processedPageFiles.ToArray();
+            ProcessedApplicationDefinitionFiles = processedApplicationDefinitionFiles.ToArray();
+            ProcessedContentFiles = processedContentFiles.ToArray();
+
+            if (Log.HasLoggedErrors)
             {
-                _assembliesInspector = LoadAssemblies();
+                Log.LogMessage(MessageImportance.High, $"{operationName} failed after {_watch.ElapsedMilliseconds} ms.");
+                Log.LogMessage(MessageImportance.High, "Note: the XAML editor sometimes raises errors that are misleading. To see only real non-misleading errors, make sure to close all the XAML editor windows/tabs before compiling.");
+            }
+            else
+            {
+                Log.LogMessage($"{operationName} finished after {_watch.ElapsedMilliseconds} ms.");
+            }
 
-                foreach (ITaskItem item in SourceFiles)
+            return !Log.HasLoggedErrors;
+        }
+
+        private (List<ITaskItem> GeneratedFiles, List<ITaskItem> ProcessedFiles) ProcessFiles(ITaskItem[] sourceFiles)
+        {
+            var generatedFiles = new List<ITaskItem>();
+            var processedFiles = new List<ITaskItem>();
+
+            if (sourceFiles.Length > 0)
+            {
+                foreach (ITaskItem item in sourceFiles)
                 {
                     if (!IsXamlFile(item))
                     {
@@ -128,9 +172,9 @@ namespace OpenSilver.Compiler
                         ITaskItem generatedFile = GenerateOutputFile(item);
                         generatedFiles.Add(generatedFile);
 
-                        ITaskItem removedFile = new TaskItem(item);
-                        removedFile.SetMetadata(CompiledXamlFilePathMetadata, generatedFile.ItemSpec);
-                        removedFiles.Add(removedFile);
+                        ITaskItem processedFile = new TaskItem(item);
+                        processedFile.SetMetadata(CompiledXamlFilePathMetadata, generatedFile.ItemSpec);
+                        processedFiles.Add(processedFile);
                     }
                     catch (Exception ex)
                     {
@@ -147,24 +191,9 @@ namespace OpenSilver.Compiler
                         }
                     }
                 }
-
-                _assembliesInspector.Dispose();
             }
 
-            GeneratedFiles = generatedFiles.ToArray();
-            RemovedFiles = removedFiles.ToArray();
-
-            if (Log.HasLoggedErrors)
-            {
-                Log.LogMessage(MessageImportance.High, $"{operationName} failed after {_watch.ElapsedMilliseconds} ms.");
-                Log.LogMessage(MessageImportance.High, "Note: the XAML editor sometimes raises errors that are misleading. To see only real non-misleading errors, make sure to close all the XAML editor windows/tabs before compiling.");
-            }
-            else
-            {
-                Log.LogMessage($"{operationName} finished after {_watch.ElapsedMilliseconds} ms.");
-            }
-
-            return !Log.HasLoggedErrors;
+            return (generatedFiles, processedFiles);
         }
 
         private AssembliesInspector LoadAssemblies()
@@ -207,7 +236,7 @@ namespace OpenSilver.Compiler
                         sourceFile,
                         fileIdentity,
                         AssemblyName,
-                        _assembliesInspector,
+                        AssembliesInspector,
                         !IsSecondPass,
                         OutputRootPath,
                         OutputAppFilesPath,
@@ -227,7 +256,7 @@ namespace OpenSilver.Compiler
                         fileIdentity,
                         AssemblyName,
                         RootNamespace,
-                        _assembliesInspector,
+                        AssembliesInspector,
                         !IsSecondPass,
                         OutputRootPath,
                         OutputAppFilesPath,
@@ -247,7 +276,7 @@ namespace OpenSilver.Compiler
                         fileIdentity,
                         AssemblyName,
                         RootNamespace,
-                        _assembliesInspector,
+                        AssembliesInspector,
                         !IsSecondPass,
                         OutputRootPath,
                         OutputAppFilesPath,

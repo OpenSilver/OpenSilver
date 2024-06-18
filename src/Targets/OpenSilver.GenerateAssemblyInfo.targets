@@ -30,11 +30,16 @@
   <Target Name="GetOpenSilverAssemblyAttributes"
           DependsOnTargets="SetSourceRevisionId">
     <PropertyGroup>
+      <OpenSilverCompatibilityVersionAttribute>1</OpenSilverCompatibilityVersionAttribute>
       <OpenSilverExposeResourcesToExtractor Condition="'$(OpenSilverExposeResourcesToExtractor)' != 'true'">false</OpenSilverExposeResourcesToExtractor>
     </PropertyGroup>
 
     <ItemGroup>
       <OpenSilver_AssemblyAttribute Include="OpenSilver.Runtime.CompilerServices.OpenSilverAssemblyAttribute" />
+      <OpenSilver_AssemblyAttribute Include="OpenSilver.Runtime.CompilerServices.OpenSilverCompatibilityVersionAttribute">
+        <_Parameter1>$(OpenSilverCompatibilityVersionAttribute)</_Parameter1>
+        <_Parameter1_TypeName Condition="'$(Language)'=='VB' or '$(Language)'=='C#'">System.UInt32</_Parameter1_TypeName>
+      </OpenSilver_AssemblyAttribute>
       <OpenSilver_AssemblyAttribute Include="OpenSilver.Runtime.CompilerServices.OpenSilverResourceExposureAttribute">
         <_Parameter1>$(OpenSilverExposeResourcesToExtractor)</_Parameter1>
         <_Parameter1_TypeName Condition="'$(Language)'=='VB' or '$(Language)'=='C#'">System.Boolean</_Parameter1_TypeName>

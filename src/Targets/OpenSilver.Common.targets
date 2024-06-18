@@ -18,10 +18,11 @@
   LOCATION OF COMPILER TASKS
   ============================================================-->
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ServiceReferenceFixer" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.XamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ChangeInPlaceXamlToGenerated" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.UpdateIncludesInFSharpProjectFile" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourceClassifier" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesGenerator" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerResourcesAssemblyName).dll" TaskName="OpenSilver.Compiler.Resources.ResourcesExtractorAndCopier" />
 
   <Import Project="$(MSBuildThisFileDirectory)\OpenSilver.GenerateAssemblyInfo.targets" />
@@ -49,16 +50,19 @@
     </CompileDependsOn>
   </PropertyGroup>
 
-  <Target Name="CSharpXamlForHtml5BeforeCompile">
-    <CallTarget Condition="'$(IsNotDesignTimeCompilation)' == 'true'"
-      Targets="CSharpXamlForHtml5BeforeCompile_NotDesignTime" />
-  </Target>
-
   <PropertyGroup>
     <BuildDependsOn>
 		CSharpXamlForHtml5BeforeBuild;
 		$(BuildDependsOn);
 	</BuildDependsOn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsSecondPass)' == 'True'">
+    <PrepareResourcesDependsOn>
+      FileClassification;
+      MainResourcesGeneration;
+      $(PrepareResourcesDependsOn)
+    </PrepareResourcesDependsOn>
   </PropertyGroup>
 
   <!--============================================================
@@ -97,41 +101,71 @@
     <OutputAssemblyDirectory Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.:.*'))"
         >$(OutputPath)</OutputAssemblyDirectory>
   </PropertyGroup>
+  
+  <!--
+  ================================================================
+  FileClassification
+  ================================================================
+  -->
+  <Target Name="FileClassification">
 
-  <!--============================================================
-      Change the names of the EmbeddedResources so they keep their original names.
-   ============================================================-->
-  <Target Name="ModifyEmbeddedResourceNames" BeforeTargets="CreateManifestResourceNames">
+    <ResourceClassifier Condition="'@(Resource)' != '' or '@(Content)' != ''"
+                        ResourceFiles="@(Resource)"
+                        ContentFiles="@(Content)">
+      <Output ItemName="MainEmbeddedFiles" TaskParameter="MainEmbeddedFiles" />
+      <Output ItemName="_ResourceClassifierRemovedContentFiles" TaskParameter="RemovedContentFiles" />
+    </ResourceClassifier>
+
     <ItemGroup>
-      <EmbeddedResource>
-        <LogicalName Condition="'%(EmbeddedResource.Extension)' != '.resx'">%(EmbeddedResource.Identity)</LogicalName>
+      <Content Remove="@(_ResourceClassifierRemovedContentFiles)" />
+    </ItemGroup>
+
+  </Target>
+  
+  <!--
+  ============================================================
+  MainResourcesGeneration
+  ============================================================
+  -->
+  <Target Name="MainResourcesGeneration">
+    
+    <PropertyGroup>
+      <_ResourceNameInMainAssembly>$(AssemblyName).g.resources</_ResourceNameInMainAssembly>
+    </PropertyGroup>
+
+    <ResourcesGenerator ResourceFiles="@(MainEmbeddedFiles)"
+                        OutputPath="$(IntermediateOutputPath)"
+                        OutputResourcesFile="$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)"
+                        Condition="'@(MainEmbeddedFiles)' != ''">
+
+      <!-- Put the generated files in item FileWrites so that they can be cleaned up appropriately in a next Rebuild -->
+      <Output ItemName="FileWrites" TaskParameter="OutputResourcesFile" />
+    </ResourcesGenerator>
+
+    <ItemGroup Condition="'@(MainEmbeddedFiles)' != ''">
+      <EmbeddedResource Include="$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)">
+        <GenerateResource>false</GenerateResource>
+        <Type>Resx</Type>
+        <WithCulture>false</WithCulture>
+        <OutputResource>$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)</OutputResource>
       </EmbeddedResource>
     </ItemGroup>
+    
+  </Target>
+
+  <Target Name="CSharpXamlForHtml5BeforeCompile">
+    <CallTarget Condition="'$(IsNotDesignTimeCompilation)' == 'true'"
+                Targets="CSharpXamlForHtml5BeforeCompile_NotDesignTime" />
   </Target>
 
   <!--============================================================
   BEFORE BUILD
   ============================================================-->
   <Target Name="CSharpXamlForHtml5BeforeBuild">
+
     <PropertyGroup>
       <IsNotDesignTimeCompilation>true</IsNotDesignTimeCompilation>
     </PropertyGroup>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="OpenSilver Compiler"
-      Importance="normal"/>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="Visual Studio version: $(VisualStudioVersion)"
-      Importance="normal"/>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="OpenSilver Pass 1. Assembly name - $(AssemblyName)"
-      Importance="normal"/>
-    <Message
-      Condition="'$(IsSecondPass)'=='True'"
-      Text="OpenSilver Pass 2. Assembly name - $(AssemblyName)"
-      Importance="normal"/>
 
 	  <!--============================================================
     Check if the project has a reference to WebAssembly:
@@ -171,34 +205,6 @@
           Command="explorer.exe https://opensilver.net/upgrade-to-2.2/" Timeout="2000" ContinueOnError="True"></Exec>
     <Error Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;6"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-2.2/"/>
-	  
-    <!--============================================================
-      Change the Build Action of XAML files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition"] to "Content" in case the developer has not already done so.
-      ============================================================-->
-    <ItemGroup>
-      <Content Include="@(Page)"/>
-      <Page Remove="@(Page)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(CodeAnalysisDictionary)"/>
-      <CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(ApplicationDefinition)"/>
-      <ApplicationDefinition Remove="@(ApplicationDefinition)"/>
-    </ItemGroup>
-    <!--============================================================
-      Change the Build Action of JS/CSS/Image/Video/Audio/Text/Xml/Font files from ["Content", "Resource"] to "EmbeddedResource" in case the developer has not already done so.
-      ============================================================-->
-
-    <ItemGroup Condition="'$(IsBrowserProject)' == 'False'">
-      <EmbeddedResource Include="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
-      <EmbeddedResource Include="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
-      <None Remove="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
-      <EmbeddedResource Include="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.woff2' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx' "/>
-      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.woff2' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx'"/>
-    </ItemGroup>
 
     <!--============================================================
       Validate that XAML files have "MSBuild:Compile" set for their "Custom Tool" property (useful for always-up-to-date Intellisense) (only during Pass 1):
@@ -233,32 +239,13 @@
 		  <FileWrites Include="@(ServiceReferenceFixerProcessedFiles)" />
 	  </ItemGroup>
 
-    <!--============================================================
-      ResourcesProcessor (only during Pass 2)
-      ============================================================-->
-    <ResourcesProcessor
-      Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'"
-      SourceFile="%(Resource.FullPath)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).g.js"
-      />
-    <ItemGroup>
-      <ResourcesProcessorProcessedFiles Include="@(Resource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.js')" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
-      <Resource Remove="@(Resource)" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
-      <Resource Include="@(ResourcesProcessorProcessedFiles)" />
-      <FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
-    </ItemGroup>
-
   </Target>
-
 
   <!--============================================================
   BEFORE COMPILE
   ============================================================-->
   <Target Name="CSharpXamlForHtml5BeforeCompile_NotDesignTime">
     
-    <Message Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
-             Importance="normal"/>
-
     <PropertyGroup>
       <_OpenSilverPkgPath>$(PkgOpenSilver)</_OpenSilverPkgPath>
     </PropertyGroup>
@@ -271,7 +258,9 @@
       ============================================================-->
     <XamlPreprocessor
       Condition="'$(SkipXamlPreprocessor)'!='true' And '$(NoXamlPreprocessor)'!='True'"
-      SourceFiles="@(Content)"
+      PageFiles="@(Page)"
+      ApplicationDefinitionFiles="@(ApplicationDefinition)"
+      ContentFiles="@(Content->WithMetadataValue('Extension', '.xaml'))"
       ResolvedReferences="@(ReferencePath)"
       IntermediateOutputPath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
       OutputPath="$(OutputAssemblyDirectory)"
@@ -284,13 +273,17 @@
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
       Language="$(Language)">
-      <Output TaskParameter="GeneratedFiles" ItemName="CompiledXamlFiles" />
-      <Output TaskParameter="RemovedFiles" ItemName="RemovedXamlFiles" />
+      <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />
+      <Output ItemName="_XamlPreprocessorProcessedPageFiles" TaskParameter="ProcessedPageFiles" />
+      <Output ItemName="_XamlPreprocessorProcessedApplicationDefinitionFiles" TaskParameter="ProcessedApplicationDefinitionFiles" />
+      <Output ItemName="_XamlPreprocessorProcessedContentFiles" TaskParameter="ProcessedContentFiles" />
     </XamlPreprocessor>
 
     <ItemGroup Condition="'$(Language)' == 'C#' Or '$(Language)' == 'VB'">
-      <Content Remove="@(RemovedXamlFiles)" />
-      <Compile Include="@(CompiledXamlFiles)" />
+      <Page Remove="@(_XamlPreprocessorProcessedPageFiles)" />
+      <ApplicationDefinition Remove="@(_XamlPreprocessorProcessedApplicationDefinitionFiles)" />
+      <Content Remove="@(_XamlPreprocessorProcessedContentFiles)" />
+      <Compile Include="@(_XamlPreprocessorGeneratedFiles)" />
     </ItemGroup>
 
     <!--============================================================
@@ -298,17 +291,20 @@
       it to generated fs file names. Changed file names will be added 
       as Include itemgroup later.
       ============================================================-->
-    <ChangeInPlaceXamlToGenerated ProjectPath="$(MSBuildProjectFullPath)"
-                                  AllItems="@(Compile);@(RemovedXamlFiles)"
-                                  Condition="'$(Language)' == 'F#'">
-      <Output TaskParameter="UpdatedItems" ItemName="UpdatedItems" />
-    </ChangeInPlaceXamlToGenerated>
+    <UpdateIncludesInFSharpProjectFile ProjectPath="$(MSBuildProjectFullPath)"
+                                       AllItems="@(Compile);@(_XamlPreprocessorProcessedPageFiles);@(_XamlPreprocessorProcessedApplicationDefinitionFiles);@(_XamlPreprocessorProcessedContentFiles)"
+                                       Condition="'$(Language)' == 'F#'">
+      <Output ItemName="_UpdateIncludesInFSharpProjectFileUpdatedItems" TaskParameter="UpdatedItems" />
+    </UpdateIncludesInFSharpProjectFile>
     
     <ItemGroup Condition="'$(Language)' == 'F#'">
-      <Content Remove="@(RemovedXamlFiles)" />
       <Compile Remove="@(Compile)" />
-      <Compile Include="@(UpdatedItems)" />
+      <Page Remove="@(_XamlPreprocessorProcessedPageFiles)" />
+      <ApplicationDefinition Remove="@(_XamlPreprocessorProcessedApplicationDefinitionFiles)" />
+      <Content Remove="@(_XamlPreprocessorProcessedContentFiles)" />
+      <Compile Include="@(_UpdateIncludesInFSharpProjectFileUpdatedItems)" />
     </ItemGroup>
+
   </Target>
 
   <!--============================================================
@@ -407,37 +403,19 @@
   </PropertyGroup>
 
   <Target Name="BeforeCoreCompile">
-    <CallTarget Condition="'$(IsNotDesignTimeCompilation)' != 'true'"
-      Targets="DesignTimeCompilation" />
+    <CallTarget Condition="'$(IsNotDesignTimeCompilation)' != 'true'" Targets="DesignTimeCompilation" />
   </Target>
 
   <Target Name="DesignTimeCompilation">
-    <Message
-      Text="OpenSilver Design-Time Compilation started"
-      Importance="normal"/>
-
-    <!--============================================================
-      Change the Build Action of XAML files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition"] to "Content" in case the developer has not already done so.
-      ============================================================-->
-    <ItemGroup>
-      <Content Include="@(Page)"/>
-      <Page Remove="@(Page)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(CodeAnalysisDictionary)"/>
-      <CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(ApplicationDefinition)"/>
-      <ApplicationDefinition Remove="@(ApplicationDefinition)"/>
-    </ItemGroup>
 
     <!--============================================================
       XamlPreprocessor
       ============================================================-->
     <XamlPreprocessor
       Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-      SourceFiles="@(Content)"
+      PageFiles="@(Page)"
+      ApplicationDefinitionFiles="@(ApplicationDefinition)"
+      ContentFiles="@(Content->WithMetadataValue('Extension', '.xaml'))"
       ResolvedReferences="@(ReferencePath)"
       IntermediateOutputPath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
       OutputPath="$(OutputAssemblyDirectory)"
@@ -450,13 +428,17 @@
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
       Language="$(Language)">
-      <Output TaskParameter="GeneratedFiles" ItemName="CompiledXamlFiles"/>
-      <Output TaskParameter="RemovedFiles" ItemName="RemovedXamlFiles"/>
+      <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />
+      <Output ItemName="_XamlPreprocessorProcessedPageFiles" TaskParameter="ProcessedPageFiles" />
+      <Output ItemName="_XamlPreprocessorProcessedApplicationDefinitionFiles" TaskParameter="ProcessedApplicationDefinitionFiles" />
+      <Output ItemName="_XamlPreprocessorProcessedContentFiles" TaskParameter="ProcessedContentFiles" />
     </XamlPreprocessor>
 
     <ItemGroup Condition="'$(Language)' == 'C#' Or '$(Language)' == 'VB'">
-      <Content Remove="@(RemovedXamlFiles)" />
-      <Compile Include="@(CompiledXamlFiles)" />
+      <Page Remove="@(_XamlPreprocessorProcessedPageFiles)" />
+      <ApplicationDefinition Remove="@(_XamlPreprocessorProcessedApplicationDefinitionFiles)" />
+      <Content Remove="@(_XamlPreprocessorProcessedContentFiles)" />
+      <Compile Include="@(_XamlPreprocessorGeneratedFiles)" />
     </ItemGroup>
 
     <!--============================================================
@@ -464,21 +446,20 @@
       it to generated fs file names. Changed file names will be added 
       as Include itemgroup later.
       ============================================================-->
-    <ChangeInPlaceXamlToGenerated ProjectPath="$(MSBuildProjectFullPath)"
-                                  AllItems="@(Compile);@(RemovedXamlFiles)"
-                                  Condition="'$(Language)' == 'F#'">
-      <Output TaskParameter="UpdatedItems" ItemName="UpdatedItems" />
-    </ChangeInPlaceXamlToGenerated>
+    <UpdateIncludesInFSharpProjectFile ProjectPath="$(MSBuildProjectFullPath)"
+                                       AllItems="@(Compile);@(_XamlPreprocessorProcessedPageFiles);@(_XamlPreprocessorProcessedApplicationDefinitionFiles);@(_XamlPreprocessorProcessedContentFiles)"
+                                       Condition="'$(Language)' == 'F#'">
+      <Output ItemName="_UpdateIncludesInFSharpProjectFileUpdatedItems" TaskParameter="UpdatedItems" />
+    </UpdateIncludesInFSharpProjectFile>
     
     <ItemGroup Condition="'$(Language)' == 'F#'">
-      <Content Remove="@(RemovedXamlFiles)" />
       <Compile Remove="@(Compile)" />
-      <Compile Include="@(UpdatedItems)" />
+      <Page Remove="@(_XamlPreprocessorProcessedPageFiles)" />
+      <ApplicationDefinition Remove="@(_XamlPreprocessorProcessedApplicationDefinitionFiles)" />
+      <Content Remove="@(_XamlPreprocessorProcessedContentFiles)" />
+      <Compile Include="@(_UpdateIncludesInFSharpProjectFileUpdatedItems)" />
     </ItemGroup>
-    
-    <Message
-      Text="OpenSilver Design-Time Compilation ended"
-      Importance="normal"/>
+
   </Target>
 
 </Project>

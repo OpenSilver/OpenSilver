@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
-using System.Text;
 using System.Windows.Resources;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
@@ -77,10 +76,8 @@ namespace System.Windows
 
             AppParams = GetAppParams();
 
-            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-            {
-                OnUnhandledException(e.ExceptionObject as Exception, false);
-            };
+            AppDomain.CurrentDomain.UnhandledException +=
+                (s, e) => OnUnhandledException(e.ExceptionObject as Exception, false);
 
             new DOMEventManager(GetWindow, "unload", ProcessOnExit).AttachToDomEvents();
 
@@ -426,7 +423,7 @@ namespace System.Windows
             }
 
             string resourceUri = resourceLocator.ToString();
-            if (IsComponentUri(resourceUri))
+            if (AppResourcesManager.IsComponentUri(resourceUri))
             {
                 IXamlComponentLoader factory = GetXamlComponentLoader(resourceUri);
                 if (factory != null)
@@ -452,27 +449,10 @@ namespace System.Windows
             loader.LoadComponent(component);
         }
 
-        private static bool IsComponentUri(string uri)
-        {
-            int index = uri.IndexOf(';');
-            if (index > -1)
-            {
-                return uri.Substring(index).StartsWith(";component/");
-            }
-
-            return false;
-        }
-
-        private static string ExtractAssemblyNameFromComponentUri(string uri)
-        {
-            int offset = uri[0] == '/' ? 1 : 0;
-            return uri.Substring(offset, uri.IndexOf(';') - offset);
-        }
-
         private static IXamlComponentLoader GetXamlComponentLoader(string componentUri)
         {
             string className = XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri);
-            string assemblyName = ExtractAssemblyNameFromComponentUri(componentUri);
+            string assemblyName = AppResourcesManager.ExtractAssemblyNameFromComponentUri(componentUri);
 
             Type loaderType = Type.GetType($"{className}, {assemblyName}");
             if (loaderType != null)
@@ -483,58 +463,41 @@ namespace System.Windows
             return null;
         }
 
-        // Exceptions:
-        //   System.ArgumentNullException:
-        //     The System.Uri that is passed to System.Windows.Application.GetResourceStream(System.Uri)
-        //     is null.
-        //
-        //   System.ArgumentException:
-        //     The System.Uri.OriginalString property of the System.Uri that is passed to
-        //     System.Windows.Application.GetResourceStream(System.Uri) is null.
-        //
-        //   System.ArgumentException:
-        //     The System.Uri that is passed to System.Windows.Application.GetResourceStream(System.Uri)
-        //     is either not relative, or is absolute but not in the pack://application:,,,/
-        //     form.
-        //
-        //   System.IO.IOException:
-        //     The System.Uri that is passed to System.Windows.Application.GetResourceStream(System.Uri)
-        //     cannot be found.
         /// <summary>
-        /// Returns a resource stream for a resource data file that is located at the
-        /// specified System.Uri (see WPF Application Resource, Content, and Data Files).
+        /// Returns a resource file from a location in the application package.
         /// </summary>
-        /// <param name="uriResource">The System.Uri that maps to an embedded resource.</param>
+        /// <param name="uriResource">
+        /// A relative URI that identifies the resource file to be loaded. The URI is relative
+        /// to the application package and does not need a leading forward slash.
+        /// </param>
         /// <returns>
-        /// A System.Windows.Resources.StreamResourceInfo that contains a resource stream
-        /// for resource data file that is located at the specified System.Uri.
+        /// A <see cref="StreamResourceInfo"/> that contains the stream for the desired resource 
+        /// file.
         /// </returns>
-        public static async Task<StreamResourceInfo> GetResourceStream(Uri uriResource)
+        /// <exception cref="ArgumentNullException">
+        /// uriResource is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// uriResource is an absolute URI.
+        /// </exception>
+        public static Task<StreamResourceInfo> GetResourceStream(Uri uriResource)
         {
-            string resourceString = await GetResourceString(uriResource);
-            string uriAsString = uriResource.OriginalString;
-            string extension = uriAsString.Substring(uriAsString.LastIndexOf('.'));
-
-            string mimeType;
-
-            if (string.Equals(extension, ".xml", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(extension, ".config", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(extension, ".clientconfig", StringComparison.OrdinalIgnoreCase))
+            if (uriResource is null)
             {
-                mimeType = "application/xml";
+                throw new ArgumentNullException(nameof(uriResource));
             }
-            else if (string.Equals(extension, ".json", StringComparison.OrdinalIgnoreCase))
-            {
-                mimeType = "application/json";
-            }
-            else
-            {
-                mimeType = "text/plain";
-            } //todo: update this when more extensions will be handled
 
-            return new StreamResourceInfo(
-                new MemoryStream(Encoding.ASCII.GetBytes(resourceString)),
-                mimeType);
+            if (uriResource.IsAbsoluteUri)
+            {
+                throw new ArgumentException("Uri must be relative.");
+            }
+
+            if (AppResourcesManager.GetResourceStream(uriResource.ToString()) is Stream stream)
+            {
+                return Task.FromResult(new StreamResourceInfo(stream, null));
+            }
+
+            return Task.FromResult<StreamResourceInfo>(null);
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]

@@ -21,7 +21,7 @@ using Microsoft.Build.Utilities;
 
 namespace OpenSilver.Compiler
 {
-    public sealed class ChangeInPlaceXamlToGenerated : Task
+    public sealed class UpdateIncludesInFSharpProjectFile : Task
     {
         private const string _xpathExpression = "//ItemGroup/*";
 

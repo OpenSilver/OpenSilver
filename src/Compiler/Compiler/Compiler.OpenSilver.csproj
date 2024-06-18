@@ -49,7 +49,11 @@
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.Pass2.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\IMetadataFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\SystemTypesHelperFS.cs" />
-    <Compile Include="EntryPoints\ChangeInPlaceXamlToGenerated.cs" />
+    <Compile Include="EntryPoints\UpdateIncludesInFSharpProjectFile.cs" />
+    <Compile Include="EntryPoints\ResourceClassifier.cs" />
+    <Compile Include="EntryPoints\ResourcesGenerator.cs" />
+    <Compile Include="Helpers\ResourceIDHelper.cs" />
+    <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferencesVB.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssembliesInspectorImpl.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssemblyStorage.cs" />
@@ -71,7 +75,6 @@
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.cs" />
     <Compile Include="7_ConvertingXamlToVB\ConvertingXamlToVB.cs" />
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
-    <Compile Include="EntryPoints\ResourcesProcessor.cs" />
     <Compile Include="EntryPoints\ServiceReferenceFixer.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferences.cs" />
     <Compile Include="OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" />

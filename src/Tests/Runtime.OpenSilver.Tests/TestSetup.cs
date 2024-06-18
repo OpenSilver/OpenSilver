@@ -122,7 +122,7 @@ namespace Runtime.OpenSilver.Tests
             INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;
 
             // Instantiating Application because it sets itself as Application.Current
-            _ = new Application
+            _ = new App
             {
                 RootVisual = new Grid(),
             };
@@ -150,6 +150,10 @@ namespace Runtime.OpenSilver.Tests
                         " that do not take this long to flip.");
                 }
             }
+        }
+
+        private sealed class App : Application
+        {
         }
     }
 }

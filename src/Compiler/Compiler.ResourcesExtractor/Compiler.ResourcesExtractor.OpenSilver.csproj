@@ -21,9 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Compiler\OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssemblyStorage.cs">
-      <Link>MonoCecilAssemblyStorage.cs</Link>
-    </Compile>
+    <Compile Include="..\Compiler\Helpers\ResourceIDHelper.cs" Link="ResourceIDHelper.cs" />
+    <Compile Include="..\Compiler\OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssemblyStorage.cs" Link="MonoCecilAssemblyStorage.cs" />
   </ItemGroup>
 
 </Project>

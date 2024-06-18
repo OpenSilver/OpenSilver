@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,61 +11,52 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace System.Windows.Resources
+namespace System.Windows.Resources;
+
+/// <summary>
+/// Provides resource stream information for application resources or other packages obtained 
+/// through the <see cref="Application.GetResourceStream(StreamResourceInfo, Uri)"/> method.
+/// </summary>
+public class StreamResourceInfo
 {
     /// <summary>
-    /// Provides resource stream information for application resources or other packages
-    /// obtained through the System.Windows.Application.GetResourceStream(System.Windows.Resources.StreamResourceInfo,System.Uri)
-    /// method.
+    /// Initializes a new instance of the <see cref="StreamResourceInfo"/> class.
     /// </summary>
-    public partial class StreamResourceInfo
+    public StreamResourceInfo() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StreamResourceInfo"/> class.
+    /// </summary>
+    /// <param name="stream">
+    /// The stream to use to create the resource.
+    /// </param>
+    /// <param name="contentType">
+    /// The MIME type of the content.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// stream is null.
+    /// </exception>
+    public StreamResourceInfo(Stream stream, string contentType)
     {
-        /// <summary>
-        /// Initializes a new instance of the System.Windows.Resources.StreamResourceInfo
-        /// class.
-        /// </summary>
-        public StreamResourceInfo(){ } //don't know what this is good for since Stream and ContentType are both read-only.
-       
-        /// <summary>
-        /// Initializes a new instance of the System.Windows.Resources.StreamResourceInfo
-        /// class based on a provided stream.
-        /// </summary>
-        /// <param name="stream">The reference stream.</param>
-        /// <param name="contentType">The Multipurpose Internet Mail Extensions (MIME) content type of the stream.</param>
-        public StreamResourceInfo(Stream stream, string contentType)
-        {
-            Stream = stream;
-            ContentType = contentType;
-        }
-
-        string _contentType;
-        // Returns:
-        //     The Multipurpose Internet Mail Extensions (MIME) content type.
-        /// <summary>
-        /// Gets the content type of a stream.
-        /// </summary>
-        public string ContentType
-        {
-            get{return _contentType;}
-            private set { _contentType = value; }
-        }
-
-        Stream _stream;
-        /// <summary>
-        /// Gets the actual stream of the resource.
-        /// </summary>
-        public Stream Stream
-        {
-            get { return _stream; }
-            private set { _stream = value; }
-        }
+        Stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        ContentType = contentType;
     }
+
+    /// <summary>
+    /// Gets the MIME type of the content in the stream.
+    /// </summary>
+    /// <returns>
+    /// The MIME type of the content in the stream, as a string.
+    /// </returns>
+    public string ContentType { get; }
+
+    /// <summary>
+    /// Gets the stream that is contained by the resource.
+    /// </summary>
+    /// <returns>
+    /// The stream that is contained by the resource.
+    /// </returns>
+    public Stream Stream { get; }
 }

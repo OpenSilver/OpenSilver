@@ -20,33 +20,18 @@ namespace CSHTML5.Internal
     public static class StartupAssemblyInfo
     {
         private static Assembly _startupAssembly;
-        private static string _startupAssemblyShortName;
+
         internal static Assembly StartupAssembly
         {
-            get
-            {
-                return _startupAssembly;
-            }
+            get => _startupAssembly;
             set
             {
                 _startupAssembly = value;
-
-                // Remember the short name of the assembly:
-                string name = _startupAssembly.FullName; // Note: we do not call "GetName().Name" because it does not appear to work well with JSIL.
-                int i = name.IndexOf(',');
-                if (i > -1)
-                    name = name.Substring(0, i);
-                _startupAssemblyShortName = name;
+                StartupAssemblyShortName = value?.GetName().Name;
             }
         }
 
-        public static string StartupAssemblyShortName
-        {
-            get
-            {
-                return _startupAssemblyShortName;
-            }
-        }
+        public static string StartupAssemblyShortName { get; private set; }
 
         public static string OutputRootPath; // This is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
         public static string OutputAppFilesPath; // This is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)

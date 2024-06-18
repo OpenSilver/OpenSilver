@@ -132,6 +132,7 @@
 		<Compile Include="OpenSilver\IO\MemoryFileInfo.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
 		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverAssemblyAttribute.cs" />
+		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverCompatibilityVersionAttribute.cs" />
 		<Compile Include="OpenSilver\Runtime\CompilerServices\OpenSilverResourceExposureAttribute.cs" />
 		<Compile Include="OpenSilver\Utility\FrugalMap.cs" />
 		<Compile Include="OpenSilver\XamlDesignerAttribute.cs" />
@@ -275,6 +276,7 @@
 		<Compile Include="System.Windows.Threading\DispatcherPriority.cs" />
 		<Compile Include="System.Windows.Threading\DispatcherOperationStatus.cs" />
 		<Compile Include="System.Windows.Threading\DispatcherProcessingDisabled.cs" />
+		<Compile Include="OpenSilver\Internal\AppResourcesManager.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows.input\CursorConverter.cs" />
 		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
@@ -997,8 +999,7 @@
 	    <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-	
-</ItemGroup>
+  </ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
 	</ItemGroup>

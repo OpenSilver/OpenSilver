@@ -130,7 +130,7 @@ internal sealed class FontFace
 
     private static (string CssFontName, string CssFontUrl) ParseFontSource(string fontSource)
     {
-        string fontPath = fontSource.Trim().ToLower();
+        string fontPath = fontSource.Trim().ToLowerInvariant();
 
         // Note: if the path does not contain the character '.', then it means that there is no
         // specified file. It is therefore a default font or thet path to a folder containing
@@ -152,17 +152,16 @@ internal sealed class FontFace
         // specifically defined otherwise: (basically add a prefix ms-appx if there is none)
         // Note: we should not enter the "if" below if the path was defined in xaml. This cas
         // is already handled during compilation.
-        if (!fontUrl.StartsWith(@"ms-appx:/") &&
-            !fontUrl.StartsWith(@"http://") &&
-            !fontUrl.StartsWith(@"https://") &&
-            !fontUrl.Contains(@";component/"))
+        if (!AppResourcesManager.IsMsAppxUri(fontUrl) &&
+            !AppResourcesManager.IsHttpUri(fontUrl) &&
+            !AppResourcesManager.IsHttpsUri(fontUrl) &&
+            !AppResourcesManager.IsComponentUri(fontUrl))
         {
             fontUrl = $"ms-appx:/{fontUrl}";
         }
 
         // Get a path that will lead to the position of the file
         string relativeFontPath = INTERNAL_UriHelper.ConvertToHtml5Path(fontUrl, null);
-        relativeFontPath = relativeFontPath.Replace('\\', '/');
         if (relativeFontPath.StartsWith("/"))
         {
             relativeFontPath = relativeFontPath.Substring(1);

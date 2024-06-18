@@ -12,18 +12,33 @@
 \*====================================================================================*/
 
 using System;
-using System.Linq;
 using System.Windows.Browser;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using OpenSilver.Internal;
 using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
     public static class INTERNAL_UriHelper
     {
+        private static string OutputResourcesPath
+        {
+            get
+            {
+                // Note: this is populated at the startup of the application
+                // (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
+                string path = StartupAssemblyInfo.OutputResourcesPath.Replace('\\', '/');
+                if (!path.EndsWith("/") && path != string.Empty)
+                {
+                    path += '/';
+                }
+
+                return path;
+            }
+        }
+
         /// <summary>
         /// Converts to an URI suitable to use in the HTML5 "src" property.
         /// </summary>
@@ -40,300 +55,183 @@ namespace CSHTML5.Internal
             {
                 return null;
             }
+
             uri = uri.Trim();
-            var originalStringLowercase = uri.ToLower();
 
-            if (originalStringLowercase.StartsWith(@"ms-appx:/"))
+            if (AppResourcesManager.IsComponentUri(uri))
             {
-                //----------------
-                // This is the WinRT/UWP syntax for files in the app package.
-                //----------------
-
-                string html5Path;
-
-                // Remove "ms-appx:/", "ms-appx://", and "ms-appx:///":
-                html5Path = uri.Replace("://", ":/").Replace("://", ":/").Replace("://", ":/").Substring(9); // Note: We use "Substring" instead of "String.Replace" to remove "ms-appx:/" in order to support any case (lowercase/uppercase).
-
-                // Fix slashes:
-                html5Path = html5Path.Replace('\\', '/');
-
-                // If the path does not contain an assembly name, we need to add it:
-                string assemblyName;
-                string pathAfterAssemblyName;
-                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyName, out pathAfterAssemblyName))
-                {
-                    // We are supposed to know the startup assembly (it is set by the constructor of the "Application" class):
-                    string startupAssemblyShortName = StartupAssemblyInfo.StartupAssemblyShortName;
-                    if (!string.IsNullOrEmpty(startupAssemblyShortName))
-                    {
-                        html5Path = startupAssemblyShortName + "/" + html5Path.ToLower();
-                    }
-                }
-                else
-                {
-                    // Make sure the portion of the path AFTER the assembly name is lowercase:
-                    html5Path = assemblyName + "/" + pathAfterAssemblyName.ToLower();
-                }
-
-                // Get the relative path where the resources are located (such as "Resources/"), and ensure that it ends with "/":
-                string outputResourcesPath = StartupAssemblyInfo.OutputResourcesPath.Replace('\\', '/'); // Note: this is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
-                if (!outputResourcesPath.EndsWith("/") && outputResourcesPath != "")
-                    outputResourcesPath = outputResourcesPath + '/';
-
-                // Add the above relative path to the beginning of the path:
-                html5Path = outputResourcesPath + html5Path;
-
-                return html5Path;
+                return ConvertComponentUri(uri);
             }
-            else if (originalStringLowercase.StartsWith(@"http://") || originalStringLowercase.StartsWith(@"https://"))
+            else if (AppResourcesManager.IsHttpUri(uri) || AppResourcesManager.IsHttpsUri(uri))
             {
-                //----------------
-                // This is the syntax for online resources.
-                //----------------
-
                 return uri;
             }
-            else if (originalStringLowercase.StartsWith(@"pack://application:,,,/"))
+            else if (AppResourcesManager.IsMsAppxUri(uri))
             {
-                // https://docs.microsoft.com/en-us/dotnet/framework/wpf/app-development/pack-uris-in-wpf
-                // Note that the pack URI syntax for referenced assembly resource files can be used only with the application:/// authority. 
-                // For example, the following is not supported in WPF.
-                // pack://siteoforigin:,,,/SomeAssembly;component/ResourceFile.xaml
-
-                string html5Path = uri.Substring(23);
-
-                // If the path does not contain an assembly name, we need to add it:
-                string assemblyName;
-                string pathAfterAssemblyName;
-                if (!DoesPathContainAssemblyName("/" + html5Path, out assemblyName, out pathAfterAssemblyName))
-                {
-                    // We are supposed to know the startup assembly (it is set by the constructor of the "Application" class):
-                    string startupAssemblyShortName = StartupAssemblyInfo.StartupAssemblyShortName;
-                    if (!string.IsNullOrEmpty(startupAssemblyShortName))
-                    {
-                        html5Path = startupAssemblyShortName + "/" + html5Path.ToLower();
-                    }
-                }
-                else
-                {
-                    // Make sure the portion of the path AFTER the assembly name is lowercase:
-                    html5Path = assemblyName + "/" + pathAfterAssemblyName.ToLower();
-                }
-
-                // Get the relative path where the resources are located (such as "Resources/"), and ensure that it ends with "/":
-                string outputResourcesPath = StartupAssemblyInfo.OutputResourcesPath.Replace('\\', '/'); // Note: this is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
-                if (!outputResourcesPath.EndsWith("/") && outputResourcesPath != "")
-                    outputResourcesPath = outputResourcesPath + '/';
-
-                // Add the above relative path to the beginning of the path:
-                html5Path = outputResourcesPath + html5Path;
-
-                return html5Path;
+                return ConvertMsAppxUri(uri);
             }
-            else if (originalStringLowercase.Contains(@";component/"))
+            else if (AppResourcesManager.IsPackUri(uri))
             {
-                //----------------
-                // This is the Silverlight/WPF syntax for files in the app package (absolute paths).
-                //----------------
-
-                string componentKeyword = @";component/";
-                int indexOfComponentKeyword = originalStringLowercase.IndexOf(componentKeyword); //We use the lowercase version of the uri to get the index, so "Component" can work. The index will still be the same.
-                string assemblyName = uri.Substring(0, indexOfComponentKeyword);
-                assemblyName = TrimStartChars(TrimStartChars(assemblyName, '/'), '\\');
-                assemblyName = TrimEndChars(TrimEndChars(assemblyName, '/'), '\\');
-                string relativeFolderAndFileName = uri.Substring(indexOfComponentKeyword + componentKeyword.Length);
-                relativeFolderAndFileName = TrimStartChars(TrimStartChars(relativeFolderAndFileName, '/'), '\\');
-
-                // Get the relative path where the resources are located (such as "Resources/"), and ensure that it ends with "/":
-                string outputResourcesPath = StartupAssemblyInfo.OutputResourcesPath.Replace('\\', '/'); // Note: this is populated at the startup of the application (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
-                if (!outputResourcesPath.EndsWith("/") && outputResourcesPath != "")
-                    outputResourcesPath = outputResourcesPath + '/';
-
-                // Combine the path:
-                string html5Path = outputResourcesPath + assemblyName + "/" + relativeFolderAndFileName.ToLower();
-
-                return html5Path;
+                return ConvertPackApplicationUri(uri);
             }
             else
             {
-                //----------------
-                // The path is a relative path. We convert it to an absolute path, and call this very method again.
-                //----------------
-
-                // Try to determine the location of the .XAML file so as to transform the relative path into an absolute path:
-                string xamlSourcePath = null;
-                if (elementThatARelativeUriIsRelativeTo != null
-                    && INTERNAL_VisualTreeManager.IsElementInVisualTree(elementThatARelativeUriIsRelativeTo)
-                    && TryGetLocationOfXamlFile(elementThatARelativeUriIsRelativeTo, out xamlSourcePath)
-                    && xamlSourcePath.Contains(@"\"))
-                {
-                    // Note: the "XamlSourcePath" is always in the following format: AssemblyName\Folder1\Folder2\FileName.xaml
-
-                    // Fix the slashes:
-                    uri = uri.Replace('\\', '/');
-                    xamlSourcePath = xamlSourcePath.Replace('\\', '/');
-
-                    // Remove the filename from the "XamlSourcePath":
-                    string xamlSourcePathWithoutFileName = xamlSourcePath.Substring(0, xamlSourcePath.LastIndexOf('/'));
-
-                    // Remove the assembly name from the "XamlSourcePath", so as to keep only the folder:
-                    string assemblyName;
-                    string folderWhereXamlFileIsLoated_PossibleEmpty;
-                    if (xamlSourcePathWithoutFileName.Contains('/'))
-                    {
-                        assemblyName = xamlSourcePathWithoutFileName.Substring(0, xamlSourcePathWithoutFileName.IndexOf('/'));
-                        folderWhereXamlFileIsLoated_PossibleEmpty = xamlSourcePathWithoutFileName.Substring(assemblyName.Length + 1);
-                    }
-                    else
-                    {
-                        assemblyName = xamlSourcePathWithoutFileName;
-                        folderWhereXamlFileIsLoated_PossibleEmpty = "";
-                    }
-
-                    string absolutePath;
-
-                    // If the Uri starts with "/", it means that it refers to the root of the assembly, otherwise it is relative to the XAML where it is used (if any):
-                    if (uri.StartsWith("/"))
-                    {
-                        //================
-                        // The path is relative to the root of the assembly:
-                        //================
-
-                        // Merge the path and the assembly name to obtain an absolute path:
-                        absolutePath = "ms-appx:/" + assemblyName + uri;
-                    }
-                    else
-                    {
-                        //================
-                        // The path is relative to the XAML where it is used (if any)
-                        //================
-
-                        // Handle ".." in a way that, if we reach the root, we ignore any additional ".." (this is the same behavior as in Silverlight):
-                        while (uri.StartsWith("../"))
-                        {
-                            // Remove the "../":
-                            uri = uri.Substring(3);
-
-                            // Remove the last folder (if any) in the xamlSourcePath:
-                            if (folderWhereXamlFileIsLoated_PossibleEmpty.Contains('/'))
-                            {
-                                folderWhereXamlFileIsLoated_PossibleEmpty = folderWhereXamlFileIsLoated_PossibleEmpty.Substring(0, folderWhereXamlFileIsLoated_PossibleEmpty.LastIndexOf('/'));
-                            }
-                            else
-                            {
-                                folderWhereXamlFileIsLoated_PossibleEmpty = "";
-                            }
-                        }
-
-                        // Merge the path of the .XAML file with the relative URI specified as parameter of this method:
-                        absolutePath = "ms-appx:/" + assemblyName + (folderWhereXamlFileIsLoated_PossibleEmpty != "" ? "/" + folderWhereXamlFileIsLoated_PossibleEmpty : "") + (!uri.StartsWith("/") ? "/" : "") + uri;
-                    }
-
-                    // Call again this very method (re-entrance), but this time pass the absolute path instead of the relative path:
-                    string result = ConvertToHtml5Path(absolutePath, null);
-                    return result;
-                }
-                else
-                {
-                    throw new Exception(@"Unless you specify the URI in XAML, the current version only supports absolute URIs that start with http:// or https:// or that are in the form of ""ms-appx:///AssemblyName/Folder/FileName"" or ""/AssemblyName;component/Folder/FileName"""
-                            + (!originalStringLowercase.Contains(":") ? "    - Try adding  ms-appx:///YourAssemblyName/  to the beginning of your path." : string.Empty));
-                }
+                return ConvertFromRelativePath(uri, elementThatARelativeUriIsRelativeTo);
             }
         }
 
-        private static bool TryGetLocationOfXamlFile(UIElement element, out string xamlSourcePath)
+        private static string ConvertComponentUri(string uri)
         {
-            // Walk up the visual tree until we find the root of the .XAML file (if any):
-            UIElement current = element;
-            while (current != null)
+            string assemblyName = AppResourcesManager.ExtractAssemblyNameFromComponentUri(uri).ToLowerInvariant();
+            string partName = AppResourcesManager.ExtractResourcePartFromComponentUri(uri).ToLowerInvariant();
+
+            return $"{OutputResourcesPath}{assemblyName}/{partName}";
+        }
+
+        private static string ConvertMsAppxUri(string uri)
+        {
+            AppResourcesManager.ExtractPartsFromMsAppxUri(uri, out string assemblyName, out string resourcePart);
+            assemblyName ??= StartupAssemblyInfo.StartupAssemblyShortName;
+
+            if (assemblyName is null)
             {
-                if (!string.IsNullOrEmpty(current.XamlSourcePath))
+                return $"{OutputResourcesPath}{resourcePart.ToLowerInvariant()}";
+            }
+            else
+            {
+                return $"{OutputResourcesPath}{assemblyName.ToLowerInvariant()}/{resourcePart.ToLowerInvariant()}";
+            }
+        }
+
+        private static string ConvertPackApplicationUri(string uri)
+        {
+            // https://docs.microsoft.com/en-us/dotnet/framework/wpf/app-development/pack-uris-in-wpf
+            // Note that the pack URI syntax for referenced assembly resource files can be used only with the application:/// authority. 
+            // For example, the following is not supported in WPF.
+            // pack://siteoforigin:,,,/SomeAssembly;component/ResourceFile.xaml
+
+            AppResourcesManager.ExtractPartsFromPackUri(uri, out string assemblyName, out string resourcePart);
+            assemblyName ??= StartupAssemblyInfo.StartupAssemblyShortName;
+
+            if (assemblyName is null)
+            {
+                return $"{OutputResourcesPath}{resourcePart.ToLowerInvariant()}";
+            }
+            else
+            {
+                return $"{OutputResourcesPath}{assemblyName.ToLowerInvariant()}/{resourcePart.ToLowerInvariant()}";
+            }
+        }
+
+        private static string ConvertFromRelativePath(string uri, UIElement relativeTo)
+        {
+            if (!TryGetLocationOfXamlFile(relativeTo, out string xamlSourcePath))
+            {
+                throw InvalidUriException(uri);
+            }
+
+            // Note: the "XamlSourcePath" is always in the following format: AssemblyName\Folder1\Folder2\FileName.xaml
+
+            int index1 = xamlSourcePath.AsSpan().LastIndexOfAny('/', '\\');
+            if (index1 == -1)
+            {
+                throw InvalidUriException(uri);
+            }
+
+            // Remove file name
+            ReadOnlySpan<char> basePath = xamlSourcePath.AsSpan(0, index1);
+            ReadOnlySpan<char> xamlFilePath;
+
+            string assemblyName;
+
+            int index2 = basePath.IndexOfAny('\\', '/');
+            if (index2 != -1)
+            {
+                assemblyName = basePath.Slice(0, index2).ToString();
+                xamlFilePath = basePath.Slice(index2 + 1);
+            }
+            else
+            {
+                assemblyName = basePath.ToString();
+                xamlFilePath = ReadOnlySpan<char>.Empty;
+            }
+
+            // If the Uri starts with "/", it means that it refers to the root of the assembly,
+            // otherwise it is relative to the XAML where it is used (if any):
+            if (uri.StartsWith("/") || uri.StartsWith("\\"))
+            {
+                return ConvertComponentUri($"/{assemblyName}{AppResourcesManager.Component}{uri.Substring(1)}");
+            }
+
+            //================
+            // The path is relative to the XAML where it is used (if any)
+            //================
+
+            ReadOnlySpan<char> path = uri.AsSpan();
+
+            // Handle ".." in a way that, if we reach the root, we ignore any additional ".." (this is the same behavior as in Silverlight)
+            while (StartsWithCollapseSeparator(path))
+            {
+                // Remove the "../"
+                path = path.Slice(3);
+
+                // Remove the last folder (if any) in the xamlSourcePath
+                int i = xamlFilePath.LastIndexOfAny('/', '\\');
+                if (i != -1)
                 {
-                    xamlSourcePath = current.XamlSourcePath;
-                    return true;
+                    xamlFilePath = xamlFilePath.Slice(0, i);
                 }
                 else
                 {
+                    xamlFilePath = ReadOnlySpan<char>.Empty;
+                }
+            }
+
+            string separator = (path.StartsWith("/".AsSpan()) || path.StartsWith("\\".AsSpan())) ? string.Empty : "/";
+
+            // Merge the path of the .XAML file with the relative URI specified as parameter of this method:
+            return ConvertComponentUri($"/{assemblyName}{AppResourcesManager.Component}{xamlFilePath.ToString()}{separator}{path.ToString()}");
+
+            static bool TryGetLocationOfXamlFile(UIElement element, out string xamlSourcePath)
+            {
+                UIElement current = element;
+
+                while (current is not null)
+                {
+                    if (!string.IsNullOrEmpty(current.XamlSourcePath))
+                    {
+                        xamlSourcePath = current.XamlSourcePath;
+                        return true;
+                    }
+
                     current = VisualTreeHelper.GetParent(current) as UIElement ?? (current as FrameworkElement)?.Parent as Popup;
                 }
-            }
-            xamlSourcePath = null;
-            return false;
-        }
 
-        //todo: Replace with "TrimStart" when it works in JSIL:
-        static string TrimStartChars(string value, char charToRemove)
-        {
-            int removeLength = 0;
-            for (int i = 0; i < value.Length; i++)
-            {
-                char let = value[i];
-                if (let == charToRemove)
-                {
-                    removeLength++;
-                }
-                else
-                {
-                    break;
-                }
+                xamlSourcePath = null;
+                return false;
             }
-            if (removeLength > 0)
-            {
-                return value.Substring(removeLength, value.Length - removeLength);
-            }
-            return value;
-        }
 
-        //todo: Replace with "TrimEnd" when it works in JSIL:
-        static string TrimEndChars(string value, char charToRemove)
-        {
-            int removeLength = 0;
-            for (int i = value.Length - 1; i >= 0; i--)
+            static bool StartsWithCollapseSeparator(ReadOnlySpan<char> input)
             {
-                char let = value[i];
-                if (let == charToRemove)
+                if (input.Length < 3)
                 {
-                    removeLength++;
+                    return false;
                 }
-                else
-                {
-                    break;
-                }
-            }
-            if (removeLength > 0)
-            {
-                return value.Substring(0, value.Length - removeLength);
-            }
-            return value;
-        }
 
-        static bool DoesPathContainAssemblyName(string path, out string assemblyName, out string pathAfterAssemblyName)
-        {
-            //BRIDGETODO: verify "to lower" & "to lower invariant" doesnt change much, otherwise, implement it
-            string pathLowercase = path.ToLower();
-            string[] listOfAssemblies = GetListOfLoadedAssemblies();
-            foreach (string assemblyShortName in listOfAssemblies)
-            {
-                if (pathLowercase.Contains("/" + assemblyShortName.ToLower() + "/"))
-                {
-                    assemblyName = assemblyShortName; // Note: here we deliberately do not call "ToLower()".
-                    pathAfterAssemblyName = pathLowercase.Substring(assemblyName.Length + 2); // + 2 because we want to remove "/assemblyName/"
-                    return true;
-                }
+                return input[0] == '.' && input[1] == '.' && (input[2] == '/' || input[2] == '\\');
             }
-            assemblyName = null;
-            pathAfterAssemblyName = null;
-            return false;
-        }
 
-        static string[] GetListOfLoadedAssemblies()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetName().Name).ToArray();
+            static Exception InvalidUriException(string uri)
+            {
+                return new Exception(
+                    @"Unless you specify the URI in XAML, the current version only supports absolute URIs that start with http:// or https:// or that are in the form of ""/AssemblyName;component/Folder/FileName"" or ""ms-appx:///AssemblyName/Folder/FileName"""
+                    + (!uri.Contains(":") ? @" - Try adding ""ms-appx:///YourAssemblyName/"" to the beginning of your path." : string.Empty));
+            }
         }
 
         public static Uri EnsureAbsoluteUri(string uriString)
         {
-            if (uriString.ToLower().StartsWith("http://") || uriString.ToLower().StartsWith("https://"))
+            if (AppResourcesManager.IsHttpUri(uriString) || AppResourcesManager.IsHttpsUri(uriString))
             {
                 return new Uri(uriString, UriKind.Absolute);
             }
@@ -341,18 +239,18 @@ namespace CSHTML5.Internal
             {
                 string originalString = HtmlPage.Document.DocumentUri.OriginalString;
                 int firstIndexOfSlashAfterNameOfDomain = -1;
-                string httpPrefix = "";
+                string httpPrefix = string.Empty;
                 string nameOfDomain = originalString;
-                if (originalString.ToLower().StartsWith("https://"))
+                if (AppResourcesManager.IsHttpsUri(originalString))
                 {
-                    httpPrefix = "https://";
-                    nameOfDomain = nameOfDomain.Substring(8);
+                    httpPrefix = AppResourcesManager.Https;
+                    nameOfDomain = nameOfDomain.Substring(AppResourcesManager.Https.Length);
                     firstIndexOfSlashAfterNameOfDomain = nameOfDomain.IndexOf('/');
                 }
-                else if (originalString.ToLower().StartsWith("http://"))
+                else if (AppResourcesManager.IsHttpUri(originalString))
                 {
-                    httpPrefix = "http://";
-                    nameOfDomain = nameOfDomain.Substring(7);
+                    httpPrefix = AppResourcesManager.Http;
+                    nameOfDomain = nameOfDomain.Substring(AppResourcesManager.Http.Length);
                     firstIndexOfSlashAfterNameOfDomain = nameOfDomain.IndexOf('/');
                 }
                 if (firstIndexOfSlashAfterNameOfDomain > -1)
@@ -367,15 +265,13 @@ namespace CSHTML5.Internal
                 int lastIndexOfSlash = originalString.LastIndexOf('/');
                 if (lastIndexOfSlash > -1)
                 {
-                    if (originalString.Substring(0, lastIndexOfSlash + 1).ToLower() == "https://"
-                        || originalString.Substring(0, lastIndexOfSlash + 1).ToLower() == "http://")
+                    if (AppResourcesManager.IsHttpsUri(originalString) || AppResourcesManager.IsHttpUri(originalString))
                     {
                         return new Uri(originalString + "/" + uriString, UriKind.Absolute);
                     }
                     else
                     {
-                        string absoluteUriAsString = originalString.Substring(0, lastIndexOfSlash + 1) + uriString;
-                        return new Uri(absoluteUriAsString, UriKind.Absolute);
+                        return new Uri(originalString.Substring(0, lastIndexOfSlash + 1) + uriString, UriKind.Absolute);
                     }
                 }
                 else
