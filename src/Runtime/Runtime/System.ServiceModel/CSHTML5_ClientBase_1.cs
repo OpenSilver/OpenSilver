@@ -995,7 +995,7 @@ namespace System.ServiceModel
 
                 if (interfaceType.GetCustomAttributes<ServiceContractAttribute>(false).FirstOrDefault() is ServiceContractAttribute serviceContractAttr)
                 {
-                    if (!string.IsNullOrEmpty(serviceContractAttr.Namespace))
+                    if (serviceContractAttr.Namespace is not null)
                     {
                         interfaceTypeNamespace = serviceContractAttr.Namespace;
                     }
