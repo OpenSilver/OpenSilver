@@ -542,7 +542,7 @@ namespace System.Windows.Controls
                     // handler will be fired when it's set to true in
                     // ChangeSelection
                     current.IgnorePropertyChange = true;
-                    current.IsSelected = false;
+                    current.SetCurrentValue(TreeViewItem.IsSelectedProperty, false);
 
                     ChangeSelection(current, current, true);
 
@@ -1065,7 +1065,7 @@ namespace System.Windows.Controls
                     oldValue = SelectedItem;
                     if (SelectedContainer != null)
                     {
-                        SelectedContainer.IsSelected = false;
+                        SelectedContainer.SetCurrentValue(TreeViewItem.IsSelectedProperty, false);
                         SelectedContainer.UpdateContainsSelection(false);
                     }
 
@@ -1094,7 +1094,7 @@ namespace System.Windows.Controls
                     raiseSelectionChanged = true;
                 }
 
-                container.IsSelected = selected;
+                container.SetCurrentValue(TreeViewItem.IsSelectedProperty, selected);
             }
             finally
             {
