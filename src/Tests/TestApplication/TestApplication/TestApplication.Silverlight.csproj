@@ -330,6 +330,11 @@
     <Compile Include="Tests\RadioButtonTest.xaml.cs">
       <DependentUpon>RadioButtonTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\ResourceDictionary\CachedResourceDictionary\CachedResourceDictionary.cs" />
+    <Compile Include="Tests\ResourceDictionary\CachedResourceDictionary\CountableInstance.cs" />
+    <Compile Include="Tests\ResourceDictionary\ResourceDictionaryTest.xaml.cs">
+      <DependentUpon>ResourceDictionaryTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\Right ClickTest.xaml.cs">
       <DependentUpon>Right ClickTest.xaml</DependentUpon>
     </Compile>
@@ -674,6 +679,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\RadioButtonTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\ResourceDictionary\CachedResourceDictionary\SomeResourceDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tests\ResourceDictionary\ResourceDictionaryTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

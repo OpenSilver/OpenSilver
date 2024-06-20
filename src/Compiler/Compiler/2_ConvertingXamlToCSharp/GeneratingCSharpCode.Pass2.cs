@@ -440,14 +440,26 @@ namespace OpenSilver.Compiler
                             _fileNameWithPathRelativeToProjectRoot,
                             _assemblyNameWithoutExtension);
 
+                        // Initially, ResourceDictionary (or subclass) is instantiated and remains empty.
                         parameters.StringBuilder.AppendLine(
                             string.Format(
-                                "var {0} = {3}.XamlContext_WriteStartObject({4}, (({1})new {2}()).CreateComponent());",
+                                "var {0} = {1}.XamlContext_WriteStartObject({2}, new {3}());",
                                 elementUniqueNameOrThisKeyword,
-                                $"{IXamlComponentFactoryClass}<{elementTypeInCSharp}>",
-                                XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
                                 RuntimeHelperClass,
-                                parameters.CurrentXamlContext
+                                parameters.CurrentXamlContext,
+                                elementTypeInCSharp
+                            )
+                        );
+
+                        // The ResourceDictionary content is only loaded the moment Source is set,
+                        // so users could do things like caching (by interrupting Source being set
+                        // in an ResourceDictionary subclass, and not having LoadComponent() called).
+                        parameters.StringBuilder.AppendLine(
+                            string.Format(
+                                "{0}.SourceChanged += (s, e) => {{ (({1})new {2}()).LoadComponent({0}); }};",
+                                elementUniqueNameOrThisKeyword,
+                                IXamlComponentLoaderClass,
+                                XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri)
                             )
                         );
                     }
