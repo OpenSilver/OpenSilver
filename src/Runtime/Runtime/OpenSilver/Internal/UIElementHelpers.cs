@@ -124,18 +124,12 @@ internal static class UIElementHelpers
 
     internal static void SetTextAlignment(this UIElement uie, TextAlignment textAlignment)
     {
-        uie.OuterDiv.Style.textAlign = textAlignment switch
-        {
-            TextAlignment.Center => "center",
-            TextAlignment.Right => "end",
-            TextAlignment.Justify => "justify",
-            _ => "start",
-        };
+        uie.OuterDiv.Style.textAlign = FontProperties.ToCssTextAlignment(textAlignment);
     }
 
     internal static void SetTextDecorations(this UIElement uie, TextDecorationCollection tdc)
     {
-        uie.OuterDiv.Style.textDecoration = tdc?.ToHtmlString() ?? string.Empty;
+        uie.OuterDiv.Style.textDecoration = FontProperties.ToCssTextDecoration(tdc);
     }
 
     internal static void SetTextTrimming(this UIElement uie, TextTrimming textTrimming)

@@ -24,7 +24,7 @@ internal abstract partial class TextViewBase : FrameworkElement
 
     internal TextViewBase(UIElement host)
     {
-        Debug.Assert(host is TextBox || host is PasswordBox);
+        Debug.Assert(host is TextBox || host is PasswordBox || host is RichTextBox);
 
         Host = host ?? throw new ArgumentNullException(nameof(host));
     }

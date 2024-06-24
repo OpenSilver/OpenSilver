@@ -11,13 +11,12 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Provides data for the <see cref="RichTextBox.ContentChanged"/> event.
+/// </summary>
+public sealed class ContentChangedEventArgs : RoutedEventArgs
 {
-    /// <summary>
-	/// Provides data for the <see cref="RichTextBox.ContentChanged"/> event.
-	/// </summary>
-	public sealed class ContentChangedEventArgs : RoutedEventArgs
-	{
-		internal ContentChangedEventArgs() { }
-    }
+    internal ContentChangedEventArgs() { }
 }

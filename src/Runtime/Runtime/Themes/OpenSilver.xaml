@@ -4082,10 +4082,10 @@
                             <controls:Border x:Name="MouseOverBorder"
                                              BorderThickness="1"
                                              BorderBrush="Transparent">
-                                <controls:ContentPresenter x:Name="ContentElement"
-                                                           Content="{markup:Null}"
-                                                           ContentTemplate="{markup:Null}"
-                                                           Margin="{TemplateBinding Padding}" />
+                                <controls:ScrollViewer x:Name="ContentElement"
+                                              Padding="{TemplateBinding Padding}"
+                                              BorderThickness="0"
+                                              IsTabStop="False" />
                             </controls:Border>
                         </controls:Border>
                         <controls:Border x:Name="DisabledVisualElement"

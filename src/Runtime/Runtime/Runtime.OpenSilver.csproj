@@ -40,7 +40,6 @@
 		<Compile Include="OpenSilver\Internal\Controls\EmptyEnumerator.cs" />
 		<Compile Include="OpenSilver\Internal\InheritablePropertyChangeInfo.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerLineBreak.cs" />
-		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBox.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerParagraph.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBlock.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRun.cs" />
@@ -214,12 +213,11 @@
 		<Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBlock.NotImplemented.cs" />
-		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDelta.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
-		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillRange.cs" />
-		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillRangeFormat.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxAutomationPeer.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextFormatParser.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\RichTextViewManager.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
@@ -384,7 +382,7 @@
 		<Compile Include="System.Windows.Controls\IGeneratorHost.cs" />
 		<Compile Include="System.Windows.Controls\RangeObservableCollection.cs" />
 		<Compile Include="System.Windows.Controls\ContentChangedEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
+		<Compile Include="System.Windows.Controls\ContentChangedEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\IDefinitionBase.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MediaElement.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
@@ -402,10 +400,10 @@
 		<Compile Include="System.Windows.Data\CollectionViewGroupRoot.cs" />
 		<Compile Include="System.Windows.Documents\BlockCollection.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\LogicalDirection.cs" />
+		<Compile Include="System.Windows.Documents\LogicalDirection.cs" />
 		<Compile Include="System.Windows.Documents\Paragraph.cs" />
 		<Compile Include="System.Windows.Documents\Section.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\TextPointer.cs" />
+		<Compile Include="System.Windows.Documents\TextPointer.cs" />
 		<Compile Include="System.Windows.Documents\TextSelection.cs" />
 		<Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />
 		<Compile Include="System.Windows.Media.Animation\BounceEase.cs" />

@@ -18,19 +18,28 @@ namespace System.Windows
     /// </summary>
     public static class FontStyles
     {
-        public static FontStyle Normal
-        {
-            get { return new FontStyle(0); }
-        }
+        /// <summary>
+        /// Specifies a normal, or roman, font style.
+        /// </summary>
+        /// <returns>
+        /// A font style that represents a normal, or roman, font style.
+        /// </returns>
+        public static FontStyle Normal => new FontStyle(0);
 
-        public static FontStyle Oblique
-        {
-            get { return new FontStyle(1); }
-        }
+        /// <summary>
+        /// Specifies an oblique font style.
+        /// </summary>
+        /// <returns>
+        /// A font style that represents an oblique font style.
+        /// </returns>
+        public static FontStyle Oblique => new FontStyle(1);
 
-        public static FontStyle Italic
-        {
-            get { return new FontStyle(2); }
-        }
+        /// <summary>
+        /// Specifies an italic font style.
+        /// </summary>
+        /// <returns>
+        /// A font style that represents an italic font style.
+        /// </returns>
+        public static FontStyle Italic => new FontStyle(2);
     }
 }

@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections;
-using System.Linq;
 using OpenSilver.Internal.Documents;
 
 namespace System.Windows.Documents;
@@ -57,16 +56,19 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
                 ClearVisualParent(item);
             }
 
-            try
+            if (TextContainer is ITextContainer textContainer)
             {
-                foreach (T item in oldItems)
+                try
                 {
-                    TextContainer.OnTextRemoved(item);
+                    foreach (T item in oldItems)
+                    {
+                        textContainer.OnTextRemoved(item);
+                    }
                 }
-            }
-            finally
-            {
-                TextContainer.OnTextContentChanged();
+                finally
+                {
+                    textContainer.OnTextContentChanged();
+                }
             }
         }
     }
@@ -100,25 +102,31 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
 
     private void OnAdd(T item, int index)
     {
-        try
+        if (TextContainer is ITextContainer textContainer)
         {
-            TextContainer.OnTextAdded(item, index);
-        }
-        finally
-        {
-            TextContainer.OnTextContentChanged();
+            try
+            {
+                textContainer.OnTextAdded(item, index);
+            }
+            finally
+            {
+                textContainer.OnTextContentChanged();
+            }
         }
     }
 
     private void OnRemove(T item)
     {
-        try
+        if (TextContainer is ITextContainer textContainer)
         {
-            TextContainer.OnTextRemoved(item);
-        }
-        finally
-        {
-            TextContainer.OnTextContentChanged();
+            try
+            {
+                textContainer.OnTextRemoved(item);
+            }
+            finally
+            {
+                textContainer.OnTextContentChanged();
+            }
         }
     }
 

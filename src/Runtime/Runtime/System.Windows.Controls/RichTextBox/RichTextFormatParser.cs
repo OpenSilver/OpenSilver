@@ -17,178 +17,177 @@ using System.Xml;
 using System.Windows.Documents;
 using DotNetForHtml5.Core;
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+internal static class RichTextXamlParser
 {
-    internal static class RichTextXamlParser
+    public static IEnumerable<Block> Parse(string xaml)
     {
-        public static IEnumerable<Block> Parse(string xaml)
-        {
-            List<Block> result = new List<Block>();
-            XmlDocument document = new XmlDocument();
-            document.LoadXml(xaml);
-            XmlNode root = document.SelectSingleNode("*");
-            result.AddRange(ParseInternal(root));
-            return result;
-        }
+        var document = new XmlDocument();
+        document.LoadXml(xaml);
 
-        private static IEnumerable<Block> ParseInternal(XmlNode node)
+        return ParseInternal(document.SelectSingleNode("*"));
+    }
+
+    private static IEnumerable<Block> ParseInternal(XmlNode node)
+    {
+        if (node is XmlElement)
         {
-            List<Block> result = new List<Block>();
-            if (node is XmlElement)
+            var currentNode = ProcessNode(node);
+
+            if (node.HasChildNodes)
             {
-                var currentNode = ProcessNode(node);
-                result.Add(currentNode);
-
-                if (node.HasChildNodes)
+                if (currentNode is Section section)
                 {
-                    if (currentNode is Section section)
+                    foreach (var item in ParseInternal(node.FirstChild))
                     {
-                        foreach (var item in ParseInternal(node.FirstChild))
-                        {
-                            section.Blocks.Add(item);
-                        }
+                        section.Blocks.Add(item);
                     }
-                    else if (currentNode is Paragraph paragraph)
+                }
+                else if (currentNode is Paragraph paragraph)
+                {
+                    foreach (XmlNode item in node.ChildNodes)
                     {
-                        foreach (XmlNode item in node.ChildNodes)
+                        var inline = ProcessNodeInline(item);
+                        if (inline != null)
                         {
-                            var inline = ProcessNodeInline(item);
-                            if (inline != null)
-                            {
-                                paragraph.Inlines.Add(inline);
-                            }
+                            paragraph.Inlines.Add(inline);
                         }
                     }
                 }
-
-                if (node.NextSibling != null)
-                {
-                    result.AddRange(ParseInternal(node.NextSibling));
-                }
-            }
-            return result;
-        }
-
-        private static Block ProcessNode(XmlNode node)
-        {
-            if (node.NodeType == XmlNodeType.Element)
-            {
-                if (node.Name == nameof(Section))
-                {
-                    var element = new Section();
-                    SetProperties(element, node);
-                    return element;
-                }
-                if (node.Name == nameof(Paragraph))
-                {
-                    var element = new Paragraph();
-                    SetProperties(element, node);
-                    return element;
-                }
             }
 
-            return null;
-        }
+            yield return currentNode;
 
-        private static Inline ProcessNodeInline(XmlNode node)
-        {
-            if (node.NodeType == XmlNodeType.Element)
+            if (node.NextSibling != null)
             {
-                if (node.Name == nameof(Run))
+                foreach (var sibling in ParseInternal(node.NextSibling))
                 {
-                    var element = new Run();
-                    SetProperties(element, node);
-                    element.Text = node.InnerText;
-                    return element;
-                }
-                if (node.Name == nameof(LineBreak))
-                {
-                    var element = new LineBreak();
-                    SetProperties(element, node);
-                    return element;
-                }
-                if (node.Name == nameof(InlineUIContainer))
-                {
-                    var element = new InlineUIContainer();
-                    SetProperties(element, node);
-                    return element;
-                }
-                if (node.Name == nameof(Span))
-                {
-                    var element = new Span();
-                    SetProperties(element, node);
-                    ProcessChildInlines(element, node);
-                    return element;
-                }
-                if (node.Name == nameof(Bold))
-                {
-                    var element = new Bold();
-                    SetProperties(element, node);
-                    ProcessChildInlines(element, node);
-                    return element;
-                }
-                if (node.Name == nameof(Italic))
-                {
-                    var element = new Italic();
-                    SetProperties(element, node);
-                    ProcessChildInlines(element, node);
-                    return element;
-                }
-                if (node.Name == nameof(Underline))
-                {
-                    var element = new Underline();
-                    SetProperties(element, node);
-                    ProcessChildInlines(element, node);
-                    return element;
-                }
-                if (node.Name == nameof(Hyperlink))
-                {
-                    var element = new Hyperlink();
-                    SetProperties(element, node);
-                    ProcessChildInlines(element, node);
-                    return element;
-                }
-            }
-            else if (node.NodeType == XmlNodeType.Text)
-            {
-                return node.InnerText; // return Run element with text
-            }
-
-            return null;
-        }
-
-        private static void ProcessChildInlines(Span element, XmlNode node)
-        {
-            foreach (XmlNode item in node.ChildNodes)
-            {
-                var inline = ProcessNodeInline(item);
-                if (inline != null)
-                {
-                    element.Inlines.Add(inline);
+                    yield return sibling;
                 }
             }
         }
+    }
 
-        private static void SetProperties(TextElement element, XmlNode node)
+    private static Block ProcessNode(XmlNode node)
+    {
+        if (node.NodeType == XmlNodeType.Element)
         {
-            foreach (XmlAttribute attribute in node.Attributes)
+            if (node.Name == nameof(Section))
             {
-                SetProperty(element, attribute.Name, attribute.Value);
+                var element = new Section();
+                SetProperties(element, node);
+                return element;
+            }
+            if (node.Name == nameof(Paragraph))
+            {
+                var element = new Paragraph();
+                SetProperties(element, node);
+                return element;
             }
         }
 
-        private static void SetProperty(object obj, string propertyName, object value)
+        return null;
+    }
+
+    private static Inline ProcessNodeInline(XmlNode node)
+    {
+        if (node.NodeType == XmlNodeType.Element)
         {
-            var propInfo = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-            if (propInfo != null)
+            if (node.Name == nameof(Run))
             {
-                try
-                {
-                    var val = value == null ? null : TypeFromStringConverters.ConvertFromInvariantString(propInfo.PropertyType, value.ToString());
-                    propInfo.SetValue(obj, val);
-                }
-                catch { }
+                var element = new Run();
+                element.Text = node.InnerText;
+                SetProperties(element, node);
+                return element;
             }
+            if (node.Name == nameof(LineBreak))
+            {
+                var element = new LineBreak();
+                SetProperties(element, node);
+                return element;
+            }
+            if (node.Name == nameof(InlineUIContainer))
+            {
+                var element = new InlineUIContainer();
+                SetProperties(element, node);
+                return element;
+            }
+            if (node.Name == nameof(Span))
+            {
+                var element = new Span();
+                SetProperties(element, node);
+                ProcessChildInlines(element, node);
+                return element;
+            }
+            if (node.Name == nameof(Bold))
+            {
+                var element = new Bold();
+                SetProperties(element, node);
+                ProcessChildInlines(element, node);
+                return element;
+            }
+            if (node.Name == nameof(Italic))
+            {
+                var element = new Italic();
+                SetProperties(element, node);
+                ProcessChildInlines(element, node);
+                return element;
+            }
+            if (node.Name == nameof(Underline))
+            {
+                var element = new Underline();
+                SetProperties(element, node);
+                ProcessChildInlines(element, node);
+                return element;
+            }
+            if (node.Name == nameof(Hyperlink))
+            {
+                var element = new Hyperlink();
+                SetProperties(element, node);
+                ProcessChildInlines(element, node);
+                return element;
+            }
+        }
+        else if (node.NodeType == XmlNodeType.Text)
+        {
+            return new Run { Text = node.InnerText };
+        }
+
+        return null;
+    }
+
+    private static void ProcessChildInlines(Span element, XmlNode node)
+    {
+        foreach (XmlNode item in node.ChildNodes)
+        {
+            var inline = ProcessNodeInline(item);
+            if (inline != null)
+            {
+                element.Inlines.Add(inline);
+            }
+        }
+    }
+
+    private static void SetProperties(TextElement element, XmlNode node)
+    {
+        foreach (XmlAttribute attribute in node.Attributes)
+        {
+            SetProperty(element, attribute.Name, attribute.Value);
+        }
+    }
+
+    private static void SetProperty(object obj, string propertyName, object value)
+    {
+        var propInfo = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+        if (propInfo != null)
+        {
+            try
+            {
+                var val = value == null ? null : TypeFromStringConverters.ConvertFromInvariantString(propInfo.PropertyType, value.ToString());
+                propInfo.SetValue(obj, val);
+            }
+            catch { }
         }
     }
 }

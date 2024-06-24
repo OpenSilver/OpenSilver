@@ -15,6 +15,7 @@ using System.Windows.Browser;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Media;
 
 namespace System.Windows.Documents;
 
@@ -140,7 +141,7 @@ public sealed class Hyperlink : Span
                     const string MouseOverTextDecorationsVariable = "--mouse-over-decoration";
 
                     Hyperlink hyperlink = (Hyperlink)d;
-                    string value = ((TextDecorationCollection)newValue)?.ToHtmlString() ?? string.Empty;
+                    string value = FontProperties.ToCssTextDecoration((TextDecorationCollection)newValue);
                     hyperlink.OuterDiv.Style.setProperty(MouseOverTextDecorationsVariable, value);
                 },
             });

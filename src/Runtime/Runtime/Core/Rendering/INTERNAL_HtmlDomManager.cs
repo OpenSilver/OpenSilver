@@ -668,6 +668,22 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
+        internal static INTERNAL_HtmlDomElementReference CreateRichTextBoxViewDomElementAndAppendIt(
+            INTERNAL_HtmlDomElementReference parent,
+            RichTextBoxView richTextBoxView)
+        {
+            Debug.Assert(parent is not null);
+            Debug.Assert(richTextBoxView is not null);
+
+            string uid = NewId();
+
+            RichTextViewManager.Instance.CreateView(uid, parent.UniqueIdentifier);
+
+            AddToGlobalStore(uid, richTextBoxView);
+
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
+        }
+
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static object CreateDomElementAndInsertIt(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition) //associatedUIElement is the UIElement of which the current dom element is a part.

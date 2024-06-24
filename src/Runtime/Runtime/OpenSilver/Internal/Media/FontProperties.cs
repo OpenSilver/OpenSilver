@@ -106,7 +106,21 @@ internal readonly struct FontProperties
     
     internal static string ToCssLetterSpacing(int spacing)
     {
-        double value = spacing / 1000.0;
-        return $"{value.ToInvariantString()}em";
+        return spacing switch
+        {
+            0 => "normal",
+            _ => $"{(spacing / 1000.0).ToInvariantString()}em",
+        };
     }
+
+    internal static string ToCssTextDecoration(TextDecorationCollection textDecoration) => textDecoration?.ToHtmlString() ?? string.Empty;
+
+    internal static string ToCssTextAlignment(TextAlignment textAlignment) =>
+        textAlignment switch
+        {
+            TextAlignment.Center => "center",
+            TextAlignment.Right => "end",
+            TextAlignment.Justify => "justify",
+            _ => "start",
+        };
 }

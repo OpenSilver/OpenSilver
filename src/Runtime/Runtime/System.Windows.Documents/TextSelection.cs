@@ -11,7 +11,9 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
 using System.Windows.Controls;
+using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Documents
 {
@@ -21,12 +23,11 @@ namespace System.Windows.Documents
     public sealed class TextSelection
     {
         private readonly RichTextBox _richTextBox;
-        private int _start;
-        private int _length;
 
         internal TextSelection(RichTextBox rtb)
         {
-            _richTextBox = rtb ?? throw new ArgumentNullException(nameof(rtb));
+            Debug.Assert(rtb is not null);
+            _richTextBox = rtb;
         }
 
         /// <summary>
@@ -35,8 +36,7 @@ namespace System.Windows.Documents
         /// <returns>
         /// A <see cref="TextPointer"/> that represents the end of the current selection.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public TextPointer End { get; }
+        public TextPointer End { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="TextPointer"/> that represents the beginning of the current selection.
@@ -44,8 +44,9 @@ namespace System.Windows.Documents
         /// <returns>
         /// A <see cref="TextPointer"/> that represents the beginning of the current selection.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public TextPointer Start { get; }
+        public TextPointer Start { get; private set; }
+
+        private int Length => End.Offset - Start.Offset;
 
         /// <summary>
         /// Gets or sets the plain text contents of the current selection.
@@ -55,8 +56,8 @@ namespace System.Windows.Documents
         /// </returns>
         public string Text
         {
-            get => _richTextBox.View?.GetText(_start, _length) ?? string.Empty;
-            set => _richTextBox.View?.SetText(_start, _length, value);
+            get => _richTextBox.View?.GetText(Start.Offset, Length) ?? string.Empty;
+            set => _richTextBox.View?.SetText(Start.Offset, Length, value);
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace System.Windows.Documents
         /// </returns>
         public string Xaml
         {
-            get => _richTextBox.View?.GetContents(_start, _length);
+            get => _richTextBox.View?.GetContents(Start.Offset, Length) ?? string.Empty;
             set
             {
                 //TODO: implement
@@ -86,7 +87,7 @@ namespace System.Windows.Documents
         /// The value for the formatting property.
         /// </param>
         public void ApplyPropertyValue(DependencyProperty formattingProperty, object value)
-            => _richTextBox.View?.SetPropertyValue(formattingProperty, value, _start, _length);
+            => _richTextBox.View?.Format(formattingProperty, value);
 
         /// <summary>
         /// Gets the value of the specified formatting property on the current selection.
@@ -99,8 +100,8 @@ namespace System.Windows.Documents
         /// current selection.
         /// </returns>
         public object GetPropertyValue(DependencyProperty formattingProperty)
-            => _richTextBox.View?.GetPropertyValue(formattingProperty, _start, _length);
-        
+            => _richTextBox.View?.GetFormat(formattingProperty);
+
         /// <summary>
         /// Inserts or replaces the content at the current selection as a <see cref="TextElement"/>.
         /// </summary>
@@ -108,14 +109,8 @@ namespace System.Windows.Documents
         /// The <see cref="TextElement"/> to be inserted.
         /// </param>
         public void Insert(TextElement element)
-        {
-            //TODO: support other TextElements
-            if (element is Run run)
-            {
-                _richTextBox.View?.SetText(_start, _length, run.Text);
-            }
-        }
-        
+            => _richTextBox.View?.UpdateContentsFromTextElement(element, Start.Offset, Length);
+
         /// <summary>
         /// Updates the current selection, taking two <see cref="TextPointer"/>
         /// positions to indicate the updated selection.
@@ -126,19 +121,41 @@ namespace System.Windows.Documents
         /// <param name="movingPosition">
         /// A movable position that marks the other end of the updated selection.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// anchorPosition or movingPosition is null.
+        /// </exception>
         /// <exception cref="ArgumentException">
         /// Position specifies a position from a different <see cref="RichTextBox"/>
         /// associated with the current position.
         /// </exception>
-        [OpenSilver.NotImplemented]
         public void Select(TextPointer anchorPosition, TextPointer movingPosition)
         {
+            if (anchorPosition is null)
+            {
+                throw new ArgumentNullException(nameof(anchorPosition));
+            }
+            if (movingPosition is null)
+            {
+                throw new ArgumentNullException(nameof(movingPosition));
+            }
+            if (anchorPosition.VisualParent != _richTextBox || movingPosition.VisualParent != _richTextBox)
+            {
+                throw new ArgumentException("TextPointer is not in the TextTree associated with this object.");
+            }
+
+            if (_richTextBox.View is RichTextBoxView view)
+            {
+                int start = Math.Min(anchorPosition.Offset, movingPosition.Offset);
+                int length = Math.Abs(anchorPosition.Offset - movingPosition.Offset);
+
+                view.Select(start, length);
+            }
         }
 
-        internal void UpdateSelection(int start, int length)
+        internal void Update(int start, int length)
         {
-            _start = start;
-            _length = length;
+            Start = new TextPointer(_richTextBox, start, LogicalDirection.Backward);
+            End = new TextPointer(_richTextBox, start + length, LogicalDirection.Forward);
         }
     }
 }

@@ -29,7 +29,6 @@ internal static class TextContainersHelper
             RichTextBlock richTextBlock => new TextContainerRichTextBlock(richTextBlock),
             Paragraph paragraph => new TextContainerParagraph(paragraph),
             Section section => new TextContainerSection(section),
-            RichTextBox richTextBox => new TextContainerRichTextBox(richTextBox),
             _ => null,
         };
 
@@ -39,7 +38,6 @@ internal static class TextContainersHelper
             TextElement textElement => textElement.TextContainer,
             TextBlock textBlock => textBlock.Inlines.TextContainer,
             RichTextBlock richTextBlock => richTextBlock.Blocks.TextContainer,
-            RichTextBox richTextBox => richTextBox.Blocks.TextContainer,
             _ => null,
         };
 }

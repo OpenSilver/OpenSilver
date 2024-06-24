@@ -21,7 +21,6 @@ namespace System.Windows.Documents;
 /// elements.
 /// </summary>
 [ContentProperty(nameof(Blocks))]
-[OpenSilver.NotImplemented]
 public sealed class Section : Block
 {
     private BlockCollection _blocks;
@@ -70,5 +69,17 @@ public sealed class Section : Block
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);
         }
+    }
+
+    internal sealed override int VisualChildrenCount => Blocks.Count;
+
+    internal sealed override UIElement GetVisualChild(int index)
+    {
+        if (index >= VisualChildrenCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        return Blocks.InternalItems[index];
     }
 }
