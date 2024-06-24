@@ -627,7 +627,6 @@
 		<Compile Include="System.ComponentModel\SortDescription.cs" />
 		<Compile Include="System.ComponentModel\SortDescriptionCollection.cs" />
 		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettings.cs" />
-		<Compile Include="System.IO.IsolatedStorage\IsolatedStorageSettingsForCSharp.cs" />
 		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSettings.cs" />
 		<Compile Include="System.Net\CredentialsMode.cs" />
 		<Compile Include="System.Runtime.Serialization\CollectionDataContract2Attribute.cs" />
