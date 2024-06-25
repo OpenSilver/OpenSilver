@@ -154,6 +154,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
         SetAcceptsReturn(host.AcceptsReturn);
         SetAcceptsTab(host.AcceptsTab);
+        INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "spellcheck", host.IsSpellCheckEnabled);
 
         SetContentsFromBlocks();
     }
@@ -861,6 +862,14 @@ internal sealed class RichTextBoxView : TextViewBase
     }
 
     internal void OnIsReadOnlyChanged() => SetEnable(!IsReadOnly);
+
+    internal void OnIsSpellCheckEnabledChanged(bool isSpellCheckEnabled)
+    {
+        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && OuterDiv is not null)
+        {
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(OuterDiv, "spellcheck", isSpellCheckEnabled);
+        }
+    }
 
     internal void OnTextWrappingChanged(TextWrapping textWrapping)
     {

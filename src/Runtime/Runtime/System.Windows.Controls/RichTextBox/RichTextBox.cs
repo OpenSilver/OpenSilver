@@ -277,6 +277,35 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="IsSpellCheckEnabled"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsSpellCheckEnabledProperty =
+            DependencyProperty.Register(
+                nameof(IsSpellCheckEnabled),
+                typeof(bool),
+                typeof(RichTextBox),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSpellCheckEnabledChanged));
+
+        /// <summary>
+        /// Gets or sets a value that specifies whether the <see cref="RichTextBox"/> input 
+        /// interacts with a spell check engine.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="RichTextBox"/> input interacts with a spell check engine; 
+        /// otherwise, false. The default is false.
+        /// </returns>
+        public bool IsSpellCheckEnabled
+        {
+            get => (bool)GetValue(IsSpellCheckEnabledProperty);
+            set => SetValueInternal(IsSpellCheckEnabledProperty, value);
+        }
+
+        private static void OnIsSpellCheckEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((RichTextBox)d).View?.OnIsSpellCheckEnabledChanged((bool)e.NewValue);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="LineHeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty LineHeightProperty =
