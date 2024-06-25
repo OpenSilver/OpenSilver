@@ -113,7 +113,7 @@ internal readonly struct FontProperties
         };
     }
 
-    internal static string ToCssTextDecoration(TextDecorationCollection textDecoration) => textDecoration?.ToHtmlString() ?? string.Empty;
+    internal static string ToCssTextDecoration(TextDecorationCollection textDecoration) => textDecoration?.ToHtmlString() ?? "none";
 
     internal static string ToCssTextAlignment(TextAlignment textAlignment) =>
         textAlignment switch

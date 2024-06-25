@@ -15,38 +15,22 @@ namespace System.Windows
 {
     public sealed class TextDecorationCollection
     {
-        internal TextDecorationCollection() { }
+        internal TextDecorationCollection(TextDecorationLocation location)
+        {
+            Location = location;
+        }
 
-        internal TextDecoration Decoration { get; set; }
+        internal TextDecorationLocation Location { get; }
 
         internal string ToHtmlString()
         {
-            if (Decoration != null)
+            return Location switch
             {
-                switch (Decoration.Location)
-                {
-                    case TextDecorationLocation.Underline:
-                        return "underline";
-                    case TextDecorationLocation.Strikethrough:
-                        return "line-through";
-                    case TextDecorationLocation.OverLine:
-                        return "overline";
-                    //case TextDecorationLocation.Baseline:
-                    //    break;
-                }
-            }
-
-            return string.Empty;
+                TextDecorationLocation.Underline => "underline",
+                TextDecorationLocation.Strikethrough => "line-through",
+                TextDecorationLocation.OverLine => "overline",
+                _ => "none",
+            };
         }
-    }
-
-    internal sealed class TextDecoration
-    {
-        internal TextDecoration(TextDecorationLocation location)
-        {
-            this.Location = location;
-        }
-
-        internal TextDecorationLocation Location { get; private set; }
     }
 }

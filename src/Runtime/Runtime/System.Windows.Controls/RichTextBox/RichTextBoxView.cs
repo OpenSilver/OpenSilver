@@ -25,7 +25,6 @@ using System.Windows.Media;
 using System.Xml;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Media;
-using System.Collections;
 
 namespace OpenSilver.Internal.Controls;
 
@@ -440,28 +439,274 @@ internal sealed class RichTextBoxView : TextViewBase
             $"document.richTextViewManager.format('{OuterDiv.UniqueIdentifier}', '{property}', {HttpUtility.JavaScriptStringEncode(value, true)})");
     }
 
-    internal string GetContents()
+    internal string GetXaml() => GetXaml(GetContents());
+
+    internal string GetXaml(int start, int length) => GetXaml(GetContents(start, length));
+
+    private string GetXaml(QuillDelta[] contents)
     {
-        if (OuterDiv is null)
+        if (contents.Length == 0)
         {
             return string.Empty;
         }
 
-        return GetXamlContents(
-            Interop.ExecuteJavaScriptString(
-                $"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}')"));
+        Span<QuillDelta> deltas = RemoveTrailingLineBreak(contents);
+
+        var xaml = new XmlDocument();
+        xaml.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></Section>");
+
+        var runDelta = new List<QuillDelta>();
+
+        foreach (QuillDelta delta in deltas)
+        {
+            if (!IsEndOfParagraph(delta))
+            {
+                runDelta.Add(delta);
+                continue;
+            }
+
+            int start = FindStartOfParagraph(runDelta);
+
+            if (start > 0)
+            {
+                xaml.DocumentElement.AppendChild(CreateParagraph(xaml, default, runDelta.Take(start)));
+            }
+
+            var paragraph = CreateParagraph(xaml, delta.Attributes.Value, runDelta.Skip(start));
+
+            string text = delta.Text.EndsWith("\n") ? delta.Text.Substring(0, delta.Text.Length - 1) : delta.Text;
+            if (!string.IsNullOrEmpty(text))
+            {
+                paragraph.AppendChild(CreateRun(xaml, new QuillDelta { Text = text }));
+            }
+
+            xaml.DocumentElement.AppendChild(paragraph);
+
+            runDelta.Clear();
+        }
+
+        if (runDelta.Count > 0)
+        {
+            xaml.DocumentElement.AppendChild(CreateParagraph(xaml, default, runDelta));
+        }
+
+        return xaml.OuterXml;
+
+        static Span<QuillDelta> RemoveTrailingLineBreak(Span<QuillDelta> deltas)
+        {
+            ref QuillDelta delta = ref deltas[deltas.Length - 1];
+
+            if (delta.Text == "\n" && !delta.Attributes.HasValue)
+            {
+                return deltas.Slice(0, deltas.Length - 1);
+            }
+
+            if (delta.Text.EndsWith("\n"))
+            {
+                delta.Text = delta.Text.Substring(0, delta.Text.Length - 1);
+            }
+
+            return deltas;
+        }
+
+        static bool IsEndOfParagraph(QuillDelta delta)
+        {
+            return delta.Attributes is QuillRangeFormat format &&
+                (!string.IsNullOrEmpty(format.TextAlignment) || !string.IsNullOrEmpty(format.LineHeight));
+        }
+
+        static int FindStartOfParagraph(List<QuillDelta> deltas)
+        {
+            for (int i = deltas.Count - 1; i >= 0; i--)
+            {
+                QuillDelta delta = deltas[i];
+                int index = delta.Text.LastIndexOf('\n');
+                if (index != -1)
+                {
+                    deltas[i] = new QuillDelta
+                    {
+                        Text = delta.Text.Substring(0, index),
+                        Attributes = delta.Attributes,
+                    };
+                    deltas.Insert(i + 1, new QuillDelta
+                    {
+                        Text = delta.Text.Substring(index + 1),
+                        Attributes = delta.Attributes,
+                    });
+
+                    return i + 1;
+                }
+            }
+
+            return 0;
+        }
     }
 
-    internal string GetContents(int start, int length)
+    private XmlElement CreateRun(XmlDocument document, QuillDelta delta)
+    {
+        var run = document.CreateElement(nameof(Run), document.DocumentElement.NamespaceURI);
+
+        run.SetAttribute(nameof(Run.Text), delta.Text);
+
+        QuillRangeFormat format = delta.Attributes ?? default;
+        run.SetAttribute(nameof(TextElement.FontFamily), format.FontFamily switch
+        {
+            null or "" => ((FontFamily)GetValue(TextElement.FontFamilyProperty)).Source,
+            _ => format.FontFamily,
+        });
+
+        run.SetAttribute(nameof(TextElement.FontWeight), format.FontWeight switch
+        {
+            _ when int.TryParse(
+                format.FontWeight,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out int weight) && FontWeights.FontWeightToString(weight, out string fontWeight) => fontWeight,
+            _ => ((FontWeight)GetValue(TextElement.FontWeightProperty)).ToString(),
+        });
+
+        run.SetAttribute(nameof(TextElement.FontStyle), format.FontStyle switch
+        {
+            "normal" => nameof(FontStyles.Normal),
+            "italic" => nameof(FontStyles.Italic),
+            "oblique" => nameof(FontStyles.Oblique),
+            _ => ((FontStyle)GetValue(TextElement.FontStyleProperty)).ToString(),
+        });
+
+        run.SetAttribute(nameof(TextElement.FontSize), format.FontSize switch
+        {
+            null or "" => ((double)GetValue(TextElement.FontSizeProperty)).ToInvariantString(),
+            _ => format.FontSize.Substring(0, format.FontSize.Length - 2), // Remove 'px'
+        });
+
+        run.SetAttribute(nameof(TextElement.Foreground), format.Foreground switch
+        {
+            string when TryParseCssColor(format.Foreground, out Color color) => color.ToString(CultureInfo.InvariantCulture),
+            _ => (Brush)GetValue(TextElement.ForegroundProperty) switch
+            {
+                SolidColorBrush scb => scb.GetColorWithOpacity().ToString(CultureInfo.InvariantCulture),
+                _ => "Black",
+            },
+        });
+
+        run.SetAttribute(nameof(TextElement.CharacterSpacing), format.CharacterSpacing switch
+        {
+            "normal" => "0",
+            { Length: > 2 } when double.TryParse(
+                format.CharacterSpacing.Substring(0, format.CharacterSpacing.Length - 2), // Remove 'em'
+                NumberStyles.Float | NumberStyles.AllowThousands,
+                CultureInfo.InvariantCulture,
+                out double cSpacing) => ((int)(1000 * cSpacing)).ToInvariantString(),
+            _ => ((int)GetValue(TextElement.CharacterSpacingProperty)).ToInvariantString(),
+        });
+
+        run.SetAttribute(nameof(Inline.TextDecorations), format.TextDecorations switch
+        {
+            "underline" => nameof(TextDecorations.Underline),
+            "line-through" => nameof(TextDecorations.Strikethrough),
+            "overline" => nameof(TextDecorations.OverLine),
+            "none" => "None",
+            _ => (TextDecorationCollection)GetValue(Inline.TextDecorationsProperty) switch
+            {
+                null => "None",
+                TextDecorationCollection decoration => decoration.Location switch
+                {
+                    TextDecorationLocation.Underline => nameof(TextDecorations.Underline),
+                    TextDecorationLocation.Strikethrough => nameof(TextDecorations.Strikethrough),
+                    TextDecorationLocation.OverLine => nameof(TextDecorations.OverLine),
+                    _ => "None",
+                },
+            }
+        });
+
+        return run;
+    }
+
+    private static bool TryParseCssColor(string cssColor, out Color color)
+    {
+        if (cssColor.StartsWith("rgb("))
+        {
+            string[] rgb = cssColor.Substring(4, cssColor.Length - 5).Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (rgb.Length == 3)
+            {
+                color = Color.FromRgb(
+                    byte.Parse(rgb[0], CultureInfo.InvariantCulture),
+                    byte.Parse(rgb[1], CultureInfo.InvariantCulture),
+                    byte.Parse(rgb[2], CultureInfo.InvariantCulture));
+                return true;
+            }
+        }
+        else if (cssColor.StartsWith("rgba("))
+        {
+            string[] rgba = cssColor.Substring(5, cssColor.Length - 6).Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (rgba.Length == 4)
+            {
+                color = Color.FromArgb(
+                    (byte)(255 * double.Parse(rgba[3], CultureInfo.InvariantCulture)),
+                    byte.Parse(rgba[0], CultureInfo.InvariantCulture),
+                    byte.Parse(rgba[1], CultureInfo.InvariantCulture),
+                    byte.Parse(rgba[2], CultureInfo.InvariantCulture));
+                return true;
+            }
+        }
+
+        color = default;
+        return false;
+    }
+
+    private XmlElement CreateParagraph(XmlDocument document, QuillRangeFormat format, IEnumerable<QuillDelta> deltas)
+    {
+        var paragraph = document.CreateElement(nameof(Paragraph), document.DocumentElement.NamespaceURI);
+        paragraph.SetAttribute(nameof(Block.TextAlignment), format.TextAlignment switch
+        {
+            "center" => nameof(TextAlignment.Center),
+            "end" => nameof(TextAlignment.Right),
+            "justify" => nameof(TextAlignment.Justify),
+            _ => nameof(TextAlignment.Left),
+        });
+        paragraph.SetAttribute(nameof(Block.LineHeight), format.LineHeight switch
+        {
+            "normal" or "" or null => "0",
+            _ => format.LineHeight.Substring(0, format.LineHeight.Length - 2), // Remove 'px'
+        });
+
+        foreach (QuillDelta d in deltas)
+        {
+            if (!string.IsNullOrEmpty(d.Text))
+            {
+                paragraph.AppendChild(CreateRun(document, d));
+            }
+        }
+
+        return paragraph;
+    }
+
+    private QuillDelta[] GetContents()
     {
         if (OuterDiv is null)
         {
-            return string.Empty;
+            return Array.Empty<QuillDelta>();
         }
 
-        return GetXamlContents(
-            Interop.ExecuteJavaScriptString(
-                $"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}', {start.ToInvariantString()}, {length.ToInvariantString()})"));
+        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}')") switch
+        {
+            "" or null => Array.Empty<QuillDelta>(),
+            string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
+        };
+    }
+
+    private QuillDelta[] GetContents(int start, int length)
+    {
+        if (OuterDiv is null)
+        {
+            return Array.Empty<QuillDelta>();
+        }
+
+        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getContents('{OuterDiv.UniqueIdentifier}', {start.ToInvariantString()}, {length.ToInvariantString()})") switch
+        {
+            "" or null => Array.Empty<QuillDelta>(),
+            string contents => JsonSerializer.Deserialize<QuillDelta[]>(contents, SerializerOptions),
+        };
     }
 
     internal void SetEnable(bool value)
@@ -473,116 +718,6 @@ internal sealed class RichTextBoxView : TextViewBase
 
         Interop.ExecuteJavaScriptVoid(
             $"document.richTextViewManager.enable('{OuterDiv.UniqueIdentifier}', {(value ? "true" : "false")})");
-    }
-
-    private string GetFontName(string fontName)
-    {
-        var names = fontName.Split('-');
-        return string.Join(" ", names);
-    }
-
-    private string GetXamlContents(string content)
-    {
-        var deltas = JsonSerializer.Deserialize<QuillDelta[]>(content);
-        if (deltas is null || deltas.Length == 0)
-        {
-            return null;
-        }
-
-        var xaml = new XmlDocument();
-        xaml.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Paragraph/></Section>");
-        var paragraph = xaml.DocumentElement.FirstChild;
-
-        foreach (QuillDelta delta in deltas)
-        {
-            var run = xaml.CreateElement("Run", xaml.DocumentElement.NamespaceURI);
-            run.InnerText = delta.Text.TrimEnd('\n');
-
-            if (delta.Attributes is QuillRangeFormat format)
-            {
-                if (!string.IsNullOrEmpty(format.FontFamily))
-                {
-                    run.SetAttribute(nameof(TextElement.FontFamily), format.FontFamily);
-                }
-                if (!string.IsNullOrEmpty(format.FontWeight))
-                {
-                    if (int.TryParse(format.FontWeight, NumberStyles.Integer, CultureInfo.InvariantCulture, out int weight) &&
-                        FontWeights.FontWeightToString(weight, out string fontWeight))
-                    {
-                        run.SetAttribute(nameof(TextElement.FontWeight), fontWeight);
-                    }
-                }
-                if (!string.IsNullOrEmpty(format.FontStyle))
-                {
-                    run.SetAttribute(nameof(TextElement.FontStyle), format.FontStyle switch
-                    {
-                        "italic" => nameof(FontStyles.Italic),
-                        "oblique" => nameof(FontStyles.Oblique),
-                        _ => nameof(FontStyles.Normal),
-                    });
-                }
-                if (!string.IsNullOrEmpty(format.FontSize))
-                {
-                    run.SetAttribute(nameof(TextElement.FontSize), format.FontSize.Substring(0, format.FontSize.Length - 2)); // Remove 'px'
-                }
-                if (!string.IsNullOrEmpty(format.Foreground))
-                {
-                    if (format.Foreground.StartsWith("rgb("))
-                    {
-                        string[] rgb = format.Foreground.Substring(4, format.Foreground.Length - 5).Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (rgb.Length == 3)
-                        {
-                            Color color = Color.FromRgb(
-                                byte.Parse(rgb[0], CultureInfo.InvariantCulture),
-                                byte.Parse(rgb[1], CultureInfo.InvariantCulture),
-                                byte.Parse(rgb[2], CultureInfo.InvariantCulture));
-                            run.SetAttribute(nameof(TextElement.Foreground), color.ToString(CultureInfo.InvariantCulture));
-                        }
-                    }
-                    else if (format.Foreground.StartsWith("rgba("))
-                    {
-                        string[] rgba = format.Foreground.Substring(5, format.Foreground.Length - 6).Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (rgba.Length == 4)
-                        {
-                            Color color = Color.FromArgb(
-                                (byte)(255 * double.Parse(rgba[3], CultureInfo.InvariantCulture)),
-                                byte.Parse(rgba[0], CultureInfo.InvariantCulture),
-                                byte.Parse(rgba[1], CultureInfo.InvariantCulture),
-                                byte.Parse(rgba[2], CultureInfo.InvariantCulture));
-                            run.SetAttribute(
-                                nameof(TextElement.Foreground),
-                                color.ToString(CultureInfo.InvariantCulture));
-                        }
-                    }
-                }
-                if (!string.IsNullOrEmpty(format.CharacterSpacing))
-                {
-                    if (double.TryParse(
-                        format.CharacterSpacing.Substring(0, format.CharacterSpacing.Length - 2), // Remove 'em'
-                        NumberStyles.Float | NumberStyles.AllowThousands,
-                        CultureInfo.InvariantCulture,
-                        out double cssSpacing))
-                    {
-                        int spacing = (int)(1000 * cssSpacing);
-                        run.SetAttribute(nameof(TextElement.CharacterSpacing), spacing.ToInvariantString());
-                    }
-                }
-                if (!string.IsNullOrEmpty(format.TextDecorations))
-                {
-                    run.SetAttribute(nameof(Inline.TextDecorations), format.TextDecorations switch
-                    {
-                        "underline" => nameof(TextDecorations.Underline),
-                        "line-through" => nameof(TextDecorations.Strikethrough),
-                        "overline" => nameof(TextDecorations.OverLine),
-                        _ => "None",
-                    });
-                }
-            }
-
-            paragraph.AppendChild(run);
-        }
-
-        return xaml.OuterXml;
     }
 
     internal void SetContentsFromBlocks()
@@ -660,10 +795,24 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         return block switch
         {
-            Section section => GetDeltas(section.Blocks),
-            Paragraph paragraph => GetDeltas(paragraph.Inlines),
+            Section section when section.Blocks.Count > 0 => GetDeltas(section.Blocks),
+            Section section => GetDeltas(section.Blocks).Append(CloseBlock(section)),
+            Paragraph paragraph => GetDeltas(paragraph.Inlines).Append(CloseBlock(paragraph)),
             _ => Enumerable.Empty<QuillDelta>(),
         };
+
+        static QuillDelta CloseBlock(Block block)
+        {
+            return new QuillDelta
+            {
+                Text = "\n",
+                Attributes = new QuillRangeFormat
+                {
+                    TextAlignment = FontProperties.ToCssTextAlignment(block.TextAlignment),
+                    LineHeight = FontProperties.ToCssLineHeight(block.LineHeight),
+                },
+            };
+        }
     }
 
     private static IEnumerable<QuillDelta> GetDeltas(Inline inline)

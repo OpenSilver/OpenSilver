@@ -170,7 +170,7 @@ namespace System.Windows.Controls
         /// </returns>
         public string Xaml
         {
-            get => View.GetContents();
+            get => View?.GetXaml() ?? string.Empty;
             set
             {
                 Blocks.Clear();

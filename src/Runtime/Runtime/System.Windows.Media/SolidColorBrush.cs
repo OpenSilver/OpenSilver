@@ -84,6 +84,18 @@ namespace System.Windows.Media
 
         internal string ToHtmlString() => Color.ToHtmlString(Opacity);
 
+        internal Color GetColorWithOpacity()
+        {
+            Color color = Color;
+            double opacity = Math.Max(0, Math.Min(Opacity, 1));
+
+            return Color.FromArgb(
+                (byte)(opacity * color.A),
+                color.R,
+                color.G,
+                color.B);
+        }
+
         internal override ISvgBrush GetSvgElement(Shape shape) => new SvgSolidColorBrush(this);
 
         private sealed class SvgSolidColorBrush : ISvgBrush

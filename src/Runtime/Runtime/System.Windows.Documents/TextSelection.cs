@@ -70,7 +70,7 @@ namespace System.Windows.Documents
         /// </returns>
         public string Xaml
         {
-            get => _richTextBox.View?.GetContents(Start.Offset, Length) ?? string.Empty;
+            get => _richTextBox.View?.GetXaml(Start.Offset, Length) ?? string.Empty;
             set
             {
                 //TODO: implement

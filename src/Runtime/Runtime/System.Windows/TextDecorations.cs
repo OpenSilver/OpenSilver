@@ -21,55 +21,34 @@ namespace System.Windows
         static TextDecorations()
         {
             // Underline
-            underline = new TextDecorationCollection();
-            underline.Decoration = new TextDecoration(TextDecorationLocation.Underline);
+            Underline = new TextDecorationCollection(TextDecorationLocation.Underline);
 
             // Striketrough
-            strikethrough = new TextDecorationCollection();
-            strikethrough.Decoration = new TextDecoration(TextDecorationLocation.Strikethrough);
+            Strikethrough = new TextDecorationCollection(TextDecorationLocation.Strikethrough);
 
             // Overline
-            overline = new TextDecorationCollection();
-            overline.Decoration = new TextDecoration(TextDecorationLocation.OverLine);
+            OverLine = new TextDecorationCollection(TextDecorationLocation.OverLine);
 
             ////Baseline
-            //baseline = new TextDecorationCollection();
-            //baseline.Decoration = new TextDecoration(TextDecorationLocation.Baseline);
+            //Baseline = new TextDecorationCollection(TextDecorationLocation.Baseline);
         }
 
         /// <summary>
         /// Specifies an underlined text decoration.
         /// </summary>
-        public static TextDecorationCollection Underline
-        {
-            get { return underline; }
-        }
+        public static TextDecorationCollection Underline { get; }
 
         /// <summary>
         /// Specifies a strikethrough text decoration
         /// </summary>
-        public static TextDecorationCollection Strikethrough
-        {
-            get { return strikethrough; }
-        }
+        public static TextDecorationCollection Strikethrough { get; }
 
         /// <summary>
         /// Specifies an overlined text decoration.
         /// </summary>
-        public static TextDecorationCollection OverLine
-        {
-            get { return overline; }
-        }
+        public static TextDecorationCollection OverLine { get; }
 
-        //public static TextDecorationCollection Baseline
-        //{
-        //    get { return baseline; }
-        //}
-
-        private static readonly TextDecorationCollection underline;
-        private static readonly TextDecorationCollection strikethrough;
-        private static readonly TextDecorationCollection overline;
-        //private static readonly TextDecorationCollection baseline;
+        //public static TextDecorationCollection Baseline { get; }
     }
 
     /// <summary>
