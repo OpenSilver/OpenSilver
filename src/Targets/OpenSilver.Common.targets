@@ -207,13 +207,6 @@
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-2.2/"/>
 
     <!--============================================================
-      Validate that XAML files have "MSBuild:Compile" set for their "Custom Tool" property (useful for always-up-to-date Intellisense) (only during Pass 1):
-      ============================================================-->
-    <Error
-      Condition="'%(Content.Extension)'=='.xaml' And '%(Content.Generator)'=='' And '$(IsSecondPass)'!='True' And '$(IgnoreMissingCustomTool)'!='True'"
-      Text="Before you can build the project, please go to Solution Explorer, select the file '%(Content.FileName).xaml', hit F4, and enter 'MSBuild:Compile' (without the quotes) in the 'Custom Tool' property. You will need to do the same for all XAML files in the project."/>
-
-    <!--============================================================
       ServiceReferenceFixer (case insensitive) (only during Pass 2)
       ============================================================-->
 	  <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
