@@ -178,11 +178,25 @@ namespace System.Windows
             }
         }
 
+        // SourceChanged is used by the Compiler to only call LoadComponent() the moment Source is set,
+        // so that users could do things like caching (by interrupting Source being set
+        // in an ResourceDictionary subclass, and not having LoadComponent() called).
+        public event EventHandler SourceChanged;
+
         /// <summary>
         /// Gets or sets a Uniform Resource Identifier (URI) that provides the source
         /// location of a merged resource dictionary.
         /// </summary>
-        public Uri Source { get; set; }  // NOTE: This is used during COMPILE-TIME only.
+        private Uri _source;
+        public Uri Source
+        {
+            get => _source;
+            set
+            {
+                _source = value;
+                SourceChanged?.Invoke(this, EventArgs.Empty);
+            }
+        } // NOTE: This is used during COMPILE-TIME only.
 
         /// <summary>
         /// Gets an <see cref="ICollection"/> object containing the values of the <see cref="ResourceDictionary"/>.
