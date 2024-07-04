@@ -1,0 +1,7 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:crd="clr-namespace:TestApplication.Tests.ResourceDictionary.CachedResourceDictionary">
+
+    <crd:CountableInstance x:Key="SomeCountableInstance"/>
+</ResourceDictionary>

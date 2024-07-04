@@ -1,0 +1,35 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.ResourceDictionaryTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+           xmlns:crd="clr-namespace:TestApplication.Tests.ResourceDictionary.CachedResourceDictionary"
+           xmlns:rd="clr-namespace:TestApplication.Tests.ResourceDictionary">
+    <sdk:Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <crd:CachedResourceDictionary Source="/Tests/ResourceDictionary/CachedResourceDictionary/CountableResourceDictionary.xaml"/>
+                <crd:CachedResourceDictionary Source="/Tests/ResourceDictionary/CachedResourceDictionary/CountableResourceDictionary.xaml"/>
+                <crd:CachedResourceDictionary Source="/Tests/ResourceDictionary/CachedResourceDictionary/CountableResourceDictionary.xaml"/>
+
+                <!-- This tests whether Compiler handles a ResourceDictionary subclass that defines a custom property. -->
+                <rd:CustomPropertyResourceDictionary CustomProperty="Test" Source="SomeResourceDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </sdk:Page.Resources>
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Cached ResourceDictionary:"/>
+        <Button Name="CachedResourceDictionaryLoadButton" Content="Load" Width="100" Click="CachedResourceDictionaryLoadButton_Click"/>
+        <TextBox Name="CachedResourceDictionaryTextBox" IsReadOnly="True" Width="700" Height="100"/>
+
+        <TextBlock Margin="0,20,0,0" Text="ResourceDictionary with custom property:"/>
+        <TextBlock Text="This tests whether Compiler handles a ResourceDictionary subclass that defines a custom property. CustomPropertyResourceDictionary is defined on Page.Resources MergedDictionaries of this Page."/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="CustomProperty value:"/>
+            <TextBlock Margin="5,0,0,0" Name="CustomPropertyValue"/>
+        </StackPanel>
+    </StackPanel>
+</sdk:Page>

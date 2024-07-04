@@ -312,7 +312,7 @@
     <Compile Include="Tests\OpenFileDialogTest.xaml.cs">
       <DependentUpon>OpenFileDialogTest.xaml</DependentUpon>
     </Compile>
-	<Compile Include="Tests\PopupZIndexTest.xaml.cs">
+    <Compile Include="Tests\PopupZIndexTest.xaml.cs">
       <DependentUpon>PopupZIndexTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\Paths\PathChangeTest.xaml.cs">
@@ -324,12 +324,18 @@
     <Compile Include="Tests\PrintingTest.xaml.cs">
       <DependentUpon>PrintingTest.xaml</DependentUpon>
     </Compile>
-	<Compile Include="Tests\PrintDocumentTest.xaml.cs">
+    <Compile Include="Tests\PrintDocumentTest.xaml.cs">
       <DependentUpon>PrintDocumentTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\RadioButtonTest.xaml.cs">
       <DependentUpon>RadioButtonTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\ResourceDictionary\CachedResourceDictionary\CachedResourceDictionary.cs" />
+    <Compile Include="Tests\ResourceDictionary\CachedResourceDictionary\CountableInstance.cs" />
+    <Compile Include="Tests\ResourceDictionary\ResourceDictionaryTest.xaml.cs">
+      <DependentUpon>ResourceDictionaryTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tests\ResourceDictionary\CustomPropertyResourceDictionary.cs" />
     <Compile Include="Tests\Right ClickTest.xaml.cs">
       <DependentUpon>Right ClickTest.xaml</DependentUpon>
     </Compile>
@@ -653,7 +659,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-	<Page Include="Tests\PopupZIndexTest.xaml">
+    <Page Include="Tests\PopupZIndexTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -669,13 +675,25 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-	<Page Include="Tests\PrintDocumentTest.xaml">
+    <Page Include="Tests\PrintDocumentTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\RadioButtonTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\ResourceDictionary\CachedResourceDictionary\CountableResourceDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tests\ResourceDictionary\ResourceDictionaryTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\ResourceDictionary\SomeResourceDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tests\Right ClickTest.xaml">
       <SubType>Designer</SubType>

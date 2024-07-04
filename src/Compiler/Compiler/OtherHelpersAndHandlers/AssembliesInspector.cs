@@ -104,6 +104,9 @@ namespace OpenSilver.Compiler
         public bool IsFrameworkTemplateTemplateProperty(string propertyName, string namespaceName, string typeName)
             => _monoCecilVersion.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName);
 
+        public bool IsResourceDictionarySourcePropertyVisible( string namespaceName, string typeName)
+            => _monoCecilVersion.IsResourceDictionarySourcePropertyVisible(namespaceName, typeName);
+
         public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
             => _monoCecilVersion.GetField(fieldName, namespaceName, typeName, assemblyName);
     }
