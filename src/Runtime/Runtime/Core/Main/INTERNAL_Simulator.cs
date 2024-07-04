@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System;
 using System.ComponentModel;
@@ -21,34 +20,6 @@ namespace DotNetForHtml5.Core
     public static class INTERNAL_Simulator
     {
         // Note: all the properties here are populated by the Simulator, which "injects" stuff here when the application is launched in the Simulator.
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static dynamic HtmlDocument { internal get; set; }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static dynamic DOMDocument { internal get; set; }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static dynamic WpfMediaElementFactory { internal get; set; }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static Func<object, object> ConvertBrowserResult { get; set; }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Windows.Clipboard instead.")]
-        public static dynamic ClipboardHandler { internal get; set; }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static dynamic DynamicJavaScriptExecutionHandler { internal get; set; }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static Action<object> SimulatorCallbackSetup { get; set; }
 
         // BeginInvoke of the WebControl's Dispatcher
         public static Action<Action> WebControlDispatcherBeginInvoke

@@ -11,22 +11,12 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.ComponentModel;
 using System.Windows.Browser.Internal;
-using OpenSilver.Internal;
 
 namespace System.Windows.Browser
 {
     public sealed class HtmlWindow : HtmlObject
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Windows.Browser.HtmlPage.Window instead.")]
-        public HtmlWindow()
-            : this(new WindowRef())
-        {
-        }
-
         internal HtmlWindow(IJSObjectRef jsObject)
             : base(jsObject)
         {

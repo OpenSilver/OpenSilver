@@ -54,7 +54,7 @@ namespace DotNetForHtml5.Core
             // Create a DIV for the PopupRoot in the DOM tree:
             //--------------------------------------
 
-            popupRoot.OuterDiv = popupRoot.InnerDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
+            popupRoot.OuterDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
             popupRoot.IsConnectedToLiveTree = true;
             popupRoot.UpdateIsVisible();
 
@@ -70,7 +70,7 @@ namespace DotNetForHtml5.Core
                 INTERNAL_HtmlDomManager.RemoveNodeNative(popupRoot.OuterDiv);
             }
 
-            popupRoot.OuterDiv = popupRoot.InnerDiv = null;
+            popupRoot.OuterDiv = null;
             popupRoot.IsConnectedToLiveTree = false;
             popupRoot.ParentPopup = null;
         }

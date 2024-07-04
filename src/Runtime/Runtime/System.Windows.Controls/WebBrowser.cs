@@ -43,6 +43,8 @@ namespace System.Windows.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            domElementWhereToPlaceChildren = null;
+
             var outerDiv = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, false);
 
             _iFrame = INTERNAL_HtmlDomManager.AppendDomElement("iframe", outerDiv, this);
@@ -73,7 +75,6 @@ namespace System.Windows.Controls
                 OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sIFrame}.src = 'about:blank'");
             }
 
-            domElementWhereToPlaceChildren = _iFrame;
             return outerDiv;
         }
 

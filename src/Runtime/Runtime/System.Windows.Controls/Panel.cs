@@ -14,7 +14,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -158,14 +157,6 @@ namespace System.Windows.Controls
             set => _progressiveRenderingChunkSize = value;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use ProgressiveRenderingChunkSize instead.")]
-        public bool EnableProgressiveRendering
-        {
-            get => ProgressiveRenderingChunkSize > 0;
-            set => ProgressiveRenderingChunkSize = 1;
-        }
-
         internal static int GlobalProgressiveRenderingChunkSize;
 
         private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -198,7 +189,7 @@ namespace System.Windows.Controls
         {
             if (VisualChildrenInformation != null)
             {
-                foreach (var oldChild in VisualChildrenInformation.Keys.ToArray())
+                foreach (var oldChild in VisualChildrenInformation.ToArray())
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
                 }

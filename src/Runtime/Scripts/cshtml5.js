@@ -12,25 +12,6 @@
 *
 \*====================================================================================*/
 
-//------------------------------
-// CHECK BROWSER COMPATIBILITY
-//------------------------------
-
-(function () {
-    const userAgentLowercase = navigator.userAgent.toLowerCase();
-
-    window.ANDROID_VERSION = (userAgentLowercase.indexOf('android') != -1) ? parseInt(userAgentLowercase.split('android')[1]) : false;
-    window.FIREFOX_VERSION = ((index = userAgentLowercase.indexOf('firefox')) != -1) ? parseInt(userAgentLowercase.substring(index + 8)) : false;
-
-    // Current version does not support Android < 4:
-    if (window.ANDROID_VERSION && window.ANDROID_VERSION < 4)
-        alert("This version of Android is not supported yet. Please use Android 4.x (or newer), Internet Explorer 11 (or newer), Chrome 35 (or newer), Firefox 27 (or newer), Safari 8 (or newer), Safari Mobile iOS 8 (or newer), or Opera 24 (or newer). More browsers will be supported in the future.");
-})();
-
-//------------------------------
-// DEFINE OTHER SCRIPTS
-//------------------------------
-
 document.getAppParams = function (element) {
     if (element) {
         return JSON.stringify(
@@ -334,24 +315,6 @@ document.getBBox = function (svgElement) {
         return JSON.stringify({ X: bbox.x, Y: bbox.y, Width: bbox.width, Height: bbox.height, });
     }
     return '{}';
-};
-
-document.set2dContextProperty = function (id, propertyName, propertyValue) {
-    const element = document.getElementById(id);
-    if (!element || element.tagName !== 'CANVAS')
-        return;
-
-    element.getContext('2d')[propertyName] = propertyValue;
-};
-
-document.invoke2dContextMethod = function (id, methodName, args) {
-    const element = document.getElementById(id);
-    if (!element || element.tagName !== 'CANVAS')
-        return undefined;
-    return CanvasRenderingContext2D.prototype[methodName].apply(element.getContext('2d'),
-        args.split(',')
-            .map(Function.prototype.call, String.prototype.trim)
-            .filter(i => i.length > 0));
 };
 
 document.setCSS = function (id, cssPropertyName, value) {
@@ -933,15 +896,6 @@ document.measureBaseline = function (measurerId, ...fonts) {
     return 0.0;
 };
 
-document.setContentString = function (id, text, removeTextWrapping) {
-    var el = document.getElementById(id);
-    if (el) {
-        el.innerText = text;
-        if (removeTextWrapping)
-            el.style.whiteSpace = "nowrap";
-    };
-};
-
 window.ViewInteropErrors = function () {
     for (var key in document.interopErrors) {
         console.log(`Unable to find element with id '${key}' (${document.interopErrors[key]} time(s)).`);
@@ -1216,6 +1170,63 @@ document.createTextviewManager = function (inputCallback, scrollCallback) {
                 default:
                     return false;
             }
+        },
+        handleKeyDownFromSimulator: function (view) {
+            if (!view) return;
+            view.addEventListener('keydown', function (e) {
+                const acceptsReturn = this.getAttribute('data-acceptsreturn');
+                const maxLength = this.getAttribute('maxlength');
+                const acceptsTab = this.getAttribute('data-acceptstab');
+
+                if (maxLength == null) maxLength = 0;
+                if (e.keyCode == 13) {
+                    if (acceptsReturn != "true") {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+
+                const isAddingTabulation = e.keyCode == 9 && acceptsTab == 'true';
+                if ((isAddingTabulation || e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && maxLength != 0) {
+                    let text = this.value;
+                    if (!acceptsReturn) {
+                        text = text.replace('\n', '').replace('\r', '');
+                    }
+
+                    let correctionDueToNewLines = 0;
+                    if (e.keyCode == 13) {
+                        ++correctionDueToNewLines; //because adding a new line takes 2 characters instead of 1.
+                    }
+                    if (text.length + correctionDueToNewLines >= maxLength) {
+                        if (!window.getSelection().toString()) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                }
+
+                if (isAddingTabulation) {
+                    //we need to add '\t' where the cursor is, prevent the event (which would change the focus) and dispatch the event for the text changed:
+                    let sel, range;
+                    if (window.getSelection) {
+                        sel = window.getSelection();
+                        if (sel.rangeCount) {
+                            range = sel.getRangeAt(0);
+                            range.deleteContents();
+                            range.insertNode(document.createTextNode('\t'));
+                            sel.collapseToEnd();
+                            range.collapse(false); //for IE
+                        }
+                    } else if (document.selection && document.selection.createRange) {
+                        range = document.selection.createRange();
+                        range.text = '\t';
+                        document.selection.collapseToEnd();
+                    }
+
+                    e.preventDefault();
+                    return false;
+                }
+            }, false);
         },
         getSelectionStart: function (view) {
             if (view) {

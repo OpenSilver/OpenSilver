@@ -11,18 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using OpenSilver.Internal;
 
 namespace System.Windows
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public enum WhenToCallPropertyChangedEnum
     {
         Never = 0,
         IfPropertyIsSet = 1,
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        Always = 2,
     }
 }

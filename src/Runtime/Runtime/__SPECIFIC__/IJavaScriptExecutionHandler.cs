@@ -12,8 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.ComponentModel;
-using OpenSilver.Internal;
 
 namespace DotNetForHtml5
 {
@@ -29,13 +27,6 @@ namespace DotNetForHtml5
         TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
         TResult InvokeUnmarshalled<T0, T1, TResult>(string identifier, T0 arg0, T1 arg1);
         TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2);
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.IWebAssemblyExecutionHandler instead.", true)]
-    public interface IJavaScriptExecutionHandler2 : IJavaScriptExecutionHandler
-    {
-        TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
     }
 
     internal sealed class JSRuntimeWrapper : IWebAssemblyExecutionHandler

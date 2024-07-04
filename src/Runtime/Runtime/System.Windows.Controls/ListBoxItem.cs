@@ -98,7 +98,9 @@ namespace System.Windows.Controls
             base.OnMouseEnter(e);
             if (this.ParentSelector != null)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 this.ParentSelector.NotifyItemMouseEnter(this);
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             this.IsMouseOver = true;

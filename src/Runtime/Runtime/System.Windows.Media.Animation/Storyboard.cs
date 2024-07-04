@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal;
@@ -246,13 +245,6 @@ public sealed class Storyboard : Timeline
             _activeClock = null;
         }
     }
-
-    /// <summary>
-    /// Stops the storyboard.
-    /// </summary>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public void Stop(FrameworkElement frameworkElement) => Stop();
 
     internal override TimelineClock CreateClock(bool isRoot) => new StoryboardClock(this, isRoot);
 

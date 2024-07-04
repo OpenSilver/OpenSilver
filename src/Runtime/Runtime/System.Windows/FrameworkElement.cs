@@ -453,9 +453,8 @@ namespace System.Windows
 
         internal object CreateDomElementInternal(object parentRef, bool isKeyboardFocusable, out object domElementWhereToPlaceChildren)
         {
-            object div = INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, isKeyboardFocusable);
-            domElementWhereToPlaceChildren = div;
-            return div;
+            domElementWhereToPlaceChildren = null;
+            return INTERNAL_HtmlDomManager.CreateDomLayoutElementAndAppendIt("div", parentRef, this, isKeyboardFocusable);
         }
 
         // Internal helper so the FrameworkElement could see the

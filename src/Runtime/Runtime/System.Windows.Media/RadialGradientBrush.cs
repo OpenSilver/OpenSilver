@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
@@ -208,20 +206,6 @@ namespace System.Windows.Media
             string cx = ((int)(center.X * multiplier)).ToInvariantString();
             string cy = ((int)(center.Y * multiplier)).ToInvariantString();
             return $"{gradientType}({rx}{unit} {ry}{unit} at {cx}{unit} {cy}{unit}, {stops})";
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public List<object> ConvertToCSSValues(DependencyObject parent)
-        {
-            string gradientString = ToHtmlString(parent);
-            return new List<object>(4)
-            {
-                "-webkit-" + gradientString,
-                "-o-" + gradientString,
-                "-moz-" + gradientString,
-                gradientString,
-            };
         }
 
         private sealed class SvgRadialGradient : ISvgBrush

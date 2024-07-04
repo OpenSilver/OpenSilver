@@ -323,16 +323,10 @@ namespace OpenSilver.Internal.Xaml
             Debug.Assert(context != null);
             Debug.Assert(timeline != null);
 
-            if (!(timeline is Storyboard))
+            if (timeline is not Storyboard)
             {
                 timeline.NameResolver = context.NameResolver;
             }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage, true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void UIElement_SetKeepHiddenInFirstRender(UIElement uie, bool value)
-        {
         }
     }
 }

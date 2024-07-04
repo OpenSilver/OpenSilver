@@ -11,9 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
-using OpenSilver.Internal;
-
 namespace System.Windows.Media
 {
     /// <summary>
@@ -88,9 +85,5 @@ namespace System.Windows.Media
         /// An inverse of this instance, if possible; otherwise null.
         /// </returns>
         public abstract GeneralTransform Inverse { get; }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use TryTransform() instead.", true)]
-        protected virtual Point INTERNAL_TransformPoint(Point point) => throw new NotImplementedException();
     }
 }

@@ -581,7 +581,9 @@ namespace System.Windows
             set { CheckSealed(); _methodToUpdateDom2 = value; }
         }
 
+#pragma warning disable CS0618
         private WhenToCallPropertyChangedEnum _whenToCallProperty;
+#pragma warning restore CS0618
         private MethodToUpdateDom _methodToUpdateDom;
         private MethodToUpdateDom2 _methodToUpdateDom2;
     }

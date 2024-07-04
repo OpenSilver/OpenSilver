@@ -98,9 +98,8 @@ internal sealed class TextBoxView : TextViewBase
 
     public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
     {
-        var textarea = INTERNAL_HtmlDomManager.CreateTextBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
-        domElementWhereToPlaceChildren = textarea;
-        return textarea;
+        domElementWhereToPlaceChildren = null;
+        return INTERNAL_HtmlDomManager.CreateTextBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
     }
 
     protected sealed internal override void INTERNAL_OnAttachedToVisualTree()
@@ -162,80 +161,8 @@ internal sealed class TextBoxView : TextViewBase
 
         if (Interop.IsRunningInTheSimulator)
         {
-            // ---- SIMULATOR ----
-            string uid = OuterDiv.UniqueIdentifier;
-
-            // Register the "keydown" javascript event:
-            Interop.ExecuteJavaScriptVoidAsync($@"
-var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
-element_OutsideEventHandler.addEventListener('keydown', function(e) {{
-
-    var element_InsideEventHandler = document.getElementByIdSafe(""{uid}""); // For some reason we need to get again the reference to the element.
-    var acceptsReturn = element_InsideEventHandler.getAttribute(""data-acceptsreturn"");
-    var maxLength = element_InsideEventHandler.getAttribute(""maxlength"");
-    var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
-
-    if (maxLength == null) maxLength = 0;
-    if (e.keyCode == 13)
-    {{
-        if(acceptsReturn != ""true"")
-        {{
-            e.preventDefault();
-            return false;
-        }}
-    }}
-
-    var isAddingTabulation = e.keyCode == 9 && acceptsTab == ""true"";
-
-    if((isAddingTabulation || e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && maxLength != 0)
-    {{
-        var text = element_InsideEventHandler.value;
-        if (!acceptsReturn) {{
-            text = text.replace(""\n"", """").replace(""\r"", """");
-        }}
-
-        var correctionDueToNewLines = 0;
-        if (e.keyCode == 13)
-        {{
-            ++correctionDueToNewLines; //because adding a new line takes 2 characters instead of 1.
-        }}
-        if(text.length + correctionDueToNewLines >= maxLength)
-        {{
-            if (!window.getSelection().toString()) {{
-                e.preventDefault();
-                return false;
-            }}
-        }}
-    }}
-
-    if(isAddingTabulation)
-    {{
-        //we need to add '\t' where the cursor is, prevent the event (which would change the focus) and dispatch the event for the text changed:
-        var sel, range;
-        if (window.getSelection) {{
-            sel = window.getSelection();
-            if (sel.rangeCount) {{
-                range = sel.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode(document.createTextNode('\t'));
-                sel.collapseToEnd();
-                range.collapse(false); //for IE
-            }}
-        }} else if (document.selection && document.selection.createRange) {{
-            range = document.selection.createRange();
-            range.text = '\t';
-            document.selection.collapseToEnd();
-        }}
-        if (window.IS_EDGE)
-        {{
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }}
-
-        e.preventDefault();
-            return false;
-    }}
-}}, false)");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
+            string sElement = Interop.GetVariableStringForJS(OuterDiv);
+            Interop.ExecuteJavaScriptVoidAsync($"document.textviewManager.handleKeyDownFromSimulator({sElement})");
         }
 
         SetTextNative(host.Text);

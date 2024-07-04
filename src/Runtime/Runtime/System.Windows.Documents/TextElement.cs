@@ -351,5 +351,8 @@ public abstract class TextElement : UIElement
     }
 
     public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        => domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateTextElementDomElementAndAppendIt(parentRef, this);
+    {
+        domElementWhereToPlaceChildren = null;
+        return INTERNAL_HtmlDomManager.CreateTextElementDomElementAndAppendIt(parentRef, this);
+    }
 }

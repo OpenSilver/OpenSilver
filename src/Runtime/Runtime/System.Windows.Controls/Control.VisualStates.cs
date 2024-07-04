@@ -15,7 +15,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -25,14 +24,6 @@ namespace System.Windows.Controls
         private bool _handleCommonVisualStates = false;
         private bool _isInvalid;
         private bool _isFocused;
-
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use EnableBaseControlHandlingOfVisualStates instead.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected bool DisableBaseControlHandlingOfVisualStates
-        {
-            get => !EnableBaseControlHandlingOfVisualStates;
-            set => EnableBaseControlHandlingOfVisualStates = !value;
-        }
 
         /// <summary>
         /// Derived classes can set this flag to True in their constructor in order to 

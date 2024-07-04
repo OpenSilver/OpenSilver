@@ -14,7 +14,6 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -39,16 +38,10 @@ namespace CSHTML5.Internal
                 if (IsElementInVisualTree(child))
                 {
                     // Verify that the child is really a child of the specified control:
-                    if (parent.VisualChildrenInformation != null
-                        && parent.VisualChildrenInformation.ContainsKey(child))
+                    if (parent.VisualChildrenInformation != null && parent.VisualChildrenInformation.Contains(child))
                     {
                         // Remove the element from the DOM:
                         INTERNAL_HtmlDomManager.RemoveFromDom(child.OuterDiv);
-
-                        // Remove the parent-specific wrapper around the child in the DOM (if any):
-                        var optionalChildWrapper_OuterDomElement = parent.VisualChildrenInformation[child].WrapperDiv;
-                        if (optionalChildWrapper_OuterDomElement != null)
-                            INTERNAL_HtmlDomManager.RemoveFromDom(optionalChildWrapper_OuterDomElement);
 
                         // Remove the element from the parent's children collection:
                         parent.VisualChildrenInformation.Remove(child);
@@ -64,8 +57,7 @@ namespace CSHTML5.Internal
                                           parent.GetType().ToString()));
                     }
                 }
-                else if (parent.VisualChildrenInformation != null
-                        && parent.VisualChildrenInformation.ContainsKey(child))
+                else if (parent.VisualChildrenInformation != null && parent.VisualChildrenInformation.Contains(child))
                 {
                     // Remove the element from the parent's children collection:
                     parent.VisualChildrenInformation.Remove(child);
@@ -87,7 +79,7 @@ namespace CSHTML5.Internal
                 element.IsUnloading = true;
                 if (element.VisualChildrenInformation is not null)
                 {
-                    foreach (UIElement child in element.VisualChildrenInformation.Keys)
+                    foreach (UIElement child in element.VisualChildrenInformation)
                     {
                         PropagateIsUnloading(child);
                     }
@@ -100,7 +92,7 @@ namespace CSHTML5.Internal
                 UnloadVisual(element);
                 if (children is not null)
                 {
-                    foreach (UIElement child in children.Keys)
+                    foreach (UIElement child in children)
                     {
                         UnloadVisualRec(child);
                     }
@@ -135,109 +127,14 @@ namespace CSHTML5.Internal
                 }
 
                 INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.OuterDiv);
-                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.InnerDiv);
             }
 
             // Reset all visual-tree related information:
             element.IsConnectedToLiveTree = false;
             element.IsUnloading = false;
             element.OuterDiv = null;
-            element.InnerDiv = null;
             element.VisualChildrenInformation = null;
             element.RenderingIsDeferred = false;
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
-        {
-            if (oldIndex < 0)
-            {
-                // setting oldIndex to -1 means we don't know the previous
-                // position of the child. We have to iterate through all the
-                // child to find it.
-                MoveVisualChildInSameParent(child, parent, newIndex);
-                return;
-            }
-
-            if (parent.VisualChildrenInformation.ContainsKey(child))
-            {
-                VisualChildInformation visualChildInformation = parent.VisualChildrenInformation[child];
-                var domElementToMove = visualChildInformation.WrapperDiv ?? child.OuterDiv;
-
-                //Not sure if this test is needed but at least we won't 
-                // break anything if the element is not in the Visual tree
-                if (domElementToMove != null)
-                {
-                    object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.InnerDiv);
-
-                    object movedChild = OpenSilver.Interop.ExecuteJavaScript(
-                        "$0.children[$1]",
-                        domElementWhereToPlaceChildStuff,
-                        oldIndex);
-
-
-                    if (!Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0 == $1", movedChild, domElementToMove)))
-                    {
-                        throw new InvalidOperationException(string.Format("index '{0}' does match index of the element about to be moved.", oldIndex));
-                    }
-
-                    object nextSibling = OpenSilver.Interop.ExecuteJavaScript(
-                        "$0.children[$1]",
-                        domElementWhereToPlaceChildStuff,
-                        newIndex);
-
-                    if (nextSibling != null)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScript(
-                            "$0.insertBefore($1, $2)",
-                            domElementWhereToPlaceChildStuff,
-                            domElementToMove,
-                            nextSibling);
-                    }
-                    else
-                    {
-                        OpenSilver.Interop.ExecuteJavaScript(
-                            "$0.appendChild($1)",
-                            domElementWhereToPlaceChildStuff,
-                            domElementToMove);
-                    }
-                }
-            }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int index)
-        {
-            if (parent.VisualChildrenInformation.ContainsKey(child))
-            {
-                VisualChildInformation visualChildInformation = parent.VisualChildrenInformation[child];
-                var domElementToMove = visualChildInformation.WrapperDiv;
-                if (domElementToMove == null)
-                    domElementToMove = child.OuterDiv;
-
-                if (domElementToMove != null) //Not sure if this test is needed but at least we won't break anything if the element is not in the Visual tree
-                {
-                    object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.InnerDiv);
-                    //todo: see if there is a way to know the index of the domElement in its parent without looping through the list (where we find i in the js below).
-                    OpenSilver.Interop.ExecuteJavaScript(@"
-var actualIndex = $1;
-var i = 0;
-while (i < actualIndex && $0.children[i]!=$2) { 
-    ++i;
-}
-if(i < actualIndex) {
-    ++actualIndex; //to compensate the fact that the item that will be moved was before the next sibling
-}
-var nextSibling = $0.children[$1];
-if(nextSibling != undefined) {
-    $0.insertBefore($2, nextSibling);
-} else {
-    $0.appendChild($2);
-}", domElementWhereToPlaceChildStuff, index, domElementToMove);
-                }
-            }
         }
 
         public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent, int index = -1)
@@ -255,7 +152,7 @@ if(nextSibling != undefined) {
                         Profiler.ConsoleTime(label);
                     }
 
-                    AttachVisualChild_Private(child, parent, index);
+                    AttachVisualChild_Private(child, parent);
 
                     if (EnablePerformanceLogging)
                     {
@@ -274,48 +171,15 @@ if(nextSibling != undefined) {
             }
         }
 
-        static void AttachVisualChild_Private(UIElement child, UIElement parent, int index)
+        static void AttachVisualChild_Private(UIElement child, UIElement parent)
         {
-            //
-            // THIS IS WHAT THE FINAL STRUCTURE IN THE DOM TREE WILL LOOK LIKE:
-            //
-            //     domElementWhereToPlaceChildStuff
-            //     --- [wrapperForChild]
-            //     --- --- [innerDivOfWrapperForChild]
-            //     --- --- --- [additionalOutsideDivForMargins, aka BoxSizing]
-            //     --- --- --- --- outerDomElement
-            //
-
             //--------------------------------------------------------
             // PREPARE THE PARENT:
             //--------------------------------------------------------
 
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-
-            // Prepare the parent DOM structure so that it is ready to contain the child (for example, in case of a grid, we need to (re)create the rows and columns where to place the elements).
-            //parent.INTERNAL_UpdateDomStructureIfNecessary();
-
-#pragma warning disable CS0618
-            object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.InnerDiv);
-#pragma warning restore CS0618
-
-            // A "wrapper for child" is sometimes needed between the child and the parent (for example in case of a grid).
-            // It is usually one or more DIVs that fit in-between the child and the parent, and that are used to position
-            // the child within the parent.
-#pragma warning disable CS0618
-            object wrapperForChild = parent.CreateDomChildWrapper(domElementWhereToPlaceChildStuff, out object innerDivOfWrapperForChild, index);
-#pragma warning restore CS0618
-            bool doesParentRequireToCreateAWrapperForEachChild = wrapperForChild is not null && innerDivOfWrapperForChild is not null;
-
             // Remember the information about the "VisualChildren"
-            parent.VisualChildrenInformation ??= new Dictionary<UIElement, VisualChildInformation>();
-            parent.VisualChildrenInformation.Add(child, new VisualChildInformation(wrapperForChild));
-
-#if PERFSTAT
-            Performance.Counter("VisualTreeManager: Prepare the parent", t0);
-#endif
+            parent.VisualChildrenInformation ??= new HashSet<UIElement>();
+            parent.VisualChildrenInformation.Add(child);
 
             //--------------------------------------------------------
             // CONTINUE WITH THE OTHER STEPS
@@ -323,34 +187,14 @@ if(nextSibling != undefined) {
             
             AttachVisualChild_Private_MainSteps(
                 child,
-                parent,
-                index,
-                doesParentRequireToCreateAWrapperForEachChild,
-                innerDivOfWrapperForChild,
-                domElementWhereToPlaceChildStuff,
-                wrapperForChild);
+                parent);
         }
 
-        static void AttachVisualChild_Private_MainSteps(UIElement child,
-            UIElement parent,
-            int index,
-            bool doesParentRequireToCreateAWrapperForEachChild,
-            object innerDivOfWrapperForChild,
-            object domElementWhereToPlaceChildStuff,
-            object wrapperForChild)
+        static void AttachVisualChild_Private_MainSteps(UIElement child, UIElement parent)
         {
             //--------------------------------------------------------
             // PREPARE THE CHILD:
             //--------------------------------------------------------
-
-#if PERFSTAT
-            var t2 = Performance.now();
-#endif
-
-            // Determine where to place the child:
-            object whereToPlaceTheChild = (doesParentRequireToCreateAWrapperForEachChild
-                    ? innerDivOfWrapperForChild
-                    : domElementWhereToPlaceChildStuff);
 
             child.IsConnectedToLiveTree = true;
 
@@ -358,25 +202,7 @@ if(nextSibling != undefined) {
             child.ParentWindow = parent.ParentWindow;
 
             // Create and append the DOM structure of the Child:
-            object domElementWhereToPlaceGrandChildren = null;
-            INTERNAL_HtmlDomElementReference outerDomElement;
-            if (child.HtmlRepresentation == null)
-            {
-                if (child is Control control && control.HasTemplate)
-                {
-                    outerDomElement = (INTERNAL_HtmlDomElementReference)control.CreateDomElementForControlTemplate(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
-                }
-                else
-                {
-                    outerDomElement = (INTERNAL_HtmlDomElementReference)child.CreateDomElement(whereToPlaceTheChild, out domElementWhereToPlaceGrandChildren);
-                }
-            }
-            else
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                outerDomElement = (INTERNAL_HtmlDomElementReference)INTERNAL_HtmlDomManager.CreateDomFromStringAndAppendIt(child.HtmlRepresentation, whereToPlaceTheChild, child);
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
+            var outerDomElement = (INTERNAL_HtmlDomElementReference)child.CreateDomElement(parent.OuterDiv, out _);
 
             // For debugging purposes (to better read the output html), add a class to the outer DIV
             // that tells us the corresponding type of the element (Border, StackPanel, etc.):
@@ -385,17 +211,12 @@ if(nextSibling != undefined) {
                 INTERNAL_HtmlDomManager.AddCSSClass(outerDomElement, child.GetType().ToString());
             }
 
-#if PERFSTAT
-            Performance.Counter("VisualTreeManager: Prepare the child", t2);
-#endif
-
             //--------------------------------------------------------
             // REMEMBER ALL INFORMATION FOR FUTURE USE:
             //--------------------------------------------------------
 
             // Remember the DIVs:
             child.OuterDiv = outerDomElement;
-            child.InnerDiv = (INTERNAL_HtmlDomElementReference)domElementWhereToPlaceGrandChildren;
 
             //--------------------------------------------------------
             // HANDLE EVENTS:
@@ -451,20 +272,14 @@ if(nextSibling != undefined) {
             //--------------------------------------------------------
             // RAISE THE "LOADED" EVENT:
             //--------------------------------------------------------
-#if PERFSTAT
-            var t11 = Performance.now();
-#endif
-
+            
             // Raise the "Loaded" event: (note: in XAML, the "loaded" event of the children is called before the "loaded" event of the parent)
             if (child is FrameworkElement fe)
             {
                 fe.RaiseLoadedEvent();
             }
-
-#if PERFSTAT
-            Performance.Counter("VisualTreeManager: Raise Loaded event", t11);
-#endif
         }
+
         public static bool IsElementInVisualTree(UIElement element) => element.IsConnectedToLiveTree && !element.IsUnloading;
 
         internal static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(UIElement uie)

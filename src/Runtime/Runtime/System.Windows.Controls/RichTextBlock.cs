@@ -444,9 +444,8 @@ namespace System.Windows.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this);
-            domElementWhereToPlaceChildren = div;
-            return div;
+            domElementWhereToPlaceChildren = null;
+            return INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this);
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()

@@ -15,7 +15,6 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Windows.Shapes;
-using OpenSilver.Internal;
 using OpenSilver.Internal.Media;
 using OpenSilver.Internal.Media.Animation;
 
@@ -120,13 +119,5 @@ namespace System.Windows.Media
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object Clone() => new SolidColorBrush(this);
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object ConvertToCSSValue() => Color.ToHtmlString(Opacity);
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool IsAlreadyAClone() => false;
     }
 }

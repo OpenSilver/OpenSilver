@@ -78,12 +78,6 @@ namespace System.Windows
 
         internal virtual bool BuildVisualTree(IFrameworkElement container) => false;
 
-        [Obsolete(Helper.ObsoleteMemberMessage + " Please use the Template property instead.", true)]
-        public void SetMethodToInstantiateFrameworkTemplate(Func<FrameworkElement, TemplateInstance> methodToInstantiateFrameworkTemplate)
-        {
-            throw new NotSupportedException("Deprecated. Please use the Template property instead.");
-        }
-
         // The following property is used during the "InsertImplicitNodes" step of the compilation,
         // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
         [Obsolete(Helper.ObsoleteMemberMessage)]

@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -522,20 +521,6 @@ namespace System.Windows.Media
             }
 
             return StringBuilderCache.GetStringAndRelease(sb);
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public List<object> ConvertToCSSValues(DependencyObject parent)
-        {
-            string baseString = ToHtmlString(parent);
-            return new List<object>(4)
-            {
-                "-webkit-" + baseString,
-                "-o-" + baseString,
-                "-moz-" + baseString,
-                baseString,
-            };
         }
 
         private sealed class SvgLinearGradient : ISvgBrush

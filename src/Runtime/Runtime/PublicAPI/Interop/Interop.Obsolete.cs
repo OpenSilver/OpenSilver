@@ -63,16 +63,6 @@ namespace CSHTML5
         }
 
         /// <summary>
-        /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
-        /// </summary>
-        /// <param name="value">The value to unbox.</param>
-        /// <returns>the unboxed value if the value was boxed, the value itself otherwise.</returns>
-        public static object Unbox(object value)
-        {
-            return OpenSilver.Interop.Unbox(value);
-        }
-
-        /// <summary>
         /// Adds a 'script' tag to the HTML page and waits for the script to finish loading.
         /// </summary>
         /// <param name="url">The URL of the JavaScript file, with the syntax ms-appx:///AssemblyName/Folder/FileName.js or /AssemblyName;component/Folder/FileName.js</param>

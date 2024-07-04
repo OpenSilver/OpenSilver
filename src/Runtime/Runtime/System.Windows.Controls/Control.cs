@@ -530,32 +530,9 @@ namespace System.Windows.Controls
             }
         }
 
-        /// <summary>
-        /// This method is here to avoid creating the dom for a control which has a Template.
-        /// It creates the basic dom elements in which we will be able to add the template.
-        /// </summary>
-        /// <param name="parentRef">The parent of the FrameworkElement</param>
-        /// <param name="domElementWhereToPlaceChildren">The dom element where the FrameworkElement's template constructed children will be added.</param>
-        /// <returns>The "root" dom element of the FrameworkElement.</returns>
-        internal object CreateDomElementForControlTemplate(object parentRef, out object domElementWhereToPlaceChildren)
+        public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             return CreateDomElementInternal(parentRef, true, out domElementWhereToPlaceChildren);
-        }
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            return CreateDomElementForControlTemplate(parentRef, out domElementWhereToPlaceChildren);
-        }
-
-        /// <summary>
-        /// Returns a value that indicates whether the control is to be rendered with a ControlTemplate.
-        /// </summary>
-        internal bool HasTemplate
-        {
-            get
-            {
-                return this.TemplateCache != null;
-            }
         }
 
         /// <summary>

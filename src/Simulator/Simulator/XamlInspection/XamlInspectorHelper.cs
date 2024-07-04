@@ -98,7 +98,7 @@ namespace OpenSilver.Simulator.XamlInspection
                     if (currMaxLevel > 0 || maxTreeLevel == -1)
                     {
                         if (maxTreeLevel != -1) currMaxLevel--;
-                        foreach (UIElement child in uiElement.VisualChildrenInformation.Keys)
+                        foreach (UIElement child in uiElement.VisualChildrenInformation)
                         {
                             if (treeNode.Title == "Window" && (GetTitleFromElement(child) == "TextBlock" || GetTitleFromElement(child) == "TextBox"))
                                 return treeNode;
@@ -138,7 +138,7 @@ namespace OpenSilver.Simulator.XamlInspection
 
                 if (parentElement.VisualChildrenInformation != null)
                 {
-                    foreach (UIElement child in parentElement.VisualChildrenInformation.Keys)
+                    foreach (UIElement child in parentElement.VisualChildrenInformation)
                     {
                         var treeNode = new TreeNode()
                         {

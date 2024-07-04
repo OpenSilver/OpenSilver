@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
 using OpenSilver.Internal;
@@ -165,13 +164,5 @@ namespace System.Windows.Media
 
             public void RenderBrush() { }
         }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool LogBrushDeadWeakReferencesUpdates { get; set; } = false;
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static int UpdateBrushWeakReferencesSecs { get; set; } = 30;
     }
 }

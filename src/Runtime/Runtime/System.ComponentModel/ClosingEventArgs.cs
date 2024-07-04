@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Windows;
-using OpenSilver.Internal;
 
 namespace System.ComponentModel
 {
@@ -21,9 +20,6 @@ namespace System.ComponentModel
     /// </summary>
     public class ClosingEventArgs : CancelEventArgs
     {
-        private object _jsArgs;
-        private bool _showCloseConfirmationDialog;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ClosingEventArgs"/> class.
         /// </summary>
@@ -35,12 +31,6 @@ namespace System.ComponentModel
             IsCancelable = isCancelable;
         }
 
-        internal ClosingEventArgs(bool isCancelable, object jsArgs)
-        {
-            IsCancelable = isCancelable;
-            _jsArgs = jsArgs;
-        }
-
         /// <summary>
         /// Gets a value that indicates whether you can cancel the <see cref="Window.Closing"/> event.
         /// </summary>
@@ -48,29 +38,5 @@ namespace System.ComponentModel
         /// true if you can cancel the event; otherwise, false.
         /// </returns>
         public bool IsCancelable { get; }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShowCloseConfirmationDialog
-        {
-            get { return _showCloseConfirmationDialog; }
-            set
-            {
-                _showCloseConfirmationDialog = value;
-                if (_jsArgs != null)
-                {
-                    if (value)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{OpenSilver.Interop.GetVariableStringForJS(_jsArgs)}.returnValue = 'The modifications you made may not be saved.';"); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe Edge).
-                    }
-                    else
-                    {
-                        OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{OpenSilver.Interop.GetVariableStringForJS(_jsArgs)}.returnValue = '';");
-                    }
-                }
-            }
-        }
     }
 }

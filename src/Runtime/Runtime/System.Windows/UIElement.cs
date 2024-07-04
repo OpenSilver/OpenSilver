@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Media.Effects;
@@ -265,9 +264,7 @@ namespace System.Windows
 
         // This is the main DIV of the HTML representation of the control
         internal INTERNAL_HtmlDomElementReference OuterDiv { get; set; }
-        internal INTERNAL_HtmlDomElementReference InnerDiv { get; set; }
-        internal string HtmlRepresentation { get; set; }
-        internal Dictionary<UIElement, VisualChildInformation> VisualChildrenInformation { get; set; }
+        internal HashSet<UIElement> VisualChildrenInformation { get; set; }
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
         internal bool _isLoaded;
 
@@ -399,42 +396,6 @@ namespace System.Windows
         /// <param name="domElementWhereToPlaceChildren">The dom element where the UIElement's children will be added.</param>
         /// <returns>The "root" dom element of the UIElement.</returns>
         public abstract object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren);
-
-        /// <summary>
-        /// When overriden, creates a dom wrapper for each child that is added to the UIElement.
-        /// </summary>
-        /// <param name="parentRef"></param>
-        /// <param name="domElementWhereToPlaceChild"></param>
-        /// <param name="index">The index for the position in which to add the child.</param>
-        /// <returns></returns>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public virtual object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
-        {
-            domElementWhereToPlaceChild = null;
-            return null;
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public virtual object GetDomElementWhereToPlaceChild(UIElement child)
-        {
-            return null;
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object GetChildsWrapper(UIElement child)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
-            {
-                return VisualChildrenInformation[child].WrapperDiv;
-            }
-            else
-            {
-                return null;
-            }
-        }
 
         #region IsEnabled
 

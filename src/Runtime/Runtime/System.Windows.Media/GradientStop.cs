@@ -11,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
 using System.Windows.Markup;
-using OpenSilver.Internal;
 
 namespace System.Windows.Media
 {
@@ -74,9 +72,5 @@ namespace System.Windows.Media
         private void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
         public object Clone() => new GradientStop { Color = Color, Offset = Offset };
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool IsAlreadyAClone() => false;
     }
 }

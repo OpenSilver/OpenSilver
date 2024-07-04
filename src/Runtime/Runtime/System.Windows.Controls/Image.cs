@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -157,16 +156,12 @@ namespace System.Windows.Controls
         /// </summary>
         public event EventHandler<RoutedEventArgs> ImageOpened;
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object INTERNAL_DomImageElement => _imageDiv;
-
         internal INTERNAL_HtmlDomElementReference ImageDiv => _imageDiv;
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            (var outerDiv, _imageDiv) = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
             domElementWhereToPlaceChildren = null;
+            (var outerDiv, _imageDiv) = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
             return outerDiv;
         }
 

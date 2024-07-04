@@ -13,7 +13,6 @@
 
 using System.ComponentModel;
 using System.Text;
-using OpenSilver.Internal;
 
 namespace System.Windows.Media.Animation;
 
@@ -377,16 +376,5 @@ public struct RepeatBehavior : IFormattable
     /// values that describes the way behavior repeats.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use HasCount and HasDuration instead. Setter does not do anything.")]
-    public RepeatBehaviorType Type
-    {
-        get
-        {
-            return _type;
-        }
-        set
-        {
-
-        }
-    }
+    public RepeatBehaviorType Type => _type;
 }

@@ -728,10 +728,11 @@ namespace System.Windows.Shapes
 
         public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            (domElementWhereToPlaceChildren, SvgElement, DefsElement) = INTERNAL_HtmlDomManager.CreateShapeElementAndAppendIt(
+            domElementWhereToPlaceChildren = null;
+            (var outerDiv, SvgElement, DefsElement) = INTERNAL_HtmlDomManager.CreateShapeElementAndAppendIt(
                 (INTERNAL_HtmlDomElementReference)parentRef, this);
 
-            return domElementWhereToPlaceChildren;
+            return outerDiv;
         }
 
         protected internal sealed override void INTERNAL_OnDetachedFromVisualTree()

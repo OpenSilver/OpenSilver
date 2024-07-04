@@ -24,10 +24,14 @@ namespace System.Windows
     /// </summary>
     public abstract partial class FrameworkElement : UIElement
     {
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void OnAfterApplyHorizontalAlignmentAndWidth()
         {
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void OnAfterApplyVerticalAlignmentAndWidth()
         {
         }
@@ -352,12 +356,6 @@ namespace System.Windows
         public double ActualHeight => ActualHeightInternal;
 
         internal virtual double ActualHeightInternal => RenderSize.Height;
-
-        /// <summary>
-        /// Gets the rendered size of a FrameworkElement.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use FrameworkElement.RenderSize instead.")]
-        public Size ActualSize => RenderSize;
 
         #endregion
 

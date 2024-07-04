@@ -11,10 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -33,10 +30,6 @@ namespace System.Windows
             // We want the default zero value of new FontWeight() to correspond to FontWeights.Normal.
             // Therefore, the _weight value is shifted by 400 relative to the OpenType weight value.
             _weight = weight - 400;
-
-#pragma warning disable CS0618 // Type or member is obsolete
-            Weight = (ushort)weight;
-#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <summary>
@@ -191,9 +184,5 @@ namespace System.Windows
         /// Therefore, _weight value is shifted by 400 relative to the OpenType weight value.
         /// </summary>
         private int RealWeight => _weight + 400;
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public ushort Weight;
     }
 }

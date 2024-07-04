@@ -18,7 +18,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using CSHTML5.Internal;
-using OpenSilver.Internal;
 
 namespace System
 {
@@ -110,24 +109,6 @@ namespace System
         }
 
         /// <summary>
-        /// When True, do not create the DOM elements for the UI elements that are not visible.
-        /// The DOM elements are created later, when the control becomes visible.
-        /// Enabling this option results in significantly improved performance if there are many hidden elements.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool EnableOptimizationWhereCollapsedControlsAreNotLoaded { get; set; }
-
-        /// <summary>
-        /// Wait a few moments before creating the DOM elements for the UI elements that are not visible.
-        /// The goal is to give the time to the browser engine to draw the visible ones, in order to improve the perceived performance.
-        /// The DOM elements are created immediately after the browser engine has finished drawing (when the UI thread is available).
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool EnableOptimizationWhereCollapsedControlsAreLoadedLast { get; set; }
-
-        /// <summary>
         /// Gets or sets the number of children in a Panel to render progressively in a batch.
         /// Setting this option can improve performance.
         /// Value of 0 or less means progressive rendering is disabled.
@@ -140,14 +121,6 @@ namespace System
         {
             get { return Panel.GlobalProgressiveRenderingChunkSize; }
             set { Panel.GlobalProgressiveRenderingChunkSize = value; }
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use ProgressiveRenderingChunkSize instead.")]
-        public bool EnableProgressiveRendering
-        {
-            get => Panel.GlobalProgressiveRenderingChunkSize > 0;
-            set => Panel.GlobalProgressiveRenderingChunkSize = 1;
         }
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }

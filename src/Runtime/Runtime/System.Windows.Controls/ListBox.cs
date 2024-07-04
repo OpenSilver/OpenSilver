@@ -17,7 +17,6 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -559,37 +558,5 @@ namespace System.Windows.Controls
                 }
             }
         }
-
-        #region Obsoletes
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        public Brush SelectedItemBackgroundBrush
-        {
-            get { return SelectedItemBackground; }
-            set { SelectedItemBackground = value; }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        public Brush SelectedItemForegroundBrush
-        {
-            get { return SelectedItemForeground; }
-            set { SelectedItemForeground = value; }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        public Brush UnselectedItemBackgroundBrush
-        {
-            get { return RowBackground; }
-            set { RowBackground = value; }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        public Brush UnselectedItemForegroundBrush
-        {
-            get { return UnselectedItemForeground; }
-            set { UnselectedItemForeground = value; }
-        }
-
-        #endregion Obsoletes
     }
 }

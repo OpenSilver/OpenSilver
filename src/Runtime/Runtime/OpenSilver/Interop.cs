@@ -463,25 +463,6 @@ public static partial class Interop
     }
 
     /// <summary>
-    /// Returns True is the app is running inside the Simulator, and False otherwise.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use IsRunningInTheSimulator instead.")]
-    public static bool IsRunningInTheSimulator_WorkAround => IsRunningInTheSimulator;
-
-    /// <summary>
-    /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
-    /// </summary>
-    /// <param name="value">The value to unbox.</param>
-    /// <returns>the unboxed value if the value was boxed, the value itself otherwise.</returns>
-    [Obsolete(Helper.ObsoleteMemberMessage)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static object Unbox(object value)
-    {
-        return value;
-    }
-
-    /// <summary>
     /// Check if the given jsnode is undefined
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]

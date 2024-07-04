@@ -4,12 +4,10 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -915,56 +913,5 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         private ContentControl _previousHeader;
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush SelectedBackground
-        {
-            get { return (Brush)GetValue(SelectedBackgroundProperty); }
-            set { SetValue(SelectedBackgroundProperty, value); }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty SelectedBackgroundProperty =
-            DependencyProperty.Register(
-                nameof(SelectedBackground),
-                typeof(Brush),
-                typeof(TabItem),
-                new PropertyMetadata(new SolidColorBrush(Colors.White)));
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush SelectedForeground
-        {
-            get { return (Brush)GetValue(SelectedForegroundProperty); }
-            set { SetValue(SelectedForegroundProperty, value); }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty SelectedForegroundProperty =
-            DependencyProperty.Register(
-                nameof(SelectedForeground),
-                typeof(Brush),
-                typeof(TabItem),
-                new PropertyMetadata(new SolidColorBrush(Colors.Black)));
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush SelectedAccent
-        {
-            get { return (Brush)GetValue(SelectedAccentProperty); }
-            set { SetValue(SelectedAccentProperty, value); }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty SelectedAccentProperty =
-            DependencyProperty.Register(
-                nameof(SelectedAccent),
-                typeof(Brush),
-                typeof(TabItem),
-                new PropertyMetadata(new SolidColorBrush(Colors.Blue)));
     }
 }

@@ -449,9 +449,8 @@ namespace System.Windows.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parentRef, this);
-            domElementWhereToPlaceChildren = div;
-            return div;
+            domElementWhereToPlaceChildren = null;
+            return INTERNAL_HtmlDomManager.CreateBorderDomElementAndAppendIt(parentRef, this);
         }
     }
 }

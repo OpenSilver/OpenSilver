@@ -84,9 +84,8 @@ internal sealed class PasswordBoxView : TextViewBase
 
     public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
     {
-        var div = INTERNAL_HtmlDomManager.CreatePasswordBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
-        domElementWhereToPlaceChildren = div;
-        return div;
+        domElementWhereToPlaceChildren = null;
+        return INTERNAL_HtmlDomManager.CreatePasswordBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
     }
 
     protected internal override void INTERNAL_OnAttachedToVisualTree()

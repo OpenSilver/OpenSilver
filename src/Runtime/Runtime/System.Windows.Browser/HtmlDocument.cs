@@ -11,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Security;
 using System.Windows.Browser.Internal;
-using CSHTML5;
-using OpenSilver.Internal;
 
 namespace System.Windows.Browser
 {
@@ -28,13 +24,6 @@ namespace System.Windows.Browser
     {
         private HtmlElement _body;
         private HtmlElement _documentElement;
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Windows.Browser.HtmlPage.Document instead.")]
-        public HtmlDocument()
-            : this(new DocumentRef())
-        {
-        }
 
         internal HtmlDocument(IJSObjectRef jsObject)
             : base(jsObject)

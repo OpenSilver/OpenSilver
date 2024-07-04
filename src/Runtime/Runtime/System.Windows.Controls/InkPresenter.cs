@@ -71,8 +71,8 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            domElementWhereToPlaceChildren = null;
             (var outerDiv, _canvasDom) = INTERNAL_HtmlDomManager.CreateInkPresenterDomElementAndAppendIt(parentRef, this);
-            domElementWhereToPlaceChildren = outerDiv;
             return outerDiv;
         }
         

@@ -64,7 +64,7 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(rootDivId));
             }
 
-            _rootDiv = new INTERNAL_HtmlDomElementReference(rootDivId, null);
+            _rootDiv = new(rootDivId);
 
             // Keep a reference to the app:
             Current = this;

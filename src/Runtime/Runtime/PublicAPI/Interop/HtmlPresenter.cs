@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -140,45 +139,13 @@ namespace CSHTML5.Native.Html.Controls
 
         internal bool IsUsingShadowDOM { get; private set; }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object DomElement
-        {
-            get
-            {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                {
-                    if (_jsDiv is not null)
-                    {
-                        string sDiv = OpenSilver.Interop.GetVariableStringForJS(_jsDiv);
-                        if (IsUsingShadowDOM)
-                        {
-                            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.shadowRoot && {sDiv}.shadowRoot.hasChildNodes()"))
-                            {
-                                return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.shadowRoot.firstChild");
-                            }
-                        }
-                        else
-                        {
-                            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.hasChildNodes()"))
-                            {
-                                return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.firstChild");
-                            }
-                        }
-                    }
-                }
-
-                return null;
-            }
-        }
-
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            domElementWhereToPlaceChildren = null;
             IsUsingShadowDOM = UseShadowDom;
             (var outerDiv, _jsDiv) = INTERNAL_HtmlDomManager.CreateHtmlPresenterElementAndAppendIt(
                 (INTERNAL_HtmlDomElementReference)parentRef, this);
 
-            domElementWhereToPlaceChildren = _jsDiv;
             return outerDiv;
         }
 

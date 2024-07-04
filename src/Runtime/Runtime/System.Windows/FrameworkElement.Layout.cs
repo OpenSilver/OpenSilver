@@ -11,9 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Collections.Generic;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 

@@ -17,7 +17,6 @@ using System.Globalization;
 using System.Windows.Markup;
 using System.Windows.Input;
 using CSHTML5.Internal;
-using CSHTML5;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -124,7 +123,7 @@ namespace System.Windows
             RootDomElement.Style.overflow = "clip";
 
             // Create the DIV that will correspond to the root of the window visual tree:
-            OuterDiv = InnerDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", RootDomElement, this);
+            OuterDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", RootDomElement, this);
 
             OuterDiv.Style.width = "100%";
             OuterDiv.Style.height = "100%";
@@ -151,18 +150,6 @@ namespace System.Windows
             RaiseLoadedEvent();
             
             SizeChanged += WindowSizeChangedEventHandler;
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void AttachToDomElement(object rootDomElement)
-        {
-            if (rootDomElement is not INTERNAL_HtmlDomElementReference domRef)
-            {
-                throw new ArgumentException($"'{nameof(rootDomElement)}' must be a '{typeof(INTERNAL_HtmlDomElementReference)}'");
-            }
-
-            AttachToDomElement(domRef);
         }
 
         private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)
@@ -312,7 +299,7 @@ namespace System.Windows
         /// </summary>
         void ProcessOnClosing(object jsEventArg)
         {
-            OnClosing(new ClosingEventArgs(true, jsEventArg));
+            OnClosing(new ClosingEventArgs(true));
         }
 
         /// <summary>

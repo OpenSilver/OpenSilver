@@ -154,17 +154,6 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Retrieves an object that is located within a specified point of an object's coordinate space.
-        /// </summary>
-        /// <param name="intersectingPoint">The point to use as the determination point.</param>
-        /// <returns>The UIElement object that is determined to be located
-        /// in the visual tree composition at the specified point.</returns>
-        internal static UIElement FindElementInHostCoordinates(Point intersectingPoint)
-        {
-            return INTERNAL_HtmlDomManager.FindElementInHostCoordinates_UsedBySimulatorToo(intersectingPoint.X, intersectingPoint.Y);
-        }
-
-        /// <summary>
         /// Retrieves a set of objects that are located within a specified point of an object's
         /// coordinate space.
         /// </summary>
@@ -322,42 +311,6 @@ namespace System.Windows.Media
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Get the visual tree children of an element.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <returns>The visual tree children of an element.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="element"/> is null.
-        /// </exception>
-        public static IEnumerable<DependencyObject> GetVisualChildren(DependencyObject element)
-        {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            return GetVisualChildrenAndSelfIterator(element).Skip(1);
-        }
-
-        /// <summary>
-        /// Get the visual tree children of an element and the element itself.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <returns>
-        /// The visual tree children of an element and the element itself.
-        /// </returns>
-        private static IEnumerable<DependencyObject> GetVisualChildrenAndSelfIterator(DependencyObject element)
-        {
-            yield return element;
-
-            int count = GetChildrenCount(element);
-            for (int i = 0; i < count; i++)
-            {
-                yield return GetChild(element, i);
-            }
         }
     }
 }

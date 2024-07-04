@@ -17,7 +17,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Windows.Media;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls.Primitives
@@ -92,7 +91,9 @@ namespace System.Windows.Controls.Primitives
                 s.SelectionChange.SelectJustThisItem(s.ItemInfoFromIndex(newIndex), true /* assumeInItemsCollection */);
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             s.ManageSelectedIndex_Changed(e);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         private static object CoerceSelectedIndex(DependencyObject d, object value)
@@ -1401,125 +1402,21 @@ namespace System.Windows.Controls.Primitives
 
         #region Obsolete
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void ApplySelectedIndex(int index) { }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void ManageSelectedIndex_Changed(DependencyPropertyChangedEventArgs e) { }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void OnSelectedItemChanged(object selectedItem) { }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void NotifyItemMouseEnter(SelectorItem item) { }
-
-        /// <summary>
-        /// Gets or sets the bakground color of the selected Items.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush SelectedItemBackground
-        {
-            get { return (Brush)GetValue(SelectedItemBackgroundProperty); }
-            set { SetValueInternal(SelectedItemBackgroundProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the SelectedItemBackground dependency property
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty SelectedItemBackgroundProperty =
-            DependencyProperty.Register(
-                "SelectedItemBackground",
-                typeof(Brush),
-                typeof(Selector),
-                new PropertyMetadata(new SolidColorBrush(Color.FromUInt32(0xFFBADDE9))));
-
-        /// <summary>
-        /// Gets or sets the foreground color of the selected Items.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush SelectedItemForeground
-        {
-            get { return (Brush)GetValue(SelectedItemForegroundProperty); }
-            set { SetValueInternal(SelectedItemForegroundProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the SelectedItemForeground dependency property
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty SelectedItemForegroundProperty =
-            DependencyProperty.Register(
-                "SelectedItemForeground",
-                typeof(Brush),
-                typeof(Selector),
-                new PropertyMetadata(new SolidColorBrush(Colors.Black)));
-
-        /// <summary>
-        /// Gets or sets the bakground color of the Items that are not selected.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush RowBackground
-        {
-            get { return (Brush)GetValue(RowBackgroundProperty); }
-            set { SetValueInternal(RowBackgroundProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the RowBackground dependency property
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty RowBackgroundProperty =
-            DependencyProperty.Register(
-                "RowBackground",
-                typeof(Brush),
-                typeof(Selector),
-                new PropertyMetadata(new SolidColorBrush(Colors.White)));
-
-
-        /// <summary>
-        /// Gets or sets the foreground color of the Items that are not selected.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush UnselectedItemForeground
-        {
-            get { return (Brush)GetValue(UnselectedItemForegroundProperty); }
-            set { SetValueInternal(UnselectedItemForegroundProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the UnselectedItemForeground dependency property
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty UnselectedItemForegroundProperty =
-            DependencyProperty.Register(
-                "UnselectedItemForeground",
-                typeof(Brush),
-                typeof(Selector),
-                new PropertyMetadata((Brush)null));
-
-        /// <summary>
-        /// Gets or sets the bakground color of the Items that are not selected.
-        /// </summary>
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Brush UnselectedItemBackground
-        {
-            get { return this.RowBackground; }
-            set { this.RowBackground = value; }
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected bool ChangingSelectionProgrammatically { get; set; }
 
         #endregion Obsolete
     }

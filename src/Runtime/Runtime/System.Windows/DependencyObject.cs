@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -237,23 +236,6 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Sets the local value of a dependency property on a DependencyObject while not overriding a hypothetical Binding (example: when the user writes in a TextBox with a two way Binding on its Text property).
-        /// </summary>
-        /// <param name="dependencyProperty">The identifier of the dependency property to set.</param>
-        /// <param name="value">The new local value.</param>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use SetCurrentValue instead.")]
-        public void SetLocalValue(DependencyProperty dependencyProperty, object value)
-        {
-            if (dependencyProperty == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyProperty));
-            }
-
-            SetCurrentValue(dependencyProperty, value);
-        }
-
-        /// <summary>
         /// Sets the value of a dependency property without changing its value source.
         /// </summary>
         /// <param name="dp">
@@ -284,13 +266,6 @@ namespace System.Windows
                 dp,
                 metadata,
                 value);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue instead.")]
-        public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
-        {
-            CoerceValue(dependencyProperty);
         }
 
         /// <summary>
@@ -353,24 +328,6 @@ namespace System.Windows
             return GetStorage(dp, null, false) is not Storage storage ||
                 storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default;
         }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object GetVisualStateValue(DependencyProperty dependencyProperty) => GetValue(dependencyProperty);
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SetVisualStateValue(DependencyProperty dependencyProperty, object value) =>
-            SetValue(dependencyProperty, value);
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SetAnimationValue(DependencyProperty dependencyProperty, object value) =>
-            SetValue(dependencyProperty, value);
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object GetAnimationValue(DependencyProperty dependencyProperty) => GetValue(dependencyProperty);
 
         internal void RefreshAnimation(DependencyProperty dp, AnimationClock clock)
         {
@@ -586,17 +543,6 @@ namespace System.Windows
                 metadata,
                 value,
                 recursively);
-        }
-
-        /// <summary>
-        /// Refreshes the value of the given DependencyProperty on this DependencyObject so that it fits the coercion that should be applied on it.
-        /// </summary>
-        /// <param name="dependencyProperty">The dependencyProperty whose value we want to refresh.</param>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue.")]
-        public void Coerce(DependencyProperty dependencyProperty)
-        {
-            CoerceValue(dependencyProperty);
         }
 
         /// <summary>

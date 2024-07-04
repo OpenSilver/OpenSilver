@@ -54,13 +54,6 @@ namespace System.Windows.Controls
         private ScrollViewer _scrollHost;
         private bool _isMouseOver;
 
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
-        public bool UseNativeComboBox
-        {
-            get { return false; }
-            set { }
-        }
-
         static ComboBox()
         {
             IsSelectionActivePropertyKey.OverrideMetadata(
@@ -97,19 +90,6 @@ namespace System.Windows.Controls
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
             return (item is ComboBoxItem);
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        protected override SelectorItem INTERNAL_GenerateContainer(object item)
-        {
-            return (SelectorItem)this.GetContainerFromItem(item);
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        protected override DependencyObject GetContainerFromItem(object item)
-        {
-            ComboBoxItem comboBoxItem = item as ComboBoxItem ?? new ComboBoxItem();
-            return comboBoxItem;
         }
 
         private void UpdatePresenter()
