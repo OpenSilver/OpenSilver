@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -25,7 +25,8 @@ internal sealed class TextContainerRichTextBlock : ITextContainer
 
     public TextContainerRichTextBlock(RichTextBlock rtb)
     {
-        _rtb = rtb ?? throw new ArgumentNullException(nameof(rtb));
+        Debug.Assert(rtb is not null);
+        _rtb = rtb;
     }
 
     public string Text => string.Join("\n", _rtb.Blocks.InternalItems.Select(b => b.TextContainer.Text));

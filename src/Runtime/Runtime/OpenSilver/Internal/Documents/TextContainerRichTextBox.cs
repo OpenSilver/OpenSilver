@@ -11,34 +11,27 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media;
 
 namespace OpenSilver.Internal.Documents;
 
-internal sealed class TextContainerRun : ITextContainer
+internal sealed class TextContainerRichTextBox : ITextContainer
 {
-    private readonly Run _run;
+    private readonly RichTextBox _richTextBox;
 
-    public TextContainerRun(Run run)
+    public TextContainerRichTextBox(RichTextBox richTextBox)
     {
-        Debug.Assert(run is not null);
-        _run = run;
+        Debug.Assert(richTextBox is not null);
+        _richTextBox = richTextBox;
     }
 
-    public string Text => _run.Text;
+    public string Text => string.Empty;
 
-    public void OnTextContentChanged()
-    {
-        if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_run)) is ITextContainer parent)
-        {
-            parent.OnTextContentChanged();
-        }
-    }
+    public void OnTextContentChanged() => _richTextBox.InvalidateUI();
 
-    public void OnTextAdded(TextElement textElement, int index) => throw new NotSupportedException();
+    public void OnTextAdded(TextElement textElement, int index) { }
 
-    public void OnTextRemoved(TextElement textElement) => throw new NotSupportedException();
+    public void OnTextRemoved(TextElement textElement) { }
 }

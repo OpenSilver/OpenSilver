@@ -13,6 +13,7 @@
 
 using System.Windows.Markup;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows.Documents;
 
@@ -23,6 +24,38 @@ namespace System.Windows.Documents;
 public sealed class Paragraph : Block
 {
     private InlineCollection _inlines;
+
+    static Paragraph()
+    {
+        LineHeightProperty.OverrideMetadata(
+            typeof(Paragraph),
+            new FrameworkPropertyMetadata(
+                0.0,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                OnPropertyChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Paragraph)d).SetLineHeight((double)newValue),
+            });
+
+        LineStackingStrategyProperty.OverrideMetadata(
+            typeof(Paragraph),
+            new FrameworkPropertyMetadata(
+                LineStackingStrategy.MaxHeight,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Paragraph)d).SetLineStackingStrategy((LineStackingStrategy)newValue),
+            });
+
+        TextAlignmentProperty.OverrideMetadata(
+            typeof(Paragraph),
+            new FrameworkPropertyMetadata(
+                TextAlignment.Left,
+                FrameworkPropertyMetadataOptions.Inherits,
+                OnPropertyChanged)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Paragraph)d).SetTextAlignment((TextAlignment)newValue),
+            });
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Paragraph"/> class.
@@ -52,6 +85,11 @@ public sealed class Paragraph : Block
         ((Paragraph)d)._inlines = (InlineCollection)e.NewValue;
     }
 
+    private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Block)d).TextContainer.OnTextContentChanged();
+    }
+
     protected internal override void INTERNAL_OnAttachedToVisualTree()
     {
         base.INTERNAL_OnAttachedToVisualTree();
@@ -59,6 +97,12 @@ public sealed class Paragraph : Block
         {
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(inline, this);
         }
+    }
+
+    internal sealed override bool IsModel
+    {
+        get => _inlines.IsModel;
+        set => _inlines.IsModel = value;
     }
 
     internal sealed override int VisualChildrenCount => Inlines.Count;

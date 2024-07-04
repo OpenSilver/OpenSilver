@@ -31,35 +31,50 @@ public sealed class Run : Inline
     {
         CharacterSpacingProperty.OverrideMetadata(
             typeof(Run),
-            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            new FrameworkPropertyMetadata(
+                0,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                OnPropertyChanged)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetCharacterSpacing((int)newValue),
             });
 
         FontFamilyProperty.OverrideMetadata(
             typeof(Run),
-            new FrameworkPropertyMetadata(FontFamily.Default, FrameworkPropertyMetadataOptions.Inherits, OnFontFamilyChanged)
+            new FrameworkPropertyMetadata(
+                FontFamily.Default,
+                FrameworkPropertyMetadataOptions.Inherits,
+                OnFontFamilyChanged)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontFamily((FontFamily)newValue),
             });
 
         FontSizeProperty.OverrideMetadata(
             typeof(Run),
-            new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            new FrameworkPropertyMetadata(
+                11d,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                OnPropertyChanged)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontSize((double)newValue),
             });
 
         FontStyleProperty.OverrideMetadata(
             typeof(Run),
-            new FrameworkPropertyMetadata(FontStyles.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            new FrameworkPropertyMetadata(
+                FontStyles.Normal,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                OnPropertyChanged)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontStyle((FontStyle)newValue),
             });
 
         FontWeightProperty.OverrideMetadata(
             typeof(Run),
-            new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
+            new FrameworkPropertyMetadata(
+                FontWeights.Normal,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                OnPropertyChanged)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetFontWeight((FontWeight)newValue),
             });
@@ -76,7 +91,10 @@ public sealed class Run : Inline
 
         TextDecorationsProperty.OverrideMetadata(
             typeof(Run),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits)
+            new FrameworkPropertyMetadata(
+                null,
+                FrameworkPropertyMetadataOptions.Inherits,
+                OnPropertyChanged)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetTextDecorations((TextDecorationCollection)newValue),
             });
@@ -139,7 +157,9 @@ public sealed class Run : Inline
 
     private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        UIElementHelpers.InvalidateMeasureOnFontFamilyChanged((Run)d, (FontFamily)e.NewValue);
+        var run = (Run)d;
+        UIElementHelpers.InvalidateMeasureOnFontFamilyChanged(run, (FontFamily)e.NewValue);
+        run.OnPropertyChanged();
     }
 
     private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -161,6 +181,8 @@ public sealed class Run : Inline
             };
             newBrush.Changed += run._foregroundChangedListener.OnEvent;
         }
+
+        run.OnPropertyChanged();
     }
 
     private void OnForegroundChanged(object sender, EventArgs e)
@@ -169,6 +191,19 @@ public sealed class Run : Inline
         {
             var foreground = (Brush)sender;
             this.SetForeground(foreground, foreground);
+        }
+    }
+
+    private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        ((Run)d).OnPropertyChanged();
+    }
+
+    private void OnPropertyChanged()
+    {
+        if (IsModel)
+        {
+            TextContainer.OnTextContentChanged();
         }
     }
 

@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
-
 namespace System.Windows.Documents;
 
 /// <summary>
@@ -20,32 +18,6 @@ namespace System.Windows.Documents;
 /// </summary>
 public abstract class Block : TextElement
 {
-    static Block()
-    {
-        LineHeightProperty.OverrideMetadata(
-            typeof(Block),
-            new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
-            {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Block)d).SetLineHeight((double)newValue),
-            });
-
-        LineStackingStrategyProperty.OverrideMetadata(
-            typeof(Block),
-            new FrameworkPropertyMetadata(
-                LineStackingStrategy.MaxHeight,
-                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
-            {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Block)d).SetLineStackingStrategy((LineStackingStrategy)newValue),
-            });
-
-        TextAlignmentProperty.OverrideMetadata(
-            typeof(Block),
-            new FrameworkPropertyMetadata(TextAlignment.Left, FrameworkPropertyMetadataOptions.Inherits)
-            {
-                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Block)d).SetTextAlignment((TextAlignment)newValue),
-            });
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="Block" /> class. 
     /// </summary>

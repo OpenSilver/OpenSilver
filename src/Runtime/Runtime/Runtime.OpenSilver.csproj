@@ -42,13 +42,14 @@
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerLineBreak.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerParagraph.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBlock.cs" />
+    <Compile Include="OpenSilver\Internal\Documents\TextContainerRichTextBox.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerRun.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerSection.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainer.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainersHelper.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerSpan.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerTextBlock.cs" />
-		<Compile Include="OpenSilver\Internal\Controls\ScrollData.cs" />
+    <Compile Include="OpenSilver\Internal\Controls\ScrollData.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.IScrollInfo.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewHosts.cs" />
@@ -213,6 +214,7 @@
 		<Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBlock.NotImplemented.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillContentParser.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDelta.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxAutomationPeer.cs" />

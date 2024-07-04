@@ -28,6 +28,7 @@ namespace System.Windows.Documents
         {
             Debug.Assert(rtb is not null);
             _richTextBox = rtb;
+            Update(0, 0);
         }
 
         /// <summary>
@@ -56,8 +57,8 @@ namespace System.Windows.Documents
         /// </returns>
         public string Text
         {
-            get => _richTextBox.View?.GetText(Start.Offset, Length) ?? string.Empty;
-            set => _richTextBox.View?.SetText(Start.Offset, Length, value);
+            get => _richTextBox.View?.GetSelectedText() ?? string.Empty;
+            set => _richTextBox.View?.SetSelectedText(value);
         }
 
         /// <summary>

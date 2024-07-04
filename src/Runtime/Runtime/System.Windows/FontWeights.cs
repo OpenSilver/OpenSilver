@@ -106,7 +106,7 @@ namespace System.Windows
         /// </summary>
         public static FontWeight UltraLight => new FontWeight((int)FontWeightsCode.UltraLight);
 
-        internal static bool FontWeightStringToKnownWeight(string s, IFormatProvider provider, ref FontWeight fontWeight)
+        internal static bool FontWeightStringToKnownWeight(string s, IFormatProvider provider, out FontWeight fontWeight)
         {
             switch (s.Length)
             {
@@ -216,6 +216,8 @@ namespace System.Windows
                 fontWeight = FontWeight.FromOpenTypeWeight(weightValue);
                 return true;
             }
+
+            fontWeight = default;
             return false;
         }
 

@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Markup;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
@@ -46,6 +48,9 @@ namespace System.Windows.Controls
         private FrameworkElement _contentElement;
         private ScrollViewer _scrollViewer;
         private ITextViewHost<RichTextBoxView> _textViewHost;
+        private bool _isModelInvalidated;
+        private int _notificationsSuspended;
+        private int _changesCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextBox"/> class.
@@ -53,7 +58,7 @@ namespace System.Windows.Controls
         public RichTextBox()
         {
             DefaultStyleKey = typeof(RichTextBox);
-            SetValueInternal(BlocksProperty, new BlockCollection(this));
+            SetValueInternal(BlocksPropertyKey, new BlockCollection(this));
             Selection = new TextSelection(this);
             ContentStart = new TextPointer(this, 0, LogicalDirection.Backward);
             ContentEnd = new TextPointer(this, 0, LogicalDirection.Forward);
@@ -173,15 +178,13 @@ namespace System.Windows.Controls
             get => View?.GetXaml() ?? string.Empty;
             set
             {
-                Blocks.Clear();
-                foreach (Block block in RichTextXamlParser.Parse(value))
+                using (DeferRefresh())
                 {
-                    Blocks.Add(block);
-                }
-
-                if (View is RichTextBoxView view)
-                {
-                    view.SetContentsFromBlocks();
+                    _blocks.Clear();
+                    foreach (Block block in RichTextXamlParser.Parse(value))
+                    {
+                        _blocks.Add(block);
+                    }
                 }
             }
         }
@@ -227,12 +230,12 @@ namespace System.Windows.Controls
         /// </returns>
         public TextPointer ContentEnd { get; private set; }
 
-        private static readonly DependencyProperty BlocksProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey BlocksPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(Blocks),
                 typeof(BlockCollection),
                 typeof(RichTextBox),
-                new PropertyMetadata(null, OnBlocksChanged));
+                new ReadOnlyPropertyMetadata(null, GetBlocks, OnBlocksChanged));
 
         /// <summary>
         /// Gets the contents of the <see cref="RichTextBox"/>.
@@ -241,11 +244,34 @@ namespace System.Windows.Controls
         /// A <see cref="BlockCollection"/> that contains the contents of the
         /// <see cref="RichTextBox"/>.
         /// </returns>
-        public BlockCollection Blocks => _blocks;
+        public BlockCollection Blocks => (BlockCollection)GetValue(BlocksPropertyKey.DependencyProperty);
+
+        internal BlockCollection GetBlocksCache() => _blocks;
+
+        private static object GetBlocks(DependencyObject d)
+        {
+            var richTextBox = (RichTextBox)d;
+            if (richTextBox._isModelInvalidated)
+            {
+                richTextBox._isModelInvalidated = false;
+                richTextBox.Resync();
+            }
+
+            return richTextBox._blocks;
+        }
 
         private static void OnBlocksChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((RichTextBox)d)._blocks = (BlockCollection)e.NewValue;
+
+            if (e.OldValue is BlockCollection oldBlocks)
+            {
+                oldBlocks.IsModel = false;
+            }
+            if (e.NewValue is BlockCollection newBlocks)
+            {
+                newBlocks.IsModel = true;
+            }
         }
 
         /// <summary>
@@ -257,6 +283,20 @@ namespace System.Windows.Controls
                 typeof(bool),
                 typeof(RichTextBox),
                 new PropertyMetadata(false, OnIsReadOnlyChanged));
+
+        public IDisposable DeferRefresh() => new DeferHelper(this);
+
+        private void EndRefresh()
+        {
+            if (--_notificationsSuspended == 0)
+            {
+                if (_changesCount > 0)
+                {
+                    _changesCount = 0;
+                    View?.SetContentsFromBlocks();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value that determines whether the user can change the text in
@@ -661,6 +701,161 @@ namespace System.Windows.Controls
             base.OnTextInput(e);
         }
 
+        internal void InvalidateUI()
+        {
+            if (_notificationsSuspended > 0)
+            {
+                _changesCount++;
+                return;
+            }
+
+            View?.InvalidateUI();
+        }
+
+        internal void InvalidateModel()
+        {
+            if (_notificationsSuspended == 0)
+            {
+                _isModelInvalidated = true;
+            }
+        }
+
+        private void Resync()
+        {
+            _blocks.Clear();
+
+            if (View is RichTextBoxView view)
+            {
+                var parser = new QuillContentParser(view.GetContents());
+
+                while (parser.MoveToNextBlock())
+                {
+                    _blocks.Add(CreateParagraph(parser.BlockFormat, parser.Inlines));
+                }
+            }
+        }
+
+        private Paragraph CreateParagraph(QuillRangeFormat format, IEnumerable<QuillDelta> deltas)
+        {
+            var paragraph = new Paragraph();
+
+            if (!string.IsNullOrEmpty(format.TextAlignment))
+            {
+                paragraph.TextAlignment = format.TextAlignment switch
+                {
+                    "center" => TextAlignment.Center,
+                    "end" => TextAlignment.Right,
+                    "justify" => TextAlignment.Justify,
+                    _ => TextAlignment.Left,
+                };
+            }
+
+            if (!string.IsNullOrEmpty(format.LineHeight))
+            {
+                if (format.LineHeight == "normal")
+                {
+                    paragraph.LineHeight = 0.0;
+                }
+                else if (format.LineHeight.EndsWith("px") && double.TryParse(
+                    format.LineHeight.Substring(0, format.LineHeight.Length - 2),
+                    NumberStyles.Float | NumberStyles.AllowThousands,
+                    CultureInfo.InvariantCulture,
+                    out double lineHeight))
+                {
+                    paragraph.LineHeight = lineHeight;
+                }
+            }
+
+            foreach (QuillDelta delta in deltas)
+            {
+                paragraph.Inlines.Add(CreateRun(delta));
+            }
+
+            return paragraph;
+        }
+
+        private Run CreateRun(QuillDelta delta)
+        {
+            var run = new Run();
+
+            run.Text = delta.Text;
+
+            if (delta.Attributes is QuillRangeFormat format)
+            {
+                if (!string.IsNullOrEmpty(format.FontFamily))
+                {
+                    run.FontFamily = new FontFamily(format.FontFamily);
+                }
+
+                if (!string.IsNullOrEmpty(format.FontWeight))
+                {
+                    if (FontWeights.FontWeightStringToKnownWeight(format.FontWeight, CultureInfo.InvariantCulture, out FontWeight fontWeight))
+                    {
+                        run.FontWeight = fontWeight;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(format.FontStyle))
+                {
+                    run.FontStyle = format.FontStyle switch
+                    {
+                        "italic" => FontStyles.Italic,
+                        "oblique" => FontStyles.Oblique,
+                        _ => FontStyles.Normal,
+                    };
+                }
+
+                if (!string.IsNullOrEmpty(format.FontSize))
+                {
+                    if (format.FontSize.EndsWith("px") && double.TryParse(
+                        format.FontSize.Substring(0, format.FontSize.Length - 2),
+                        NumberStyles.Float | NumberStyles.AllowThousands,
+                        CultureInfo.InvariantCulture,
+                        out double fontSize))
+                    {
+                        run.FontSize = fontSize;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(format.Foreground))
+                {
+                    if (RichTextBoxView.TryParseCssColor(format.Foreground, out Color color))
+                    {
+                        run.Foreground = new SolidColorBrush(color);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(format.CharacterSpacing))
+                {
+                    if (format.CharacterSpacing == "normal")
+                    {
+                        run.CharacterSpacing = 0;
+                    }
+                    else if (format.CharacterSpacing.EndsWith("em") && double.TryParse(
+                        format.CharacterSpacing.Substring(0, format.CharacterSpacing.Length - 2),
+                        NumberStyles.Float | NumberStyles.AllowThousands,
+                        CultureInfo.InvariantCulture,
+                        out double spacing))
+                    {
+                        run.CharacterSpacing = (int)(spacing * 1000);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(format.TextDecorations))
+                {
+                    run.TextDecorations = format.TextDecorations switch
+                    {
+                        "underline" => Windows.TextDecorations.Underline,
+                        "line-through" => Windows.TextDecorations.Strikethrough,
+                        "overline" => Windows.TextDecorations.OverLine,
+                        _ => null,
+                    };
+                }
+            }
+
+            return run;
+        }
+
         internal override void UpdateVisualStates()
         {
             if (!IsEnabled)
@@ -720,6 +915,27 @@ namespace System.Windows.Controls
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
+        }
+
+        private sealed class DeferHelper : IDisposable
+        {
+            private readonly RichTextBox _richTextBox;
+
+            public DeferHelper(RichTextBox richTextBox)
+            {
+                _richTextBox = richTextBox;
+                _richTextBox._notificationsSuspended++;
+            }
+
+            ~DeferHelper() => Dispose(false);
+
+            public void Dispose()
+            {
+                GC.SuppressFinalize(this);
+                Dispose(true);
+            }
+
+            private void Dispose(bool isDisposing) => _richTextBox.EndRefresh();
         }
     }
 }

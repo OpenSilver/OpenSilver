@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -25,7 +25,8 @@ internal sealed class TextContainerSpan : ITextContainer
 
     internal TextContainerSpan(Span span)
     {
-        _span = span ?? throw new ArgumentNullException(nameof(span));
+        Debug.Assert(span is not null);
+        _span = span;
     }
 
     public string Text => string.Join(string.Empty, _span.Inlines.InternalItems.Select(i => i.TextContainer.Text));

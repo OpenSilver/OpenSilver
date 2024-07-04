@@ -37,6 +37,8 @@ public abstract class TextElement : UIElement
 
     internal ITextContainer TextContainer => _textContainer ??= TextContainersHelper.Create(this);
 
+    internal virtual bool IsModel { get; set; }
+
     /// <summary>
     /// Identifies the <see cref="CharacterSpacing"/> dependency property.
     /// </summary>

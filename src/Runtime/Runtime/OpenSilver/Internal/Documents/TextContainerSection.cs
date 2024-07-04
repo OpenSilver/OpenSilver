@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Documents;
+using System.Windows.Media;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal.Documents;
@@ -24,7 +25,8 @@ internal sealed class TextContainerSection : ITextContainer
 
     public TextContainerSection(Section section)
     {
-        _section = section ?? throw new ArgumentNullException(nameof(section));
+        Debug.Assert(section is not null);
+        _section = section;
     }
 
     public string Text => string.Join("\n", _section.Blocks.InternalItems.Select(b => b.TextContainer.Text));
@@ -45,5 +47,11 @@ internal sealed class TextContainerSection : ITextContainer
         }
     }
 
-    public void OnTextContentChanged() { }
+    public void OnTextContentChanged()
+    {
+        if (TextContainersHelper.Get(VisualTreeHelper.GetParent(_section)) is ITextContainer parent)
+        {
+            parent.OnTextContentChanged();
+        }
+    }
 }

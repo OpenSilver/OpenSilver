@@ -1512,7 +1512,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
                 }
             });
             ql.on('text-change', function (delta, oldDelta, source) {
-                if (source === Quill.sources.USER || source === Quill.sources.API) {
+                if (source === Quill.sources.USER) {
                     contentChangedCallback(id);
                 }
             });
@@ -1536,7 +1536,13 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             if (!ql) return '0|0';
 
             const root = ql.root;
-            return root.scrollWidth + '|' + root.scrollHeight;
+
+            // quill sets 'height: 100%' on the editor. It needs to be removed while measuring.
+            root.style.height = 'auto';
+            const size = root.scrollWidth + '|' + root.scrollHeight;
+            root.style.height = '';
+
+            return size;
         },
         onKeyDownNative: function (view, e) {
             const ql = Quill.find(view);
@@ -1578,23 +1584,25 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return 0;
 
-            return getLength(ql);
+            return ql.getLength();
         },
-        getText: function (id, start, length) {
+        getSelectedText: function (id) {
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return;
 
-            return ql.getText(start, length);
+            return ql.getText(ql.getSelection());
         },
-        replaceText: function (id, start, length, text) {
+        setSelectedText: function (id, text) {
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return;
+
+            const selection = ql.getSelection();
 
             if (text.length > 0) {
-                ql.deleteText(start, length, Quill.sources.SILENT);
-                ql.insertText(start, text, Quill.sources.API);
+                ql.deleteText(selection.index, selection.length, Quill.sources.SILENT);
+                ql.insertText(selection.index, text, Quill.sources.API);
             } else {
-                ql.deleteText(start, length, Quill.sources.API);
+                ql.deleteText(selection.index, selection.length, Quill.sources.API);
             }
         },
         select: function (id, start, length) {
@@ -1607,7 +1615,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return;
 
-            ql.setSelection(0, getLength(ql), Quill.sources.API);
+            ql.setSelection(0, ql.getLength(), Quill.sources.API);
         },
         getContents: function (id, start, length) {
             const ql = Quill.find(document.getElementById(id));
@@ -1638,7 +1646,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return;
 
-            ql.format(property, value);
+            ql.format(property, value, Quill.sources.API);
         },
         getFormat: function (id, property) {
             const ql = Quill.find(document.getElementById(id));

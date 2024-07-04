@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -25,7 +25,8 @@ internal sealed class TextContainerTextBlock : ITextContainer
 
     internal TextContainerTextBlock(TextBlock tb)
     {
-        _textblock = tb ?? throw new ArgumentNullException(nameof(tb));
+        Debug.Assert(tb is not null);
+        _textblock = tb;
     }
 
     public string Text => string.Join(string.Empty, _textblock.Inlines.InternalItems.Select(i => i.TextContainer.Text));

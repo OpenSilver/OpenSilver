@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Collections;
+using System.Diagnostics;
 using OpenSilver.Internal.Documents;
 
 namespace System.Windows.Documents;
@@ -27,20 +28,39 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
     where T : TextElement
 {
     private readonly UIElement _owner;
+    private bool _isModel;
 
     internal TextElementCollection(UIElement owner)
         : base(false)
     {
-        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        Debug.Assert(owner is not null);
+        _owner = owner;
         TextContainer = TextContainersHelper.Create(owner);
     }
 
     internal ITextContainer TextContainer { get; }
 
+    internal bool IsModel
+    {
+        get => _isModel;
+        set
+        {
+            if (_isModel != value)
+            {
+                _isModel = value;
+                foreach (T element in InternalItems)
+                {
+                    element.IsModel = value;
+                }
+            }
+        }
+    }
+
     internal sealed override void AddOverride(T value)
     {
         AddDependencyObjectInternal(value);
         SetVisualParent(value);
+        value.IsModel = IsModel;
         OnAdd(value, Count);
     }
 
@@ -54,6 +74,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
             foreach (T item in oldItems)
             {
                 ClearVisualParent(item);
+                item.IsModel = false;
             }
 
             if (TextContainer is ITextContainer textContainer)
@@ -79,6 +100,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
     {
         InsertDependencyObjectInternal(index, value);
         SetVisualParent(value);
+        value.IsModel = IsModel;
         OnAdd(value, index);
     }
 
@@ -87,6 +109,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         T item = GetItemInternal(index);
         RemoveAtDependencyObjectInternal(index);
         ClearVisualParent(item);
+        item.IsModel = false;
         OnRemove(item);
     }
 
@@ -95,8 +118,10 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         T oldItem = GetItemInternal(index);
         SetItemDependencyObjectInternal(index, value);
         ClearVisualParent(oldItem);
+        oldItem.IsModel = false;
         OnRemove(oldItem);
         SetVisualParent(value);
+        value.IsModel = IsModel;
         OnAdd(value, index);
     }
 

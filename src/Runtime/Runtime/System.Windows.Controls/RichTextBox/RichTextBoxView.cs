@@ -22,6 +22,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using System.Xml;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Media;
@@ -109,6 +110,7 @@ internal sealed class RichTextBoxView : TextViewBase
         IsHitTestableProperty.OverrideMetadata(typeof(RichTextBoxView), new PropertyMetadata(BooleanBoxes.TrueBox));
     }
 
+    private DispatcherOperation _refreshOp;
     private WeakEventListener<RichTextBoxView, Brush, EventArgs> _foregroundChangedListener;
 
     public RichTextBoxView(RichTextBox rtb)
@@ -176,21 +178,31 @@ internal sealed class RichTextBoxView : TextViewBase
         return new Size();
     }
 
-    protected internal override void OnInput()
+    protected internal override void OnInput() => OnContentChanged(true);
+
+    internal void InvalidateUI()
     {
-        InvalidateMeasure();
-        Host.OnContentChanged();
+        if (OuterDiv is null)
+        {
+            return;
+        }
+
+        _refreshOp ??= Dispatcher.InvokeAsync(() =>
+        {
+            _refreshOp = null;
+            SetContentsFromBlocks();
+        },
+        DispatcherPriority.Background);
     }
 
-    internal string GetText(int start, int length)
+    internal string GetSelectedText()
     {
         if (OuterDiv is null)
         {
             return string.Empty;
         }
 
-        return Interop.ExecuteJavaScriptString(
-            $"document.richTextViewManager.getText('{OuterDiv.UniqueIdentifier}', {start.ToInvariantString()}, {length.ToInvariantString()})");
+        return Interop.ExecuteJavaScriptString($"document.richTextViewManager.getSelectedText('{OuterDiv.UniqueIdentifier}')");
     }
 
     internal int GetContentLength()
@@ -203,7 +215,7 @@ internal sealed class RichTextBoxView : TextViewBase
         return Interop.ExecuteJavaScriptInt32($"document.richTextViewManager.getContentLength('{OuterDiv.UniqueIdentifier}')");
     }
 
-    internal void SetText(int start, int length, string text)
+    internal void SetSelectedText(string text)
     {
         if (OuterDiv is null)
         {
@@ -211,7 +223,9 @@ internal sealed class RichTextBoxView : TextViewBase
         }
 
         Interop.ExecuteJavaScriptVoid(
-            $"document.richTextViewManager.replaceText('{OuterDiv.UniqueIdentifier}', {start.ToInvariantString()}, {length.ToInvariantString()}, {HttpUtility.JavaScriptStringEncode(text, true)})");
+            $"document.richTextViewManager.setSelectedText('{OuterDiv.UniqueIdentifier}', {HttpUtility.JavaScriptStringEncode(text, true)})");
+
+        OnContentChanged(true);
     }
 
     internal void SelectAll()
@@ -438,6 +452,8 @@ internal sealed class RichTextBoxView : TextViewBase
 
         Interop.ExecuteJavaScriptVoid(
             $"document.richTextViewManager.format('{OuterDiv.UniqueIdentifier}', '{property}', {HttpUtility.JavaScriptStringEncode(value, true)})");
+
+        OnContentChanged(true);
     }
 
     internal string GetXaml() => GetXaml(GetContents());
@@ -446,101 +462,71 @@ internal sealed class RichTextBoxView : TextViewBase
 
     private string GetXaml(QuillDelta[] contents)
     {
-        if (contents.Length == 0)
+        var deltas = RemoveTrailingLineBreak(contents);
+
+        if (deltas.Length == 0)
         {
             return string.Empty;
         }
 
-        Span<QuillDelta> deltas = RemoveTrailingLineBreak(contents);
-
         var xaml = new XmlDocument();
         xaml.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></Section>");
 
-        var runDelta = new List<QuillDelta>();
+        var parser = new QuillContentParser(deltas);
 
-        foreach (QuillDelta delta in deltas)
+        while (parser.MoveToNextBlock())
         {
-            if (!IsEndOfParagraph(delta))
-            {
-                runDelta.Add(delta);
-                continue;
-            }
-
-            int start = FindStartOfParagraph(runDelta);
-
-            if (start > 0)
-            {
-                xaml.DocumentElement.AppendChild(CreateParagraph(xaml, default, runDelta.Take(start)));
-            }
-
-            var paragraph = CreateParagraph(xaml, delta.Attributes.Value, runDelta.Skip(start));
-
-            string text = delta.Text.EndsWith("\n") ? delta.Text.Substring(0, delta.Text.Length - 1) : delta.Text;
-            if (!string.IsNullOrEmpty(text))
-            {
-                paragraph.AppendChild(CreateRun(xaml, new QuillDelta { Text = text }));
-            }
-
-            xaml.DocumentElement.AppendChild(paragraph);
-
-            runDelta.Clear();
-        }
-
-        if (runDelta.Count > 0)
-        {
-            xaml.DocumentElement.AppendChild(CreateParagraph(xaml, default, runDelta));
+            xaml.DocumentElement.AppendChild(CreateParagraph(xaml, parser.BlockFormat, parser.Inlines));
         }
 
         return xaml.OuterXml;
 
         static Span<QuillDelta> RemoveTrailingLineBreak(Span<QuillDelta> deltas)
         {
-            ref QuillDelta delta = ref deltas[deltas.Length - 1];
-
-            if (delta.Text == "\n" && !delta.Attributes.HasValue)
+            if (deltas.Length > 0)
             {
-                return deltas.Slice(0, deltas.Length - 1);
-            }
+                ref QuillDelta delta = ref deltas[deltas.Length - 1];
 
-            if (delta.Text.EndsWith("\n"))
-            {
-                delta.Text = delta.Text.Substring(0, delta.Text.Length - 1);
+                if (delta.Text == "\n" && !delta.Attributes.HasValue)
+                {
+                    return deltas.Slice(0, deltas.Length - 1);
+                }
+
+                if (delta.Text.EndsWith("\n"))
+                {
+                    delta.Text = delta.Text.Substring(0, delta.Text.Length - 1);
+                }
             }
 
             return deltas;
         }
+    }
 
-        static bool IsEndOfParagraph(QuillDelta delta)
+    private XmlElement CreateParagraph(XmlDocument document, QuillRangeFormat format, IEnumerable<QuillDelta> deltas)
+    {
+        var paragraph = document.CreateElement(nameof(Paragraph), document.DocumentElement.NamespaceURI);
+        paragraph.SetAttribute(nameof(Block.TextAlignment), format.TextAlignment switch
         {
-            return delta.Attributes is QuillRangeFormat format &&
-                (!string.IsNullOrEmpty(format.TextAlignment) || !string.IsNullOrEmpty(format.LineHeight));
-        }
+            "center" => nameof(TextAlignment.Center),
+            "end" => nameof(TextAlignment.Right),
+            "justify" => nameof(TextAlignment.Justify),
+            _ => nameof(TextAlignment.Left),
+        });
+        paragraph.SetAttribute(nameof(Block.LineHeight), format.LineHeight switch
+        {
+            "normal" or "" or null => "0",
+            _ => format.LineHeight.Substring(0, format.LineHeight.Length - 2), // Remove 'px'
+        });
 
-        static int FindStartOfParagraph(List<QuillDelta> deltas)
+        foreach (QuillDelta d in deltas)
         {
-            for (int i = deltas.Count - 1; i >= 0; i--)
+            if (!string.IsNullOrEmpty(d.Text))
             {
-                QuillDelta delta = deltas[i];
-                int index = delta.Text.LastIndexOf('\n');
-                if (index != -1)
-                {
-                    deltas[i] = new QuillDelta
-                    {
-                        Text = delta.Text.Substring(0, index),
-                        Attributes = delta.Attributes,
-                    };
-                    deltas.Insert(i + 1, new QuillDelta
-                    {
-                        Text = delta.Text.Substring(index + 1),
-                        Attributes = delta.Attributes,
-                    });
-
-                    return i + 1;
-                }
+                paragraph.AppendChild(CreateRun(document, d));
             }
-
-            return 0;
         }
+
+        return paragraph;
     }
 
     private XmlElement CreateRun(XmlDocument document, QuillDelta delta)
@@ -623,7 +609,7 @@ internal sealed class RichTextBoxView : TextViewBase
         return run;
     }
 
-    private static bool TryParseCssColor(string cssColor, out Color color)
+    internal static bool TryParseCssColor(string cssColor, out Color color)
     {
         if (cssColor.StartsWith("rgb("))
         {
@@ -655,34 +641,7 @@ internal sealed class RichTextBoxView : TextViewBase
         return false;
     }
 
-    private XmlElement CreateParagraph(XmlDocument document, QuillRangeFormat format, IEnumerable<QuillDelta> deltas)
-    {
-        var paragraph = document.CreateElement(nameof(Paragraph), document.DocumentElement.NamespaceURI);
-        paragraph.SetAttribute(nameof(Block.TextAlignment), format.TextAlignment switch
-        {
-            "center" => nameof(TextAlignment.Center),
-            "end" => nameof(TextAlignment.Right),
-            "justify" => nameof(TextAlignment.Justify),
-            _ => nameof(TextAlignment.Left),
-        });
-        paragraph.SetAttribute(nameof(Block.LineHeight), format.LineHeight switch
-        {
-            "normal" or "" or null => "0",
-            _ => format.LineHeight.Substring(0, format.LineHeight.Length - 2), // Remove 'px'
-        });
-
-        foreach (QuillDelta d in deltas)
-        {
-            if (!string.IsNullOrEmpty(d.Text))
-            {
-                paragraph.AppendChild(CreateRun(document, d));
-            }
-        }
-
-        return paragraph;
-    }
-
-    private QuillDelta[] GetContents()
+    internal QuillDelta[] GetContents()
     {
         if (OuterDiv is null)
         {
@@ -728,10 +687,12 @@ internal sealed class RichTextBoxView : TextViewBase
             return;
         }
 
-        QuillDelta[] deltas = GetDeltas(Host.Blocks).ToArray();
+        QuillDelta[] deltas = GetDeltas(Host.GetBlocksCache()).ToArray();
 
         Interop.ExecuteJavaScriptVoid(
             $"document.richTextViewManager.setContents('{OuterDiv.UniqueIdentifier}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
+
+        OnContentChanged(false);
     }
 
     internal void UpdateContentsFromTextElement(TextElement element, int start, int length)
@@ -746,10 +707,15 @@ internal sealed class RichTextBoxView : TextViewBase
         Interop.ExecuteJavaScriptVoid(
             $"document.richTextViewManager.updateContents('{OuterDiv.UniqueIdentifier}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");
 
+        OnContentChanged(true);
+
         static IEnumerable<QuillDelta> GetDeltas(int start, int length, TextElement element)
         {
             yield return new QuillDelta { Retain = start, };
-            yield return new QuillDelta { Delete = length, };
+            if (length > 0)
+            {
+                yield return new QuillDelta { Delete = length, };
+            }
 
             switch (element)
             {
@@ -941,6 +907,16 @@ internal sealed class RichTextBoxView : TextViewBase
         {
             var foreground = (Brush)sender;
             this.SetForeground(foreground, foreground);
+        }
+    }
+
+    private void OnContentChanged(bool invalidateModel)
+    {
+        InvalidateMeasure();
+        Host.OnContentChanged();
+        if (invalidateModel)
+        {
+            Host.InvalidateModel();
         }
     }
 }

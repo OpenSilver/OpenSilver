@@ -50,18 +50,17 @@ namespace System.Windows
         /// </exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (null == value)
+            if (value is null)
             {
                 throw GetConvertFromException(value);
             }
 
-            if (!(value is string s))
+            if (value is not string s)
             {
                 throw new ArgumentException("The object passed to 'ConvertFrom' is not a valid type.", nameof(value));
             }
 
-            FontWeight fontWeight = new FontWeight();
-            if (!FontWeights.FontWeightStringToKnownWeight(s, culture, ref fontWeight))
+            if (!FontWeights.FontWeightStringToKnownWeight(s, culture, out FontWeight fontWeight))
             {
                 throw new FormatException("Token is not valid.");
             }
