@@ -101,6 +101,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private const string StaticResExtension = "StaticResourceExtension";
         private const string DependencyObj = "DependencyObject";
         private const string FrameworkTemplateName = "FrameworkTemplate";
+        private const string ResourceDictionaryName = "ResourceDictionary";
 
         private readonly MonoCecilAssemblyStorage _storage;
         private readonly List<AssemblyData> _assemblies = new();
@@ -501,6 +502,16 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             return FindPropertyDeep(type, TemplatePropertyName, out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == FrameworkTemplateName &&
+                prop.DeclaringType.Namespace == _metadata.SystemWindowsNS &&
+                prop.DeclaringType.Module.Assembly.Name.Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
+        }
+
+        public bool IsResourceDictionarySourcePropertyVisible(string namespaceName, string typeName)
+        {
+            var type = FindType(namespaceName, typeName);
+
+            return FindPropertyDeep(type, "Source", out _) is PropertyDefinition prop &&
+                prop.DeclaringType.Name == ResourceDictionaryName &&
                 prop.DeclaringType.Namespace == _metadata.SystemWindowsNS &&
                 prop.DeclaringType.Module.Assembly.Name.Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
         }

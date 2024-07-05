@@ -426,30 +426,6 @@ namespace OpenSilver.Compiler
                                 parameters.CurrentXamlContext
                             )
                         );
-
-                    }
-                    else if (element.Attribute("Source") != null && _reflectionOnSeparateAppDomain.IsAssignableFrom(
-                        _settings.Metadata.SystemWindowsNS, "ResourceDictionary", element.Name.NamespaceName, element.Name.LocalName))
-                    {
-                        //------------------------------------------------
-                        // Add the type initialization from "Source" URI:
-                        //------------------------------------------------
-                        string sourceUri = element.Attribute("Source").Value; // Note: this attribute exists because we have checked earlier.
-                        string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(
-                            sourceUri,
-                            _fileNameWithPathRelativeToProjectRoot,
-                            _assemblyNameWithoutExtension);
-
-                        parameters.StringBuilder.AppendLine(
-                            string.Format(
-                                "var {0} = {3}.XamlContext_WriteStartObject({4}, (({1})new {2}()).CreateComponent());",
-                                elementUniqueNameOrThisKeyword,
-                                $"{IXamlComponentFactoryClass}<{elementTypeInCSharp}>",
-                                XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
-                                RuntimeHelperClass,
-                                parameters.CurrentXamlContext
-                            )
-                        );
                     }
                     else
                     {
@@ -464,6 +440,21 @@ namespace OpenSilver.Compiler
 
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUniqueNameOrThisKeyword} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new {elementTypeInCSharp}());");
+
+                        if (IsResourceDictionaryCreatedFromSource(element))
+                        {
+                            //------------------------------------------------
+                            // Add the type initialization from "Source" URI:
+                            //------------------------------------------------
+                            string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(
+                                element.Attribute("Source").Value,
+                                _fileNameWithPathRelativeToProjectRoot,
+                                _assemblyNameWithoutExtension);
+                            string loadTypeFullName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
+
+                            parameters.StringBuilder.AppendLine(
+                                $"(({IXamlComponentLoaderClass})new {loadTypeFullName}()).LoadComponent({elementUniqueNameOrThisKeyword});");
+                        }
                     }
                 }
 
@@ -1259,6 +1250,17 @@ if (!{RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKe
             private bool IsClassTheApplicationClass(string className)
             {
                 return className == $"global::{_settings.Metadata.SystemWindowsNS}.Application";
+            }
+
+            private bool IsResourceDictionaryCreatedFromSource(XElement element)
+            {
+                if (element.Attribute("Source") != null)
+                {
+                    return _reflectionOnSeparateAppDomain.IsResourceDictionarySourcePropertyVisible(
+                        element.Name.NamespaceName, element.Name.LocalName);
+                }
+
+                return false;
             }
 
             private string GenerateCodeForSetterProperty(XElement styleElement, string attributeValue)

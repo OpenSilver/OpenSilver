@@ -221,6 +221,10 @@
     <Compile Include="Tests\RadioButtonTest.xaml.cs">
       <DependentUpon>RadioButtonTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\ResourceDictionary\CachedResourceDictionary\CachedResourceDictionary.cs" />
+    <Compile Include="Tests\ResourceDictionary\CachedResourceDictionary\CountableInstance.cs" />
+    <Compile Include="Tests\ResourceDictionary\CustomPropertyResourceDictionary.cs" />
+    <Compile Include="Tests\ResourceDictionary\ResourceDictionaryTest.xaml.cs" />
     <Compile Include="Tests\Right ClickTest.xaml.cs">
       <DependentUpon>Right ClickTest.xaml</DependentUpon>
     </Compile>
@@ -656,6 +660,15 @@
     <Page Include="Tests\PopupZIndexTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Tests\ResourceDictionary\CachedResourceDictionary\CountableResourceDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\ResourceDictionary\ResourceDictionaryTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\ResourceDictionary\SomeResourceDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tests\RightToLeftTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -668,6 +681,12 @@
     <Page Include="Tests\ValidationSummaryTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Tests\ResourceDictionary\CachedResourceDictionary\CountableResourceDictionary.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Tests\ResourceDictionary\SomeResourceDictionary.xaml" />
   </ItemGroup>
 
 </Project>
