@@ -915,10 +915,10 @@ internal sealed class RichTextBoxView : TextViewBase
     private void OnContentChanged(bool invalidateModel)
     {
         InvalidateMeasure();
-        Host.OnContentChanged();
         if (invalidateModel)
         {
             Host.InvalidateModel();
         }
+        Host.OnContentChanged();
     }
 }

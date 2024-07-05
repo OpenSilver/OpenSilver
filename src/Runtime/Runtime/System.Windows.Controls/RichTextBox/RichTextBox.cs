@@ -253,8 +253,8 @@ namespace System.Windows.Controls
             var richTextBox = (RichTextBox)d;
             if (richTextBox._isModelInvalidated)
             {
-                richTextBox._isModelInvalidated = false;
                 richTextBox.Resync();
+                richTextBox._isModelInvalidated = false;
             }
 
             return richTextBox._blocks;
@@ -703,6 +703,11 @@ namespace System.Windows.Controls
 
         internal void InvalidateUI()
         {
+            if (_isModelInvalidated)
+            {
+                return;
+            }
+
             if (_notificationsSuspended > 0)
             {
                 _changesCount++;
@@ -768,7 +773,10 @@ namespace System.Windows.Controls
 
             foreach (QuillDelta delta in deltas)
             {
-                paragraph.Inlines.Add(CreateRun(delta));
+                if (!string.IsNullOrEmpty(delta.Text))
+                {
+                    paragraph.Inlines.Add(CreateRun(delta));
+                }
             }
 
             return paragraph;
