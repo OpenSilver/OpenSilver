@@ -10,5 +10,15 @@
         <Border Name="EllipsisTrimmedCustomLayoutBorder" Width="100">
             <TextBlock Name="EllipsisTrimmedCustomLayoutTextBlock" Margin="0,10,0,0" Text="Long text that should be trimmed with ellipsis" Height="22" TextTrimming="WordEllipsis"/>
         </Border>
+
+        <TextBlock TextTrimming="WordEllipsis" TextWrapping="Wrap"
+                   Width="200" LineHeight="14" Height="28" Margin="0,10,0,0"
+                   Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent volutpat cursus est, sed pharetra ex. Etiam vehicula mollis augue. Sed id erat id nisl condimentum facilisis. Curabitur feugiat suscipit quam. Quisque mollis vehicula lobortis. Suspendisse quis porttitor mi, id posuere quam. Etiam at purus a urna euismod consequat id et magna. Phasellus scelerisque ipsum vel sem bibendum, in laoreet ex maximus. Pellentesque bibendum gravida malesuada. Nulla accumsan lorem varius cursus dignissim. Praesent tincidunt et magna vel viverra. Duis blandit lorem felis, a malesuada justo congue at. Sed sodales diam tincidunt lorem varius sodales. Nunc lorem nulla, varius vel massa sit amet, viverra tincidunt sem." />
+
+        <TextBlock TextTrimming="WordEllipsis" TextWrapping="Wrap"
+                   Width="200" LineHeight="14" Height="28" Margin="0,10,0,0">
+            <Run>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Run>
+            <Run>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Run>
+        </TextBlock>
     </StackPanel>
 </sdk:Page>
