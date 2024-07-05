@@ -129,7 +129,7 @@ namespace OpenSilver.Compiler.Resources
             // Copy files:
             foreach (EmbeddedResource resource in GetManifestResources(asm))
             {
-                string fileRelativePath = ResourceIDHelper.GetResourceIDFromRelativePath(resource.Name);
+                string fileRelativePath = ResourceIDHelper.GetResourceIDFromRelativePath(resource.Name, UriFormat.Unescaped);
                 byte[] fileContent = resource.GetResourceData();
 
                 // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
@@ -193,7 +193,7 @@ namespace OpenSilver.Compiler.Resources
                         continue;
                     }
 
-                    string resourceId = enumerator.Key.ToString();
+                    string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(enumerator.Key.ToString(), UriFormat.Unescaped);
 
                     // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
                     string resourcesRootDir = Path.GetFullPath(Path.Combine(outputPathAbsolute, OutputResourcesPath, assemblyName.ToLowerInvariant()));

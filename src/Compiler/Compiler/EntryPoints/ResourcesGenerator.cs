@@ -265,6 +265,6 @@ public class ResourcesGenerator : Task
         // ' ' is converted to escaped version %20
         //
 
-        return ResourceIDHelper.GetResourceIDFromRelativePath(relPath);
+        return ResourceIDHelper.GetResourceIDFromRelativePath(relPath, UriFormat.UriEscaped);
     }
 }

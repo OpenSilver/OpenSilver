@@ -14,7 +14,7 @@ internal static class ResourceIDHelper
     // as ResourceID.
     // MarkupCompiler, ResXGen, Loader will call this method internally.
     //
-    static internal string GetResourceIDFromRelativePath(string relPath)
+    static internal string GetResourceIDFromRelativePath(string relPath, UriFormat uriFormat)
     {
         // It is important that relPath not contain a fragment or query at this point
         //
@@ -26,14 +26,14 @@ internal static class ResourceIDHelper
         Uri baseUri = new Uri("http://foo/");
         Uri srcUri = new Uri(baseUri, relPath.Replace("#", "%23"));
 
-        return GetResourceIDFromUri(baseUri, srcUri);
+        return GetResourceIDFromUri(baseUri, srcUri, uriFormat);
     }
 
     //
     // This is the central place that returns right ResourceID for 
     // the passed SourceUri.
     //
-    static private string GetResourceIDFromUri(Uri baseUri, Uri sourceUri)
+    static private string GetResourceIDFromUri(Uri baseUri, Uri sourceUri, UriFormat uriFormat)
     {
         string resourceID = String.Empty;
 
@@ -60,8 +60,8 @@ internal static class ResourceIDHelper
             //
             // Get the escaped Path part, Path doesn't include Query and Fragment.
             //
-            string basePath = baseUri.GetComponents(UriComponents.Path, UriFormat.UriEscaped);
-            string sourcePath = sourceUri.GetComponents(UriComponents.Path, UriFormat.UriEscaped);
+            string basePath = baseUri.GetComponents(UriComponents.Path, uriFormat);
+            string sourcePath = sourceUri.GetComponents(UriComponents.Path, uriFormat);
 
             // 
             // Always lower case the Path string.
