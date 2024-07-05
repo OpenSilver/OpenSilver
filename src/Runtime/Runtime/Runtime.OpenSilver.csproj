@@ -28,6 +28,8 @@
 		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
 		<Compile Include="Core\Events\DOMEventManager.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
+		<Compile Include="OpenSilver\Design\DesignInstanceExtension.cs" />
+		<Compile Include="OpenSilver\Design\SampleDataExtension.cs" />
 		<Compile Include="OpenSilver\Features.cs" />
 		<Compile Include="OpenSilver\Buffers\StackVector.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\ImageManager.cs" />

@@ -60,3 +60,6 @@ using System.Windows.Markup;
 
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "System.Windows.Controls")] // This is used for example when migrating Silverlight apps, for example with the DockPanel control that was in the Toolkit.
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "System.Windows.Controls.Primitives")]
+
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/expression/blend/2008", "OpenSilver.Design")]
+[assembly: XmlnsPrefix("http://schemas.microsoft.com/expression/blend/2008", "d")]
