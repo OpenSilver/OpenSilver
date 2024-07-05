@@ -1542,16 +1542,27 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
                 view.setAttribute(ACCEPTS_RETURN_ATTR, value);
             }
         },
-        measureView: function (id) {
+        measureView: function (id, maxWidth, maxHeight) {
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return '0|0';
 
             const root = ql.root;
 
-            // quill sets 'height: 100%' on the editor. It needs to be removed while measuring.
+            root.style.width = 'max-content';
             root.style.height = 'auto';
+            if (maxWidth >= 0) {
+                root.style.maxWidth = maxWidth + 'px';
+            }
+            if (maxHeight >= 0) {
+                root.style.maxHeight = maxHeight + 'px';
+            }
+
             const size = root.scrollWidth + '|' + root.scrollHeight;
+
+            root.style.width = '';
             root.style.height = '';
+            root.style.maxWidth = '';
+            root.style.maxHeight = '';
 
             return size;
         },

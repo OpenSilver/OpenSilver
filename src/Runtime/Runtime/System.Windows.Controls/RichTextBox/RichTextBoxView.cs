@@ -163,8 +163,10 @@ internal sealed class RichTextBoxView : TextViewBase
 
     protected override Size MeasureContent(Size constraint)
     {
+        double maxWidth = double.IsPositiveInfinity(constraint.Width) ? -1 : constraint.Width;
+        double maxHeight = double.IsPositiveInfinity(constraint.Height) ? -1 : constraint.Height;
         string size = Interop.ExecuteJavaScriptString(
-            $"document.richTextViewManager.measureView('{OuterDiv.UniqueIdentifier}')");
+            $"document.richTextViewManager.measureView('{OuterDiv.UniqueIdentifier}', {maxWidth.ToInvariantString()}, {maxHeight.ToInvariantString()})");
 
         int i = size.IndexOf('|');
         string w = size.Substring(0, i);
