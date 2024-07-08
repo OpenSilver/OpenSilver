@@ -312,7 +312,11 @@ internal sealed class RichTextBoxView : TextViewBase
         {
             if (GetFormatNative(FontColorName) is string format)
             {
-                return string.IsNullOrEmpty(format) ? GetValue(TextElement.ForegroundProperty) : new SolidColorBrush(Color.Parse(format));
+                return format switch
+                {
+                    _ when TryParseCssColor(format, out Color color) => new SolidColorBrush(color),
+                    _ => GetValue(TextElement.ForegroundProperty),
+                };
             }
         }
         else if (dp == TextElement.CharacterSpacingProperty)

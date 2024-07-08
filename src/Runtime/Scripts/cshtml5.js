@@ -1612,19 +1612,28 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return;
 
-            return ql.getText(ql.getSelection());
+            const selection = ql.getSelection();
+            if (selection) {
+                return ql.getText(selection);
+            }
+            return '';
         },
         setSelectedText: function (id, text) {
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return;
 
             const selection = ql.getSelection();
-
-            if (text.length > 0) {
-                ql.deleteText(selection.index, selection.length, Quill.sources.SILENT);
-                ql.insertText(selection.index, text, Quill.sources.API);
-            } else {
-                ql.deleteText(selection.index, selection.length, Quill.sources.API);
+            if (selection) {
+                if (text.length > 0) {
+                    if (selection.length > 0) {
+                        ql.deleteText(selection.index, selection.length, Quill.sources.SILENT);
+                    }
+                    ql.insertText(selection.index, text, Quill.sources.API);
+                } else if (selection.length > 0) {
+                    ql.deleteText(selection.index, selection.length, Quill.sources.API);
+                }
+            } else if (text.length > 0) {
+                ql.insertText(0, text, Quill.sources.API);
             }
         },
         select: function (id, start, length) {
