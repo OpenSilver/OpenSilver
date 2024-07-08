@@ -30,6 +30,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Xaml.Schema;
@@ -733,6 +734,9 @@ namespace System.Xaml
                         return xt.IsNullable ? null : xt.Invoker.CreateInstance(new object[0]);
                 }
                 if (ReferenceEquals(xt, null))
+                    return value;
+
+                if (typeof(Expression).IsInstanceOfType(value))
                     return value;
 
                 // FIXME: this could be generalized by some means, but I cannot find any.
