@@ -2,7 +2,7 @@
   <Import Project="..\Directory.Build.props" />
 
   <PropertyGroup>
-    <OpenSilverDependencyVersion>2.2.0</OpenSilverDependencyVersion>
+    <OpenSilverDependencyVersion>3.0.0</OpenSilverDependencyVersion>
     <OpenSilverTargetsDirectory>$(MSBuildThisFileDirectory)..\packages\OpenSilver.$(OpenSilverDependencyVersion)\build</OpenSilverTargetsDirectory>
     <OpenSilverTargets>$(OpenSilverTargetsDirectory)\OpenSilver.targets</OpenSilverTargets>
     <OpenSilverGenerateAssemblyInfoTargets>$(OpenSilverTargetsDirectory)\OpenSilver.GenerateAssemblyInfo.targets</OpenSilverGenerateAssemblyInfoTargets>
