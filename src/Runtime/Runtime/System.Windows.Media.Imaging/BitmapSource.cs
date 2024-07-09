@@ -11,158 +11,159 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
+using OpenSilver.Internal;
 
-namespace System.Windows.Media.Imaging
+namespace System.Windows.Media.Imaging;
+
+/// <summary>
+/// Provides a source object for properties that use a bitmap.
+/// </summary>
+public abstract class BitmapSource : ImageSource
 {
+    private const string PngB64Prefix = "data:image/png;base64,";
+
+    private MemoryStream _streamSource;
+    private string _b64String;
+
     /// <summary>
-    /// Provides a source object for properties that use a bitmap.
+    /// Sets the source of the <see cref="BitmapSource"/>.
     /// </summary>
-    public abstract class BitmapSource : ImageSource
+    /// <param name="streamSource">
+    /// The stream to set the source to.
+    /// </param>
+    public void SetSource(Stream streamSource)
     {
-        bool _isStreamAsBase64StringValid = false;
-
-        private string _streamAsBase64String;
-        public string INTERNAL_StreamAsBase64String
+        // early exit if both values are null
+        if (streamSource == _streamSource)
         {
-            get
+            return;
+        }
+
+        if (streamSource is not null)
+        {
+            if (streamSource.Length > int.MaxValue)
             {
-                if (!_isStreamAsBase64StringValid)
-                {
-                    byte[] bytes = new byte[INTERNAL_StreamSource.Length];//note: if s.Length is longer than int.MaxValue, that's a problem... But that means they have a stream of more than 2 Go...
-                    if (INTERNAL_StreamSource.Length > int.MaxValue)
-                    {
-                        throw new InvalidOperationException("The Stream set as the BitmapSource's Source is too big (more than int.MaxValue (2,147,483,647) bytes).");
-                    }
-
-                    int n = INTERNAL_StreamSource.Read(bytes, 0, (int)INTERNAL_StreamSource.Length);
-
-                    //the following (commented) is in case the previous line doesn't work.
-                    //int numBytesToRead = (int)s.Length; 
-                    //int numBytesRead = 0;
-                    //do
-                    //{
-                    //    // Read may return anything from 0 to 10.
-                    //    int n = s.Read(bytes, numBytesRead, 10);
-                    //    numBytesRead += n;
-                    //    numBytesToRead -= n;
-                    //} while (numBytesToRead > 0);
-                    INTERNAL_StreamSource.Close();
-                    _streamAsBase64String = Convert.ToBase64String(bytes);
-                    _isStreamAsBase64StringValid = true;
-                }
-                return _streamAsBase64String;
+                throw new InvalidOperationException(
+                    "The Stream set as the BitmapSource's Source is too big (more than int.MaxValue (2,147,483,647) bytes).");
             }
         }
 
-        /// <summary>
-        /// Provides base class initialization behavior for BitmapSource-derived classes.
-        /// </summary>
-        protected BitmapSource() : base() { }
+        _streamSource?.Dispose();
+        _streamSource = null;
+        _b64String = null;
 
-        private Stream _streamSource;
-        public Stream INTERNAL_StreamSource
+        if (streamSource is not null)
         {
-            get { return _streamSource; }
-            private set { _streamSource = value; }
+            var stream = new MemoryStream();
+            streamSource.CopyTo(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            _streamSource = stream;
         }
 
-
-        private string _dataUrl;
-        public string INTERNAL_DataURL
-        {
-            get { return _dataUrl; }
-            private set { _dataUrl = value; }
-        }
-
-        /// <summary>
-        /// Sets the source image for a BitmapSource by accessing a stream.
-        /// </summary>
-        /// <param name="streamSource">The stream source that sets the image source value.</param>
-        public void SetSource(Stream streamSource) //note: this is supposed to be a IRandomAccessStream
-        {
-            // Copying the original stream because it could be disposed by the user before it is consumed
-            // by the target image
-            MemoryStream streamCopy = new MemoryStream();
-            streamSource.CopyTo(streamCopy);
-            streamCopy.Seek(0, SeekOrigin.Begin);
-
-            INTERNAL_StreamSource = streamCopy;
-            _isStreamAsBase64StringValid = false; //in case we set the source after having already set it and used it.
-        }
-
-
-        /// <summary>
-        /// Sets the source image for a BitmapSource by passing a "data URL".
-        /// </summary>
-        /// <param name="dataUrl">The image encoded in "data URL" format.</param>
-        public void SetSource(string dataUrl)
-        {
-            INTERNAL_DataURL = dataUrl;
-        }
-
-        internal override ValueTask<string> GetDataStringAsync(UIElement parent)
-        {
-            string data = string.Empty;
-            if (INTERNAL_StreamSource != null)
-            {
-                data = "data:image/png;base64," + INTERNAL_StreamAsBase64String;
-            }
-            else if (!string.IsNullOrEmpty(INTERNAL_DataURL))
-            {
-                data = INTERNAL_DataURL;
-            }
-
-            return new(data);
-        }
-
-        #region Not supported yet
-        /// <summary>
-        /// Gets the height of the bitmap in pixels.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public int PixelHeight => PixelHeightInternal;
-
-        /// <summary>
-        /// Identifies the PixelHeight dependency property.
-        /// 
-        /// Returns the identifier for the PixelHeight dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty PixelHeightProperty = DependencyProperty.Register("PixelHeight", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
-
-        /// <summary>
-        /// Gets the width of the bitmap in pixels.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public int PixelWidth => PixelWidthInternal;
-
-        /// <summary>
-        /// Identifies the PixelWidth dependency property.
-        /// 
-        /// Returns the identifier for the PixelWidth dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty PixelWidthProperty = DependencyProperty.Register("PixelWidth", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
-
-
-        ////
-        //// Summary:
-        ////     Sets the source image for a BitmapSource by accessing a stream and processing
-        ////     the result asynchronously.
-        ////
-        //// Parameters:
-        ////   streamSource:
-        ////     The stream source that sets the image source value.
-        ////
-        //// Returns:
-        ////     An asynchronous handler called when the operation is complete.
-        //public IAsyncAction SetSourceAsync(IRandomAccessStream streamSource);
-        #endregion
-
-        internal virtual int PixelHeightInternal => (int)GetValue(PixelHeightProperty);
-
-        internal virtual int PixelWidthInternal => (int)GetValue(PixelWidthProperty);
+        RaiseChanged();
     }
+
+    internal override ValueTask<string> GetDataStringAsync(UIElement parent)
+    {
+        string data = string.Empty;
+        if (_streamSource is not null)
+        {
+            data = AsBase64String();
+        }
+#pragma warning disable CS0618 // Type or member is obsolete
+        else if (!string.IsNullOrEmpty(INTERNAL_DataURL))
+        {
+            data = INTERNAL_DataURL;
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        return new(data);
+    }
+
+    private string AsBase64String()
+    {
+        if (_b64String is null)
+        {
+            _b64String = PngB64Prefix + Convert.ToBase64String(_streamSource.GetBuffer(), 0, (int)_streamSource.Length);
+            _streamSource.Dispose();
+        }
+
+        return _b64String;
+    }
+
+    /// <summary>
+    /// Gets the height of the bitmap in pixels.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public int PixelHeight => PixelHeightInternal;
+
+    /// <summary>
+    /// Identifies the <see cref="PixelHeight"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty PixelHeightProperty =
+        DependencyProperty.Register(
+            nameof(PixelHeight),
+            typeof(int),
+            typeof(BitmapSource),
+            new PropertyMetadata(0));
+
+    /// <summary>
+    /// Gets the width of the bitmap in pixels.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public int PixelWidth => PixelWidthInternal;
+
+    /// <summary>
+    /// Identifies the <see cref="PixelWidth"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty PixelWidthProperty =
+        DependencyProperty.Register(
+            nameof(PixelWidth),
+            typeof(int),
+            typeof(BitmapSource),
+            new PropertyMetadata(0));
+
+    internal virtual int PixelHeightInternal => (int)GetValue(PixelHeightProperty);
+
+    internal virtual int PixelWidthInternal => (int)GetValue(PixelWidthProperty);
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use BitmapSource.SetSource(Stream) instead.")]
+    public Stream INTERNAL_StreamSource
+    {
+        get => _streamSource;
+        private set => SetSource(value);
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64ImageSource class instead.")]
+    public string INTERNAL_DataURL { get; private set; }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    public string INTERNAL_StreamAsBase64String
+    {
+        get
+        {
+            if (_streamSource is null)
+            {
+                return string.Empty;
+            }
+
+            return AsBase64String().Substring(PngB64Prefix.Length);
+        }
+    }
+
+    /// <summary>
+    /// Sets the source image for a BitmapSource by passing a "data URL".
+    /// </summary>
+    /// <param name="dataUrl">The image encoded in "data URL" format.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64ImageSource class instead.")]
+    public void SetSource(string dataUrl) => INTERNAL_DataURL = dataUrl;
 }

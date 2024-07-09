@@ -40,7 +40,7 @@ namespace System.Windows.Controls
     {
         private INTERNAL_HtmlDomElementReference _imageDiv;
         private Size _naturalSize;
-        private WeakEventListener<Image, BitmapImage, EventArgs> _sourceChangedListener;
+        private WeakEventListener<Image, ImageSource, EventArgs> _sourceChangedListener;
 
         static Image()
         {
@@ -84,14 +84,14 @@ namespace System.Windows.Controls
                 image._sourceChangedListener = null;
             }
 
-            if (e.NewValue is BitmapImage bmi)
+            if (e.NewValue is ImageSource source)
             {
-                image._sourceChangedListener = new(image, bmi)
+                image._sourceChangedListener = new(image, source)
                 {
-                    OnEventAction = static (instance, sender, args) => instance.OnBitmapImageSourceChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.UriSourceChanged -= listener.OnEvent,
+                    OnEventAction = static (instance, sender, args) => instance.OnSourceChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
                 };
-                bmi.UriSourceChanged += image._sourceChangedListener.OnEvent;
+                source.Changed += image._sourceChangedListener.OnEvent;
             }
         }
 
@@ -239,7 +239,7 @@ namespace System.Windows.Controls
             _imageDiv.Style.objectPosition = $"{hPos} {vPos}";
         }
 
-        private void OnBitmapImageSourceChanged(object sender, EventArgs e)
+        private void OnSourceChanged(object sender, EventArgs e)
         {
             _ = RefreshSource();
         }

@@ -14,16 +14,19 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace System.Windows.Media
-{
-    /// <summary>
-    /// Provides an object source type for Source and ImageSource.
-    /// </summary>
-    [TypeConverter(typeof(ImageSourceConverter))]
-    public abstract class ImageSource : DependencyObject
-    {
-        internal ImageSource() { }
+namespace System.Windows.Media;
 
-        internal abstract ValueTask<string> GetDataStringAsync(UIElement parent);
-    }
+/// <summary>
+/// Provides an object source type for Source and ImageSource.
+/// </summary>
+[TypeConverter(typeof(ImageSourceConverter))]
+public abstract class ImageSource : DependencyObject
+{
+    internal ImageSource() { }
+
+    internal event EventHandler Changed;
+
+    internal void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
+
+    internal abstract ValueTask<string> GetDataStringAsync(UIElement parent);
 }

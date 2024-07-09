@@ -232,6 +232,7 @@
 		<Compile Include="System.Windows.Media.Animation\KeySplineConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\KeyTimeType.cs" />
 		<Compile Include="System.Windows.Media.Animation\LinearPointKeyFrame.cs" />
+		<Compile Include="System.Windows.Media.Imaging\Base64Image.cs" />
 		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Wasm.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Simulator.cs" />
