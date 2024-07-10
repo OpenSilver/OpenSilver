@@ -917,7 +917,7 @@ namespace System.Windows
                 nameof(OpacityMask),
                 typeof(Brush),
                 typeof(UIElement),
-                new PropertyMetadata((object)null)
+                new PropertyMetadata(null, OnOpacityMaskChanged)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) => _ = ((UIElement)d).SetMaskImageAsync((Brush)newValue),
                 });
@@ -933,6 +933,37 @@ namespace System.Windows
             get => (Brush)GetValue(OpacityMaskProperty);
             set => SetValueInternal(OpacityMaskProperty, value);
         }
+
+        private static void OnOpacityMaskChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uie = (UIElement)d;
+
+            if (uie._opacityMaskChangedListener != null)
+            {
+                uie._opacityMaskChangedListener.Detach();
+                uie._opacityMaskChangedListener = null;
+            }
+
+            if (e.NewValue is Brush newBrush)
+            {
+                uie._opacityMaskChangedListener = new(uie, newBrush)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnOpacityMaskChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newBrush.Changed += uie._opacityMaskChangedListener.OnEvent;
+            }
+        }
+
+        private void OnOpacityMaskChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                _ = this.SetMaskImageAsync(OpacityMask);
+            }
+        }
+
+        private WeakEventListener<UIElement, Brush, EventArgs> _opacityMaskChangedListener;
 
         #endregion
 
