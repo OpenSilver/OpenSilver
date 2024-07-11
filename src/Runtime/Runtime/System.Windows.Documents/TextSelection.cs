@@ -101,7 +101,32 @@ namespace System.Windows.Documents
         /// current selection.
         /// </returns>
         public object GetPropertyValue(DependencyProperty formattingProperty)
-            => _richTextBox.View?.GetFormat(formattingProperty);
+        {
+            if (_richTextBox.View is RichTextBoxView view)
+            {
+                return view.GetFormat(formattingProperty);
+            }
+
+            return GetRichTextBoxFormattingProperty(formattingProperty);
+        }
+
+        private object GetRichTextBoxFormattingProperty(DependencyProperty formattingProperty)
+        {
+            if (formattingProperty == TextElement.FontFamilyProperty ||
+                formattingProperty == TextElement.FontWeightProperty ||
+                formattingProperty == TextElement.FontStyleProperty ||
+                formattingProperty == TextElement.FontSizeProperty ||
+                formattingProperty == TextElement.ForegroundProperty ||
+                formattingProperty == TextElement.CharacterSpacingProperty ||
+                formattingProperty == TextElement.FontStretchProperty ||
+                formattingProperty == Inline.TextDecorationsProperty ||
+                formattingProperty == Block.TextAlignmentProperty ||
+                formattingProperty == Block.LineHeightProperty)
+            {
+                return _richTextBox.GetValue(formattingProperty);
+            }
+            return DependencyProperty.UnsetValue;
+        }
 
         /// <summary>
         /// Inserts or replaces the content at the current selection as a <see cref="TextElement"/>.

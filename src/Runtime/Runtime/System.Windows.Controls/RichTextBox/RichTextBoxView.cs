@@ -255,115 +255,105 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         if (dp == TextElement.FontFamilyProperty)
         {
-            if (GetFormatNative(FontFamilyName) is string format)
+            string format = GetFormatNative(FontFamilyName);
+            return format switch
             {
-                return string.IsNullOrEmpty(format) ? GetValue(TextElement.FontFamilyProperty) : new FontFamily(format);
-            }
+                { Length: > 0 } => new FontFamily(format),
+                _ => GetValue(TextElement.FontFamilyProperty),
+            };
         }
         else if (dp == TextElement.FontWeightProperty)
         {
-            if (GetFormatNative(FontWeightName) is string format)
+            string format = GetFormatNative(FontWeightName);
+            return format switch
             {
-                return int.TryParse(format, NumberStyles.Integer, CultureInfo.InvariantCulture, out int weight) ?
-                    new FontWeight(weight) :
-                    GetValue(TextElement.FontWeightProperty);
-            }
+                _ when int.TryParse(format, NumberStyles.Integer, CultureInfo.InvariantCulture, out int weight) => new FontWeight(weight),
+                _ => GetValue(TextElement.FontWeightProperty),
+            };
         }
         else if (dp == TextElement.FontStyleProperty)
         {
-            if (GetFormatNative(FontStyleName) is string format)
+            string format = GetFormatNative(FontStyleName);
+            return format switch
             {
-                return format switch
-                {
-                    "normal" => FontStyles.Normal,
-                    "italic" => FontStyles.Italic,
-                    "oblique" => FontStyles.Oblique,
-                    _ => GetValue(TextElement.FontStyleProperty),
-                };
-            }
+                "normal" => FontStyles.Normal,
+                "italic" => FontStyles.Italic,
+                "oblique" => FontStyles.Oblique,
+                _ => GetValue(TextElement.FontStyleProperty),
+            };
         }
         else if (dp == Inline.TextDecorationsProperty)
         {
-            if (GetFormatNative(TextDecorationName) is string format)
+            string format = GetFormatNative(TextDecorationName);
+            return format switch
             {
-                return format switch
-                {
-                    "underline" => TextDecorations.Underline,
-                    "line-through" => TextDecorations.Strikethrough,
-                    "overline" => TextDecorations.OverLine,
-                    _ => GetValue(Inline.TextDecorationsProperty),
-                };
-            }
+                "underline" => TextDecorations.Underline,
+                "line-through" => TextDecorations.Strikethrough,
+                "overline" => TextDecorations.OverLine,
+                _ => GetValue(Inline.TextDecorationsProperty),
+            };
         }
         else if (dp == TextElement.FontSizeProperty)
         {
-            if (GetFormatNative(FontSizeName) is string format)
+            string format = GetFormatNative(FontSizeName);
+            return format switch
             {
-                return double.TryParse(
+                { Length: > 2 } when double.TryParse(
                     format.Substring(0, format.Length - 2), // Remove 'px'
                     NumberStyles.Float | NumberStyles.AllowThousands,
                     CultureInfo.InvariantCulture,
-                    out double fontSize) ?
-                    fontSize :
-                    GetValue(TextElement.FontSizeProperty);
-            }
+                    out double fontSize) => fontSize,
+                _ => GetValue(TextElement.FontSizeProperty),
+            };
         }
         else if (dp == TextElement.ForegroundProperty)
         {
-            if (GetFormatNative(FontColorName) is string format)
+            string format = GetFormatNative(FontColorName);
+            return format switch
             {
-                return format switch
-                {
-                    _ when TryParseCssColor(format, out Color color) => new SolidColorBrush(color),
-                    _ => GetValue(TextElement.ForegroundProperty),
-                };
-            }
+                _ when TryParseCssColor(format, out Color color) => new SolidColorBrush(color),
+                _ => GetValue(TextElement.ForegroundProperty),
+            };
         }
         else if (dp == TextElement.CharacterSpacingProperty)
         {
-            if (GetFormatNative(LetterSpacingName) is string format)
+            string format = GetFormatNative(LetterSpacingName);
+            return format switch
             {
-                return format switch
-                {
-                    "normal" => 0,
-                    _ when double.TryParse(
-                        format.Substring(0, format.Length - 2), // Remove 'em'
-                        NumberStyles.Float | NumberStyles.AllowThousands,
-                        CultureInfo.InvariantCulture,
-                        out double cSpacing) => (int)(1000 * cSpacing),
-                    _ => GetValue(TextElement.CharacterSpacingProperty),
-                };
-            }
+                "normal" => 0,
+                { Length: > 2 } when double.TryParse(
+                    format.Substring(0, format.Length - 2), // Remove 'em'
+                    NumberStyles.Float | NumberStyles.AllowThousands,
+                    CultureInfo.InvariantCulture,
+                    out double cSpacing) => (int)(1000 * cSpacing),
+                _ => GetValue(TextElement.CharacterSpacingProperty),
+            };
         }
         else if (dp == Block.LineHeightProperty)
         {
-            if (GetFormatNative(LetterSpacingName) is string format)
+            string format = GetFormatNative(LetterSpacingName);
+            return format switch
             {
-                return format switch
-                {
-                    "normal" => 0.0,
-                    _ when double.TryParse(
-                        format.Substring(0, format.Length - 2), // Remove 'px'
-                        NumberStyles.Float | NumberStyles.AllowThousands,
-                        CultureInfo.InvariantCulture,
-                        out double lineHeight) => lineHeight, 
-                    _ => GetValue(Block.LineHeightProperty),
-                };
-            }
+                "normal" => 0.0,
+                { Length: > 2 } when double.TryParse(
+                    format.Substring(0, format.Length - 2), // Remove 'px'
+                    NumberStyles.Float | NumberStyles.AllowThousands,
+                    CultureInfo.InvariantCulture,
+                    out double lineHeight) => lineHeight,
+                _ => GetValue(Block.LineHeightProperty),
+            };
         }
         else if (dp == Block.TextAlignmentProperty)
         {
-            if (GetFormatNative(TextAlignmentName) is string format)
+            string format = GetFormatNative(TextAlignmentName);
+            return format switch
             {
-                return format switch
-                {
-                    "start" => TextAlignment.Left,
-                    "center" => TextAlignment.Center,
-                    "end" => TextAlignment.Right,
-                    "justify" => TextAlignment.Justify,
-                    _ => GetValue(Block.TextAlignmentProperty),
-                };
-            }
+                "start" => TextAlignment.Left,
+                "center" => TextAlignment.Center,
+                "end" => TextAlignment.Right,
+                "justify" => TextAlignment.Justify,
+                _ => GetValue(Block.TextAlignmentProperty),
+            };
         }
         else if (dp == TextElement.FontStretchProperty)
         {

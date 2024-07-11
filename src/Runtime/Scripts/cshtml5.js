@@ -1684,10 +1684,10 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             if (!ql) return null;
 
             const format = ql.getFormat()[property];
-            if (!Array.isArray(format)) {
+            if (typeof format === 'string') {
                 return format;
             }
-            return '';
+            return null;
         },
     };
 };
