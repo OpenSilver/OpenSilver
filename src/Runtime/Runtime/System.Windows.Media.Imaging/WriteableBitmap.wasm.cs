@@ -152,12 +152,11 @@ element.style.transform = currentTransform;
 
                 if (transform is null)
                 {
-                    data.Transform = "";
+                    data.Transform = string.Empty;
                 }
                 else
                 {
-                    Matrix m = transform.Matrix;
-                    data.Transform = $"matrix({m.M11}, {m.M12}, {m.M21}, {m.M22}, {m.OffsetX}, {m.OffsetY})";
+                    data.Transform = MatrixTransform.MatrixToHtmlString(transform.Matrix);
                 }
 
                 OpenSilver.Interop.ExecuteJavaScriptVoid(
@@ -170,6 +169,11 @@ element.style.transform = currentTransform;
 
             private void OnImageDataLoadedCallback(string errorMessage, int arrayLength, int width, int height)
             {
+                _imageRenderedCallback.Dispose();
+                _imageRenderedCallback = null;
+
+                bool invalidate = false;
+
                 if (errorMessage is null)
                 {
                     _bitmap._pixelWidth = width;
@@ -177,24 +181,29 @@ element.style.transform = currentTransform;
                     _bitmap._pixels = new int[arrayLength / 4];
                     INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
                         "document.WB_Fill32Buffer", _bitmap._pixels);
-                    _bitmap.Invalidate();
+                    invalidate = true;
                 }
 
-                _imageRenderedCallback.Dispose();
-                _imageRenderedCallback = null;
                 _taskCompletion.SetResult(null);
+
+                // Important: we must complete the task before invalidating the WriteableBitmap
+                if (invalidate)
+                {
+                    _bitmap.Invalidate();
+                }
             }
 
             private void OnRenderDataLoadedCallback(string errorMessage, int arrayLength, int width, int height)
             {
+                _imageRenderedCallback.Dispose();
+                _imageRenderedCallback = null;
+
                 if (errorMessage is null)
                 {
                     INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
                         "document.WB_Fill32Buffer", _bitmap._pixels);
                 }
 
-                _imageRenderedCallback.Dispose();
-                _imageRenderedCallback = null;
                 _taskCompletion.SetResult(null);
             }
 

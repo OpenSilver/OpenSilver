@@ -169,7 +169,7 @@ namespace System.Windows.Media.Imaging
                 throw new ArgumentNullException(nameof(element));
             }
 
-            _ = _impl.RenderUIElementAsync(element, transform, PixelWidth, PixelHeight);
+            _ = _impl.RenderUIElementAsync(element, transform, _pixelWidth, _pixelHeight);
         }
 
         public Task RenderAsync(UIElement element, Transform transform)
@@ -179,7 +179,7 @@ namespace System.Windows.Media.Imaging
                 throw new ArgumentNullException(nameof(element));
             }
 
-            return _impl.RenderUIElementAsync(element, transform, PixelWidth, PixelHeight);
+            return _impl.RenderUIElementAsync(element, transform, _pixelWidth, _pixelHeight);
         }
 
         /// <summary>
@@ -193,11 +193,11 @@ namespace System.Windows.Media.Imaging
 
                 var bytes = new byte[rowLenth * _pixelHeight];
 
-                for (int y = 0; y < PixelHeight; y++)
+                for (int y = 0; y < _pixelHeight; y++)
                 {
-                    for (int x = 0; x < PixelWidth; x++)
+                    for (int x = 0; x < _pixelWidth; x++)
                     {
-                        var rgba = BitConverter.GetBytes(Pixels[PixelWidth * y + x]);
+                        var rgba = BitConverter.GetBytes(_pixels[_pixelWidth * y + x]);
                         int startIdx = rowLenth * y + x * 4 + 1;
                         for (int j = 0; j < rgba.Length; j++)
                         {
@@ -206,7 +206,7 @@ namespace System.Windows.Media.Imaging
                     }
                 }
 
-                SetSource(PngEncoder.Encode(bytes, PixelWidth, PixelHeight));
+                SetSourceInternal(PngEncoder.Encode(bytes, _pixelWidth, _pixelHeight));
             }
         }
 

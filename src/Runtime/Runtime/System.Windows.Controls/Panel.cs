@@ -251,7 +251,7 @@ namespace System.Windows.Controls
                 typeof(Panel),
                 new PropertyMetadata(null, OnBackgroundChanged)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => _ = ((Panel)d).SetBackgroundAsync((Brush)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Panel)d).SetBackground((Brush)newValue),
                 });
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace System.Windows.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                _ = this.SetBackgroundAsync((Brush)sender);
+                this.SetBackground((Brush)sender);
             }
         }
 
@@ -306,7 +306,7 @@ namespace System.Windows.Controls
 
             if (_refreshBackgroundOnSizeChange && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                _ = this.SetBackgroundAsync(Background);
+                this.SetBackground(Background);
             }
         }
 

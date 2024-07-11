@@ -42,6 +42,8 @@ public abstract class BitmapSource : ImageSource
             return;
         }
 
+        MemoryStream stream = null;
+
         if (streamSource is not null)
         {
             if (streamSource.Length > int.MaxValue)
@@ -49,19 +51,20 @@ public abstract class BitmapSource : ImageSource
                 throw new InvalidOperationException(
                     "The Stream set as the BitmapSource's Source is too big (more than int.MaxValue (2,147,483,647) bytes).");
             }
-        }
 
-        _streamSource?.Dispose();
-        _streamSource = null;
-        _b64String = null;
-
-        if (streamSource is not null)
-        {
-            var stream = new MemoryStream();
+            stream = new MemoryStream();
             streamSource.CopyTo(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            _streamSource = stream;
         }
+
+        SetSourceInternal(stream);
+    }
+
+    internal void SetSourceInternal(MemoryStream stream)
+    {
+        _streamSource?.Dispose();
+        _b64String = null;
+        _streamSource = stream;
 
         RaiseChanged();
     }
@@ -141,7 +144,7 @@ public abstract class BitmapSource : ImageSource
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64ImageSource class instead.")]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64Image class instead.")]
     public string INTERNAL_DataURL { get; private set; }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -164,6 +167,6 @@ public abstract class BitmapSource : ImageSource
     /// </summary>
     /// <param name="dataUrl">The image encoded in "data URL" format.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64ImageSource class instead.")]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use the Base64Image class instead.")]
     public void SetSource(string dataUrl) => INTERNAL_DataURL = dataUrl;
 }

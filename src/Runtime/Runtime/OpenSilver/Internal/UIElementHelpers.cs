@@ -97,13 +97,27 @@ internal static class UIElementHelpers
         }
     }
 
-    internal static async ValueTask SetBackgroundAsync(this UIElement uie, Brush brush)
+    internal static void SetBackground(this UIElement uie, Brush brush)
     {
-        uie.OuterDiv.Style.background = brush switch
+        string background;
+
+        switch (brush)
         {
-            Brush => await brush.GetDataStringAsync(uie),
-            _ => string.Empty,
-        };
+            case Brush:
+                var task = brush.GetDataStringAsync(uie);
+                if (!task.IsCompletedSuccessfully)
+                {
+                    return;
+                }
+                background = task.Result;
+                break;
+
+            default:
+                background = string.Empty;
+                break;
+        }
+
+        uie.OuterDiv.Style.background = background;
     }
 
     internal static void SetLineHeight(this UIElement uie, double lineHeight)
@@ -176,7 +190,7 @@ internal static class UIElementHelpers
         uie.OuterDiv.Style.opacity = Math.Round(opacity, 2).ToInvariantString();
     }
 
-    internal static async ValueTask SetMaskImageAsync(this UIElement uie, Brush mask)
+    internal static void SetMaskImage(this UIElement uie, Brush mask)
     {
         string maskImage;
 
@@ -196,7 +210,12 @@ internal static class UIElementHelpers
                 break;
 
             case ImageBrush ib:
-                maskImage = await ib.GetDataStringAsync(uie);
+                var task = ib.GetDataStringAsync(uie);
+                if (!task.IsCompletedSuccessfully)
+                {
+                    return;
+                }
+                maskImage = task.Result;
                 break;
 
             default:

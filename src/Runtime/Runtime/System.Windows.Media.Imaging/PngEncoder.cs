@@ -27,14 +27,14 @@ namespace System.Windows.Media.Imaging
         private static readonly byte[] _4BYTEDATA = { 0, 0, 0, 0 };
         private static readonly byte[] _ARGB = { 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0 };
 
-        public static Stream Encode(byte[] data, int width, int height)
+        public static MemoryStream Encode(byte[] data, int width, int height)
         {
             // See http://www.libpng.org/pub/png//spec/1.2/PNG-Chunks.html
             // See http://www.libpng.org/pub/png/book/chapter08.html#png.ch08.div.4
             // See http://www.gzip.org/zlib/rfc-zlib.html (ZLIB format)
             // See ftp://ftp.uu.net/pub/archiving/zip/doc/rfc1951.txt (ZLIB compression format)
 
-            MemoryStream ms = new MemoryStream();
+            var ms = new MemoryStream();
             byte[] size;
 
             // Write PNG header
@@ -98,7 +98,7 @@ namespace System.Windows.Media.Imaging
             //    ADLER32
 
             uint adler = ComputeAdler32(data);
-            MemoryStream comp = new MemoryStream();
+            var comp = new MemoryStream();
 
             // Calculate number of 64K blocks
             uint rowsPerBlock = _MAXBLOCK / widthLength;
@@ -155,7 +155,7 @@ namespace System.Windows.Media.Imaging
             WriteChunk(ms, _IDAT, dat);
 
             // Write IEND chunk
-            WriteChunk(ms, _IEND, new byte[0]);
+            WriteChunk(ms, _IEND, Array.Empty<byte>());
 
             // Reset stream
             ms.Seek(0, SeekOrigin.Begin);
@@ -193,7 +193,7 @@ namespace System.Windows.Media.Imaging
             WriteReversedBuffer(stream, BitConverter.GetBytes(GetCRC(buffer)));
         }
 
-        private static uint[] _crcTable = new uint[256];
+        private static readonly uint[] _crcTable = new uint[256];
         private static bool _crcTableComputed;
 
         private static void MakeCRCTable()

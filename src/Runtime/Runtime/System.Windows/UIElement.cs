@@ -919,7 +919,7 @@ namespace System.Windows
                 typeof(UIElement),
                 new PropertyMetadata(null, OnOpacityMaskChanged)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => _ = ((UIElement)d).SetMaskImageAsync((Brush)newValue),
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetMaskImage((Brush)newValue),
                 });
 
         /// <summary>
@@ -959,7 +959,7 @@ namespace System.Windows
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                _ = this.SetMaskImageAsync(OpacityMask);
+                this.SetMaskImage(OpacityMask);
             }
         }
 

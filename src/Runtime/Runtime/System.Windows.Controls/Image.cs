@@ -97,7 +97,7 @@ namespace System.Windows.Controls
 
         private static void UpdateDomOnSourceChanged(DependencyObject d, object oldValue, object newValue)
         {
-            _ = ((Image)d).RefreshSource();
+            ((Image)d).RefreshSource();
         }
 
         /// <summary>
@@ -239,19 +239,19 @@ namespace System.Windows.Controls
             _imageDiv.Style.objectPosition = $"{hPos} {vPos}";
         }
 
-        private void OnSourceChanged(object sender, EventArgs e)
-        {
-            _ = RefreshSource();
-        }
+        private void OnSourceChanged(object sender, EventArgs e) => RefreshSource();
 
-        private async ValueTask RefreshSource()
+        private void RefreshSource()
         {
             _naturalSize = new Size();
 
-            if (Source != null)
+            if (Source is ImageSource source)
             {
-                var imageSrc = await Source.GetDataStringAsync(this);
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc ?? string.Empty, true);
+                var task = source.GetDataStringAsync(this);
+                if (task.IsCompletedSuccessfully)
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", task.Result ?? string.Empty, true);
+                }
             }
             else
             {
