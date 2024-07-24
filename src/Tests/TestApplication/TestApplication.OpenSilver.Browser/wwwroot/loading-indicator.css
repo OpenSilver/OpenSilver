@@ -24,9 +24,8 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	position: relative;
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 }
 
 .loading-indicator {
@@ -145,10 +144,14 @@
 		animation-delay: 5.9s;
 	}
 
-.loading-indicator-percentage-container {
+.loading-indicator-text {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	width: 100%;
 	height: 100%;
 }
+
+	.loading-indicator-text:after {
+		content: var(--blazor-load-percentage-text, "Loading...");
+	}
