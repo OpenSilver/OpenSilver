@@ -209,6 +209,7 @@
 		<Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.Navigation.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
+		<Compile Include="System.Windows.Controls.Primitives\UniformGrid.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
