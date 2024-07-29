@@ -1,17 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net472</TargetFramework>
-		<StartArguments>"..\..\..\..\TestApplication\bin\OpenSilver\$(Configuration)\netstandard2.0\TestApplication.OpenSilver.dll"</StartArguments>
-	</PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="OpenSilver.Simulator" Version="2.2.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="OpenSilver.Simulator" Version="3.0.0" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\TestApplication\TestApplication.OpenSilver.csproj" />
+    </ItemGroup>
 
 </Project>

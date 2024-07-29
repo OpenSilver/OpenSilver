@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<EnableDefaultItems>false</EnableDefaultItems>
-        <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="OpenSilver" Version="2.2.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="OpenSilver" Version="3.0.0" />
+  </ItemGroup>
 
-	<ItemGroup>
+  <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
