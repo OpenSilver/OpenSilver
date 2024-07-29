@@ -74,16 +74,11 @@ namespace OpenSilver.Controls
             // Listen to the "change" property of the "input" element, and call the callback:
             Interop.ExecuteJavaScriptVoid(@"
                 $0.addEventListener(""change"", function(e) {
-                    var isRunningInTheSimulator = $2;
-                    if (isRunningInTheSimulator) {
-                        alert(""The file open dialog is not supported in the Simulator. Please test in the browser instead."");
-                    }
-
                     window.isOpenFileDialogOpen = false;
 
                     // Removing window focus handler to detect cancels, otherwise we could have multiple handlers
                     // after calling multiple ShowDialogAsync()
-                    window.removeEventListener('focus', $3);
+                    window.removeEventListener('focus', $2);
 
                     if(!e) {
                       e = window.event;
@@ -102,7 +97,7 @@ namespace OpenSilver.Controls
                                 readNext(i + 1);
                             } else {
                                 // Triggers finished callback
-                                $4();
+                                $3();
                             }
                         };
 
@@ -112,7 +107,7 @@ namespace OpenSilver.Controls
                         reader.readAsDataURL(file);
                     }
                     readNext(0);
-                });", flushQueue:false, _inputElement, onFileChanged, Interop.IsRunningInTheSimulator,
+                });", flushQueue:false, _inputElement, onFileChanged,
                     _windowFocusCallback, onFinishedReading);
         }
 
