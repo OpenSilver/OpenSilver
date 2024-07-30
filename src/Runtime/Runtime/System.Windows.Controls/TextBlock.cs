@@ -678,7 +678,8 @@ namespace System.Windows.Controls
 
         internal override string GetPlainText() => Text;
 
-        internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        /// <inheritdoc />
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             base.OnPropertyChanged(e);
 

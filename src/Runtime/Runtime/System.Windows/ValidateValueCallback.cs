@@ -11,12 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System.Windows;
-
-namespace OpenSilver.Internal;
+namespace System.Windows;
 
 /// <summary>
 /// Represents a method used as a callback that validates the effective value of a
 /// <see cref="DependencyProperty"/>.
 /// </summary>
-internal delegate bool ValidateValueCallback(object value);
+public delegate bool ValidateValueCallback(object value);

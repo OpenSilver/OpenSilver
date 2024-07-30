@@ -319,7 +319,8 @@ public abstract class TextElement : UIElement
 
     internal override sealed void SetPointerEvents(bool hitTestable) { }
 
-    internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    /// <inheritdoc />
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
 

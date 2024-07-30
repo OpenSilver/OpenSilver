@@ -434,7 +434,22 @@ namespace System.Windows
 
         internal void SetValueInternal(DependencyProperty dp, bool value) => SetValueInternal(dp, BooleanBoxes.Box(value));
 
-        internal void SetValue(DependencyPropertyKey key, object value)
+        /// <summary>
+        /// Sets the local value of a read-only dependency property on a <see cref="DependencyObject"/>.
+        /// </summary>
+        /// <param name="key">
+        /// The <see cref="DependencyPropertyKey"/> identifier of the property to set.
+        /// </param>
+        /// <param name="value">
+        /// The new local value.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// key is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// value was not the correct type as registered for the property.
+        /// </exception>
+        public void SetValue(DependencyPropertyKey key, object value)
         {
             if (key == null)
             {
@@ -476,7 +491,16 @@ namespace System.Windows
 
         internal void SetValueInternal(DependencyPropertyKey key, bool value) => SetValueInternal(key, BooleanBoxes.Box(value));
 
-        internal virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Invoked whenever the effective value of any dependency property on this
+        /// <see cref="DependencyObject"/> has been updated. The specific dependency 
+        /// property that changed is reported in the event data.
+        /// </summary>
+        /// <param name="e">
+        /// Event data that will contain the dependency property identifier of interest, 
+        /// the property metadata for the type, and old and new values.
+        /// </param>
+        protected virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             e.Metadata?.PropertyChangedCallback?.Invoke(this, e);
         }
@@ -672,6 +696,9 @@ namespace System.Windows
         /// <param name="dp">
         /// The <see cref="DependencyProperty"/> identifier of the property to clear the value for.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// dp is null.
+        /// </exception>
         public void ClearValue(DependencyProperty dp)
         {
             if (dp == null)
@@ -687,7 +714,17 @@ namespace System.Windows
             }
         }
 
-        internal void ClearValue(DependencyPropertyKey key)
+        /// <summary>
+        /// Clears the local value of a read-only property.
+        /// The property to be cleared is specified by a <see cref="DependencyPropertyKey"/>.
+        /// </summary>
+        /// <param name="key">
+        /// The key for the dependency property to be cleared.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// key is null.
+        /// </exception>
+        public void ClearValue(DependencyPropertyKey key)
         {
             if (key == null)
             {

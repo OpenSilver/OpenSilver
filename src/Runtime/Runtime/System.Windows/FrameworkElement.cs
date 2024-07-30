@@ -920,7 +920,8 @@ namespace System.Windows
             set { SetValueInternal(LanguageProperty, value); }
         }
 
-        internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        /// <inheritdoc />
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             base.OnPropertyChanged(e);
 

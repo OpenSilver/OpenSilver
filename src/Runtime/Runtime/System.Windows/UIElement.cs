@@ -281,7 +281,8 @@ namespace System.Windows
             WriteVisualFlag(VisualFlags.IsUIElement, true);
         }
 
-        internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        /// <inheritdoc />
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             if (e.Metadata is PropertyMetadata metadata && _isLoaded)
             {

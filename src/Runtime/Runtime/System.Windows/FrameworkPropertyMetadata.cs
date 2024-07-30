@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-
 namespace System.Windows
 {
     /// <summary>
@@ -11,7 +9,7 @@ namespace System.Windows
     /// dependency property.
     /// </summary>
     [Flags]
-    internal enum FrameworkPropertyMetadataOptions : int
+    public enum FrameworkPropertyMetadataOptions : int
     {
         /// <summary>No flags</summary>
         None = 0x000,
@@ -39,7 +37,7 @@ namespace System.Windows
     /// Reports or applies metadata for a dependency property, specifically adding framework-specific
     /// property system characteristics.
     /// </summary>
-    internal sealed class FrameworkPropertyMetadata : PropertyMetadata
+    public class FrameworkPropertyMetadata : PropertyMetadata
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FrameworkPropertyMetadata"/> class.
@@ -351,7 +349,7 @@ namespace System.Windows
         /// <param name="dp">
         /// The dependency property this metadata is being applied to.
         /// </param>
-        internal override void Merge(PropertyMetadata baseMetadata, DependencyProperty dp)
+        protected override void Merge(PropertyMetadata baseMetadata, DependencyProperty dp)
         {
             // Does parameter validation
             base.Merge(baseMetadata, dp);
@@ -391,7 +389,7 @@ namespace System.Windows
         /// The type associated with this metadata if this is type-specific metadata. If
         /// this is default metadata, this value can be null.
         /// </param>
-        internal override void OnApply(DependencyProperty dp, Type targetType)
+        protected override void OnApply(DependencyProperty dp, Type targetType)
         {
             // Remember if this is the metadata for a ReadOnly property
             ReadOnly = dp.ReadOnly;

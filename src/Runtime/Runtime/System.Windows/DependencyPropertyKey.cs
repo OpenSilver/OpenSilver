@@ -17,7 +17,7 @@ namespace System.Windows;
 /// be non-null.  Otherwise it is treated as a key that can't unlock anything.
 /// (When needed, this property is available via the static constant NoAccess.
 /// </remarks>
-internal sealed class DependencyPropertyKey
+public sealed class DependencyPropertyKey
 {
     /// <summary>
     /// Gets the dependency property identifier associated with this specialized read-only

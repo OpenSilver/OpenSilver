@@ -70,7 +70,7 @@ namespace System.Windows
         /// <param name="typeMetadata">Metadata to use if current type doesn't specify type-specific metadata</param>
         /// <param name="validateValueCallback">Provides additional value validation outside automatic type validation</param>
         /// <returns>Dependency Property</returns>
-        internal static DependencyProperty Register(
+        public static DependencyProperty Register(
             string name,
             Type propertyType,
             Type ownerType,
@@ -117,7 +117,7 @@ namespace System.Windows
         /// A dependency property key that should be used to set the value of a static read-only
         /// field in your class, which is then used to reference the dependency property.
         /// </returns>
-        internal static DependencyPropertyKey RegisterReadOnly(
+        public static DependencyPropertyKey RegisterReadOnly(
             string name,
             Type propertyType,
             Type ownerType,
@@ -131,7 +131,7 @@ namespace System.Windows
         /// key.  Calling this version restricts the property such that it can
         /// only be set via the corresponding overload of DependencyObject.SetValue.
         /// </summary>
-        internal static DependencyPropertyKey RegisterReadOnly(
+        public static DependencyPropertyKey RegisterReadOnly(
             string name,
             Type propertyType,
             Type ownerType,
@@ -201,7 +201,7 @@ namespace System.Windows
         /// A dependency property key that should be used to set the value of a static read-only
         /// field in your class, which is then used to reference the dependency property later.
         /// </returns>
-        internal static DependencyPropertyKey RegisterAttachedReadOnly(
+        public static DependencyPropertyKey RegisterAttachedReadOnly(
             string name,
             Type propertyType,
             Type ownerType,
@@ -234,7 +234,7 @@ namespace System.Windows
         /// A dependency property key that should be used to set the value of a static read-only
         /// field in your class, which is then used to reference the dependency property.
         /// </returns>
-        internal static DependencyPropertyKey RegisterAttachedReadOnly(
+        public static DependencyPropertyKey RegisterAttachedReadOnly(
             string name,
             Type propertyType,
             Type ownerType,
@@ -330,7 +330,7 @@ namespace System.Windows
         /// the dependency property later, for operations such as setting its value programmatically
         /// or obtaining metadata.
         /// </returns>
-        internal static DependencyProperty RegisterAttached(
+        public static DependencyProperty RegisterAttached(
             string name,
             Type propertyType,
             Type ownerType,
@@ -615,7 +615,7 @@ namespace System.Windows
         /// <param name="key">
         /// The access key for a read-only dependency property.
         /// </param>
-        internal void OverrideMetadata(Type forType, PropertyMetadata typeMetadata, DependencyPropertyKey key)
+        public void OverrideMetadata(Type forType, PropertyMetadata typeMetadata, DependencyPropertyKey key)
         {
             SetupOverrideMetadata(forType, typeMetadata, out DependencyObjectType dType, out PropertyMetadata baseMetadata);
 
@@ -909,37 +909,37 @@ namespace System.Windows
 
             return this;
         }
-        
+
         /// <summary>
         /// Gets the name of the <see cref="DependencyProperty"/>.
         /// </summary>
-        internal string Name { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets the type that the <see cref="DependencyProperty"/> uses for its value.
         /// </summary>
-        internal Type PropertyType { get; }
+        public Type PropertyType { get; }
 
         /// <summary>
         /// Gets the type of the object that registered the <see cref="DependencyProperty"/> with the
         /// property system, or added itself as owner of the property.
         /// </summary>
-        internal Type OwnerType { get; }
+        public Type OwnerType { get; }
 
         /// <summary>
         /// Gets the default metadata of the <see cref="DependencyProperty"/>.
         /// </summary>
-        internal PropertyMetadata DefaultMetadata { get; }
+        public PropertyMetadata DefaultMetadata { get; }
 
         /// <summary>
         /// Gets the value validation callback for the <see cref="DependencyProperty"/>.
         /// </summary>
-        internal ValidateValueCallback ValidateValueCallback { get; }
+        public ValidateValueCallback ValidateValueCallback { get; }
 
         /// <summary>
         /// Gets an internally generated value that uniquely identifies the <see cref="DependencyProperty"/>.
         /// </summary>
-        internal int GlobalIndex { get; }
+        public int GlobalIndex { get; }
 
         public bool IsAttached
         {
@@ -989,7 +989,7 @@ namespace System.Windows
         /// true if the specified value is the registered property type or an acceptable
         /// derived type; otherwise, false.
         /// </returns>
-        internal bool IsValidType(object value)
+        public bool IsValidType(object value)
         {
             return IsValidType(value, PropertyType);
         }
@@ -1006,7 +1006,7 @@ namespace System.Windows
         /// true if the value is acceptable and is of the correct type or a derived type;
         /// otherwise, false.
         /// </returns>
-        internal bool IsValidValue(object value)
+        public bool IsValidValue(object value)
         {
             if (!IsValidType(value, PropertyType))
             {
@@ -1029,7 +1029,7 @@ namespace System.Windows
         /// <returns>
         /// true if the dependency property is read-only; otherwise, false.
         /// </returns>
-        internal bool ReadOnly
+        public bool ReadOnly
         {
             get
             {

@@ -340,7 +340,7 @@ namespace System.Windows
         /// <param name="dp">
         /// The dependency property to which this metadata is being applied.
         /// </param>
-        internal virtual void Merge(PropertyMetadata baseMetadata, DependencyProperty dp)
+        protected virtual void Merge(PropertyMetadata baseMetadata, DependencyProperty dp)
         {
             if (baseMetadata == null)
             {
@@ -400,7 +400,7 @@ namespace System.Windows
         /// The type associated with this metadata if this is type-specific metadata. If
         /// this is default metadata, this value is a null reference.
         /// </param>
-        internal virtual void OnApply(DependencyProperty dp, Type targetType)
+        protected virtual void OnApply(DependencyProperty dp, Type targetType)
         {
         }
 
