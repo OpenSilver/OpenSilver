@@ -118,8 +118,6 @@ namespace OpenSilver.Internal.Xaml.Context
 
         internal IEnumerable<object> ServiceProvider_GetAllAmbientValues()
         {
-            var retList = new List<object>();
-
             XamlObjectFrame frame = _stack.CurrentFrame;
             while (frame.Depth >= 1)
             {
@@ -128,25 +126,23 @@ namespace OpenSilver.Internal.Xaml.Context
                 {
                     if (fe.HasResources)
                     {
-                        retList.Add(fe.Resources);
+                        yield return fe.Resources;
                     }
                 }
                 else if (inst is ResourceDictionary)
                 {
-                    retList.Add(inst);
+                    yield return inst;
                 }
                 else if (inst is Application app)
                 {
                     if (app.HasResources)
                     {
-                        retList.Add(app.Resources);
+                        yield return app.Resources;
                     }
                 }
 
                 frame = frame.Previous;
             }
-
-            return retList;
         }
     }
 }
