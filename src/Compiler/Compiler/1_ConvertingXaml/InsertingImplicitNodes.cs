@@ -237,23 +237,22 @@ namespace OpenSilver.Compiler
                 // If there is some direct text content (such as <Button.Visibility>Collapsed</Button.Visibility>
                 // or <ToolTipService.ToolTip>Test</ToolTipService.ToolTip>), we convert the text into an attribute
                 // (such as <Button Visibility="Collapsed"></Button> or <Button ToolTipService.ToolTip="Test></Button>)
-                XText directTextContent;
-                if (ContainsTextNode(currentElement, out directTextContent))
+                if (ContainsTextNode(currentElement, out XText directTextContent))
                 {
                     // Check if we are on a direct object property (such as <Button.Visibility>) or an attached property
                     // (such as <ToolTipService.ToolTip>). For example, if the current element is <TextBlock.Text> and
                     // the parent is <TextBlock>, the result is true. Conversely, if the current element is
                     // <ToolTipService.ToolTip> and the parent is <Border>, the result is false.
-                    bool isAttachedProperty = 
+                    bool isAttachedProperty =
                         currentElement.Parent.Name != (currentElement.Name.Namespace + currentElement.Name.LocalName.Substring(0, currentElement.Name.LocalName.IndexOf(".")));
 
                     // Read the content
                     string contentValue = directTextContent.Value;
 
                     // Get the property name
-                    string contentPropertyName = isAttachedProperty ? 
-                        currentElement.Name.LocalName : 
-                        currentElement.Name.LocalName.Substring(currentElement.Name.LocalName.IndexOf(".") + 1);
+                    XName xName = isAttachedProperty ?
+                        currentElement.Name :
+                        XName.Get(currentElement.Name.LocalName.Substring(currentElement.Name.LocalName.IndexOf(".") + 1), string.Empty);
 
                     // Replace multiple spaces (and line returns) with just one space (same behavior as in WPF): 
                     //cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
@@ -264,17 +263,13 @@ namespace OpenSilver.Compiler
                     }
 
                     // Verify that the attribute is not already set:
-                    if (currentElement.Attribute(contentPropertyName) != null)
+                    if (currentElement.Attribute(xName.LocalName) != null)
                     {
-                        throw new XamlParseException(
-                            string.Format("The property '{0}' is set more than once.", contentPropertyName)
-                        );
+                        throw new XamlParseException($"The property '{xName.LocalName}' is set more than once.");
                     }
 
                     // Add the attribute
-                    currentElement.Parent.Add(
-                        new XAttribute(contentPropertyName, contentValue)
-                    );
+                    currentElement.Parent.Add(new XAttribute(xName, contentValue));
 
                     // Remove the element
                     currentElement.Remove();
