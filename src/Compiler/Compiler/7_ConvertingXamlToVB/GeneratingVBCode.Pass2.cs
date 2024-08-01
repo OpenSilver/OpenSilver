@@ -558,7 +558,7 @@ End Sub
                                 // property, so for now we assume the xaml is always valid.
                                 parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent = Global.{_settings.Metadata.SystemWindowsNS}.FrameworkElement.LoadedEvent");
                             }
-                            else if (string.IsNullOrEmpty(attribute.Name.NamespaceName))
+                            else if (string.IsNullOrEmpty(attribute.Name.NamespaceName) || attribute.Name.NamespaceName == element.Name.NamespaceName)
                             {
                                 //-------------
                                 // Attributes without namespace
