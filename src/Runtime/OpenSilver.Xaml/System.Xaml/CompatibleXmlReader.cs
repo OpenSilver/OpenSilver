@@ -28,17 +28,11 @@ namespace System.Xaml
 		private IXmlLineInfo _baseLineInfo;
 		private IXmlNamespaceResolver _baseNamespaceResolver;
 
-		public CompatibleXmlReader(XmlReader baseReader, XamlSchemaContext context)
+		public CompatibleXmlReader(XmlReader baseReader, TryGetCompatibleNamespaceDelegate compatible)
 		{
 			_base = baseReader;
 			_baseLineInfo = _base as IXmlLineInfo;
 			_baseNamespaceResolver = _base as IXmlNamespaceResolver;
-			_getCompatible = context.TryGetCompatibleXamlNamespace;
-		}
-
-		public CompatibleXmlReader(XmlReader baseReader, TryGetCompatibleNamespaceDelegate compatible)
-		{
-			_base = baseReader;
 			_getCompatible = compatible;
 		}
 
@@ -86,7 +80,12 @@ namespace System.Xaml
 
 		public override bool Read()
 		{
-			while (_base.Read())
+			if (!_base.Read())
+			{
+				return false;
+			}
+
+			while (true)
 			{
 				if (_base.NodeType == XmlNodeType.Element)
 				{
@@ -94,7 +93,11 @@ namespace System.Xaml
 						PopScopeIfNeeded();
 					_previousWasEmpty = _base.IsEmptyElement;
 					if (ProcessStartElement())
+					{
+						if (_base.EOF)
+							return false;
 						continue;
+					}
 					return true;
 				}
 				if (_base.NodeType == XmlNodeType.EndElement)
@@ -104,7 +107,6 @@ namespace System.Xaml
 				}
 				return true;
 			}
-			return false;
 		}
 
 
@@ -113,8 +115,6 @@ namespace System.Xaml
 		{
 			if (ShouldIgnore(NamespaceURI))
 			{
-				if (IsEmptyElement)
-					return true;
 				_base.Skip();
 				return true;
 			}
@@ -123,7 +123,15 @@ namespace System.Xaml
 			{
 				var ignorable = _base.GetAttribute("Ignorable", "http://schemas.openxmlformats.org/markup-compatibility/2006");
 				if (ignorable != null)
+				{
 					PushScope(ignorable);
+					if (ShouldIgnore(NamespaceURI))
+					{
+						PopScopeIfNeeded();
+						_base.Skip();
+						return true;
+					}
+				}
 				_base.MoveToFirstAttribute();
 				do
 				{

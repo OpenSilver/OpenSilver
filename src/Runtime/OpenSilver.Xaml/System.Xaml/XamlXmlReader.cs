@@ -270,7 +270,7 @@ namespace System.Xaml
 			this.settings = settings ?? default_settings;
 			if (settings?.SkipXmlCompatibilityProcessing != true)
 			{
-				xmlReader = new CompatibleXmlReader(xmlReader, schemaContext);
+				xmlReader = new CompatibleXmlReader(xmlReader, schemaContext.TryGetCompatibleXamlNamespace);
 			}
 
 			r = xmlReader;

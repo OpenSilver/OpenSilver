@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\Runtime\OpenSilver.Xaml\System.Xaml\CompatibleXmlReader.cs" Link="Helpers\CompatibleXmlReader.cs" />
     <Compile Include="..\Shared\XamlResourcesHelper.cs">
       <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
     </Compile>
@@ -42,6 +43,7 @@
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass1.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\IMetadataCS.cs" />
+    <Compile Include="Helpers\XDocumentHelper.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\ConvertingXamlToFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\CoreTypesHelperFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.cs" />

@@ -37,7 +37,7 @@ namespace OpenSilver.Compiler
             // could be badly formatted and not be parsable using XDocument.Parse.
             xaml = ProcessingHtmlPresenterNodes.Process(xaml);
 
-            XDocument doc = XDocument.Parse(xaml, LoadOptions.SetLineInfo);
+            XDocument doc = XDocumentHelper.Parse(xaml, LoadOptions.SetLineInfo);
 
             if (!isFirstPass)
             {
