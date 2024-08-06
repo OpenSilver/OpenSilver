@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Xaml.Schema;
+using OpenSilver.Internal.Xaml;
 
 namespace System.Xaml
 {
@@ -45,16 +46,22 @@ namespace System.Xaml
 		IRootObjectProvider rootProvider;
 		IDestinationTypeProvider destinationProvider;
 		IXamlObjectWriterFactory objectWriterFactory;
+		ITemplateOwnerProvider templateOwnerProvider;
+
+		public static ValueSerializerContext Create(PrefixLookup prefixLookup, XamlSchemaContext schemaContext, Func<IAmbientProvider> ambientProvider, IProvideValueTarget provideValue, IRootObjectProvider rootProvider, IDestinationTypeProvider destinationProvider, IXamlObjectWriterFactory objectWriterFactory, ITemplateOwnerProvider templateOwnerProvider)
+		{
+            var context = new ValueSerializerContext();
+
+            context.Initialize(prefixLookup, schemaContext, ambientProvider, provideValue, rootProvider, destinationProvider, objectWriterFactory, templateOwnerProvider);
+            return context;
+        }
 
 		public static ValueSerializerContext Create(PrefixLookup prefixLookup, XamlSchemaContext schemaContext, Func<IAmbientProvider> ambientProvider, IProvideValueTarget provideValue, IRootObjectProvider rootProvider, IDestinationTypeProvider destinationProvider, IXamlObjectWriterFactory objectWriterFactory)
 		{
-			var context = new ValueSerializerContext();
-
-			context.Initialize(prefixLookup, schemaContext, ambientProvider, provideValue, rootProvider, destinationProvider, objectWriterFactory);
-			return context;
+			return Create(prefixLookup, schemaContext, ambientProvider, provideValue, rootProvider, destinationProvider, objectWriterFactory, null);
 		}
 
-		void Initialize(PrefixLookup prefixLookup, XamlSchemaContext schemaContext, Func<IAmbientProvider> ambientProvider, IProvideValueTarget provideValue, IRootObjectProvider rootProvider, IDestinationTypeProvider destinationProvider, IXamlObjectWriterFactory objectWriterFactory)
+        void Initialize(PrefixLookup prefixLookup, XamlSchemaContext schemaContext, Func<IAmbientProvider> ambientProvider, IProvideValueTarget provideValue, IRootObjectProvider rootProvider, IDestinationTypeProvider destinationProvider, IXamlObjectWriterFactory objectWriterFactory, ITemplateOwnerProvider templateOwnerProvider)
 		{
 			prefix_lookup = prefixLookup ?? throw new ArgumentNullException("prefixLookup");
 			sctx = schemaContext ?? throw new ArgumentNullException("schemaContext");
@@ -63,7 +70,9 @@ namespace System.Xaml
 			this.rootProvider = rootProvider;
 			this.destinationProvider = destinationProvider;
 			this.objectWriterFactory = objectWriterFactory;
-		}
+			this.templateOwnerProvider = templateOwnerProvider;
+
+        }
 
 		NamespaceResolver NamespaceResolver => namespace_resolver ?? (namespace_resolver = new NamespaceResolver(prefix_lookup.Namespaces));
 
@@ -93,6 +102,8 @@ namespace System.Xaml
 				return destinationProvider;
 			if (serviceType == typeof(IXamlObjectWriterFactory))
 				return objectWriterFactory;
+			if (serviceType == typeof(ITemplateOwnerProvider))
+				return templateOwnerProvider;
 			return null;
 		}
 

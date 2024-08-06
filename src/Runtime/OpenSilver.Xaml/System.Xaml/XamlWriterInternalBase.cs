@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Markup;
 using System.Xaml.Markup;
+using OpenSilver.Internal.Xaml;
 
 
 namespace System.Xaml
@@ -43,7 +44,7 @@ namespace System.Xaml
 			this.sctx = schemaContext;
 			this.manager = manager;
 			var p = new PrefixLookup(sctx) { IsCollectingNamespaces = true }; // it does not raise unknown namespace error.
-			service_provider = ValueSerializerContext.Create(p, schemaContext, object_states.GetAmbientProvider, this, this, this, this as IXamlObjectWriterFactory);
+			service_provider = ValueSerializerContext.Create(p, schemaContext, object_states.GetAmbientProvider, this, this, this, this as IXamlObjectWriterFactory, this as ITemplateOwnerProvider);
 		}
 
 		internal XamlSchemaContext sctx;

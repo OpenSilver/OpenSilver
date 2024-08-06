@@ -286,10 +286,10 @@ namespace OpenSilver.Internal.Xaml
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static T CallProvideValue<T>(XamlContext context, IMarkupExtension<T> markupExtension) where T : class
         {
-            Debug.Assert(context != null);
-            Debug.Assert(markupExtension != null);
+            Debug.Assert(context is not null);
+            Debug.Assert(markupExtension is not null);
 
-            return markupExtension.ProvideValue(new ServiceProviderContext(context));
+            return markupExtension.ProvideValue(context.ServiceProvider);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

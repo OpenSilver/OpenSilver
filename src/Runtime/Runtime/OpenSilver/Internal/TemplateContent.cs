@@ -38,6 +38,7 @@ internal sealed class TemplateContent : ITemplateContent
         var context = new XamlContext(_xamlContext)
         {
             ExternalNameScope = new NameScope(),
+            TemplateOwner = owner,
         };
 
         IFrameworkElement rootElement = _factory(owner, context);

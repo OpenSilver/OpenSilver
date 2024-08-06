@@ -196,8 +196,6 @@ namespace OpenSilver.Compiler
                 public string CurrentXamlContext => CurrentScope.XamlContext;
             }
 
-            private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
-
             private readonly XamlReader _reader;
             private readonly ConversionSettings _settings;
 
@@ -1024,11 +1022,12 @@ namespace OpenSilver.Compiler
                                         _assemblyNameWithoutExtension);
 
                                 parameters.StringBuilder.AppendLine(string.Format(
-                                    "{0}.SetValue({1}, {2}.ProvideValue(new global::System.ServiceProvider({3}, null)));",
+                                    "{0}.SetValue({1}, {2}.CallProvideValue({3}, {4}));",
                                     parentElementUniqueNameOrThisKeyword,
                                     dependencyPropertyName,
-                                    GeneratingCode.GetUniqueName(child),
-                                    parameters.CurrentScope is FrameworkTemplateScope scope ? scope.TemplateOwner : TemplateOwnerValuePlaceHolder));
+                                    RuntimeHelperClass,
+                                    parameters.CurrentXamlContext,
+                                    GeneratingCode.GetUniqueName(child)));
                             }
                             else if (child.Name == GeneratingCode.xNamespace + "NullExtension")
                             {

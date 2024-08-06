@@ -13,23 +13,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Markup;
 using System.Xaml;
 using OpenSilver.Internal.Xaml.Context;
 
 namespace OpenSilver.Internal.Xaml
 {
-    internal interface IAmbientResourcesProvider
-    {
-        IEnumerable<object> GetAllAmbientValues();
-    }
-
     internal sealed class ServiceProviderContext :
         IProvideValueTarget,
         IServiceProvider,
         IRootObjectProvider,
-        IAmbientResourcesProvider
+        IAmbientResourcesProvider,
+        ITemplateOwnerProvider
     {
         private readonly XamlContext _xamlContext;
 
@@ -40,17 +35,22 @@ namespace OpenSilver.Internal.Xaml
 
         object IServiceProvider.GetService(Type serviceType)
         {
-            if (serviceType == typeof(IProvideValueTarget))
-            {
-                return this;
-            }
-            
-            if (serviceType == typeof(IRootObjectProvider))
+            if (serviceType == typeof(IAmbientResourcesProvider))
             {
                 return this;
             }
 
-            if (serviceType == typeof(IAmbientResourcesProvider))
+            if (serviceType == typeof(ITemplateOwnerProvider))
+            {
+                return this;
+            }
+
+            if (serviceType == typeof(IProvideValueTarget))
+            {
+                return this;
+            }
+
+            if (serviceType == typeof(IRootObjectProvider))
             {
                 return this;
             }
@@ -66,5 +66,7 @@ namespace OpenSilver.Internal.Xaml
 
         IEnumerable<object> IAmbientResourcesProvider.GetAllAmbientValues()
             => _xamlContext.ServiceProvider_GetAllAmbientValues();
+
+        object ITemplateOwnerProvider.GetTemplateOwner() => _xamlContext.TemplateOwner;
     }
 }

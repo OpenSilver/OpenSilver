@@ -28,6 +28,7 @@ namespace OpenSilver.Internal.Xaml.Context
         {
             _stack = new XamlContextStack();
             SavedDepth = 0;
+            ServiceProvider = new ServiceProviderContext(this);
         }
 
         internal XamlContext(XamlContext ctx)
@@ -39,6 +40,7 @@ namespace OpenSilver.Internal.Xaml.Context
 
             _stack = ctx._stack.DeepCopy();
             SavedDepth = _stack.Depth;
+            ServiceProvider = new ServiceProviderContext(this);
         }
 
         internal void PushScope() => _stack.PushScope();
@@ -92,7 +94,11 @@ namespace OpenSilver.Internal.Xaml.Context
             }
         }
 
+        internal ServiceProviderContext ServiceProvider { get; }
+
         internal INameScope ExternalNameScope { get; set; }
+
+        internal object TemplateOwner { get; set; }
 
         /// <summary>
         /// Total depth of the stack SavedDepth+LiveDepth

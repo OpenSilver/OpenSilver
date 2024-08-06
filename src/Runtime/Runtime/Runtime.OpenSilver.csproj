@@ -119,7 +119,9 @@
 		<Compile Include="OpenSilver\Internal\Xaml\Context\XamlContext.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\Context\XamlContextStack.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\Context\XamlObjectFrame.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\IAmbientResourcesProvider.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\IComponentConnector.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\ITemplateOwnerProvider.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\IXamlComponentLoader.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\OpenSilverMemberInvoker.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\OpenSilverXamlMember.cs" />

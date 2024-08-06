@@ -53,6 +53,7 @@ internal sealed class XamlTemplateContent : ITemplateContent
         XamlObjectWriterSettings settings = CreateObjectWriterSettings(_objectWriterParentSettings);
         settings.ExternalNameScope = new NameScope();
         settings.RegisterNamesOnExternalNamescope = true;
+        settings.TemplateOwner = owner;
 
         settings.BeforePropertiesHandler =
             delegate (object sender, XamlObjectEventArgs args)

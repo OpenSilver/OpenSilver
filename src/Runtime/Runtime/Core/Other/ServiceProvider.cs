@@ -23,6 +23,8 @@ namespace System
     /// </summary>
     public class ServiceProvider : IServiceProvider, IProvideValueTarget
     {
+        private List<object> _parents;
+
         /// <summary>
         /// Initialize a new instance of the <see cref="ServiceProvider"/> class.
         /// </summary>
@@ -30,14 +32,14 @@ namespace System
         {
             TargetObject = element;
             TargetProperty = property;
-            Parents = parents;
+            _parents = parents;
         }
 
         /// <summary>
         /// Initialize a new instance of the <see cref="ServiceProvider"/> class.
         /// </summary>
         public ServiceProvider(object element, DependencyProperty property)
-            : this(element, property, new List<object>(0))
+            : this(element, property, null)
         {
         }
 
@@ -56,7 +58,7 @@ namespace System
         /// <summary>
         /// Gets or sets the List of UIElement that are parents of the element.
         /// </summary>
-        public List<object> Parents { get; private set; }
+        public List<object> Parents => _parents ??= new List<object>(0);
 
         public object TargetObject { get; private set; }
 

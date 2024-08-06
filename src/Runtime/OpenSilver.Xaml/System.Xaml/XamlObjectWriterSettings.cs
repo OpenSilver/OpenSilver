@@ -60,6 +60,8 @@ namespace System.Xaml
 		public EventHandler<XamlObjectEventArgs> BeforePropertiesHandler { get; set; }
 		public EventHandler<XamlSetValueEventArgs> XamlSetValueHandler { get; set; }
 
+		public object TemplateOwner { get; set; }
+
 		public INameScope ExternalNameScope { get; set; }
 
 		public bool IgnoreCanConvert { get; set; }

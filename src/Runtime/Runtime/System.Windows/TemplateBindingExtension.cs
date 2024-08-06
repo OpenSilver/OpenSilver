@@ -11,16 +11,24 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Windows.Markup;
 using System.ComponentModel;
 using System.Windows.Controls;
+using OpenSilver.Internal.Xaml;
 
 namespace System.Windows
 {
     [ContentProperty(nameof(Path))]
     public class TemplateBindingExtension : MarkupExtension
     {
+        public TemplateBindingExtension() { }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public TemplateBindingExtension(string path)
+        {
+            Path = path;
+        }
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         public string Path { get; set; }
 
@@ -30,9 +38,61 @@ namespace System.Windows
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget provider)
+            if (serviceProvider.GetService(typeof(ITemplateOwnerProvider)) is ITemplateOwnerProvider templateOwnerProvider)
             {
-                if (provider.TargetObject is IInternalControl source)
+                return ProvideValueImpl(templateOwnerProvider, serviceProvider);
+            }
+
+            return LegacyProvideValue(serviceProvider);
+        }
+
+        private object ProvideValueImpl(ITemplateOwnerProvider templateOwnerProvider, IServiceProvider serviceProvider)
+        {
+            if (templateOwnerProvider.GetTemplateOwner() is IInternalControl source)
+            {
+                DependencyProperty dp = null;
+
+                if (DependencyPropertyName is not null)
+                {
+                    Type type = DependencyPropertyOwnerType ?? source.GetType();
+                    dp = DependencyProperty.FromName(DependencyPropertyName, type);
+                }
+                else if (Path is not null)
+                {
+                    int index = Path.IndexOf('.');
+                    if (index > -1)
+                    {
+                        if (serviceProvider.GetService(typeof(IXamlTypeResolver)) is IXamlTypeResolver typeResolver)
+                        {
+                            string typeName = Path.Substring(0, index);
+                            if (typeResolver.Resolve(typeName) is Type type)
+                            {
+                                string propertyName = Path.Substring(index + 1);
+                                dp = DependencyProperty.FromName(propertyName, type);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Type type = source.GetType();
+                        dp = DependencyProperty.FromName(Path, type);
+                    }
+                }
+
+                if (dp is not null)
+                {
+                    return new TemplateBindingExpression(source, dp);
+                }
+            }
+
+            return DependencyProperty.UnsetValue;
+        }
+
+        private object LegacyProvideValue(IServiceProvider serviceProvider)
+        {
+            if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget provideValueTarget)
+            {
+                if (provideValueTarget.TargetObject is IInternalControl source)
                 {
                     string propertyName = DependencyPropertyName ?? Path;
                     Type type = DependencyPropertyOwnerType ?? source.GetType();
