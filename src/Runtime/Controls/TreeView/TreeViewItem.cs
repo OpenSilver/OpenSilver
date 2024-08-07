@@ -1158,7 +1158,7 @@ namespace System.Windows.Controls
                     {
                         bool opened = !IsExpanded;
                         UserInitiatedExpansion |= opened;
-                        IsExpanded = opened;
+                        SetCurrentValue(IsExpandedProperty, opened);
 
                         e.Handled = true;
                     }
@@ -1178,7 +1178,7 @@ namespace System.Windows.Controls
         {
             bool opened = !IsExpanded;
             UserInitiatedExpansion |= opened;
-            IsExpanded = opened;
+            SetCurrentValue(IsExpandedProperty, opened);
         }
 
         /// <summary>
@@ -1263,7 +1263,7 @@ namespace System.Windows.Controls
                             }
                             else
                             {
-                                IsExpanded = false;
+                                SetCurrentValue(IsExpandedProperty, false);
                             }
                             e.Handled = true;
                         }
@@ -1278,7 +1278,7 @@ namespace System.Windows.Controls
                             if (!IsExpanded)
                             {
                                 UserInitiatedExpansion = true;
-                                IsExpanded = true;
+                                SetCurrentValue(IsExpandedProperty, true);
                                 e.Handled = true;
                             }
                             else if (HandleDownKey())
@@ -1303,14 +1303,14 @@ namespace System.Windows.Controls
                         if (CanExpandOnInput && !IsExpanded)
                         {
                             UserInitiatedExpansion = true;
-                            IsExpanded = true;
+                            SetCurrentValue(IsExpandedProperty, true);
                             e.Handled = true;
                         }
                         break;
                     case Key.Subtract:
                         if (CanExpandOnInput && IsExpanded)
                         {
-                            IsExpanded = false;
+                            SetCurrentValue(IsExpandedProperty, false);
                             e.Handled = true;
                         }
                         break;

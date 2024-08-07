@@ -467,7 +467,7 @@ namespace System.Windows.Controls
 
                 if (_treeViewItem is TreeViewItem treeViewItem)
                 {
-                    treeViewItem.IsExpanded = true;
+                    treeViewItem.SetCurrentValue(TreeViewItem.IsExpandedProperty, true);
                 }
             }
         }

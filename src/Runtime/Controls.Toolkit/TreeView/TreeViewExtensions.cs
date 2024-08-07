@@ -623,7 +623,7 @@ namespace System.Windows.Controls
 
             if (item != null)
             {
-                item.IsSelected = true;
+                item.SetCurrentValue(TreeViewItem.IsSelectedProperty, true);
             }
             else
             {
@@ -648,7 +648,7 @@ namespace System.Windows.Controls
             TreeViewItem item = view.GetSelectedContainer();
             if (item != null)
             {
-                item.IsSelected = false;
+                item.SetCurrentValue(TreeViewItem.IsSelectedProperty, false);
             }
         }
 
@@ -675,7 +675,7 @@ namespace System.Windows.Controls
             bool found = container != null;
             if (found)
             {
-                container.IsSelected = true;
+                container.SetCurrentValue(TreeViewItem.IsSelectedProperty, true);
             }
 
             return found;
@@ -733,7 +733,7 @@ namespace System.Windows.Controls
             if (expand)
             {
                 bool justExpanded = !item.IsExpanded;
-                item.IsExpanded = true;
+                item.SetCurrentValue(TreeViewItem.IsExpandedProperty, true);
 
                 // If the item was just expanded, we'll need to wait for the
                 // visual tree to update before its children to be created
@@ -755,7 +755,7 @@ namespace System.Windows.Controls
             // Collapse items after recursing through children
             if (!expand)
             {
-                item.IsExpanded = false;
+                item.SetCurrentValue(TreeViewItem.IsExpandedProperty, false);
             }
         }
 
@@ -865,7 +865,7 @@ namespace System.Windows.Controls
                         if (sibling != container)
                         {
                             ExpandOrCollapseAll(sibling, false, 0, null);
-                            sibling.IsExpanded = false;
+                            sibling.SetCurrentValue(TreeViewItem.IsExpandedProperty, false);
                         }
                     }
                 }
@@ -873,7 +873,7 @@ namespace System.Windows.Controls
                 // Expand all but the first item (which stays as we found it)
                 if (container != item)
                 {
-                    container.IsExpanded = true;
+                    container.SetCurrentValue(TreeViewItem.IsExpandedProperty, true);
                 }
             }
         }
