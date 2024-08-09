@@ -298,6 +298,14 @@ namespace System.Windows
                 SetShouldLookupImplicitStyles();
             }
 
+            // Invalidate implicit and explicit resource references on current instance
+
+            if (containsTypeOfKey)
+            {
+                HasStyleInvalidated = false;
+                UpdateStyleProperty();
+            }
+
             ResourcesChanged?.Invoke(this, new ResourcesChangedEventArgs(info));
         }
 
@@ -447,17 +455,6 @@ namespace System.Windows
                 if (oldValue != value)
                 {
                     TreeWalkHelper.InvalidateOnResourcesChange(this, new ResourcesChangeInfo(oldValue, value));
-                }
-
-                // todo: remove the following block when 'InvalidateOnResourcesChange' is implemented
-                {
-                    HasStyleInvalidated = false;
-
-                    if (HasImplicitStyleFromResources == true &&
-                        (oldValue.Contains(GetType()) || Style == StyleProperty.GetDefaultValue(this)))
-                    {
-                        UpdateStyleProperty();
-                    }
                 }
             }
         }
@@ -1086,12 +1083,10 @@ namespace System.Windows
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            if (HasImplicitStyleFromResources &&
-                (!HasResources || !Resources.Contains(GetType())))
-            {
-                HasStyleInvalidated = false;
-                UpdateStyleProperty();
-            }
+
+            // Fetch the implicit style
+            HasStyleInvalidated = false;
+            UpdateStyleProperty();
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
@@ -1099,14 +1094,8 @@ namespace System.Windows
             base.INTERNAL_OnAttachedToVisualTree();
 
             // Fetch the implicit style
-            // If this element's ResourceDictionary contains the
-            // implicit style, it has already been retrieved.
-            if (!HasImplicitStyleFromResources ||
-                (!HasResources || !Resources.Contains(GetType())))
-            {
-                HasStyleInvalidated = false;
-                UpdateStyleProperty();
-            }
+            HasStyleInvalidated = false;
+            UpdateStyleProperty();
 
             if (!HasThemeStyleEverBeenFetched)
             {
