@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
@@ -1239,12 +1240,12 @@ namespace System.Windows
         }
 
         /// <summary>
-        ///     Gets or sets a value indicating whether the invalidations fired
-        ///     by the ResourceDictionary when an implicit data template resource
-        ///     changes will cause ContentPresenters to re-evaluate their choice
-        ///     of template.
+        /// Gets or sets a value that indicates whether the invalidations fired by the
+        /// <see cref="ResourceDictionary"/> object cause <see cref="ContentPresenter"/> 
+        /// objects to reevaluate their choice of template. The invalidations happen when
+        /// an implicit data template resource changes.
         /// </summary>
-        internal bool InvalidatesImplicitDataTemplateResources
+        public bool InvalidatesImplicitDataTemplateResources
         {
             get => ReadPrivateFlag(PrivateFlags.InvalidatesImplicitDataTemplateResources);
             set => WritePrivateFlag(PrivateFlags.InvalidatesImplicitDataTemplateResources, value);

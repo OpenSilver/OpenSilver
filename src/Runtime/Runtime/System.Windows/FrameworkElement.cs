@@ -300,6 +300,15 @@ namespace System.Windows
 
             // Invalidate implicit and explicit resource references on current instance
 
+            // if the change affects implicit data templates, notify ContentPresenters
+            if (info.IsImplicitDataTemplateChange)
+            {
+                if (this is ContentPresenter contentPresenter)
+                {
+                    contentPresenter.ReevaluateTemplate();
+                }
+            }
+
             if (containsTypeOfKey)
             {
                 HasStyleInvalidated = false;
