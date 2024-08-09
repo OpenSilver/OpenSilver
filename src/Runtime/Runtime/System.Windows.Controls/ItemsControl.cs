@@ -409,10 +409,13 @@ namespace System.Windows.Controls
         #region Internal Properties
 
         /// <summary>
-        /// Returns enumerator to logical children
+        /// Gets an enumerator for the logical child objects of the <see cref="ItemsControl"/> object.
         /// </summary>
-        /*protected*/
-        internal override IEnumerator LogicalChildren
+        /// <returns>
+        /// An enumerator for the logical child objects of the <see cref="ItemsControl"/> object.
+        /// The default is null.
+        /// </returns>
+        protected internal override IEnumerator LogicalChildren
         {
             get
             {
@@ -424,7 +427,7 @@ namespace System.Windows.Controls
                 // Items in direct-mode of ItemCollection are the only model children.
                 // note: the enumerator walks the ItemCollection.InnerList as-is,
                 // no flattening of any content on model children level!
-                return this.Items.LogicalChildren;
+                return Items.LogicalChildren;
             }
         }
 

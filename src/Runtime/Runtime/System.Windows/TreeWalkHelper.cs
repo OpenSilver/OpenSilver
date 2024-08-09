@@ -26,28 +26,30 @@ namespace System.Windows
         ///     references during a tree change operation.
         /// </summary>
         internal static void InvalidateOnTreeChange(
-            FrameworkElement fe,
+            IInternalFrameworkElement fe,
             DependencyObject parent,
             bool isAddOperation)
         {
-            DependencyObject.InvalidateInheritedProperties(fe, fe.Parent ?? fe.VisualParent);
+            DependencyObject d = fe.AsDependencyObject();
+
+            DependencyObject.InvalidateInheritedProperties(d, fe.Parent ?? fe.VisualParent);
 
             if (HasChildren(fe))
             {
                 // The TreeChangeInfo object is used here to track
                 // information that we have because we're doing a tree walk.
-                var parentInfo = new TreeChangeInfo(fe, parent, isAddOperation);
+                var parentInfo = new TreeChangeInfo(d, parent, isAddOperation);
 
                 var walker = new DescendentsWalker<TreeChangeInfo>(
                     TreeWalkPriority.LogicalTree, TreeChangeDelegate, parentInfo);
 
-                walker.StartWalk(fe, false);
+                walker.StartWalk(d, false);
             }
             else
             {
                 // Degenerate case when the current node is a leaf node and has no children.
 
-                var parentInfo = new TreeChangeInfo(fe, parent, isAddOperation);
+                var parentInfo = new TreeChangeInfo(fe.AsDependencyObject(), parent, isAddOperation);
 
                 // Degenerate case of OnAncestorChanged for a single node
                 OnAncestorChanged(fe, parentInfo);

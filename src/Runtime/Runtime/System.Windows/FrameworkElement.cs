@@ -254,12 +254,12 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Returns enumerator to logical children
+        /// Gets an enumerator for logical child elements of this element.
         /// </summary>
-        /*protected*/ internal virtual IEnumerator LogicalChildren
-        {
-            get { return null; }
-        }
+        /// <returns>
+        /// An enumerator for logical child elements of this element.
+        /// </returns>
+        protected internal virtual IEnumerator LogicalChildren => null;
 
         internal bool IsLogicalChildrenIterationInProgress
         {

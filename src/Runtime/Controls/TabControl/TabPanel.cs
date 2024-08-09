@@ -663,15 +663,9 @@ namespace System.Windows.Controls.Primitives
             return base.CreateUIElementCollection(null);
         }
 
-        internal override IEnumerator LogicalChildren
-        {
-            get
-            {
-                // Note: Since children are displayed in a grid in our implementation,
-                // this panel's children are not logical children. There are the logical
-                // children of the grid they are displayed in.
-                return EmptyEnumerator.Instance;
-            }
-        }
+        // Note: Since children are displayed in a grid in our implementation,
+        // this panel's children are not logical children. There are the logical
+        // children of the grid they are displayed in.
+        protected internal sealed override IEnumerator LogicalChildren => EmptyEnumerator.Instance;
     }
 }

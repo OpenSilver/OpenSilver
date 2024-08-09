@@ -38,15 +38,17 @@ namespace System.Windows.Controls
         private WeakEventListener<Panel, Brush, EventArgs> _backgroundChangedListener;
         private bool _refreshBackgroundOnSizeChange;
 
-        /// <summary> 
-        /// Returns enumerator to logical children.
+        /// <summary>
+        /// Gets an enumerator that can iterate the logical child elements of this <see cref="Panel"/> element.
         /// </summary>
-        /*protected*/
-        internal override IEnumerator LogicalChildren
+        /// <returns>
+        /// An <see cref="IEnumerator"/>. This property has no default value.
+        /// </returns>
+        protected internal override IEnumerator LogicalChildren
         {
             get
             {
-                if (this._uiElementCollection == null || this._uiElementCollection.Count == 0 || this.IsItemsHost)
+                if (_uiElementCollection is null || _uiElementCollection.Count == 0 || IsItemsHost)
                 {
                     // empty panel or a panel being used as the items
                     // host has *no* logical children; give empty enumerator
@@ -54,7 +56,7 @@ namespace System.Windows.Controls
                 }
 
                 // otherwise, its logical children is its visual children
-                return this.Children.GetEnumerator();
+                return Children.GetEnumerator();
             }
         }
 

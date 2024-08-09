@@ -59,18 +59,14 @@ namespace System.Windows.Controls
         /// <summary>
         /// Returns the Visual children count.
         /// </summary>
-        internal override int VisualChildrenCount
-        {
-            get { return (Child == null) ? 0 : 1; }
-        }
+        internal override int VisualChildrenCount => Child is null ? 0 : 1;
 
         /// <summary>
         /// Returns the child at the specified index.
         /// </summary>
         internal override UIElement GetVisualChild(int index)
         {
-            if ((Child == null)
-                || (index != 0))
+            if (Child is null || index != 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -78,15 +74,17 @@ namespace System.Windows.Controls
             return Child;
         }
 
-        /// <summary> 
-        /// Returns enumerator to logical children.
+        /// <summary>
+        /// Gets an enumerator that can be used to iterate the logical child elements of a <see cref="Border"/>.
         /// </summary>
-        /*protected*/
-        internal override IEnumerator LogicalChildren
+        /// <returns>
+        /// An enumerator that can be used to iterate the logical child elements of a <see cref="Border"/>.
+        /// </returns>
+        protected internal override IEnumerator LogicalChildren
         {
             get
             {
-                if (this.Child == null)
+                if (Child is null)
                 {
                     return EmptyEnumerator.Instance;
                 }
@@ -96,18 +94,12 @@ namespace System.Windows.Controls
             }
         }
 
-        internal override bool EnablePointerEventsCore
-        {
-            // We only check the Background property even if BorderBrush not null
-            // and BorderThickness > 0 is a sufficient condition to enable pointer
-            // events on the borders of the control.
-            // There is no way right now to differentiate the Background and BorderBrush
-            // as they are both defined on the same DOM element.
-            get
-            {
-                return this.Background != null;
-            }
-        }
+        // We only check the Background property even if BorderBrush not null
+        // and BorderThickness > 0 is a sufficient condition to enable pointer
+        // events on the borders of the control.
+        // There is no way right now to differentiate the Background and BorderBrush
+        // as they are both defined on the same DOM element.
+        internal override bool EnablePointerEventsCore => Background is not null;
 
         /// <summary>
         /// Identifies the <see cref="Child"/> dependency property.

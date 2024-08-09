@@ -124,15 +124,18 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Returns enumerator to logical children
+        /// Gets an enumerator to the content control's logical child elements.
         /// </summary>
-        /*protected*/ internal override IEnumerator LogicalChildren
+        /// <returns>
+        /// An enumerator. The default value is null.
+        /// </returns>
+        protected internal override IEnumerator LogicalChildren
         {
             get
             {
                 object content = Content;
                 
-                if (ContentIsNotLogical || content == null)
+                if (ContentIsNotLogical || content is null)
                 {
                     return EmptyEnumerator.Instance;
                 }
@@ -140,11 +143,10 @@ namespace System.Windows.Controls
                 // If the current ContentControl is in a Template.VisualTree and is meant to host
                 // the content for the container then that content shows up as the logical child
                 // for the container and not for the current ContentControl.
-                FrameworkElement fe = content as FrameworkElement;
-                if (fe != null)
+                if (content is FrameworkElement fe)
                 {
                     DependencyObject logicalParent = fe.Parent;
-                    if (logicalParent != null && logicalParent != this)
+                    if (logicalParent is not null && logicalParent != this)
                     {
                         return EmptyEnumerator.Instance;
                     }

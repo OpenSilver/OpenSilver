@@ -24,20 +24,23 @@ namespace System.Windows.Controls
     [ContentProperty(nameof(Content))]
     public class UserControl : Control, IUserControl
     {
-        /// <summary> 
-        /// Returns enumerator to logical children.
+        /// <summary>
+        /// Gets an enumerator to the user control's logical child elements.
         /// </summary>
-        /*protected*/ internal override IEnumerator LogicalChildren
+        /// <returns>
+        /// An enumerator. The default value is null.
+        /// </returns>
+        protected internal override IEnumerator LogicalChildren
         {
             get
             {
-                if (this.Content == null)
+                if (Content is not UIElement content)
                 {
                     return EmptyEnumerator.Instance;
                 }
 
                 // otherwise, its logical children is its visual children
-                return new SingleChildEnumerator(this.Content);
+                return new SingleChildEnumerator(content);
             }
         }
 

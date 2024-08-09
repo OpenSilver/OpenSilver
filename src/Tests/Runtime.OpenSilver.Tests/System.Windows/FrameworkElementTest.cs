@@ -174,7 +174,7 @@ namespace System.Windows.Tests
             set { SetValue(InheritsProperty, value); }
         }
 
-        internal override IEnumerator LogicalChildren
+        protected internal override IEnumerator LogicalChildren
             => Children.GetEnumerator();
 
         #region Private classes

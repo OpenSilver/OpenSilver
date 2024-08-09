@@ -123,15 +123,18 @@ namespace System.Windows.Controls.Primitives
             => new PopupRootAutomationPeer(this);
 
         /// <summary>
-        /// Returns enumerator to logical children.
+        /// Gets an enumerator that you can use to access the logical child elements of the
+        /// <see cref="Popup"/> control.
         /// </summary>
-        internal override IEnumerator LogicalChildren
+        /// <returns>
+        /// An <see cref="IEnumerator"/> that you can use to access the logical child elements 
+        /// of a <see cref="Popup"/> control. The default is null.
+        /// </returns>
+        protected internal override IEnumerator LogicalChildren
         {
             get
             {
-                object content = Child;
-
-                if (content == null)
+                if (Child is not UIElement content)
                 {
                     return EmptyEnumerator.Instance;
                 }
@@ -140,7 +143,7 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        private class PopupModelTreeEnumerator : ModelTreeEnumerator
+        private sealed class PopupModelTreeEnumerator : ModelTreeEnumerator
         {
             internal PopupModelTreeEnumerator(Popup popup, object child)
                 : base(child)
@@ -151,15 +154,9 @@ namespace System.Windows.Controls.Primitives
                 _popup = popup;
             }
 
-            protected override bool IsUnchanged
-            {
-                get
-                {
-                    return Object.ReferenceEquals(Content, _popup.Child);
-                }
-            }
+            protected override bool IsUnchanged => ReferenceEquals(Content, _popup.Child);
 
-            private Popup _popup;
+            private readonly Popup _popup;
         }
 
         #region Dependency Properties
