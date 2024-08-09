@@ -37,6 +37,12 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 {
     event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
+    event EventHandler ResourcesChanged;
+
+    void OnResourcesChanged(ResourcesChangeInfo info);
+
+    void OnAncestorChangedInternal(TreeChangeInfo info);
+
     bool HasLogicalChildren { get; set; }
 
     bool IsLogicalChildrenIterationInProgress { get; set; }

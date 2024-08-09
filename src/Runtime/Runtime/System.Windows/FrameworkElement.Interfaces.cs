@@ -60,6 +60,16 @@ public partial class FrameworkElement : IInternalFrameworkElement
         remove => InheritedPropertyChanged -= value;
     }
 
+    event EventHandler IInternalFrameworkElement.ResourcesChanged
+    {
+        add => ResourcesChanged += value;
+        remove => ResourcesChanged -= value;
+    }
+
+    void IInternalFrameworkElement.OnResourcesChanged(ResourcesChangeInfo info) => OnResourcesChanged(info);
+
+    void IInternalFrameworkElement.OnAncestorChangedInternal(TreeChangeInfo info) => OnAncestorChangedInternal(info);
+
     void IInternalFrameworkElement.AddLogicalChild(object child) => AddLogicalChild(child);
 
     void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent) => ChangeLogicalParent(newParent);

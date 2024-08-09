@@ -713,13 +713,12 @@ namespace System.Windows
                                 fe.ShouldLookupImplicitStyles = true;
                             }
 
-                            // todo: implement this.
-                            //// If this dictionary has been initialized fire an invalidation
-                            //// to let the tree know of this change.
-                            //if (shouldInvalidate)
-                            //{
-                            //    TreeWalkHelper.InvalidateOnResourcesChange(fe, null, info);
-                            //}
+                            // If this dictionary has been initialized fire an invalidation
+                            // to let the tree know of this change.
+                            if (shouldInvalidate)
+                            {
+                                TreeWalkHelper.InvalidateOnResourcesChange(fe, info);
+                            }
                         }
                     }
                 }
@@ -739,8 +738,7 @@ namespace System.Windows
                             
                             if (shouldInvalidate)
                             {
-                                app.InvalidateStyleCache(info);
-                                // app.InvalidateResourceReferences(info);
+                                app.InvalidateResources(info);
                             }
                         }
                     }

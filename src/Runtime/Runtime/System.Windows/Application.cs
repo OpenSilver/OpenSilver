@@ -191,11 +191,8 @@ namespace System.Windows
                 ResourceDictionary oldValue = _resources;
                 _resources = value;
 
-                if (oldValue != null)
-                {
-                    // This app is no longer an owner for the old ResourceDictionary
-                    oldValue.RemoveOwner(this);
-                }
+                // This app is no longer an owner for the old ResourceDictionary
+                oldValue?.RemoveOwner(this);
 
                 if (value != null)
                 {
@@ -208,10 +205,8 @@ namespace System.Windows
 
                 if (oldValue != value)
                 {
-                    InvalidateStyleCache(new ResourcesChangeInfo(oldValue, value));
-
-                    //// this notify all window in the app that Application resources changed
-                    // InvalidateResourceReferences(new ResourcesChangeInfo(oldValue, value));
+                    // this notify all window in the app that Application resources changed
+                    InvalidateResources(new ResourcesChangeInfo(oldValue, value));
                 }
             }
         }
@@ -236,7 +231,13 @@ namespace System.Windows
             return null;
         }
 
-        internal void InvalidateStyleCache(ResourcesChangeInfo info)
+        internal void InvalidateResources(ResourcesChangeInfo info)
+        {
+            InvalidateStyleCache(info);
+            InvalidateResourceReferences(info);
+        }
+
+        private void InvalidateStyleCache(ResourcesChangeInfo info)
         {
             if (info.Key is not null)
             {
@@ -264,6 +265,14 @@ namespace System.Windows
                 _implicitResourcesCache = HasResources && (Resources.HasImplicitStyles || Resources.HasImplicitDataTemplates) ?
                     ResourceDictionary.Helpers.BuildImplicitResourcesCache(Resources) :
                     null;
+            }
+        }
+
+        private void InvalidateResourceReferences(ResourcesChangeInfo info)
+        {
+            foreach (Window window in Windows)
+            {
+                TreeWalkHelper.InvalidateOnResourcesChange(window, info);
             }
         }
 

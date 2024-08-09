@@ -32,7 +32,7 @@ internal struct DescendentsWalker<T>
         _startNode = null;
         _priority = priority;
         _recursionDepth = 0;
-        _nodes = new HashSet<DependencyObject>();
+        _nodes = new HashSet<IInternalUIElement>();
     }
 
     /// <summary>
@@ -227,14 +227,12 @@ internal struct DescendentsWalker<T>
 
             for (int i = 0; i < count; i++)
             {
-                var child = feParent.GetVisualChild(i);
-                if (child is IInternalUIElement)
+                if (feParent.GetVisualChild(i) is IInternalUIElement child)
                 {
                     // For the case that both parents are identical, this node should
                     // have already been visited when walking through logical
                     // children, hence we short-circuit here
-                    if (child is not IInternalFrameworkElement feChild ||
-                        VisualTreeHelper.GetParent(child) != feChild.Parent)
+                    if (child is not IInternalFrameworkElement feChild || feChild.VisualParent != feChild.Parent)
                     {
                         bool visitedViaVisualTree = true;
                         VisitNode(child, visitedViaVisualTree);
@@ -258,18 +256,18 @@ internal struct DescendentsWalker<T>
             // any node can be reached at most two times, once
             // via its visual parent and once via its logical parent
 
-            if (_nodes.Remove(uie.AsDependencyObject()))
+            if (_nodes.Remove(uie))
             {
                 return;
             }
 
             if (uie is IInternalFrameworkElement fe)
             {
-                DependencyObject visualParent = VisualTreeHelper.GetParent(fe);
+                DependencyObject visualParent = fe.VisualParent;
                 DependencyObject logicalParent = fe.Parent;
                 if (visualParent != null && logicalParent != null && visualParent != logicalParent)
                 {
-                    _nodes.Add(fe.AsDependencyObject());
+                    _nodes.Add(fe);
                 }
             }
 
@@ -310,7 +308,7 @@ internal struct DescendentsWalker<T>
     private DependencyObject _startNode;
     private int _recursionDepth;
     private readonly TreeWalkPriority _priority;
-    private readonly HashSet<DependencyObject> _nodes;
+    private readonly HashSet<IInternalUIElement> _nodes;
     private readonly VisitedCallback<T> _callback;
     private readonly T _data;
 }

@@ -85,33 +85,35 @@ namespace System.Windows
         private void ConnectMentor(IInternalFrameworkElement mentor)
         {
             mentor.InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
-            
-            InvalidateInheritedProperties(this, mentor.AsDependencyObject());
+            mentor.ResourcesChanged += new EventHandler(OnMentorResourcesChanged);
+
+            // invalidate the mentee's tree
+            TreeWalkHelper.InvalidateOnTreeChange(this, mentor.AsDependencyObject(), true);
         }
 
         private void DisconnectMentor(IInternalFrameworkElement mentor)
         {
             mentor.InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+            mentor.ResourcesChanged -= new EventHandler(OnMentorResourcesChanged);
 
-            InvalidateInheritedProperties(this, mentor.AsDependencyObject());
+            // invalidate the mentee's tree
+            TreeWalkHelper.InvalidateOnTreeChange(this, mentor.AsDependencyObject(), false);
         }
 
         // handle the InheritedPropertyChanged event from the mentor
-        private void OnMentorInheritedPropertyChanged(object sender, InheritedPropertyChangedEventArgs e)
-        {
+        private void OnMentorInheritedPropertyChanged(object sender, InheritedPropertyChangedEventArgs e) =>
             TreeWalkHelper.InvalidateOnInheritablePropertyChange(this, e.Info, false);
-        }
+
+        // handle the ResourcesChanged event from the mentor
+        private void OnMentorResourcesChanged(object sender, EventArgs e) =>
+            TreeWalkHelper.InvalidateOnResourcesChange(this, ResourcesChangeInfo.CatastrophicDictionaryChangeInfo);
 
         internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
-        internal static void OnInheritedPropertyChanged(FrameworkElement fe, InheritablePropertyChangeInfo info)
-        {
-            var handler = fe.InheritedPropertyChanged;
-            if (handler != null)
-            {
-                handler(fe, new InheritedPropertyChangedEventArgs(ref info));
-            }
-        }
+        private static void OnInheritedPropertyChanged(FrameworkElement fe, InheritablePropertyChangeInfo info) =>
+            fe.InheritedPropertyChanged?.Invoke(fe, new InheritedPropertyChangedEventArgs(ref info));
+
+        internal event EventHandler ResourcesChanged;
 
         #endregion Inheritance Context
 
@@ -122,10 +124,11 @@ namespace System.Windows
             DependencyObject newParent = VisualTreeHelper.GetParent(this);
 
             // Do it only if you do not have a logical parent
-            if (this.Parent == null)
+            if (Parent == null)
             {
                 // Invalidate relevant properties for this subtree
-                this.OnParentChangedInternal(newParent ?? oldParent);
+                DependencyObject parent = newParent ?? oldParent;
+                TreeWalkHelper.InvalidateOnTreeChange(this, parent, newParent is not null);
             }
 
             base.OnVisualParentChanged(oldParent);
@@ -242,16 +245,12 @@ namespace System.Windows
                 throw new InvalidOperationException("Element cannot be its own parent.");
             }
 
+            DependencyObject oldParent = Parent;
+
             Parent = newParent;
 
-            OnParentChangedInternal(newParent);
-        }
-
-        private void OnParentChangedInternal(DependencyObject parent)
-        {
-            // For now we only update the value of inherited properties
-
-            InvalidateInheritedProperties(this, parent);
+            DependencyObject parent = newParent ?? oldParent;
+            TreeWalkHelper.InvalidateOnTreeChange(this, parent, newParent is not null);
         }
 
         /// <summary>
@@ -272,6 +271,48 @@ namespace System.Windows
         {
             get { return ReadInternalFlag(InternalFlags.HasLogicalChildren); }
             set { WriteInternalFlag(InternalFlags.HasLogicalChildren, value); }
+        }
+
+        private void OnAncestorChangedInternal(TreeChangeInfo parentTreeState)
+        {
+            // If this is a tree add operation update the ShouldLookupImplicitStyles
+            // flag with respect to your parent.
+            if (parentTreeState.IsAddOperation)
+            {
+                SetShouldLookupImplicitStyles();
+            }
+
+            ResourcesChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnResourcesChanged(ResourcesChangeInfo info)
+        {
+            bool containsTypeOfKey = info.Contains(DependencyObjectType.SystemType, true /*isImplicitStyleKey*/);
+
+            // If a resource dictionary changed above this node then we need to
+            // synchronize the ShouldLookupImplicitStyles flag with respect to
+            // our parent here.
+
+            if (info.IsResourceAddOperation || info.IsCatastrophicDictionaryChange)
+            {
+                SetShouldLookupImplicitStyles();
+            }
+
+            ResourcesChanged?.Invoke(this, new ResourcesChangedEventArgs(info));
+        }
+
+        // Set the ShouldLookupImplicitStyles flag on the current
+        // node if the parent has it set to true.
+        private void SetShouldLookupImplicitStyles()
+        {
+            if (!ShouldLookupImplicitStyles)
+            {
+                var parent = (Parent ?? VisualParent) as FrameworkElement;
+                if (parent is not null && parent.ShouldLookupImplicitStyles)
+                {
+                    ShouldLookupImplicitStyles = true;
+                }
+            }
         }
 
         #endregion Logical Parent
@@ -342,8 +383,8 @@ namespace System.Windows
                 IsRightToLeft = true;
             }
 
-            Application app = Application.Current;
-            if (app != null && app.HasImplicitStylesInResources)
+            // Set the ShouldLookupImplicitStyles flag to true if App.Resources has implicit styles.
+            if (Application.Current is Application app && app.HasImplicitStylesInResources)
             {
                 ShouldLookupImplicitStyles = true;
             }
@@ -389,11 +430,8 @@ namespace System.Windows
                 ResourceDictionary oldValue = _resources;
                 _resources = value;
 
-                if (oldValue != null)
-                {
-                    // This element is no longer an owner for the old RD
-                    oldValue.RemoveOwner(this);
-                }
+                // This element is no longer an owner for the old RD
+                oldValue?.RemoveOwner(this);
 
                 if (value != null)
                 {
@@ -404,13 +442,12 @@ namespace System.Windows
                     }
                 }
 
-                // todo: implement this.
-                //// Invalidate ResourceReference properties for this subtree
-                //// 
-                //if (oldValue != value)
-                //{
-                //    TreeWalkHelper.InvalidateOnResourcesChange(this, null, new ResourcesChangeInfo(oldValue, value));
-                //}
+                // Invalidate ResourceReference properties for this subtree
+                // 
+                if (oldValue != value)
+                {
+                    TreeWalkHelper.InvalidateOnResourcesChange(this, new ResourcesChangeInfo(oldValue, value));
+                }
 
                 // todo: remove the following block when 'InvalidateOnResourcesChange' is implemented
                 {
@@ -1044,12 +1081,12 @@ namespace System.Windows
             BindingValidationError?.Invoke(this, e);
         }
 
-#endregion
+        #endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            if (HasImplicitStyleFromResources && 
+            if (HasImplicitStyleFromResources &&
                 (!HasResources || !Resources.Contains(GetType())))
             {
                 HasStyleInvalidated = false;
@@ -1061,17 +1098,10 @@ namespace System.Windows
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            // We check if the parent has implicit styles in its ancestors and inherit it if it is the case
-            FrameworkElement parent = (Parent ?? VisualTreeHelper.GetParent(this)) as FrameworkElement;
-            if (parent != null && parent.ShouldLookupImplicitStyles)
-            {
-                ShouldLookupImplicitStyles = true;
-            }
-
             // Fetch the implicit style
             // If this element's ResourceDictionary contains the
             // implicit style, it has already been retrieved.
-            if (!HasImplicitStyleFromResources || 
+            if (!HasImplicitStyleFromResources ||
                 (!HasResources || !Resources.Contains(GetType())))
             {
                 HasStyleInvalidated = false;

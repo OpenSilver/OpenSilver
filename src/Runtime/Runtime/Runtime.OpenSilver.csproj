@@ -74,7 +74,11 @@
 		<Compile Include="OpenSilver\Internal\SynchronyzedStore.cs" />
 		<Compile Include="OpenSilver\Internal\TemplateContent.cs" />
 		<Compile Include="OpenSilver\Internal\UIElementHelpers.cs" />
+		<Compile Include="System.Windows\DynamicResourceExtension.cs" />
+		<Compile Include="System.Windows\ResourceReferenceExpression.cs" />
+		<Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />
 		<Compile Include="System.Windows\LogicalTreeHelper.cs" />
+		<Compile Include="System.Windows\TreeChangeInfo.cs" />
 		<Compile Include="System.Windows\ValidateValueCallback.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />

@@ -15,7 +15,6 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using OpenSilver;
@@ -196,6 +195,8 @@ namespace CSHTML5.Internal
             // PREPARE THE CHILD:
             //--------------------------------------------------------
 
+            var childFE = child as FrameworkElement;
+
             child.IsConnectedToLiveTree = true;
 
             // Set the "ParentWindow" property so that the element knows where to display popups:
@@ -229,10 +230,7 @@ namespace CSHTML5.Internal
             // SET "ISLOADED" PROPERTY AND CALL "ONATTACHED" EVENT:
             //--------------------------------------------------------
 
-            if (child is FrameworkElement)
-            {
-                ((FrameworkElement)child).LoadResources();
-            }
+            childFE?.LoadResources();
 
             // Tell the control that it is now present into the visual tree:
             child._isLoaded = true;
@@ -274,10 +272,7 @@ namespace CSHTML5.Internal
             //--------------------------------------------------------
             
             // Raise the "Loaded" event: (note: in XAML, the "loaded" event of the children is called before the "loaded" event of the parent)
-            if (child is FrameworkElement fe)
-            {
-                fe.RaiseLoadedEvent();
-            }
+            childFE?.RaiseLoadedEvent();
         }
 
         public static bool IsElementInVisualTree(UIElement element) => element.IsConnectedToLiveTree && !element.IsUnloading;

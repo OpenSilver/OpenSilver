@@ -124,7 +124,7 @@ namespace System.Windows
         /// </summary>
         private void UpdateThemeStyleProperty()
         {
-            if (IsThemeStyleUpdateInProgress == false)
+            if (!IsThemeStyleUpdateInProgress)
             {
                 IsThemeStyleUpdateInProgress = true;
                 try
@@ -138,7 +138,7 @@ namespace System.Windows
             }
             else
             {
-                throw new InvalidOperationException(string.Format("Cyclic reference found while evaluating the ThemeStyle property on element '{0}'.", this));
+                throw new InvalidOperationException($"Cyclic reference found while evaluating the ThemeStyle property on element '{this}'.");
             }
         }
 
@@ -153,7 +153,7 @@ namespace System.Windows
         {
             if (!HasStyleInvalidated)
             {
-                if (IsStyleUpdateInProgress == false)
+                if (!IsStyleUpdateInProgress)
                 {
                     IsStyleUpdateInProgress = true;
                     try
@@ -168,7 +168,7 @@ namespace System.Windows
                 }
                 else
                 {
-                    throw new InvalidOperationException(string.Format("Cyclic reference found while evaluating the Style property on element '{0}'.", this));
+                    throw new InvalidOperationException($"Cyclic reference found while evaluating the Style property on element '{this}'.");
                 }
             }
         }
@@ -176,11 +176,11 @@ namespace System.Windows
         private void InvalidateStyleProperty()
         {
             // Try to find an implicit style
-            Style implicitStyle = FindImplicitStyleResource(this, GetType()) as Style;
+            Style implicitStyle = FindImplicitStyleResource(this, DependencyObjectType.SystemType) as Style;
             Style oldStyle = ImplicitStyle;
 
             // Set the flag associated with the StyleProperty
-            HasImplicitStyleFromResources = implicitStyle != null;
+            HasImplicitStyleFromResources = implicitStyle is not null;
 
             if (oldStyle != implicitStyle)
             {

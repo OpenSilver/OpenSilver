@@ -308,9 +308,9 @@ namespace OpenSilver.Internal.Xaml
                 value = binding.ProvideValue(serviceProvider);
             }
 
-            if (value is BindingExpression bindingExpression && target is DependencyObject d)
+            if (value is Expression expression && target is DependencyObject d)
             {
-                d.SetValue(dp, bindingExpression);
+                d.SetValue(dp, expression);
                 return true;
             }
 
