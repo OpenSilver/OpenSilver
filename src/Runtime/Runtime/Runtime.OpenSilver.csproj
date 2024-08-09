@@ -930,7 +930,7 @@
 		<Compile Include="System.Windows\TriggerBase.cs" />
 		<Compile Include="System.Windows\TriggerCollection.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\VisualTransition.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\WindowCollection.cs" />
+		<Compile Include="System.Windows\WindowCollection.cs" />
 		<Compile Include="System.Windows\WindowStyle.cs" />
 		<Compile Include="System.Windows\OutOfBrowserSettings.cs" />
 		<Compile Include="System.Windows\WindowSettings.cs" />

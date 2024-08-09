@@ -36,6 +36,11 @@ namespace System.Windows
         {
             BypassLayoutPolicies = true;
 
+            if (Application.Current is Application app)
+            {
+                app.Windows.Add(this);
+            }
+
             if (hookUpEvents)
             {
                 new DOMEventManager(

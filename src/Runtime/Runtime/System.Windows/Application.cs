@@ -105,8 +105,15 @@ namespace System.Windows
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());
             });
-
         }
+
+        /// <summary>
+        /// Gets a collection of the <see cref="Window"/> instances that have been created.
+        /// </summary>
+        /// <returns>
+        /// A collection of the windows used by the application.
+        /// </returns>
+        public WindowCollection Windows { get; } = new();
 
         public IList ApplicationLifetimeObjects => _lifetimeObjects ??= new ApplicationLifetimeObjectsCollection();
 

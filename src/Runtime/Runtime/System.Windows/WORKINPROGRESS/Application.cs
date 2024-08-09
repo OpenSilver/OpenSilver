@@ -27,21 +27,6 @@ namespace System.Windows
     /// </summary>
     public partial class Application
     {
-        // Summary:
-        //     Gets a collection of the System.Windows.Window instances that have been created.
-        //
-        // Returns:
-        //     A collection of the windows used by the application.
-        //
-        // Exceptions:
-        //   T:System.NotSupportedException:
-        //     The application is not running outside the browser.
-        //
-        //   T:System.UnauthorizedAccessException:
-        //     The current thread is not the user interface (UI) thread.
-        [OpenSilver.NotImplemented]
-        public WindowCollection Windows { get; }
-
         /// <summary>
         /// Occurs when an exception that is raised is not handled.
         /// </summary>
