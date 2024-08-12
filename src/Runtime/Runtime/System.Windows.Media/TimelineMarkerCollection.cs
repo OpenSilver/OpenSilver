@@ -21,7 +21,7 @@ namespace System.Windows.Media
         /// <summary>
         /// Initializes a new instance of the <see cref="TimelineMarkerCollection"/> class.
         /// </summary>
-        public TimelineMarkerCollection() : base(false) { }
+        public TimelineMarkerCollection() { }
 
         internal override void AddOverride(TimelineMarker value)
         {

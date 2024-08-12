@@ -24,7 +24,6 @@ public sealed class SetterBaseCollection : PresentationFrameworkCollection<Sette
     /// Initializes a new instance of the <see cref="SetterBaseCollection"/> class.
     /// </summary>
     public SetterBaseCollection()
-        : base(false)
     {
     }
 

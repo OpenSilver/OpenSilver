@@ -23,10 +23,7 @@ public sealed class ExternalPartCollection : PresentationFrameworkCollection<Ext
     /// <summary>
     /// Initializes a new instance of the <see cref="ExternalPartCollection"/> class.
     /// </summary>
-    public ExternalPartCollection()
-        : base(false)
-    {
-    }
+    public ExternalPartCollection() { }
 
     internal override void AddOverride(ExternalPart value) => AddInternal(value);
 

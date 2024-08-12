@@ -20,20 +20,21 @@ namespace System.Windows.Media
     /// </summary>
     public sealed class GeometryCollection : PresentationFrameworkCollection<Geometry>
     {
-        private WeakReference<GeometryGroup> _ownerWeakRef;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="GeometryCollection"/> class.
         /// </summary>
-        public GeometryCollection()
-            : base(true)
-        {
-        }
+        public GeometryCollection() { }
+
+        internal event EventHandler Changed;
+
+        private void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
         internal override void AddOverride(Geometry value)
         {
             ListenForPathChanges(value);
             AddDependencyObjectInternal(value);
+
+            OnChanged();
         }
 
         internal override void ClearOverride()
@@ -44,18 +45,24 @@ namespace System.Windows.Media
             }
 
             ClearDependencyObjectInternal();
+
+            OnChanged();
         }
 
         internal override void InsertOverride(int index, Geometry value)
         {
             ListenForPathChanges(value);
             InsertDependencyObjectInternal(index, value);
+
+            OnChanged();
         }
 
         internal override void RemoveAtOverride(int index)
         {
             StopListeningForPathChanges(GetItemInternal(index));
             RemoveAtDependencyObjectInternal(index);
+
+            OnChanged();
         }
 
         internal override Geometry GetItemOverride(int index) => GetItemInternal(index);
@@ -65,10 +72,9 @@ namespace System.Windows.Media
             StopListeningForPathChanges(GetItemInternal(index));
             ListenForPathChanges(value);
             SetItemDependencyObjectInternal(index, value);
-        }
 
-        internal void SetOwner(GeometryGroup owner) =>
-            _ownerWeakRef = owner is null ? null : new WeakReference<GeometryGroup>(owner);
+            OnChanged();
+        }
 
         private void ListenForPathChanges(Geometry geometry)
         {
@@ -84,9 +90,9 @@ namespace System.Windows.Media
 
         private void OnChildrenPathChanged(object sender, GeometryInvalidatedEventsArgs e)
         {
-            if (e.AffectsMeasure && _ownerWeakRef.TryGetTarget(out GeometryGroup owner))
+            if (e.AffectsMeasure)
             {
-                owner.RaisePathChanged();
+                OnChanged();
             }
         }
     }

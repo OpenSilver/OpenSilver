@@ -11,6 +11,9 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Specialized;
+using OpenSilver.Internal;
+
 namespace System.Windows.Input
 {
     /// <summary>
@@ -18,12 +21,14 @@ namespace System.Windows.Input
     /// </summary>
     public sealed class StylusPointCollection : PresentationFrameworkCollection<StylusPoint>
     {
+        private readonly CollectionChangedHelper _collectionChanged;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StylusPointCollection" /> class.
         /// </summary>
         public StylusPointCollection()
-            : base (true)
         {
+            _collectionChanged = new();
         }
 
         /// <summary>
@@ -45,34 +50,49 @@ namespace System.Windows.Input
             }
         }
 
+        internal event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add => _collectionChanged.CollectionChanged += value;
+            remove => _collectionChanged.CollectionChanged -= value;
+        }
+
         internal override void AddOverride(StylusPoint point)
         {
+            _collectionChanged.CheckReentrancy();
             AddInternal(point);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, point, Count - 1);
         }
 
         internal override void ClearOverride()
         {
+            _collectionChanged.CheckReentrancy();
             ClearInternal();
+            _collectionChanged.OnCollectionReset();
         }
 
         internal override void RemoveAtOverride(int index)
         {
+            _collectionChanged.CheckReentrancy();
+            StylusPoint removedItem = GetItemInternal(index);
             RemoveAtInternal(index);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
         }
 
         internal override void InsertOverride(int index, StylusPoint point)
         {
+            _collectionChanged.CheckReentrancy();
             InsertInternal(index, point);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, point, index);
         }
 
-        internal override StylusPoint GetItemOverride(int index)
-        {
-            return GetItemInternal(index);
-        }
+        internal override StylusPoint GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, StylusPoint point)
         {
+            _collectionChanged.CheckReentrancy();
+            StylusPoint originalItem = GetItemInternal(index);
             SetItemInternal(index, point);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, point, index);
         }
     }
 }

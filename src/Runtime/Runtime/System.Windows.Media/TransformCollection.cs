@@ -15,19 +15,29 @@ using System.Diagnostics;
 
 namespace System.Windows.Media
 {
+    /// <summary>
+    /// Represents a collection of <see cref="Transform"/> objects that can be individually 
+    /// accessed by index.
+    /// </summary>
     public sealed class TransformCollection : PresentationFrameworkCollection<Transform>
     {
-        private WeakReference<TransformGroup> _ownerWeakRef;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransformCollection"/> class.
+        /// </summary>
         public TransformCollection()
-            : base(true)
         {
         }
+
+        internal event EventHandler Changed;
+
+        private void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
         internal override void AddOverride(Transform value)
         {
             SubscribeToChangedEvent(value);
             AddDependencyObjectInternal(value);
+
+            OnChanged();
         }
 
         internal override void ClearOverride()
@@ -38,18 +48,24 @@ namespace System.Windows.Media
             }
 
             ClearDependencyObjectInternal();
+
+            OnChanged();
         }
 
         internal override void InsertOverride(int index, Transform value)
         {
             SubscribeToChangedEvent(value);
             InsertDependencyObjectInternal(index, value);
+
+            OnChanged();
         }
 
         internal override void RemoveAtOverride(int index)
         {
             UnsubscribeToChangedEvent(GetItemInternal(index));
             RemoveAtDependencyObjectInternal(index);
+
+            OnChanged();
         }
 
         internal override Transform GetItemOverride(int index) => GetItemInternal(index);
@@ -59,10 +75,9 @@ namespace System.Windows.Media
             UnsubscribeToChangedEvent(GetItemInternal(index));
             SubscribeToChangedEvent(value);
             SetItemDependencyObjectInternal(index, value);
-        }
 
-        internal void SetOwner(TransformGroup owner) =>
-            _ownerWeakRef = owner is null ? null : new WeakReference<TransformGroup>(owner);
+            OnChanged();
+        }
 
         private void SubscribeToChangedEvent(Transform transform)
         {
@@ -76,12 +91,6 @@ namespace System.Windows.Media
             transform.Changed -= TransformChanged;
         }
 
-        private void TransformChanged(object sender, EventArgs e)
-        {
-            if (_ownerWeakRef.TryGetTarget(out TransformGroup owner))
-            {
-                owner.OnTransformChanged();
-            }
-        }
+        private void TransformChanged(object sender, EventArgs e) => OnChanged();
     }
 }

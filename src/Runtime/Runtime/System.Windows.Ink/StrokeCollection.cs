@@ -11,6 +11,9 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Specialized;
+using OpenSilver.Internal;
+
 namespace System.Windows.Ink
 {
     /// <summary>
@@ -18,42 +21,59 @@ namespace System.Windows.Ink
     /// </summary>
     public sealed class StrokeCollection : PresentationFrameworkCollection<Stroke>
     {
+        private readonly CollectionChangedHelper _collectionChanged;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StrokeCollection"/> class.
         /// </summary>
         public StrokeCollection()
-            : base(true)
         {
+            _collectionChanged = new();
+        }
+
+        internal event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add => _collectionChanged.CollectionChanged += value;
+            remove => _collectionChanged.CollectionChanged -= value;
         }
 
         internal override void AddOverride(Stroke point)
         {
+            _collectionChanged.CheckReentrancy();
             AddInternal(point);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, point, Count - 1);
         }
 
         internal override void ClearOverride()
         {
+            _collectionChanged.CheckReentrancy();
             ClearInternal();
+            _collectionChanged.OnCollectionReset();
         }
 
         internal override void RemoveAtOverride(int index)
         {
+            _collectionChanged.CheckReentrancy();
+            Stroke removedItem = GetItemInternal(index);
             RemoveAtInternal(index);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
         }
 
         internal override void InsertOverride(int index, Stroke point)
         {
+            _collectionChanged.CheckReentrancy();
             InsertInternal(index, point);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, point, index);
         }
 
-        internal override Stroke GetItemOverride(int index)
-        {
-            return GetItemInternal(index);
-        }
+        internal override Stroke GetItemOverride(int index) => GetItemInternal(index);
 
         internal override void SetItemOverride(int index, Stroke point)
         {
+            _collectionChanged.CheckReentrancy();
+            Stroke originalItem = GetItemInternal(index);
             SetItemInternal(index, point);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, point, index);
         }
     }
 }

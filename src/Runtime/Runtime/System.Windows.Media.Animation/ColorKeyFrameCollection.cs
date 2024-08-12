@@ -25,13 +25,9 @@ public sealed class ColorKeyFrameCollection : PresentationFrameworkCollection<Co
     /// <summary>
     /// Initializes a new instance of the <see cref="ColorKeyFrameCollection"/> class.
     /// </summary>
-    public ColorKeyFrameCollection()
-        : base(false)
-    {
-    }
+    public ColorKeyFrameCollection() { }
 
     internal ColorKeyFrameCollection(ColorAnimationUsingKeyFrames owner)
-        : base(false)
     {
         Debug.Assert(owner is not null);
         owner.ProvideSelfAsInheritanceContext(this, null);

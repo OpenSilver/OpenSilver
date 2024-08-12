@@ -11,11 +11,11 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -37,13 +37,16 @@ namespace System.Windows
         public DependencyObjectCollection()
         {
             _collection = new DependencyObjectCollectionInternal(this);
-            _collection.CollectionChanged += new NotifyCollectionChangedEventHandler(OnCollectionChanged);
         }
 
         /// <summary>
         /// Occurs when items in the collection are added, removed, or replaced.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add => _collection.CollectionChanged += value;
+            remove => _collection.CollectionChanged -= value;
+        }
 
         /// <summary>
         /// Gets or sets the object at the specified index.
@@ -234,16 +237,14 @@ namespace System.Windows
 
         IEnumerator IEnumerable.GetEnumerator() => _collection.GetEnumerator();
 
-        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
-
         private static DependencyObject AsDependencyObject(object item)
         {
-            if (!(item is DependencyObject) && item != null)
+            return item switch
             {
-                throw new ArgumentException("item is not a DependencyObject.");
-            }
-
-            return (DependencyObject)item;
+                DependencyObject d => d,
+                null => null,
+                _ => throw new ArgumentException("item is not a DependencyObject."),
+            };
         }
 
         private static T AsT(object item)
@@ -254,22 +255,58 @@ namespace System.Windows
 
     internal sealed class DependencyObjectCollectionInternal : PresentationFrameworkCollection<DependencyObject>
     {
-        internal DependencyObjectCollectionInternal(DependencyObject owner) : base(true)
+        private readonly CollectionChangedHelper _collectionChanged;
+
+        internal DependencyObjectCollectionInternal(DependencyObject owner)
         {
+            _collectionChanged = new();
             owner.ProvideSelfAsInheritanceContext(this, null);
             IsInheritanceContextSealed = true;
         }
 
-        internal override void AddOverride(DependencyObject value) => AddDependencyObjectInternal(value);
+        internal event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add => _collectionChanged.CollectionChanged += value;
+            remove => _collectionChanged.CollectionChanged -= value;
+        }
 
-        internal override void ClearOverride() => ClearDependencyObjectInternal();
+        internal override void AddOverride(DependencyObject value)
+        {
+            _collectionChanged.CheckReentrancy();
+            AddDependencyObjectInternal(value);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
+        }
 
-        internal override void InsertOverride(int index, DependencyObject value) => InsertDependencyObjectInternal(index, value);
+        internal override void ClearOverride()
+        {
+            _collectionChanged.CheckReentrancy();
+            ClearDependencyObjectInternal();
+            _collectionChanged.OnCollectionReset();
+        }
 
-        internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+        internal override void InsertOverride(int index, DependencyObject value)
+        {
+            _collectionChanged.CheckReentrancy();
+            InsertDependencyObjectInternal(index, value);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, index);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            _collectionChanged.CheckReentrancy();
+            DependencyObject removedItem = GetItemInternal(index);
+            RemoveAtDependencyObjectInternal(index);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
+        }
 
         internal override DependencyObject GetItemOverride(int index) => GetItemInternal(index);
 
-        internal override void SetItemOverride(int index, DependencyObject value) => SetItemDependencyObjectInternal(index, value);
+        internal override void SetItemOverride(int index, DependencyObject value)
+        {
+            _collectionChanged.CheckReentrancy();
+            DependencyObject originalItem = GetItemInternal(index);
+            SetItemDependencyObjectInternal(index, value);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, value, index);
+        }
     }
 }

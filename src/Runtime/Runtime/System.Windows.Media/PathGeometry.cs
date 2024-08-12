@@ -13,7 +13,6 @@
 
 using System.Collections.Generic;
 using System.Windows.Markup;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Windows.Shapes;
 using OpenSilver.Internal;
@@ -69,7 +68,6 @@ namespace System.Windows.Media
                             PathGeometry pathGeometry = (PathGeometry)d;
                             var figures = new PathFigureCollection();
                             figures.SetParentGeometry(pathGeometry);
-                            figures.CollectionChanged += new NotifyCollectionChangedEventHandler(pathGeometry.OnFiguresCollectionChanged);
                             return figures;
                         }),
                     OnFiguresChanged,
@@ -95,12 +93,10 @@ namespace System.Windows.Media
             if (e.OldValue is PathFigureCollection oldFigures)
             {
                 oldFigures.SetParentGeometry(null);
-                oldFigures.CollectionChanged -= new NotifyCollectionChangedEventHandler(pathGeometry.OnFiguresCollectionChanged);
             }
             if (e.NewValue is PathFigureCollection newFigures)
             {
                 newFigures.SetParentGeometry(pathGeometry);
-                newFigures.CollectionChanged += new NotifyCollectionChangedEventHandler(pathGeometry.OnFiguresCollectionChanged);
             }
 
             OnPathChanged(d, e);
@@ -110,8 +106,6 @@ namespace System.Windows.Media
         {
             return baseValue ?? new PathFigureCollection();
         }
-
-        private void OnFiguresCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaisePathChanged();
 
         /// <summary>
         /// Identifies the <see cref="FillRule"/> dependency property.

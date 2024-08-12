@@ -24,12 +24,10 @@ public sealed class TimelineCollection : PresentationFrameworkCollection<Timelin
     /// Initializes a new instance of the <see cref="TimelineCollection"/> class.
     /// </summary>
     public TimelineCollection()
-        : base(false)
     {
     }
 
     internal TimelineCollection(Storyboard owner)
-        : base(false)
     {
         Debug.Assert(owner != null);
         owner.ProvideSelfAsInheritanceContext(this, null);

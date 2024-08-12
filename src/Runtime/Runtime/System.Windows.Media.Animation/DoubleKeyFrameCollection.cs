@@ -25,13 +25,9 @@ public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<D
     /// <summary>
     /// Initializes a new instance of the <see cref="DoubleKeyFrameCollection"/> class.
     /// </summary>
-    public DoubleKeyFrameCollection()
-        : base(false)
-    {
-    }
+    public DoubleKeyFrameCollection() { }
 
     internal DoubleKeyFrameCollection(DoubleAnimationUsingKeyFrames owner)
-        : base(false)
     {
         Debug.Assert(owner is not null);
         owner.ProvideSelfAsInheritanceContext(this, null);

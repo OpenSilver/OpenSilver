@@ -29,7 +29,6 @@ namespace System.Windows.Media
         /// Initializes a new instance of the <see cref="PathFigureCollection"/> class.
         /// </summary>
         public PathFigureCollection()
-            : base(true)
         {
         }
 
@@ -41,7 +40,7 @@ namespace System.Windows.Media
         /// The initial capacity of this <see cref="PathFigureCollection"/>.
         /// </param>
         public PathFigureCollection(int capacity)
-            : base(capacity, true)
+            : base(capacity)
         {
         }
 
@@ -54,7 +53,7 @@ namespace System.Windows.Media
         /// up the geometry of the <see cref="Path"/>.
         /// </param>
         public PathFigureCollection(IEnumerable<PathFigure> figures)
-            : base(figures, true)
+            : base(figures)
         {
         }
 
@@ -62,18 +61,24 @@ namespace System.Windows.Media
         {
             SetParentGeometry(figure, _parentGeometry);
             AddDependencyObjectInternal(figure);
+
+            OnChanged();
         }
 
         internal override void RemoveAtOverride(int index)
         {
             SetParentGeometry(GetItemInternal(index), null);
             RemoveAtDependencyObjectInternal(index);
+
+            OnChanged();
         }
 
         internal override void InsertOverride(int index, PathFigure figure)
         {
             SetParentGeometry(figure, _parentGeometry);
             InsertDependencyObjectInternal(index, figure);
+
+            OnChanged();
         }
 
         internal override void ClearOverride()
@@ -84,6 +89,8 @@ namespace System.Windows.Media
             }
 
             ClearDependencyObjectInternal();
+
+            OnChanged();
         }
 
         internal override PathFigure GetItemOverride(int index) => GetItemInternal(index);
@@ -93,6 +100,8 @@ namespace System.Windows.Media
             SetParentGeometry(GetItemInternal(index), null);
             SetParentGeometry(figure, _parentGeometry);
             SetItemDependencyObjectInternal(index, figure);
+
+            OnChanged();
         }
 
         internal void SetParentGeometry(Geometry geometry)
@@ -111,5 +120,7 @@ namespace System.Windows.Media
             Debug.Assert(figure is not null);
             figure.SetParentGeometry(geometry);
         }
+
+        private void OnChanged() => _parentGeometry?.RaisePathChanged();
     }
 }

@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
@@ -24,7 +23,7 @@ namespace System.Windows.Media
     [ContentProperty(nameof(Children))]
     public sealed class TransformGroup : Transform
     {
-        private WeakEventListener<TransformGroup, TransformCollection, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+        private WeakEventListener<TransformGroup, TransformCollection, EventArgs> _childrenChangedListener;
 
         /// <summary>
         /// Identifies the <see cref="Children"/> dependency property.
@@ -67,28 +66,24 @@ namespace System.Windows.Media
             tg.OnTransformChanged();
         }
 
-        private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => OnTransformChanged();
+        private void OnChildrenCollectionChanged(object sender, EventArgs e) => OnTransformChanged();
 
         private void OnChildrenChanged(TransformCollection oldChildren, TransformCollection newChildren)
         {
-            oldChildren?.SetOwner(null);
-
-            if (_collectionChangedListener != null)
+            if (_childrenChangedListener != null)
             {
-                _collectionChangedListener.Detach();
-                _collectionChangedListener = null;
+                _childrenChangedListener.Detach();
+                _childrenChangedListener = null;
             }
 
             if (newChildren is not null)
             {
-                newChildren.SetOwner(this);
-
-                _collectionChangedListener = new(this, newChildren)
+                _childrenChangedListener = new(this, newChildren)
                 {
                     OnEventAction = static (instance, sender, args) => instance.OnChildrenCollectionChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
                 };
-                newChildren.CollectionChanged += _collectionChangedListener.OnEvent;
+                newChildren.Changed += _childrenChangedListener.OnEvent;
             }
         }
 

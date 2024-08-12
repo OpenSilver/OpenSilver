@@ -31,7 +31,6 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
     private bool _isModel;
 
     internal TextElementCollection(UIElement owner)
-        : base(false)
     {
         Debug.Assert(owner is not null);
         _owner = owner;

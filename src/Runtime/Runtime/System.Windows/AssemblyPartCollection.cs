@@ -22,10 +22,7 @@ public sealed class AssemblyPartCollection : PresentationFrameworkCollection<Ass
     /// <summary>
     /// Initializes a new instance of the <see cref="AssemblyPartCollection"/> class.
     /// </summary>
-    public AssemblyPartCollection()
-        : base(false)
-    {
-    }
+    public AssemblyPartCollection() { }
 
     internal override void AddOverride(AssemblyPart value) => AddInternal(value);
 

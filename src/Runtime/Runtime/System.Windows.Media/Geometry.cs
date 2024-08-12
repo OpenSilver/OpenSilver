@@ -85,7 +85,7 @@ namespace System.Windows.Media
             geometry.RaisePathChanged();
         }
 
-        internal void RaisePathChanged() => Invalidated?.Invoke(this, new GeometryInvalidatedEventsArgs(true, false));
+        internal void RaisePathChanged() => Invalidated?.Invoke(this, GeometryInvalidatedEventsArgs.AffectsMeasureArgs);
 
         internal static void OnFillRuleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -93,7 +93,7 @@ namespace System.Windows.Media
             geometry.RaiseFillRuleChanged();
         }
 
-        private void RaiseFillRuleChanged() => Invalidated?.Invoke(this, new GeometryInvalidatedEventsArgs(false, true));
+        private void RaiseFillRuleChanged() => Invalidated?.Invoke(this, GeometryInvalidatedEventsArgs.AffectsFillRuleArgs);
 
         internal abstract string ToPathData(IFormatProvider formatProvider);
 
@@ -107,6 +107,10 @@ namespace System.Windows.Media
             AffectsMeasure = affectsMeasure;
             AffectsFillRule = affectsFillRule;
         }
+
+        public static GeometryInvalidatedEventsArgs AffectsMeasureArgs { get; } = new(true, false);
+
+        public static GeometryInvalidatedEventsArgs AffectsFillRuleArgs { get; } = new(false, true);
 
         public bool AffectsMeasure { get; }
 

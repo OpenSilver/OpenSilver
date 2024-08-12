@@ -86,10 +86,7 @@ file class MyDependencyObject : DependencyObject
 
 file class StringCollection : PresentationFrameworkCollection<string>
 {
-    public StringCollection()
-        : base(false)
-    {
-    }
+    public StringCollection() { }
 
     internal override void AddOverride(string value) => AddInternal(value);
     internal override void ClearOverride() => ClearInternal();

@@ -21,9 +21,7 @@ namespace System.Windows.Media
     /// </summary>
     public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
-        public DoubleCollection() : base(false) 
-        { 
-        }
+        public DoubleCollection() { }
 
         public static DoubleCollection Parse(string source)
         {

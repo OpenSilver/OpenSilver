@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Media;
 using OpenSilver.Buffers;
@@ -85,36 +84,12 @@ namespace System.Windows.Controls
         /// <summary>
         /// Gets a list of ColumnDefinition objects defined on this instance of Grid.
         /// </summary>
-        public ColumnDefinitionCollection ColumnDefinitions
-        {
-            get
-            {
-                if (_columns == null)
-                {
-                    _columns = new ColumnDefinitionCollection(this);
-                    _columns.CollectionChanged += OnDefinitionsCollectionChanged;
-                }
-                return _columns;
-            }
-        }
+        public ColumnDefinitionCollection ColumnDefinitions => _columns ??= new ColumnDefinitionCollection(this);
 
         /// <summary>
         /// Gets a list of RowDefinition objects defined on this instance of Grid.
         /// </summary>
-        public RowDefinitionCollection RowDefinitions
-        {
-            get
-            {
-                if (_rows == null)
-                {
-                    _rows = new RowDefinitionCollection(this);
-                    _rows.CollectionChanged += OnDefinitionsCollectionChanged;
-                }
-                return _rows;
-            }
-        }
-
-        private void OnDefinitionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateDefinitions();
+        public RowDefinitionCollection RowDefinitions => _rows ??= new RowDefinitionCollection(this);
 
         /// <summary>
         /// Sets the value of the Grid.Row XAML attached property on the specified FrameworkElement.
@@ -443,7 +418,7 @@ namespace System.Windows.Controls
                    (ColumnDefinitions == null || ColumnDefinitions.Count == 0);
         }
 
-        private void InvalidateDefinitions()
+        internal void InvalidateDefinitions()
         {
             SetGridFlags(GridFlags.DefinitionsChanged);
             InvalidateMeasure();

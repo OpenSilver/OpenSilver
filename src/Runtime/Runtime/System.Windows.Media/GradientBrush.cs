@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal;
@@ -28,7 +27,7 @@ namespace System.Windows.Media
     [ContentProperty(nameof(GradientStops))]
     public class GradientBrush : Brush
     {
-        private WeakEventListener<GradientBrush, GradientStopCollection, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+        private WeakEventListener<GradientBrush, GradientStopCollection, EventArgs> _gradientStopsChangedListener;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GradientBrush"/> class.
@@ -89,28 +88,24 @@ namespace System.Windows.Media
             brush.RaiseChanged();
         }
 
-        private void OnGradientStopCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => RaiseChanged();
+        private void OnGradientStopCollectionChanged(object sender, EventArgs e) => RaiseChanged();
 
         private void OnGradientStopsChanged(GradientStopCollection oldStops, GradientStopCollection newStops)
         {
-            oldStops?.SetOwner(null);
-
-            if (_collectionChangedListener != null)
+            if (_gradientStopsChangedListener != null)
             {
-                _collectionChangedListener.Detach();
-                _collectionChangedListener = null;
+                _gradientStopsChangedListener.Detach();
+                _gradientStopsChangedListener = null;
             }
 
             if (newStops is not null)
             {
-                newStops.SetOwner(this);
-
-                _collectionChangedListener = new(this, newStops)
+                _gradientStopsChangedListener = new(this, newStops)
                 {
                     OnEventAction = static (instance, sender, args) => instance.OnGradientStopCollectionChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
                 };
-                newStops.CollectionChanged += _collectionChangedListener.OnEvent;
+                newStops.Changed += _gradientStopsChangedListener.OnEvent;
             }
         }
 

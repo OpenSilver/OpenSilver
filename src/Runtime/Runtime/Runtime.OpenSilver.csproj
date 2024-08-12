@@ -74,6 +74,7 @@
 		<Compile Include="OpenSilver\Internal\SynchronyzedStore.cs" />
 		<Compile Include="OpenSilver\Internal\TemplateContent.cs" />
 		<Compile Include="OpenSilver\Internal\UIElementHelpers.cs" />
+		<Compile Include="OpenSilver\Internal\CollectionChangedHelper.cs" />
 		<Compile Include="System.Windows\DynamicResourceExtension.cs" />
 		<Compile Include="System.Windows\ResourceReferenceExpression.cs" />
 		<Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />

@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
@@ -44,7 +43,7 @@ namespace System.Windows.Media
                         {
                             PolyBezierSegment segment = (PolyBezierSegment)d;
                             var points = new PointCollection();
-                            points.CollectionChanged += new NotifyCollectionChangedEventHandler(segment.OnPointsCollectionChanged);
+                            points.Changed += new EventHandler(segment.OnPointsCollectionChanged);
                             return points;
                         }),
                     OnPointsChanged,
@@ -68,11 +67,11 @@ namespace System.Windows.Media
             PolyBezierSegment segment = (PolyBezierSegment)d;
             if (e.OldValue is PointCollection oldPoints)
             {
-                oldPoints.CollectionChanged -= new NotifyCollectionChangedEventHandler(segment.OnPointsCollectionChanged);
+                oldPoints.Changed -= new EventHandler(segment.OnPointsCollectionChanged);
             }
             if (e.NewValue is PointCollection newPoints)
             {
-                newPoints.CollectionChanged += new NotifyCollectionChangedEventHandler(segment.OnPointsCollectionChanged);
+                newPoints.Changed += new EventHandler(segment.OnPointsCollectionChanged);
             }
 
             PropertyChanged(d, e);
@@ -83,7 +82,7 @@ namespace System.Windows.Media
             return baseValue ?? new PointCollection();
         }
 
-        private void OnPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateParentGeometry();
+        private void OnPointsCollectionChanged(object sender, EventArgs e) => InvalidateParentGeometry();
 
         internal override IEnumerable<string> ToDataStream(IFormatProvider formatProvider)
         {

@@ -21,10 +21,7 @@ public sealed class IconCollection : PresentationFrameworkCollection<Icon>
     /// <summary>
     /// Initializes a new instance of the <see cref="IconCollection"/> class.
     /// </summary>
-    public IconCollection()
-        : base(false)
-    {
-    }
+    public IconCollection() { }
 
     internal override void AddOverride(Icon value) => AddInternal(value);
 

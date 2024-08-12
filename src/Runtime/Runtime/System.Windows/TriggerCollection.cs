@@ -22,10 +22,9 @@ namespace System.Windows
     {
         private readonly IInternalFrameworkElement _owner;
 
-        internal TriggerCollection() : base(false) { }
+        internal TriggerCollection() { }
 
         internal TriggerCollection(IInternalFrameworkElement owner)
-            : base(false)
         {
             Debug.Assert(owner is not null);
             _owner = owner;

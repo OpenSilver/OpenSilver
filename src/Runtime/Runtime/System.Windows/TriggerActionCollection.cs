@@ -23,7 +23,7 @@ namespace System.Windows
         /// <summary>
         /// Initializes a new instance of the <see cref="TriggerActionCollection"/> class.
         /// </summary>
-        public TriggerActionCollection() : base(false) { }
+        public TriggerActionCollection() { }
 
         internal override void AddOverride(TriggerAction value)
         {

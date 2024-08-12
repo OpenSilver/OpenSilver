@@ -13,7 +13,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using Stop = (double Offset, System.Windows.Media.Color Color);
 
 namespace System.Windows.Media
@@ -23,16 +22,16 @@ namespace System.Windows.Media
     /// </summary>
     public sealed class GradientStopCollection : PresentationFrameworkCollection<GradientStop>
     {
-        private WeakReference<GradientBrush> _ownerWeakRef;
         private Stop[] _sortedStops;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GradientStopCollection"/> class.
         /// </summary>
-        public GradientStopCollection()
-            : base(true)
-        {
-        }
+        public GradientStopCollection() { }
+
+        internal event EventHandler Changed;
+
+        private void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
         internal Stop[] GetSortedCollection()
         {
@@ -64,6 +63,8 @@ namespace System.Windows.Media
             _sortedStops = null;
             SubscribeToChangedEvent(gradientStop);
             AddDependencyObjectInternal(gradientStop);
+
+            OnChanged();
         }
 
         internal override void ClearOverride()
@@ -75,6 +76,8 @@ namespace System.Windows.Media
             }
 
             ClearDependencyObjectInternal();
+
+            OnChanged();
         }
 
         internal override void RemoveAtOverride(int index)
@@ -82,6 +85,8 @@ namespace System.Windows.Media
             _sortedStops = null;
             UnsubscribeToChangedEvent(GetItemInternal(index));
             RemoveAtDependencyObjectInternal(index);
+
+            OnChanged();
         }
 
         internal override void InsertOverride(int index, GradientStop gradientStop)
@@ -89,6 +94,8 @@ namespace System.Windows.Media
             _sortedStops = null;
             SubscribeToChangedEvent(gradientStop);
             InsertDependencyObjectInternal(index, gradientStop);
+
+            OnChanged();
         }
 
         internal override GradientStop GetItemOverride(int index) => GetItemInternal(index);
@@ -99,10 +106,9 @@ namespace System.Windows.Media
             UnsubscribeToChangedEvent(GetItemInternal(index));
             SubscribeToChangedEvent(gradientStop);
             SetItemDependencyObjectInternal(index, gradientStop);
-        }
 
-        internal void SetOwner(GradientBrush owner) =>
-            _ownerWeakRef = owner is null ? null : new WeakReference<GradientBrush>(owner);
+            OnChanged();
+        }
 
         private void SubscribeToChangedEvent(GradientStop gradientStop)
         {
@@ -119,10 +125,7 @@ namespace System.Windows.Media
         private void GradientStopChanged(object sender, EventArgs e)
         {
             _sortedStops = null;
-            if (_ownerWeakRef.TryGetTarget(out GradientBrush owner))
-            {
-                owner.RaiseChanged();
-            }
+            OnChanged();
         }
     }
 }

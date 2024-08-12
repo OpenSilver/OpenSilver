@@ -28,7 +28,6 @@ namespace System.Windows.Media
         /// Initializes a new instance of the <see cref="PathSegmentCollection"/> class.
         /// </summary>
         public PathSegmentCollection()
-            : base(true)
         {
         }
 
@@ -42,7 +41,7 @@ namespace System.Windows.Media
         /// capable of storing.
         /// </param>
         public PathSegmentCollection(int capacity)
-            : base(capacity, true)
+            : base(capacity)
         {
         }
 
@@ -55,7 +54,7 @@ namespace System.Windows.Media
         /// <see cref="PathSegmentCollection"/>.
         /// </param>
         public PathSegmentCollection(IEnumerable<PathSegment> segments)
-            : base(segments, true)
+            : base(segments)
         {
         }
 
@@ -63,18 +62,24 @@ namespace System.Windows.Media
         {
             SetParentGeometry(segment, _parentGeometry);
             AddDependencyObjectInternal(segment);
+
+            OnChanged();
         }
 
         internal override void RemoveAtOverride(int index)
         {
             SetParentGeometry(GetItemInternal(index), null);
             RemoveAtDependencyObjectInternal(index);
+
+            OnChanged();
         }
 
         internal override void InsertOverride(int index, PathSegment segment)
         {
             SetParentGeometry(segment, _parentGeometry);
             InsertDependencyObjectInternal(index, segment);
+
+            OnChanged();
         }
 
         internal override void ClearOverride()
@@ -84,6 +89,8 @@ namespace System.Windows.Media
                 SetParentGeometry(segment, null);
             }
             ClearDependencyObjectInternal();
+
+            OnChanged();
         }
 
         internal override PathSegment GetItemOverride(int index) => GetItemInternal(index);
@@ -93,6 +100,8 @@ namespace System.Windows.Media
             SetParentGeometry(GetItemInternal(index), null);
             SetParentGeometry(segment, _parentGeometry);
             SetItemDependencyObjectInternal(index, segment);
+
+            OnChanged();
         }
 
         internal void SetParentGeometry(Geometry geometry)
@@ -111,5 +120,7 @@ namespace System.Windows.Media
             Debug.Assert(segment is not null);
             segment.SetParentGeometry(geometry);
         }
+
+        private void OnChanged() => _parentGeometry?.RaisePathChanged();
     }
 }

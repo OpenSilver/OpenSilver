@@ -19,7 +19,6 @@ namespace OpenSilver.Internal
     internal sealed class VisualTransitionsCollection : PresentationFrameworkCollection<VisualTransition>
     {
         public VisualTransitionsCollection(VisualStateGroup owner)
-            : base(false)
         {
             Debug.Assert(owner != null);
             owner.ProvideSelfAsInheritanceContext(this, null);

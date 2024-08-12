@@ -12,10 +12,9 @@
 \*====================================================================================*/
 
 using System.Linq;
-using System.Collections.Specialized;
 using System.Windows.Media;
-using OpenSilver.Internal;
 using System.Collections.Generic;
+using OpenSilver.Internal;
 
 namespace System.Windows.Shapes
 {
@@ -24,7 +23,7 @@ namespace System.Windows.Shapes
     /// </summary>
     public sealed class Polyline : Shape
     {
-        private WeakEventListener<Polyline, PointCollection, NotifyCollectionChangedEventArgs> _pointsCollectionChanged;
+        private WeakEventListener<Polyline, PointCollection, EventArgs> _pointsChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Polyline"/> class.
@@ -118,24 +117,24 @@ namespace System.Windows.Shapes
             return baseValue ?? new PointCollection();
         }
 
-        private void OnPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateMeasure();
+        private void OnPointsCollectionChanged(object sender, EventArgs e) => InvalidateMeasure();
 
         private void OnPointsChanged(PointCollection oldPoints, PointCollection newPoints)
         {
-            if (_pointsCollectionChanged is not null)
+            if (_pointsChanged is not null)
             {
-                _pointsCollectionChanged.Detach();
-                _pointsCollectionChanged = null;
+                _pointsChanged.Detach();
+                _pointsChanged = null;
             }
 
             if (newPoints is not null)
             {
-                _pointsCollectionChanged = new(this, newPoints)
+                _pointsChanged = new(this, newPoints)
                 {
                     OnEventAction = static (instance, sender, args) => instance.OnPointsCollectionChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
                 };
-                newPoints.CollectionChanged += _pointsCollectionChanged.OnEvent;
+                newPoints.Changed += _pointsChanged.OnEvent;
             }
         }
 

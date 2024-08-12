@@ -22,13 +22,9 @@ namespace System.Windows.Media.Animation;
 /// </summary>
 public sealed class PointKeyFrameCollection : PresentationFrameworkCollection<PointKeyFrame>, IKeyFrameCollection<Point>
 {
-    public PointKeyFrameCollection()
-        : base(false)
-    {
-    }
+    public PointKeyFrameCollection() { }
 
     internal PointKeyFrameCollection(PointAnimationUsingKeyFrames owner)
-        : base(false)
     {
         Debug.Assert(owner is not null);
         owner.ProvideSelfAsInheritanceContext(this, null);

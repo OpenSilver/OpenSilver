@@ -22,13 +22,9 @@ namespace System.Windows.Media.Animation;
 /// </summary>
 public sealed class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>, IKeyFrameCollection<object>
 {
-    public ObjectKeyFrameCollection()
-        : base(false)
-    {
-    }
+    public ObjectKeyFrameCollection() { }
 
     internal ObjectKeyFrameCollection(ObjectAnimationUsingKeyFrames owner)
-        : base(false)
     {
         Debug.Assert(owner != null);
         owner.ProvideSelfAsInheritanceContext(this, null);

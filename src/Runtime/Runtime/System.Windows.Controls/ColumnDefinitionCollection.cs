@@ -13,14 +13,16 @@
 
 namespace System.Windows.Controls
 {
+    /// <summary>
+    /// Provides access to an ordered, strongly typed collection of <see cref="ColumnDefinition"/> objects.
+    /// </summary>
     public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection<ColumnDefinition>
     {
-        private readonly Grid _parentGrid;
+        private readonly Grid _grid;
 
         internal ColumnDefinitionCollection(Grid parent)
-            : base(true)
         {
-            _parentGrid = parent;
+            _grid = parent;
             parent.ProvideSelfAsInheritanceContext(this, null);
         }
 
@@ -29,15 +31,18 @@ namespace System.Windows.Controls
         internal override void AddOverride(ColumnDefinition value)
         {
             VerifyWriteAccess();
+
             AddDependencyObjectInternal(value);
-            value.SetParent(_parentGrid);
+            value.SetParent(_grid);
+
+            _grid.InvalidateDefinitions();
         }
 
         internal override void ClearOverride()
         {
             VerifyWriteAccess();
 
-            if (_parentGrid != null)
+            if (_grid != null)
             {
                 foreach (ColumnDefinition column in InternalItems)
                 {
@@ -46,21 +51,29 @@ namespace System.Windows.Controls
             }
 
             ClearDependencyObjectInternal();
+
+            _grid.InvalidateDefinitions();
         }
 
         internal override void InsertOverride(int index, ColumnDefinition value)
         {
             VerifyWriteAccess();
-            value.SetParent(_parentGrid);
+
+            value.SetParent(_grid);
             InsertDependencyObjectInternal(index, value);
+
+            _grid.InvalidateDefinitions();
         }
 
         internal override void RemoveAtOverride(int index)
         {
             VerifyWriteAccess();
+
             ColumnDefinition removedColumn = GetItemInternal(index);
             removedColumn.SetParent(null);
             RemoveAtDependencyObjectInternal(index);
+
+            _grid.InvalidateDefinitions();
         }
 
         internal override ColumnDefinition GetItemOverride(int index) => GetItemInternal(index);
@@ -68,9 +81,12 @@ namespace System.Windows.Controls
         internal override void SetItemOverride(int index, ColumnDefinition value)
         {
             VerifyWriteAccess();
+
             ColumnDefinition originalItem = GetItemInternal(index);
             originalItem.SetParent(null);
             SetItemDependencyObjectInternal(index, value);
+
+            _grid.InvalidateDefinitions();
         }
 
         private void VerifyWriteAccess()
@@ -82,7 +98,7 @@ namespace System.Windows.Controls
         }
 
         private bool AreDefinitionsLocked() =>
-            _parentGrid is not null &&
-            (_parentGrid.MeasureOverrideInProgress || _parentGrid.ArrangeOverrideInProgress);
+            _grid is not null &&
+            (_grid.MeasureOverrideInProgress || _grid.ArrangeOverrideInProgress);
     }
 }

@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Specialized;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
@@ -95,7 +94,6 @@ namespace System.Windows.Media
                             PathFigure figure = (PathFigure)d;
                             var segments = new PathSegmentCollection();
                             segments.SetParentGeometry(figure._parentGeometry);
-                            segments.CollectionChanged += new NotifyCollectionChangedEventHandler(figure.OnSegmentsCollectionChanged);
                             return segments;
                         }),
                     OnSegmentsChanged,
@@ -121,12 +119,10 @@ namespace System.Windows.Media
             if (e.OldValue is PathSegmentCollection oldSegments)
             {
                 oldSegments.SetParentGeometry(null);
-                oldSegments.CollectionChanged -= new NotifyCollectionChangedEventHandler(figure.OnSegmentsCollectionChanged);
             }
             if (e.NewValue is PathSegmentCollection newSegments)
             {
                 newSegments.SetParentGeometry(figure._parentGeometry);
-                newSegments.CollectionChanged += new NotifyCollectionChangedEventHandler(figure.OnSegmentsCollectionChanged);
             }
             
             PropertyChanged(d, e);
@@ -136,8 +132,6 @@ namespace System.Windows.Media
         {
             return baseValue ?? new PathSegmentCollection();
         }
-
-        private void OnSegmentsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => InvalidateParentGeometry();
 
         /// <summary>
         /// Identifies the <see cref="StartPoint"/> dependency property.

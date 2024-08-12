@@ -16,7 +16,7 @@ namespace System.Windows.Input
     [OpenSilver.NotImplemented]
     public sealed partial class TouchPointCollection : PresentationFrameworkCollection<TouchPoint>
     {
-        internal TouchPointCollection() : base(false)
+        internal TouchPointCollection()
         {
         }
 

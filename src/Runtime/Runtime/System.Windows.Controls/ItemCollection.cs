@@ -23,6 +23,7 @@ namespace System.Windows.Controls
     public sealed class ItemCollection : PresentationFrameworkCollection<object>, INotifyCollectionChanged
     {
         private readonly IInternalFrameworkElement _modelParent;
+        private readonly CollectionChangedHelper _collectionChanged;
 
         private IEnumerable _itemsSource; // base collection
         private WeakEventListener<ItemCollection, INotifyCollectionChanged, NotifyCollectionChangedEventArgs> _collectionChangedListener;
@@ -30,9 +31,10 @@ namespace System.Windows.Controls
         private bool _isUsingListWrapper;
         private ListWrapper _listWrapper;
 
-        internal ItemCollection(IInternalFrameworkElement parent) : base(true)
+        internal ItemCollection(IInternalFrameworkElement parent)
         {
             _modelParent = parent;
+            _collectionChanged = new();
         }
 
         internal override bool IsFixedSizeImpl => IsUsingItemsSource;
@@ -46,8 +48,12 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
+            _collectionChanged.CheckReentrancy();
+
             SetModelParent(value);
             AddInternal(value);
+
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
         }
 
         internal override void CopyToImpl(object[] array, int index)
@@ -69,12 +75,16 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
+            _collectionChanged.CheckReentrancy();
+
             foreach (var item in InternalItems)
             {
                 ClearModelParent(item);
             }
 
             ClearInternal();
+
+            _collectionChanged.OnCollectionReset();
         }
 
         internal override void InsertOverride(int index, object value)
@@ -84,8 +94,12 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
+            _collectionChanged.CheckReentrancy();
+
             SetModelParent(value);
             InsertInternal(index, value);
+
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, index);
         }
 
         internal override void RemoveAtOverride(int index)
@@ -95,9 +109,13 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
+            _collectionChanged.CheckReentrancy();
+
             object removedItem = GetItemInternal(index);
             ClearModelParent(removedItem);
             RemoveAtInternal(index);
+
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
         }
 
         internal override object GetItemOverride(int index) => IsUsingItemsSource ? SourceList[index] : GetItemInternal(index);
@@ -109,20 +127,24 @@ namespace System.Windows.Controls
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
 
+            _collectionChanged.CheckReentrancy();
+
             object originalItem = GetItemInternal(index);
             ClearModelParent(originalItem);
             SetModelParent(value);
             SetItemInternal(index, value);
+
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, value, index);
         }
 
         internal override int IndexOfImpl(object value) => IsUsingItemsSource ? SourceList.IndexOf(value) : base.IndexOfImpl(value);
 
         internal override IEnumerator<object> GetEnumeratorImpl() => IsUsingItemsSource ? new Enumerator(this) : base.GetEnumeratorImpl();
 
-        public new event NotifyCollectionChangedEventHandler CollectionChanged
+        public event NotifyCollectionChangedEventHandler CollectionChanged
         {
-            add => base.CollectionChanged += value;
-            remove => base.CollectionChanged -= value;
+            add => _collectionChanged.CollectionChanged += value;
+            remove => _collectionChanged.CollectionChanged -= value;
         }
 
         internal IEnumerator LogicalChildren => IsUsingItemsSource ? EmptyEnumerator.Instance : GetEnumerator();
@@ -153,7 +175,7 @@ namespace System.Windows.Controls
 
             UpdateCountProperty(previousCount, Count);
 
-            OnCollectionReset();
+            _collectionChanged.OnCollectionReset();
         }
 
         internal void ClearItemsSource()
@@ -172,7 +194,7 @@ namespace System.Windows.Controls
 
                 UpdateCountProperty(previousCount, Count);
 
-                OnCollectionReset();
+                _collectionChanged.OnCollectionReset();
             }
         }
 
@@ -256,7 +278,7 @@ namespace System.Windows.Controls
             UpdateCountProperty(previousCount, Count);
 
             // Raise collection changed
-            OnCollectionChanged(e);
+            _collectionChanged.OnCollectionChanged(e);
         }
 
         private void SetModelParent(object item) => _modelParent?.AddLogicalChild(item);

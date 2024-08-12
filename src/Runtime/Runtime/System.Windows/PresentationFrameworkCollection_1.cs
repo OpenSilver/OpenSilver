@@ -13,7 +13,6 @@
 
 using System.Collections.Generic;
 using System.Collections;
-using System.Collections.Specialized;
 
 namespace System.Windows
 {
@@ -26,24 +25,19 @@ namespace System.Windows
     public abstract class PresentationFrameworkCollection<T> : DependencyObject, IList<T>, IList
     {
         private readonly List<T> _items;
-        private readonly bool _processCollectionChanged;
-        private int _blockReentrancyCount;
 
-        internal PresentationFrameworkCollection(bool processCollectionChanged)
+        internal PresentationFrameworkCollection()
         {
-            _processCollectionChanged = processCollectionChanged;
             _items = new List<T>();
         }
 
-        internal PresentationFrameworkCollection(int capacity, bool processCollectionChanged)
+        internal PresentationFrameworkCollection(int capacity)
         {
-            _processCollectionChanged = processCollectionChanged;
             _items = new List<T>(capacity);
         }
 
-        internal PresentationFrameworkCollection(IEnumerable<T> source, bool processCollectionChanged)
+        internal PresentationFrameworkCollection(IEnumerable<T> source)
         {
-            _processCollectionChanged = processCollectionChanged;
             _items = new List<T>(source);
         }
 
@@ -82,18 +76,12 @@ namespace System.Windows
             get => GetItemOverride(index);
             set
             {
-                CheckReentrancy();
-
                 if (value is null)
                 {
                     throw new ArgumentNullException(nameof(value));
                 }
 
-                T originalItem = GetItemOverride(index);
-
                 SetItemOverride(index, value);
-
-                OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, value, index);
             }
         }
 
@@ -150,29 +138,18 @@ namespace System.Windows
         /// <param name="value">The object to add.</param>
         public void Add(T value)
         {
-            CheckReentrancy();
-
             if (value is null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
 
             AddOverride(value);
-
-            OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
         }
 
         /// <summary>
         /// Removes all items from the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
-        public void Clear()
-        {
-            CheckReentrancy();
-
-            ClearOverride();
-
-            OnCollectionReset();
-        }
+        public void Clear() => ClearOverride();
 
         /// <summary>
         /// Determines whether the <see cref="PresentationFrameworkCollection{T}"/> contains
@@ -240,16 +217,12 @@ namespace System.Windows
         /// <param name="value">The object to insert into the <see cref="PresentationFrameworkCollection{T}"/>.</param>
         public void Insert(int index, T value)
         {
-            CheckReentrancy();
-
             if (value is null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
 
             InsertOverride(index, value);
-
-            OnCollectionChanged(NotifyCollectionChangedAction.Add, value, index);
         }
 
         /// <summary>
@@ -274,16 +247,7 @@ namespace System.Windows
         /// Removes the item at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index of the item to remove.</param>
-        public void RemoveAt(int index)
-        {
-            CheckReentrancy();
-
-            T removedItem = GetItemOverride(index);
-
-            RemoveAtOverride(index);
-
-            OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
-        }
+        public void RemoveAt(int index) => RemoveAtOverride(index);
 
         #region Explicit Interface implementation
 
@@ -510,84 +474,5 @@ namespace System.Windows
                         _countMetadata));
             }
         }
-
-        internal event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        internal void OnCollectionReset()
-        {
-            if (_processCollectionChanged)
-            {
-                OnCollectionChangedImpl(EventArgsCache.ResetCollectionChanged);
-            }
-        }
-
-        internal void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            if (_processCollectionChanged)
-            {
-                OnCollectionChangedImpl(e);
-            }
-        }
-
-        private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index)
-        {
-            if (_processCollectionChanged)
-            {
-                OnCollectionChangedImpl(new NotifyCollectionChangedEventArgs(action, item, index));
-            }
-        }
-
-        private void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index)
-        {
-            if (_processCollectionChanged)
-            {
-                OnCollectionChangedImpl(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
-            }
-        }
-
-        private void OnCollectionChangedImpl(NotifyCollectionChangedEventArgs e)
-        {
-            NotifyCollectionChangedEventHandler handler = CollectionChanged;
-            if (handler != null)
-            {
-                _blockReentrancyCount++;
-                try
-                {
-                    handler(this, e);
-                }
-                finally
-                {
-                    _blockReentrancyCount--;
-                }
-            }
-        }
-
-        /// <summary> Check and assert for reentrant attempts to change this collection. </summary>
-        /// <exception cref="InvalidOperationException"> raised when changing the collection
-        /// while another collection change is still being notified to other listeners </exception>
-        internal void CheckReentrancy()
-        {
-            if (!_processCollectionChanged)
-            {
-                return;
-            }
-
-            if (_blockReentrancyCount > 0)
-            {
-                // we can allow changes if there's only one listener - the problem
-                // only arises if reentrant changes make the original event args
-                // invalid for later listeners.  This keeps existing code working
-                // (e.g. Selector.SelectedItems).
-                if (CollectionChanged?.GetInvocationList().Length > 1)
-                {
-                    throw new InvalidOperationException("Reentrancy not allowed");
-                }
-            }
-        }
-    }
-
-    internal static class EventArgsCache
-    {
-        internal static readonly NotifyCollectionChangedEventArgs ResetCollectionChanged = new(NotifyCollectionChangedAction.Reset);
     }
 }
