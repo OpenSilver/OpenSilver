@@ -158,7 +158,7 @@ namespace CSHTML5.Internal
                         Profiler.ConsoleTimeEnd(label);
                     }
                 }
-                else if (child.VisualParent is not null && !ReferenceEquals(child.VisualParent, parent))
+                else if (child.InternalVisualParent is not null && !ReferenceEquals(child.InternalVisualParent, parent))
                 {
                     throw new InvalidOperationException("The element already has a parent. An element cannot appear in multiple locations in the Visual Tree. Remove the element from the Visual Tree before adding it elsewhere.");
                 }

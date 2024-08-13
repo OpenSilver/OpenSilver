@@ -403,10 +403,10 @@ namespace System.Windows.Controls
 
                     static IEnumerable<FontProperties> GetFontsRecursive(Block block, UIElement current)
                     {
-                        int count = current.VisualChildrenCount;
+                        int count = current.InternalVisualChildrenCount;
                         for (int i = 0; i < count; i++)
                         {
-                            switch (current.GetVisualChild(i))
+                            switch (current.InternalGetVisualChild(i))
                             {
                                 case Run run:
                                     if (!string.IsNullOrEmpty(run.Text))
@@ -476,9 +476,9 @@ namespace System.Windows.Controls
 
         protected override Size ArrangeOverride(Size finalSize) => finalSize;
 
-        internal sealed override int VisualChildrenCount => Blocks.Count;
+        protected sealed override int VisualChildrenCount => Blocks.Count;
 
-        internal sealed override UIElement GetVisualChild(int index)
+        protected sealed override UIElement GetVisualChild(int index)
         {
             if (index < 0 || index >= VisualChildrenCount)
             {

@@ -344,7 +344,7 @@ public abstract class TextElement : UIElement
         }
     }
 
-    internal override void OnVisualParentChanged(DependencyObject oldParent)
+    protected internal override void OnVisualParentChanged(DependencyObject oldParent)
     {
         InvalidateInheritedProperties(this, VisualTreeHelper.GetParent(this));
 

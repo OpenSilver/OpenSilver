@@ -74,9 +74,23 @@ namespace System.Windows.Controls
             set { SetValueInternal(OrientationProperty, value); }
         }
 
-        internal sealed override Orientation LogicalOrientation => Orientation;
+        /// <summary>
+        /// Gets a value that represents the <see cref="Controls.Orientation"/> of the 
+        /// <see cref="VirtualizingStackPanel"/>.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="Controls.Orientation"/> value.
+        /// </returns>
+        protected internal override Orientation LogicalOrientation => Orientation;
 
-        internal sealed override bool HasLogicalOrientation => true;
+        /// <summary>
+        /// Gets a value that indicates if this <see cref="VirtualizingStackPanel"/> has
+        /// a vertical or horizontal orientation.
+        /// </summary>
+        /// <returns>
+        /// This property always returns true.
+        /// </returns>
+        protected internal override bool HasLogicalOrientation => true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VirtualizingStackPanel"/>

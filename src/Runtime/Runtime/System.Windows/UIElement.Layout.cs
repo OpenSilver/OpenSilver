@@ -535,8 +535,7 @@ namespace System.Windows
 
             for (int i = 0; i < count; i++)
             {
-                UIElement cv = v.GetVisualChild(i);
-                if (cv != null)
+                if (v.GetVisualChild(i) is UIElement cv)
                 {
                     PropagateSuspendLayout(cv);
                 }
@@ -587,8 +586,7 @@ namespace System.Windows
 
             for (int i = 0; i < count; i++)
             {
-                UIElement cv = v.GetVisualChild(i);
-                if (cv != null)
+                if (v.GetVisualChild(i) is UIElement cv)
                 {
                     PropagateResumeLayout(v, cv);
                 }

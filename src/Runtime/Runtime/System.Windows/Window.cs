@@ -61,15 +61,9 @@ namespace System.Windows
 
         internal TextMeasurementService TextMeasurementService { get; private set; }
 
-        internal override int VisualChildrenCount
-        {
-            get
-            {
-                return Content == null ? 0 : 1;
-            }
-        }
+        protected override int VisualChildrenCount => Content is null ? 0 : 1;
 
-        internal override UIElement GetVisualChild(int index)
+        protected override UIElement GetVisualChild(int index)
         {
             UIElement content = Content;
             if (content == null || index != 0)

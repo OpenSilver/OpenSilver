@@ -72,9 +72,9 @@ public class Span : Inline
         set => _inlines.IsModel = value;
     }
 
-    internal sealed override int VisualChildrenCount => Inlines.Count;
+    protected sealed override int VisualChildrenCount => Inlines.Count;
 
-    internal sealed override UIElement GetVisualChild(int index)
+    protected sealed override UIElement GetVisualChild(int index)
     {
         if (index >= VisualChildrenCount)
         {

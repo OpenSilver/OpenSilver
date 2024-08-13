@@ -60,9 +60,13 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets the Visual children count.
+        /// Gets the number of child <see cref="UIElement"/> objects in this instance
+        /// of <see cref="Panel"/>.
         /// </summary>
-        internal override int VisualChildrenCount
+        /// <returns>
+        /// The number of child <see cref="UIElement"/> objects.
+        /// </returns>
+        protected override int VisualChildrenCount
         {
             get
             {
@@ -78,9 +82,15 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Gets the Visual child at the specified index.
+        /// Gets a <see cref="UIElement"/> child of this <see cref="Panel"/> at the specified index position.
         /// </summary>
-        internal override UIElement GetVisualChild(int index)
+        /// <param name="index">
+        /// The index position of the <see cref="UIElement"/> child.
+        /// </param>
+        /// <returns>
+        /// A <see cref="UIElement"/> child of the parent <see cref="Panel"/> element.
+        /// </returns>
+        protected override UIElement GetVisualChild(int index)
         {
             if (_uiElementCollection == null)
             {
@@ -91,35 +101,29 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// Orientation of the panel if its layout is in one dimension.
-        /// Otherwise HasLogicalOrientation is false and LogicalOrientation should be ignored
+        /// The <see cref="Orientation"/> of the panel, if the panel supports layout in only a 
+        /// single dimension.
         /// </summary>
-        internal virtual Orientation LogicalOrientation => Orientation.Vertical;
+        /// <returns>
+        /// The <see cref="Orientation"/> of the panel. This property has no default value.
+        /// </returns>
+        protected internal virtual Orientation LogicalOrientation => Orientation.Vertical;
 
         /// <summary>
-        /// HasLogicalOrientation is true in case the panel layout is only one dimension (Stack panel).
+        /// Gets a value that indicates whether this <see cref="Panel"/> arranges its descendants 
+        /// in a single dimension.
         /// </summary>
-        internal virtual bool HasLogicalOrientation => false;
+        /// <returns>
+        /// true if the orientation of the <see cref="Panel"/> is in one dimension; otherwise, false.
+        /// </returns>
+        protected internal virtual bool HasLogicalOrientation => false;
 
         /// <summary>
         /// The generator associated with this panel.
         /// </summary>
-        internal IItemContainerGenerator Generator
-        {
-            get
-            {
-                return _itemContainerGenerator;
-            }
-        }
+        internal IItemContainerGenerator Generator => _itemContainerGenerator;
 
-        internal bool HasChildren
-        {
-            get
-            {
-                return this._uiElementCollection != null &&
-                       this._uiElementCollection.Count > 0;
-            }
-        }
+        internal bool HasChildren => _uiElementCollection is not null && _uiElementCollection.Count > 0;
 
         /// <summary>
         /// Creates a new <see cref="UIElementCollection"/>.

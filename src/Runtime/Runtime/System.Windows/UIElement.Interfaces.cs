@@ -31,8 +31,8 @@ public partial class UIElement : IInternalUIElement
 
     DependencyObject IInternalUIElement.VisualParent
     {
-        get => VisualParent;
-        set => VisualParent = value;
+        get => InternalVisualParent;
+        set => InternalVisualParent = value;
     }
 
     DependencyObject IInternalUIElement.GetVisualChild(int index) => GetVisualChild(index);

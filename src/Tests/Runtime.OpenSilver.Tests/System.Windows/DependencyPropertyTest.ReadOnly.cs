@@ -298,9 +298,9 @@ public partial class DependencyPropertyTest
 
 file class MyDependencyObject2 : FrameworkElement
 {
-    internal override int VisualChildrenCount => Child is null ? 0 : 1;
+    protected override int VisualChildrenCount => Child is null ? 0 : 1;
 
-    internal override UIElement GetVisualChild(int index)
+    protected override UIElement GetVisualChild(int index)
     {
         if (index != 0 || Child is null)
         {

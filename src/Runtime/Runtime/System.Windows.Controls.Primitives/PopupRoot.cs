@@ -20,33 +20,16 @@ namespace System.Windows.Controls.Primitives
 {
     internal sealed class PopupRoot : FrameworkElement
     {
-        /// <summary>
-        /// Returns the Visual children count.
-        /// </summary>
-        internal override int VisualChildrenCount
-        {
-            get
-            {
-                if (Content == null)
-                {
-                    return 0;
-                }
+        protected override int VisualChildrenCount => Content is null ? 0 : 1;
 
-                return 1;
-            }
-        }
-
-        /// <summary>
-        /// Returns the child at the specified index.
-        /// </summary>
-        internal override UIElement GetVisualChild(int index)
+        protected override UIElement GetVisualChild(int index)
         {
-            if (Content == null || index != 0)
+            if (index != 0 || Content is not UIElement content)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            return Content;
+            return content;
         }
 
         internal Popup ParentPopup { get; set; }

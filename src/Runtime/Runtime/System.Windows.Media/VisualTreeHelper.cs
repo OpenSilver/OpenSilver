@@ -91,7 +91,7 @@ namespace System.Windows.Media
         /// <returns>
         /// The parent object of the reference object in the visual tree.
         /// </returns>
-        public static DependencyObject GetParent(UIElement reference) => reference?.VisualParent;
+        public static DependencyObject GetParent(UIElement reference) => reference?.InternalVisualParent;
 
         /// <summary>
         /// Returns the number of children that exist in an object's child collection in the visual tree.
@@ -124,7 +124,7 @@ namespace System.Windows.Media
                 throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
             }
 
-            return reference.VisualChildrenCount;
+            return reference.InternalVisualChildrenCount;
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace System.Windows.Media
                 throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
             }
 
-            return reference.GetVisualChild(childIndex);
+            return reference.InternalGetVisualChild(childIndex);
         }
 
         /// <summary>
@@ -226,10 +226,10 @@ namespace System.Windows.Media
 
             static IEnumerable<UIElement> GetChildren(UIElement element)
             {
-                int childrenCount = element.VisualChildrenCount;
+                int childrenCount = element.InternalVisualChildrenCount;
                 for (int i = childrenCount - 1; i >= 0; i--)
                 {
-                    UIElement child = element.GetVisualChild(i);
+                    UIElement child = element.InternalGetVisualChild(i);
                     if (child is null or Inline)
                     {
                         continue;

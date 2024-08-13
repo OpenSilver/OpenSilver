@@ -57,14 +57,26 @@ namespace System.Windows.Controls
         private bool _refreshBackgroundOnSizeChange;
 
         /// <summary>
-        /// Returns the Visual children count.
+        /// Gets a value that is equal to the number of visual child elements of this instance of <see cref="Border"/>.
         /// </summary>
-        internal override int VisualChildrenCount => Child is null ? 0 : 1;
+        /// <returns>
+        /// The number of visual child elements.
+        /// </returns>
+        protected override int VisualChildrenCount => Child is null ? 0 : 1;
 
         /// <summary>
-        /// Returns the child at the specified index.
+        /// Gets the child <see cref="UIElement"/> element at the specified index position.
         /// </summary>
-        internal override UIElement GetVisualChild(int index)
+        /// <param name="index">
+        /// Index position of the child element.
+        /// </param>
+        /// <returns>
+        /// The child element at the specified index position.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// index is greater than the number of visual child elements.
+        /// </exception>
+        protected override UIElement GetVisualChild(int index)
         {
             if (Child is null || index != 0)
             {

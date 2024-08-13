@@ -119,12 +119,20 @@ namespace System.Windows
 
         #region Visual Children
 
-        internal override void OnVisualParentChanged(DependencyObject oldParent)
+        /// <summary>
+        /// Invoked when the parent of this element in the visual tree is changed. Overrides
+        /// <see cref="UIElement.OnVisualParentChanged(DependencyObject)"/>.
+        /// </summary>
+        /// <param name="oldParent">
+        /// The old parent element. May be null to indicate that the element did not have
+        /// a visual parent previously.
+        /// </param>
+        protected internal override void OnVisualParentChanged(DependencyObject oldParent)
         {
             DependencyObject newParent = VisualTreeHelper.GetParent(this);
 
             // Do it only if you do not have a logical parent
-            if (Parent == null)
+            if (Parent is null)
             {
                 // Invalidate relevant properties for this subtree
                 DependencyObject parent = newParent ?? oldParent;
@@ -135,30 +143,27 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Gets the number of Visual children of this FrameworkElement.
+        /// Gets the number of visual child elements within this element.
         /// </summary>
-        /// <remarks>
-        /// Derived classes override this property getter to provide the children count
-        /// of their custom children collection.
-        /// </remarks>
-        internal override int VisualChildrenCount
-        {
-            get
-            {
-                return (TemplateChild == null) ? 0 : 1;
-            }
-        }
+        /// <returns>
+        /// The number of visual child elements for this element.
+        /// </returns>
+        protected override int VisualChildrenCount => TemplateChild is null ? 0 : 1;
 
         /// <summary>
-        /// Gets the Visual child at the specified index.
+        /// Overrides <see cref="UIElement.GetVisualChild(int)"/>, and returns a child at 
+        /// the specified index from a collection of child elements.
         /// </summary>
-        /// <remarks>
-        /// Derived classes that provide a custom children collection must override this method
-        /// and return the child at the specified index.
-        /// </remarks>
-        internal override UIElement GetVisualChild(int index)
+        /// <param name="index">
+        /// The zero-based index of the requested child element in the collection.
+        /// </param>
+        /// <returns>
+        /// The requested child element. This should not return null; if the provided index
+        /// is out of range, an exception is thrown.
+        /// </returns>
+        protected override UIElement GetVisualChild(int index)
         {
-            if (TemplateChild == null || index != 0)
+            if (TemplateChild is null || index != 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -179,7 +184,13 @@ namespace System.Windows
             private set;
         }
 
-        internal void AddLogicalChild(object child)
+        /// <summary>
+        /// Adds the provided object to the logical tree of this element.
+        /// </summary>
+        /// <param name="child">
+        /// Child element to be added.
+        /// </param>
+        protected internal void AddLogicalChild(object child)
         {
             if (child != null)
             {
@@ -199,7 +210,14 @@ namespace System.Windows
             }
         }
 
-        internal void RemoveLogicalChild(object child)
+        /// <summary>
+        /// Removes the provided object from this element's logical tree. <see cref="FrameworkElement"/>
+        /// updates the affected logical tree parent pointers to keep in sync with this deletion.
+        /// </summary>
+        /// <param name="child">
+        /// The element to remove.
+        /// </param>
+        protected internal void RemoveLogicalChild(object child)
         {
             if (child != null)
             {
@@ -324,7 +342,7 @@ namespace System.Windows
         {
             if (!ShouldLookupImplicitStyles)
             {
-                var parent = (Parent ?? VisualParent) as FrameworkElement;
+                var parent = (Parent ?? InternalVisualParent) as FrameworkElement;
                 if (parent is not null && parent.ShouldLookupImplicitStyles)
                 {
                     ShouldLookupImplicitStyles = true;
@@ -336,18 +354,26 @@ namespace System.Windows
 
         private WeakReference<DependencyObject> _templatedParentRef;
 
-        internal DependencyObject TemplatedParent
+        /// <summary>
+        /// Gets a reference to the template parent of this element. This property is not
+        /// relevant if the element was not created through a template.
+        /// </summary>
+        /// <returns>
+        /// The element whose <see cref="FrameworkTemplate"/> caused this element to be created.
+        /// This value is frequently null.
+        /// </returns>
+        public DependencyObject TemplatedParent
         {
             get
             {
-                if (_templatedParentRef?.TryGetTarget(out DependencyObject templatedParent) ?? false)
+                if (_templatedParentRef is not null && _templatedParentRef.TryGetTarget(out DependencyObject templatedParent))
                 {
                     return templatedParent;
                 }
 
                 return null;
             }
-            set
+            internal set
             {
                 Debug.Assert(_templatedParentRef is null);
                 _templatedParentRef = new WeakReference<DependencyObject>(value);

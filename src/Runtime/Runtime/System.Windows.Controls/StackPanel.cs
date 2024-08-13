@@ -34,9 +34,21 @@ namespace System.Windows.Controls
     /// </example>
     public class StackPanel : Panel
     {
-        internal sealed override Orientation LogicalOrientation => Orientation;
+        /// <summary>
+        /// Gets a value that represents the <see cref="Controls.Orientation"/> of the <see cref="StackPanel"/>.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="Controls.Orientation"/> value.
+        /// </returns>
+        protected internal override Orientation LogicalOrientation => Orientation;
 
-        internal sealed override bool HasLogicalOrientation => true;
+        /// <summary>
+        /// Gets a value that indicates if this <see cref="StackPanel"/> has vertical or horizontal orientation.
+        /// </summary>
+        /// <returns>
+        /// This property always returns true.
+        /// </returns>
+        protected internal override bool HasLogicalOrientation => true;
 
         /// <summary>
         /// Gets or sets the dimension by which child elements are stacked.

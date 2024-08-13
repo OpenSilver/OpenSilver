@@ -193,19 +193,18 @@ namespace System.Windows
         private void MarkTreeDirtyHelper(UIElement uie)
         {
             //now walk down and mark all UIElements dirty
-            if (uie != null)
+            if (uie is not null)
             {
                 uie.InvalidateMeasureInternal();
                 uie.InvalidateArrangeInternal();
 
                 //walk children doing the same, don't stop if they are already dirty since there can
                 //be insulated dirty islands below
-                int cnt = uie.VisualChildrenCount;
+                int cnt = uie.InternalVisualChildrenCount;
 
                 for (int i = 0; i < cnt; i++)
                 {
-                    UIElement child = uie.GetVisualChild(i);
-                    if (child != null)
+                    if (uie.InternalGetVisualChild(i) is UIElement child)
                     {
                         MarkTreeDirtyHelper(child);
                     }

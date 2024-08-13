@@ -56,44 +56,137 @@ namespace System.Windows
 
         internal bool IsUnloading { get; set; }
 
-#region Visual Parent
+        #region Visual Children
 
         /// <summary>
-        /// Returns the parent of this UIElement.
+        /// Gets the visual tree parent of the visual object.
         /// </summary>
-        internal DependencyObject VisualParent { get; private set; }
-
-#endregion Visual Parent
-
-#region Visual Children
+        /// <returns>
+        /// The <see cref="UIElement"/> parent.
+        /// </returns>
+        protected DependencyObject VisualParent => InternalVisualParent;
 
         /// <summary>
-        /// Derived class must implement to support UIElement children. The method must return
-        /// the child at the specified index. Index must be between 0 and GetVisualChildrenCount-1.
-        ///
-        /// By default a UIElement does not have any children.
-        ///
-        /// Remark:
-        ///       Need to lock down Visual tree during the callbacks.
-        ///       During this virtual call it is not valid to modify the Visual tree.
+        /// Identical to <see cref="VisualParent"/>.
         /// </summary>
-        internal virtual UIElement GetVisualChild(int index)
+        internal DependencyObject InternalVisualParent { get; private set; }
+
+        /// <summary>
+        /// Returns a child at the specified index from a collection of child elements.
+        /// </summary>
+        /// <param name="index">
+        /// The zero-based index of the requested child element in the collection.
+        /// </param>
+        /// <returns>
+        /// The requested child element. This should not return null; if the provided index 
+        /// is out of range, an exception is thrown.
+        /// </returns>
+        protected virtual UIElement GetVisualChild(int index) => throw new ArgumentOutOfRangeException(nameof(index));
+
+        /// <summary>
+        /// Returns the child at index "index".
+        /// </summary>
+        internal UIElement InternalGetVisualChild(int index) => GetVisualChild(index);
+
+        /// <summary>
+        /// Gets the number of child elements for the <see cref="UIElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The number of child elements.
+        /// </returns>
+        protected virtual int VisualChildrenCount => 0;
+
+        /// <summary>
+        /// Returns the number of children.
+        /// </summary>
+        internal int InternalVisualChildrenCount => VisualChildrenCount;
+
+        /// <summary>
+        /// Defines the parent-child relationship between two visuals.
+        /// </summary>
+        /// <param name="child">
+        /// The child visual object to add to parent visual.
+        /// </param>
+        protected void AddVisualChild(UIElement child)
         {
-            throw new ArgumentOutOfRangeException(nameof(index));
+            if (child is null)
+            {
+                return;
+            }
+
+            if (child.InternalVisualParent is not null)
+            {
+                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+            }
+
+            HasVisualChildren = true;
+
+            // Set the parent pointer.
+
+            child.InternalVisualParent = this;
+
+            //
+            // Resume layout.
+            //
+            PropagateResumeLayout(this, child);
+
+            child.OnVisualParentChanged(null);
         }
 
         /// <summary>
-        /// Derived classes override this property to enable the UIElement code to enumerate
-        /// the UIElement children. Derived classes need to return the number of children
-        /// from this method.
-        ///
-        /// By default a UIElement does not have any children.
-        ///
-        /// Remark: During this virtual method the Visual tree must not be modified.
+        /// Removes the parent-child relationship between two visuals.
         /// </summary>
-        internal virtual int VisualChildrenCount
+        /// <param name="child">
+        /// The child visual object to remove from the parent visual.
+        /// </param>
+        protected void RemoveVisualChild(UIElement child)
         {
-            get { return 0; }
+            if (child is null || child.InternalVisualParent is null)
+            {
+                return;
+            }
+
+            if (child.InternalVisualParent != this)
+            {
+                throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
+            }
+
+            if (VisualChildrenCount == 0)
+            {
+                HasVisualChildren = false;
+            }
+
+            // Set the parent pointer to null.
+
+            child.InternalVisualParent = null;
+
+            PropagateSuspendLayout(child);
+
+            child.OnVisualParentChanged(this);
+        }
+
+        /// <summary>
+        /// Called when the parent of the visual object is changed.
+        /// </summary>
+        /// <param name="oldParent">
+        /// A value of type <see cref="DependencyObject"/> that represents the previous
+        /// parent of the <see cref="UIElement"/> object. If the <see cref="UIElement"/>
+        /// object did not have a previous parent, the value of the parameter is null.
+        /// </param>
+        protected internal virtual void OnVisualParentChanged(DependencyObject oldParent)
+        {
+            // Synchronize ForceInherit properties
+            if (InternalVisualParent is not null)
+            {
+                SynchronizeForceInheritProperties(this, InternalVisualParent);
+            }
+            else
+            {
+                if (oldParent is not null)
+                {
+                    SynchronizeForceInheritProperties(this, oldParent);
+                }
+            }
         }
 
         /// <Summary>
@@ -111,39 +204,6 @@ namespace System.Windows
         {
             get { return ReadVisualFlag(VisualFlags.IsVisualChildrenIterationInProgress); }
             set { WriteVisualFlag(VisualFlags.IsVisualChildrenIterationInProgress, value); }
-        }
-
-        /// <summary>
-        /// AttachChild
-        ///
-        /// Derived classes must call this method to notify the UIElement layer that a new
-        /// child appeard in the children collection. The UIElement layer will then call the GetVisualChild
-        /// method to find out where the child was added.
-        /// </summary>
-        internal void AddVisualChild(UIElement child)
-        {
-            if (child == null)
-            {
-                return;
-            }
-
-            if (child.VisualParent != null)
-            {
-                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
-            }
-
-            HasVisualChildren = true;
-
-            // Set the parent pointer.
-
-            child.VisualParent = this;
-
-            //
-            // Resume layout.
-            //
-            PropagateResumeLayout(this, child);
-
-            child.OnVisualParentChanged(null);
         }
 
         /// <summary>
@@ -172,39 +232,6 @@ namespace System.Windows
             child.VisualParent = this;
 
             child.OnVisualParentChanged(null);
-        }
-        
-        /// <summary>
-        /// DisconnectChild
-        ///
-        /// Derived classes must call this method to notify the UIElement layer that a
-        /// child was removed from the children collection. The UIElement layer will then call
-        /// GetChildren to find out which child has been removed.
-        /// </summary>
-        internal void RemoveVisualChild(UIElement child)
-        {
-            if (child == null || child.VisualParent == null)
-            {
-                return;
-            }
-
-            if (child.VisualParent != this)
-            {
-                throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
-            }
-
-            if (VisualChildrenCount == 0)
-            {
-                HasVisualChildren = false;
-            }
-
-            // Set the parent pointer to null.
-
-            child.VisualParent = null;
-
-            PropagateSuspendLayout(child);
-
-            child.OnVisualParentChanged(this);
         }
 
         /// <summary>
@@ -236,26 +263,6 @@ namespace System.Windows
             child.VisualParent = null;
 
             child.OnVisualParentChanged(this);
-        }
-
-        /// <summary>
-        /// OnVisualParentChanged is called when the parent of the UIElement is changed.
-        /// </summary>
-        /// <param name="oldParent">Old parent or null if the UIElement did not have a parent before.</param>
-        internal virtual void OnVisualParentChanged(DependencyObject oldParent)
-        {
-            // Synchronize ForceInherit properties
-            if (VisualParent != null)
-            {
-                SynchronizeForceInheritProperties(this, VisualParent);
-            }
-            else
-            {
-                if (oldParent != null)
-                {
-                    SynchronizeForceInheritProperties(this, oldParent);
-                }
-            }
         }
 
 #endregion Visual Children
@@ -798,20 +805,33 @@ namespace System.Windows
 
         #region IsVisible
 
-        /// <summary>
-        /// A property indicating if this element is visible or not.
-        /// </summary>
-        public bool IsVisible => ReadFlag(CoreFlags.IsVisibleCache);
+        // The IsVisible property is a read-only reflection of the Visibility
+        // property.
+        private static readonly PropertyMetadata _isVisibleMetadata =
+            new ReadOnlyPropertyMetadata(BooleanBoxes.FalseBox, GetIsVisible, OnIsVisibleChanged, CoerceIsVisible);
+
+        private static readonly DependencyPropertyKey IsVisiblePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsVisible),
+                typeof(bool),
+                typeof(UIElement),
+                _isVisibleMetadata);
 
         /// <summary>
         /// Identifies the <see cref="IsVisible"/> dependency property.
         /// </summary>
-        private static readonly DependencyProperty IsVisibleProperty =
-            DependencyProperty.Register(
-                nameof(IsVisible),
-                typeof(bool),
-                typeof(UIElement),
-                new PropertyMetadata(false, OnIsVisibleChanged, CoerceIsVisible));
+        public static readonly DependencyProperty IsVisibleProperty = IsVisiblePropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value indicating whether this element is visible in the user interface (UI).
+        /// This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// true if the element is visible; otherwise, false.
+        /// </returns>
+        public bool IsVisible => ReadFlag(CoreFlags.IsVisibleCache);
+
+        private static object GetIsVisible(DependencyObject d) => BooleanBoxes.Box(((UIElement)d).IsVisible);
 
         private static void OnIsVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1265,11 +1285,10 @@ namespace System.Windows
 
         internal void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
         {
-            int cChildren = this.VisualChildrenCount;
+            int cChildren = VisualChildrenCount;
             for (int i = 0; i < cChildren; i++)
             {
-                UIElement child = this.GetVisualChild(i);
-                if (child != null)
+                if (GetVisualChild(i) is UIElement child)
                 {
                     child.CoerceValue(property);
                 }

@@ -479,9 +479,9 @@ namespace System.Windows.Automation.Peers.Tests
             protected override AutomationPeer OnCreateAutomationPeer()
                 => new FE1AutomationPeer(this);
 
-            internal override int VisualChildrenCount => Content == null ? 0 : 1;
+            protected override int VisualChildrenCount => Content == null ? 0 : 1;
 
-            internal override UIElement GetVisualChild(int index)
+            protected override UIElement GetVisualChild(int index)
             {
                 if (Content is null || index != 0)
                 {

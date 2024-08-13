@@ -555,10 +555,10 @@ namespace System.Windows.Controls
 
                 static IEnumerable<FontProperties> GetFonts(TextBlock textblock, UIElement current)
                 {
-                    int count = current.VisualChildrenCount;
+                    int count = current.InternalVisualChildrenCount;
                     for (int i = 0; i < count; i++)
                     {
-                        switch (current.GetVisualChild(i))
+                        switch (current.InternalGetVisualChild(i))
                         {
                             case Run run:
                                 if (!string.IsNullOrEmpty(run.Text))
@@ -664,9 +664,9 @@ namespace System.Windows.Controls
 
         internal sealed override bool EnablePointerEventsCore => true;
 
-        internal override int VisualChildrenCount => Inlines.Count;
+        protected override int VisualChildrenCount => Inlines.Count;
 
-        internal override UIElement GetVisualChild(int index)
+        protected override UIElement GetVisualChild(int index)
         {
             if (index >= VisualChildrenCount)
             {
