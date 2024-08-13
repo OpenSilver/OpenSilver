@@ -243,11 +243,10 @@ namespace System.Windows.Data
             // Listen to changes on the Target if the Binding is TwoWay:
             if (ParentBinding.Mode == BindingMode.TwoWay && ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.Explicit)
             {
-                _isUpdateOnLostFocus = ParentBinding.UpdateSourceTrigger == UpdateSourceTrigger.Default &&
-                    ((d is TextBox && dp == TextBox.TextProperty) || (d is PasswordBox && dp == PasswordBox.PasswordProperty));
-                if (_isUpdateOnLostFocus)
+                if (ResolveUpdateSourceTrigger(d, dp, ParentBinding.UpdateSourceTrigger) == UpdateSourceTrigger.LostFocus)
                 {
-                    ((FrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
+                    _isUpdateOnLostFocus = true;
+                    ((FrameworkElement)d).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
                 }
 
                 _targetPropertyListener = new DependencyPropertyChangedListener(Target, TargetProperty, UpdateSourceCallback);
@@ -783,6 +782,20 @@ namespace System.Windows.Data
                 _needsUpdate = false;
                 UpdateSourceObject();
             }
+        }
+
+        private UpdateSourceTrigger ResolveUpdateSourceTrigger(DependencyObject d, DependencyProperty dp, UpdateSourceTrigger updateSourceTrigger)
+        {
+            return updateSourceTrigger switch
+            {
+                UpdateSourceTrigger.LostFocus when d is FrameworkElement => UpdateSourceTrigger.LostFocus,
+                UpdateSourceTrigger.Default when IsKnownProperty(d, dp) => UpdateSourceTrigger.LostFocus,
+                _ => updateSourceTrigger,
+            };
+
+            static bool IsKnownProperty(DependencyObject d, DependencyProperty dp) =>
+                (d is TextBox && dp == TextBox.TextProperty) ||
+                (d is PasswordBox && dp == PasswordBox.PasswordProperty);
         }
 
         /// <summary>

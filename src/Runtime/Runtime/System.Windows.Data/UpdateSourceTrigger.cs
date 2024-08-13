@@ -11,28 +11,31 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Data
+namespace System.Windows.Data;
+
+/// <summary>
+/// Defines constants that indicate when a binding source is updated by its binding
+/// target in two-way binding.
+/// </summary>
+public enum UpdateSourceTrigger
 {
     /// <summary>
-    /// Defines constants that indicate when a binding source is updated by its binding
-    /// target in two-way binding.
+    /// The binding source is updated automatically when the binding target value changes.
     /// </summary>
-    public enum UpdateSourceTrigger
-    {
-        /// <summary>
-        /// The binding source is updated automatically when the binding target value changes.
-        /// </summary>
-        Default = 0,
-        /// <summary>
-        /// The binding source is updated whenever the binding target value changes. If the
-        /// binding target is a <see cref="Controls.TextBox"/>, it does not have to lose
-        /// focus for the changes to be detected.
-        /// </summary>
-        PropertyChanged = 1,
-        /// <summary>
-        /// The binding source is updated only when you call the <see cref="BindingExpression.UpdateSource"/>
-        /// method.
-        /// </summary>
-        Explicit = 3
-    }
+    Default = 0,
+    /// <summary>
+    /// The binding source is updated whenever the binding target value changes. If the
+    /// binding target is a <see cref="Controls.TextBox"/>, it does not have to lose
+    /// focus for the changes to be detected.
+    /// </summary>
+    PropertyChanged = 1,
+    /// <summary>
+    /// Updates the binding source whenever the binding target element loses focus.
+    /// </summary>
+    LostFocus = 2,
+    /// <summary>
+    /// The binding source is updated only when you call the <see cref="BindingExpression.UpdateSource"/>
+    /// method.
+    /// </summary>
+    Explicit = 3
 }
