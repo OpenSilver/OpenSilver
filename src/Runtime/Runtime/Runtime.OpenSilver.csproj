@@ -75,6 +75,10 @@
 		<Compile Include="OpenSilver\Internal\TemplateContent.cs" />
 		<Compile Include="OpenSilver\Internal\UIElementHelpers.cs" />
 		<Compile Include="OpenSilver\Internal\CollectionChangedHelper.cs" />
+		<Compile Include="OpenSilver\Internal\Data\BindingCollection.cs" />
+		<Compile Include="System.Windows.Data\IMultiValueConverter.cs" />
+		<Compile Include="System.Windows.Data\MultiBinding.cs" />
+		<Compile Include="System.Windows.Data\MultiBindingExpression.cs" />
 		<Compile Include="System.Windows\DynamicResourceExtension.cs" />
 		<Compile Include="System.Windows\ResourceReferenceExpression.cs" />
 		<Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />

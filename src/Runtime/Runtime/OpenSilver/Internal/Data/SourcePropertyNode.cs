@@ -12,43 +12,48 @@
 \*====================================================================================*/
 
 using System;
+using System.Windows.Data;
 
-namespace OpenSilver.Internal.Data
+namespace OpenSilver.Internal.Data;
+
+internal sealed class SourcePropertyNode : IPropertyPathNode
 {
-    internal sealed class SourcePropertyNode : IPropertyPathNode
+    private readonly BindingExpression _listener;
+    private object _source;
+
+    public SourcePropertyNode(BindingExpression listener)
     {
-        private readonly PropertyPathWalker _listener;
-        private object _source;
-
-        public SourcePropertyNode(PropertyPathWalker listener) 
-        {
-            _listener = listener;
-        }
-
-        object IPropertyPathNode.Value => _source;
-
-        object IPropertyPathNode.Source
-        {
-            get => _source;
-            set
-            {
-                _source = value;
-                _listener.ValueChanged();
-            }
-        }
-
-        bool IPropertyPathNode.IsBroken => false;
-
-        Type IPropertyPathNode.Type => null;
-
-        string IPropertyPathNode.PropertyName => string.Empty;
-
-        IPropertyPathNode IPropertyPathNode.Next 
-        { 
-            get => null;
-            set => throw new NotSupportedException();
-        }
-
-        void IPropertyPathNode.SetValue(object value) => throw new NotSupportedException();
+        _listener = listener;
     }
+
+    object IPropertyPathNode.Value
+    {
+        get => _source;
+        set => throw new NotSupportedException();
+    }
+
+    object IPropertyPathNode.Source => _source;
+
+    void IPropertyPathNode.SetSource(object source, bool transferValue)
+    {
+        _source = source;
+        if (transferValue)
+        {
+            _listener.TransferValue(source);
+        }
+    }
+
+    bool IPropertyPathNode.IsBroken => false;
+
+    Type IPropertyPathNode.Type => null;
+
+    string IPropertyPathNode.PropertyName => string.Empty;
+
+    IPropertyPathNode IPropertyPathNode.Next
+    {
+        get => null;
+        set => throw new NotSupportedException();
+    }
+
+    void IPropertyPathNode.SetValue(object value) { }
 }

@@ -15,116 +15,147 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Data;
 
-namespace OpenSilver.Internal.Data
+namespace OpenSilver.Internal.Data;
+
+internal sealed class StandardPropertyPathNode : PropertyPathNode
 {
-    internal sealed class StandardPropertyPathNode : PropertyPathNode
+    private readonly Type _resolvedType;
+    private readonly string _propertyName;
+
+    private DependencyPropertyChangedListener _dpListener;
+    private WeakEventListener<StandardPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
+    private DependencyProperty _dp;
+    private PropertyInfo _prop;
+    private FieldInfo _field;
+
+    internal StandardPropertyPathNode(BindingExpression listener, string typeName, string propertyName)
+        : base(listener)
     {
-        private readonly Type _resolvedType;
-        private readonly string _propertyName;
+        _resolvedType = typeName is not null ? Type.GetType(typeName) : null;
+        _propertyName = propertyName;
+    }
 
-        private DependencyPropertyChangedListener _dpListener;
-        private WeakEventListener<StandardPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
-        private DependencyProperty _dp;
-        private PropertyInfo _prop;
-        private FieldInfo _field;
-
-        internal StandardPropertyPathNode(PropertyPathWalker listener, string typeName, string propertyName)
-            : base(listener)
+    public override Type Type
+    {
+        get
         {
-            _resolvedType = typeName != null ? Type.GetType(typeName) : null;
-            _propertyName = propertyName;
+            if (_dp is not null)
+            {
+                return _dp.PropertyType;
+            }
+
+            if (_prop is not null)
+            {
+                return _prop.PropertyType;
+            }
+
+            if (_field is not null)
+            {
+                return _field.FieldType;
+            }
+
+            return null;
+        }
+    }
+
+    public override string PropertyName => _propertyName;
+
+    public override bool IsBound => _dp is not null || _prop is not null;
+
+    internal override void SetValue(object value)
+    {
+        if (_dp is not null)
+        {
+            ((DependencyObject)Source).SetValue(_dp, value);
+        }
+        else if (_prop is not null)
+        {
+            _prop.SetValue(Source, value);
+        }
+        else if (_field is not null)
+        {
+            _field.SetValue(Source, value);
+        }
+    }
+
+    internal override void OnUpdateValue()
+    {
+        object value;
+        if (_dp is not null)
+        {
+            value = ((DependencyObject)Source).GetValue(_dp);
+        }
+        else if (_prop is not null)
+        {
+            value = _prop.GetValue(Source);
+        }
+        else if (_field is not null)
+        {
+            value = _field.GetValue(Source);
+        }
+        else
+        {
+            value = DependencyProperty.UnsetValue;
         }
 
-        public override Type Type
+        UpdateValueAndIsBroken(value, CheckIsBroken());
+    }
+
+    internal override void OnSourceChanged(object oldValue, object newValue)
+    {
+        if (_propertyChangedListener is not null)
         {
-            get
+            _propertyChangedListener.Detach();
+            _propertyChangedListener = null;
+        }
+
+        if (_dpListener is DependencyPropertyChangedListener listener)
+        {
+            _dpListener = null;
+            listener.Dispose();
+        }
+
+        _dp = null;
+        _prop = null;
+        _field = null;
+
+        if (Source is null) return;
+
+        var sourceDO = newValue as DependencyObject;
+
+        if (sourceDO is not null)
+        {
+            Type type = _resolvedType ?? Source.GetType();
+            _dp = DependencyProperty.FromName(_propertyName, type);
+        }
+
+        if (_dp is null)
+        {
+            Type sourceType = Source.GetType();
+            for (Type t = sourceType; t is not null; t = t.BaseType)
             {
-                if (_dp != null)
+                _prop = t.GetProperty(
+                    _propertyName,
+                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
+                if (_prop is not null)
                 {
-                    return _dp.PropertyType;
+                    break;
                 }
+            }
 
-                if (_prop != null)
-                {
-                    return _prop.PropertyType;
-                }
-
-                if (_field != null)
-                {
-                    return _field.FieldType;
-                }
-
-                return null;
+            if (_prop is null)
+            {
+                // Try in case it is a simple field instead of a property:
+                _field = sourceType.GetField(_propertyName);
             }
         }
 
-        public override string PropertyName => _propertyName;
-
-        public override bool IsBound => _dp != null || _prop != null;
-
-        internal override void SetValue(object value)
+        if (Listener.IsDynamic)
         {
-            if (_dp != null)
-            {
-                ((DependencyObject)Source).SetValue(_dp, value);
-            }
-            else if (_prop != null)
-            {
-                _prop.SetValue(Source, value);
-            }
-            else if (_field != null)
-            {
-                _field.SetValue(Source, value);
-            }
-        }
-
-        internal override void OnUpdateValue()
-        {
-            object value;
-            if (_dp != null)
-            {
-                value = ((DependencyObject)Source).GetValue(_dp);
-            }
-            else if (_prop != null)
-            {
-                value = _prop.GetValue(Source);
-            }
-            else if (_field != null)
-            {
-                value = _field.GetValue(Source);
-            }
-            else
-            {
-                value = null;
-            }
-
-            UpdateValueAndIsBroken(value, CheckIsBroken());
-        }
-
-        internal override void OnSourceChanged(object oldValue, object newValue)
-        {
-            if (Listener.ListenForChanges && _propertyChangedListener != null)
-            {
-                _propertyChangedListener.Detach();
-                _propertyChangedListener = null;
-            }
-
-            var listener = _dpListener;
-            if (listener != null)
-            {
-                _dpListener = null;
-                listener.Dispose();
-            }
-
-            _dp = null;
-            _prop = null;
-            _field = null;
-
-            if (Source == null)
-                return;
-
-            if (Listener.ListenForChanges && newValue is INotifyPropertyChanged inpc)
+            if (newValue is INotifyPropertyChanged inpc)
             {
                 _propertyChangedListener = new(this, inpc)
                 {
@@ -134,62 +165,22 @@ namespace OpenSilver.Internal.Data
                 inpc.PropertyChanged += _propertyChangedListener.OnEvent;
             }
 
-            if (newValue is DependencyObject sourceDO)
+            if (_dp is not null)
             {
-                Type type = _resolvedType ?? Source.GetType();
-
-                DependencyProperty dependencyProperty = DependencyProperty.FromName(_propertyName, type);
-
-                if (dependencyProperty != null)
-                {
-                    _dp = dependencyProperty;
-                    if (Listener.ListenForChanges)
-                    {
-                        _dpListener = new DependencyPropertyChangedListener(sourceDO, dependencyProperty, OnPropertyChanged);
-                    }
-                }
-            }
-
-            if (_dp == null)
-            {
-                Type sourceType = Source.GetType();
-                for (Type t = sourceType; t != null; t = t.BaseType)
-                {
-                    _prop = t.GetProperty(
-                        _propertyName,
-                        BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly
-                    );
-
-                    if (_prop != null)
-                    {
-                        break;
-                    }
-                }
-
-                if (_prop == null)
-                {
-                    // Try in case it is a simple field instead of a property:
-                    _field = sourceType.GetField(_propertyName);
-                }
-            }
-        }
-
-        private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            UpdateValue();
-        }
-
-        private bool CheckIsBroken()
-        {
-            return Source == null || (_prop == null && _field == null && _dp == null);
-        }
-
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop != null || _field != null))
-            {
-                UpdateValue();
+                _dpListener = new DependencyPropertyChangedListener(sourceDO, _dp, OnPropertyChanged);
             }
         }
     }
+
+    private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args) => UpdateValue(true);
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop is not null || _field is not null))
+        {
+            UpdateValue(true);
+        }
+    }
+
+    private bool CheckIsBroken() => Source is null || (_prop is null && _field is null && _dp is null);
 }

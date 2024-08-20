@@ -613,20 +613,54 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Attaches a binding to a FrameworkElement, using the provided binding object.
+        /// Attaches a binding to this element, based on the provided binding object.
         /// </summary>
-        /// <param name="dependencyProperty">The dependency property identifier of the property that is data bound.</param>
-        /// <param name="binding">The binding to use for the property.</param>
-        /// <returns>The BindingExpression created.</returns>
-        public BindingExpression SetBinding(DependencyProperty dependencyProperty, Binding binding)
-        {
-            return BindingOperations.SetBinding(this, dependencyProperty, binding);
-        }
+        /// <param name="dp">
+        /// Identifies the property where the binding should be established.
+        /// </param>
+        /// <param name="binding">
+        /// Represents the specifics of the data binding.
+        /// </param>
+        /// <returns>
+        /// Records the conditions of the binding. This return value can be useful for error checking.
+        /// </returns>
+        public BindingExpressionBase SetBinding(DependencyProperty dp, BindingBase binding)
+            => BindingOperations.SetBinding(this, dp, binding);
 
+        /// <summary>
+        /// Attaches a binding to a <see cref="FrameworkElement"/>, using the provided binding
+        /// object, and returns a <see cref="BindingExpression"/> for possible later use.
+        /// </summary>
+        /// <param name="dependencyProperty">
+        /// The dependency property identifier of the property that is data bound.
+        /// </param>
+        /// <param name="binding">
+        /// The binding to use for the property.
+        /// </param>
+        /// <returns>
+        /// A <see cref="BindingExpression"/> object.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// binding is specified as <see cref="BindingMode.TwoWay"/>, but has an empty
+        /// <see cref="Binding.Path"/>. or dp or binding parameters are null.
+        /// </exception>
+        public BindingExpression SetBinding(DependencyProperty dependencyProperty, Binding binding)
+            => BindingOperations.SetBinding(this, dependencyProperty, binding);
+
+        /// <summary>
+        /// Retrieves the <see cref="BindingExpression"/> for a dependency property where a 
+        /// binding is established.
+        /// </summary>
+        /// <param name="dp">
+        /// The dependency property identifier for the specific property on this <see cref="FrameworkElement"/>
+        /// where you want to obtain the <see cref="BindingExpression"/>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="BindingExpression"/> for the binding, if the local value represented
+        /// a data-bound value. May return null if the property is not a data-bound value.
+        /// </returns>
         public BindingExpression GetBindingExpression(DependencyProperty dp)
-        {
-            return BindingOperations.GetBindingExpression(this, dp);
-        }
+            => BindingOperations.GetBindingExpression(this, dp);
 
         /// <summary>
         /// Return the text that represents this object, from the User's perspective.

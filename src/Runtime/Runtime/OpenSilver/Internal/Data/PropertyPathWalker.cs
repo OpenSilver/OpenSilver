@@ -14,99 +14,77 @@
 using System;
 using System.Windows.Data;
 
-namespace OpenSilver.Internal.Data
+namespace OpenSilver.Internal.Data;
+
+internal sealed class PropertyPathWalker
 {
-    internal sealed class PropertyPathWalker
+    private readonly IPropertyPathNode _head;
+    private readonly IPropertyPathNode _tail;
+
+    internal PropertyPathWalker(BindingExpression bindExpr)
     {
-        private readonly BindingExpression _expr;
+        (_head, _tail) = ParsePath(bindExpr);
+    }
 
-        internal PropertyPathWalker(BindingExpression be)
+    internal bool IsEmpty => _head is SourcePropertyNode;
+
+    internal IPropertyPathNode FinalNode => _tail;
+
+    internal bool IsPathBroken
+    {
+        get
         {
-            Binding binding = be.ParentBinding;
-
-            _expr = be;
-            ListenForChanges = binding.Mode != BindingMode.OneTime;
-
-            string path = binding.XamlPath ?? binding.Path.Path ?? string.Empty;
-            ParsePath(path, out IPropertyPathNode head, out IPropertyPathNode tail);
-
-            FirstNode = head;
-            FinalNode = tail;
-        }
-
-        internal bool ListenForChanges { get; }
-
-        internal IPropertyPathNode FirstNode { get; }
-
-        internal IPropertyPathNode FinalNode { get; }
-
-        internal bool IsPathBroken
-        {
-            get
+            IPropertyPathNode node = _head;
+            while (node != null)
             {
-                IPropertyPathNode node = FirstNode;
-                while (node != null)
+                if (node.IsBroken)
                 {
-                    if (node.IsBroken)
-                    {
-                        return true;
-                    }
-
-                    node = node.Next;
+                    return true;
                 }
 
-                return false;
+                node = node.Next;
             }
+
+            return false;
         }
+    }
 
-        internal void Update(object source)
+    internal void AttachDataItem(object item, bool transferValue) => _head.SetSource(item, transferValue);
+
+    internal void DetachDataItem() => _head.SetSource(null, false);
+
+    private static (IPropertyPathNode head, IPropertyPathNode tail) ParsePath(BindingExpression bindExpr)
+    {
+        Binding binding = bindExpr.ParentBinding;
+        string path = binding.XamlPath ?? binding.Path.Path ?? string.Empty;
+
+        IPropertyPathNode head = null;
+        IPropertyPathNode tail = null;
+
+        var parser = new PropertyPathParser(path, true);
+        PropertyNodeType type;
+
+        while ((type = parser.Step(out string typeName, out string propertyName, out string index)) != PropertyNodeType.None)
         {
-            FirstNode.Source = source;
-        }
-
-        internal void ValueChanged()
-        {
-            _expr.ValueChanged();
-        }
-
-        private void ParsePath(string path, out IPropertyPathNode head, out IPropertyPathNode tail)
-        {
-            head = null;
-            tail = null;
-
-            var parser = new PropertyPathParser(path, true);
-            PropertyNodeType type;
-
-            while ((type = parser.Step(out string typeName, out string propertyName, out string index)) != PropertyNodeType.None)
+            PropertyPathNode node = type switch
             {
-                PropertyPathNode node;
-                switch (type)
-                {
-                    case PropertyNodeType.AttachedProperty:
-                    case PropertyNodeType.Property:
-                        node = new StandardPropertyPathNode(this, typeName, propertyName);
-                        break;
-                    case PropertyNodeType.Indexed:
-                        node = new IndexedPropertyPathNode(this, index);
-                        break;
-                    default:
-                        throw new InvalidOperationException();
-                }
-
-                if (head == null)
-                {
-                    head = tail = node;
-                    continue;
-                }
-
-                tail.Next = node;
-                tail = node;
-            }
+                PropertyNodeType.AttachedProperty or PropertyNodeType.Property => new StandardPropertyPathNode(bindExpr, typeName, propertyName),
+                PropertyNodeType.Indexed => new IndexedPropertyPathNode(bindExpr, index),
+                _ => throw new InvalidOperationException(),
+            };
 
             if (head == null)
             {
-                head = tail = new SourcePropertyNode(this);
+                head = tail = node;
+                continue;
             }
+
+            tail.Next = node;
+            tail = node;
         }
+
+        head ??= tail = new SourcePropertyNode(bindExpr);
+
+        return (head, tail);
     }
 }

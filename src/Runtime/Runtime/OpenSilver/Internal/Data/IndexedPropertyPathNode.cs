@@ -16,165 +16,145 @@ using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
+using System.Windows.Data;
 
-namespace OpenSilver.Internal.Data
+namespace OpenSilver.Internal.Data;
+
+internal sealed class IndexedPropertyPathNode : PropertyPathNode
 {
-    internal sealed class IndexedPropertyPathNode : PropertyPathNode
+    private const string IndexerPropertyName = "Item[]";
+
+    private readonly string _indexStr;
+    private readonly object[] _index;
+    private PropertyInfo _indexer;
+    private WeakEventListener<IndexedPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
+
+    private static readonly PropertyInfo _iListIndexer = typeof(IList).GetDefaultMembers()[0] as PropertyInfo;
+
+    internal IndexedPropertyPathNode(BindingExpression listener, string index)
+        : base(listener)
     {
-        private const string IndexerPropertyName = "Item[]";
+        _indexStr = index;
+        _index = new object[1] { index };
+    }
 
-        private readonly string _indexStr;
-        private readonly object[] _index;
-        private PropertyInfo _indexer;
-        private WeakEventListener<IndexedPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
+    public override Type Type => _indexer?.PropertyType;
 
-        private static readonly PropertyInfo _iListIndexer = GetIListIndexer();
+    public override string PropertyName => $"{_indexer?.Name ?? string.Empty}[{_indexStr}]";
 
-        internal IndexedPropertyPathNode(PropertyPathWalker listener, string index)
-            : base(listener)
+    public override bool IsBound => _indexer is not null;
+
+    internal override void OnSourceChanged(object oldValue, object newValue)
+    {
+        if (_propertyChangedListener is not null)
         {
-            _indexStr = index;
-            _index = new object[1] { index };
+            _propertyChangedListener.Detach();
+            _propertyChangedListener = null;
         }
 
-        public override Type Type => _indexer?.PropertyType;
+        // todo: (?) find out how to have a listener here since it
+        // is a method and not a DependencyProperty (get_Item and
+        // set_Item). I guess it would be nice to be able to attach
+        // to calls on set_item and handle it from there.
+        _indexer = null;
 
-        public override string PropertyName => $"{_indexer?.Name ?? string.Empty}[{_indexStr}]";
-
-        public override bool IsBound => _indexer != null;
-
-        internal override void OnSourceChanged(object oldValue, object newValue)
+        if (newValue is not null)
         {
-            if (Listener.ListenForChanges)
+            FindIndexer(newValue.GetType());
+        }
+
+        if (Listener.IsDynamic)
+        {
+            if (newValue is INotifyPropertyChanged inpc)
             {
-                if (_propertyChangedListener != null)
+                _propertyChangedListener = new(this, inpc)
                 {
-                    _propertyChangedListener.Detach();
-                    _propertyChangedListener = null;
-                }
-
-                if (newValue is INotifyPropertyChanged inpc)
-                {
-                    _propertyChangedListener = new(this, inpc)
-                    {
-                        OnEventAction = static (instance, source, args) => instance.OnPropertyChanged(source, args),
-                        OnDetachAction = static (listener, source) => source.PropertyChanged -= listener.OnEvent,
-                    };
-                    inpc.PropertyChanged += _propertyChangedListener.OnEvent;
-                }
-            }
-
-            // todo: (?) find out how to have a listener here since it
-            // is a method and not a DependencyProperty (get_Item and
-            // set_Item). I guess it would be nice to be able to attach
-            // to calls on set_item and handle it from there.
-            _indexer = null;
-
-            if (newValue != null)
-            {
-                FindIndexer(newValue.GetType());
+                    OnEventAction = static (instance, source, args) => instance.OnPropertyChanged(source, args),
+                    OnDetachAction = static (listener, source) => source.PropertyChanged -= listener.OnEvent,
+                };
+                inpc.PropertyChanged += _propertyChangedListener.OnEvent;
             }
         }
+    }
 
-        internal override void SetValue(object value)
-        {
-            if (_indexer != null)
-            {
-                TryInvokeSetMethod(value);
-            }
-        }
-
-        internal override void OnUpdateValue()
-        {
-            if (_indexer != null)
-            {
-                if (TryInvokeGetMethod(out object result))
-                {
-                    UpdateValueAndIsBroken(result, false);
-                }
-            }
-        }
-
-        private bool TryInvokeSetMethod(object value)
+    internal override void SetValue(object value)
+    {
+        if (_indexer is not null)
         {
             try
             {
                 _indexer.SetValue(Source, value, _index);
-                return true;
             }
-            catch
-            {
-                return false;
-            }
+            catch { }
         }
+    }
 
-        private bool TryInvokeGetMethod(out object result)
+    internal override void OnUpdateValue()
+    {
+        object value = DependencyProperty.UnsetValue;
+        bool isBroken = true;
+
+        if (_indexer is not null)
         {
             try
             {
-                result = _indexer.GetValue(Source, _index);
-                return true;
+                value = _indexer.GetValue(Source, _index);
+                isBroken = false;
             }
-            catch
-            {
-                result = null;
-                return false;
-            }
+            catch { }
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        UpdateValueAndIsBroken(value, isBroken);
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == IndexerPropertyName && _indexer is not null)
         {
-            if (e.PropertyName == IndexerPropertyName)
-            {
-                UpdateValue();
-            }
+            UpdateValue(true);
         }
+    }
 
-        private void FindIndexer(Type type)
+    private void FindIndexer(Type type)
+    {
+        // 1 - Look for an Int32 indexer
+        // 2 - Look for a String indexer
+        // 3 - Use indexer from IList if the Binding source implement the interface
+        foreach (MemberInfo member in type.GetDefaultMembers())
         {
-            // 1 - Look for an Int32 indexer
-            // 2 - Look for a String indexer
-            // 3 - Use indexer from IList if the Binding source implement the interface
-            foreach (MemberInfo member in type.GetDefaultMembers())
+            if (member is not PropertyInfo property)
+                continue;
+
+            ParameterInfo[] parameters = property.GetIndexParameters();
+            if (parameters.Length != 1)
+                continue;
+
+            if (parameters[0].ParameterType == typeof(int))
             {
-                if (member is not PropertyInfo property)
-                    continue;
-
-                ParameterInfo[] parameters = property.GetIndexParameters();
-                if (parameters.Length != 1)
-                    continue;
-
-                if (parameters[0].ParameterType == typeof(int))
-                {
-                    if (int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
-                    {
-                        _indexer = property;
-                        _index[0] = value;
-                        break;
-                    }
-                }
-                else if (parameters[0].ParameterType == typeof(string))
+                if (int.TryParse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
                 {
                     _indexer = property;
-                    _index[0] = _indexStr;
-                    // Do not exit the loop because we can still find an Int32 indexer,
-                    // which takes priority over this one.
+                    _index[0] = value;
+                    break;
                 }
             }
-
-            if (_indexer == null)
+            else if (parameters[0].ParameterType == typeof(string))
             {
-                if (type is IList)
-                {
-                    _indexer = _iListIndexer;
-                    _index[0] = int.Parse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture);
-                }
+                _indexer = property;
+                _index[0] = _indexStr;
+                // Do not exit the loop because we can still find an Int32 indexer,
+                // which takes priority over this one.
             }
         }
 
-        private static PropertyInfo GetIListIndexer()
+        if (_indexer is null)
         {
-            return typeof(IList).GetDefaultMembers()[0] as PropertyInfo;
+            if (type is IList)
+            {
+                _indexer = _iListIndexer;
+                _index[0] = int.Parse(_indexStr, NumberStyles.Integer, CultureInfo.InvariantCulture);
+            }
         }
     }
 }

@@ -38,14 +38,14 @@ internal static class DependencyObjectStore
         EffectiveValueEntry oldEntry = storage.Entry;
         EffectiveValueEntry newEntry = null;
 
-        var newExpr = newValue as Expression;
-
         if (oldEntry.IsExpression)
         {
             var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
 
             if (oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
             {
+                var newExpr = newValue as Expression;
+
                 if (currentExpr == newExpr)
                 {
                     Debug.Assert(newExpr.IsAttached);
@@ -63,6 +63,7 @@ internal static class DependencyObjectStore
                 }
                 else
                 {
+                    currentExpr.MarkDetached();
                     currentExpr.OnDetach(d, dp);
                 }
             }
@@ -71,6 +72,7 @@ internal static class DependencyObjectStore
                 Debug.Assert(oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle ||
                              oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle);
 
+                currentExpr.MarkDetached();
                 currentExpr.OnDetach(d, dp);
             }
         }
@@ -113,6 +115,7 @@ internal static class DependencyObjectStore
         if (oldEntry.IsExpression)
         {
             var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
             currentExpr.OnDetach(d, dp);
         }
 
@@ -220,6 +223,7 @@ internal static class DependencyObjectStore
         if (oldEntry.IsExpression)
         {
             var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
             currentExpr.OnDetach(d, dp);
         }
 
@@ -259,6 +263,7 @@ internal static class DependencyObjectStore
         if (oldEntry.IsExpression)
         {
             var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            currentExpr.MarkDetached();
             currentExpr.OnDetach(d, dp);
         }
 
@@ -311,6 +316,7 @@ internal static class DependencyObjectStore
         if (oldEntry.IsExpression)
         {
             var oldExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            oldExpr.MarkDetached();
             oldExpr.OnDetach(d, dp);
         }
 
@@ -353,6 +359,7 @@ internal static class DependencyObjectStore
         if (oldEntry.IsExpression)
         {
             var oldExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            oldExpr.MarkDetached();
             oldExpr.OnDetach(d, dp);
         }
 
@@ -595,6 +602,7 @@ internal static class DependencyObjectStore
                 throw new InvalidOperationException($"Cannot attach an instance of '{expression}' multiple times");
             }
 
+            expression.MarkAttached();
             expression.OnAttach(d, dp);
 
             entry.Value = expression;

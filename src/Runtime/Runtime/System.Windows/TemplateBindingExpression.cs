@@ -12,7 +12,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Controls;
@@ -57,13 +56,8 @@ namespace System.Windows
 
         internal override void OnAttach(DependencyObject d, DependencyProperty dp)
         {
-            if (IsAttached)
-                return;
-
             Debug.Assert(d != null);
             Debug.Assert(dp != null);
-
-            IsAttached = true;
 
             _target = d;
             _targetProperty = dp;
@@ -74,11 +68,6 @@ namespace System.Windows
 
         internal override void OnDetach(DependencyObject d, DependencyProperty dp)
         {
-            if (!IsAttached)
-                return;
-
-            IsAttached = false;
-
             _skipTypeCheck = false;
             var listener = _listener;
             _listener = null;

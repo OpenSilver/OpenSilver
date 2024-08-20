@@ -11,13 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System;
-
 namespace System.Windows
 {
-    public abstract partial class Expression
+    public abstract class Expression
     {
         internal Expression() { }
+
+        internal bool IsAttached { get; private set; }
 
         /// <summary>
         ///     Called to evaluate the Expression value
@@ -49,10 +49,8 @@ namespace System.Windows
         /// <param name="dp">Property being cleared</param>
         internal abstract void OnDetach(DependencyObject d, DependencyProperty dp);
 
-        internal bool IsAttached 
-        { 
-            get; 
-            set; 
-        }
+        internal void MarkAttached() => IsAttached = true;
+
+        internal void MarkDetached() => IsAttached = false;
     }
 }

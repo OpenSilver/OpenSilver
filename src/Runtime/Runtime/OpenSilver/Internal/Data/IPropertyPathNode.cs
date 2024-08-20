@@ -13,22 +13,23 @@
 
 using System;
 
-namespace OpenSilver.Internal.Data
+namespace OpenSilver.Internal.Data;
+
+internal interface IPropertyPathNode
 {
-    internal interface IPropertyPathNode
-    {
-        object Value { get; }
+    object Value { get; set; }
 
-        object Source { get; set; }
+    object Source { get; }
 
-        bool IsBroken { get; }
+    bool IsBroken { get; }
 
-        Type Type { get; }
+    Type Type { get; }
 
-        string PropertyName { get; }
+    string PropertyName { get; }
 
-        IPropertyPathNode Next { get; set; }
+    IPropertyPathNode Next { get; set; }
 
-        void SetValue(object value);
-    }
+    void SetSource(object source, bool transferValue);
+
+    void SetValue(object value);
 }

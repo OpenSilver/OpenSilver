@@ -14,116 +14,113 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 
-namespace OpenSilver.Internal.Data
+namespace OpenSilver.Internal.Data;
+
+internal abstract class PropertyPathNode : IPropertyPathNode
 {
-    internal abstract class PropertyPathNode : IPropertyPathNode
+    private ICollectionView _icv;
+
+    protected PropertyPathNode(BindingExpression listener)
     {
-        private ICollectionView _icv;
-        private object _source;
-
-        protected PropertyPathNode(PropertyPathWalker listener)
-        {
-            Listener = listener;
-        }
-
-        public PropertyPathWalker Listener { get; }
-
-        public object Source
-        {
-            get => _source;
-            set => SetSource(value, false);
-        }
-
-        public object Value { get; private set; } = DependencyProperty.UnsetValue;
-
-        public bool IsBroken { get; private set; }
-
-        public IPropertyPathNode Next { get; set; }
-
-        public abstract Type Type { get; }
-
-        public abstract string PropertyName { get; }
-
-        public abstract bool IsBound { get; }
-
-        void IPropertyPathNode.SetValue(object value) => SetValue(value);
-
-        private void SetSource(object source, bool sourceIsCurrentItem)
-        {
-            UpdateSource(source, sourceIsCurrentItem);
-            UpdateValue();
-        }
-
-        private void UpdateSource(object source, bool sourceIsCurrentItem)
-        {
-            object oldSource = _source;
-            _source = source;
-
-            if (oldSource != _source)
-            {
-                OnSourceChanged(oldSource, source, sourceIsCurrentItem);
-            }
-        }
-
-        private void OnSourceChanged(object oldSource, object newSource, bool sourceIsCurrentItem)
-        {
-            if (!sourceIsCurrentItem && _icv != null)
-            {
-                if (Listener.ListenForChanges)
-                {
-                    _icv.CurrentChanged -= new EventHandler(OnCurrentChanged);
-                }
-                _icv = null;
-            }
-
-            OnSourceChanged(oldSource, _source);
-
-            if (!sourceIsCurrentItem && !IsBound && newSource is ICollectionView icv)
-            {
-                if (Listener.ListenForChanges)
-                {
-                    icv.CurrentChanged += new EventHandler(OnCurrentChanged);
-                }
-                _icv = icv;
-                UpdateSource(icv.CurrentItem, true);
-            }
-        }
-
-        private void OnCurrentChanged(object sender, EventArgs e)
-        {
-            if (_icv == null)
-            {
-                return;
-            }
-
-            SetSource(_icv.CurrentItem, true);
-        }
-
-        internal void UpdateValue()
-        {
-            OnUpdateValue();
-
-            if (Next is IPropertyPathNode next)
-            {
-                next.Source = Value == DependencyProperty.UnsetValue ? null : Value;
-            }
-            else
-            {
-                Listener.ValueChanged();
-            }
-        }
-
-        internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
-        {
-            IsBroken = isBroken;
-            Value = newValue;
-        }
-
-        internal abstract void OnSourceChanged(object oldSource, object newSource);
-
-        internal abstract void OnUpdateValue();
-
-        internal abstract void SetValue(object value);
+        Listener = listener;
     }
+
+    public BindingExpression Listener { get; }
+
+    public object Source { get; private set; }
+
+    public object Value { get; set; } = DependencyProperty.UnsetValue;
+
+    public bool IsBroken { get; private set; } = true;
+
+    public IPropertyPathNode Next { get; set; }
+
+    public abstract Type Type { get; }
+
+    public abstract string PropertyName { get; }
+
+    public abstract bool IsBound { get; }
+
+    void IPropertyPathNode.SetSource(object source, bool transferValue) => SetSource(source, false, transferValue);
+
+    void IPropertyPathNode.SetValue(object value) => SetValue(value);
+
+    private void SetSource(object source, bool sourceIsCurrentItem, bool transferValue)
+    {
+        UpdateSource(source, sourceIsCurrentItem);
+        UpdateValue(transferValue);
+    }
+
+    private void UpdateSource(object source, bool sourceIsCurrentItem)
+    {
+        object oldSource = Source;
+        Source = source;
+
+        if (oldSource != Source)
+        {
+            OnSourceChanged(oldSource, source, sourceIsCurrentItem);
+        }
+    }
+
+    private void OnSourceChanged(object oldSource, object newSource, bool sourceIsCurrentItem)
+    {
+        if (!sourceIsCurrentItem && _icv != null)
+        {
+            if (Listener.IsDynamic)
+            {
+                _icv.CurrentChanged -= new EventHandler(OnCurrentChanged);
+            }
+            _icv = null;
+        }
+
+        OnSourceChanged(oldSource, Source);
+
+        if (!sourceIsCurrentItem && !IsBound && newSource is ICollectionView icv)
+        {
+            if (Listener.IsDynamic)
+            {
+                icv.CurrentChanged += new EventHandler(OnCurrentChanged);
+            }
+            _icv = icv;
+            UpdateSource(icv.CurrentItem, true);
+        }
+    }
+
+    private void OnCurrentChanged(object sender, EventArgs e)
+    {
+        if (_icv == null)
+        {
+            return;
+        }
+
+        SetSource(_icv.CurrentItem, true, true);
+    }
+
+    internal void UpdateValue(bool transferValue)
+    {
+        OnUpdateValue();
+
+        if (Next is IPropertyPathNode next)
+        {
+            next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value, transferValue);
+        }
+        else if (transferValue)
+        {
+            Listener.TransferValue(Value);
+        }
+    }
+
+    internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
+    {
+        IsBroken = isBroken;
+        Value = newValue;
+    }
+
+    internal abstract void OnSourceChanged(object oldSource, object newSource);
+
+    internal abstract void OnUpdateValue();
+
+    internal abstract void SetValue(object value);
 }

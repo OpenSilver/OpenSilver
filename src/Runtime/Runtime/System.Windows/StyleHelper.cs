@@ -100,8 +100,8 @@ namespace System.Windows
                 foreach (var pValue in newStyleValues)
                 {
                     DependencyProperty dp = DependencyProperty.RegisteredPropertyList[pValue.Key];
-                    object value = pValue.Value is Binding binding ?
-                        binding.CreateBindingExpression(fe, dp) :
+                    object value = pValue.Value is BindingBase binding ?
+                        binding.CreateBindingExpression(fe, dp, null) :
                         pValue.Value;
 
                     setValue(fe, dp, value);

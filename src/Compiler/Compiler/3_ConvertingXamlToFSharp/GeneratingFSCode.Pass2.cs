@@ -1026,10 +1026,10 @@ namespace GlobalResource
                                     );
                                 }
                             }
-                            else if (child.Name.LocalName == "Binding") //todo: verify that the namespace is the one that we used when we added the Binding to the XAML tree?
+                            else if (child.Name.LocalName == "Binding" || child.Name.LocalName == "MultiBinding")
                             {
                                 //------------------------------
-                                // {Binding ...}
+                                // {Binding ...} or MultiBinding
                                 //------------------------------
 
                                 bool isDependencyProperty =
@@ -1065,9 +1065,10 @@ namespace GlobalResource
                                 }
                                 string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
 
-                                // Check if the property is of type "Binding" (or "BindingBase"), in which 
+                                // Check if the property is of type "Binding/MultiBinding" (or "BindingBase"), in which 
                                 // case we should directly assign the value instead of calling "SetBinding"
-                                bool isPropertyOfTypeBinding = propertyTypeFullName == $"global.{_settings.Metadata.SystemWindowsDataNS}.Binding" ||
+                                bool isPropertyOfTypeBinding =
+                                    propertyTypeFullName == $"global.{_settings.Metadata.SystemWindowsDataNS}.{child.Name.LocalName}" ||
                                     propertyTypeFullName == $"global.{_settings.Metadata.SystemWindowsDataNS}.BindingBase";
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)

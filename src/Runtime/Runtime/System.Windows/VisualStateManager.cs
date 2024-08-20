@@ -222,11 +222,10 @@ namespace System.Windows
         /// Identifies the VisualStateManager.VisualStateGroup attached property
         /// </summary>
         /// <remarks>
-        /// This field is not supposed to be public, but needs to be for now because
-        /// of a limitation due to our XAML compiler. Using it to call 
-        /// <see cref="DependencyObject.SetValue(DependencyProperty, object)"/>, 
-        /// <see cref="BindingOperations.SetBinding"/> or any other method that 
-        /// manipulate dependency properties can lead to some unexpected behavior.
+        /// This field is not supposed to be public, but needs to be for now because of a limitation due to our 
+        /// XAML compiler. Using it to call <see cref="DependencyObject.SetValue(DependencyProperty, object)"/>, 
+        /// <see cref="BindingOperations.SetBinding(DependencyObject, DependencyProperty, BindingBase)"/> or any 
+        /// other method that manipulate dependency properties can lead to some unexpected behavior.
         /// </remarks>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty VisualStateGroupsProperty =

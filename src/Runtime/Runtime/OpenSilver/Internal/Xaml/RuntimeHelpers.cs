@@ -303,7 +303,7 @@ namespace OpenSilver.Internal.Xaml
 
             value = markupExtension.ProvideValue(serviceProvider);
 
-            if (value is Binding binding)
+            if (value is BindingBase binding)
             {
                 value = binding.ProvideValue(serviceProvider);
             }

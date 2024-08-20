@@ -34,7 +34,7 @@ public enum UpdateSourceTrigger
     /// </summary>
     LostFocus = 2,
     /// <summary>
-    /// The binding source is updated only when you call the <see cref="BindingExpression.UpdateSource"/>
+    /// The binding source is updated only when you call the <see cref="BindingExpression.UpdateSource()"/>
     /// method.
     /// </summary>
     Explicit = 3
