@@ -23,8 +23,6 @@ namespace System.Windows.Media.Imaging
         private readonly IWriteableBitmapImpl _impl;
 
         private int[] _pixels = Array.Empty<int>();
-        private int _pixelWidth;
-        private int _pixelHeight;
 
         private WriteableBitmap()
         {
@@ -59,9 +57,8 @@ namespace System.Windows.Media.Imaging
                 throw new ArgumentOutOfRangeException(nameof(pixelHeight));
             }
 
-            _pixelWidth = pixelWidth;
-            _pixelHeight = pixelHeight;
-            _pixels = new int[_pixelWidth * _pixelHeight];
+            SetNaturalSize(pixelWidth, pixelHeight);
+            _pixels = new int[pixelWidth * pixelHeight];
         }
 
         /// <summary>
@@ -169,7 +166,7 @@ namespace System.Windows.Media.Imaging
                 throw new ArgumentNullException(nameof(element));
             }
 
-            _ = _impl.RenderUIElementAsync(element, transform, _pixelWidth, _pixelHeight);
+            _ = _impl.RenderUIElementAsync(element, transform, PixelWidth, PixelHeight);
         }
 
         public Task RenderAsync(UIElement element, Transform transform)
@@ -179,7 +176,7 @@ namespace System.Windows.Media.Imaging
                 throw new ArgumentNullException(nameof(element));
             }
 
-            return _impl.RenderUIElementAsync(element, transform, _pixelWidth, _pixelHeight);
+            return _impl.RenderUIElementAsync(element, transform, PixelWidth, PixelHeight);
         }
 
         /// <summary>
@@ -189,15 +186,18 @@ namespace System.Windows.Media.Imaging
         {
             if (_pixels != null)
             {
-                int rowLenth = _pixelWidth * 4 + 1;
+                int pixelWidth = PixelWidth;
+                int pixelHeight = PixelHeight;
 
-                var bytes = new byte[rowLenth * _pixelHeight];
+                int rowLenth = pixelWidth * 4 + 1;
 
-                for (int y = 0; y < _pixelHeight; y++)
+                var bytes = new byte[rowLenth * pixelHeight];
+
+                for (int y = 0; y < pixelHeight; y++)
                 {
-                    for (int x = 0; x < _pixelWidth; x++)
+                    for (int x = 0; x < pixelWidth; x++)
                     {
-                        var rgba = BitConverter.GetBytes(_pixels[_pixelWidth * y + x]);
+                        var rgba = BitConverter.GetBytes(_pixels[pixelWidth * y + x]);
                         int startIdx = rowLenth * y + x * 4 + 1;
                         for (int j = 0; j < rgba.Length; j++)
                         {
@@ -206,13 +206,9 @@ namespace System.Windows.Media.Imaging
                     }
                 }
 
-                SetSourceInternal(PngEncoder.Encode(bytes, _pixelWidth, _pixelHeight));
+                SetSourceInternal(PngEncoder.Encode(bytes, pixelWidth, pixelHeight));
             }
         }
-
-        internal override int PixelHeightInternal => _pixelHeight;
-
-        internal override int PixelWidthInternal => _pixelWidth;
 
         internal override async ValueTask<string> GetDataStringAsync(UIElement parent)
         {

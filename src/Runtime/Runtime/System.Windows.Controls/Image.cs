@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Automation.Peers;
@@ -71,7 +70,7 @@ namespace System.Windows.Controls
                 typeof(Image),
                 new PropertyMetadata(null, OnSourceChanged)
                 {
-                    MethodToUpdateDom2 = UpdateDomOnSourceChanged,
+                    MethodToUpdateDom2 = (d, oldValue, newValue) => ((Image)d).RefreshSource(),
                 });
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -93,11 +92,6 @@ namespace System.Windows.Controls
                 };
                 source.Changed += image._sourceChangedListener.OnEvent;
             }
-        }
-
-        private static void UpdateDomOnSourceChanged(DependencyObject d, object oldValue, object newValue)
-        {
-            ((Image)d).RefreshSource();
         }
 
         /// <summary>
@@ -267,6 +261,11 @@ namespace System.Windows.Controls
         {
             _naturalSize = ImageManager.Instance.GetNaturalSize(this);
 
+            if (Source is BitmapImage bmi)
+            {
+                bmi.SetNaturalSize((int)_naturalSize.Width, (int)_naturalSize.Height);
+            }
+
             InvalidateMeasure();
             InvalidateArrange();
             ImageOpened?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
@@ -275,6 +274,11 @@ namespace System.Windows.Controls
         internal void OnErrorNative()
         {
             _naturalSize = new Size();
+
+            if (Source is BitmapImage bmi)
+            {
+                bmi.SetNaturalSize(0, 0);
+            }
 
             InvalidateMeasure();
             InvalidateArrange();

@@ -89,7 +89,7 @@ imageView.onload = function() {
 }";
 
                     OpenSilver.Interop.ExecuteJavaScriptVoid(
-                        javascript, flushQueue:false, 
+                        javascript, flushQueue: false,
                         data,
                         _imageRenderedCallback);
                 });
@@ -160,7 +160,7 @@ element.style.transform = currentTransform;
                 }
 
                 OpenSilver.Interop.ExecuteJavaScriptVoid(
-                   javascript, flushQueue:false, 
+                   javascript, flushQueue: false,
                    JsonSerializer.Serialize(data),
                    _imageRenderedCallback);
 
@@ -176,8 +176,7 @@ element.style.transform = currentTransform;
 
                 if (errorMessage is null)
                 {
-                    _bitmap._pixelWidth = width;
-                    _bitmap._pixelHeight = height;
+                    _bitmap.SetNaturalSize(width, height);
                     _bitmap._pixels = new int[arrayLength / 4];
                     INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
                         "document.WB_Fill32Buffer", _bitmap._pixels);

@@ -73,9 +73,16 @@ public sealed class BitmapImage : BitmapSource
 
     private static void OnUriSourceChanged(DependencyObject i, DependencyPropertyChangedEventArgs e)
     {
-        var bitmapImage = (BitmapImage)i;
-        bitmapImage.RaiseChanged();
-        bitmapImage.OnUriSourceChanged();
+        ((BitmapImage)i).OnUriSourceChanged((Uri)e.OldValue, (Uri)e.NewValue);
+    }
+
+    private void OnUriSourceChanged(Uri oldSource, Uri newSource)
+    {
+        if (oldSource == newSource) return;
+
+        SetNaturalSize(0, 0);
+        RaiseChanged();
+        OnUriSourceChanged();
     }
 
     /// <summary>

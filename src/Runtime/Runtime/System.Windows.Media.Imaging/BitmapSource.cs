@@ -97,43 +97,45 @@ public abstract class BitmapSource : ImageSource
         return _b64String;
     }
 
-    /// <summary>
-    /// Gets the height of the bitmap in pixels.
-    /// </summary>
-    [OpenSilver.NotImplemented]
-    public int PixelHeight => PixelHeightInternal;
-
-    /// <summary>
-    /// Identifies the <see cref="PixelHeight"/> dependency property.
-    /// </summary>
-    [OpenSilver.NotImplemented]
-    public static readonly DependencyProperty PixelHeightProperty =
-        DependencyProperty.Register(
+    private static readonly DependencyPropertyKey PixelHeightPropertyKey =
+        DependencyProperty.RegisterReadOnly(
             nameof(PixelHeight),
             typeof(int),
             typeof(BitmapSource),
             new PropertyMetadata(0));
 
     /// <summary>
-    /// Gets the width of the bitmap in pixels.
+    /// Identifies the <see cref="PixelHeight"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
-    public int PixelWidth => PixelWidthInternal;
+    public static readonly DependencyProperty PixelHeightProperty = PixelHeightPropertyKey.DependencyProperty;
 
     /// <summary>
-    /// Identifies the <see cref="PixelWidth"/> dependency property.
+    /// Gets the height of the bitmap in pixels.
     /// </summary>
-    [OpenSilver.NotImplemented]
-    public static readonly DependencyProperty PixelWidthProperty =
-        DependencyProperty.Register(
+    public int PixelHeight => (int)GetValue(PixelHeightProperty);
+
+    private static readonly DependencyPropertyKey PixelWidthPropertyKey =
+        DependencyProperty.RegisterReadOnly(
             nameof(PixelWidth),
             typeof(int),
             typeof(BitmapSource),
             new PropertyMetadata(0));
 
-    internal virtual int PixelHeightInternal => (int)GetValue(PixelHeightProperty);
+    /// <summary>
+    /// Identifies the <see cref="PixelWidth"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty PixelWidthProperty = PixelWidthPropertyKey.DependencyProperty;
 
-    internal virtual int PixelWidthInternal => (int)GetValue(PixelWidthProperty);
+    /// <summary>
+    /// Gets the width of the bitmap in pixels.
+    /// </summary>
+    public int PixelWidth => (int)GetValue(PixelWidthProperty);
+
+    internal void SetNaturalSize(int pixelWidth, int pixelHeight)
+    {
+        SetValueInternal(PixelWidthPropertyKey, pixelWidth);
+        SetValueInternal(PixelHeightPropertyKey, pixelHeight);
+    }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete(Helper.ObsoleteMemberMessage + " Use BitmapSource.SetSource(Stream) instead.")]
