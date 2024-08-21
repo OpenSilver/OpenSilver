@@ -27,12 +27,25 @@ namespace System.Windows.Controls.Primitives
     /// </summary>
     public partial class Selector : ItemsControl
     {
-        private bool SelectedValueWaitsForItems;
-        private bool SelectedValueDrivesSelection;
-        private bool SkipCoerceSelectedItemCheck;
-        private bool SyncingSelectionAndCurrency;
+        [Flags]
+        private enum CacheBits
+        {
+            // This flag is true while syncing the selection and the currency.  It
+            // is used to avoid reentrancy:  e.g. when the currency changes we want
+            // to change the selection accordingly, but that selection change should
+            // not try to change currency.
+            SyncingSelectionAndCurrency = 0x00000001,
+            CanSelectMultiple = 0x00000002,
+            IsSynchronizedWithCurrentItem = 0x00000004,
+            SkipCoerceSelectedItemCheck = 0x00000008,
+            SelectedValueDrivesSelection = 0x00000010,
+            SelectedValueWaitsForItems = 0x00000020,
+        }
+
+        // Condense boolean bits.  Constructor takes the default value, and will resize to access up to 32 bits.
+        private CacheBits _cacheValid;
+
         private ItemInfo PendingSelectionByValue;
-        private bool _canSelectMultiple = false;
         private ChangeInfo _changeInfo;
 
         // The selected items that we interact with.  Most of the time when SelectedItems
@@ -309,22 +322,35 @@ namespace System.Windows.Controls.Primitives
 
             if (!oldSync && newSync)
             {
-                SetSelectedToCurrent();
+                // if the selection has already been set, honor it and bring currency
+                // into sync.  (Typical case:  <ListBox SelectedItem=x IsSync=true/>)
+                // Otherwise, bring selection into sync with currency.
+                if (SelectedItem != null)
+                {
+                    SetCurrentToSelected();
+                }
+                else
+                {
+                    SetSelectedToCurrent();
+                }
             }
         }
 
         private void SetSelectedToCurrent()
         {
             Debug.Assert(IsSynchronizedWithCurrentItemPrivate);
+
+            if (ItemsSource is not ICollectionView icv)
+            {
+                return;
+            }
+
             if (!SyncingSelectionAndCurrency)
             {
                 SyncingSelectionAndCurrency = true;
 
                 try
                 {
-                    ICollectionView icv = ItemsSource as ICollectionView;
-                    Debug.Assert(icv != null);
-
                     object item = icv.CurrentItem;
 
                     if (item != null && ItemGetIsSelectable(item))
@@ -349,8 +375,7 @@ namespace System.Windows.Controls.Primitives
             Debug.Assert(IsSynchronizedWithCurrentItemPrivate);
             if (!SyncingSelectionAndCurrency)
             {
-                ICollectionView icv = ItemsSource as ICollectionView;
-                if (icv == null)
+                if (ItemsSource is not ICollectionView icv)
                 {
                     return;
                 }
@@ -393,8 +418,66 @@ namespace System.Windows.Controls.Primitives
                 SetSelectedToCurrent();
         }
 
+        private bool SyncingSelectionAndCurrency
+        {
+            get { return GetBit(CacheBits.SyncingSelectionAndCurrency); }
+            set { SetBit(CacheBits.SyncingSelectionAndCurrency, value); }
+        }
+
+        internal bool CanSelectMultiple
+        {
+            get { return GetBit(CacheBits.CanSelectMultiple); }
+            set
+            {
+                if (GetBit(CacheBits.CanSelectMultiple) != value)
+                {
+                    SetBit(CacheBits.CanSelectMultiple, value);
+                    if (!value && _selectedItems.Count > 1)
+                    {
+                        SelectionChange.Validate();
+                    }
+                }
+            }
+        }
+
         // True if we're really synchronizing selection and current item
-        private bool IsSynchronizedWithCurrentItemPrivate { get; set; }
+        private bool IsSynchronizedWithCurrentItemPrivate
+        {
+            get { return GetBit(CacheBits.IsSynchronizedWithCurrentItem); }
+            set { SetBit(CacheBits.IsSynchronizedWithCurrentItem, value); }
+        }
+
+        private bool SkipCoerceSelectedItemCheck
+        {
+            get { return GetBit(CacheBits.SkipCoerceSelectedItemCheck); }
+            set { SetBit(CacheBits.SkipCoerceSelectedItemCheck, value); }
+        }
+
+        private bool SelectedValueDrivesSelection
+        {
+            get { return GetBit(CacheBits.SelectedValueDrivesSelection); }
+            set { SetBit(CacheBits.SelectedValueDrivesSelection, value); }
+        }
+
+        private bool SelectedValueWaitsForItems
+        {
+            get { return GetBit(CacheBits.SelectedValueWaitsForItems); }
+            set { SetBit(CacheBits.SelectedValueWaitsForItems, value); }
+        }
+
+        private void SetBit(CacheBits bit, bool value)
+        {
+            if (value)
+            {
+                _cacheValid |= bit;
+            }
+            else
+            {
+                _cacheValid &= ~bit;
+            }
+        }
+
+        private bool GetBit(CacheBits bit) => (_cacheValid & bit) != 0;
 
         /// <summary>
         /// Builds the visual tree for the <see cref="Selector"/> control
@@ -501,8 +584,7 @@ namespace System.Windows.Controls.Primitives
             CoerceValue(SelectedIndexProperty);
             CoerceValue(SelectedItemProperty);
 
-            if (SelectedValueWaitsForItems &&
-                !Object.Equals(SelectedValue, InternalSelectedValue))
+            if (SelectedValueWaitsForItems && !Equals(SelectedValue, InternalSelectedValue))
             {
                 // This sets the selection from SelectedValue when SelectedValue
                 // was set prior to the arrival of any items to select, provided
@@ -609,10 +691,7 @@ namespace System.Windows.Controls.Primitives
         /// <param name="e">The arguments for the event.</param>
         protected virtual void OnSelectionChanged(SelectionChangedEventArgs e)
         {
-            if (this.SelectionChanged != null)
-            {
-                this.SelectionChanged(this, e);
-            }
+            SelectionChanged?.Invoke(this, e);
         }
 
         internal virtual ScrollViewer ScrollHost { get; }
@@ -624,22 +703,6 @@ namespace System.Windows.Controls.Primitives
         internal InternalSelectedItemsStorage SelectedItemsInternal
         {
             get { return _selectedItems; }
-        }
-
-        internal bool CanSelectMultiple
-        {
-            get { return _canSelectMultiple; }
-            set
-            {
-                if (_canSelectMultiple != value)
-                {
-                    _canSelectMultiple = value;
-                    if (!value && _selectedItems.Count > 1)
-                    {
-                        SelectionChange.Validate();
-                    }
-                }
-            }
         }
 
         // Gets the selected item but doesn't use SelectedItem (avoids putting it "in use")
@@ -910,7 +973,7 @@ namespace System.Windows.Controls.Primitives
             {
                 return;
             }
-                
+
             if (container != null)
             {
                 object item = GetItemOrContainerFromContainer(container);
@@ -1060,7 +1123,7 @@ namespace System.Windows.Controls.Primitives
 
                         SelectionChange.Select(NewUnresolvedItemInfo(e.NewItems[0]), false /* assumeInItemsCollection */);
                         break;
-                    
+
                     case NotifyCollectionChangedAction.Remove:
                         if (e.OldItems.Count != 1)
                             throw new NotSupportedException("Range actions are not supported.");
