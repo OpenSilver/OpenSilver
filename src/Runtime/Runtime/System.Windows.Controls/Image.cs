@@ -253,35 +253,34 @@ namespace System.Windows.Controls
                 _imageDiv.Style.display = "none";
 
                 InvalidateMeasure();
-                InvalidateArrange();
             }
         }
 
         internal void OnLoadNative()
         {
+            InvalidateMeasure();
+
             _naturalSize = ImageManager.Instance.GetNaturalSize(this);
 
             if (Source is BitmapImage bmi)
             {
-                bmi.SetNaturalSize((int)_naturalSize.Width, (int)_naturalSize.Height);
+                bmi.OnImageOpened((int)_naturalSize.Width, (int)_naturalSize.Height);
             }
 
-            InvalidateMeasure();
-            InvalidateArrange();
             ImageOpened?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
         }
 
         internal void OnErrorNative()
         {
+            InvalidateMeasure();
+
             _naturalSize = new Size();
 
             if (Source is BitmapImage bmi)
             {
-                bmi.SetNaturalSize(0, 0);
+                bmi.OnImageFailed();
             }
 
-            InvalidateMeasure();
-            InvalidateArrange();
             ImageFailed?.Invoke(this, new ExceptionRoutedEventArgs { OriginalSource = this });
         }
     }
