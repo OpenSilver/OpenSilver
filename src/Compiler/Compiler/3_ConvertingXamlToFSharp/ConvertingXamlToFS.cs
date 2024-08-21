@@ -49,8 +49,6 @@ namespace OpenSilver.Compiler
 
                 InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global.");
 
-                FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
-
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into
                 // "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
                 ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain, settings);
