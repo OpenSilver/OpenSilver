@@ -15,12 +15,12 @@ using System;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Internal.Xaml.Context;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media.Effects;
-using OpenSilver.Internal.Controls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -28,6 +28,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 namespace OpenSilver.MemoryLeak.Tests;
 
@@ -377,6 +378,30 @@ public class MemoryLeakTest
 
         var c = new GCTracker();
         CreateElementAndStoryboard(c);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
+    public void CurrentChanged_Should_Not_Keep_Selector_Alive()
+    {
+        static void CreateSelectorWithICollectionViewSource(GCTracker tracker, ICollectionView collectionView)
+        {
+            var element = new ListBox
+            {
+                IsSynchronizedWithCurrentItem = true
+            };
+            MemoryLeaksHelper.SetTracker(element, tracker);
+            element.ItemsSource = collectionView;
+        }
+
+        var c = new GCTracker();
+        var cvs = new CollectionViewSource
+        {
+            Source = new List<int> { 1, 2, 3, 4, 5 },
+        };
+        CreateSelectorWithICollectionViewSource(c, cvs.View);
         MemoryLeaksHelper.Collect();
 
         Assert.IsTrue(c.IsCollected);
