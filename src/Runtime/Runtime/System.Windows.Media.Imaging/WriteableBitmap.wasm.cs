@@ -38,14 +38,6 @@ document.WB_Fill32Buffer = function (wasmArray) {
   shorts.set(new Uint32Array(document.WB_TempPixelData), 0);
 }
 
-document.WB_Copy32Buffer = function (wasmArray) {
-  const dataPtr = Blazor.platform.getArrayEntryPtr(wasmArray, 0, 4);
-  const length = Blazor.platform.getArrayLength(wasmArray);
-  let tmp = new Uint8Array(Module.HEAP8.buffer, dataPtr, length * 4);
-  document.WB_TempBufferData = new Uint8ClampedArray(tmp);
-  return 0;
-}
-
 document.WB_SmoothCanvasContext = function (ctx) {
   ctx.imageSmoothingEnabled = true;
   ctx.webkitImageSmoothingEnabled = true;
@@ -120,9 +112,6 @@ imageView.onload = function() {
                 _taskCompletion = new TaskCompletionSource<object>();
                 _imageRenderedCallback = JavaScriptCallback.Create(callback);
 
-                INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], int>(
-                    "document.WB_Copy32Buffer", _bitmap._pixels);
-
                 var javascript = @"(function (data) {
 let element = document.getElementById(data.Id);
 const currentTransform = element.style.transform;
@@ -176,10 +165,9 @@ element.style.transform = currentTransform;
 
                 if (errorMessage is null)
                 {
-                    _bitmap.SetNaturalSize(width, height);
                     _bitmap._pixels = new int[arrayLength / 4];
-                    INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
-                        "document.WB_Fill32Buffer", _bitmap._pixels);
+                    FillBuffer(_bitmap);
+                    _bitmap.SetNaturalSize(width, height);
                     invalidate = true;
                 }
 
@@ -199,11 +187,24 @@ element.style.transform = currentTransform;
 
                 if (errorMessage is null)
                 {
-                    INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
-                        "document.WB_Fill32Buffer", _bitmap._pixels);
+                    FillBuffer(_bitmap);
                 }
 
                 _taskCompletion.SetResult(null);
+            }
+
+            private static void FillBuffer(WriteableBitmap bitmap)
+            {
+                INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
+                        "document.WB_Fill32Buffer", bitmap._pixels);
+
+                if (bitmap._isSilverlightCompatibilityMode)
+                {
+                    for (int i = 0; i < bitmap._pixels.Length; i++)
+                    {
+                        bitmap._pixels[i] = SwapBytes(bitmap._pixels[i]);
+                    }
+                }
             }
 
             private struct WB_Data

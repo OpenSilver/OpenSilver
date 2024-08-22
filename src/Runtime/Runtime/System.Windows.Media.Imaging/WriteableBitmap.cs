@@ -21,11 +21,13 @@ namespace System.Windows.Media.Imaging
     public sealed partial class WriteableBitmap : BitmapSource
     {
         private readonly IWriteableBitmapImpl _impl;
+        private readonly bool _isSilverlightCompatibilityMode;
 
         private int[] _pixels = Array.Empty<int>();
 
         private WriteableBitmap()
         {
+            _isSilverlightCompatibilityMode = UseSilverlightCompatibilityMode;
             _impl = OpenSilver.Interop.IsRunningInTheSimulator ?
                 new WriteableBitmapSimulator(this) :
                 new WriteableBitmapWasm(this);
@@ -126,11 +128,21 @@ namespace System.Windows.Media.Imaging
             {
                 throw new ArgumentNullException(nameof(element));
             }
-
             var bitmap = new WriteableBitmap(element, transform);
             await bitmap.WaitToInitialize();
             return bitmap;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating if <see cref="WriteableBitmap"/> should follow Silverlight's behavior 
+        /// to set its <see cref="Pixels"/>. In Silverlight, a pixel is stored in an <see cref="int"/> in the format 
+        /// <b>BGRA</b>, while OpenSilver stores it in the <b>RGBA</b> format. In other words, this means the first 
+        /// and third bytes are swapped.
+        /// </summary>
+        /// <returns>
+        /// A flag that indicates if the Silverlight compatibility mode is enabled. The default value is false.
+        /// </returns>
+        public static bool UseSilverlightCompatibilityMode { get; set; }
 
         /// <summary>
         /// User must call WaitToInitialize after instantiation in order to load the buffer
@@ -197,12 +209,12 @@ namespace System.Windows.Media.Imaging
                 {
                     for (int x = 0; x < pixelWidth; x++)
                     {
-                        var rgba = BitConverter.GetBytes(_pixels[pixelWidth * y + x]);
-                        int startIdx = rowLenth * y + x * 4 + 1;
-                        for (int j = 0; j < rgba.Length; j++)
-                        {
-                            bytes[startIdx + j] = rgba[j];
-                        }
+                        var rgba = BitConverter.GetBytes(
+                            _isSilverlightCompatibilityMode ?
+                            SwapBytes(_pixels[pixelWidth * y + x]) :
+                            _pixels[pixelWidth * y + x]);
+
+                        rgba.CopyTo(bytes, rowLenth * y + x * 4 + 1);
                     }
                 }
 
@@ -214,6 +226,23 @@ namespace System.Windows.Media.Imaging
         {
             await WaitToInitialize();
             return await base.GetDataStringAsync(parent);
+        }
+
+        private static int SwapBytes(int number)
+        {
+            // Extract each byte using bitwise operations
+            byte byte1 = (byte)(number & 0xFF);           // 1st byte
+            byte byte2 = (byte)((number >> 8) & 0xFF);    // 2nd byte
+            byte byte3 = (byte)((number >> 16) & 0xFF);   // 3rd byte
+            byte byte4 = (byte)((number >> 24) & 0xFF);   // 4th byte
+
+            // Swap the 1st and 3rd bytes
+            int swapped = (byte3) |           // Put the 3rd byte in the 1st byte's position
+                          (byte2 << 8) |      // Keep the 2nd byte in its position
+                          (byte1 << 16) |     // Put the 1st byte in the 3rd byte's position
+                          (byte4 << 24);      // Keep the 4th byte in its position
+
+            return swapped;
         }
 
         private interface IWriteableBitmapImpl
