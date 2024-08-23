@@ -94,17 +94,30 @@ internal static class DependencyObjectStore
         DependencyProperty dp,
         PropertyMetadata metadata)
     {
+        EffectiveValueEntry oldEntry = storage.Entry;
+
+        object current = storage.LocalValue;
+
         // Reset local value
         storage.LocalValue = DependencyProperty.UnsetValue;
 
-        EffectiveValueEntry oldEntry = storage.Entry;
-
-        // Check for expression
         if (oldEntry.IsExpression)
         {
-            var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
-            currentExpr.MarkDetached();
-            currentExpr.OnDetach(d, dp);
+            // Inform value expression of detachment, if applicable
+            if (current is Expression currentExpr)
+            {
+                currentExpr.MarkDetached();
+                currentExpr.OnDetach(d, dp);
+            }
+            else
+            {
+                Debug.Assert(
+                    oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle ||
+                    oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle);
+
+                RefreshExpressionCommon(storage, d, dp, metadata, (Expression)oldEntry.ModifiedValue.BaseValue);
+                return;
+            }
         }
 
         (object effectiveValue, BaseValueSourceInternal effectiveValueKind) =
