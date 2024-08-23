@@ -41,43 +41,31 @@ internal static class DependencyObjectStore
         if (oldEntry.IsExpression)
         {
             var currentExpr = (Expression)oldEntry.ModifiedValue.BaseValue;
+            var newExpr = newValue as Expression;
 
-            if (oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
+            if (currentExpr == newExpr)
             {
-                var newExpr = newValue as Expression;
+                Debug.Assert(newExpr.IsAttached);
+                RefreshExpressionCommon(storage, d, dp, metadata, newExpr);
+                return;
+            }
 
-                if (currentExpr == newExpr)
-                {
-                    Debug.Assert(newExpr.IsAttached);
-                    RefreshExpressionCommon(storage, d, dp, metadata, newExpr);
-                    return;
-                }
-
-                // if the current BindingExpression is a TwoWay binding, we don't want to remove the binding 
-                // unless we are overriding it with a new Expression.
-                if (newExpr == null && currentExpr.CanSetValue(d, dp))
-                {
-                    newEntry = new EffectiveValueEntry(BaseValueSourceInternal.Local);
-                    newEntry.Value = currentExpr;
-                    newEntry.SetExpressionValue(newValue);
-                }
-                else
-                {
-                    currentExpr.MarkDetached();
-                    currentExpr.OnDetach(d, dp);
-                }
+            // if the current BindingExpression is a TwoWay binding, we don't want to remove the binding 
+            // unless we are overriding it with a new Expression.
+            if (newExpr is null && currentExpr.CanSetValue(d, dp))
+            {
+                newEntry = new EffectiveValueEntry(oldEntry.BaseValueSourceInternal);
+                newEntry.Value = currentExpr;
+                newEntry.SetExpressionValue(newValue);
             }
             else
             {
-                Debug.Assert(oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle ||
-                             oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle);
-
                 currentExpr.MarkDetached();
                 currentExpr.OnDetach(d, dp);
             }
         }
 
-        if (newEntry == null)
+        if (newEntry is null)
         {
             // Set the new local value
             storage.LocalValue = newValue;
