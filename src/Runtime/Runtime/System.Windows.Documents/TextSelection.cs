@@ -28,7 +28,8 @@ namespace System.Windows.Documents
         {
             Debug.Assert(rtb is not null);
             _richTextBox = rtb;
-            Update(0, 0);
+            Start = new TextPointer(rtb, 0, LogicalDirection.Backward);
+            End = new TextPointer(rtb, 0, LogicalDirection.Forward);
         }
 
         /// <summary>
@@ -178,10 +179,17 @@ namespace System.Windows.Documents
             }
         }
 
-        internal void Update(int start, int length)
+        internal void Update(int start, int end)
         {
+            if (Start.Offset == start && End.Offset == end)
+            {
+                return;
+            }
+
             Start = new TextPointer(_richTextBox, start, LogicalDirection.Backward);
-            End = new TextPointer(_richTextBox, start + length, LogicalDirection.Forward);
+            End = new TextPointer(_richTextBox, end, LogicalDirection.Forward);
+
+            _richTextBox.RaiseSelectionChanged();
         }
     }
 }

@@ -89,11 +89,9 @@ namespace System.Windows.Controls
         /// </summary>
         public event RoutedEventHandler SelectionChanged;
 
-        internal void UpdateSelection(int start, int length)
-        {
-            Selection.Update(start, length);
-            SelectionChanged?.Invoke(this, new RoutedEventArgs());
-        }
+        internal void RaiseSelectionChanged() => SelectionChanged?.Invoke(this, new RoutedEventArgs());
+
+        internal void UpdateSelection(int start, int length) => Selection.Update(start, start + length);
 
         /// <summary>
         /// Identifies the <see cref="VerticalScrollBarVisibility"/> dependency property.

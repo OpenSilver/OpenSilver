@@ -1517,8 +1517,6 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
                     const range = args[0];
                     if (range) {
                         selectionChangedCallback(id, range.index, range.length);
-                    } else {
-                        selectionChangedCallback(id, 0, 0);
                     }
                 }
             });
@@ -1683,9 +1681,12 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             const ql = Quill.find(document.getElementById(id));
             if (!ql) return null;
 
-            const format = ql.getFormat()[property];
-            if (typeof format === 'string') {
-                return format;
+            const format = ql.getFormat();
+            if (!format) return null;
+
+            const f = format[property];
+            if (typeof f === 'string') {
+                return f;
             }
             return null;
         },
