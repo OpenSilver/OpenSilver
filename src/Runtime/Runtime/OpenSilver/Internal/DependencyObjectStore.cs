@@ -611,7 +611,7 @@ internal static class DependencyObjectStore
         }
         else
         {
-            entry.Value = dp.IsStringType ? value?.ToString() : value;
+            entry.Value = value;
         }
 
         return entry;
@@ -633,10 +633,6 @@ internal static class DependencyObjectStore
         if (exprValue == DependencyProperty.UnsetValue)
         {
             exprValue = metadata.GetDefaultValue(d, dp);
-        }
-        else if (dp.IsStringType)
-        {
-            exprValue = exprValue?.ToString();
         }
 
         ValidateValue(dp, exprValue, false, false);
