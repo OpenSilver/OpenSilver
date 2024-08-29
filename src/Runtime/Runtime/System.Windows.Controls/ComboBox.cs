@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -145,7 +146,7 @@ namespace System.Windows.Controls
             if (_popup != null)
             {
                 _popup.PlacementTarget = null;
-                _popup.OutsideClick -= new EventHandler<OutsideClickEventArgs>(OnOutsideClick);
+                _popup.OutsideClick -= new EventHandler<CancelEventArgs>(OnOutsideClick);
             }
 
             if (_popupChild != null)
@@ -178,7 +179,7 @@ namespace System.Windows.Controls
 
                 // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
                 _popup.StayOpen = false;
-                _popup.OutsideClick += new EventHandler<OutsideClickEventArgs>(OnOutsideClick);
+                _popup.OutsideClick += new EventHandler<CancelEventArgs>(OnOutsideClick);
 
                 _popupChild = _popup.Child;
                 if (_popupChild != null)
@@ -721,9 +722,9 @@ namespace System.Windows.Controls
                 typeof(ComboBox),
                 new PropertyMetadata(200d));
 
-        private void OnOutsideClick(object sender, OutsideClickEventArgs e)
+        private void OnOutsideClick(object sender, CancelEventArgs e)
         {
-            e.Handled = true;
+            e.Cancel = true;
 
             IsDropDownOpen = false;
         }

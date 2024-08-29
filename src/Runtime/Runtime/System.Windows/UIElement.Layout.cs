@@ -11,10 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
-using System.Windows.Controls;
 using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
@@ -487,9 +485,8 @@ namespace System.Windows
         internal static UIElement GetLayoutParent(UIElement element)
             => VisualTreeHelper.GetParent(element) switch
             {
-                PopupRoot => null,
                 UIElement uie => uie,
-                null when element is FrameworkElement fe && fe.Parent is Popup popup => popup.PopupRoot?.Content,
+                null when element is FrameworkElement fe && fe.Parent is Popup popup => popup.PopupRoot?.HiddenVisualParent,
                 _ => null,
             };
 

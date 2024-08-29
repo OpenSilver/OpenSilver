@@ -237,7 +237,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string uid = NewId();
 
-            string sPointerEvents = popupRoot.ParentPopup.StayOpen ? "none" : "auto";
+            string sPointerEvents = popupRoot.Popup.StayOpen ? "none" : "auto";
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.createPopupRoot('{uid}','{popupRoot.ParentWindow.RootDomElement.UniqueIdentifier}','{sPointerEvents}')");
 

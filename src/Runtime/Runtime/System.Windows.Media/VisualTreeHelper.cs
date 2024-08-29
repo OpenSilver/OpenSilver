@@ -299,13 +299,13 @@ namespace System.Windows.Media
 
             if (window is not null)
             {
-                foreach (PopupRoot root in PopupsManager.GetActivePopupRoots())
+                foreach (PopupRoot root in PopupRoot.GetActivePopupRoots())
                 {
                     if (root.ParentWindow == window &&
-                        root.ParentPopup.IsOpen &&
-                        root.ParentPopup.Child != null)
+                        root.Popup.IsOpen &&
+                        root.Popup.Child != null)
                     {
-                        result.Add(root.ParentPopup);
+                        result.Add(root.Popup);
                     }
                 }
             }

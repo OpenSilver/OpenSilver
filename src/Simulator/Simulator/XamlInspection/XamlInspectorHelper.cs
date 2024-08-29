@@ -226,7 +226,12 @@ namespace OpenSilver.Simulator.XamlInspection
 
         private static IEnumerable GetVisualTreeRootElements()
         {
-            return opensilver::DotNetForHtml5.Core.PopupsManager.GetAllRootUIElements();
+            yield return opensilver::System.Windows.Window.Current;
+
+            foreach (var popupRoot in opensilver::System.Windows.Controls.Primitives.PopupRoot.GetActivePopupRoots())
+            {
+                yield return popupRoot;
+            }
         }
 
         private static UIElement GetVisualParent(UIElement uiElement)

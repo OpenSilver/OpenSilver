@@ -11,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
-using DotNetForHtml5.Core;
+using System.Windows.Media;
+using CSHTML5.Internal;
 
 namespace System.Windows
 {
@@ -39,7 +39,7 @@ namespace System.Windows
 
         internal void InvokeCallback()
         {
-            Point position = PopupsManager.GetUIElementAbsolutePosition(_control);
+            Point position = GetUIElementAbsolutePosition(_control);
             Size size = _control.GetBoundingClientSize();
             Rect bounds = new(position, size);
             if (_bounds != bounds)
@@ -51,7 +51,7 @@ namespace System.Windows
 
         private void Initialize()
         {
-            Point position = PopupsManager.GetUIElementAbsolutePosition(_control);
+            Point position = GetUIElementAbsolutePosition(_control);
             Size size = _control switch
             {
                 FrameworkElement fe => fe.RenderSize,
@@ -59,6 +59,16 @@ namespace System.Windows
             };
 
             _bounds = new Rect(position, size);
+        }
+
+        private static Point GetUIElementAbsolutePosition(UIElement element)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
+            {
+                GeneralTransform gt = element.TransformToVisual(Window.GetWindow(element));
+                return gt.Transform(new Point(0d, 0d));
+            }
+            return new Point();
         }
     }
 }
