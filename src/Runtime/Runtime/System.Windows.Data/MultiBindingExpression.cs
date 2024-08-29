@@ -239,13 +239,11 @@ public sealed class MultiBindingExpression : BindingExpressionBase
                 ParentMultiBinding.ConverterCulture);
         }
 
-        string format = ParentMultiBinding.StringFormat;
-        if (format is not null)
+        string stringFormat = GetEffectiveStringFormat();
+        if (stringFormat is not null)
         {
             try
             {
-                string stringFormat = GetEffectiveStringFormat(format);
-
                 if (value == _values)
                 {
                     value = string.Format(ParentMultiBinding.ConverterCulture, stringFormat, _values);

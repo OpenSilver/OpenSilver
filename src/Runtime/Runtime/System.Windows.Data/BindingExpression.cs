@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -33,6 +34,7 @@ namespace System.Windows.Data
         private IInternalFrameworkElement _mentor;
         private ValidationError _baseValidationError;
         private List<ValidationError> _notifyDataErrors;
+        private object _effectiveTargetNullValue = DefaultValueObject;
 
         private DependencyPropertyChangedListener _dataContextListener;
         private DependencyPropertyChangedListener _cvsListener;
@@ -119,9 +121,16 @@ namespace System.Windows.Data
                 // BROKEN PATH
                 //------------------------
 
-                if (_dataContextListener != null && _propertyPathWalker.IsEmpty)
+                if (_propertyPathWalker.IsEmpty)
                 {
-                    value = UseTargetNullValue();
+                    if (ParentBinding.TargetNullValue != null)
+                    {
+                        value = GetConvertedValue(null);
+                    }
+                    else
+                    {
+                        value = DefaultValue;
+                    }
                 }
                 else
                 {
@@ -142,6 +151,8 @@ namespace System.Windows.Data
 
         private object GetConvertedValue(object rawValue)
         {
+            Type targetType = GetEffectiveTargetType();
+
             object value = rawValue;
 
             if (value != DependencyProperty.UnsetValue)
@@ -149,7 +160,7 @@ namespace System.Windows.Data
                 if (ParentBinding.Converter != null)
                 {
                     value = ParentBinding.Converter.Convert(value,
-                        TargetProperty.PropertyType,
+                        targetType,
                         ParentBinding.ConverterParameter,
                         ParentBinding.ConverterCulture);
                 }
@@ -157,19 +168,43 @@ namespace System.Windows.Data
 
             if (value == DependencyProperty.UnsetValue)
             {
-                value = ParentBinding.FallbackValue ?? DefaultValue;
+                if (ParentBinding.FallbackValue != null)
+                {
+                    value = ParentBinding.FallbackValue;
+                }
+                else if (!IsInBindingExpressionCollection)
+                {
+                    value = DefaultValue;
+                }
             }
 
-            if (value == null)
+            if (value != DependencyProperty.UnsetValue)
             {
-                value = ParentBinding.TargetNullValue;
-            }
-            else
-            {
-                value = ApplyStringFormat(value);
+                if (value is null)
+                {
+                    value = EffectiveTargetNullValue;
+                }
+                else
+                {
+                    value = ApplyStringFormat(value);
+
+                    // chain in a default value converter if the returned value's type is not compatible with the targetType
+                    if (value != null &&
+                        value != DependencyProperty.UnsetValue &&
+                        !targetType.IsAssignableFrom(value.GetType()))
+                    {
+                        value = ConvertHelper(value, targetType, Target, ParentBinding.ConverterCulture);
+                    }
+                }
             }
 
-            value = ConvertValueImplicitly(value, TargetProperty);
+            // if the value isn't acceptable to the target property, don't use it
+            // (in MultiBinding, the value will go through the multi-converter, so
+            // it's too early to make this judgment)
+            if (!IsInMultiBindingExpression && value != DependencyProperty.UnsetValue && !TargetProperty.IsValidValue(value))
+            {
+                value = DependencyProperty.UnsetValue;
+            }
 
             if (value == DependencyProperty.UnsetValue)
             {
@@ -273,6 +308,18 @@ namespace System.Windows.Data
             _propertyPathWalker.IsPathBroken ? TargetProperty.PropertyType : _propertyPathWalker.FinalNode.Type;
 
         private DynamicValueConverter DynamicConverter => _dynamicConverter ??= new DynamicValueConverter(IsReflective);
+
+        private object EffectiveTargetNullValue
+        {
+            get
+            {
+                if (_effectiveTargetNullValue == DefaultValueObject)
+                {
+                    _effectiveTargetNullValue = ConvertValue(ParentBinding.TargetNullValue, TargetProperty);
+                }
+                return _effectiveTargetNullValue;
+            }
+        }
 
         private object BindingSource
         {
@@ -696,25 +743,31 @@ namespace System.Windows.Data
             return null;
         }
 
-        private object ConvertValueImplicitly(object value, DependencyProperty dp)
+        private object ConvertValue(object value, DependencyProperty dp)
         {
-            if (dp.IsValidType(value))
+            object result;
+
+            if (value == DependencyProperty.UnsetValue || dp.IsValidValue(value))
             {
-                return value;
+                result = value;
+            }
+            else
+            {
+                result = ConvertHelper(value,
+                    dp.PropertyType,
+                    Target,
+                    ParentBinding.ConverterCulture);
             }
 
-            return UseDynamicConverter(value, dp.PropertyType);
+            return result;
         }
 
-        private object UseDynamicConverter(object value, Type targetType)
+        private object ConvertHelper(object value, Type targetType, object parameter, CultureInfo culture)
         {
             object convertedValue;
             try
             {
-                convertedValue = DynamicConverter.Convert(value,
-                    targetType,
-                    ParentBinding.ConverterParameter,
-                    ParentBinding.ConverterCulture);
+                convertedValue = DynamicConverter.Convert(value, targetType, parameter, culture);
             }
             catch (Exception ex)
             {
@@ -725,34 +778,21 @@ namespace System.Windows.Data
             return convertedValue;
         }
 
-        private object UseTargetNullValue()
-        {
-            object value;
-
-            if (ParentBinding.TargetNullValue != null)
-            {
-                value = GetConvertedValue(null);
-            }
-            else
-            {
-                value = DefaultValue;
-            }
-
-            return value;
-        }
-
         private object UseFallbackValue()
         {
             object value = DependencyProperty.UnsetValue;
 
             if (ParentBinding.FallbackValue != null)
             {
-                value = ConvertValueImplicitly(ParentBinding.FallbackValue, TargetProperty);
+                value = ConvertValue(ParentBinding.FallbackValue, TargetProperty);
             }
 
             if (value == DependencyProperty.UnsetValue)
             {
-                value = DefaultValue;
+                if (!IsInBindingExpressionCollection)
+                {
+                    value = DefaultValue;
+                }
             }
 
             return value;
@@ -762,18 +802,17 @@ namespace System.Windows.Data
         {
             object result = value;
 
-            string format = ParentBinding.StringFormat;
-            if (format != null)
+            string stringFormat = GetEffectiveStringFormat();
+            if (stringFormat != null)
             {
                 try
                 {
-                    string stringFormat = GetEffectiveStringFormat(format);
                     result = string.Format(stringFormat, value);
                 }
                 catch (FormatException fe)
                 {
                     HandleException(fe);
-                    result = UseFallbackValue();
+                    result = DependencyProperty.UnsetValue;
                 }
             }
 

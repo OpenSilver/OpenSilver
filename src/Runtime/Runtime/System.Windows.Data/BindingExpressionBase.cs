@@ -14,6 +14,7 @@
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data;
@@ -53,6 +54,9 @@ public abstract class BindingExpressionBase : Expression
             typeof(object),
             typeof(BindingExpressionBase),
             null);
+
+    /// <summary> Sentinel meaning "field has its default value" </summary>
+    internal static readonly object DefaultValueObject = new NamedObject("DefaultValue");
 
     private PrivateFlags _flags;
     private DependencyPropertyChangedListener _targetPropertyListener;
@@ -164,6 +168,9 @@ public abstract class BindingExpressionBase : Expression
         get => TestFlag(PrivateFlags.iInMultiBindingExpression);
         set => ChangeFlag(PrivateFlags.iInMultiBindingExpression, value);
     }
+
+    /// <summary> True if this binding expression belongs to a PriorityBinding or MultiBinding </summary>
+    internal bool IsInBindingExpressionCollection => TestFlag(PrivateFlags.iInMultiBindingExpression);
 
     /// <summary> True if this binding expression validates on exceptions </summary>
     internal bool ValidatesOnExceptions => TestFlag(PrivateFlags.iValidatesOnExceptions);
@@ -278,10 +285,13 @@ public abstract class BindingExpressionBase : Expression
     /// <summary>
     /// Create a format that is suitable for String.Format
     /// </summary>
-    /// <param name="stringFormat"></param>
-    /// <returns></returns>
-    internal static string GetEffectiveStringFormat(string stringFormat)
+    internal string GetEffectiveStringFormat()
     {
+        if (ParentBindingBase.StringFormat is not string stringFormat)
+        {
+            return null;
+        }
+
         if (stringFormat.IndexOf('{') < 0)
         {
             stringFormat = @"{0:" + stringFormat + @"}";
@@ -339,6 +349,27 @@ public abstract class BindingExpressionBase : Expression
     {
         ChangeFlag(PrivateFlags.iUpdateMask, false);
         ChangeFlag((PrivateFlags)BindingBase.FlagsFrom(ust), true);
+    }
+
+    internal Type GetEffectiveTargetType()
+    {
+        Type targetType = TargetProperty.PropertyType;
+        BindingExpressionBase be = ParentBindingExpressionBase;
+
+        while (be is not null)
+        {
+            if (be is MultiBindingExpression)
+            {
+                // for descendants of a MultiBinding, the effective target
+                // type is Object.
+                targetType = typeof(object);
+                break;
+            }
+
+            be = be.ParentBindingExpressionBase;
+        }
+
+        return targetType;
     }
 
     private void DetermineEffectiveValidatesOnNotifyDataErrors()
