@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -429,6 +430,132 @@ namespace System.Windows
         internal virtual Rect? GetLayoutClip(Size layoutSlotSize)
         {
             return null;
+        }
+
+        /// <summary>
+        /// Occurs when the layout of the Silverlight visual tree changes.
+        /// </summary>
+        internal event EventHandler LayoutUpdated
+        {
+            add
+            {
+                LayoutEventList.ListItem item = GetLayoutUpdatedHandler(value);
+
+                if (item == null)
+                {
+                    //set a weak ref in LM
+                    item = LayoutManager.Current.LayoutEvents.Add(value);
+                    AddLayoutUpdatedHandler(value, item);
+                }
+            }
+            remove
+            {
+                LayoutEventList.ListItem item = GetLayoutUpdatedHandler(value);
+
+                if (item != null)
+                {
+                    RemoveLayoutUpdatedHandler(value);
+                    //remove a weak ref from LM
+                    LayoutManager.Current.LayoutEvents.Remove(item);
+                }
+            }
+        }
+
+        private static readonly DependencyProperty LayoutUpdatedListItemsField =
+            DependencyProperty.Register(
+                "_LayoutUpdatedListItems",
+                typeof(object),
+                typeof(FrameworkElement),
+                null);
+
+        private static readonly DependencyProperty LayoutUpdatedHandlersField =
+            DependencyProperty.Register(
+                "_LayoutUpdatedHandlers",
+                typeof(EventHandler),
+                typeof(FrameworkElement),
+                null);
+
+        private void AddLayoutUpdatedHandler(EventHandler handler, LayoutEventList.ListItem item)
+        {
+            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
+
+            if (cachedLayoutUpdatedItems == null)
+            {
+                SetValueInternal(LayoutUpdatedListItemsField, item);
+                SetValueInternal(LayoutUpdatedHandlersField, handler);
+            }
+            else
+            {
+                EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
+                if (cachedLayoutUpdatedHandler != null)
+                {
+                    //second unique handler is coming in.
+                    //allocate a datastructure
+                    var list = new Dictionary<EventHandler, object>(2)
+                    {
+                        //add previously cached handler
+                        { cachedLayoutUpdatedHandler, cachedLayoutUpdatedItems },
+
+                        //add new handler
+                        { handler, item }
+                    };
+
+                    ClearValue(LayoutUpdatedHandlersField);
+                    SetValueInternal(LayoutUpdatedListItemsField, list);
+                }
+                else //already have a list
+                {
+                    var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                    list.Add(handler, item);
+                }
+            }
+        }
+
+        private LayoutEventList.ListItem GetLayoutUpdatedHandler(EventHandler d)
+        {
+            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
+
+            if (cachedLayoutUpdatedItems == null)
+            {
+                return null;
+            }
+            else
+            {
+                EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
+                if (cachedLayoutUpdatedHandler != null)
+                {
+                    if (cachedLayoutUpdatedHandler == d) return (LayoutEventList.ListItem)cachedLayoutUpdatedItems;
+                }
+                else //already have a list
+                {
+                    var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                    if (list.TryGetValue(d, out object item))
+                    {
+                        return (LayoutEventList.ListItem)item;
+                    }
+                }
+                return null;
+            }
+        }
+
+        private void RemoveLayoutUpdatedHandler(EventHandler d)
+        {
+            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
+            EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
+
+            if (cachedLayoutUpdatedHandler != null) //single handler
+            {
+                if (cachedLayoutUpdatedHandler == d)
+                {
+                    ClearValue(LayoutUpdatedListItemsField);
+                    ClearValue(LayoutUpdatedHandlersField);
+                }
+            }
+            else //there is an ArrayList allocated
+            {
+                var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                list.Remove(d);
+            }
         }
 
         /// <summary>

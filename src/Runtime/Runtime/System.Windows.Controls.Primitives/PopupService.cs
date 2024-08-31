@@ -24,8 +24,6 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         internal static Point MousePosition { get; set; }
 
-        internal static PositionsWatcher PositionsWatcher { get; } = new();
-
         internal static void SetRootVisual()
         {
             if (RootVisual == null && Application.Current != null)

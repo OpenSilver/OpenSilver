@@ -151,8 +151,6 @@ namespace System.Windows.Controls
 
             if (_popupChild != null)
             {
-                if (_popupChild is FrameworkElement fe)
-                    fe.SizeChanged -= new SizeChangedEventHandler(OnPopupChildSizeChanged);
                 _popupChild.KeyDown -= new KeyEventHandler(OnPopupKeyDown);
                 _popupChild.TextInput -= new TextCompositionEventHandler(OnPopupTextInput);
                 _popupChild.GotFocus -= new RoutedEventHandler(OnPopupGotFocus);
@@ -171,8 +169,6 @@ namespace System.Windows.Controls
             if (_popup != null)
             {
                 _popup.MaxHeight = MaxDropDownHeight;
-
-                //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
                 _popup.PlacementTarget = this;
                 _popup.Placement = PlacementMode.Bottom;
                 _popup.StaysWithinScreenBounds = true;
@@ -184,8 +180,6 @@ namespace System.Windows.Controls
                 _popupChild = _popup.Child;
                 if (_popupChild != null)
                 {
-                    if (_popupChild is FrameworkElement fe)
-                        fe.SizeChanged += new SizeChangedEventHandler(OnPopupChildSizeChanged);
                     _popupChild.KeyDown += new KeyEventHandler(OnPopupKeyDown);
                     _popupChild.TextInput += new TextCompositionEventHandler(OnPopupTextInput);
                     _popupChild.GotFocus += new RoutedEventHandler(OnPopupGotFocus);
@@ -526,8 +520,6 @@ namespace System.Windows.Controls
         }
 
         private void OnPopupTextInput(object sender, TextCompositionEventArgs e) => OnTextInput(e);
-
-        private void OnPopupChildSizeChanged(object sender, SizeChangedEventArgs e) => _popup?.Reposition();
 
         private void OnPopupGotFocus(object sender, RoutedEventArgs e) => SetValueInternal(IsSelectionActivePropertyKey, true);
         

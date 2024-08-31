@@ -870,7 +870,6 @@
 		<Compile Include="System.Windows\Application.cs" />
 		<Compile Include="System.Windows\CoerceValueCallback.cs" />
 		<Compile Include="System.Windows\Content.cs" />
-		<Compile Include="System.Windows\ControlToWatch.cs" />
 		<Compile Include="System.Windows\CornerRadius.cs" />
 		<Compile Include="System.Windows\DataTemplate.cs" />
 		<Compile Include="System.Windows\DependencyObject.cs" />
@@ -891,7 +890,6 @@
 		<Compile Include="System.Windows\MessageBox.cs" />
 		<Compile Include="System.Windows\MessageBoxButton.cs" />
 		<Compile Include="System.Windows\MessageBoxResult.cs" />
-		<Compile Include="System.Windows\PositionsWatcher.cs" />
 		<Compile Include="System.Windows\PropertyChangedCallback.cs" />
 		<Compile Include="System.Windows\PropertyMetadata.cs" />
 		<Compile Include="System.Windows\PropertyPath.cs" />

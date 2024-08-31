@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Markup;
-using System.Collections;
 using System.Diagnostics;
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
@@ -29,8 +30,12 @@ namespace System.Windows.Controls.Primitives
     [ContentProperty(nameof(Child))]
     public class Popup : FrameworkElement
     {
+        private static readonly List<Popup> _monitoredPopups = new();
+        private static readonly EventHandler _onLayoutUpdated = new(OnLayoutUpdated);
+        private static LayoutEventList.ListItem _item;
+
         private PopupRoot _popupRoot;
-        private ControlToWatch _controlToWatch;
+        private bool _isMonitoringPosition;
 
         public Popup()
         {
@@ -65,14 +70,21 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
-        /// Gets the identifier for the PlacementTarget dependency property
+        /// Gets the identifier for the <see cref="PlacementTarget"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PlacementTargetProperty =
             DependencyProperty.Register(
                 nameof(PlacementTarget), 
                 typeof(UIElement), 
                 typeof(Popup), 
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(null, OnPlacementTargetChanged));
+
+        private static void OnPlacementTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var popup = (Popup)d;
+            popup.UpdatePositionTracker();
+            popup.Reposition();
+        }
 
         /// <summary>
         /// Gets or sets the position of the Popup relative to the UIElement it is attached to.
@@ -84,7 +96,7 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
-        /// Gets the identifier for the Placement dependency property
+        /// Gets the identifier for the <see cref="Placement"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PlacementProperty =
             DependencyProperty.Register(
@@ -96,7 +108,9 @@ namespace System.Windows.Controls.Primitives
 
         private static void OnPlacementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((Popup)d).Reposition();
+            var popup = (Popup)d;
+            popup.UpdatePositionTracker();
+            popup.Reposition();
         }
 
         private static bool IsValidPlacementMode(object o)
@@ -224,6 +238,8 @@ namespace System.Windows.Controls.Primitives
             var popup = (Popup)d;
             bool isOpen = (bool)e.NewValue;
 
+            popup.UpdatePositionTracker();
+
             if (isOpen)
             {
                 popup.ShowPopupRootIfNotAlreadyVisible();
@@ -251,8 +267,9 @@ namespace System.Windows.Controls.Primitives
         private static void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             Popup popup = (Popup)sender;
-            PopupRoot popupRoot = popup._popupRoot;
-            if (popupRoot is not null)
+            popup.UpdatePositionTracker();
+
+            if (popup._popupRoot is PopupRoot popupRoot)
             {
                 bool isVisible = (bool)e.NewValue;
                 if (isVisible)
@@ -410,7 +427,7 @@ namespace System.Windows.Controls.Primitives
                     {
                         targetBounds = target
                             .TransformToVisual(Window.GetWindow(target))
-                            .TransformBounds(new Rect(0, 0, target.ActualWidth, target.ActualHeight));
+                            .TransformBounds(new Rect(target.RenderSize));
                     }
                     catch { }
                 }
@@ -544,41 +561,10 @@ namespace System.Windows.Controls.Primitives
 
             UpdatePosition();
 
-            if (_controlToWatch != null)
-            {
-                PopupService.PositionsWatcher.RemoveControlToWatch(_controlToWatch);
-            }
-
-            UIElement target = PlacementTarget;
-            if (target != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(target)
-                && Placement != PlacementMode.Mouse)
-            {
-                _controlToWatch = PopupService.PositionsWatcher.AddControlToWatch(target, OnTargetPositionChanged);
-            }
-
             // Force layout update to prevent the popup content from briefly appearing in
             // the top left corner of the screen.
             UpdateLayout();
             OpenSilver.Interop.JavaScriptRuntime.Flush();
-        }
-
-        private void OnTargetPositionChanged(ControlToWatch ctw)
-        {
-            if (ctw != _controlToWatch)
-            {
-                PopupService.PositionsWatcher.RemoveControlToWatch(ctw);
-                return;
-            }
-
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(ctw.Control))
-            {
-                PopupService.PositionsWatcher.RemoveControlToWatch(ctw);
-                _controlToWatch = null;
-                SetCurrentValue(IsOpenProperty, BooleanBoxes.FalseBox);
-                return;
-            }
-            
-            PerformPlacement(ctw.Bounds);
         }
 
         private void HidePopupRootIfVisible() => _popupRoot?.Close();
@@ -641,22 +627,77 @@ namespace System.Windows.Controls.Primitives
 
         }
 
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            return new Size();
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            _controlToWatch?.InvokeCallback();
-            return finalSize;
-        }
-
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void EnsurePopupStaysWithinScreenBounds(double forcedWidth = double.NaN, double forcedHeight = double.NaN)
         {
             StaysWithinScreenBounds = true;
             Reposition();
+        }
+
+        private static void StartMonitoringPosition(Popup popup)
+        {
+            if (!popup._isMonitoringPosition)
+            {
+                popup._isMonitoringPosition = true;
+                _monitoredPopups.Add(popup);
+
+                _item ??= LayoutManager.Current.LayoutEvents.Add(_onLayoutUpdated);
+            }
+        }
+
+        private static void StopMonitoringPosition(Popup popup)
+        {
+            if (popup._isMonitoringPosition)
+            {
+                popup._isMonitoringPosition = false;
+                _monitoredPopups.Remove(popup);
+
+                if (_monitoredPopups.Count == 0 && _item != null)
+                {
+                    LayoutManager.Current.LayoutEvents.Remove(_item);
+                    _item = null;
+                }
+            }
+        }
+
+        private static void OnLayoutUpdated(object sender, EventArgs e)
+        {
+            foreach (Popup popup in _monitoredPopups.ToArray())
+            {
+                popup.RepositionOnLayoutUpdated();
+            }
+        }
+
+        private void UpdatePositionTracker()
+        {
+            if (!IsOpen ||
+                Placement == PlacementMode.Mouse ||
+                PlacementTarget is not UIElement placementTarget ||
+                !INTERNAL_VisualTreeManager.IsElementInVisualTree(placementTarget))
+            {
+                StopMonitoringPosition(this);
+            }
+            else
+            {
+                StartMonitoringPosition(this);
+            }
+        }
+
+        private void RepositionOnLayoutUpdated()
+        {
+            UIElement target = PlacementTarget;
+
+            if (target is null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(target))
+            {
+                SetCurrentValue(IsOpenProperty, BooleanBoxes.FalseBox);
+                return;
+            }
+
+            Point position = target.TransformToVisual(Window.GetWindow(target)).Transform(new Point(0, 0));
+            Size size = target.GetBoundingClientSize();
+            Rect bounds = new(position, size);
+
+            PerformPlacement(bounds);
         }
     }
 }

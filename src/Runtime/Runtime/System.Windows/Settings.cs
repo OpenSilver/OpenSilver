@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System
 {
@@ -125,14 +126,12 @@ namespace System
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
 
-        /// <summary>
-        /// Gets or sets the interval between each refresh of the position an element attached to another (for example Popups or Tooltips attached to a certain element).
-        /// Note: A refresh interval too low might negatively impact performances
-        /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public TimeSpan PopupMoveDelay
         {
-            get { return PopupService.PositionsWatcher.Interval; }
-            set { PopupService.PositionsWatcher.Interval = value; }
+            get => default;
+            set { }
         }
 
         /// <summary>
