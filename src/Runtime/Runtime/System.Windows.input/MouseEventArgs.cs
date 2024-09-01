@@ -167,10 +167,10 @@ namespace System.Windows.Input
                 // Returns the pointer coordinates relative to the "relativeTo" element:
                 //-----------------------------------
 
-                UIElement rootVisual = Window.GetWindow(relativeTo)?.Content;
+                UIElement rootVisual = Window.GetWindow(relativeTo);
                 if (rootVisual != null)
                 {
-                    return rootVisual.TransformToVisual(relativeTo).Transform(origin);
+                    return rootVisual.GetRelativeTransform(relativeTo).Transform(origin);
                 }
             }
 

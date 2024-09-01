@@ -114,6 +114,8 @@ namespace System.Windows
                 throw new InvalidOperationException("The method 'Window.AttachToDomElement' can be called only once.");
             }
 
+            ParentWindow = this;
+
             //Note: The "rootDomElement" will contain one DIV for the root of the window visual tree, and other DIVs to host the popups.
             RootDomElement = rootDomElement ?? throw new ArgumentNullException(nameof(rootDomElement));
 
@@ -216,13 +218,6 @@ namespace System.Windows
         {
             if (_isLoaded)
             {
-                // Due to the fact that the children fill their "ParentWindow"
-                // property by copying the value of the "ParentWindow" property
-                // of their parent, we need to temporarily set it to be equal
-                // to "this" before calling "base.OnContentChanged", so that it
-                // then gets passed to the children recursively:
-                this.ParentWindow = this;
-
                 // Attach the child UI element:
                 UIElement newChild = newContent as UIElement;
                 UIElement oldChild = oldContent as UIElement;
@@ -231,9 +226,6 @@ namespace System.Windows
                 RemoveVisualChild(oldChild);
                 AddVisualChild(newChild);
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this);
-
-                // We can now revert the "ParentWindow" to null (cf. comment above):
-                this.ParentWindow = null;
             }
         }
 

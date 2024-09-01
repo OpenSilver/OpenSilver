@@ -657,9 +657,16 @@ namespace System.Windows
             set => SetValueInternal(RenderTransformOriginProperty, value);
         }
 
-#endregion
+        private Point GetRenderTransformOrigin()
+        {
+            Point relativeOrigin = RenderTransformOrigin;
+            Size renderSize = RenderSize;
+            return new Point(renderSize.Width * relativeOrigin.X, renderSize.Height * relativeOrigin.Y);
+        }
 
-#region UseLayoutRounding
+        #endregion
+
+        #region UseLayoutRounding
 
         /// <summary>
         /// Gets or sets a value that determines whether rendering for the object and
@@ -1171,58 +1178,6 @@ namespace System.Windows
 #endregion
 
         /// <summary>
-        /// Returns a transform object that can be used to transform coordinates from
-        /// the UIElement to the specified object.
-        /// </summary>
-        /// <param name="visual">
-        /// The object to compare to the current object for purposes of obtaining the
-        /// transform.
-        /// </param>
-        /// <returns>
-        /// The transform information as an object. Call methods on this object to get
-        /// a practical transform.
-        /// </returns>
-        public GeneralTransform TransformToVisual(UIElement visual)
-        {
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                throw new ArgumentException();
-            }
-            // If no "visual" was specified, we use the Window root instead.
-            // Note: This is useful for example when calculating the position of popups, which
-            // are defined in absolute coordinates, at the same level as the Window root.
-            INTERNAL_HtmlDomElementReference outerDivOfReferenceVisual;
-            if (visual != null)
-            {
-                if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(visual))
-                {
-                    throw new ArgumentException(nameof(visual));
-                }
-
-                outerDivOfReferenceVisual = visual.OuterDiv;
-            }
-            else
-            {
-                UIElement rootVisual = Window.GetWindow(this)?.Content ?? throw new InvalidOperationException();
-
-                outerDivOfReferenceVisual = rootVisual.OuterDiv;
-            }
-
-            // Hack to improve the Simulator performance by making only one interop call rather than two:
-            string sOuterDivOfControl = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
-            string sOuterDivOfReferenceVisual = OpenSilver.Interop.GetVariableStringForJS(outerDivOfReferenceVisual);
-            string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
-                $"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)");
-            int sepIndex = concatenated.IndexOf('|');
-            string offsetLeftAsString = concatenated.Substring(0, sepIndex);
-            string offsetTopAsString = concatenated.Substring(sepIndex + 1);
-            double offsetLeft = Convert.ToDouble(offsetLeftAsString, CultureInfo.InvariantCulture);
-            double offsetTop = Convert.ToDouble(offsetTopAsString, CultureInfo.InvariantCulture);
-
-            return new MatrixTransform(new Matrix(1, 0, 0, 1, offsetLeft, offsetTop));
-        }
-
-        /// <summary>
         /// Use this method for better performance in the Simulator compared to 
         /// requesting the ActualWidth and ActualHeight separately.
         /// </summary>
@@ -1261,6 +1216,56 @@ namespace System.Windows
             }
 
             return current == ancestor;
+        }
+
+        private UIElement FindFirstAncestorWithFlagsAnd(VisualFlags flag)
+        {
+            UIElement current = this;
+
+            do
+            {
+                if (current.ReadVisualFlag(flag))
+                {
+                    // The other UIElement crossed through this UIElement's parent chain. Hence this is our
+                    // common ancestor.
+                    return current;
+                }
+
+                current = current.VisualParent as UIElement;
+            }
+            while (current is not null);
+
+            return null;
+        }
+
+        private UIElement FindCommonVisualAncestor(UIElement otherVisual)
+        {
+            if (otherVisual is null)
+            {
+                throw new ArgumentNullException(nameof(otherVisual));
+            }
+
+            // Since we can't rely on code running in the CLR, we need to first make sure
+            // that the FindCommonAncestor flag is not set. It is enought to ensure this
+            // on one path to the root Visual.
+
+            SetVisualFlagsToRoot(VisualFlags.FindCommonAncestor, false);
+
+            // Walk up the other visual's parent chain and set the FindCommonAncestor flag.
+            otherVisual.SetVisualFlagsToRoot(VisualFlags.FindCommonAncestor, true);
+
+            // Now see if the other Visual's parent chain crosses our parent chain.
+            if (FindFirstAncestorWithFlagsAnd(VisualFlags.FindCommonAncestor) is UIElement ancestor)
+            {
+                return ancestor;
+            }
+
+            if (Window.GetWindow(this) is Window window && window == Window.GetWindow(otherVisual))
+            {
+                return window;
+            }
+
+            return null;
         }
 
         #region ForceInherit property support
@@ -1329,6 +1334,18 @@ namespace System.Windows
             {
                 _visualFlags &= (~field);
             }
+        }
+
+        private void SetVisualFlagsToRoot(VisualFlags flag, bool value)
+        {
+            UIElement current = this;
+
+            do
+            {
+                current.WriteVisualFlag(flag, value);
+                current = current.VisualParent as UIElement;
+            }
+            while (current is not null);
         }
 
         private CoreFlags _flags;
@@ -1421,8 +1438,8 @@ namespace System.Windows
         //// 
         //Are3DContentBoundsValid = 0x00000020,
 
-        //// FindCommonAncestor is used to find the common ancestor of a Visual.
-        //FindCommonAncestor = 0x00000040,
+        // FindCommonAncestor is used to find the common ancestor of a Visual.
+        FindCommonAncestor = 0x00000040,
 
         //// IsLayoutIslandRoot indicates that this Visual is a root of Element Layout Island.
         //IsLayoutIslandRoot = 0x00000080,

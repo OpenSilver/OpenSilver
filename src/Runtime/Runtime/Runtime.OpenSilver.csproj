@@ -84,6 +84,7 @@
 		<Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />
 		<Compile Include="System.Windows\LogicalTreeHelper.cs" />
 		<Compile Include="System.Windows\TreeChangeInfo.cs" />
+		<Compile Include="System.Windows\UIElement.TransformToVisual.cs" />
 		<Compile Include="System.Windows\ValidateValueCallback.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
