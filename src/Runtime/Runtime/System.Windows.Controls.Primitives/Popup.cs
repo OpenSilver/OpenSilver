@@ -30,6 +30,8 @@ namespace System.Windows.Controls.Primitives
     [ContentProperty(nameof(Child))]
     public class Popup : FrameworkElement
     {
+        private const double _cursorOffsetY = 18.0;
+
         private static readonly List<Popup> _monitoredPopups = new();
         private static readonly EventHandler _onLayoutUpdated = new(OnLayoutUpdated);
         private static LayoutEventList.ListItem _item;
@@ -103,7 +105,7 @@ namespace System.Windows.Controls.Primitives
                 nameof(Placement), 
                 typeof(PlacementMode), 
                 typeof(Popup),
-                new PropertyMetadata(PlacementMode.Right, OnPlacementChanged),
+                new PropertyMetadata(PlacementMode.Bottom, OnPlacementChanged),
                 IsValidPlacementMode);
 
         private static void OnPlacementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -413,139 +415,220 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        private void UpdatePosition()
+        private void UpdateTransform()
         {
-            if (_popupRoot is null || !_popupRoot.IsOpen)
-                return;
-
-            if (PlacementTarget is FrameworkElement target && INTERNAL_VisualTreeManager.IsElementInVisualTree(target))
+            Matrix transform;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                Rect targetBounds = new Rect(0, 0, 0, 0);
-                if (Placement != PlacementMode.Mouse)
-                {
-                    try
-                    {
-                        targetBounds = target
-                            .TransformToVisual(Window.GetWindow(target))
-                            .TransformBounds(new Rect(target.RenderSize));
-                    }
-                    catch { }
-                }
-
-                PerformPlacement(targetBounds);
+                transform = GetRelativeTransform(Window.GetWindow(this));
+                transform.OffsetX = transform.OffsetY = 0;
+            }
+            else if (GetValue(RenderTransformProperty) is Transform popupTransform)
+            {
+                transform = popupTransform.Matrix;
             }
             else
             {
-                Point point;
-                if (Placement == PlacementMode.Mouse)
-                {
-                    point = PopupService.MousePosition;
-                }
-                else if (VisualTreeHelper.GetParent(this) != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                {
-                    point = TransformToVisual(null).Transform(new Point(0, 0));
-                }
-                else
-                {
-                    point = new Point(0, 0);
-                }
-
-                _popupRoot.SetPosition(point.X + HorizontalOffset, point.Y + VerticalOffset);
+                transform = Matrix.Identity;
             }
+
+            _popupRoot.SetTransform(transform);
         }
 
-        private void PerformPlacement(Rect targetBounds)
+        private void UpdatePosition()
         {
-            if (_popupRoot is null || !_popupRoot.IsOpen)
-                return;
+            if (_popupRoot is null || !_popupRoot.IsOpen) return;
 
-            var mode = Placement;
-            var root = Application.Current.Host.Content;
-            if (root == null)
-                return;
-            if (Child is not UIElement child)
-                return;
+            UpdateTransform();
 
-            var bounds = new Point(root.ActualWidth, root.ActualHeight);
-            var childSize = child.RenderSize;
+            Point offset;
 
-            Point point = mode == PlacementMode.Mouse ?
-                PopupService.MousePosition :
-                new Point(targetBounds.Left, targetBounds.Top);
-
-            switch (mode)
+            if (PlacementTarget is FrameworkElement target && INTERNAL_VisualTreeManager.IsElementInVisualTree(target))
             {
-                case PlacementMode.Top:
-                    point.Y = targetBounds.Top - childSize.Height;
-                    break;
-                case PlacementMode.Bottom:
-                    point.Y = targetBounds.Bottom;
-                    break;
-                case PlacementMode.Left:
-                    point.X = targetBounds.Left - childSize.Width;
-                    break;
-                case PlacementMode.Right:
-                    point.X = targetBounds.Right;
-                    break;
-                case PlacementMode.Mouse:
-                    point.Y += 11.0;
-                    break;
-                default:
-                    throw new NotSupportedException($"PlacementMode '{mode}' is not supported");
+                offset = PerformPlacement(target);
+            }
+            else if (Placement == PlacementMode.Mouse)
+            {
+                offset = PopupService.MousePosition;
+                offset.Y += _cursorOffsetY;
+            }
+            else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                offset = GetRelativeTransform(null).Transform(new Point(0, 0));
+            }
+            else
+            {
+                offset = new Point(0, 0);
             }
 
-            if ((point.Y + childSize.Height) > bounds.Y)
-            {
-                if (mode == PlacementMode.Bottom)
-                    point.Y = targetBounds.Top - childSize.Height;
-                else
-                    point.Y = bounds.Y - childSize.Height;
-            }
-            else if (point.Y < 0)
-            {
-                if (mode == PlacementMode.Top)
-                    point.Y = targetBounds.Bottom;
-                else
-                    point.Y = 0;
-            }
+            _popupRoot.SetPosition(offset.X + HorizontalOffset, offset.Y + VerticalOffset);
+        }
 
-            if ((point.X + childSize.Width) > bounds.X)
-            {
-                if (mode == PlacementMode.Right)
-                    point.X = targetBounds.Left - childSize.Width;
-                else
-                    point.X = bounds.X - childSize.Width;
-            }
-            else if (point.X < 0)
-            {
-                if (mode == PlacementMode.Left)
-                    point.X = targetBounds.Right;
-                else
-                    point.X = 0;
-            }
+        private Point PerformPlacement(UIElement placementTarget)
+        {
+            var point = new Point();
 
-            if (StaysWithinScreenBounds)
+            if (Child is UIElement child)
             {
-                if ((point.Y + childSize.Height) > bounds.Y)
+                PlacementMode placement = Placement;
+
+                if (placement == PlacementMode.Mouse)
                 {
-                    point.Y = bounds.Y - childSize.Height;
+                    point = PopupService.MousePosition;
+                    point.Y += _cursorOffsetY;
                 }
-                else if (point.Y < 0)
+                else
                 {
-                    point.Y = 0;
-                }
+                    var root = Application.Current.Host.Content;
+                    var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
+                    InterestPoints targetInterestPoints = GetInterestPoints(placementTarget, Window.GetWindow(placementTarget));
+                    InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.InternalGetVisualChild(0));
 
-                if ((point.X + childSize.Width) > bounds.X)
-                {
-                    point.X = bounds.X - childSize.Width;
-                }
-                else if (point.X < 0)
-                {
-                    point.X = 0;
+                    switch (placement)
+                    {
+                        case PlacementMode.Top:
+                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X;
+                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.BottomLeft.Y;
+                            break;
+                        case PlacementMode.Bottom:
+                            point.X = targetInterestPoints.BottomLeft.X;
+                            point.Y = targetInterestPoints.BottomLeft.Y;
+                            break;
+                        case PlacementMode.Left:
+                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.TopRight.X;
+                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.TopRight.Y;
+                            break;
+                        case PlacementMode.Right:
+                            point.X = targetInterestPoints.TopRight.X;
+                            point.Y = targetInterestPoints.TopRight.Y;
+                            break;
+                        default:
+                            throw new NotSupportedException($"PlacementMode '{placement}' is not supported");
+                    }
+
+                    Rect childBounds = GetBounds(childInterestPoints);
+                    childBounds.X += childInterestPoints.TopLeft.X + point.X;
+                    childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
+
+                    if (childBounds.Y + childBounds.Height > windowBounds.Height)
+                    {
+                        if (placement == PlacementMode.Bottom)
+                        {
+                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X;
+                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.BottomLeft.Y;
+                        }
+                        else
+                        {
+                            point.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
+                        }
+                    }
+                    else if (childBounds.Y < 0)
+                    {
+                        if (placement == PlacementMode.Top)
+                        {
+                            point.X = targetInterestPoints.BottomLeft.X;
+                            point.Y = targetInterestPoints.BottomLeft.Y;
+                        }
+                        else
+                        {
+                            point.Y -= childBounds.Y;
+                        }
+                    }
+
+                    childBounds = GetBounds(childInterestPoints);
+                    childBounds.X += childInterestPoints.TopLeft.X + point.X;
+                    childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
+
+                    if (childBounds.X + childBounds.Width > windowBounds.Width)
+                    {
+                        if (placement == PlacementMode.Right)
+                        {
+                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.TopRight.X;
+                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.TopRight.Y;
+                        }
+                        else
+                        {
+                            point.X -= childBounds.X + childBounds.Width - windowBounds.Width;
+                        }
+                    }
+                    else if (childBounds.X < 0)
+                    {
+                        if (placement == PlacementMode.Left)
+                        {
+                            point.X = targetInterestPoints.TopRight.X;
+                            point.Y = targetInterestPoints.TopRight.Y;
+                        }
+                        else
+                        {
+                            point.X -= childBounds.X;
+                        }
+                    }
+
+                    childBounds = GetBounds(childInterestPoints);
+                    childBounds.X += childInterestPoints.TopLeft.X + point.X;
+                    childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
+
+                    if (StaysWithinScreenBounds)
+                    {
+                        if (childBounds.Y + childBounds.Height > windowBounds.Height)
+                        {
+                            point.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
+                        }
+                        else if (childBounds.Y < 0)
+                        {
+                            point.Y -= childBounds.Y;
+                        }
+
+                        if (childBounds.X + childBounds.Width > windowBounds.Width)
+                        {
+                            point.X -= childBounds.X + childBounds.Width - windowBounds.Width;
+                        }
+                        else if (childBounds.X < 0)
+                        {
+                            point.X -= childBounds.X;
+                        }
+                    }
                 }
             }
 
-            _popupRoot.SetPosition(point.X + HorizontalOffset, point.Y + VerticalOffset);
+            return point;
+        }
+
+        private struct InterestPoints
+        {
+            public Point TopLeft;
+            public Point TopRight;
+            public Point BottomLeft;
+            public Point BottomRight;
+        }
+
+        private static InterestPoints GetInterestPoints(UIElement element, UIElement relativeTo)
+        {
+            var transform = element.TransformToVisual(relativeTo);
+
+            return new InterestPoints
+            {
+                TopLeft = transform.Transform(new Point(0, 0)),
+                TopRight = transform.Transform(new Point(element.RenderSize.Width, 0)),
+                BottomLeft = transform.Transform(new Point(0, element.RenderSize.Height)),
+                BottomRight = transform.Transform(new Point(element.RenderSize.Width, element.RenderSize.Height)),
+            };
+        }
+
+        // Gets the smallest rectangle that contains all points in the list
+        private static Rect GetBounds(InterestPoints interestPoints)
+        {
+            Point topLeft = interestPoints.TopLeft;
+            Point topRight = interestPoints.TopRight;
+            Point bottomLeft = interestPoints.BottomLeft;
+            Point bottomRight = interestPoints.BottomRight;
+
+            double left = Math.Min(Math.Min(topLeft.X, topRight.X), Math.Min(bottomLeft.X, bottomRight.X));
+            double right = Math.Max(Math.Max(topLeft.X, topRight.X), Math.Max(bottomLeft.X, bottomRight.X));
+            double top = Math.Min(Math.Min(topLeft.Y, topRight.Y), Math.Min(bottomLeft.Y, bottomRight.Y));
+            double bottom = Math.Max(Math.Max(topLeft.Y, topRight.Y), Math.Max(bottomLeft.Y, bottomRight.Y));
+
+            return new Rect(left, top, right - left, bottom - top);
         }
 
         private void ShowPopupRootIfNotAlreadyVisible()
@@ -622,10 +705,7 @@ namespace System.Windows.Controls.Primitives
         }
         
         [OpenSilver.NotImplemented]
-        public void SetWindow(Window associatedWindow)
-        {
-
-        }
+        public void SetWindow(Window associatedWindow) { }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void EnsurePopupStaysWithinScreenBounds(double forcedWidth = double.NaN, double forcedHeight = double.NaN)
@@ -693,11 +773,7 @@ namespace System.Windows.Controls.Primitives
                 return;
             }
 
-            Point position = target.TransformToVisual(Window.GetWindow(target)).Transform(new Point(0, 0));
-            Size size = target.GetBoundingClientSize();
-            Rect bounds = new(position, size);
-
-            PerformPlacement(bounds);
+            UpdatePosition();
         }
     }
 }

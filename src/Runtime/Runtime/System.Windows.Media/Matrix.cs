@@ -745,6 +745,23 @@ namespace System.Windows.Media
         }
 
         /// <summary>
+        /// Sets the transformation to the given translation specified by the offset vector.
+        /// </summary>
+        /// <param name='offsetX'>The offset in X</param>
+        /// <param name='offsetY'>The offset in Y</param>
+        internal static Matrix CreateTranslation(double offsetX, double offsetY)
+        {
+            Matrix matrix = new Matrix();
+
+            matrix.SetMatrix(1, 0,
+                             0, 1,
+                             offsetX, offsetY,
+                             MatrixTypes.TRANSFORM_IS_TRANSLATION);
+
+            return matrix;
+        }
+
+        /// <summary>
         /// Scales this matrix around the center provided
         /// </summary>
         /// <param name='scaleX'>The scale factor in the x dimension</param>
