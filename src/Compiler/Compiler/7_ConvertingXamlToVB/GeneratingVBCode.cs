@@ -273,6 +273,7 @@ End Namespace
 
         private static string GenerateFactoryClass(
             string componentTypeFullName,
+            string baseTypeFullName,
             string componentParamName,
             string loadComponentImpl,
             string createComponentImpl,
@@ -302,7 +303,7 @@ Namespace Global
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>
     <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)>
     Public NotInheritable Class {factoryName}
-        Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}), {IXamlComponentLoaderClass}(Of {componentTypeFullName})
+        Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}), {IXamlComponentLoaderClass}(Of {baseTypeFullName})
         Public Shared Function Instantiate() As Object
             Return CreateComponentImpl()
         End Function
@@ -315,15 +316,15 @@ Namespace Global
             Return CreateComponentImpl()
         End Function
     
-        Private Sub IXamlComponentLoader_LoadComponent(component As {componentTypeFullName}) Implements {IXamlComponentLoaderClass}(Of {componentTypeFullName}).LoadComponent
+        Private Sub IXamlComponentLoader_LoadComponent(component As {baseTypeFullName}) Implements {IXamlComponentLoaderClass}(Of {baseTypeFullName}).LoadComponent
             LoadComponentImpl(component)
         End Sub
     
         Private Sub IXamlComponentLoader_LoadComponent1(component As Object) Implements {IXamlComponentLoaderClass}.LoadComponent
-            LoadComponentImpl(CType(component, {componentTypeFullName}))
+            LoadComponentImpl(CType(component, {baseTypeFullName}))
         End Sub
     
-        Private Shared Sub LoadComponentImpl(ByVal {componentParamName} As {componentTypeFullName})
+        Private Shared Sub LoadComponentImpl(ByVal {componentParamName} As {baseTypeFullName})
             If TypeOf CObj({componentParamName}) Is {uiElementFullyQualifiedTypeName} Then
                 CType(CObj({componentParamName}), {uiElementFullyQualifiedTypeName}).XamlSourcePath = ""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}""
             End If

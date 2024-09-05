@@ -115,6 +115,7 @@ namespace OpenSilver.Compiler
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
+                        baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         "throw new global::System.NotImplementedException();",
                         "throw new global::System.NotImplementedException();",
@@ -132,6 +133,7 @@ namespace OpenSilver.Compiler
                 else
                 {
                     string finalCode = GenerateFactoryClass(
+                        baseType,
                         baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         "throw new global::System.NotImplementedException();",

@@ -305,6 +305,7 @@ namespace OpenSilver.Compiler
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
+                        baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
                         $"return ({componentTypeFullName})global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof({componentTypeFullName}));",
@@ -324,6 +325,7 @@ namespace OpenSilver.Compiler
                     string rootElementName = GeneratingCode.GetUniqueName(_reader.Document.Root);
 
                     string finalCode = GenerateFactoryClass(
+                        baseType,
                         baseType,
                         rootElementName,
                         parameters.CurrentScope.ToString(),

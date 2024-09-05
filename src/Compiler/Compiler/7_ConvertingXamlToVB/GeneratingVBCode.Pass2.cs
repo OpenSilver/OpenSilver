@@ -311,6 +311,7 @@ End Sub
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
+                        baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
                         $"Return CType(Global.CSHTML5.Internal.TypeInstantiationHelper.Instantiate(GetType({componentTypeFullName})), {componentTypeFullName})",
@@ -330,6 +331,7 @@ End Sub
                     string rootElementName = GeneratingCode.GetUniqueName(_reader.Document.Root);
 
                     string finalCode = GenerateFactoryClass(
+                        baseType,
                         baseType,
                         rootElementName,
                         parameters.CurrentScope.ToString(),

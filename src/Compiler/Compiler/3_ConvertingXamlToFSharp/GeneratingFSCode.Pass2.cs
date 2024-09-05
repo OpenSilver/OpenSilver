@@ -342,6 +342,7 @@ namespace OpenSilver.Compiler
                     string behindClassTypeName = $"{namespaceStringIfAny}.{className}, {namespaceStringIfAny}";
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
+                        baseType,
                         GeneratingCode.GetUniqueName(_reader.Document.Root),
                         parameters.CurrentScope.ToString(),
                         $"        global.CSHTML5.Internal.TypeInstantiationHelper.Instantiate(System.Type.GetType(\"{behindClassTypeName}\")) :?> {componentTypeFullName}",
@@ -373,6 +374,7 @@ namespace global
                 else
                 {
                     string finalCode = GenerateFactoryClass(
+                        baseType,
                         baseType,
                         rootElementName,
                         parameters.CurrentScope.ToString(),

@@ -244,6 +244,7 @@ namespace {namespaceStringIfAny}
 
         private static string GenerateFactoryClass(
             string componentTypeFullName,
+            string baseTypeFullName,
             string componentParamName,
             string loadComponentImpl,
             string createComponentImpl,
@@ -271,7 +272,7 @@ namespace {namespaceStringIfAny}
 
 [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>, {IXamlComponentLoaderClass}<{componentTypeFullName}>
+public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>, {IXamlComponentLoaderClass}<{baseTypeFullName}>
 {{
     public static object Instantiate()
     {{
@@ -288,17 +289,17 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
         return CreateComponentImpl();
     }}
 
-    void {IXamlComponentLoaderClass}<{componentTypeFullName}>.LoadComponent({componentTypeFullName} component)
+    void {IXamlComponentLoaderClass}<{baseTypeFullName}>.LoadComponent({baseTypeFullName} component)
     {{
         LoadComponentImpl(component);
     }}
 
     void {IXamlComponentLoaderClass}.LoadComponent(object component)
     {{
-        LoadComponentImpl(({componentTypeFullName})component);
+        LoadComponentImpl(({baseTypeFullName})component);
     }}
 
-    private static void LoadComponentImpl({componentTypeFullName} {componentParamName})
+    private static void LoadComponentImpl({baseTypeFullName} {componentParamName})
     {{
         if ((object){componentParamName} is {uiElementFullyQualifiedTypeName})
         {{

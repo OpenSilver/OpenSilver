@@ -234,6 +234,7 @@ type {className}() =
 
         private static string GenerateFactoryClass(
             string componentTypeFullName,
+            string baseTypeFullName,
             string componentParamName,
             string loadComponentImpl,
             string createComponentImpl,
@@ -264,12 +265,12 @@ type {factoryName}() =
             {factoryName}.CreateComponentImpl()
         member this.CreateComponent() = 
             {factoryName}.CreateComponentImpl()
-    interface {IXamlComponentLoaderClass}<{componentTypeFullName}> with
+    interface {IXamlComponentLoaderClass}<{baseTypeFullName}> with
         member this.LoadComponent(_component: obj): unit = 
-            {factoryName}.LoadComponentImpl(_component :?> {componentTypeFullName})
-        member this.LoadComponent(_component: {componentTypeFullName}): unit = 
+            {factoryName}.LoadComponentImpl(_component :?> {baseTypeFullName})
+        member this.LoadComponent(_component: {baseTypeFullName}): unit = 
             {factoryName}.LoadComponentImpl(_component)
-    static member private LoadComponentImpl({componentParamName}: {componentTypeFullName}) =
+    static member private LoadComponentImpl({componentParamName}: {baseTypeFullName}) =
         if (box {componentParamName} :? {uiElementFullyQualifiedTypeName}) then
             (box {componentParamName} :?> {uiElementFullyQualifiedTypeName}).XamlSourcePath <- @""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}""
 {loadComponentImpl}
