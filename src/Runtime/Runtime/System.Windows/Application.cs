@@ -441,10 +441,9 @@ namespace System.Windows
             string resourceUri = resourceLocator.ToString();
             if (AppResourcesManager.IsComponentUri(resourceUri))
             {
-                IXamlComponentLoader factory = GetXamlComponentLoader(resourceUri);
-                if (factory != null)
+                if (GetXamlComponentLoader(resourceUri) is IXamlComponentLoader loader)
                 {
-                    factory.LoadComponent(component);
+                    loader.LoadComponent(component);
                 }
             }
         }

@@ -254,6 +254,7 @@ type {className}() =
             string finalCode = $@"
 #nowarn ""3391""
 #nowarn ""0067""
+#nowarn ""0044""
 
 [<global.System.Diagnostics.DebuggerNonUserCode>]
 [<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]

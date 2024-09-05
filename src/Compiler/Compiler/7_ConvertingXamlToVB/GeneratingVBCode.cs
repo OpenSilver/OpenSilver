@@ -303,16 +303,22 @@ Namespace Global
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>
     <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)>
     Public NotInheritable Class {factoryName}
+#Disable Warning BC40008
         Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}), {IXamlComponentLoaderClass}(Of {baseTypeFullName})
+#Enable Warning BC40008
         Public Shared Function Instantiate() As Object
             Return CreateComponentImpl()
         End Function
     
+#Disable Warning BC40008
         Private Function IXamlComponentFactory_CreateComponent() As {componentTypeFullName} Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}).CreateComponent
+#Enable Warning BC40008
             Return CreateComponentImpl()
         End Function
     
+#Disable Warning BC40008
         Private Function IXamlComponentFactory_CreateComponent1() As Object Implements {IXamlComponentFactoryClass}.CreateComponent
+#Enable Warning BC40008
             Return CreateComponentImpl()
         End Function
     

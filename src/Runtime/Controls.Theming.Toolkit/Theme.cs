@@ -282,10 +282,10 @@ namespace System.Windows.Controls.Theming
                     string themeUriStr = themeUri.ToString(); 
                     if (IsComponentUri(themeUriStr))
                     {
-                        IXamlComponentFactory factory = GetXamlComponentFactory(themeUriStr);
-                        if (factory != null)
+                        IXamlComponentLoader loader = GetXamlComponentLoader(themeUriStr);
+                        if (loader != null)
                         {
-                            onNewThemeAvailable(LoadAndApplyThemeFromStream(factory, currentTheme, owner));
+                            onNewThemeAvailable(LoadAndApplyThemeFromStream(loader, currentTheme, owner));
                             return;
                         }
                     }
@@ -306,11 +306,11 @@ namespace System.Windows.Controls.Theming
         /// <summary>
         /// Loads and applies a theme from a Stream.
         /// </summary>
-        /// <param name="factory">Factory containing the theme ResourceDictionary.</param>
+        /// <param name="loader">XAML loader containing the theme ResourceDictionary.</param>
         /// <param name="currentTheme">Current theme.</param>
         /// <param name="owner">ResourceDictionary owner.</param>
         /// <returns>New current theme.</returns>
-        private static ResourceDictionary LoadAndApplyThemeFromStream(IXamlComponentFactory factory, ResourceDictionary currentTheme, ResourceDictionary owner)
+        private static ResourceDictionary LoadAndApplyThemeFromStream(IXamlComponentLoader loader, ResourceDictionary currentTheme, ResourceDictionary owner)
         {
             // Remember old theme
             ResourceDictionary previousTheme = currentTheme;
@@ -318,7 +318,7 @@ namespace System.Windows.Controls.Theming
             {
                 // (Try to) load new theme
                 currentTheme = null;
-                currentTheme = LoadThemeResources(factory, owner);
+                currentTheme = LoadThemeResources(loader, owner);
             }
             finally
             {
@@ -331,13 +331,14 @@ namespace System.Windows.Controls.Theming
         /// <summary>
         /// Load a theme from a Stream.
         /// </summary>
-        /// <param name="factory">A factory containing the theme to load.</param>
+        /// <param name="loader">A XAML loader containing the theme to load.</param>
         /// <param name="owner">ResourceDictionary owner.</param>
         /// <returns>ResourceDictionary corresponding to the loaded theme.</returns>
-        private static ResourceDictionary LoadThemeResources(IXamlComponentFactory factory, ResourceDictionary owner)
+        private static ResourceDictionary LoadThemeResources(IXamlComponentLoader loader, ResourceDictionary owner)
         {
             // Load the theme
-            ResourceDictionary resources = (ResourceDictionary)factory.CreateComponent();
+            ResourceDictionary resources = new ResourceDictionary();
+            loader.LoadComponent(resources);
             owner.MergedDictionaries.Add(resources);
             return resources;
         }
@@ -359,15 +360,15 @@ namespace System.Windows.Controls.Theming
             return uri.Substring(offset, uri.IndexOf(';') - offset);
         }
 
-        private static IXamlComponentFactory GetXamlComponentFactory(string componentUri)
+        private static IXamlComponentLoader GetXamlComponentLoader(string componentUri)
         {
             string className = XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri);
             string assemblyName = ExtractAssemblyNameFromComponentUri(componentUri);
 
-            Type factoryType = Type.GetType($"{className}, {assemblyName}");
-            if (factoryType != null)
+            Type loaderType = Type.GetType($"{className}, {assemblyName}");
+            if (loaderType != null)
             {
-                return Activator.CreateInstance(factoryType) as IXamlComponentFactory;
+                return Activator.CreateInstance(loaderType) as IXamlComponentLoader;
             }
 
             return null;
