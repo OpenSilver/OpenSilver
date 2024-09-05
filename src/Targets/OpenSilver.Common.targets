@@ -13,7 +13,7 @@
 -->
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  
+
   <!--============================================================
   LOCATION OF COMPILER TASKS
   ============================================================-->
@@ -52,9 +52,9 @@
 
   <PropertyGroup>
     <BuildDependsOn>
-		CSharpXamlForHtml5BeforeBuild;
-		$(BuildDependsOn);
-	</BuildDependsOn>
+      CSharpXamlForHtml5BeforeBuild;
+      $(BuildDependsOn);
+    </BuildDependsOn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsSecondPass)' == 'True'">
@@ -101,7 +101,7 @@
     <OutputAssemblyDirectory Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.:.*'))"
         >$(OutputPath)</OutputAssemblyDirectory>
   </PropertyGroup>
-  
+
   <!--
   ================================================================
   FileClassification
@@ -121,14 +121,14 @@
     </ItemGroup>
 
   </Target>
-  
+
   <!--
   ============================================================
   MainResourcesGeneration
   ============================================================
   -->
   <Target Name="MainResourcesGeneration">
-    
+
     <PropertyGroup>
       <_ResourceNameInMainAssembly>$(AssemblyName).g.resources</_ResourceNameInMainAssembly>
     </PropertyGroup>
@@ -167,22 +167,22 @@
       <IsNotDesignTimeCompilation>true</IsNotDesignTimeCompilation>
     </PropertyGroup>
 
-	  <!--============================================================
+    <!--============================================================
     Check if the project has a reference to WebAssembly:
     ============================================================-->
-	  <PropertyGroup>
-		  <WebAssemblyFileName>Microsoft.AspNetCore.Components.WebAssembly</WebAssemblyFileName>
-	  </PropertyGroup>
+    <PropertyGroup>
+      <WebAssemblyFileName>Microsoft.AspNetCore.Components.WebAssembly</WebAssemblyFileName>
+    </PropertyGroup>
 
-	  <CreateProperty
-		Value="True"
-		Condition="$([System.String]::Copy('%(Reference.Filename)').EndsWith('$(WebAssemblyFileName)'))" >
-		  <Output
-			  TaskParameter="Value"
-			  PropertyName="HasReferenceToWebAssembly"/>
-	  </CreateProperty>
-	  
-	  <!--============================================================
+    <CreateProperty
+        Value="True"
+        Condition="$([System.String]::Copy('%(Reference.Filename)').EndsWith('$(WebAssemblyFileName)'))" >
+      <Output
+        TaskParameter="Value"
+        PropertyName="HasReferenceToWebAssembly"/>
+    </CreateProperty>
+
+    <!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
     <Exec Condition="'$(IsBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
@@ -209,28 +209,28 @@
     <!--============================================================
       ServiceReferenceFixer (case insensitive) (only during Pass 2)
       ============================================================-->
-	  <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
-		  <ServiceReferenceFile Include="%(Compile.RelativeDir)%(Compile.Filename).$(OutputExtension)"
+    <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
+      <ServiceReferenceFile Include="%(Compile.RelativeDir)%(Compile.Filename).$(OutputExtension)"
                             Condition="'%(Compile.Filename)%(Compile.Extension)'=='reference.$(OutputExtension)'" />
-		  <!-- Note: users can specify additional files by adding ServiceReferenceFile tags to the .CSPROJ
-		  Possible optional attributes are:
-		  - ClientBaseToken to enforce a specific token representing the ClientBase object, if different from "base.Channel"
-		  - ClientBaseInterfaceName to enforce a specific interface for the Service Contract
-		  - EndpointCode to enforce a specific token to retrieve the endpoint address, if diffferent from "this.INTERNAL_RemoteAddressAsString"
-		  - SoapVersion to set the SOAP version (default: 1.1) -->
-	  </ItemGroup>
-    
-	  <ServiceReferenceFixer
+      <!-- Note: users can specify additional files by adding ServiceReferenceFile tags to the .CSPROJ
+      Possible optional attributes are:
+      - ClientBaseToken to enforce a specific token representing the ClientBase object, if different from "base.Channel"
+      - ClientBaseInterfaceName to enforce a specific interface for the Service Contract
+      - EndpointCode to enforce a specific token to retrieve the endpoint address, if diffferent from "this.INTERNAL_RemoteAddressAsString"
+      - SoapVersion to set the SOAP version (default: 1.1) -->
+    </ItemGroup>
+
+    <ServiceReferenceFixer
       Condition="'$(EnableServiceReferenceFixer)' == 'true'"
       SourceFile="@(ServiceReferenceFile)"
       OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(ServiceReferenceFile.RelativeDir)%(ServiceReferenceFile.Filename).g.$(OutputExtension)"
       />
-	  <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
-		  <ServiceReferenceFixerProcessedFiles Include="@(ServiceReferenceFile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename).g.$(OutputExtension)')" />
-		  <Compile Remove="@(ServiceReferenceFile)" />
-		  <Compile Include="@(ServiceReferenceFixerProcessedFiles)" />
-		  <FileWrites Include="@(ServiceReferenceFixerProcessedFiles)" />
-	  </ItemGroup>
+    <ItemGroup Condition="'$(EnableServiceReferenceFixer)' == 'true'">
+      <ServiceReferenceFixerProcessedFiles Include="@(ServiceReferenceFile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename).g.$(OutputExtension)')" />
+      <Compile Remove="@(ServiceReferenceFile)" />
+      <Compile Include="@(ServiceReferenceFixerProcessedFiles)" />
+      <FileWrites Include="@(ServiceReferenceFixerProcessedFiles)" />
+    </ItemGroup>
 
   </Target>
 
@@ -242,10 +242,10 @@
     <PropertyGroup>
       <_OpenSilverPkgPath>$(PkgOpenSilver)</_OpenSilverPkgPath>
     </PropertyGroup>
-	  
-	  <Updates Condition="'$(IsBrowserProject)'=='True' AND '$(SkipOpenSilverUpdates)'==''"
-			       PackagePath="$(_OpenSilverPkgPath)"/>
-	  
+
+    <Updates Condition="'$(IsBrowserProject)'=='True' AND '$(SkipOpenSilverUpdates)'==''"
+             PackagePath="$(_OpenSilverPkgPath)"/>
+
     <!--============================================================
       XamlPreprocessor (during Pass 1 and Pass 2)
       ============================================================-->
@@ -289,7 +289,7 @@
                                        Condition="'$(Language)' == 'F#'">
       <Output ItemName="_UpdateIncludesInFSharpProjectFileUpdatedItems" TaskParameter="UpdatedItems" />
     </UpdateIncludesInFSharpProjectFile>
-    
+
     <ItemGroup Condition="'$(Language)' == 'F#'">
       <Compile Remove="@(Compile)" />
       <Page Remove="@(_XamlPreprocessorProcessedPageFiles)" />
@@ -323,21 +323,21 @@
       <Cshtml5OutputRootPath>..\..\..\wwwroot\</Cshtml5OutputRootPath>
     </PropertyGroup>
 
-	  <PropertyGroup Condition="'$(IsBrowserProject)' == 'True' OR ('$(IsRazorProject)' == 'True' AND '$(HasReferenceToWebAssembly)' == 'True')">
-		  <ShouldCopyJsCssFiles>True</ShouldCopyJsCssFiles>
-	  </PropertyGroup>
-	  
+    <PropertyGroup Condition="'$(IsBrowserProject)' == 'True' OR ('$(IsRazorProject)' == 'True' AND '$(HasReferenceToWebAssembly)' == 'True')">
+      <ShouldCopyJsCssFiles>True</ShouldCopyJsCssFiles>
+    </PropertyGroup>
+
     <!--============================================================
       Copying the js/css libraries that come with OpenSilver:
       ============================================================-->
-	<ItemGroup Condition="'$(ShouldCopyJsCssFiles)' == 'True'">
+    <ItemGroup Condition="'$(ShouldCopyJsCssFiles)' == 'True'">
       <MySourceFiles Include="$(MSBuildThisFileDirectory)..\js_css\*"/>
     </ItemGroup>
-    
+
     <!--<Message  Condition="'$(IsBrowserProject)' == 'True' And '$(IsSecondPass)'=='True'"
                 Text="Copying resources from &quot;$(MSBuildThisFileDirectory)&quot; to &quot;$(BaseIntermediateOutputPath)..\wwwroot\libs\&quot;"
                 Importance="normal"/>-->
-    
+
     <Message  Condition="'$(ShouldCopyJsCssFiles)' == 'True'"
                 Text="Copying OpenSilver's required js/css libraries."
                 Importance="normal"/>
@@ -383,7 +383,7 @@
     </PropertyGroup>
 
   </Target>
-  
+
   <!--============================================================
   DESIGN-TIME COMPILATION
   ============================================================-->
@@ -444,7 +444,7 @@
                                        Condition="'$(Language)' == 'F#'">
       <Output ItemName="_UpdateIncludesInFSharpProjectFileUpdatedItems" TaskParameter="UpdatedItems" />
     </UpdateIncludesInFSharpProjectFile>
-    
+
     <ItemGroup Condition="'$(Language)' == 'F#'">
       <Compile Remove="@(Compile)" />
       <Page Remove="@(_XamlPreprocessorProcessedPageFiles)" />
