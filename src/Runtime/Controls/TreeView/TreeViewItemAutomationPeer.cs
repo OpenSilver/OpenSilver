@@ -216,7 +216,7 @@ namespace System.Windows.Automation.Peers
                 throw new InvalidOperationException(Resource.Automation_OperationCannotBePerformed);
             }
 
-            owner.IsExpanded = true;
+            owner.SetCurrentValue(TreeViewItem.IsExpandedProperty, true);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace System.Windows.Automation.Peers
                 throw new InvalidOperationException(Resource.Automation_OperationCannotBePerformed);
             }
 
-            owner.IsExpanded = false;
+            owner.SetCurrentValue(TreeViewItem.IsExpandedProperty, false);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace System.Windows.Automation.Peers
             {
                 throw new InvalidOperationException(Resource.Automation_OperationCannotBePerformed);
             }
-            owner.IsSelected = true;
+            owner.SetCurrentValue(TreeViewItem.IsSelectedProperty, true);
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace System.Windows.Automation.Peers
         /// </remarks>
         void ISelectionItemProvider.Select()
         {
-            OwnerTreeViewItem.IsSelected = true;
+            OwnerTreeViewItem.SetCurrentValue(TreeViewItem.IsSelectedProperty, true);
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace System.Windows.Automation.Peers
         /// </remarks>
         void ISelectionItemProvider.RemoveFromSelection()
         {
-            OwnerTreeViewItem.IsSelected = false;
+            OwnerTreeViewItem.SetCurrentValue(TreeViewItem.IsSelectedProperty, false);
         }
 
         /// <summary>
