@@ -1284,6 +1284,45 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
         const Scroll = Quill.import('blots/scroll');
         const Text = Quill.import('blots/text');
 
+        const IMAGE_ORIG_SRC = 'data-originalsrc';
+        const IMAGE_OBJECT_FIT = 'data-objectfit';
+        const _originalSourceMap = new WeakMap();
+        class ExtendedImage extends Quill.import('formats/image') {
+            static blotName = 'image';
+            static tagName = 'IMG';
+
+            static formats(domNode) {
+                const formats = super.formats(domNode);
+                formats[IMAGE_OBJECT_FIT] = domNode.style.objectFit;
+                return formats;
+            }
+
+            static value(domNode) {
+                if (_originalSourceMap.has(domNode)) {
+                    return _originalSourceMap.get(domNode);
+                }
+                return super.value(domNode);
+            }
+
+            format(name, value) {
+                if (name === IMAGE_ORIG_SRC) {
+                    if (value) {
+                        _originalSourceMap.set(this.domNode, value);
+                    } else {
+                        _originalSourceMap.delete(this.domNode);
+                    }
+                } else if (name === IMAGE_OBJECT_FIT) {
+                    if (value) {
+                        this.domNode.style.objectFit = value;
+                    } else {
+                        this.domNode.style.objectFit = '';
+                    }
+                } else {
+                    super.format(name, value);
+                }
+            }
+        }
+
         // TextElement properties
         const Spacing = new Parchment.StyleAttributor('spacing', 'letter-spacing', {
             scope: Parchment.Scope.INLINE_ATTRIBUTE
@@ -1311,7 +1350,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
         });
 
         // Block properties
-        const Height = new Parchment.StyleAttributor('height', 'line-height', {
+        const Height = new Parchment.StyleAttributor('lineheight', 'line-height', {
             scope: Parchment.Scope.BLOCK
         });
         const Align = new Parchment.StyleAttributor('align', 'text-align', {
@@ -1328,6 +1367,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             Cursor,
             Inline,
             Text,
+            ExtendedImage,
             Spacing,
             Font,
             Size,

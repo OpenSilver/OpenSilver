@@ -12,10 +12,9 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
-using System.Reflection;
+using System.ComponentModel;
 using System.Xml;
 using System.Windows.Documents;
-using DotNetForHtml5.Core;
 
 namespace System.Windows.Controls;
 
@@ -107,12 +106,6 @@ internal static class RichTextXamlParser
                 SetProperties(element, node);
                 return element;
             }
-            if (node.Name == nameof(InlineUIContainer))
-            {
-                var element = new InlineUIContainer();
-                SetProperties(element, node);
-                return element;
-            }
             if (node.Name == nameof(Span))
             {
                 var element = new Span();
@@ -148,6 +141,18 @@ internal static class RichTextXamlParser
                 ProcessChildInlines(element, node);
                 return element;
             }
+            if (node.Name == nameof(InlineImageContainer))
+            {
+                var element = new InlineImageContainer();
+                SetProperties(element, node);
+                return element;
+            }
+            if (node.Name == nameof(InlineUIContainer))
+            {
+                var element = new InlineUIContainer();
+                SetProperties(element, node);
+                return element;
+            }
         }
         else if (node.NodeType == XmlNodeType.Text)
         {
@@ -177,17 +182,15 @@ internal static class RichTextXamlParser
         }
     }
 
-    private static void SetProperty(object obj, string propertyName, object value)
+    private static void SetProperty(object obj, string propertyName, string xamlValue)
     {
-        var propInfo = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-        if (propInfo != null)
+        if (TypeConverterHelper.GetProperties(obj.GetType())[propertyName] is ReflectedPropertyData property)
         {
-            try
+            if (property.Converter is TypeConverter converter)
             {
-                var val = value == null ? null : TypeFromStringConverters.ConvertFromInvariantString(propInfo.PropertyType, value.ToString());
-                propInfo.SetValue(obj, val);
+                object value = converter.ConvertFromInvariantString(xamlValue);
+                property.PropertyInfo.SetValue(obj, value);
             }
-            catch { }
         }
     }
 }

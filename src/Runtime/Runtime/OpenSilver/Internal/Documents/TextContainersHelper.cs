@@ -26,6 +26,7 @@ internal static class TextContainersHelper
             Run run => new TextContainerRun(run),
             Span span => new TextContainerSpan(span),
             LineBreak => TextContainerLineBreak.Instance,
+            InlineImageContainer image => new TextContainerInlineImageContainer(image),
             RichTextBlock richTextBlock => new TextContainerRichTextBlock(richTextBlock),
             Paragraph paragraph => new TextContainerParagraph(paragraph),
             Section section => new TextContainerSection(section),

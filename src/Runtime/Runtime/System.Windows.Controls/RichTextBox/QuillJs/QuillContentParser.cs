@@ -115,22 +115,30 @@ internal ref struct QuillContentParser
         for (int i = _inlines.Count - 1; i >= 0; i--)
         {
             QuillDelta delta = _inlines[i];
-            int index = delta.Text.LastIndexOf('\n');
-            if (index != -1)
-            {
-                _inlines[i] = new QuillDelta
-                {
-                    Text = delta.Text.Substring(0, index),
-                    Attributes = delta.Attributes,
-                };
-                _inlines.Insert(i + 1, new QuillDelta
-                {
-                    Text = delta.Text.Substring(index + 1),
-                    Attributes = delta.Attributes,
-                });
 
-                return i + 1;
+            if (string.IsNullOrEmpty(delta.Text))
+            {
+                continue;
             }
+
+            int index = delta.Text.LastIndexOf('\n');
+            if (index == -1)
+            {
+                continue;
+            }
+            
+            _inlines[i] = new QuillDelta
+            {
+                Text = delta.Text.Substring(0, index),
+                Attributes = delta.Attributes,
+            };
+            _inlines.Insert(i + 1, new QuillDelta
+            {
+                Text = delta.Text.Substring(index + 1),
+                Attributes = delta.Attributes,
+            });
+
+            return i + 1;
         }
 
         return 0;

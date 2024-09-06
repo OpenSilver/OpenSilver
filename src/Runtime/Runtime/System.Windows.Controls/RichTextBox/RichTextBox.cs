@@ -775,6 +775,10 @@ namespace System.Windows.Controls
                 {
                     paragraph.Inlines.Add(CreateRun(delta));
                 }
+                else if (delta.Image.HasValue)
+                {
+                    paragraph.Inlines.Add(CreateInlineImageContainer(delta));
+                }
             }
 
             return paragraph;
@@ -860,6 +864,30 @@ namespace System.Windows.Controls
             }
 
             return run;
+        }
+
+        private InlineImageContainer CreateInlineImageContainer(QuillDelta delta)
+        {
+            var image = new InlineImageContainer
+            {
+                Source = InlineImageContainer.ParseSource(delta.Image.Value.ImageData)
+            };
+
+            if (delta.Attributes.HasValue)
+            {
+                var attributes = delta.Attributes.Value;
+                if (!string.IsNullOrEmpty(attributes.Width))
+                {
+                    image.Width = double.Parse(attributes.Width, CultureInfo.InvariantCulture);
+                }
+                if (!string.IsNullOrEmpty(attributes.Height))
+                {
+                    image.Height = double.Parse(attributes.Height, CultureInfo.InvariantCulture);
+                }
+                image.Stretch = InlineImageContainer.ParseStretch(attributes.ObjectFit);
+            }
+
+            return image;
         }
 
         internal override void UpdateVisualStates()

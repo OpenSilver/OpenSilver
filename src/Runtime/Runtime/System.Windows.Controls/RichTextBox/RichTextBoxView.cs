@@ -37,7 +37,7 @@ internal sealed class RichTextBoxView : TextViewBase
     internal const string FontSizeName = "size";
     internal const string FontColorName = "color";
     internal const string LetterSpacingName = "spacing";
-    internal const string LineHeightName = "height";
+    internal const string LineHeightName = "lineheight";
     internal const string TextAlignmentName = "align";
     internal const string TextDecorationName = "decoration";
 
@@ -808,6 +808,20 @@ internal sealed class RichTextBoxView : TextViewBase
 
             case LineBreak:
                 yield return new QuillDelta { Text = "\n" };
+                break;
+
+            case InlineImageContainer image:
+                yield return new QuillDelta
+                {
+                    Image = new QuillImage { ImageData = image.GetImageData() },
+                    Attributes = new QuillRangeFormat
+                    {
+                        Width = double.IsNaN(image.Width) ? string.Empty : image.Width.ToInvariantString(),
+                        Height = double.IsNaN(image.Height) ? string.Empty : image.Height.ToInvariantString(),
+                        OriginalSource = image.GetOriginalSource(),
+                        ObjectFit = InlineImageContainer.ConvertStretch(image.Stretch),
+                    },
+                };
                 break;
         }
     }

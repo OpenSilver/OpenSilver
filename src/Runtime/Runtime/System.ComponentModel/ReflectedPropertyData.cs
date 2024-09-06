@@ -113,6 +113,8 @@ namespace System.ComponentModel
             }
         }
 
+        internal PropertyInfo PropertyInfo => _propInfo;
+
         /// <summary>
         /// Gets the type converter for this property.
         /// Do not include any type converter of the property type.

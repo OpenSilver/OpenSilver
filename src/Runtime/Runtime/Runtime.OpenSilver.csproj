@@ -33,6 +33,7 @@
 		<Compile Include="OpenSilver\Internal\Controls\ImageManager.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewManager.cs" />
 		<Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
+		<Compile Include="OpenSilver\Internal\Documents\TextContainerInlineImageContainer.cs" />
 		<Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
 		<Compile Include="OpenSilver\Internal\ITemplateContent.cs" />
 		<Compile Include="OpenSilver\Internal\Storage.cs" />
@@ -79,6 +80,7 @@
 		<Compile Include="System.Windows.Data\IMultiValueConverter.cs" />
 		<Compile Include="System.Windows.Data\MultiBinding.cs" />
 		<Compile Include="System.Windows.Data\MultiBindingExpression.cs" />
+		<Compile Include="System.Windows.Documents\InlineImageContainer.cs" />
 		<Compile Include="System.Windows\DynamicResourceExtension.cs" />
 		<Compile Include="System.Windows\ResourceReferenceExpression.cs" />
 		<Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />
