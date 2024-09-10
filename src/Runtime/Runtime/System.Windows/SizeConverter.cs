@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -96,7 +95,7 @@ namespace System.Windows
             {
                 if (value is Size instance)
                 {
-                    return instance.ConvertToString(culture);
+                    return instance.ConvertToString(null, culture);
                 }
             }
 

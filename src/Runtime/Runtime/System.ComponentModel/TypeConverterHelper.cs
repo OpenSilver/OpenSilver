@@ -328,7 +328,7 @@ namespace System.ComponentModel
         /// </summary>
         private static Dictionary<Type, TypeConverter> GetCoreTypeConverters()
         {
-            return new Dictionary<Type, TypeConverter>(28)
+            return new Dictionary<Type, TypeConverter>(29)
             {
                 [typeof(Cursor)] = new CursorConverter(),
                 [typeof(KeyTime)] = new KeyTimeConverter(),
@@ -358,6 +358,7 @@ namespace System.ComponentModel
                 [typeof(TextDecorationCollection)] = new TextDecorationCollectionConverter(),
                 [typeof(CacheMode)] = new CacheModeConverter(),
                 [typeof(FontStretch)] = new FontStretchConverter(),
+                [typeof(Vector)] = new VectorConverter(),
             };
         }
 

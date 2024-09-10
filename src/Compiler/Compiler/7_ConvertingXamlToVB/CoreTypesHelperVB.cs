@@ -42,7 +42,7 @@ namespace OpenSilver.Compiler
         //
         private static Dictionary<string, Func<string, string>> GetSupportedCoreTypes()
         {
-            return new Dictionary<string, Func<string, string>>(28)
+            return new Dictionary<string, Func<string, string>>(29)
             {
                 ["system.windows.input.cursor"] = (s => CoreTypesHelperVB.ConvertToCursor(s, "Global.System.Windows.Input.Cursor", "Global.System.Windows.Input.Cursors")),
                 ["system.windows.media.animation.keytime"] = (s => CoreTypesHelperVB.ConvertToKeyTime(s, "Global.System.Windows.Media.Animation.KeyTime")),
@@ -73,6 +73,7 @@ namespace OpenSilver.Compiler
                 ["system.windows.fontstyle"] = (s => CoreTypesHelperVB.ConvertToFontStyle(s, "Global.System.Windows.FontStyle", "Global.System.Windows.FontStyles")),
                 ["system.windows.textdecorationcollection"] = (s => CoreTypesHelperVB.ConvertToTextDecorationCollection(s, "Global.System.Windows.TextDecorationCollection", "Global.System.Windows.TextDecorations")),
                 ["system.windows.media.imagesource"] = (s => CoreTypesHelperVB.ConvertToImageSource(s, "Global.System.Windows.Media.ImageSource", "Global.System.Windows.Media.Imaging.BitmapImage")),
+                ["system.windows.vector"] = (s => CoreTypesHelperVB.ConvertToVector(s, "Global.System.Windows.Vector")),
             };
         }
     }
@@ -685,6 +686,18 @@ namespace OpenSilver.Compiler
             }
 
             return $"New {bitmapImageTypeFullName}(New Global.System.Uri({Escape(source)}, {uriKind}))";
+        }
+
+        internal static string ConvertToVector(string source, string destinationType)
+        {
+            string[] split = source.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (split.Length == 2)
+            {
+                return $"New {destinationType}({split[0]}, {split[1]})";
+            }
+
+            throw GetConvertException(source, destinationType);
         }
 
         private static Exception GetConvertException(string value, string destinationTypeFullName)
