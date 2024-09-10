@@ -1273,6 +1273,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
 
     function createOptions() {
         const Parchment = Quill.import('parchment');
+        const Delta = Quill.import('delta');
         const Keyboard = Quill.import('modules/keyboard');
 
         // Essential formats
@@ -1386,9 +1387,9 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
                     bindings: {
                         tab: {
                             key: 'Tab',
-                            handler: function (t, e) {
+                            handler: function (range, context) {
                                 if (acceptsTab(this.quill.container)) {
-                                    return Keyboard.DEFAULTS.bindings['tab'].handler.apply(this, [t, e]);
+                                    return Keyboard.DEFAULTS.bindings['tab'].handler.apply(this, [range, context]);
                                 }
                                 return false;
                             },
@@ -1396,9 +1397,9 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
                         'remove tab': {
                             key: 'Tab',
                             shiftKey: true,
-                            handler: function (t, e) {
+                            handler: function (range, context) {
                                 if (acceptsTab(this.quill.container)) {
-                                    return Keyboard.DEFAULTS.bindings['remove tab'].handler.apply(this, [t, e]);
+                                    return Keyboard.DEFAULTS.bindings['remove tab'].handler.apply(this, [range, context]);
                                 }
                                 return false;
                             },
@@ -1406,28 +1407,53 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
                         enter: {
                             key: 'Enter',
                             shiftKey: null,
-                            handler: function (t, e) {
-                                return acceptsReturn(this.quill.container);
+                            handler: function (range, context) {
+                                if (acceptsReturn(this.quill.container)) {
+                                    const lineFormats = Object.keys(context.format).reduce(
+                                        (formats, format) => {
+                                            if (this.quill.scroll.query(format, Parchment.Scope.BLOCK) &&
+                                                !Array.isArray(context.format[format])) {
+                                                formats[format] = context.format[format];
+                                            }
+                                            return formats;
+                                        },
+                                        {});
+                                    const delta = new Delta()
+                                        .retain(range.index)
+                                        .delete(range.length)
+                                        .insert('\n', lineFormats);
+                                    this.quill.updateContents(delta, Quill.sources.USER);
+                                    this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+                                    this.quill.focus();
+
+                                    Object.keys(context.format).forEach(name => {
+                                        if (lineFormats[name] != null) return;
+                                        if (Array.isArray(context.format[name])) return;
+                                        if (name === 'code' || name === 'link') return;
+                                        this.quill.format(name, context.format[name], Quill.sources.USER);
+                                    });
+                                }
+                                return false;
                             },
                         },
                         bold: {
                             key: 'b',
                             ctrlKey: true,
-                            handler: function (t, e) {
+                            handler: function (range, context) {
                                 this.quill.format('weight', this.quill.getFormat().weight > 600 ? '' : '700');
                             },
                         },
                         italic: {
                             key: 'i',
                             ctrlKey: true,
-                            handler: function (t, e) {
+                            handler: function (range, context) {
                                 this.quill.format('style', this.quill.getFormat().style === 'italic' ? '' : 'italic');
                             },
                         },
                         underline: {
                             key: 'u',
                             ctrlKey: true,
-                            handler: function (t, e) {
+                            handler: function (range, context) {
                                 this.quill.format('decoration', this.quill.getFormat().decoration === 'underline' ? '' : 'underline');
                             },
                         },
