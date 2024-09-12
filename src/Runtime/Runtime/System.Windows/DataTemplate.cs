@@ -65,7 +65,7 @@ namespace System.Windows
         {
             if (Template is not null)
             {
-                return Template.LoadContent(null) as DependencyObject;
+                return Template.LoadContent<FrameworkElement>(null) as DependencyObject;
             }
             else
             {

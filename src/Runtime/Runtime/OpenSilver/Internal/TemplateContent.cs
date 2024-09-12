@@ -33,12 +33,12 @@ internal sealed class TemplateContent : ITemplateContent
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
     }
 
-    public IFrameworkElement LoadContent(IFrameworkElement owner)
+    public IFrameworkElement LoadContent<T>(T owner) where T : DependencyObject, IFrameworkElement
     {
         var context = new XamlContext(_xamlContext)
         {
             ExternalNameScope = new NameScope(),
-            TemplateOwner = owner,
+            TemplateOwnerReference = new(owner),
         };
 
         IFrameworkElement rootElement = _factory(owner, context);

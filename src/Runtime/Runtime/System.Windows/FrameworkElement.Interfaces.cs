@@ -42,11 +42,7 @@ public partial class FrameworkElement : IInternalFrameworkElement
 
     RoutedEvent IInternalFrameworkElement.LoadedEvent => LoadedEvent;
 
-    DependencyObject IInternalFrameworkElement.TemplatedParent
-    {
-        get => TemplatedParent;
-        set => TemplatedParent = value;
-    }
+    DependencyObject IInternalFrameworkElement.TemplatedParent => TemplatedParent;
 
     IFrameworkElement IInternalFrameworkElement.TemplateChild
     {
@@ -75,4 +71,6 @@ public partial class FrameworkElement : IInternalFrameworkElement
     void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent) => ChangeLogicalParent(newParent);
 
     void IInternalFrameworkElement.RemoveLogicalChild(object child) => RemoveLogicalChild(child);
+
+    void IInternalFrameworkElement.SetTemplatedParent(WeakReference<DependencyObject> templatedParent) => SetTemplatedParent(templatedParent);
 }

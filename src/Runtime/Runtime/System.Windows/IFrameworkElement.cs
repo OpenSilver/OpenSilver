@@ -55,7 +55,9 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     RoutedEvent LoadedEvent { get; }
 
-    DependencyObject TemplatedParent { get; set; }
+    DependencyObject TemplatedParent { get; }
+
+    void SetTemplatedParent(WeakReference<DependencyObject> templatedParent);
 
     IFrameworkElement TemplateChild { get; set; }
 

@@ -59,7 +59,7 @@ namespace System.Windows
             }
         }
 
-        internal bool ApplyTemplateContent(IInternalFrameworkElement container)
+        internal bool ApplyTemplateContent<T>(T container) where T : DependencyObject, IInternalFrameworkElement
         {
             Debug.Assert(container is not null, "Must have a non-null TemplatedParent.");
 

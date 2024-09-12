@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Xaml;
@@ -67,6 +68,6 @@ namespace OpenSilver.Internal.Xaml
         IEnumerable<object> IAmbientResourcesProvider.GetAllAmbientValues()
             => _xamlContext.ServiceProvider_GetAllAmbientValues();
 
-        object ITemplateOwnerProvider.GetTemplateOwner() => _xamlContext.TemplateOwner;
+        DependencyObject ITemplateOwnerProvider.GetTemplateOwner() => _xamlContext.GetTemplateOwner();
     }
 }

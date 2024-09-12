@@ -11,9 +11,11 @@
 *  
 \*====================================================================================*/
 
+using System.Windows;
+
 namespace OpenSilver.Internal.Xaml;
 
 internal interface ITemplateOwnerProvider
 {
-    object GetTemplateOwner();
+    DependencyObject GetTemplateOwner();
 }

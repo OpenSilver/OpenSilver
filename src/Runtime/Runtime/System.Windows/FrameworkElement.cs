@@ -366,19 +366,16 @@ namespace System.Windows
         {
             get
             {
-                if (_templatedParentRef is not null && _templatedParentRef.TryGetTarget(out DependencyObject templatedParent))
+                if (_templatedParentRef is WeakReference<DependencyObject> wr)
                 {
+                    wr.TryGetTarget(out DependencyObject templatedParent);
                     return templatedParent;
                 }
-
                 return null;
             }
-            internal set
-            {
-                Debug.Assert(_templatedParentRef is null);
-                _templatedParentRef = new WeakReference<DependencyObject>(value);
-            }
         }
+
+        internal void SetTemplatedParent(WeakReference<DependencyObject> templatedParent) => _templatedParentRef = templatedParent;
 
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 

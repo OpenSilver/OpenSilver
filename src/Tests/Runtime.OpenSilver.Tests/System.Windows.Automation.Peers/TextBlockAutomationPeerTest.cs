@@ -41,7 +41,7 @@ namespace System.Windows.Automation.Peers.Tests
 
             peer.IsControlElement().Should().BeTrue();
 
-            textblock.TemplatedParent = new Button();
+            textblock.SetTemplatedParent(new(new Button()));
 
             peer.IsControlElement().Should().BeFalse();
         }

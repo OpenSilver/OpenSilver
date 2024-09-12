@@ -465,12 +465,11 @@ End Sub
                 }
 
                 // Set templated parent if any
-                if (rootScope is FrameworkTemplateScope templateScope)
+                if (rootScope is FrameworkTemplateScope &&
+                    _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                 {
-                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
-                    {
-                        templateScope.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {templateScope.TemplateOwner})");
-                    }
+                    parameters.StringBuilder.AppendLine(
+                        $"{RuntimeHelperClass}.XamlContext_SetTemplatedParent({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword})");
                 }
 
                 if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsMediaAnimationNS, "Timeline", element.Name.NamespaceName, element.Name.LocalName))
@@ -548,8 +547,6 @@ End Sub
                                 }
 
                                 rootScope.RegisterName(name, elementUniqueNameOrThisKeyword);
-                                //todo: throw an exception when both "x:Name" and "Name" are specified in the XAML.
-
                             }
                             else if (IsEventTriggerRoutedEventProperty(elementTypeInCSharp, attributeLocalName))
                             {

@@ -217,8 +217,10 @@ namespace System.Windows.Controls
                     new XamlContext(),
                     static (owner, context) =>
                     {
-                        var grid = new Grid { TemplatedParent = (DependencyObject)owner };
-                        var tb = new TextBlock { TemplatedParent = (DependencyObject)owner };
+                        var grid = new Grid();
+                        grid.SetTemplatedParent(context.TemplateOwnerReference);
+                        var tb = new TextBlock();
+                        tb.SetTemplatedParent(context.TemplateOwnerReference);
                         tb.SetBinding(TextBlock.TextProperty, new Binding());
                         grid.Children.Add(tb);
                         return grid;

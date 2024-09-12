@@ -19,5 +19,5 @@ namespace OpenSilver.Internal;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface ITemplateContent
 {
-    IFrameworkElement LoadContent(IFrameworkElement owner);
+    IFrameworkElement LoadContent<T>(T owner) where T : DependencyObject, IFrameworkElement;
 }

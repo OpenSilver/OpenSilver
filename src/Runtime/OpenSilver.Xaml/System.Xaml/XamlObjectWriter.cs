@@ -941,9 +941,14 @@ namespace System.Xaml
             return new XamlObjectWriter(sctx, settings);
         }
 
-        object ITemplateOwnerProvider.GetTemplateOwner()
+        DependencyObject ITemplateOwnerProvider.GetTemplateOwner()
         {
-            return source.Settings.TemplateOwner;
+            if (source.Settings.TemplateOwnerReference is WeakReference<DependencyObject> wr)
+            {
+                wr.TryGetTarget(out DependencyObject owner);
+                return owner;
+            }
+            return null;
         }
     }
 }

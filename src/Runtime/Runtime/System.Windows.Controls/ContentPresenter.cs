@@ -541,8 +541,8 @@ namespace System.Windows.Controls
                 }
 
                 TextBlock textBlock = new TextBlock();
+                textBlock.SetTemplatedParent(new(container));
                 textBlock.SetBinding(TextBlock.TextProperty, new Binding());
-                textBlock.TemplatedParent = container;
 
                 return textBlock;
             }

@@ -98,7 +98,17 @@ namespace OpenSilver.Internal.Xaml.Context
 
         internal INameScope ExternalNameScope { get; set; }
 
-        internal object TemplateOwner { get; set; }
+        internal WeakReference<DependencyObject> TemplateOwnerReference { get; set; }
+
+        internal DependencyObject GetTemplateOwner()
+        {
+            if (TemplateOwnerReference is WeakReference<DependencyObject> wr)
+            {
+                wr.TryGetTarget(out DependencyObject owner);
+                return owner;
+            }
+            return null;
+        }
 
         /// <summary>
         /// Total depth of the stack SavedDepth+LiveDepth

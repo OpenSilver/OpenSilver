@@ -109,7 +109,7 @@ namespace System.Windows.Controls.DataVisualization
                 static (owner, context) =>
                 {
                     var layoutRoot = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new Grid());
-                    OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplatedParent(layoutRoot, owner);
+                    OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_SetTemplatedParent(context, layoutRoot);
                     layoutRoot.SetValue(NameProperty, "LayoutRoot");
                     OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_RegisterName(context, "LayoutRoot", layoutRoot);
                     var templateBinding = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new TemplateBindingExtension());

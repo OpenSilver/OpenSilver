@@ -181,15 +181,49 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
+        public static void XamlContext_SetTemplatedParent(XamlContext context, FrameworkElement element)
         {
-            element.TemplatedParent = templatedParent;
+            Debug.Assert(context is not null);
+            Debug.Assert(element is not null);
+
+            element.SetTemplatedParent(context.TemplateOwnerReference);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void XamlContext_SetTemplatedParent(XamlContext context, IFrameworkElement element)
+        {
+            Debug.Assert(context is not null);
+            Debug.Assert(element is not null);
+
+            // We do not want to share the weak reference here, because IFrameworkElements can be defined
+            // outside of OpenSilver, and we cannot ensure that it will not modify the target of the weak
+            // reference.
+            ((IInternalFrameworkElement)element).SetTemplatedParent(new(context.GetTemplateOwner()));
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
+        {
+            Debug.Assert(element is not null);
+
+            element.SetTemplatedParent(new(templatedParent));
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplatedParent(IFrameworkElement element, DependencyObject templatedParent)
+        {
+            Debug.Assert(element is not null);
+
+            ((IInternalFrameworkElement)element).SetTemplatedParent(new(templatedParent));
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use RuntimeHelpers.SetTemplatedParent(IFrameworkElement, DependencyObject) instead.", true)]
         public static void SetTemplatedParent(IFrameworkElement element, IFrameworkElement templatedParent)
         {
-            ((IInternalFrameworkElement)element).TemplatedParent = (DependencyObject)templatedParent;
+            Debug.Assert(element is not null);
+
+            ((IInternalFrameworkElement)element).SetTemplatedParent(new((DependencyObject)templatedParent));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

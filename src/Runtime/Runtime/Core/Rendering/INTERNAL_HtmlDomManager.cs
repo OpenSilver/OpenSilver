@@ -58,9 +58,16 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return null;
         }
 
-        private static void AddToGlobalStore(string uniqueIdentifier, UIElement el)
+        private static void AddToGlobalStore(string uid, UIElement element)
         {
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(el));
+            _store.Add(uid, new WeakReference<UIElement>(element));
+        }
+
+        private static void AddToGlobalStore(string uid1, string uid2, UIElement element)
+        {
+            var wr = new WeakReference<UIElement>(element);
+            _store.Add(uid1, wr);
+            _store.Add(uid2, wr);
         }
 
         internal static void RemoveFromGlobalStore(INTERNAL_HtmlDomElementReference htmlDomElRef)
@@ -281,8 +288,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             ImageManager.Instance.CreateImage(uid, imgUid, parent.UniqueIdentifier);
 
-            AddToGlobalStore(uid, image);
-            AddToGlobalStore(imgUid, image);
+            AddToGlobalStore(uid, imgUid, image);
 
             return (new(uid), new(imgUid));
         }
@@ -308,8 +314,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                     $@"document.createInkPresenter('{uid}','{canvasUid}',{sParentRef})");
             }
 
-            AddToGlobalStore(uid, inkPresenter);
-            AddToGlobalStore(canvasUid, inkPresenter);
+            AddToGlobalStore(uid, canvasUid, inkPresenter);
 
             return (new(uid), new(canvasUid));
         }
@@ -371,8 +376,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
                 $"document.createShape('{shape.SvgTagName}','{svgUid}','{shapeUid}','{defsUid}','{parent.UniqueIdentifier}')");
 
-            AddToGlobalStore(svgUid, shape);
-            AddToGlobalStore(shapeUid, shape);
+            AddToGlobalStore(svgUid, shapeUid, shape);
 
             return (new(svgUid), new(shapeUid), new(defsUid));
         }

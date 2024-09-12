@@ -214,7 +214,12 @@ public class MemoryLeakTest
                     TargetType = typeof(MyControl),
                     Template = new TemplateContent(
                     new XamlContext(),
-                    (owner, context) => new Border { TemplatedParent = (DependencyObject)owner }),
+                    (owner, context) =>
+                    {
+                        var border = new Border();
+                        border.SetTemplatedParent(context.TemplateOwnerReference);
+                        return border;
+                    }),
                 }
             };
             MemoryLeaksHelper.SetTracker(templatedParent, tracker);
