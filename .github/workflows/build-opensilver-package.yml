@@ -36,7 +36,7 @@ jobs:
         run: ./build/build-nuget-package-OpenSilver.bat ${{ steps.format-version.outputs.version }}
       - name: Build OpenSilver.Simulator NuGet package
         run: ./build/build-nuget-package-OpenSilver.Simulator.bat ${{ steps.format-version.outputs.version }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: OpenSilver
           path: "build/output/OpenSilver"
