@@ -12,6 +12,7 @@
 
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenSilver.Internal;
 
 namespace System.Windows.Media.Tests
 {
@@ -46,12 +47,12 @@ namespace System.Windows.Media.Tests
             var invertedTransform = transform.Inverse as MatrixTransform;
             invertedTransform.Should().NotBeNull();
             var m = invertedTransform.Matrix;
-            (Matrix.IsZero(m.M11)).Should().BeTrue();
-            (Matrix.IsZero(m.M12 - 1)).Should().BeTrue();
-            (Matrix.IsZero(m.M21 - 0.5)).Should().BeTrue();
-            (Matrix.IsZero(m.M22)).Should().BeTrue();
-            (Matrix.IsZero(m.OffsetX - -2.5)).Should().BeTrue();
-            (Matrix.IsZero(m.OffsetY - -10)).Should().BeTrue();
+            (DoubleUtil.IsZero(m.M11)).Should().BeTrue();
+            (DoubleUtil.IsZero(m.M12 - 1)).Should().BeTrue();
+            (DoubleUtil.IsZero(m.M21 - 0.5)).Should().BeTrue();
+            (DoubleUtil.IsZero(m.M22)).Should().BeTrue();
+            (DoubleUtil.IsZero(m.OffsetX - -2.5)).Should().BeTrue();
+            (DoubleUtil.IsZero(m.OffsetY - -10)).Should().BeTrue();
         }
 
         [TestMethod]

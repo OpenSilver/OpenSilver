@@ -12,6 +12,7 @@
 
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenSilver.Internal;
 
 namespace System.Windows.Media.Tests
 {

@@ -28,6 +28,7 @@ public sealed class Dispatcher
 {
     private const int DefaultTickRate = 60;
 
+    private readonly IDispatcherImpl _dispatcherImpl;
     private readonly PriorityQueue<DispatcherOperation> _queue;
     private readonly Queue<DispatcherOperation> _pendingOperations;
     private readonly object _sync = new();
@@ -40,10 +41,9 @@ public sealed class Dispatcher
         _queue = new((int)DispatcherPriority.Send - (int)DispatcherPriority.Inactive + 1);
         _pendingOperations = new();
 
-        var jsCallback = JavaScriptCallback.Create(OnDispatcherTickNative);
-        string sHandler = OpenSilver.Interop.GetVariableStringForJS(jsCallback);
-        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createUIDispatcher({sHandler})", false);
-        SetTickRate(DefaultTickRate);
+        _dispatcherImpl = OpenSilver.Interop.IsRunningInTheSimulator ?
+            new SimulatorDispatcher(this) : new WasmDispatcher(this);
+        _dispatcherImpl.SetTickRate(DefaultTickRate);
     }
 
     /// <summary>
@@ -118,8 +118,7 @@ public sealed class Dispatcher
     /// <returns>
     /// true if the calling thread is the thread associated with this <see cref="Dispatcher"/>; otherwise, false.
     /// </returns>
-    public bool CheckAccess() =>
-        !OpenSilver.Interop.IsRunningInTheSimulator || INTERNAL_Simulator.OpenSilverDispatcherCheckAccess();
+    public bool CheckAccess() => _dispatcherImpl.CheckAccess();
 
     /// <summary>
     /// Executes the specified <see cref="Action"/> asynchronously at the specified priority on the thread 
@@ -171,8 +170,7 @@ public sealed class Dispatcher
 
     internal void EnableProcessing() => Interlocked.Decrement(ref _disableProcessingRequests);
 
-    private void SetTickRate(int tickRate) =>
-        OpenSilver.Interop.ExecuteJavaScriptVoid($"document.UIDispatcher.setTickRate({tickRate.ToInvariantString()})", false);
+    private void SetTickRate(int tickRate) => _dispatcherImpl.SetTickRate(tickRate);
 
     private void OnDispatcherTickNative()
     {
@@ -196,7 +194,7 @@ public sealed class Dispatcher
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine("Dispatcher: Method excution failed: " + ex);
+                    Console.Error.WriteLine("Dispatcher: Method execution failed: " + ex);
                 }
             }
         }
@@ -247,5 +245,74 @@ public sealed class Dispatcher
         {
             throw new InvalidEnumArgumentException(paramName, (int)priority, typeof(DispatcherPriority));
         }
+    }
+
+    private interface IDispatcherImpl
+    {
+        void SetTickRate(int tickRate);
+        bool CheckAccess();
+    }
+
+    private sealed class WasmDispatcher : IDispatcherImpl
+    {
+        private readonly Dispatcher _dispatcher;
+
+        public WasmDispatcher(Dispatcher dispatcher)
+        {
+            _dispatcher = dispatcher;
+            var jsCallback = JavaScriptCallback.Create(OnDispatcherTickNative);
+            string sHandler = OpenSilver.Interop.GetVariableStringForJS(jsCallback);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createUIDispatcher({sHandler})", false);
+        }
+
+        public bool CheckAccess() => true;
+
+        public void SetTickRate(int tickRate) =>
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.UIDispatcher.setTickRate({tickRate.ToInvariantString()})", false);
+
+        private void OnDispatcherTickNative() => _dispatcher.OnDispatcherTickNative();
+    }
+
+    private sealed class SimulatorDispatcher : IDispatcherImpl
+    {
+        private readonly Dispatcher _dispatcher;
+        private readonly Timer _timer;
+
+        public SimulatorDispatcher(Dispatcher dispatcher)
+        {
+            _dispatcher = dispatcher;
+
+            var interval = GetInterval(dispatcher._tickRate);
+            _timer = new Timer(Timer_Tick, null, interval, interval);
+        }
+
+        private static int GetInterval(int tickRate) =>
+            tickRate switch
+            {
+                > 0 => 1000 / tickRate,
+                0 => 1000,
+                _ => 1
+            };
+
+        private void Timer_Tick(object state) =>
+            INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(() =>
+            {
+                try
+                {
+                    _dispatcher.OnDispatcherTickNative();
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine("Dispatcher: Native Tick failed: " + ex);
+                }
+            });
+
+        public void SetTickRate(int tickRate)
+        {
+            var interval = GetInterval(tickRate);
+            _timer.Change(interval, interval);
+        }
+
+        public bool CheckAccess() => INTERNAL_Simulator.OpenSilverDispatcherCheckAccess();
     }
 }
