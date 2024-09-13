@@ -14,7 +14,6 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -175,7 +174,7 @@ internal static class UIElementHelpers
 
     internal static void SetTextSelection(this UIElement uie, bool enabled)
     {
-        uie.OuterDiv.Style.userSelect = enabled ? "auto" : "none";
+        uie.OuterDiv.Style.userSelect = enabled ? "text" : "none";
     }
 
     internal static void SetInnerText(this UIElement uie, string text)

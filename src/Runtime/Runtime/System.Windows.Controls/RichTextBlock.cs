@@ -260,7 +260,7 @@ namespace System.Windows.Controls
                 nameof(IsTextSelectionEnabled),
                 typeof(bool),
                 typeof(RichTextBlock),
-                new PropertyMetadata(true)
+                new PropertyMetadata(BooleanBoxes.TrueBox)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetTextSelection((bool)newValue),
                 });
@@ -451,6 +451,9 @@ namespace System.Windows.Controls
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
+
+            this.SetTextSelection(IsTextSelectionEnabled);
+
             foreach (var block in Blocks.InternalItems)
             {
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(block, this);
