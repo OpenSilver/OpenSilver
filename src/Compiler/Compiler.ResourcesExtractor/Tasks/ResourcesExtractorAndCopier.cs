@@ -103,9 +103,9 @@ namespace OpenSilver.Compiler.Resources
                     continue;
                 }
 
-                uint compatiblityVersion = GetCompatibilityVersion(asm);
+                uint compatibilityVersion = GetCompatibilityVersion(asm);
 
-                switch (compatiblityVersion)
+                switch (compatibilityVersion)
                 {
                     case 0:
                         LegacyExtractResourcesFromAssembly(asm, outputPathAbsolute);
@@ -133,7 +133,8 @@ namespace OpenSilver.Compiler.Resources
                 byte[] fileContent = resource.GetResourceData();
 
                 // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
-                string resourcesRootDir = Path.GetFullPath(Path.Combine(outputPathAbsolute, OutputResourcesPath, assemblyName.ToLowerInvariant()));
+                string resourcesRootDir = Path.GetFullPath(
+                    Path.Combine(outputPathAbsolute, NormalizeDirectorySeparator(OutputResourcesPath), assemblyName.ToLowerInvariant()));
 
                 // Create the destination folders hierarchy if it does not already exist:
                 string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, fileRelativePath));
@@ -196,7 +197,8 @@ namespace OpenSilver.Compiler.Resources
                     string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(enumerator.Key.ToString(), UriFormat.Unescaped);
 
                     // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
-                    string resourcesRootDir = Path.GetFullPath(Path.Combine(outputPathAbsolute, OutputResourcesPath, assemblyName.ToLowerInvariant()));
+                    string resourcesRootDir = Path.GetFullPath(Path.Combine(outputPathAbsolute,
+                        NormalizeDirectorySeparator(OutputResourcesPath), assemblyName.ToLowerInvariant()));
 
                     // Create the destination folders hierarchy if it does not already exist:
                     string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, resourceId));
@@ -242,6 +244,24 @@ namespace OpenSilver.Compiler.Resources
             }
         }
 
+        private static string NormalizeDirectorySeparator(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return path;
+            }
+
+            var separator = Path.DirectorySeparatorChar;
+            var pathFixed = path.Replace('/', separator).Replace('\\', separator);
+
+            if (!pathFixed.EndsWith(separator.ToString()) && pathFixed != "")
+            {
+                pathFixed += separator;
+            }
+
+            return pathFixed;
+        }
+
         private static string GetOutputPathAbsolute(string assemblyFullNameAndPath, string outputRootPath)
         {
             //--------------------------
@@ -249,12 +269,7 @@ namespace OpenSilver.Compiler.Resources
             // IMPORTANT: If you update this method, make sure to update the other one as well.
             //--------------------------
 
-            var separator = Path.DirectorySeparatorChar;
-            var outputRootPathFixed = outputRootPath.Replace('/', separator).Replace('\\', separator);
-            if (!outputRootPathFixed.EndsWith(separator.ToString()) && outputRootPathFixed != "")
-            {
-                outputRootPathFixed += separator;
-            }
+            var outputRootPathFixed = NormalizeDirectorySeparator(outputRootPath);
 
             // If the path is already ABSOLUTE, we return it directly, otherwise we concatenate it to the path of the assembly:
             string outputPathAbsolute;
@@ -266,12 +281,7 @@ namespace OpenSilver.Compiler.Resources
             {
                 outputPathAbsolute = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(assemblyFullNameAndPath)), outputRootPathFixed);
 
-                outputPathAbsolute = outputPathAbsolute.Replace('/', separator).Replace('\\', separator);
-
-                if (!outputPathAbsolute.EndsWith(separator.ToString()) && outputPathAbsolute != "")
-                {
-                    outputPathAbsolute += separator;
-                }
+                outputPathAbsolute = NormalizeDirectorySeparator(outputPathAbsolute);
             }
 
             return outputPathAbsolute;
