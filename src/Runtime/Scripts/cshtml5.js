@@ -1347,7 +1347,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
         });
         const Decoration = new Parchment.StyleAttributor('decoration', 'text-decoration', {
             scope: Parchment.Scope.INLINE_ATTRIBUTE,
-            whitelist: ['underline', 'line-through', 'overline']
+            whitelist: ['none', 'underline', 'line-through', 'overline']
         });
 
         // Block properties

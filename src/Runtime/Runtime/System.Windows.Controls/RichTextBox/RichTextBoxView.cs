@@ -290,6 +290,7 @@ internal sealed class RichTextBoxView : TextViewBase
                 "underline" => TextDecorations.Underline,
                 "line-through" => TextDecorations.Strikethrough,
                 "overline" => TextDecorations.OverLine,
+                "none" => null,
                 _ => GetValue(Inline.TextDecorationsProperty),
             };
         }
