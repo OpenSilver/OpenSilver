@@ -133,11 +133,24 @@ namespace System.Windows.Shapes
             double penThickness = GetStrokeThickness();
             double margin = penThickness / 2;
 
-            var rect = new Rect(
-                margin,
-                margin,
-                Math.Max(0, finalSize.Width - penThickness),
-                Math.Max(0, finalSize.Height - penThickness));
+            double x = margin;
+            double y = margin;
+            double width = finalSize.Width - penThickness;
+            double height = finalSize.Height - penThickness;
+
+            if (width <= 0)
+            {
+                width = Math.Min(penThickness, finalSize.Width);
+                x = 0;
+            }
+
+            if (height <= 0)
+            {
+                height = Math.Min(penThickness, finalSize.Height);
+                y = 0;
+            }
+
+            var rect = new Rect(x, y, width, height);
 
             switch (Stretch)
             {
@@ -178,7 +191,7 @@ namespace System.Windows.Shapes
             }
 
             ArrangeNative(rect);
-            
+
             return finalSize;
         }
 
