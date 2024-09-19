@@ -21,23 +21,25 @@ namespace OpenSilver.Compiler
             IMetadata metadata,
             ICoreTypesConverter coreTypes,
             SystemTypesHelper systemTypes,
-            bool enableImplicitAssemblyRedirection)
+            bool enableImplicitAssemblyRedirection,
+            XamlPreprocessorOptions options)
         {
             AssemblyName = assemblyName;
             Metadata = metadata;
             CoreTypes = coreTypes;
             SystemTypes = systemTypes;
             EnableImplicitAssemblyRedirection = enableImplicitAssemblyRedirection;
+            Options = options;
         }
 
-        public static ConversionSettings CreateCSharpSettings(string assembly) =>
-            new(assembly, MetadatasCS.Silverlight, CoreTypesConverters.CSharp, SystemTypesHelper.CSharp, true);
+        public static ConversionSettings CreateCSharpSettings(string assembly, XamlPreprocessorOptions options) =>
+            new(assembly, MetadatasCS.Silverlight, CoreTypesConverters.CSharp, SystemTypesHelper.CSharp, true, options);
 
-        public static ConversionSettings CreateVisualBasicSettings(string assembly) =>
-            new(assembly, MetadatasVB.Silverlight, CoreTypesConverters.VisualBasic, SystemTypesHelper.VisualBasic, true);
+        public static ConversionSettings CreateVisualBasicSettings(string assembly, XamlPreprocessorOptions options) =>
+            new(assembly, MetadatasVB.Silverlight, CoreTypesConverters.VisualBasic, SystemTypesHelper.VisualBasic, true, options);
 
-        public static ConversionSettings CreateFSharpSettings(string assembly) =>
-            new(assembly, MetadatasFS.Silverlight, CoreTypesConverters.FSharp, SystemTypesHelper.FSharp, true);
+        public static ConversionSettings CreateFSharpSettings(string assembly, XamlPreprocessorOptions options) =>
+            new(assembly, MetadatasFS.Silverlight, CoreTypesConverters.FSharp, SystemTypesHelper.FSharp, true, options);
 
         public string AssemblyName { get; }
 
@@ -48,5 +50,7 @@ namespace OpenSilver.Compiler
         public SystemTypesHelper SystemTypes { get; }
 
         public bool EnableImplicitAssemblyRedirection { get; }
+
+        public XamlPreprocessorOptions Options { get; }
     }
 }

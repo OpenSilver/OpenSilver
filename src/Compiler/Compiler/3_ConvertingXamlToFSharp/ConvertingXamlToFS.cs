@@ -25,10 +25,11 @@ namespace OpenSilver.Compiler
             string assemblyNameWithoutExtension,
             string rootNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
+            XamlPreprocessorOptions options,
             bool isFirstPass,
             string outputResourcesPath)
         {
-            ConversionSettings settings = ConversionSettings.CreateFSharpSettings(assemblyNameWithoutExtension);
+            ConversionSettings settings = ConversionSettings.CreateFSharpSettings(assemblyNameWithoutExtension, options);
 
             // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it
             // could be badly formatted and not be parsable using XDocument.Parse.

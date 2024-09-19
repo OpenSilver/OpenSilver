@@ -38,6 +38,7 @@
     <Compile Include="1_ConvertingXaml\ProcessingTextBlockNodes.cs" />
     <Compile Include="1_ConvertingXaml\SystemTypesHelper.cs" />
     <Compile Include="1_ConvertingXaml\XamlParseException.cs" />
+    <Compile Include="1_ConvertingXaml\XamlPreprocessorOptions.cs" />
     <Compile Include="1_ConvertingXaml\XamlReader.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass1.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />

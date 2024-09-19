@@ -86,6 +86,7 @@
     <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)'==''">resources/</Cshtml5OutputResourcesPath>
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
+    <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
   </PropertyGroup>
 
   <!--============================================================
@@ -258,6 +259,7 @@
       VerifyHash="false"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
+      Options="$(OpenSilverXamlPreprocessorOptions)"
       Language="$(Language)">
       <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />
       <Output ItemName="_XamlPreprocessorProcessedPageFiles" TaskParameter="ProcessedPageFiles" />
@@ -410,6 +412,7 @@
       VerifyHash="false"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
+      Options="$(OpenSilverXamlPreprocessorOptions)"
       Language="$(Language)">
       <Output ItemName="_XamlPreprocessorGeneratedFiles" TaskParameter="GeneratedFiles" />
       <Output ItemName="_XamlPreprocessorProcessedPageFiles" TaskParameter="ProcessedPageFiles" />

@@ -431,14 +431,17 @@ namespace OpenSilver.Compiler
                     }
                     else
                     {
-                        isInNewScope = true;
+                        if (_settings.Options == XamlPreprocessorOptions.Auto)
+                        {
+                            isInNewScope = true;
 
-                        var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
+                            var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
 
-                        parameters.StringBuilder.AppendLine(
-                            $"var {elementUniqueNameOrThisKeyword} = {objectScope.MethodName}({parameters.CurrentXamlContext});");
+                            parameters.StringBuilder.AppendLine(
+                                $"var {elementUniqueNameOrThisKeyword} = {objectScope.MethodName}({parameters.CurrentXamlContext});");
 
-                        parameters.PushScope(objectScope);
+                            parameters.PushScope(objectScope);
+                        }
 
                         parameters.StringBuilder.AppendLine(
                             $"var {elementUniqueNameOrThisKeyword} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new {elementTypeInCSharp}());");

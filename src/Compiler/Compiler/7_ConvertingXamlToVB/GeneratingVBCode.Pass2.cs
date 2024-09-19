@@ -437,14 +437,17 @@ End Sub
                     }
                     else
                     {
-                        isInNewScope = true;
+                        if (_settings.Options == XamlPreprocessorOptions.Auto)
+                        {
+                            isInNewScope = true;
 
-                        var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
+                            var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
 
-                        parameters.StringBuilder.AppendLine(
-                            $"Dim {elementUniqueNameOrThisKeyword} = {objectScope.MethodName}({parameters.CurrentXamlContext})");
+                            parameters.StringBuilder.AppendLine(
+                                $"Dim {elementUniqueNameOrThisKeyword} = {objectScope.MethodName}({parameters.CurrentXamlContext})");
 
-                        parameters.PushScope(objectScope);
+                            parameters.PushScope(objectScope);
+                        }
 
                         parameters.StringBuilder.AppendLine(
                             $"Dim {elementUniqueNameOrThisKeyword} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, New {elementTypeInCSharp}())");

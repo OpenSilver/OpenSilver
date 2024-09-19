@@ -494,14 +494,17 @@ namespace GlobalResource
                     }
                     else
                     {
-                        isInNewScope = true;
+                        if (_settings.Options == XamlPreprocessorOptions.Auto)
+                        {
+                            isInNewScope = true;
 
-                        var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
+                            var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
 
-                        parameters.StringBuilder.AppendLine(
-                            $"let {elementUniqueNameOrThisKeyword} = {_factoryName}.{objectScope.MethodName}({parameters.CurrentXamlContext})");
+                            parameters.StringBuilder.AppendLine(
+                                $"let {elementUniqueNameOrThisKeyword} = {_factoryName}.{objectScope.MethodName}({parameters.CurrentXamlContext})");
 
-                        parameters.PushScope(objectScope);
+                            parameters.PushScope(objectScope);
+                        }
 
                         parameters.StringBuilder.AppendLine(
                             $"let {elementUniqueNameOrThisKeyword} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new {elementTypeInCSharp}())");

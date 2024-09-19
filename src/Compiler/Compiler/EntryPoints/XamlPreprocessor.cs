@@ -40,6 +40,7 @@ namespace OpenSilver.Compiler
         private readonly Stopwatch _watch;
         private AssembliesInspector _assembliesInspector;
         private SupportedLanguage _language;
+        private XamlPreprocessorOptions _options;
 
         private AssembliesInspector AssembliesInspector => _assembliesInspector ??= LoadAssemblies();
 
@@ -74,6 +75,8 @@ namespace OpenSilver.Compiler
 
         public string RootNamespace { get; set; }
 
+        public string Options { get; set; }
+
         [Required]
         public bool IsSecondPass { get; set; }
 
@@ -105,6 +108,15 @@ namespace OpenSilver.Compiler
             {
                 Log.LogError($"'{Language}' is not a supported language (C#, Visual Basic and F#).");
                 return false;
+            }
+
+            if (!XamlPreprocessorOptionsHelpers.TryParse(Options, out _options))
+            {
+                _options = XamlPreprocessorOptions.Auto;
+                if (!string.IsNullOrEmpty(Options))
+                {
+                    Log.LogWarning($"'{Options}' is not a supported xaml preprocessor option (Auto or Optimize).");
+                }
             }
 
             _watch.Start();
@@ -216,7 +228,7 @@ namespace OpenSilver.Compiler
             }
         }
 
-        private string GenerateCode(string xaml, string sourceFile, string fileIdentity)
+        private string GenerateCode(string xaml, string sourceFile, string fileIdentity, XamlPreprocessorOptions options)
         {
             string generatedCode = string.Empty;
             switch (_language)
@@ -228,6 +240,7 @@ namespace OpenSilver.Compiler
                         fileIdentity,
                         AssemblyName,
                         AssembliesInspector,
+                        options,
                         !IsSecondPass,
                         OutputResourcesPath);
 
@@ -245,6 +258,7 @@ namespace OpenSilver.Compiler
                         AssemblyName,
                         RootNamespace,
                         AssembliesInspector,
+                        options,
                         !IsSecondPass,
                         OutputResourcesPath);
 
@@ -262,6 +276,7 @@ namespace OpenSilver.Compiler
                         AssemblyName,
                         RootNamespace,
                         AssembliesInspector,
+                        options,
                         !IsSecondPass,
                         OutputResourcesPath);
 
@@ -280,12 +295,13 @@ namespace OpenSilver.Compiler
             string sourceFilePath = item.GetMetadata("FullPath");
             string fileIdentity = GetFileIdentity(item);
             string xaml = ReadFileContent(sourceFilePath);
+            XamlPreprocessorOptions options = GetXamlProcessorOptions(item);
 
             if (!VerifyHash || IsFileOutdated(xaml, outputFilePath))
             {
                 TimeSpan start = _watch.Elapsed;
 
-                string generatedCode = GenerateCode(xaml, sourceFilePath, fileIdentity);
+                string generatedCode = GenerateCode(xaml, sourceFilePath, fileIdentity, options);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
                 using (var sw = new StreamWriter(outputFilePath))
@@ -357,6 +373,12 @@ namespace OpenSilver.Compiler
             {
                 return $"{fileIdentity}.g.i.{GetExtension()}";
             }
+        }
+
+        private XamlPreprocessorOptions GetXamlProcessorOptions(ITaskItem item)
+        {
+            string options = item.GetMetadata("OpenSilverXamlPreprocessorOptions");
+            return XamlPreprocessorOptionsHelpers.TryParse(options, out XamlPreprocessorOptions opts) ? opts : _options;
         }
 
         private static string ReadFileContent(string filePath)
