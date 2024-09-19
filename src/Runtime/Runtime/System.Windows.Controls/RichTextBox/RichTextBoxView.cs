@@ -684,7 +684,7 @@ internal sealed class RichTextBoxView : TextViewBase
             return;
         }
 
-        QuillDelta[] deltas = GetDeltas(Host.GetBlocksCache()).ToArray();
+        QuillDelta[] deltas = GetDeltas(Host.InternalBlocks).ToArray();
 
         Interop.ExecuteJavaScriptVoid(
             $"document.richTextViewManager.setContents('{OuterDiv.UniqueIdentifier}', {JsonSerializer.Serialize(deltas, SerializerOptions)})");

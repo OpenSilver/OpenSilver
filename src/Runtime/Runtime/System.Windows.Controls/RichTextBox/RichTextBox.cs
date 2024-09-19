@@ -43,7 +43,6 @@ namespace System.Windows.Controls
     {
         private const string ContentElementName = "ContentElement";
 
-        private BlockCollection _blocks;
         private bool _isFocused;
         private FrameworkElement _contentElement;
         private ScrollViewer _scrollViewer;
@@ -178,10 +177,10 @@ namespace System.Windows.Controls
             {
                 using (DeferRefresh())
                 {
-                    _blocks.Clear();
+                    InternalBlocks.Clear();
                     foreach (Block block in RichTextXamlParser.Parse(value))
                     {
-                        _blocks.Add(block);
+                        InternalBlocks.Add(block);
                     }
                 }
             }
@@ -244,7 +243,7 @@ namespace System.Windows.Controls
         /// </returns>
         public BlockCollection Blocks => (BlockCollection)GetValue(BlocksPropertyKey.DependencyProperty);
 
-        internal BlockCollection GetBlocksCache() => _blocks;
+        internal BlockCollection InternalBlocks { get; private set; }
 
         private static object GetBlocks(DependencyObject d)
         {
@@ -255,12 +254,12 @@ namespace System.Windows.Controls
                 richTextBox._isModelInvalidated = false;
             }
 
-            return richTextBox._blocks;
+            return richTextBox.InternalBlocks;
         }
 
         private static void OnBlocksChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((RichTextBox)d)._blocks = (BlockCollection)e.NewValue;
+            ((RichTextBox)d).InternalBlocks = (BlockCollection)e.NewValue;
 
             if (e.OldValue is BlockCollection oldBlocks)
             {
@@ -725,7 +724,7 @@ namespace System.Windows.Controls
 
         private void Resync()
         {
-            _blocks.Clear();
+            InternalBlocks.Clear();
 
             if (View is RichTextBoxView view)
             {
@@ -733,7 +732,7 @@ namespace System.Windows.Controls
 
                 while (parser.MoveToNextBlock())
                 {
-                    _blocks.Add(CreateParagraph(parser.BlockFormat, parser.Inlines));
+                    InternalBlocks.Add(CreateParagraph(parser.BlockFormat, parser.Inlines));
                 }
             }
         }

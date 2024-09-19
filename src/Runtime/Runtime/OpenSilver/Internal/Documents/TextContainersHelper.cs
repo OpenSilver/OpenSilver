@@ -40,7 +40,7 @@ internal static class TextContainersHelper
             TextElement textElement => textElement.TextContainer,
             TextBlock textBlock => textBlock.Inlines.TextContainer,
             RichTextBlock richTextBlock => richTextBlock.Blocks.TextContainer,
-            RichTextBox richTextBox => richTextBox.Blocks.TextContainer,
+            RichTextBox richTextBox => richTextBox.InternalBlocks.TextContainer,
             _ => null,
         };
 }
