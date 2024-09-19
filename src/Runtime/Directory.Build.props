@@ -9,6 +9,7 @@
 
     <OpenSilverGenerateAssemblyInfo>true</OpenSilverGenerateAssemblyInfo>
     <OpenSilverExposeResourcesToExtractor>false</OpenSilverExposeResourcesToExtractor>
+    <OpenSilverXamlPreprocessorOptions>optimize</OpenSilverXamlPreprocessorOptions>
     <EnableAdditionalMetadataAttributes>true</EnableAdditionalMetadataAttributes>
   </PropertyGroup>
 </Project>
