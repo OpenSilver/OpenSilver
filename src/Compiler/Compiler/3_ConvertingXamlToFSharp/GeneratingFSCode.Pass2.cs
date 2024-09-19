@@ -221,7 +221,7 @@ namespace OpenSilver.Compiler
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
-            private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
+            private readonly string _outputResourcesPath;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -229,7 +229,7 @@ namespace OpenSilver.Compiler
                 string assemblyNameWithoutExtension,
                 AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings,
-                string codeToPutInTheInitializeComponentOfTheApplicationClass)
+                string outputResourcesPath)
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
@@ -237,7 +237,7 @@ namespace OpenSilver.Compiler
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
-                _codeToPutInTheInitializeComponentOfTheApplicationClass = codeToPutInTheInitializeComponentOfTheApplicationClass;
+                _outputResourcesPath = outputResourcesPath;
             }
 
             public string Generate() => GenerateImpl(new GeneratorContext());
@@ -308,18 +308,20 @@ namespace OpenSilver.Compiler
 
                 if (hasCodeBehind)
                 {
+                    bool isApp = IsClassTheApplicationClass(baseType);
+
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"global.{_settings.Metadata.SystemWindowsNS}.Application",
-                        IsClassTheApplicationClass(baseType) ? _codeToPutInTheInitializeComponentOfTheApplicationClass : string.Empty,
+                        isApp ? $"global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath <- @\"{_outputResourcesPath}\"" : string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
                     string classNameXaml = className + "Xaml"; // As F# doesn't support partial class, at the codebehind it will inherit []Xaml class
 
-                    string additionalConstructors = IsClassTheApplicationClass(baseType)
-                        ? @$"    private new(stub: global.OpenSilver.XamlDesignerConstructorStub) as this =
+                    string additionalConstructors = isApp ?
+                        @$"    private new(stub: global.OpenSilver.XamlDesignerConstructorStub) as this =
         {classNameXaml}()
         then
             this.InitializeComponent ()

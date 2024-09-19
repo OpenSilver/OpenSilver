@@ -81,15 +81,6 @@ namespace OpenSilver.Compiler
         public bool VerifyHash { get; set; }
 
         [Required]
-        public string OutputRootPath { get; set; }
-
-        [Required]
-        public string OutputAppFilesPath { get; set; }
-
-        [Required]
-        public string OutputLibrariesPath { get; set; }
-
-        [Required]
         public string OutputResourcesPath { get; set; }
 
         [Output]
@@ -238,9 +229,6 @@ namespace OpenSilver.Compiler
                         AssemblyName,
                         AssembliesInspector,
                         !IsSecondPass,
-                        OutputRootPath,
-                        OutputAppFilesPath,
-                        OutputLibrariesPath,
                         OutputResourcesPath);
 
                     generatedCode = CreateCSHeaderContainingHash(xaml)
@@ -258,9 +246,6 @@ namespace OpenSilver.Compiler
                         RootNamespace,
                         AssembliesInspector,
                         !IsSecondPass,
-                        OutputRootPath,
-                        OutputAppFilesPath,
-                        OutputLibrariesPath,
                         OutputResourcesPath);
 
                     generatedCode = CreateVBHeaderContainingHash(xaml)
@@ -278,9 +263,6 @@ namespace OpenSilver.Compiler
                         RootNamespace,
                         AssembliesInspector,
                         !IsSecondPass,
-                        OutputRootPath,
-                        OutputAppFilesPath,
-                        OutputLibrariesPath,
                         OutputResourcesPath);
 
                     generatedCode = CreateFSHeaderContainingHash(xaml)

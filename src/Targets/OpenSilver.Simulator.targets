@@ -35,7 +35,7 @@
 	<Target Name="ResourcesExtractor">
 		<ResourcesExtractorAndCopier
 			SourceAssembly="$(_SourceAssemblyFilePath)"
-			ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
+			ResolvedReferences="@(ReferencePath)"
 			OutputRootPath="wwwroot\"
 			OutputResourcesPath="resources\" />
 	</Target>

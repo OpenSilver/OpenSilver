@@ -88,7 +88,7 @@ namespace OpenSilver.Compiler
             AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
             ConversionSettings settings,
-            string codeToPutInTheInitializeComponentOfTheApplicationClass)
+            string outputResourcesPath)
         {
             ICodeGenerator generator;
             if (isFirstPass)
@@ -107,7 +107,7 @@ namespace OpenSilver.Compiler
                     assemblyNameWithoutExtension,
                     reflectionOnSeparateAppDomain,
                     settings,
-                    codeToPutInTheInitializeComponentOfTheApplicationClass);
+                    outputResourcesPath);
             }
 
             return generator.Generate();

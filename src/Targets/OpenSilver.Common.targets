@@ -82,12 +82,8 @@
     <SkipResourcesExtractorAndCopier Condition="'$(SkipResourcesExtractorAndCopier)' == '' And '$(IsBrowserProject)' != 'True'">true</SkipResourcesExtractorAndCopier>
     <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
     <Cshtml5OutputRootPath Condition="'$(Cshtml5OutputRootPath)'==''">wwwroot\</Cshtml5OutputRootPath>
-    <!-- Default sub-path for output application files. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputAppFilesPath Condition="'$(Cshtml5OutputAppFilesPath)'==''">app\</Cshtml5OutputAppFilesPath>
-    <!-- Default sub-path for output libraries. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputLibrariesPath Condition="'$(Cshtml5OutputLibrariesPath)'==''">libs\</Cshtml5OutputLibrariesPath>
     <!-- Default sub-path for output resources. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)'==''">resources\</Cshtml5OutputResourcesPath>
+    <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)'==''">resources/</Cshtml5OutputResourcesPath>
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
   </PropertyGroup>
@@ -260,9 +256,6 @@
       AssemblyName="$(AssemblyName)"
       IsSecondPass="$(IsSecondPass)"
       VerifyHash="false"
-      OutputRootPath="$(Cshtml5OutputRootPath)"
-      OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-      OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
       Language="$(Language)">
@@ -415,9 +408,6 @@
       AssemblyName="$(AssemblyName)"
       IsSecondPass="false"
       VerifyHash="false"
-      OutputRootPath="$(Cshtml5OutputRootPath)"
-      OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-      OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
       Language="$(Language)">

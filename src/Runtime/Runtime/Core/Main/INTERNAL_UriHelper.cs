@@ -27,12 +27,16 @@ namespace CSHTML5.Internal
         {
             get
             {
-                // Note: this is populated at the startup of the application
-                // (cf. "codeToPutInTheInitializeComponentOfTheApplicationClass" in the "Compiler" project)
-                string path = StartupAssemblyInfo.OutputResourcesPath.Replace('\\', '/');
-                if (!path.EndsWith("/") && path != string.Empty)
+                string path = StartupAssemblyInfo.OutputResourcesPath;
+                if (string.IsNullOrEmpty(path))
                 {
-                    path += '/';
+                    return string.Empty;
+                }
+
+                path = path.Replace('\\', '/');
+                if (!path.EndsWith("/"))
+                {
+                    path += "/";
                 }
 
                 return path;

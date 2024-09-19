@@ -21,10 +21,7 @@ namespace CSHTML5.Internal.Tests;
 public class INTERNAL_UriHelperTests
 {
     [ClassInitialize]
-    public static void ClassInitialize(TestContext context)
-    {
-        StartupAssemblyInfo.OutputResourcesPath = @"resources\";
-    }
+    public static void ClassInitialize(TestContext context) { }
 
     [TestMethod]
     public void ComponentURI()

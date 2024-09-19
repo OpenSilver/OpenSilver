@@ -25,9 +25,6 @@ namespace OpenSilver.Compiler
             string assemblyNameWithoutExtension,
             AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
-            string outputRootPath,
-            string outputAppFilesPath,
-            string outputLibrariesPath,
             string outputResourcesPath)
         {
             ConversionSettings settings = ConversionSettings.CreateCSharpSettings(assemblyNameWithoutExtension);
@@ -59,15 +56,6 @@ namespace OpenSilver.Compiler
             // Generate unique names for XAML elements:
             GeneratingUniqueNames.ProcessDocument(doc);
 
-            // Prepare the code that will be put in the "InitializeComponent" of the Application class,
-            // which means that it will be executed when the application is launched:
-            string codeToPutInTheInitializeComponentOfTheApplicationClass = $@"
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputRootPath = @""{outputRootPath}"";
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputAppFilesPath = @""{outputAppFilesPath}"";
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputLibrariesPath = @""{outputLibrariesPath}"";
-global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{outputResourcesPath}"";
-";
-
             // Generate C# code from the tree:
             return GeneratingCSCode.GenerateCode(
                 doc,
@@ -77,7 +65,7 @@ global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{outputRes
                 reflectionOnSeparateAppDomain,
                 isFirstPass,
                 settings,
-                codeToPutInTheInitializeComponentOfTheApplicationClass);
+                outputResourcesPath);
         }
     }
 }

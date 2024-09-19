@@ -202,7 +202,7 @@ namespace OpenSilver.Compiler
             private readonly string _assemblyNameWithoutExtension;
             private readonly string _rootNamespace;
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
-            private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
+            private readonly string _outputResourcesPath;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -211,7 +211,7 @@ namespace OpenSilver.Compiler
                 string rootNamespace,
                 AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings,
-                string codeToPutInTheInitializeComponentOfTheApplicationClass)
+                string outputResourcesPath)
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
@@ -220,7 +220,7 @@ namespace OpenSilver.Compiler
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _rootNamespace = rootNamespace;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
-                _codeToPutInTheInitializeComponentOfTheApplicationClass = codeToPutInTheInitializeComponentOfTheApplicationClass;
+                _outputResourcesPath = outputResourcesPath;
             }
 
             public string Generate() => GenerateImpl(new GeneratorContext());
@@ -284,16 +284,18 @@ namespace OpenSilver.Compiler
 
                 if (hasCodeBehind)
                 {
+                    bool isApp = IsClassTheApplicationClass(baseType);
+
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"Global.{_settings.Metadata.SystemWindowsNS}.Application",
-                        IsClassTheApplicationClass(baseType) ? _codeToPutInTheInitializeComponentOfTheApplicationClass : string.Empty,
+                        isApp ? $"Global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = \"{_outputResourcesPath}\"" : string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
-                    string additionalConstructors = IsClassTheApplicationClass(baseType)
-                        ? @"Private Sub New(stub as Global.OpenSilver.XamlDesignerConstructorStub)
+                    string additionalConstructors = isApp ?
+                        @"Private Sub New(stub as Global.OpenSilver.XamlDesignerConstructorStub)
     InitializeComponent()
 End Sub
 " : string.Empty;
