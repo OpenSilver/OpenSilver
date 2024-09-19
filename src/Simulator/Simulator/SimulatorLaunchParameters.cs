@@ -30,8 +30,8 @@ namespace OpenSilver.Simulator
 
         /// <summary>
         /// The URL used by the simulator's browser instance.
-        /// This can be useful for cases where a project requires "http" instead of "https"
-        /// or any other URL customization.
+        /// This can be useful for cases where a project requires "http" instead of "https" or any other 
+        /// URL customization. If not specified, the URL <b>https://simulator.opensilver/</b> will be used.
         /// </summary>
         public string SimulatorUrl { get; set; }
     }

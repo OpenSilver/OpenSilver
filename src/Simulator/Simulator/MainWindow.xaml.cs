@@ -47,7 +47,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         const string NAME_OF_TEMP_CACHE_FOLDER = "simulator-temp-cache";
 
         //https is used because of XR# requirement to host on https.
-        private string _simulatorUrl = "https://simulator.opensilver/";
+        private const string DefaultSimulatorUrl = "https://simulator.opensilver/";
+        private readonly string _simulatorUrl;
 
         private const string OutputRootPath = "wwwroot";
         private const string OutputResourcesPath = "resources";
@@ -71,7 +72,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             _simulatorLaunchParameters = simulatorLaunchParameters;
             _entryPointAssembly = appAssembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
-            _simulatorUrl = simulatorLaunchParameters?.SimulatorUrl ?? _simulatorUrl;
+            _simulatorUrl = simulatorLaunchParameters?.SimulatorUrl ?? DefaultSimulatorUrl;
 
             MainWebBrowser = new WebView2
             {
