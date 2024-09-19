@@ -22,10 +22,17 @@ namespace OpenSilver.Simulator
         /// Sets or gets custom cookies to the simulator
         /// </summary>
         public IList<CookieData> CookiesData { get; set; }
-    
+
         /// <summary>
         /// Sets the application init parameters
         /// </summary>
         public string InitParams { get; set; }
+
+        /// <summary>
+        /// The URL used by the simulator's browser instance.
+        /// This can be useful for cases where a project requires "http" instead of "https"
+        /// or any other URL customization.
+        /// </summary>
+        public string SimulatorUrl { get; set; }
     }
 }

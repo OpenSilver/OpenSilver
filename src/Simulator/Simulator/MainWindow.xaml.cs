@@ -47,7 +47,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         const string NAME_OF_TEMP_CACHE_FOLDER = "simulator-temp-cache";
 
         //https is used because of XR# requirement to host on https.
-        private const string OpenSilverSimulator = "https://simulator.opensilver/";
+        private string _simulatorUrl = "https://simulator.opensilver/";
+
         private const string OutputRootPath = "wwwroot";
         private const string OutputResourcesPath = "resources";
 
@@ -70,6 +71,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             _simulatorLaunchParameters = simulatorLaunchParameters;
             _entryPointAssembly = appAssembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
+            _simulatorUrl = simulatorLaunchParameters?.SimulatorUrl ?? _simulatorUrl;
 
             MainWebBrowser = new WebView2
             {
@@ -284,7 +286,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             MainWebBrowser.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
             MainWebBrowser.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
 
-            MainWebBrowser.CoreWebView2.Navigate(OpenSilverSimulator);
+            MainWebBrowser.CoreWebView2.Navigate(_simulatorUrl);
         }
 
         private void SyncXamlInspectorVisibility()
@@ -307,6 +309,16 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             return $"Content-Type:{MimeTypesMap.GetMimeType(fileName)}";
         }
 
+        private static bool AreUrlsEqual(string url1, string url2)
+        {
+            Uri uri1 = new Uri(url1);
+            Uri uri2 = new Uri(url2);
+
+            return uri1.Scheme == uri2.Scheme &&
+                   uri1.Host == uri2.Host &&
+                   uri1.AbsolutePath.TrimEnd('/') == uri2.AbsolutePath.TrimEnd('/');
+        }
+
         private void CoreWebView2_WebResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs e)
         {
             var environment = MainWebBrowser.CoreWebView2.Environment;
@@ -317,12 +329,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 return;
             }
 
-            if (!uriString.StartsWith(OpenSilverSimulator))
+            if (!uriString.StartsWith(_simulatorUrl))
             {
                 return;
             }
 
-            if (uriString == OpenSilverSimulator)
+            if (AreUrlsEqual(uriString, _simulatorUrl))
             {
                 var response = environment.CreateWebResourceResponse(
                     new MemoryStream(Encoding.UTF8.GetBytes(PrepareIndexFile())),
