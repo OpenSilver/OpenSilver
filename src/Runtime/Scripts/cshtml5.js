@@ -1270,6 +1270,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
     const ACCEPTS_TAB_ATTR = 'data-acceptstab';
     const ACCEPTS_RETURN_ATTR = 'data-acceptsreturn';
     const Options = createOptions();
+    const instances = new Map();
 
     function createOptions() {
         const Parchment = Quill.import('parchment');
@@ -1469,6 +1470,8 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
 
     function isNewLineChar(c) { return c === '\n' || c === '\r'; };
 
+    function getView(id) { return instances.get(id); }
+
     function getLength(ql) { return Math.max(0, ql.getLength() - 1); }
 
     function getSelectionLength(ql) {
@@ -1563,6 +1566,8 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             if (!parent) return;
 
             const view = document._createLayout('div', id, true);
+            instances.set(id, view);
+
             view.addEventListener('scroll', function (e) { scrollCallback(this.id); });
             view.addEventListener('focus', function (e) {
                 setTimeout(function (thisArg) {
@@ -1594,6 +1599,9 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
 
             parent.appendChild(view);
         },
+        deleteView: function (id) {
+            instances.delete(id);
+        },
         setAcceptsTab: function (id, value) {
             const view = document.getElementById(id);
             if (view) {
@@ -1607,7 +1615,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             }
         },
         measureView: function (id, maxWidth, maxHeight) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return '0|0';
 
             const root = ql.root;
@@ -1667,13 +1675,13 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             }
         },
         getContentLength: function (id) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return 0;
 
             return ql.getLength();
         },
         getSelectedText: function (id) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             const selection = ql.getSelection();
@@ -1683,7 +1691,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             return '';
         },
         setSelectedText: function (id, text) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             const selection = ql.getSelection();
@@ -1701,50 +1709,50 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             }
         },
         select: function (id, start, length) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             ql.setSelection(start, length, Quill.sources.API);
         },
         selectAll: function (id) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             ql.setSelection(0, ql.getLength(), Quill.sources.API);
         },
         getContents: function (id, start, length) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return '[]';
 
             const contents = ql.getContents(start, length);
             return JSON.stringify(contents.ops);
         },
         setContents: function (id, delta) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             ql.setContents(delta, Quill.sources.API);
         },
         updateContents: function (id, delta) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             ql.updateContents(delta, Quill.sources.API);
         },
         enable: function (id, enable) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             ql.enable(enable);
         },
         format: function (id, property, value) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return;
 
             ql.format(property, value, Quill.sources.API);
         },
         getFormat: function (id, property) {
-            const ql = Quill.find(document.getElementById(id));
+            const ql = Quill.find(getView(id));
             if (!ql) return null;
 
             const format = ql.getFormat();

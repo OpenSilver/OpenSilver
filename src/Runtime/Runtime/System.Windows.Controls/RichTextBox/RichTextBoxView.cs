@@ -129,7 +129,7 @@ internal sealed class RichTextBoxView : TextViewBase
         return INTERNAL_HtmlDomManager.CreateRichTextBoxViewDomElementAndAppendIt((INTERNAL_HtmlDomElementReference)parentRef, this);
     }
 
-    protected sealed internal override void INTERNAL_OnAttachedToVisualTree()
+    protected internal sealed override void INTERNAL_OnAttachedToVisualTree()
     {
         base.INTERNAL_OnAttachedToVisualTree();
 
@@ -139,6 +139,15 @@ internal sealed class RichTextBoxView : TextViewBase
         {
             InputManager.SetFocusNative(OuterDiv);
         }
+    }
+
+    protected internal sealed override void INTERNAL_OnDetachedFromVisualTree()
+    {
+        base.INTERNAL_OnDetachedFromVisualTree();
+
+        Host.Synchronize();
+
+        Interop.ExecuteJavaScriptAsync($"document.richTextViewManager.deleteView('{OuterDiv.UniqueIdentifier}')");
     }
 
     private void SetProperties()
@@ -457,11 +466,11 @@ internal sealed class RichTextBoxView : TextViewBase
 
     internal string GetXaml(int start, int length) => GetXaml(GetContents(start, length));
 
-    private string GetXaml(QuillDelta[] contents)
+    private string GetXaml(QuillDelta[] deltas)
     {
-        var deltas = RemoveTrailingLineBreak(contents);
+        var parser = new QuillContentParser(deltas);
 
-        if (deltas.Length == 0)
+        if (!parser.MoveToNextBlock())
         {
             return string.Empty;
         }
@@ -469,34 +478,13 @@ internal sealed class RichTextBoxView : TextViewBase
         var xaml = new XmlDocument();
         xaml.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></Section>");
 
-        var parser = new QuillContentParser(deltas);
-
-        while (parser.MoveToNextBlock())
+        do
         {
             xaml.DocumentElement.AppendChild(CreateParagraph(xaml, parser.BlockFormat, parser.Inlines));
         }
+        while (parser.MoveToNextBlock());
 
         return xaml.OuterXml;
-
-        static Span<QuillDelta> RemoveTrailingLineBreak(Span<QuillDelta> deltas)
-        {
-            if (deltas.Length > 0)
-            {
-                ref QuillDelta delta = ref deltas[deltas.Length - 1];
-
-                if (delta.Text == "\n" && !delta.Attributes.HasValue)
-                {
-                    return deltas.Slice(0, deltas.Length - 1);
-                }
-
-                if (delta.Text.EndsWith("\n"))
-                {
-                    delta.Text = delta.Text.Substring(0, delta.Text.Length - 1);
-                }
-            }
-
-            return deltas;
-        }
     }
 
     private XmlElement CreateParagraph(XmlDocument document, QuillRangeFormat format, IEnumerable<QuillDelta> deltas)

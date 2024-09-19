@@ -248,12 +248,7 @@ namespace System.Windows.Controls
         private static object GetBlocks(DependencyObject d)
         {
             var richTextBox = (RichTextBox)d;
-            if (richTextBox._isModelInvalidated)
-            {
-                richTextBox.Resync();
-                richTextBox._isModelInvalidated = false;
-            }
-
+            richTextBox.Synchronize();
             return richTextBox.InternalBlocks;
         }
 
@@ -268,6 +263,26 @@ namespace System.Windows.Controls
             if (e.NewValue is BlockCollection newBlocks)
             {
                 newBlocks.IsModel = true;
+            }
+        }
+
+        internal void Synchronize()
+        {
+            if (_isModelInvalidated)
+            {
+                InternalBlocks.Clear();
+
+                if (View is RichTextBoxView view)
+                {
+                    var parser = new QuillContentParser(view.GetContents());
+
+                    while (parser.MoveToNextBlock())
+                    {
+                        InternalBlocks.Add(CreateParagraph(parser.BlockFormat, parser.Inlines));
+                    }
+                }
+
+                _isModelInvalidated = false;
             }
         }
 
@@ -719,21 +734,6 @@ namespace System.Windows.Controls
             if (_notificationsSuspended == 0)
             {
                 _isModelInvalidated = true;
-            }
-        }
-
-        private void Resync()
-        {
-            InternalBlocks.Clear();
-
-            if (View is RichTextBoxView view)
-            {
-                var parser = new QuillContentParser(view.GetContents());
-
-                while (parser.MoveToNextBlock())
-                {
-                    InternalBlocks.Add(CreateParagraph(parser.BlockFormat, parser.Inlines));
-                }
             }
         }
 

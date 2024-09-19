@@ -28,7 +28,7 @@ internal ref struct QuillContentParser
 
     public QuillContentParser(Span<QuillDelta> deltas)
     {
-        _deltas = deltas;
+        _deltas = RemoveTrailingLineBreak(deltas);
         _inlines = new();
     }
 
@@ -126,7 +126,7 @@ internal ref struct QuillContentParser
             {
                 continue;
             }
-            
+
             _inlines[i] = new QuillDelta
             {
                 Text = delta.Text.Substring(0, index),
@@ -142,5 +142,25 @@ internal ref struct QuillContentParser
         }
 
         return 0;
+    }
+
+    private static Span<QuillDelta> RemoveTrailingLineBreak(Span<QuillDelta> deltas)
+    {
+        if (deltas.Length > 0)
+        {
+            ref QuillDelta delta = ref deltas[deltas.Length - 1];
+
+            if (delta.Text == "\n" && !delta.Attributes.HasValue)
+            {
+                return deltas.Slice(0, deltas.Length - 1);
+            }
+
+            if (delta.Text.EndsWith("\n"))
+            {
+                delta.Text = delta.Text.Substring(0, delta.Text.Length - 1);
+            }
+        }
+
+        return deltas;
     }
 }
