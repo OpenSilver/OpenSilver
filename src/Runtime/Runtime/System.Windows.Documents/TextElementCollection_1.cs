@@ -57,7 +57,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
 
     internal sealed override void AddOverride(T value)
     {
-        AddDependencyObjectInternal(value);
+        AddInternal(value);
         SetVisualParent(value);
         value.IsModel = IsModel;
         OnAdd(value, Count);
@@ -68,7 +68,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         if (Count > 0)
         {
             T[] oldItems = InternalItems.ToArray();
-            ClearDependencyObjectInternal();
+            ClearInternal();
 
             foreach (T item in oldItems)
             {
@@ -97,7 +97,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
 
     internal sealed override void InsertOverride(int index, T value)
     {
-        InsertDependencyObjectInternal(index, value);
+        InsertInternal(index, value);
         SetVisualParent(value);
         value.IsModel = IsModel;
         OnAdd(value, index);
@@ -106,7 +106,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
     internal sealed override void RemoveAtOverride(int index)
     {
         T item = GetItemInternal(index);
-        RemoveAtDependencyObjectInternal(index);
+        RemoveAtInternal(index);
         ClearVisualParent(item);
         item.IsModel = false;
         OnRemove(item);
@@ -115,7 +115,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
     internal sealed override void SetItemOverride(int index, T value)
     {
         T oldItem = GetItemInternal(index);
-        SetItemDependencyObjectInternal(index, value);
+        SetItemInternal(index, value);
         ClearVisualParent(oldItem);
         oldItem.IsModel = false;
         OnRemove(oldItem);
