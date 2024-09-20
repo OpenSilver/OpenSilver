@@ -478,16 +478,28 @@ internal sealed class RichTextBoxView : TextViewBase
         var xaml = new XmlDocument();
         xaml.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></Section>");
 
+        bool done;
+        bool isEmpty = true;
+
         do
         {
-            xaml.DocumentElement.AppendChild(CreateParagraph(xaml, parser.BlockFormat, parser.Inlines));
-        }
-        while (parser.MoveToNextBlock());
+            var p = CreateParagraph(xaml, parser.BlockFormat, parser.Inlines);
 
-        return xaml.OuterXml;
+            done = !parser.MoveToNextBlock();
+
+            if (!done || !p.IsEmpty)
+            {
+                // SL drops the last paragraph if it is empty.
+                xaml.DocumentElement.AppendChild(p.Paragraph);
+                isEmpty = false;
+            }
+        }
+        while (!done);
+
+        return isEmpty ? string.Empty : xaml.OuterXml;
     }
 
-    private XmlElement CreateParagraph(XmlDocument document, QuillRangeFormat format, IEnumerable<QuillDelta> deltas)
+    private (XmlElement Paragraph, bool IsEmpty) CreateParagraph(XmlDocument document, QuillRangeFormat format, IEnumerable<QuillDelta> deltas)
     {
         var paragraph = document.CreateElement(nameof(Paragraph), document.DocumentElement.NamespaceURI);
         paragraph.SetAttribute(nameof(Block.TextAlignment), format.TextAlignment switch
@@ -503,15 +515,18 @@ internal sealed class RichTextBoxView : TextViewBase
             _ => format.LineHeight.Substring(0, format.LineHeight.Length - 2), // Remove 'px'
         });
 
+        bool isEmpty = true;
+
         foreach (QuillDelta d in deltas)
         {
             if (!string.IsNullOrEmpty(d.Text))
             {
+                isEmpty = false;
                 paragraph.AppendChild(CreateRun(document, d));
             }
         }
 
-        return paragraph;
+        return (paragraph, isEmpty);
     }
 
     private XmlElement CreateRun(XmlDocument document, QuillDelta delta)

@@ -953,6 +953,7 @@ namespace System.Windows.Controls
         private sealed class DeferHelper : IDisposable
         {
             private readonly RichTextBox _richTextBox;
+            private bool _disposed;
 
             public DeferHelper(RichTextBox richTextBox)
             {
@@ -962,13 +963,21 @@ namespace System.Windows.Controls
 
             ~DeferHelper() => Dispose(false);
 
-            public void Dispose()
-            {
-                GC.SuppressFinalize(this);
-                Dispose(true);
-            }
+            public void Dispose() => Dispose(true);
 
-            private void Dispose(bool isDisposing) => _richTextBox.EndRefresh();
+            private void Dispose(bool isDisposing)
+            {
+                if (_disposed) return;
+
+                _disposed = true;
+
+                if (isDisposing)
+                {
+                    GC.SuppressFinalize(this);
+                }
+
+                _richTextBox.EndRefresh();
+            }
         }
     }
 }
