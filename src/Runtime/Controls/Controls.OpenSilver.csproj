@@ -1,0 +1,105 @@
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AssemblyName>OpenSilver.Controls</AssemblyName>
+    <RootNamespace>System.Windows.Controls</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DefineTrace>true</DefineTrace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Calendar\Calendar.cs" />
+    <Compile Include="Calendar\CalendarAutomationPeer.cs" />
+    <Compile Include="Calendar\CalendarBlackoutDatesCollection.cs" />
+    <Compile Include="Calendar\CalendarButton.cs" />
+    <Compile Include="Calendar\CalendarButtonAutomationPeer.cs" />
+    <Compile Include="Calendar\CalendarDateChangedEventArgs.cs" />
+    <Compile Include="Calendar\CalendarDateRange.cs" />
+    <Compile Include="Calendar\CalendarDayButton.cs" />
+    <Compile Include="Calendar\CalendarDayButtonAutomationPeer.cs" />
+    <Compile Include="Calendar\CalendarExtensions.cs" />
+    <Compile Include="Calendar\CalendarItem.cs" />
+    <Compile Include="Calendar\CalendarMode.cs" />
+    <Compile Include="Calendar\CalendarModeChangedEventArgs.cs" />
+    <Compile Include="Calendar\CalendarSelectionMode.cs" />
+    <Compile Include="Calendar\DateTimeHelper.cs" />
+    <Compile Include="Calendar\DateTimeTypeConverter.cs" />
+    <Compile Include="Calendar\SelectedDatesCollection.cs" />
+    <Compile Include="Common\Dock.cs" />
+    <Compile Include="..\Runtime\System.Windows.Controls\InteractionHelper.cs">
+      <Link>Common\InteractionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\System.Windows.Controls\IUpdateVisualState.cs">
+      <Link>Common\IUpdateVisualState.cs</Link>
+    </Compile>
+    <Compile Include="Common\RoutedPropertyChangingEventArgs.cs" />
+    <Compile Include="Common\RoutedPropertyChangingEventHandler.cs" />
+    <Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">
+      <Link>Common\VisualStates.cs</Link>
+    </Compile>
+    <Compile Include="DatePicker\DatePicker.cs" />
+    <Compile Include="DatePicker\DatePicker.TestHook.cs" />
+    <Compile Include="DatePicker\DatePickerAutomationPeer.cs" />
+    <Compile Include="DatePicker\DatePickerDateValidationErrorEventArgs.cs" />
+    <Compile Include="DatePicker\DatePickerFormat.cs" />
+    <Compile Include="DatePicker\DatePickerTextBox.cs" />
+    <Compile Include="GridSplitter\DragValidator.cs" />
+    <Compile Include="GridSplitter\GridSplitter.cs" />
+    <Compile Include="GridSplitter\GridSplitter.DefinitionAbstraction.cs" />
+    <Compile Include="GridSplitter\GridSplitter.DoubleUtil.cs" />
+    <Compile Include="GridSplitter\GridSplitter.GridResizeBehavior.cs" />
+    <Compile Include="GridSplitter\GridSplitter.GridResizeDirection.cs" />
+    <Compile Include="GridSplitter\GridSplitter.ResizeBehavior.cs" />
+    <Compile Include="GridSplitter\GridSplitter.SplitBehavior.cs" />
+    <Compile Include="GridSplitter\GridSplitter.TestHook.cs" />
+    <Compile Include="GridSplitter\GridSplitterAutomationPeer.cs" />
+    <Compile Include="GridSplitter\PreviewControl.cs" />
+    <Compile Include="TabControl\TabControl.cs" />
+    <Compile Include="TabControl\TabControlAutomationPeer.cs" />
+    <Compile Include="TabControl\TabItem.cs" />
+    <Compile Include="TabControl\TabItemAutomationPeer.cs" />
+    <Compile Include="TabControl\TabPanel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="Calendar\Calendar.xaml" />
+    <None Include="Calendar\CalendarItem.xaml" />
+    <None Include="Calendar\CalendarDayButton.xaml" />
+    <None Include="Calendar\CalendarButton.xaml" />
+    <None Include="Common\Common.xaml" />
+    <None Include="DatePicker\DatePicker.xaml" />
+    <None Include="DatePicker\DatePickerTextBox.xaml" />
+    <None Include="GridSplitter\GridSplitter.xaml" />
+    <None Include="TabControl\TabControl.xaml" />
+    <None Include="TabControl\TabItem.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Controls</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(OpenSilverTargets)" />
+
+</Project>

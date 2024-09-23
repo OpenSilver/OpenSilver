@@ -170,7 +170,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
         }
 
-        private TypeDefinition FindType(string namespaceName, string localTypeName, string assemblyName = null,
+        private TypeDefinition FindType(string namespaceName, string typeName, string assemblyName = null,
             bool doNotRaiseExceptionIfNotFound = false)
         {
             // Fix the namespace:
@@ -194,20 +194,18 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
             // Handle special cases:
-            if (localTypeName == StaticRes)
+            if (typeName == StaticRes)
             {
-                localTypeName = StaticResExtension;
+                typeName = StaticResExtension;
             }
 
             // Generate string representing the type:
             string fullTypeNameWithNamespaceInsideBraces = !string.IsNullOrEmpty(namespaceName)
-                ? "{" + namespaceName + "}" + localTypeName
-                : localTypeName;
-
-            TypeDefinition type;
+                ? "{" + namespaceName + "}" + typeName
+                : typeName;
 
             // Start by looking in the cache dictionary:
-            if (_typeNameToType.TryGetValue(fullTypeNameWithNamespaceInsideBraces, out type))
+            if (_typeNameToType.TryGetValue(fullTypeNameWithNamespaceInsideBraces, out TypeDefinition type))
             {
                 return type;
             }
@@ -236,16 +234,24 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 }
 
                 // Search for the type:
-                foreach (string namespaceToLookInto in namespacesToLookInto)
+                foreach (string ns in namespacesToLookInto)
                 {
-                    string fullName = string.IsNullOrEmpty(namespaceToLookInto) ? localTypeName : $"{namespaceToLookInto}.{localTypeName}";
+                    // First, try to get the type from the assembly
+                    type = assembly.MainModule.GetType(ns, typeName);
 
-                    type = assembly.MainModule.Types.FirstOrDefault(x => x.FullName == fullName);
-                    if (type == null)
+                    // If type is not found, look for an exported type (TypeForwardedToAttribute)
+                    if (type is null &&
+                        assembly.MainModule.HasExportedTypes &&
+                        assembly.MainModule.ExportedTypes.FirstOrDefault(x => x.Name == typeName && x.Namespace == ns) is ExportedType exportedType)
                     {
-                        //try to find a matching nested type.
-                        TypeDefinition containerType = assembly.MainModule.Types.FirstOrDefault(x => x.FullName == namespaceToLookInto);
-                        type = containerType?.NestedTypes.FirstOrDefault(x => x.Name == localTypeName);
+                        type = exportedType.Resolve();
+                    }
+
+                    // Finally, try to find a nested type
+                    if (type is null &&
+                        assembly.MainModule.GetType(ns) is TypeDefinition containerType)
+                    {
+                        type = containerType.NestedTypes.FirstOrDefault(x => x.Name == typeName);
                     }
 
                     if (type != null)

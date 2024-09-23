@@ -13,11 +13,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Common;
+using OpenSilver.Internal.Data;
+using SR = OpenSilver.Internal.Strings;
 
 namespace System.Windows.Data
 {
@@ -25,9 +25,6 @@ namespace System.Windows.Data
     /// PagedCollectionView view over an IEnumerable.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "WPF Compatability")]
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1010:CollectionsShouldImplementGenericInterface", Justification = "WPF Compatibility")]
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "WPF Compatibility for naming")]
     public sealed class PagedCollectionView : ICollectionView, IPagedCollectionView, IEditableCollectionView, INotifyPropertyChanged
     {
         ////------------------------------------------------------
@@ -211,8 +208,6 @@ namespace System.Windows.Data
         /// <param name="source">The source for the collection</param>
         /// <param name="isDataSorted">Determines whether the source is already sorted</param>
         /// <param name="isDataInGroupOrder">Whether the source is already in the correct order for grouping</param>
-        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "We want deriving classes to be able to override the refresh operation")]
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "Cannot use underscore in name to differentiate")]
         public PagedCollectionView(IEnumerable source, bool isDataSorted, bool isDataInGroupOrder)
         {
             if (source == null)
@@ -431,7 +426,7 @@ namespace System.Windows.Data
         /// </summary>
         public bool CanCancelEdit
         {
-            get { return this._editItem is global::System.ComponentModel.IEditableObject; }
+            get { return this._editItem is IEditableObject; }
         }
 
         /// <summary>
@@ -645,12 +640,12 @@ namespace System.Windows.Data
             {
                 if (this.IsAddingNew || this.IsEditingItem)
                 {
-                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringAddOrEdit, "Filter"));
+                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringAddOrEdit, "Filter"));
                 }
 
                 if (!this.CanFilter)
                 {
-                    throw new NotSupportedException(PagedCollectionViewResources.CannotFilter);
+                    throw new NotSupportedException(SR.CannotFilter);
                 }
 
                 if (this._filter != value)
@@ -802,7 +797,7 @@ namespace System.Windows.Data
                 {
                     throw new ArgumentException(
                         string.Format(CultureInfo.InvariantCulture,
-                            PagedCollectionViewResources.InvalidEnumArgument,
+                            SR.InvalidEnumArgument,
                             "value",
                             value.ToString(),
                             typeof(NewItemPlaceholderPosition).Name));
@@ -837,7 +832,7 @@ namespace System.Windows.Data
             {
                 if (value < 0)
                 {
-                    throw new ArgumentOutOfRangeException(PagedCollectionViewResources.InvalidPageSize);
+                    throw new ArgumentOutOfRangeException(SR.InvalidPageSize);
                 }
 
                 // if the Refresh is currently deferred, cache the desired PageSize
@@ -870,7 +865,7 @@ namespace System.Windows.Data
                         // commit their changes. So, we will not be able to change the PageSize.
                         if (!this.OkToChangeCurrent())
                         {
-                            throw new InvalidOperationException(PagedCollectionViewResources.ChangingPageSizeNotAllowedDuringAddOrEdit);
+                            throw new InvalidOperationException(SR.ChangingPageSizeNotAllowedDuringAddOrEdit);
                         }
 
                         // Currently CommitNew()/CommitEdit()/CancelNew()/CancelEdit() can't handle committing or 
@@ -886,7 +881,7 @@ namespace System.Windows.Data
                         // need to throw an exception to show that the PageSize change failed. 
                         if (this.CurrentAddItem != null || this.CurrentEditItem != null)
                         {
-                            throw new InvalidOperationException(PagedCollectionViewResources.ChangingPageSizeNotAllowedDuringAddOrEdit);
+                            throw new InvalidOperationException(SR.ChangingPageSizeNotAllowedDuringAddOrEdit);
                         }
                     }
 
@@ -1229,7 +1224,7 @@ namespace System.Windows.Data
             // Checking CanAddNew will validate that we have the correct itemConstructor
             if (!this.CanAddNew)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedForView, "AddNew"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedForView, "AddNew"));
             }
 
             object newItem = null;
@@ -1348,11 +1343,11 @@ namespace System.Windows.Data
         {
             if (this.IsAddingNew)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringTransaction, "CancelEdit", "AddNew"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringTransaction, "CancelEdit", "AddNew"));
             }
             else if (!this.CanCancelEdit)
             {
-                throw new InvalidOperationException(PagedCollectionViewResources.CancelEditNotSupported);
+                throw new InvalidOperationException(SR.CancelEditNotSupported);
             }
 
             this.VerifyRefreshNotDeferred();
@@ -1365,14 +1360,14 @@ namespace System.Windows.Data
             object editItem = this.CurrentEditItem;
             this.CurrentEditItem = null;
 
-            global::System.ComponentModel.IEditableObject ieo = editItem as global::System.ComponentModel.IEditableObject;
+            IEditableObject ieo = editItem as IEditableObject;
             if (ieo != null)
             {
                 ieo.CancelEdit();
             }
             else
             {
-                throw new InvalidOperationException(PagedCollectionViewResources.CancelEditNotSupported);
+                throw new InvalidOperationException(SR.CancelEditNotSupported);
             }
         }
 
@@ -1384,7 +1379,7 @@ namespace System.Windows.Data
         {
             if (this.IsEditingItem)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringTransaction, "CancelNew", "EditItem"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringTransaction, "CancelNew", "EditItem"));
             }
 
             this.VerifyRefreshNotDeferred();
@@ -1492,12 +1487,11 @@ namespace System.Windows.Data
         /// Complete the transaction started by <seealso cref="EditItem"/>.
         /// The pending changes (if any) to the item are committed.
         /// </summary>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Handles multiple input types and scenarios")]
         public void CommitEdit()
         {
             if (this.IsAddingNew)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringTransaction, "CommitEdit", "AddNew"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringTransaction, "CommitEdit", "AddNew"));
             }
 
             this.VerifyRefreshNotDeferred();
@@ -1510,7 +1504,7 @@ namespace System.Windows.Data
             object editItem = this.CurrentEditItem;
             this.CurrentEditItem = null;
 
-            global::System.ComponentModel.IEditableObject ieo = editItem as global::System.ComponentModel.IEditableObject;
+            IEditableObject ieo = editItem as IEditableObject;
             if (ieo != null)
             {
                 ieo.EndEdit();
@@ -1676,12 +1670,11 @@ namespace System.Windows.Data
         /// convention in that the view's sort, filter, and paging
         /// specifications (if any) are applied to the new item.
         /// </summary>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Handles multiple input types and scenarios")]
         public void CommitNew()
         {
             if (this.IsEditingItem)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringTransaction, "CommitNew", "EditItem"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringTransaction, "CommitNew", "EditItem"));
             }
 
             this.VerifyRefreshNotDeferred();
@@ -1898,7 +1891,7 @@ namespace System.Windows.Data
         {
             if (this.IsAddingNew || this.IsEditingItem)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringAddOrEdit, "DeferRefresh"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringAddOrEdit, "DeferRefresh"));
             }
 
             ++this._deferLevel;
@@ -1933,7 +1926,7 @@ namespace System.Windows.Data
 
             this.CurrentEditItem = item;
 
-            global::System.ComponentModel.IEditableObject ieo = item as global::System.ComponentModel.IEditableObject;
+            IEditableObject ieo = item as IEditableObject;
             if (ieo != null)
             {
                 ieo.BeginEdit();
@@ -2370,7 +2363,7 @@ namespace System.Windows.Data
             IEditableCollectionView ecv = this as IEditableCollectionView;
             if (ecv != null && (ecv.IsAddingNew || ecv.IsEditingItem))
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringAddOrEdit, "Refresh"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringAddOrEdit, "Refresh"));
             }
 
             this.RefreshInternal();
@@ -2401,16 +2394,16 @@ namespace System.Windows.Data
         {
             if (index < 0 || index >= this.Count)
             {
-                throw new ArgumentOutOfRangeException("index", PagedCollectionViewResources.IndexOutOfRange);
+                throw new ArgumentOutOfRangeException("index", SR.IndexOutOfRange);
             }
 
             if (this.IsEditingItem || this.IsAddingNew)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringAddOrEdit, "RemoveAt"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringAddOrEdit, "RemoveAt"));
             }
             else if (!this.CanRemove)
             {
-                throw new InvalidOperationException(PagedCollectionViewResources.RemoveNotSupported);
+                throw new InvalidOperationException(SR.RemoveNotSupported);
             }
 
             this.VerifyRefreshNotDeferred();
@@ -2507,34 +2500,6 @@ namespace System.Windows.Data
         }
 
 #endregion Public Methods
-
-        ////------------------------------------------------------
-        ////
-        ////  Static Methods
-        ////
-        ////------------------------------------------------------
-
-#region Static Methods
-
-        /// <summary>
-        /// Helper for SortList to handle nested properties (e.g. Address.Street)
-        /// </summary>
-        /// <param name="item">parent object</param>
-        /// <param name="propertyPath">property names path</param>
-        /// <param name="propertyType">property type that we want to check for</param>
-        /// <returns>child object</returns>
-        internal static object InvokePath(object item, string propertyPath, Type propertyType)
-        {
-            Exception exception;
-            object propertyValue = TypeHelper.GetNestedPropertyValue(item, propertyPath, propertyType, out exception);
-            if (exception != null)
-            {
-                throw exception;
-            }
-            return propertyValue;
-        }
-
-#endregion Static Methods
 
         ////------------------------------------------------------
         ////
@@ -2770,7 +2735,7 @@ namespace System.Windows.Data
 
             this.CurrentAddItem = null;    // leave "adding-new" mode
 
-            global::System.ComponentModel.IEditableObject ieo = newItem as global::System.ComponentModel.IEditableObject;
+            IEditableObject ieo = newItem as IEditableObject;
             if (ieo != null)
             {
                 if (cancel)
@@ -3079,7 +3044,7 @@ namespace System.Windows.Data
         {
             if (this.IsAddingNew || this.IsEditingItem)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringAddOrEdit, "Grouping"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringAddOrEdit, "Grouping"));
             }
 
             this.RefreshOrDefer();
@@ -3094,7 +3059,7 @@ namespace System.Windows.Data
         {
             if (this.IsAddingNew || this.IsEditingItem)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringAddOrEdit, "Grouping"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringAddOrEdit, "Grouping"));
             }
 
             // we want to make sure that the data is refreshed before we try to move to a page
@@ -3335,7 +3300,6 @@ namespace System.Windows.Data
         /// </summary>
         /// <param name="addedItem">Item added to the source collection</param>
         /// <param name="addIndex">Index item was added into</param>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Handles multiple input types and scenarios")]
         private void ProcessAddEvent(object addedItem, int addIndex)
         {
             // item to fire remove notification for if necessary
@@ -3735,7 +3699,6 @@ namespace System.Windows.Data
         /// Re-create the view, using any SortDescriptions. 
         /// Also updates currency information.
         /// </summary>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Handles multiple input types and scenarios")]
         private void RefreshOverride()
         {
             object oldCurrentItem = this.CurrentItem;
@@ -3980,7 +3943,7 @@ namespace System.Windows.Data
         {
             if (this.IsAddingNew || this.IsEditingItem)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, PagedCollectionViewResources.OperationNotAllowedDuringAddOrEdit, "Sorting"));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, SR.OperationNotAllowedDuringAddOrEdit, "Sorting"));
             }
 
             // we want to make sure that the data is refreshed before we try to move to a page
@@ -4014,7 +3977,7 @@ namespace System.Windows.Data
             Debug.Assert(list != null, "Input list to sort should not be null");
 
             IEnumerable<object> seq = (IEnumerable<object>)list;
-            IComparer<object> comparer = new CultureSensitiveComparer(this.Culture);
+            IComparer<object> comparer = CultureSensitiveComparer.GetComparer(this.Culture);
 
             foreach (SortDescription sort in this.SortDescriptions)
             {
@@ -4027,7 +3990,7 @@ namespace System.Windows.Data
                 {
                     if (item != null)
                     {
-                        propertyType = item.GetType().GetNestedPropertyType(propertyPath);
+                        propertyType = TypeHelper.GetNestedPropertyType(item.GetType(), propertyPath);
                         break;
                     }
                 }
@@ -4036,29 +3999,29 @@ namespace System.Windows.Data
 
                 switch (sort.Direction)
                 {
-                    case global::System.ComponentModel.ListSortDirection.Ascending:
+                    case ListSortDirection.Ascending:
                         if (orderedEnum != null)
                         {
                             // thenby
-                            seq = orderedEnum.ThenBy(item => InvokePath(item, propertyPath, propertyType), comparer);
+                            seq = orderedEnum.ThenBy(item => SortFieldComparer.InvokePath(item, propertyPath, propertyType), comparer);
                         }
                         else
                         {
                             // orderby
-                            seq = seq.OrderBy(item => InvokePath(item, propertyPath, propertyType), comparer);
+                            seq = seq.OrderBy(item => SortFieldComparer.InvokePath(item, propertyPath, propertyType), comparer);
                         }
 
                         break;
-                    case global::System.ComponentModel.ListSortDirection.Descending:
+                    case ListSortDirection.Descending:
                         if (orderedEnum != null)
                         {
                             // thenby
-                            seq = orderedEnum.ThenByDescending(item => InvokePath(item, propertyPath, propertyType), comparer);
+                            seq = orderedEnum.ThenByDescending(item => SortFieldComparer.InvokePath(item, propertyPath, propertyType), comparer);
                         }
                         else
                         {
                             // orderby
-                            seq = seq.OrderByDescending(item => InvokePath(item, propertyPath, propertyType), comparer);
+                            seq = seq.OrderByDescending(item => SortFieldComparer.InvokePath(item, propertyPath, propertyType), comparer);
                         }
 
                         break;
@@ -4081,7 +4044,7 @@ namespace System.Windows.Data
             // state of the underlying data.
             if (this.IsRefreshDeferred)
             {
-                throw new InvalidOperationException(PagedCollectionViewResources.NoCheckOrChangeWhenDeferred);
+                throw new InvalidOperationException(SR.NoCheckOrChangeWhenDeferred);
             }
         }
 
@@ -4219,7 +4182,7 @@ namespace System.Windows.Data
             {
                 if (this._timestamp != this._collectionView.Timestamp)
                 {
-                    throw new InvalidOperationException(PagedCollectionViewResources.EnumeratorVersionChanged);
+                    throw new InvalidOperationException(SR.EnumeratorVersionChanged);
                 }
 
                 switch (this._position)
@@ -4299,258 +4262,4 @@ namespace System.Windows.Data
 
 #endregion Private Classes
     }
-
-    /// <summary>
-    /// IComparer class to sort by class property value (using reflection).
-    /// </summary>
-    internal class SortFieldComparer : IComparer
-    {
-#region Constructors
-
-        internal SortFieldComparer() { }
-
-        /// <summary>
-        /// Create a comparer, using the SortDescription and a Type;
-        /// tries to find a reflection PropertyInfo for each property name
-        /// </summary>
-        /// <param name="collectionView">CollectionView that contains list of property names and direction to sort by</param>
-        public SortFieldComparer(ICollectionView collectionView)
-        {
-            this._collectionView = collectionView;
-            this._sortFields = collectionView.SortDescriptions;
-            this._fields = CreatePropertyInfo(this._sortFields);
-            this._comparer = new CultureSensitiveComparer(collectionView.Culture);
-        }
-
-#endregion
-
-#region Public Methods
-
-        /// <summary>
-        /// Compares two objects and returns a value indicating whether one is less than, equal to or greater than the other.
-        /// </summary>
-        /// <param name="x">first item to compare</param>
-        /// <param name="y">second item to compare</param>
-        /// <returns>Negative number if x is less than y, zero if equal, and a positive number if x is greater than y</returns>
-        /// <remarks>
-        /// Compares the 2 items using the list of property names and directions.
-        /// </remarks>
-        public int Compare(object x, object y)
-        {
-            int result = 0;
-
-            // compare both objects by each of the properties until property values don't match
-            for (int k = 0; k < this._fields.Length; ++k)
-            {
-                // if the property type is not yet determined, try
-                // obtaining it from the objects
-                Type propertyType = this._fields[k].PropertyType;
-                if (propertyType == null)
-                {
-                    if (x != null)
-                    {
-                        this._fields[k].PropertyType = x.GetType().GetNestedPropertyType(this._fields[k].PropertyPath);
-                        propertyType = this._fields[k].PropertyType;
-                    }
-                    if (this._fields[k].PropertyType == null && y != null)
-                    {
-                        this._fields[k].PropertyType = y.GetType().GetNestedPropertyType(this._fields[k].PropertyPath);
-                        propertyType = this._fields[k].PropertyType;
-                    }
-                }
-
-                object v1 = this._fields[k].GetValue(x);
-                object v2 = this._fields[k].GetValue(y);
-
-                // this will handle the case with string comparisons
-                if (propertyType == typeof(string))
-                {
-                    result = this._comparer.Compare(v1, v2);
-                }
-                else
-                {
-                    // try to also set the value for the comparer if this was 
-                    // not already calculated
-                    IComparer comparer = this._fields[k].Comparer;
-                    if (propertyType != null && comparer == null)
-                    {
-                        this._fields[k].Comparer = (typeof(Comparer<>).MakeGenericType(propertyType).GetProperty("Default")).GetValue(null, null) as IComparer;
-                        comparer = this._fields[k].Comparer;
-                    }
-
-                    result = (comparer != null) ? comparer.Compare(v1, v2) : 0 /*both values equal*/;
-                }
-
-                if (this._fields[k].Descending)
-                {
-                    result = -result;
-                }
-
-                if (result != 0)
-                {
-                    break;
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Steps through the given list using the comparer to find where
-        /// to insert the specified item to maintain sorted order
-        /// </summary>
-        /// <param name="x">Item to insert into the list</param>
-        /// <param name="list">List where we want to insert the item</param>
-        /// <returns>Index where we should insert into</returns>
-        public int FindInsertIndex(object x, IList list)
-        {
-            int min = 0;
-            int max = list.Count - 1;
-            int index;
-
-            // run a binary search to find the right index
-            // to insert into.
-            while (min <= max)
-            {
-                index = (min + max) / 2;
-
-                int result = this.Compare(x, list[index]);
-                if (result == 0)
-                {
-                    return index;
-                }
-                else if (result > 0)
-                {
-                    min = index + 1;
-                }
-                else
-                {
-                    max = index - 1;
-                }
-            }
-
-            return min;
-        }
-
-#endregion
-
-#region Private Methods
-
-        private static SortPropertyInfo[] CreatePropertyInfo(SortDescriptionCollection sortFields)
-        {
-            SortPropertyInfo[] fields = new SortPropertyInfo[sortFields.Count];
-            for (int k = 0; k < sortFields.Count; ++k)
-            {
-                // remember PropertyPath and Direction, used when actually sorting
-                fields[k].PropertyPath = sortFields[k].PropertyName;
-                fields[k].Descending = (sortFields[k].Direction == ListSortDirection.Descending);
-            }
-            return fields;
-        }
-
-#endregion
-
-#region Private Fields
-
-        struct SortPropertyInfo
-        {
-            internal IComparer Comparer;
-            internal bool Descending;
-            internal string PropertyPath;
-            internal Type PropertyType;
-
-            internal object GetValue(object o)
-            {
-                object value;
-                if (String.IsNullOrEmpty(this.PropertyPath))
-                {
-                    value = (this.PropertyType == o.GetType()) ? o : null;
-                }
-                else
-                {
-                    value = PagedCollectionView.InvokePath(o, this.PropertyPath, this.PropertyType);
-                }
-
-                return value;
-            }
-        }
-
-        private ICollectionView _collectionView;
-        private SortPropertyInfo[] _fields;
-        private SortDescriptionCollection _sortFields;
-        private IComparer<object> _comparer;
-
-#endregion
-    }
-
-    /// <summary>
-    /// Creates a comparer class that takes in a CultureInfo as a parameter,
-    /// which it will use when comparing strings.
-    /// </summary>
-    internal class CultureSensitiveComparer : IComparer<object>
-    {
-        /// <summary>
-        /// Private accessor for the CultureInfo of our comparer
-        /// </summary>
-        private CultureInfo _culture;
-
-        /// <summary>
-        /// Creates a comparer which will respect the CultureInfo
-        /// that is passed in when comparing strings.
-        /// </summary>
-        /// <param name="culture">The CultureInfo to use in string comparisons</param>
-        public CultureSensitiveComparer(CultureInfo culture)
-            : base()
-        {
-            this._culture = culture ?? CultureInfo.InvariantCulture;
-        }
-
-#region IComparer<object> Members
-
-        /// <summary>
-        /// Compares two objects and returns a value indicating whether one is less than, equal to or greater than the other.
-        /// </summary>
-        /// <param name="x">first item to compare</param>
-        /// <param name="y">second item to compare</param>
-        /// <returns>Negative number if x is less than y, zero if equal, and a positive number if x is greater than y</returns>
-        /// <remarks>
-        /// Compares the 2 items using the specified CultureInfo for string and using the default object comparer for all other objects.
-        /// </remarks>
-        public int Compare(object x, object y)
-        {
-            if (x == null)
-            {
-                if (y != null)
-                {
-                    return -1;
-                }
-                return 0;
-            }
-            if (y == null)
-            {
-                return 1;
-            }
-
-            // at this point x and y are not null
-            if (x.GetType() == typeof(string) && y.GetType() == typeof(string))
-            {
-                return this._culture.CompareInfo.Compare((string)x, (string)y);
-            }
-            else
-            {
-                return Comparer<object>.Default.Compare(x, y);
-            }
-        }
-
-#endregion
-    }
-
-    /// <summary>
-    /// Represents a method that is used to provide custom logic to select 
-    /// the GroupDescription based on the parent group and its level. 
-    /// </summary>
-    /// <param name="group">The parent group.</param>
-    /// <param name="level">The level of group.</param>
-    /// <returns>The GroupDescription chosen based on the parent group and its level.</returns>
-    public delegate GroupDescription GroupDescriptionSelectorCallback(CollectionViewGroup group, int level);
 }

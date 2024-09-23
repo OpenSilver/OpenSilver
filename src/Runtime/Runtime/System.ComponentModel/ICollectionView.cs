@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,10 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -177,8 +174,6 @@ namespace System.ComponentModel
         /// <returns>true if <seealso cref="CurrentItem"/> points to an item within the view.</returns>
         bool MoveCurrentToPosition(int position);
 
-
-
         /// <summary>
         /// Raise this event before change of current item pointer.  Handlers can cancel the change.
         /// </summary>
@@ -207,6 +202,5 @@ namespace System.ComponentModel
         /// Raise this event after changing to a new current item.
         /// </summary>
         event EventHandler CurrentChanged;
-
     }
 }

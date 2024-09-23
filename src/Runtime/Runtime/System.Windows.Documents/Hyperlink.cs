@@ -11,7 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Browser;
+using System.Diagnostics;
+using System.Windows.Controls.Primitives;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
@@ -238,9 +240,9 @@ public sealed class Hyperlink : Span
 
         ExecuteCommand();
 
-        if (NavigateUri is Uri uri)
+        if (NavigateUri is Uri navigateUri)
         {
-            HtmlPage.Window.Navigate(uri, GetTargetName());
+            Navigate(this, navigateUri, TargetName);
         }
     }
 
@@ -256,9 +258,95 @@ public sealed class Hyperlink : Span
         }
     }
 
-    private string GetTargetName()
+    internal static void Navigate(DependencyObject d, Uri navigateUri, string target)
     {
-        string targetName = TargetName;
-        return string.IsNullOrEmpty(targetName) ? "_blank" : targetName;
+        Debug.Assert(navigateUri is not null);
+
+        if (!IsExternalTarget(target))
+        {
+            if (TryInternalNavigate(d, navigateUri, target))
+            {
+                return;
+            }
+        }
+
+        if (target == "_search")
+        {
+            throw new NotImplementedException("The search target is not implemented.");
+        }
+
+        if (string.IsNullOrEmpty(target))
+        {
+            target = "_self";
+        }
+
+        NavigateNative(navigateUri, target);
+    }
+
+    private static bool IsExternalTarget(string target) =>
+        target == "_blank" ||
+        target == "_media" ||
+        target == "_parent" ||
+        target == "_search" ||
+        target == "_self" ||
+        target == "_top";
+
+    private static void NavigateNative(Uri navigateUri, string target)
+    {
+        string sUri = OpenSilver.Interop.GetVariableStringForJS(navigateUri.ToString());
+        string sTarget = OpenSilver.Interop.GetVariableStringForJS(target);
+        OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"window.open({sUri}, {sTarget})");
+    }
+
+    private static bool TryInternalNavigate(DependencyObject d, Uri navigateUri, string target)
+    {
+        DependencyObject subtree = d;
+        do
+        {
+            d = VisualTreeHelper.GetParent(d) ?? (d as FrameworkElement)?.Parent;
+
+            if (d is not null && (d is INavigate || VisualTreeHelper.GetParent(d) is null))
+            {
+                if (FindNavigator(d as FrameworkElement, subtree, target) is INavigate navigator)
+                {
+                    return navigator.Navigate(navigateUri);
+                }
+                subtree = d;
+            }
+        }
+        while (d is not null);
+
+        return false;
+    }
+
+    private static INavigate FindNavigator(FrameworkElement fe, DependencyObject subtree, string target)
+    {
+        if (fe is null)
+        {
+            return null;
+        }
+
+        if (fe is INavigate && (fe.Name == target || string.IsNullOrEmpty(target)))
+        {
+            return (INavigate)fe;
+        }
+
+        bool isPopup = fe is Popup;
+        int count = isPopup ? 1 : VisualTreeHelper.GetChildrenCount(fe);
+        for (int i = 0; i < count; i++)
+        {
+            DependencyObject child = isPopup ? ((Popup)fe).Child : VisualTreeHelper.GetChild(fe, i);
+            if (child == subtree)
+            {
+                continue;
+            }
+
+            if (FindNavigator(child as FrameworkElement, subtree, target) is INavigate navigate)
+            {
+                return navigate;
+            }
+        }
+
+        return null;
     }
 }

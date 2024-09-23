@@ -11,10 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
-using System.Windows.Browser;
 using System.Windows.Interop;
+using System.Web;
 using CSHTML5.Internal;
 
 namespace System.Windows

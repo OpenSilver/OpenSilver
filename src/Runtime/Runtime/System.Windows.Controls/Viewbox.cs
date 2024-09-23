@@ -14,6 +14,7 @@
 using System.Diagnostics;
 using System.Windows.Markup;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -191,8 +192,8 @@ namespace System.Windows.Controls
                  && (isConstrainedWidth || isConstrainedHeight))
             {
                 // Compute scaling factors for both axes
-                scaleX = contentSize.Width.IsZero() ? 0.0 : availableSize.Width / contentSize.Width;
-                scaleY = contentSize.Height.IsZero() ? 0.0 : availableSize.Height / contentSize.Height;
+                scaleX = DoubleUtil.IsZero(contentSize.Width) ? 0.0 : availableSize.Width / contentSize.Width;
+                scaleY = DoubleUtil.IsZero(contentSize.Height) ? 0.0 : availableSize.Height / contentSize.Height;
 
                 if (!isConstrainedWidth)
                 {

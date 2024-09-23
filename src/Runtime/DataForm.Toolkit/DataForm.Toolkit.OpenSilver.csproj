@@ -11,10 +11,12 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DefineTrace>true</DefineTrace>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls\Controls.OpenSilver.csproj" />
     <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\Data\Data.OpenSilver.csproj" />
   </ItemGroup>
 
   <ItemGroup>

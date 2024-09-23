@@ -13,6 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\Data\Data.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Runtime\OpenSilver\Internal\RectangleAdapter.cs" Link="Helpers\RectangleAdapter.cs" />
     <Compile Include="DataGrid\Automation\DataGridAutomationPeer.cs" />
     <Compile Include="DataGrid\Automation\DataGridCellAutomationPeer.cs" />
@@ -129,16 +135,11 @@
     <Content Include="DataGrid\System.Windows.Controls.DataGrid.DataGridCheckBoxColumn.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
-        <Content Include="DataGrid\System.Windows.Controls.DataGrid.DataGridColumnDropLocationIndicator.xaml">
+    <Content Include="DataGrid\System.Windows.Controls.DataGrid.DataGridColumnDropLocationIndicator.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
-    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
-  </ItemGroup>
-  
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <Import Project="$(OpenSilverTargets)" />
 

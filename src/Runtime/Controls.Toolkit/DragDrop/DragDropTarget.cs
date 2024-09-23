@@ -899,11 +899,12 @@ namespace System.Windows.Controls
             this._insertionIndicatorContainer = GetTemplateChild(InsertionIndicatorContainerName) as Canvas;
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        /// <inheritdoc />
+        protected override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            OuterDiv.Style.userSelect = "none";
+            INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).userSelect = "none";
         }
 
         /// <summary>

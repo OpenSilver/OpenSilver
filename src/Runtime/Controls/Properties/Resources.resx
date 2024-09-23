@@ -112,15 +112,11 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
-    <value>Cannot perform operation.</value>
-    <comment>Exception thrown by automation peers.</comment>
-  </data>
   <data name="CalendarAutomationPeer_BlackoutDayHelpText" xml:space="preserve">
     <value>Blackout Day - {0}</value>
   </data>
@@ -169,10 +165,6 @@
   <data name="Calendar_UnSelectableDates" xml:space="preserve">
     <value>Value is not valid.</value>
   </data>
-  <data name="ChildWindow_InvalidOperation" xml:space="preserve">
-    <value>Cannot call Show() on a ChildWindow that is in the visual tree. ChildWindow should be the top-most element in the .xaml file.</value>
-    <comment>Exception thrown when the ChildWindow is in the visual tree and Show() is called on it.</comment>
-  </data>
   <data name="DatePickerAutomationPeer_LocalizedControlType" xml:space="preserve">
     <value>date picker</value>
   </data>
@@ -214,29 +206,5 @@
   </data>
   <data name="TabControl_InvalidIndex" xml:space="preserve">
     <value>'{0}' is not a valid value for property 'SelectedIndex'</value>
-  </data>
-  <data name="TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property HasItems.</value>
-    <comment>Exception thrown when the HasItems property is improperly set.</comment>
-  </data>
-  <data name="TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property IsSelectionActive.</value>
-    <comment>Exception thrown when the IsSelectionActive property is improperly set.</comment>
-  </data>
-  <data name="TreeView_OnSelectedItemPropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property SelectedItem.</value>
-    <comment>Exception thrown when the SelectedItem property is improperly set.</comment>
-  </data>
-  <data name="TreeView_OnSelectedValuePropertyChanged_InvalidWrite" xml:space="preserve">
-    <value>Cannot set read-only property SelectedValue.</value>
-    <comment>Exception thrown when the SelectedValue property is improperly set.</comment>
-  </data>
-  <data name="TypeConverters_ConvertFrom_CannotConvertFromType" xml:space="preserve">
-    <value>'{0}' cannot convert from '{1}'.</value>
-    <comment>Exception thrown when a type converter is asked to convert something it cannot.</comment>
-  </data>
-  <data name="TypeConverters_Convert_CannotConvert" xml:space="preserve">
-    <value>'{0}' is unable to convert '{1}' to '{2}'.</value>
-    <comment>Exception thrown when a type converter fails to convert a value to another type.</comment>
   </data>
 </root>

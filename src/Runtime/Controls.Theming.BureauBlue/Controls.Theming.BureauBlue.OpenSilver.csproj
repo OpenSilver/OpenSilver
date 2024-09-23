@@ -13,14 +13,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls\Controls.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Data\Controls.Data.OpenSilver.csproj" />
     <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
     <ProjectReference Include="..\Controls.DataVisualization\Controls.DataVisualization.OpenSilver.csproj" />
-    <ProjectReference Include="..\Controls.Data\Controls.Data.OpenSilver.csproj" />
-    <ProjectReference Include="..\Controls.Layout.Toolkit\Controls.Layout.Toolkit.OpenSilver.csproj" />
-    <ProjectReference Include="..\DataForm.Toolkit\DataForm.Toolkit.OpenSilver.csproj" />
-    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
     <ProjectReference Include="..\Controls.Input\Controls.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Input.Toolkit\Controls.Input.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Layout.Toolkit\Controls.Layout.Toolkit.OpenSilver.csproj" />
     <ProjectReference Include="..\Controls.Theming.Toolkit\Controls.Theming.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Toolkit\Controls.Toolkit.OpenSilver.csproj" />
+    <ProjectReference Include="..\DataForm.Toolkit\DataForm.Toolkit.OpenSilver.csproj" />
   </ItemGroup>
 
   <ItemGroup>

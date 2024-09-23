@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
     <value>Cannot perform operation.</value>
@@ -219,14 +219,6 @@
   <data name="TreeViewExtensions_GetDepth_NotInTreeView" xml:space="preserve">
     <value>The item is not in a TreeView.</value>
     <comment>Exception thrown when getting the depth of an item not in a TreeView.</comment>
-  </data>
-  <data name="TypeConverters_ConvertFrom_CannotConvertFromType" xml:space="preserve">
-    <value>'{0}' cannot convert from '{1}'.</value>
-    <comment>Exception thrown when a type converter is asked to convert something it cannot.</comment>
-  </data>
-  <data name="TypeConverters_Convert_CannotConvert" xml:space="preserve">
-    <value>'{0}' is unable to convert '{1}' to '{2}'.</value>
-    <comment>Exception thrown when a type converter fails to convert a value to another type.</comment>
   </data>
   <data name="UIElementExtendedRoutedEventExtensions_TypeOfHandlerMustBeDragEventHandler" xml:space="preserve">
     <value>Type of the event handler must be DragEventHandler.</value>

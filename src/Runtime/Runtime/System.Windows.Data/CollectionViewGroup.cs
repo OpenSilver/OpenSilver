@@ -1,154 +1,118 @@
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace System.Windows.Data
+namespace System.Windows.Data;
+
+/// <summary>
+/// Represents a group created by a <see cref="CollectionView"/> object based on the 
+/// <see cref="CollectionView.GroupDescriptions"/>.
+/// </summary>
+public abstract class CollectionViewGroup : INotifyPropertyChanged
 {
     /// <summary>
-    /// A CollectionViewGroup, as created by a CollectionView according to a GroupDescription.
+    /// Initializes a new instance of the <see cref="CollectionViewGroup"/> class with 
+    /// the specified group name.
     /// </summary>
-    public abstract class CollectionViewGroup : INotifyPropertyChanged
+    /// <param name="name">
+    /// The name of the group.
+    /// </param>
+    protected CollectionViewGroup(object name)
     {
-        #region Constructors
+        Name = name;
+        ProtectedItems = new ObservableCollection<object>();
+        Items = new ReadOnlyObservableCollection<object>(ProtectedItems);
+    }
 
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
+    /// <summary>
+    /// Gets the name of this group.
+    /// </summary>
+    /// <returns>
+    /// The name of this group.
+    /// </returns>
+    public object Name { get; }
 
-        /// <summary>
-        /// Initializes a new instance of CollectionViewGroup.
-        /// </summary>
-        protected CollectionViewGroup(object name)
+    /// <summary>
+    /// Gets the items that are immediate children of the group.
+    /// </summary>
+    /// <returns>
+    /// A read-only collection of the immediate items in this group. This is either a
+    /// collection of subgroups or a collection of data items if this group does not
+    /// have any subgroups.
+    /// </returns>
+    public ReadOnlyObservableCollection<object> Items { get; }
+
+    /// <summary>
+    /// Gets the number of data items in the subtree under this group.
+    /// </summary>
+    /// <returns>
+    /// The number of data items in the subtree under this group.
+    /// </returns>
+    public int ItemCount { get; private set; }
+
+    /// <summary>
+    /// Gets a value that indicates whether this group has any subgroups.
+    /// </summary>
+    /// <returns>
+    /// true if this group is at the bottom level and does not have any subgroups; otherwise, false.
+    /// </returns>
+    public abstract bool IsBottomLevel { get; }
+
+    /// <summary>
+    /// PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+    /// </summary>
+    event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+    {
+        add => PropertyChanged += value;
+        remove => PropertyChanged -= value;
+    }
+
+    /// <summary>
+    /// Occurs when a property value changes.
+    /// </summary>
+    protected virtual event PropertyChangedEventHandler PropertyChanged;
+
+    /// <summary>
+    /// Raises the <see cref="PropertyChanged"/> event with the provided arguments.
+    /// </summary>
+    /// <param name="e">
+    /// The event data.
+    /// </param>
+    protected virtual void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+
+    /// <summary>
+    /// Gets the immediate items that are contained in this group.
+    /// </summary>
+    /// <returns>
+    /// The immediate items that are contained in this group.
+    /// </returns>
+    protected ObservableCollection<object> ProtectedItems { get; }
+
+    /// <summary>
+    /// Gets or sets the number of data items in the subtree under this group.
+    /// </summary>
+    /// <returns>
+    /// The number of data items in the subtree under this group.
+    /// </returns>
+    protected int ProtectedItemCount
+    {
+        get { return ItemCount; }
+        set
         {
-            _name = name;
-            _itemsRW = new ObservableCollection<object>();
-            _itemsRO = new ReadOnlyObservableCollection<object>(_itemsRW);
+            ItemCount = value;
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(ItemCount)));
         }
-
-        #endregion Constructors
-
-        #region Public Properties
-
-        //------------------------------------------------------
-        //
-        //  Public Properties
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// The name of the group, i.e. the common value of the
-        /// property used to divide data items into groups.
-        /// </summary>
-        public object Name
-        {
-            get { return _name; }
-        }
-
-        /// <summary>
-        /// The immediate children of the group.
-        /// These may be data items (leaves) or subgroups.
-        /// </summary>
-        public ReadOnlyObservableCollection<object> Items
-        {
-            get { return _itemsRO; }
-        }
-
-        /// <summary>
-        /// The number of data items (leaves) in the subtree under this group.
-        /// </summary>
-        public int ItemCount
-        {
-            get { return _itemCount; }
-        }
-
-        /// <summary>
-        /// Is this group at the bottom level (not further subgrouped).
-        /// </summary>
-        public abstract bool IsBottomLevel
-        {
-            get;
-        }
-
-        #endregion Public Properties
-
-        #region INotifyPropertyChanged
-
-        /// <summary>
-        /// PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
-        /// </summary>
-        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
-        {
-            add { PropertyChanged += value; }
-            remove { PropertyChanged -= value; }
-        }
-
-        /// <summary>
-        /// PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
-        /// </summary>
-        protected virtual event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Raises a PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
-        /// </summary>
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, e);
-            }
-        }
-
-        #endregion INotifyPropertyChanged
-
-        #region Protected Properties
-
-        //------------------------------------------------------
-        //
-        //  Protected Properties
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// The items of the group.
-        /// Derived classes can add or remove items using this property;
-        /// the changes will be reflected in the public Items property.
-        /// </summary>
-        protected ObservableCollection<object> ProtectedItems
-        {
-            get { return _itemsRW; }
-        }
-
-        /// <summary>
-        /// The number of data items (leaves) in the subtree under this group.
-        /// Derived classes can change the count using this property;
-        /// the changes will be reflected in the public ItemCount property.
-        /// </summary>
-        protected int ProtectedItemCount
-        {
-            get { return _itemCount; }
-            set
-            {
-                _itemCount = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("ItemCount"));
-            }
-        }
-
-        #endregion Protected Properties
-
-        #region Private Fields
-
-        //------------------------------------------------------
-        //
-        //  Private Fields
-        //
-        //------------------------------------------------------
-
-        object _name;
-        ObservableCollection<object> _itemsRW;
-        ReadOnlyObservableCollection<object> _itemsRO;
-        int _itemCount;
-
-        #endregion Private Fields
     }
 }

@@ -15,7 +15,6 @@ namespace System.Windows.Controls
     /// Exposes ListTimePickerPopup types to UI Automation.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
     public class ListTimePickerPopupAutomationPeer : TimePickerPopupAutomationPeer, ISelectionProvider
     {
         /// <summary>

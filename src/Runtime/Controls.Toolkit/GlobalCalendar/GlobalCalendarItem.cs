@@ -1178,7 +1178,7 @@ namespace System.Windows.Controls.Primitives
                 }
 
                 bool ctrl, shift;
-                CalendarExtensions.GetMetaKeyState(out ctrl, out shift);
+                GlobalCalendarExtensions.GetMetaKeyState(out ctrl, out shift);
                 GlobalCalendarDayButton b = sender as GlobalCalendarDayButton;
 
                 if (b != null)
@@ -1315,7 +1315,7 @@ namespace System.Windows.Controls.Primitives
             if (Owner != null)
             {
                 bool ctrl, shift;
-                CalendarExtensions.GetMetaKeyState(out ctrl, out shift);
+                GlobalCalendarExtensions.GetMetaKeyState(out ctrl, out shift);
                 GlobalCalendarDayButton b = sender as GlobalCalendarDayButton;
                 if (b != null && !b.IsBlackout)
                 {
@@ -1376,7 +1376,7 @@ namespace System.Windows.Controls.Primitives
             if (Owner != null)
             {
                 bool ctrl, shift;
-                CalendarExtensions.GetMetaKeyState(out ctrl, out shift);
+                GlobalCalendarExtensions.GetMetaKeyState(out ctrl, out shift);
 
                 if (ctrl && Owner.SelectionMode == CalendarSelectionMode.MultipleRange)
                 {

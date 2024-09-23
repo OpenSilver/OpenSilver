@@ -2269,7 +2269,7 @@ namespace System.Windows.Controls
             {
                 bool ctrl;
                 bool shift;
-                CalendarExtensions.GetMetaKeyState(out ctrl, out shift);
+                GlobalCalendarExtensions.GetMetaKeyState(out ctrl, out shift);
 
                 if (!ctrl)
                 {
@@ -2341,7 +2341,7 @@ namespace System.Windows.Controls
             Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, e.Key);
 
             bool ctrl, shift;
-            CalendarExtensions.GetMetaKeyState(out ctrl, out shift);
+            GlobalCalendarExtensions.GetMetaKeyState(out ctrl, out shift);
 
             switch (invariantKey)
             {

@@ -3,6 +3,8 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+#if DEBUG
+
 using System.Windows.Controls.Primitives;
 
 namespace System.Windows.Controls
@@ -116,3 +118,5 @@ namespace System.Windows.Controls
         }
     }
 }
+
+#endif

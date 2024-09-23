@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\Runtime\Browser\Browser.OpenSilver.csproj" />
   </ItemGroup>
 
 </Project>

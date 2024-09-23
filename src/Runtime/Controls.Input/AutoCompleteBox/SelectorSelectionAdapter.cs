@@ -164,7 +164,7 @@ namespace System.Windows.Controls
                 ScrollViewer sv = SelectorControl.GetLogicalChildrenBreadthFirst().OfType<ScrollViewer>().FirstOrDefault();
                 if (sv != null)
                 {
-                    sv.ScrollToTop();
+                    sv.ScrollToVerticalOffset(0);
                 }
             }
         }

@@ -33,6 +33,15 @@ namespace OpenSilver.Compiler
 
             switch (assemblyName)
             {
+                case "System.Windows":
+                    assemblyName = "OpenSilver";
+                    return;
+                case "System.Windows.Browser":
+                    assemblyName = "OpenSilver.Browser";
+                    return;
+                case "System.Windows.Controls":
+                    assemblyName = "OpenSilver.Controls";
+                    return;
                 case "System.Windows.Controls.Data.Input":
                     assemblyName = "OpenSilver.Controls.Data.Input";
                     return;
@@ -53,6 +62,9 @@ namespace OpenSilver.Compiler
                     return;
                 case "System.Windows.Controls.Input":
                     assemblyName = "OpenSilver.Controls.Input";
+                    return;
+                case "System.Windows.Controls.Input.Toolkit":
+                    assemblyName = "OpenSilver.Controls.Input.Toolkit";
                     return;
                 case "System.Windows.Controls.Layout.Toolkit":
                     assemblyName = "OpenSilver.Controls.Layout.Toolkit";
@@ -96,6 +108,12 @@ namespace OpenSilver.Compiler
                 case "System.Windows.Controls.Theming.SystemColors":
                     assemblyName = "OpenSilver.Controls.Theming.SystemColors";
                     return;
+                case "System.Windows.Controls.Toolkit":
+                    assemblyName = "OpenSilver.Controls.Toolkit";
+                    return;
+                case "System.Windows.Data":
+                    assemblyName = "OpenSilver.Data";
+                    return;
                 case "System.Windows.Interactivity":
                     assemblyName = "OpenSilver.Interactivity";
                     return;
@@ -108,15 +126,6 @@ namespace OpenSilver.Compiler
                 case "System.Windows.Controls.DomainServices":
                     assemblyName = "OpenRiaServices.Controls.DomainServices";
                     namespaceName = "OpenRiaServices.Controls";
-                    return;
-                case "System":
-                case "System.Windows":
-                case "System.Windows.Browser":
-                case "System.Windows.Controls":
-                case "System.Windows.Controls.Toolkit":
-                case "System.Windows.Controls.Input.Toolkit":
-                case "System.Windows.Data":
-                    assemblyName = Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
                     return;
             }
         }

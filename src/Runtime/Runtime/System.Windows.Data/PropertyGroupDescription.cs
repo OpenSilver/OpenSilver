@@ -7,236 +7,228 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Windows.Common;
+using OpenSilver.Internal.Data;
 
-namespace System.Windows.Data
+namespace System.Windows.Data;
+
+/// <summary>
+/// Describes the grouping of items by using a property name as the criteria.
+/// </summary>
+public class PropertyGroupDescription : GroupDescription
 {
-    
+    /// <summary>
+    /// Cached Type that we store when we are looking for a property value
+    /// </summary>
+    private Type _cachedType;
 
     /// <summary>
-    /// Describes the grouping of items using a property name as the criteria. 
+    /// Private accessor for the Converter
     /// </summary>
-    /// <QualityBand>Stable</QualityBand>
-    public class PropertyGroupDescription : GroupDescription
+    private IValueConverter _converter;
+
+    /// <summary>
+    /// Private accessor for the PropertyName
+    /// </summary>
+    private string _propertyName;
+
+    /// <summary>
+    /// Private accessor for the StringComparison
+    /// </summary>
+    private StringComparison _stringComparison;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyGroupDescription"/> class.
+    /// </summary>
+    public PropertyGroupDescription()
     {
-#region Private Fields
+        _stringComparison = StringComparison.Ordinal;
+    }
 
-        //------------------------------------------------------
-        //
-        //  Private Fields
-        //
-        //------------------------------------------------------
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyGroupDescription"/> class with the specified 
+    /// property name.
+    /// </summary>
+    /// <param name="propertyName">
+    /// The name of the property that specifies which group an item belongs to.
+    /// </param>
+    public PropertyGroupDescription(string propertyName)
+        : this()
+    {
+        _propertyName = propertyName;
+    }
 
-        /// <summary>
-        /// Cached Type that we store when we are looking for a property value
-        /// </summary>
-        private Type _cachedType;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyGroupDescription"/> class with the specified 
+    /// property name and converter.
+    /// </summary>
+    /// <param name="propertyName">
+    /// The name of the property that specifies which group an item belongs to. If this parameter is null,
+    /// the item itself is passed to the value converter.
+    /// </param>
+    /// <param name="converter">
+    /// An <see cref="IValueConverter"/> object to apply to the property value or the item to produce the 
+    /// final value that is used to determine which group(s) an item belongs to. The converter may return 
+    /// a collection, which indicates that the items can appear in more than one group.
+    /// </param>
+    public PropertyGroupDescription(string propertyName, IValueConverter converter)
+        : this(propertyName)
+    {
+        _converter = converter;
+    }
 
-        /// <summary>
-        /// Private accessor for the Converter
-        /// </summary>
-        private IValueConverter _converter;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyGroupDescription"/> class with the specified 
+    /// property name, converter, and string comparison.
+    /// </summary>
+    /// <param name="propertyName">
+    /// The name of the property that specifies which group an item belongs to. If this parameter is null, 
+    /// the item itself is passed to the value converter.
+    /// </param>
+    /// <param name="converter">
+    /// An <see cref="IValueConverter"/> object to apply to the property value or the item to produce the 
+    /// final value that is used to determine which group(s) an item belongs to. The converter may return 
+    /// a collection, which indicates that the items can appear in more than one group.
+    /// </param>
+    /// <param name="stringComparison">
+    /// A <see cref="StringComparison"/> value that specifies the comparison between the value of an item 
+    /// and the name of a group.
+    /// </param>
+    public PropertyGroupDescription(string propertyName, IValueConverter converter, StringComparison stringComparison)
+        : this(propertyName, converter)
+    {
+        _stringComparison = stringComparison;
+    }
 
-        /// <summary>
-        /// Private accessor for the PropertyName
-        /// </summary>
-        private string _propertyName;
-
-        /// <summary>
-        /// Private accessor for the StringComparison
-        /// </summary>
-        private StringComparison _stringComparison;
-
-#endregion Private Fields
-
-#region Constructors
-
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// Initializes a new instance of the PropertyGroupDescription class.
-        /// </summary>
-        public PropertyGroupDescription()
+    /// <summary>
+    /// Gets or sets a converter to apply to the property value or the item to produce the final value that 
+    /// is used to determine which group(s) an item belongs to.
+    /// </summary>
+    /// <returns>
+    /// The converter to apply. The default is null.
+    /// </returns>
+    [DefaultValue(null)]
+    public IValueConverter Converter
+    {
+        get { return _converter; }
+        set
         {
-            this._stringComparison = StringComparison.Ordinal;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the PropertyGroupDescription class.
-        /// </summary>
-        /// <param name="propertyName">Property name that we want to group by</param>
-        public PropertyGroupDescription(string propertyName) : this()
-        {
-            this._propertyName = propertyName;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the PropertyGroupDescription class.
-        /// </summary>
-        /// <param name="propertyName">Property name that we want to group by</param>
-        /// <param name="converter">Converter applied to the property value before determining the group name</param>
-        public PropertyGroupDescription(string propertyName, IValueConverter converter) : this(propertyName)
-        {
-            this._converter = converter;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the PropertyGroupDescription class.
-        /// </summary>
-        /// <param name="propertyName">Property name that we want to group by</param>
-        /// <param name="converter">Converter applied to the property value before determining the group name</param>
-        /// <param name="stringComparison">The type of string comparison to use</param>
-        public PropertyGroupDescription(string propertyName, IValueConverter converter, StringComparison stringComparison) : this(propertyName, converter)
-        {
-            this._stringComparison = stringComparison;
-        }
-
-#endregion Constructors
-
-#region Public Properties
-
-        //------------------------------------------------------
-        //
-        //  Public Properties
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// Gets or sets a converter to apply to the property value or the item to 
-        /// produce the final value that is used to determine which group(s) an 
-        /// item belongs to. 
-        /// </summary>
-        [DefaultValue(null)]
-        public IValueConverter Converter
-        {
-            get
+            if (_converter != value)
             {
-                return this._converter;
+                _converter = value;
+                OnPropertyChanged(nameof(Converter));
             }
-
-            set
-            {
-                if (this._converter != value)
-                {
-                    this._converter = value;
-                    this.OnPropertyChanged("Converter");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name of the property that is used to determine which 
-        /// group(s) an item belongs to. 
-        /// </summary>
-        [DefaultValue(null)]
-        public string PropertyName
-        {
-            get
-            {
-                return this._propertyName;
-            }
-
-            set
-            {
-                if (this._propertyName != value)
-                {
-                    this._propertyName = value;
-                    this._cachedType = null;
-                    this.OnPropertyChanged("PropertyName");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a StringComparison value that specifies the comparison 
-        /// between the value of an item (as determined by PropertyName and Converter) 
-        /// and the name of a group. 
-        /// </summary>
-        [DefaultValue(StringComparison.Ordinal)]
-        public StringComparison StringComparison
-        {
-            get
-            {
-                return this._stringComparison;
-            }
-
-            set
-            {
-                if (this._stringComparison != value)
-                {
-                    this._stringComparison = value;
-                    this.OnPropertyChanged("StringComparison");
-                }
-            }
-        }
-
-#endregion Public Properties
-
-        /// <summary>
-        /// Returns the group name(s) for the given item
-        /// </summary>
-        /// <param name="item">The item to return group names for</param>
-        /// <param name="level">The level of grouping</param>
-        /// <param name="culture">The CultureInfo to supply to the converter</param>
-        /// <returns>The group name(s) for the given item</returns>
-        public override object GroupNameFromItem(object item, int level, CultureInfo culture)
-        {
-            if (item != null)
-            {
-                if (this._cachedType == null)
-                {
-                    this._cachedType = TypeHelper.GetNestedPropertyType(item.GetType(), this._propertyName);
-                }
-
-                Exception exception;
-                object propertyValue = TypeHelper.GetNestedPropertyValue(item, this._propertyName, this._cachedType, out exception);
-                if (exception != null)
-                {
-                    throw exception;
-                }
-
-                if (this.Converter != null)
-                {
-                    return this.Converter.Convert(propertyValue, typeof(object), null, culture);
-                }
-                else
-                {
-                    return propertyValue;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Returns a value that indicates whether the group name and 
-        /// the item name match so that the item belongs to the group.
-        /// </summary>
-        /// <param name="groupName">The name of the group to check</param>
-        /// <param name="itemName">The name of the item to check</param>
-        /// <returns>true if the names match and the item belongs to the group; otherwise, false</returns>
-        public override bool NamesMatch(object groupName, object itemName)
-        {
-            string a = groupName as string;
-            string b = itemName as string;
-            if ((a != null) && (b != null))
-            {
-                return string.Equals(a, b, this.StringComparison);
-            }
-
-            return object.Equals(groupName, itemName);
-        }
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
     }
+
+    /// <summary>
+    /// Gets or sets the name of the property that is used to determine which group(s) an item belongs to.
+    /// </summary>
+    /// <returns>
+    /// The name of the property that is used to determine which group(s) an item belongs to. The default 
+    /// is null.
+    /// </returns>
+    [DefaultValue(null)]
+    public string PropertyName
+    {
+        get { return _propertyName; }
+        set
+        {
+            if (_propertyName != value)
+            {
+                _propertyName = value;
+                _cachedType = null;
+                OnPropertyChanged(nameof(PropertyName));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a <see cref="System.StringComparison"/> value that specifies the comparison between 
+    /// the value of an item (as determined by <see cref="PropertyName"/> and <see cref="Converter"/>) 
+    /// and the name of a group.
+    /// </summary>
+    /// <returns>
+    /// An enumeration value that specifies the comparison between the value of an item and the name of 
+    /// a group. The default is <see cref="StringComparison.Ordinal"/>.
+    /// </returns>
+    [DefaultValue(StringComparison.Ordinal)]
+    public StringComparison StringComparison
+    {
+        get { return _stringComparison; }
+        set
+        {
+            if (_stringComparison != value)
+            {
+                _stringComparison = value;
+                OnPropertyChanged(nameof(StringComparison));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Returns the group name(s) for the specified item.
+    /// </summary>
+    /// <param name="item">
+    /// The item to return group names for.
+    /// </param>
+    /// <param name="level">
+    /// The level of grouping.
+    /// </param>
+    /// <param name="culture">
+    /// The <see cref="CultureInfo"/> to supply to the converter.
+    /// </param>
+    /// <returns>
+    /// The group name(s) for the specified item.
+    /// </returns>
+    public override object GroupNameFromItem(object item, int level, CultureInfo culture)
+    {
+        if (item is not null)
+        {
+            _cachedType ??= TypeHelper.GetNestedPropertyType(item.GetType(), _propertyName);
+
+            object propertyValue = TypeHelper.GetNestedPropertyValue(item, _propertyName, _cachedType, out Exception exception);
+            if (exception is not null)
+            {
+                throw exception;
+            }
+
+            if (Converter is not null)
+            {
+                return Converter.Convert(propertyValue, typeof(object), null, culture);
+            }
+            else
+            {
+                return propertyValue;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Returns a value that indicates whether the group name and the item name match, which indicates 
+    /// that the item belongs to the group.
+    /// </summary>
+    /// <param name="groupName">
+    /// The name of the group to check.
+    /// </param>
+    /// <param name="itemName">
+    /// The name of the item to check.
+    /// </param>
+    /// <returns>
+    /// true if the names match, which indicates that the item belongs to the group; otherwise, false.
+    /// </returns>
+    public override bool NamesMatch(object groupName, object itemName)
+    {
+        if (groupName is string a && itemName is string b)
+        {
+            return string.Equals(a, b, StringComparison);
+        }
+
+        return Equals(groupName, itemName);
+    }
+
+    private void OnPropertyChanged(string propertyName) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 }

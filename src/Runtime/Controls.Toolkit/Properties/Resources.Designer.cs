@@ -39,7 +39,7 @@ namespace OpenSilver.Controls.Toolkit {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Runtime.OpenSilver.Controls.Toolkit.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("System.Windows.Controls.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -328,24 +328,6 @@ namespace OpenSilver.Controls.Toolkit {
         internal static string TreeViewExtensions_GetDepth_NotInTreeView {
             get {
                 return ResourceManager.GetString("TreeViewExtensions_GetDepth_NotInTreeView", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is unable to convert &apos;{1}&apos; to &apos;{2}&apos;..
-        /// </summary>
-        internal static string TypeConverters_Convert_CannotConvert {
-            get {
-                return ResourceManager.GetString("TypeConverters_Convert_CannotConvert", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; cannot convert from &apos;{1}&apos;..
-        /// </summary>
-        internal static string TypeConverters_ConvertFrom_CannotConvertFromType {
-            get {
-                return ResourceManager.GetString("TypeConverters_ConvertFrom_CannotConvertFromType", resourceCulture);
             }
         }
         

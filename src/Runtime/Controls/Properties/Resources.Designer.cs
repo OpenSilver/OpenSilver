@@ -39,7 +39,7 @@ namespace OpenSilver.Controls {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Runtime.OpenSilver.Controls.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("System.Windows.Controls.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,15 +57,6 @@ namespace OpenSilver.Controls {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot perform operation..
-        /// </summary>
-        internal static string Automation_OperationCannotBePerformed {
-            get {
-                return ResourceManager.GetString("Automation_OperationCannotBePerformed", resourceCulture);
             }
         }
         
@@ -214,15 +205,6 @@ namespace OpenSilver.Controls {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot call Show() on a ChildWindow that is in the visual tree. ChildWindow should be the top-most element in the .xaml file..
-        /// </summary>
-        internal static string ChildWindow_InvalidOperation {
-            get {
-                return ResourceManager.GetString("ChildWindow_InvalidOperation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Show Calendar.
         /// </summary>
         internal static string DatePicker_DropDownButtonName {
@@ -336,60 +318,6 @@ namespace OpenSilver.Controls {
         internal static string TabControl_InvalidIndex {
             get {
                 return ResourceManager.GetString("TabControl_InvalidIndex", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property SelectedItem..
-        /// </summary>
-        internal static string TreeView_OnSelectedItemPropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeView_OnSelectedItemPropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property SelectedValue..
-        /// </summary>
-        internal static string TreeView_OnSelectedValuePropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeView_OnSelectedValuePropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property HasItems..
-        /// </summary>
-        internal static string TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot set read-only property IsSelectionActive..
-        /// </summary>
-        internal static string TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite {
-            get {
-                return ResourceManager.GetString("TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is unable to convert &apos;{1}&apos; to &apos;{2}&apos;..
-        /// </summary>
-        internal static string TypeConverters_Convert_CannotConvert {
-            get {
-                return ResourceManager.GetString("TypeConverters_Convert_CannotConvert", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; cannot convert from &apos;{1}&apos;..
-        /// </summary>
-        internal static string TypeConverters_ConvertFrom_CannotConvertFromType {
-            get {
-                return ResourceManager.GetString("TypeConverters_ConvertFrom_CannotConvertFromType", resourceCulture);
             }
         }
     }

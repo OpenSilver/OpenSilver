@@ -1,0 +1,52 @@
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AssemblyName>OpenSilver.Data</AssemblyName>
+    <RootNamespace>System.Windows.Data</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DefineTrace>true</DefineTrace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Runtime\OpenSilver\Internal\Data\SortFieldComparer.cs">
+      <Link>PagedCollectionView\SortFieldComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\OpenSilver\Internal\Data\CultureSensitiveComparer.cs">
+      <Link>PagedCollectionView\CultureSensitiveComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\OpenSilver\Internal\Data\TypeHelper.cs">
+      <Link>PagedCollectionView\TypeHelper.cs</Link>
+    </Compile>
+    <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
+    <Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
+    <Compile Include="PagedCollectionView\IPagedCollectionView.cs" />
+    <Compile Include="PagedCollectionView\PageChangingEventArgs.cs" />
+    <Compile Include="PagedCollectionView\PagedCollectionView.cs" />
+    <Compile Include="PagedCollectionView\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="PagedCollectionView\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Internal</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(OpenSilverTargets)" />
+
+</Project>

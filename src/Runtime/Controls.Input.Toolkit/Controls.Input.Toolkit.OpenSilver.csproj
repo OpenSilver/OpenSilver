@@ -1,0 +1,139 @@
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <AssemblyName>OpenSilver.Controls.Input.Toolkit</AssemblyName>
+    <RootNamespace>System.Windows.Controls</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DefineTrace>true</DefineTrace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+    <ProjectReference Include="..\Controls.Toolkit\Controls.Toolkit.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Controls.Input\Common\Extensions.cs">
+      <Link>Common\Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Controls.Toolkit\Common\BindingSourceEvaluator.cs">
+      <Link>Common\BindingSourceEvaluator.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\System.Windows.Controls\InteractionHelper.cs">
+      <Link>Common\InteractionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\System.Windows.Controls\ItemsControlHelper.cs">
+      <Link>Common\ItemsControlHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\System.Windows.Controls\IUpdateVisualState.cs">
+      <Link>Common\IUpdateVisualState.cs</Link>
+    </Compile>
+    <Compile Include="Common\TypeConverters.cs" />
+    <Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">
+      <Link>Common\VisualStates.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\OpenSilver\Internal\WeakEventListener.cs">
+      <Link>Common\WeakEventListener.cs</Link>
+    </Compile>
+    <Compile Include="..\Runtime\System.Runtime.CompilerServices\IsExternalInit.cs">
+      <Link>System.Runtime.CompilerServices\IsExternalInit.cs</Link>
+    </Compile>
+    <Compile Include="DomainUpDown\DomainUpDown.cs" />
+    <Compile Include="DomainUpDown\DomainUpDownAutomationPeer.cs" />
+    <Compile Include="DomainUpDown\InvalidInputAction.cs" />
+    <Compile Include="DomainUpDown\ObservableObjectCollection.cs" />
+    <Compile Include="NumericUpDown\NumericUpDown.cs" />
+    <Compile Include="NumericUpDown\NumericUpDownAutomationPeer.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Rating\Clipper.cs" />
+    <Compile Include="Rating\EnumerableFunctions.cs" />
+    <Compile Include="Rating\LinearClipper.cs" />
+    <Compile Include="Rating\NullableConverter.cs" />
+    <Compile Include="Rating\Rating.cs" />
+    <Compile Include="Rating\RatingAutomationPeer.cs" />
+    <Compile Include="Rating\RatingItem.cs" />
+    <Compile Include="Rating\RatingItemAutomationPeer.cs" />
+    <Compile Include="Rating\RatingSelectionMode.cs" />
+    <Compile Include="Spinner\ButtonSpinner.cs" />
+    <Compile Include="Spinner\SpinDirection.cs" />
+    <Compile Include="Spinner\SpinEventArgs.cs" />
+    <Compile Include="Spinner\Spinner.cs" />
+    <Compile Include="Spinner\ValidSpinDirections.cs" />
+    <Compile Include="TimeInput\AutomationPeers\ListTimePickerPopupAutomationPeer.cs" />
+    <Compile Include="TimeInput\AutomationPeers\PickerAutomationPeer.cs" />
+    <Compile Include="TimeInput\AutomationPeers\RangeTimePickerPopupAutomationPeer.cs" />
+    <Compile Include="TimeInput\AutomationPeers\TimePickerPopupAutomationPeer.cs" />
+    <Compile Include="TimeInput\AutomationPeers\TimePickerAutomationPeer.cs" />
+    <Compile Include="TimeInput\AutomationPeers\TimeUpDownAutomationPeer.cs" />
+    <Compile Include="TimeInput\Popups\ItemSelectionHelper.cs" />
+    <Compile Include="TimeInput\Popups\ListTimePickerPopup.cs" />
+    <Compile Include="TimeInput\Popups\RangeTimePickerPopup.cs" />
+    <Compile Include="TimeInput\Popups\TimePickerPopup.cs" />
+    <Compile Include="TimeInput\Popups\TimePickerPopupTemplate.cs" />
+    <Compile Include="TimeInput\PopupTimeSelectionMode.cs" />
+    <Compile Include="TimeInput\TimeFormat\CustomTimeFormat.cs" />
+    <Compile Include="TimeInput\TimeFormat\ITimeFormat.cs" />
+    <Compile Include="TimeInput\TimeFormat\LongTimeFormat.cs" />
+    <Compile Include="TimeInput\TimeFormat\ShortTimeFormat.cs" />
+    <Compile Include="TimeInput\TimeFormat\TimeFormatConverter.cs" />
+    <Compile Include="TimeInput\TimeGlobalizationInfo.cs" />
+    <Compile Include="TimeInput\ITimeInput.cs" />
+    <Compile Include="TimeInput\Picker.cs" />
+    <Compile Include="TimeInput\TimeCoercionHelper.cs" />
+    <Compile Include="TimeInput\TimeParser.cs" />
+    <Compile Include="TimeInput\TimeParserCollection.cs" />
+    <Compile Include="TimeInput\TimeParsers\CatchallTimeParser.cs" />
+    <Compile Include="TimeInput\TimePicker.cs" />
+    <Compile Include="TimeInput\TimeTypeConverter.cs" />
+    <Compile Include="TimeInput\TimeUpDown.cs" />
+    <Compile Include="UpDownBase\UpDownBase.cs" />
+    <Compile Include="UpDownBase\UpDownBase.Generic.cs" />
+    <Compile Include="UpDownBase\UpDownBaseAutomationPeer.cs" />
+    <Compile Include="UpDownBase\UpDownParseErrorEventArgs.cs" />
+    <Compile Include="UpDownBase\UpDownParsingEventArgs.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Controls.Input.Toolkit</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="NumericUpDown\NumericUpDown.xaml" />
+    <None Include="Spinner\ButtonSpinner.xaml" />
+    <None Include="UpDownBase\UpDownBase.xaml" />
+    <None Include="DomainUpDown\DomainUpDown.xaml" />
+    <None Include="TimeInput\Picker.xaml" />
+    <None Include="TimeInput\TimeUpDown.xaml" />
+    <None Include="TimeInput\Popups\ListTimePickerPopup.xaml" />
+    <None Include="TimeInput\TimePicker.xaml" />
+    <None Include="TimeInput\Popups\RangeTimePickerPopup.xaml" />
+    <None Include="Rating\Rating.xaml" />
+    <None Include="Rating\RatingItem.xaml" />
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="$(OpenSilverTargets)" />
+
+</Project>

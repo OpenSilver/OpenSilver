@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Windows.Browser;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -241,7 +240,7 @@ namespace CSHTML5.Internal
             }
             else if (uriString.StartsWith("/"))
             {
-                string originalString = HtmlPage.Document.DocumentUri.OriginalString;
+                string originalString = GetDocumentURI();
                 int firstIndexOfSlashAfterNameOfDomain = -1;
                 string httpPrefix = string.Empty;
                 string nameOfDomain = originalString;
@@ -265,7 +264,7 @@ namespace CSHTML5.Internal
             }
             else
             {
-                string originalString = HtmlPage.Document.DocumentUri.OriginalString;
+                string originalString = GetDocumentURI();
                 int lastIndexOfSlash = originalString.LastIndexOf('/');
                 if (lastIndexOfSlash > -1)
                 {
@@ -284,6 +283,8 @@ namespace CSHTML5.Internal
                 }
             }
         }
+
+        private static string GetDocumentURI() => OpenSilver.Interop.ExecuteJavaScriptString("window.location.href");
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
