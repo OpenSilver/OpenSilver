@@ -62,6 +62,8 @@ namespace DotNetForHtml5.Core
 
         internal static IWebAssemblyExecutionHandler WebAssemblyExecutionHandler { get; private set; }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static dynamic WebClientFactory { get; set; }
 
         internal static IAsyncClipboard AsyncClipboard { get; set; }

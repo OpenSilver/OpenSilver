@@ -16,9 +16,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.Console
             set { SetValue(MessageBackgroundProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for MessageBackground.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MessageBackgroundProperty =
-            DependencyProperty.Register("MessageBackground", typeof(Brush), typeof(ConsoleMessageControl), new PropertyMetadata(new SolidColorBrush(Colors.Transparent)));
+            DependencyProperty.Register("MessageBackground", typeof(Brush), typeof(ConsoleMessageControl), new PropertyMetadata(Brushes.Transparent));
         #endregion
 
         #region MessageForeground
@@ -28,9 +27,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.Console
             set { SetValue(MessageForegroundProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for MessageForeground.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MessageForegroundProperty =
-            DependencyProperty.Register("MessageForeground", typeof(Brush), typeof(ConsoleMessageControl), new PropertyMetadata(new SolidColorBrush(Colors.Transparent)));
+            DependencyProperty.Register("MessageForeground", typeof(Brush), typeof(ConsoleMessageControl), new PropertyMetadata(Brushes.Transparent));
         #endregion
 
         public ConsoleMessageControl()
@@ -49,7 +47,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.Console
                 case ConsoleMessage.LogLevel:
                 case ConsoleMessage.InfoLevel:
                 case ConsoleMessage.DebugLevel:
-                    MessageBackground = new SolidColorBrush(Colors.Transparent);
+                    MessageBackground = Brushes.Transparent;
                     MessageForeground = new SolidColorBrush(Color.FromRgb(0xD5, 0xD5, 0xD5));
                     break;
                 case ConsoleMessage.WarningLevel:

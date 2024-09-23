@@ -22,6 +22,8 @@ namespace OpenSilver.Compiler
 {
     public class Updates : Task
     {
+        private const string Key = "Identifier";
+
         [Required]
         public string PackagePath { get; set; }
 
@@ -51,11 +53,11 @@ namespace OpenSilver.Compiler
 
         private static string GetIdentifier()
         {
-            string id = OpenSilverSettings.Instance.GetValue(Constants.UPDATES_IDENTIFIER_KEY);
+            string id = OpenSilverSettings.Instance.GetValue(Key);
             if (string.IsNullOrWhiteSpace(id))
             {
                 id = Guid.NewGuid().ToString();
-                OpenSilverSettings.Instance.SetValue(Constants.UPDATES_IDENTIFIER_KEY, id);
+                OpenSilverSettings.Instance.SetValue(Key, id);
                 OpenSilverSettings.Instance.SaveSettings();
             }
             return id;

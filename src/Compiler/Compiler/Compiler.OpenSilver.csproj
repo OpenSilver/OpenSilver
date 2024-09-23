@@ -79,12 +79,8 @@
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
     <Compile Include="EntryPoints\ServiceReferenceFixer.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferences.cs" />
-    <Compile Include="OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\Constants.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesInspector.cs" />
-    <Compile Include="OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
   </ItemGroup>
   <ItemGroup>

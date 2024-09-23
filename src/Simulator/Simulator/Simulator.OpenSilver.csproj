@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net462</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <RootNamespace>OpenSilver.Simulator</RootNamespace>
@@ -15,10 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1905-prerelease" />
-    <PackageReference Include="Microsoft.Web.WebView2.DevToolsProtocolExtension" Version="1.0.824" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2739.15" />
+    <PackageReference Include="Microsoft.Web.WebView2.DevToolsProtocolExtension" Version="1.0.2271" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,16 +32,8 @@
     <None Remove="Expand-Icon-5.png" />
     <None Remove="interop_debug_root_opensilver.html" />
     <None Remove="MainWindow.xaml" />
-    <None Remove="OpenSilverIcon.ico" />
+    <None Remove="OpenSilverIcon.png" />
     <None Remove="simulator_root_opensilver.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\Constants.cs" Link="Constants.cs" />
-    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" Link="RegistryHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs" Link="TrialHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs" Link="ValidityHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs" Link="VersionInformation_SharedWithOtherProjects.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,7 +47,7 @@
 
   <ItemGroup>
     <Resource Include="Expand-Icon-5.png" />
-    <Resource Include="OpenSilverIcon.ico" />
+    <Resource Include="OpenSilverIcon.png" />
   </ItemGroup>
 
   <ItemGroup>

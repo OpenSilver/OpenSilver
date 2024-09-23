@@ -41,7 +41,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         internal static void InjectWebClientFactory()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             INTERNAL_Simulator.WebClientFactory = new WebClientFactory();
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         internal static void InjectClipboardHandler()

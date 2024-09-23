@@ -8,6 +8,7 @@
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="Manual"
         ShowIconOnTitleBar="True"
+        Icon="/OpenSilver.Simulator;component/OpenSilverIcon.png"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         Left="100" Top="5"
         KeyUp="MetroWindow_KeyUp">

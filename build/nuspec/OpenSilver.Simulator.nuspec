@@ -14,18 +14,10 @@
     <licenseUrl>https://raw.githubusercontent.com/OpenSilver/OpenSilver/master/LICENSE.txt</licenseUrl>
 
     <dependencies>
-      <group targetFramework="net462">
-        <dependency id="Microsoft.Web.WebView2" version="1.0.1905-prerelease" />
-        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.824" />
-        <dependency id="MahApps.Metro" version="2.4.9" />
-        <dependency id="Microsoft.Extensions.ObjectPool" version="5.0.10" />
-        <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
-      </group>
-
       <group targetFramework="netcoreapp3.1">
-        <dependency id="Microsoft.Web.WebView2" version="1.0.1905-prerelease" />
-        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.824" />
-        <dependency id="MahApps.Metro" version="2.4.9" />
+        <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
+        <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
+        <dependency id="MahApps.Metro" version="2.4.10" />
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
     </dependencies>
@@ -34,7 +26,6 @@
       <group targetFramework="netcoreapp3.1">
         <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
       </group>
-      <group targetFramework="net462" />
     </frameworkReferences>
 
     <contentFiles>
@@ -46,11 +37,7 @@
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net462/OpenSilver.Simulator.dll" target="lib/net462" />
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net462/OpenSilver.Simulator.pdb" target="lib/net462" />
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/net462/OpenSilver.Simulator.xml" target="lib/net462" />
     <file src="../../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.dll" target="lib/netcoreapp3.1" />
-    <file src="../../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.pdb" target="lib/netcoreapp3.1" />
     <file src="../../src/Simulator/Simulator/bin/$Configuration$/netcoreapp3.1/OpenSilver.Simulator.xml" target="lib/netcoreapp3.1" />
 
     <!-- OpenSilver targets -->

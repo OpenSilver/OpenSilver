@@ -5,7 +5,6 @@ using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Core.DevToolsProtocolExtension;
 using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Win32;
-using OpenSilver;
 using OpenSilver.Simulator;
 using OpenSilver.Simulator.XamlInspection;
 using System.Diagnostics;
@@ -17,7 +16,6 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Path = System.IO.Path;
 
@@ -28,7 +26,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        public const string TipToCopyToClipboard = "TIP: You can copy the content of this message box by pressing Ctrl+C now.";
         string _pathOfAssemblyThatContainsEntryPoint;
         JavaScriptExecutionHandler _javaScriptExecutionHandler;
         bool _htmlHasBeenLoaded = false;
@@ -43,7 +40,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         Dispatcher _openSilverRuntimeDispatcher;
         string _lastExecutedJavaScript = "";
 
-        const string NAME_FOR_STORING_COOKIES = "ms_cookies_for_user_application"; // This is an arbitrary name used to store the cookies in the registry
         const string NAME_OF_TEMP_CACHE_FOLDER = "simulator-temp-cache";
 
         //https is used because of XR# requirement to host on https.
@@ -65,7 +61,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             InitializeComponent();
             Instance = this;
 
-            Icon = new BitmapImage(new Uri("pack://application:,,,/OpenSilver.Simulator;component/OpenSilverIcon.ico"));
             Title = "Simulator II - OpenSilver";
 
             _appCreationDelegate = appCreationDelegate ?? throw new ArgumentNullException(nameof(appCreationDelegate));
@@ -82,9 +77,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;
 
             simulatorLaunchParameters?.BrowserCreatedCallback?.Invoke(MainWebBrowser);
-
-            //Note: The following line was an attempt to persist the Microsoft login cookies (for use by user applications that required AAD login), but it is no longer necessary because we changed the DotNetBrowser "StorageType" from "MEMORY" to "DISK", so cookies are now automatically persisted.
-            //CookiesHelper.LoadMicrosoftCookies(MainWebBrowser, NAME_FOR_STORING_COOKIES);
 
             BrowserContainer.Child = MainWebBrowser;
 
@@ -112,7 +104,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             _openSilverRuntimeThread.Start();
         }
 
-        void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             SimulatorProxy.ShowExceptionStatic(e.Exception);
             e.Handled = true;
@@ -384,9 +376,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 // Start the app:
                 ShowLoadingMessage();
 
-                //We check if the key used by the user is still valid:
-                CheckKeysValidity();
-
                 await WaitForDocumentToBeFullyLoadedAsync(); // Note: without this, we got errors when running rokjs (with localhost as base url) without any breakpoints.
 
                 await SetupSimulatorHostObject();
@@ -455,25 +444,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             {
                 Debug.WriteLine("Initialization: The document was still not loaded after timeout.");
             }
-        }
-
-        private void CheckKeysValidity()
-        {
-            Thread thread = new Thread(() =>
-            {
-                bool isAllOK = CheckFeatureValidity(Constants.ENTERPRISE_EDITION_FEATURE_ID, Constants.ENTERPRISE_EDITION_FRIENDLY_NAME);
-                isAllOK = isAllOK && CheckFeatureValidity(Constants.SL_MIGRATION_EDITION_FEATURE_ID, Constants.SL_MIGRATION_EDITION_FRIENDLY_NAME);
-                isAllOK = isAllOK && CheckFeatureValidity(Constants.PROFESSIONAL_EDITION_FEATURE_ID, Constants.PROFESSIONAL_EDITION_FRIENDLY_NAME);
-                isAllOK = isAllOK && CheckFeatureValidity(Constants.COMMERCIAL_EDITION_S_FEATURE_ID, Constants.COMMERCIAL_EDITION_S_FRIENDLY_NAME);
-                isAllOK = isAllOK && CheckFeatureValidity(Constants.COMMERCIAL_EDITION_L_FEATURE_ID, Constants.COMMERCIAL_EDITION_L_FRIENDLY_NAME);
-                isAllOK = isAllOK && CheckFeatureValidity(Constants.PREMIUM_SUPPORT_EDITION_FEATURE_ID, Constants.PREMIUM_SUPPORT_EDITION_FRIENDLY_NAME);
-            });
-            thread.Start();
-        }
-
-        private bool CheckFeatureValidity(string featureId, string editionName)
-        {
-            return true;
         }
 
         private async void ButtonStats_Click(object sender, RoutedEventArgs e)
@@ -637,7 +607,6 @@ Click OK to continue.";
                 InteropHelpers.InjectSimulatorProxy(
                     new SimulatorProxy(MainWebBrowser,
                         Console,
-                        MainWebBrowser.Dispatcher,
                         _openSilverRuntimeDispatcher,
                         _javaScriptExecutionHandler));
 
@@ -723,7 +692,7 @@ Click OK to continue.";
             // Determine the output path by reading the "OutputRootPath" attribute that the compiler has injected into the entry assembly:
             if (_outputRootPath == null)
             {
-                ReflectionInUserAssembliesHelper.GetOutputPathsByReadingAssemblyAttributes(_entryPointAssembly, out _outputRootPath, out _, out _, out _outputResourcesPath, out _);
+                ReflectionInUserAssembliesHelper.GetOutputPathsByReadingAssemblyAttributes(out _outputRootPath, out _outputResourcesPath);
             }
 
             string outputRootPathFixed = _outputRootPath.Replace('/', '\\');
@@ -756,7 +725,6 @@ Click OK to continue.";
 
         void ButtonClearCookiesAndCache_Click(object sender, RoutedEventArgs e)
         {
-            CookiesHelper.ClearCookies(MainWebBrowser, NAME_FOR_STORING_COOKIES);
             try
             {
                 if (!string.IsNullOrWhiteSpace(_browserUserDataDir)
@@ -766,7 +734,7 @@ Click OK to continue.";
                         = MessageBox.Show("To fully clear the Simulator cache, please close the Simulator and manually delete the following folder:" + Environment.NewLine + Environment.NewLine + _browserUserDataDir + Environment.NewLine + Environment.NewLine + "Click OK to see this folder in Windows Explorer.", "Confirm?", MessageBoxButton.OKCancel);
                     if (result == MessageBoxResult.OK)
                     {
-                        System.Diagnostics.Process.Start(_browserUserDataDir);
+                        Process.Start(_browserUserDataDir);
                     }
                 }
             }
@@ -858,9 +826,6 @@ Click OK to continue.";
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-
-            //Note: The following line was an attempt to persist the Microsoft login cookies (for use by user applications that required AAD login), but it is no longer necessary because we changed the DotNetBrowser "StorageType" from "MEMORY" to "DISK", so cookies are now automatically persisted.
-            //CookiesHelper.SaveMicrosoftCookies(MainWebBrowser, NAME_FOR_STORING_COOKIES);
 
             // Destroy the WebControl and its underlying view:
             _openSilverRuntimeDispatcher?.BeginInvokeShutdown(DispatcherPriority.Normal);
@@ -1153,17 +1118,6 @@ Click OK to continue.";
                     break;
             }
         }
-
-        private class CustomResponseEventArgs : EventArgs
-        {
-            public string Url { get; private set; }
-
-            public CustomResponseEventArgs(string url)
-            {
-                this.Url = url;
-            }
-        }
-        private delegate void CustomResponseHandler(object sender, CustomResponseEventArgs e);
 
         #region Element Picker for XAML Inspection
 
