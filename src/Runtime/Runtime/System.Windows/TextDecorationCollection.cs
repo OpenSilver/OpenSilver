@@ -28,8 +28,24 @@ namespace System.Windows
             {
                 TextDecorationLocation.Underline => "underline",
                 TextDecorationLocation.Strikethrough => "line-through",
-                TextDecorationLocation.OverLine => "overline",
+                TextDecorationLocation.Overline => "overline",
                 _ => "none",
+            };
+        }
+
+        internal static string ToString(TextDecorationCollection textDecoration)
+        {
+            if (textDecoration is null)
+            {
+                return "None";
+            }
+
+            return textDecoration.Location switch
+            {
+                TextDecorationLocation.Underline => nameof(TextDecorationLocation.Underline),
+                TextDecorationLocation.Strikethrough => nameof(TextDecorationLocation.Strikethrough),
+                TextDecorationLocation.Overline => nameof(TextDecorationLocation.Overline),
+                _ => string.Empty,
             };
         }
     }

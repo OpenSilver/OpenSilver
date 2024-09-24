@@ -13,8 +13,11 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Xml;
+using System.Globalization;
 using System.Windows.Documents;
+using System.Windows.Media;
+using System.Xml;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls;
 
@@ -192,5 +195,170 @@ internal static class RichTextXamlParser
                 property.PropertyInfo.SetValue(obj, value);
             }
         }
+    }
+
+    public static string ToXaml(BlockCollection blockCollection)
+    {
+        var blocks = blockCollection.InternalItems;
+
+        if (blocks.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var document = new XmlDocument();
+        document.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"></Section>");
+
+        bool isEmpty = true;
+
+        for (int i = 0; i < blocks.Count - 1; i++)
+        {
+            if (ProcessBlock(blocks[i], document, true))
+            {
+                isEmpty = false;
+            }
+        }
+
+        if (ProcessBlock(blocks[blocks.Count - 1], document, false))
+        {
+            isEmpty = false;
+        }
+
+        return isEmpty ? string.Empty : document.OuterXml;
+    }
+
+    /// <summary>
+    /// Add a block's content to a xml document.
+    /// </summary>
+    /// <returns>
+    /// true if the block is not empty (i.e. it contains at least one non-empty Inline if it is a 
+    /// Paragraph, or at least one non empty paragraph if it is a Section), false otherwise.
+    /// </returns>
+    private static bool ProcessBlock(Block block, XmlDocument document, bool allowEmpty)
+    {
+        switch (block)
+        {
+            case Paragraph paragraph:
+                var xmlParagraph = XmlParagraph(paragraph, document);
+                if (allowEmpty || !xmlParagraph.IsEmpty)
+                {
+                    document.DocumentElement.AppendChild(xmlParagraph.Paragraph);
+                    return true;
+                }
+                break;
+
+            case Section section:
+                var blocks = section.Blocks.InternalItems;
+                bool isEmpty = true;
+                if (blocks.Count > 0)
+                {
+                    for (int i = 0; i < blocks.Count - 1; i++)
+                    {
+                        if (ProcessBlock(blocks[i], document, true))
+                        {
+                            isEmpty = false;
+                        }
+                    }
+
+                    if (ProcessBlock(blocks[blocks.Count - 1], document, allowEmpty))
+                    {
+                        isEmpty = false;
+                    }
+                }
+                return isEmpty;
+        }
+
+        return false;
+    }
+
+    private static (XmlElement Paragraph, bool IsEmpty) XmlParagraph(Paragraph paragraph, XmlDocument document)
+    {
+        var xmlBlock = document.CreateElement(nameof(Paragraph), document.DocumentElement.NamespaceURI);
+        bool isEmpty = true;
+
+        xmlBlock.SetAttribute(nameof(Block.TextAlignment), paragraph.TextAlignment.ToString());
+        xmlBlock.SetAttribute(nameof(Block.LineHeight), paragraph.LineHeight.ToInvariantString());
+
+        foreach (Inline inline in paragraph.Inlines)
+        {
+            if (ProcessInline(inline, xmlBlock))
+            {
+                isEmpty = false;
+            }
+        }
+
+        return (xmlBlock, isEmpty);
+    }
+
+    /// <summary>
+    /// Add a inline's content to a xml document.
+    /// </summary>
+    /// <returns>
+    /// true if the inline is not empty (i.e. it is a Run with non empty text or a LineBreak
+    /// or a Span that contains at least one non empty Inline), false otherwise.
+    /// </returns>
+    private static bool ProcessInline(Inline inline, XmlNode parent)
+    {
+        XmlDocument document = parent.OwnerDocument;
+
+        switch (inline)
+        {
+            case Run run:
+                if (!string.IsNullOrEmpty(run.Text))
+                {
+                    parent.AppendChild(XmlRun(run, document));
+                    return true;
+                }
+                break;
+
+            case LineBreak:
+                parent.AppendChild(XmlLineBreak(document));
+                return true;
+
+            case Span span:
+                var xmlSpan = XmlSpan(span, document);
+                parent.AppendChild(xmlSpan.Span);
+                return !xmlSpan.IsEmpty;
+        }
+
+        return false;
+    }
+
+    private static XmlElement XmlRun(Run run, XmlDocument document)
+    {
+        var xmlRun = document.CreateElement(nameof(Run), document.DocumentElement.NamespaceURI);
+
+        xmlRun.SetAttribute(nameof(Run.Text), run.Text);
+        xmlRun.SetAttribute(nameof(TextElement.CharacterSpacing), run.CharacterSpacing.ToInvariantString());
+        xmlRun.SetAttribute(nameof(TextElement.FontFamily), run.FontFamily.Source);
+        xmlRun.SetAttribute(nameof(TextElement.FontSize), run.FontSize.ToInvariantString());
+        xmlRun.SetAttribute(nameof(TextElement.FontStyle), run.FontStyle.ToString());
+        xmlRun.SetAttribute(nameof(TextElement.FontWeight), run.FontWeight.ToString());
+        xmlRun.SetAttribute(nameof(Inline.TextDecorations), TextDecorationCollection.ToString(run.TextDecorations));
+        if (run.Foreground is SolidColorBrush foreground)
+        {
+            xmlRun.SetAttribute(nameof(TextElement.Foreground), foreground.Color.ToString(CultureInfo.InvariantCulture));
+        }
+
+        return xmlRun;
+    }
+
+    private static XmlElement XmlLineBreak(XmlDocument document)
+        => document.CreateElement(nameof(LineBreak), document.DocumentElement.NamespaceURI);
+
+    private static (XmlElement Span, bool IsEmpty) XmlSpan(Span span, XmlDocument document)
+    {
+        var xmlSpan = document.CreateElement(span.GetType().Name, document.DocumentElement.NamespaceURI);
+        bool isEmpty = true;
+
+        foreach (Inline inline in span.Inlines)
+        {
+            if (ProcessInline(inline, xmlSpan))
+            {
+                isEmpty = false;
+            }
+        }
+
+        return (xmlSpan, isEmpty);
     }
 }

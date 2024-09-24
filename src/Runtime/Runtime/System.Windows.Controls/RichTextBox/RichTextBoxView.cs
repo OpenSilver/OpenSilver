@@ -539,6 +539,7 @@ internal sealed class RichTextBoxView : TextViewBase
         run.SetAttribute(nameof(TextElement.FontFamily), format.FontFamily switch
         {
             null or "" => ((FontFamily)GetValue(TextElement.FontFamilyProperty)).Source,
+            string s when s == FontFace.DefaultCssFontFamily => FontFamily.Default.Source,
             _ => format.FontFamily,
         });
 
@@ -600,7 +601,7 @@ internal sealed class RichTextBoxView : TextViewBase
                 {
                     TextDecorationLocation.Underline => nameof(TextDecorations.Underline),
                     TextDecorationLocation.Strikethrough => nameof(TextDecorations.Strikethrough),
-                    TextDecorationLocation.OverLine => nameof(TextDecorations.OverLine),
+                    TextDecorationLocation.Overline => nameof(TextDecorations.OverLine),
                     _ => "None",
                 },
             }

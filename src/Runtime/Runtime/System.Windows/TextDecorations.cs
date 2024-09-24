@@ -27,7 +27,7 @@ namespace System.Windows
             Strikethrough = new TextDecorationCollection(TextDecorationLocation.Strikethrough);
 
             // Overline
-            OverLine = new TextDecorationCollection(TextDecorationLocation.OverLine);
+            OverLine = new TextDecorationCollection(TextDecorationLocation.Overline);
 
             ////Baseline
             //Baseline = new TextDecorationCollection(TextDecorationLocation.Baseline);
@@ -64,7 +64,7 @@ namespace System.Windows
         /// <summary>
         ///     OverLine - OverLine position
         /// </summary>
-        OverLine = 1,
+        Overline = 1,
 
         /// <summary>
         ///     Strikethrough - Strikethrough position

@@ -172,7 +172,15 @@ namespace System.Windows.Controls
         /// </returns>
         public string Xaml
         {
-            get => View?.GetXaml() ?? string.Empty;
+            get
+            {
+                if (View is RichTextBoxView view && INTERNAL_VisualTreeManager.IsElementInVisualTree(view))
+                {
+                    return view.GetXaml();
+                }
+
+                return RichTextXamlParser.ToXaml(Blocks);
+            }
             set
             {
                 using (DeferRefresh())
