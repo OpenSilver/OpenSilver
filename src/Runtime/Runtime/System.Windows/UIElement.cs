@@ -134,6 +134,12 @@ namespace System.Windows
         }
 
         /// <summary>
+        /// Helper method to provide access to <see cref="AddVisualChild(UIElement)"/> for visual 
+        /// collections such as UIElementCollection or TextElementCollection.
+        /// </summary>
+        internal void InternalAddVisualChild(UIElement child) => AddVisualChild(child);
+
+        /// <summary>
         /// Removes the parent-child relationship between two visuals.
         /// </summary>
         /// <param name="child">
@@ -164,6 +170,12 @@ namespace System.Windows
 
             child.OnVisualParentChanged(this);
         }
+
+        /// <summary>
+        /// Helper method to provide access to <see cref="RemoveVisualChild(UIElement)"/> for visual 
+        /// collections such as UIElementCollection or TextElementCollection.
+        /// </summary>
+        internal void InternalRemoveVisualChild(UIElement child) => RemoveVisualChild(child);
 
         /// <summary>
         /// Called when the parent of the visual object is changed.

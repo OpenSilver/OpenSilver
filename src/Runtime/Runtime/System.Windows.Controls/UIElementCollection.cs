@@ -156,8 +156,8 @@ namespace System.Windows.Controls
 
         private void ClearLogicalParent(UIElement child) => LogicalParent?.RemoveLogicalChild(child);
 
-        private void SetVisualParent(UIElement child) => VisualParent.AddVisualChild(child);
+        private void SetVisualParent(UIElement child) => VisualParent.InternalAddVisualChild(child);
 
-        private void ClearVisualParent(UIElement child) => VisualParent.RemoveVisualChild(child);
+        private void ClearVisualParent(UIElement child) => VisualParent.InternalRemoveVisualChild(child);
     }
 }

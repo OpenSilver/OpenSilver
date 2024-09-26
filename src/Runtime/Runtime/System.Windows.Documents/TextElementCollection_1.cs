@@ -154,7 +154,7 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         }
     }
 
-    private void SetVisualParent(T item) => _owner.AddVisualChild(item);
+    private void SetVisualParent(T item) => _owner.InternalAddVisualChild(item);
 
-    private void ClearVisualParent(T item) => _owner.RemoveVisualChild(item);
+    private void ClearVisualParent(T item) => _owner.InternalRemoveVisualChild(item);
 }
