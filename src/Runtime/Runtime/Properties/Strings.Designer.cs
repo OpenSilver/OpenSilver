@@ -79,6 +79,33 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Markup extension &apos;{0}&apos; requires &apos;{1}&apos; be implemented in the IServiceProvider for ProvideValue..
+        /// </summary>
+        internal static string MarkupExtensionNoContext1 {
+            get {
+                return ResourceManager.GetString("MarkupExtensionNoContext1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Markup extension &apos;{0}&apos; requires &apos;{1}&apos; or &apos;{2}&apos; be implemented in the IServiceProvider for ProvideValue..
+        /// </summary>
+        internal static string MarkupExtensionNoContext2 {
+            get {
+                return ResourceManager.GetString("MarkupExtensionNoContext2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find resource named &apos;{0}&apos;. Resource names are case sensitive..
+        /// </summary>
+        internal static string ParserNoResource {
+            get {
+                return ResourceManager.GetString("ParserNoResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The property named &apos;{0}&apos; on type &apos;{1}&apos; cannot be read..
         /// </summary>
         internal static string PropertyNotReadable {

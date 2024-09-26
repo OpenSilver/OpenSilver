@@ -14,6 +14,8 @@
 using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Windows;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System
 {
@@ -58,6 +60,8 @@ namespace System
         /// <summary>
         /// Gets or sets the List of UIElement that are parents of the element.
         /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> Parents => _parents ??= new List<object>(0);
 
         public object TargetObject { get; private set; }

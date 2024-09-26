@@ -118,57 +118,23 @@ namespace System.Windows
             // Fetch the DefaultStyleKey and the self Style for
             // the given FrameworkElement
             object themeStyleKey = fe.GetValue(FrameworkElement.DefaultStyleKeyProperty);
-            //Style selfStyle = fe.Style;
             Style oldThemeStyle = fe.ThemeStyle;
             Style newThemeStyle = null;
 
-            // Don't lookup properties from the themes if user has specified OverridesDefaultStyle
-            // or DefaultStyleKey = null
-            if (themeStyleKey != null)
+            if (themeStyleKey is Type typeKey)
             {
-                // First look for an applicable style in system resources
-                object styleLookup;
                 // Regular lookup based on the DefaultStyleKey. Involves locking and Hashtable lookup
+                newThemeStyle = XamlResources.FindStyleResourceInGenericXaml(typeKey);
 
-                if (themeStyleKey is Type typeKey)
-                {
-                    styleLookup = XamlResources.FindStyleResourceInGenericXaml(typeKey);
-                }
-                else
-                {
-                    styleLookup = null;
-                }
-
-                if (styleLookup != null)
-                {
-                    if (styleLookup is Style)
-                    {
-                        // We have found an applicable Style in system resources
-                        //  let's us use that as second stop to find property values.
-                        newThemeStyle = (Style)styleLookup;
-                    }
-                    else
-                    {
-                        // We found something keyed to the ThemeStyleKey, but it's not
-                        //  a style.  This is a problem, throw an exception here.
-                        throw new InvalidOperationException(string.Format("System resource for type '{0}' is not a Style object.", themeStyleKey));
-                    }
-                }
-
-                if (newThemeStyle == null)
+                if (newThemeStyle is null)
                 {
                     // No style in system resources, try to retrieve the default
                     // style for the target type.
-                    Type themeStyleTypeKey = themeStyleKey as Type;
-                    if (themeStyleTypeKey != null)
-                    {
-                        PropertyMetadata styleMetadata = FrameworkElement.StyleProperty.GetMetadata(themeStyleTypeKey);
 
-                        if (styleMetadata != null)
-                        {
-                            // Have a metadata object, get the default style (if any)
-                            newThemeStyle = styleMetadata.DefaultValue as Style;
-                        }
+                    if (FrameworkElement.StyleProperty.GetMetadata(typeKey) is PropertyMetadata styleMetadata)
+                    {
+                        // Have a metadata object, get the default style (if any)
+                        newThemeStyle = styleMetadata.DefaultValue as Style;
                     }
                 }
             }

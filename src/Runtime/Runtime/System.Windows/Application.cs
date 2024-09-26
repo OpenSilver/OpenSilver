@@ -399,17 +399,14 @@ namespace System.Windows
         /// </returns>
         public object TryFindResource(object resourceKey)
         {
-            if (resourceKey is Type typeKey)
+            if (resourceKey is Type typeKey && XamlResources.FindStyleResourceInGenericXaml(typeKey) is object resource)
             {
-                if (XamlResources.FindStyleResourceInGenericXaml(typeKey) is object resource1)
-                {
-                    return resource1;
-                }
+                return resource;
             }
 
-            if (HasResources && Resources.TryGetResource(resourceKey, out object resource2))
+            if (HasResources && Resources.TryGetResource(resourceKey, out resource))
             {
-                return resource2;
+                return resource;
             }
 
             return XamlResources.FindBuiltInResource(resourceKey);

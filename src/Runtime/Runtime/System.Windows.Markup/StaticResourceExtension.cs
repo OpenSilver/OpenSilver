@@ -11,159 +11,145 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xaml;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
 
-namespace System.Windows.Markup
+namespace System.Windows.Markup;
+
+/// <summary>
+/// Implements a markup extension that supports static (XAML load time) resource references made from XAML.
+/// </summary>
+[ContentProperty(nameof(ResourceKey))]
+public class StaticResourceExtension : MarkupExtension
 {
     /// <summary>
-    /// Class used to access elements inside the XAML code
+    /// Initializes a new instance of the <see cref="StaticResourceExtension"/> class.
     /// </summary>
-    [ContentProperty(nameof(ResourceKey))]
-    public class StaticResourceExtension : MarkupExtension
+    public StaticResourceExtension() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StaticResourceExtension"/> class, with the provided 
+    /// initial key.
+    /// </summary>
+    /// <param name="resourceKey">
+    /// The key of the resource that this markup extension references.
+    /// </param>
+    public StaticResourceExtension(string resourceKey)
     {
-        /// <summary>
-        /// The key of the StaticResource.
-        /// </summary>
-        public string ResourceKey { get; set; }
+        ResourceKey = resourceKey;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of StaticResource.
-        /// </summary>
-        public StaticResourceExtension() { }
+    /// <summary>
+    /// Gets or sets the key value passed by this static resource reference. They key is used to return 
+    /// the object matching that key in resource dictionaries.
+    /// </summary>
+    public string ResourceKey { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of StaticResource with the given ResourceKey.
-        /// </summary>
-        /// <param name="resourceKey">The ResourceKey for the StaticResource</param>
-        public StaticResourceExtension(string resourceKey)
+    /// <summary>
+    /// Returns the object found in a resource dictionary, where the object to find is identified by the 
+    /// <see cref="ResourceKey"/>.
+    /// </summary>
+    /// <param name="serviceProvider">
+    /// Object that can provide services for the markup extension.
+    /// </param>
+    /// <returns>
+    /// The object value to set on the property where the markup extension provided value is evaluated.
+    /// </returns>
+    public override object ProvideValue(IServiceProvider serviceProvider)
+    {
+        if (TryFindTheResource(serviceProvider, out object resource))
         {
-            ResourceKey = resourceKey;
+            return resource;
         }
 
-        /// <summary>
-        /// returns an object that is provided as the value of the target property for this StaticResource.
-        /// </summary>
-        /// <param name="serviceProvider">A service provider helper that can provide services for the StaticResource.</param>
-        /// <returns>An object that is provided as the value of the target property for this StaticResource.</returns>
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            if (TryFindTheResource(serviceProvider, out object resource))
-            {
-                return resource;
-            }
+        return FindResourceInAppOrSystem() ??
+            throw new XamlParseException(string.Format(Strings.ParserNoResource, ResourceKey));
+    }
 
-            object value = FindResourceInAppOrSystem();
-            if (value == null)
-            {
-                throw new XamlParseException($"StaticResource resolve failed: cannot find resource named '{ResourceKey}' (Note: resource names are case sensitive)");
-            }
-            return value;
+    private bool TryFindTheResource(IServiceProvider serviceProvider, out object resource)
+    {
+        if (serviceProvider.GetService(typeof(IAmbientResourcesProvider)) is IAmbientResourcesProvider ambientResourcesProvider)
+        {
+            return TryFindResourceFromCompiler(ambientResourcesProvider, out resource);
         }
-
-        private bool TryFindTheResource(IServiceProvider serviceProvider, out object resource)
+        else if (serviceProvider.GetService(typeof(IAmbientProvider)) is IAmbientProvider ambientProvider)
         {
-            if (serviceProvider.GetService(typeof(IAmbientResourcesProvider)) is IAmbientResourcesProvider ambientResourcesProvider)
-            {
-                return TryFindResourceFromCompiler(ambientResourcesProvider, out resource);
-            }
-            else if (serviceProvider.GetService(typeof(IAmbientProvider)) is IAmbientProvider ambientProvider)
-            {
-                if (serviceProvider.GetService(typeof(IXamlSchemaContextProvider)) is not IXamlSchemaContextProvider schemaContextProvider)
-                {
-                    throw new InvalidOperationException(
-                        string.Format("Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.",
-                            GetType().Name,
-                            nameof(IXamlSchemaContextProvider)));
-                }
-
-                return TryFindResourceFromParser(ambientProvider, schemaContextProvider, out resource);
-            }
-            else
+            if (serviceProvider.GetService(typeof(IXamlSchemaContextProvider)) is not IXamlSchemaContextProvider schemaContextProvider)
             {
                 throw new InvalidOperationException(
-                    string.Format("Markup extension '{0}' requires '{1}' or '{2}' be implemented in the IServiceProvider for ProvideValue.",
-                        GetType().Name,
-                        nameof(IAmbientResourcesProvider),
-                        nameof(IAmbientProvider)));
+                    string.Format(Strings.MarkupExtensionNoContext1, GetType().Name, nameof(IXamlSchemaContextProvider)));
             }
-        }
 
-        private bool TryFindResourceFromCompiler(IAmbientResourcesProvider ambientProvider, out object resource)
+            return TryFindResourceFromParser(ambientProvider, schemaContextProvider, out resource);
+        }
+        else
         {
-            Debug.Assert(ambientProvider != null);
-
-            IEnumerable<object> ambientValues = ambientProvider.GetAllAmbientValues();
-            foreach (object ambientValue in ambientValues)
-            {
-                if (ambientValue is ResourceDictionary rd)
-                {
-                    if (rd.TryGetResource(ResourceKey, out resource))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            resource = null;
-            return false;
+            throw new InvalidOperationException(
+                string.Format(Strings.MarkupExtensionNoContext2, GetType().Name, nameof(IAmbientResourcesProvider), nameof(IAmbientProvider)));
         }
+    }
 
-        private bool TryFindResourceFromParser(IAmbientProvider ambientProvider, IXamlSchemaContextProvider schemaContextProvider, out object resource)
+    private bool TryFindResourceFromCompiler(IAmbientResourcesProvider ambientProvider, out object resource)
+    {
+        Debug.Assert(ambientProvider is not null);
+
+        foreach (object ambientValue in ambientProvider.GetAllAmbientValues())
         {
-            Debug.Assert(ambientProvider != null);
-            Debug.Assert(schemaContextProvider != null);
-
-            XamlSchemaContext schemaContext = schemaContextProvider.SchemaContext;
-
-            XamlType feXType = schemaContext.GetXamlType(typeof(FrameworkElement));
-            XamlType appXType = schemaContext.GetXamlType(typeof(Application));
-
-            XamlMember feResourcesProperty = feXType.GetMember("Resources");
-            XamlMember appResourcesProperty = appXType.GetMember("Resources");
-
-            XamlType[] types = new XamlType[1] { schemaContext.GetXamlType(typeof(ResourceDictionary)) };
-
-            var ambientValues = ambientProvider.GetAllAmbientValues(null,
-                                                                    false,
-                                                                    types,
-                                                                    feResourcesProperty,
-                                                                    appResourcesProperty);
-
-            foreach (var ambientValue in ambientValues)
+            if (ambientValue is ResourceDictionary rd && rd.TryGetResource(ResourceKey, out resource))
             {
-                if (ambientValue.Value is ResourceDictionary rd)
-                {
-                    if (rd.TryGetResource(ResourceKey, out resource))
-                    {
-                        return true;
-                    }
-                }
+                return true;
             }
-
-            resource = null;
-            return false;
         }
 
-        private object FindResourceInAppOrSystem()
+        resource = null;
+        return false;
+    }
+
+    private bool TryFindResourceFromParser(IAmbientProvider ambientProvider, IXamlSchemaContextProvider schemaContextProvider, out object resource)
+    {
+        Debug.Assert(ambientProvider is not null);
+        Debug.Assert(schemaContextProvider is not null);
+
+        XamlSchemaContext schemaContext = schemaContextProvider.SchemaContext;
+
+        XamlType feXType = schemaContext.GetXamlType(typeof(FrameworkElement));
+        XamlType appXType = schemaContext.GetXamlType(typeof(Application));
+
+        XamlMember feResourcesProperty = feXType.GetMember("Resources");
+        XamlMember appResourcesProperty = appXType.GetMember("Resources");
+
+        XamlType[] types = new XamlType[1] { schemaContext.GetXamlType(typeof(ResourceDictionary)) };
+
+        var ambientValues = ambientProvider.GetAllAmbientValues(null,
+                                                                false,
+                                                                types,
+                                                                feResourcesProperty,
+                                                                appResourcesProperty);
+
+        foreach (var ambientValue in ambientValues)
         {
-            Application app = Application.Current;
-            if (app != null)
+            if (ambientValue.Value is ResourceDictionary rd && rd.TryGetResource(ResourceKey, out resource))
             {
-                if (app.HasResources && app.Resources.TryGetResource(ResourceKey, out object resource))
-                {
-                    return resource;
-                }
-                else
-                {
-                    // Look in the built-in resources (eg. "SystemAccentColor")
-                    return app.TryFindResource(ResourceKey);
-                }
+                return true;
             }
-
-            return null;
         }
+
+        resource = null;
+        return false;
+    }
+
+    private object FindResourceInAppOrSystem()
+    {
+        if (Application.Current is Application app &&
+            app.HasResources &&
+            app.Resources.TryGetResource(ResourceKey, out object resource))
+        {
+            return resource;
+        }
+
+        // Look in the built-in resources (eg. "SystemAccentColor")
+        return XamlResources.FindResource(ResourceKey);
     }
 }
