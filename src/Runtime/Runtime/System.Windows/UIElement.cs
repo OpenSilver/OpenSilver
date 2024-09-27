@@ -114,9 +114,19 @@ namespace System.Windows
                 return;
             }
 
+            //if (child.InternalVisualParent is not null)
+            //{
+            //    throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+            //}
+
+            // Check if the child already has a parent and remove it from the current parent
             if (child.InternalVisualParent is not null)
             {
-                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+                // Remove the child from its current parent
+                if (child.InternalVisualParent is FrameworkElement oldParent)
+                {
+                    oldParent.RemoveVisualChild(child);
+                }
             }
 
             HasVisualChildren = true;
