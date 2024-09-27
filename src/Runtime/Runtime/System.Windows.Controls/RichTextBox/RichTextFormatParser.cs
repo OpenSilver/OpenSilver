@@ -265,7 +265,7 @@ internal static class RichTextXamlParser
                         isEmpty = false;
                     }
                 }
-                return isEmpty;
+                return !isEmpty;
         }
 
         return false;
