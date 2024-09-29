@@ -79,6 +79,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to VisualTree of ItemsPanelTemplate must contain a Panel. &apos;{0}&apos; is not a Panel..
+        /// </summary>
+        internal static string ItemsPanelNotAPanel {
+            get {
+                return ResourceManager.GetString("ItemsPanelNotAPanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VisualTree of ItemsPanelTemplate must be a single element..
+        /// </summary>
+        internal static string ItemsPanelNotSingleNode {
+            get {
+                return ResourceManager.GetString("ItemsPanelNotSingleNode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Markup extension &apos;{0}&apos; requires &apos;{1}&apos; be implemented in the IServiceProvider for ProvideValue..
         /// </summary>
         internal static string MarkupExtensionNoContext1 {

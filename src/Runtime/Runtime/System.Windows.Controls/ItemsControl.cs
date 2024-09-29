@@ -438,6 +438,24 @@ namespace System.Windows.Controls
 
         internal override FrameworkTemplate TemplateInternal => base.TemplateInternal ?? DefaultTemplate;
 
+        internal sealed override FrameworkTemplate TemplateCache
+        {
+            get { return base.TemplateCache; }
+            set
+            {
+                base.TemplateCache = value;
+
+                // This is a workaround to ensure that resources held by the current ItemsPresenter and
+                // ItemsHost are are released. We put this code here because this cleanup needs to happen
+                // before the previous template is cleared, and we do not have any other method or event
+                // to do this.
+                if (ItemsPresenter.FromPanel(ItemsHost) is ItemsPresenter ip)
+                {
+                    ip.DetachFromOwner();
+                }
+            }
+        }
+
         internal Panel ItemsHost { get; set; }
 
         internal bool HasItems

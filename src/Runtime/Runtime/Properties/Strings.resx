@@ -125,6 +125,12 @@
     <value>Cannot call Show() on a ChildWindow that is in the visual tree. ChildWindow should be the top-most element in the .xaml file.</value>
     <comment>Exception thrown when the ChildWindow is in the visual tree and Show() is called on it.</comment>
   </data>
+  <data name="ItemsPanelNotAPanel" xml:space="preserve">
+    <value>VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.</value>
+  </data>
+  <data name="ItemsPanelNotSingleNode" xml:space="preserve">
+    <value>VisualTree of ItemsPanelTemplate must be a single element.</value>
+  </data>
   <data name="MarkupExtensionNoContext1" xml:space="preserve">
     <value>Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.</value>
   </data>

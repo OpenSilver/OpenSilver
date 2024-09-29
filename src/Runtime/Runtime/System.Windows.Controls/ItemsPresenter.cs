@@ -11,204 +11,190 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls
+using OpenSilver.Internal;
+
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Specifies where items are placed in a control, usually an <see cref="ItemsControl"/>.
+/// </summary>
+public class ItemsPresenter : FrameworkElement
 {
-    /// <summary>
-    /// Displays the content of a ItemsPresenter.
-    /// </summary>
-    public class ItemsPresenter : FrameworkElement
+    private ItemsPanelTemplate _templateCache;
+
+    internal sealed override FrameworkElement TemplateChild
     {
-        private ItemsPanelTemplate _templateCache;
-        private ItemsControl _owner; // templated parent.
-        private ItemContainerGenerator _generator;
-
-        internal sealed override FrameworkElement TemplateChild
+        get { return base.TemplateChild; }
+        set
         {
-            get { return base.TemplateChild; }
-            set
+            if (value is not null)
             {
-                if (value != null)
+                if (value is not Panel panel)
                 {
-                    Panel panel = value as Panel;
-                    if (panel == null)
-                    {
-                        throw new InvalidOperationException(string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", value.GetType()));
-                    }
-                    panel.IsItemsHost = true;
+                    throw new InvalidOperationException(string.Format(Strings.ItemsPanelNotAPanel, value.GetType()));
                 }
-
-                base.TemplateChild = value;
+                panel.IsItemsHost = true;
             }
+
+            base.TemplateChild = value;
+        }
+    }
+
+    internal ItemsControl Owner { get; private set; }
+
+    internal ItemContainerGenerator Generator { get; private set; }
+
+    // Internal Helper so the FrameworkElement could see this property
+    internal override FrameworkTemplate TemplateInternal => Template;
+
+    // Internal Helper so the FrameworkElement could see the template cache
+    internal override FrameworkTemplate TemplateCache
+    {
+        get => _templateCache;
+        set => _templateCache = (ItemsPanelTemplate)value;
+    }
+
+    /// <summary>
+    /// TemplateProperty
+    /// </summary>
+    internal static readonly DependencyProperty TemplateProperty =
+        DependencyProperty.Register(
+            nameof(Template),
+            typeof(ItemsPanelTemplate),
+            typeof(ItemsPresenter),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTemplateChanged));
+
+    /// <summary>
+    /// Template Property
+    /// </summary>
+    internal ItemsPanelTemplate Template
+    {
+        get => _templateCache;
+        set => SetValueInternal(TemplateProperty, value);
+    }
+
+    private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var ip = (ItemsPresenter)d;
+        ip.ClearPanel();
+        UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+    }
+
+    private void ClearPanel()
+    {
+        if (TemplateChild is Panel oldPanel)
+        {
+            oldPanel.IsItemsHost = false;
+        }
+    }
+
+    internal void DetachFromOwner()
+    {
+        UseGenerator(null);
+        ClearPanel();
+    }
+
+    private void AttachToOwner()
+    {
+        ItemsControl owner = TemplatedParent as ItemsControl;
+
+        // top-level presenter - get information from ItemsControl
+        ItemContainerGenerator generator = owner?.ItemContainerGenerator;
+
+        Owner = owner;
+        UseGenerator(generator);
+
+        // create the panel, based on ItemsControl.ItemsPanel
+        ItemsPanelTemplate template = Owner?.ItemsPanel;
+
+        Template = template;
+    }
+
+    private void UseGenerator(ItemContainerGenerator generator)
+    {
+        if (generator == Generator) return;
+
+        if (Generator is not null)
+        {
+            Generator.PanelChanged -= new EventHandler(OnPanelChanged);
         }
 
-        internal ItemsControl Owner
+        Generator = generator;
+
+        if (Generator is not null)
         {
-            get { return _owner; }
+            Generator.PanelChanged += new EventHandler(OnPanelChanged);
+        }
+    }
+
+    private void OnPanelChanged(object sender, EventArgs e)
+    {
+        // something has changed that affects the ItemsPresenter.
+        // Re-measure.  This will recalculate everything from scratch.
+        InvalidateMeasure();
+    }
+
+    internal static ItemsPresenter FromPanel(Panel panel)
+    {
+        if (panel is null)
+        {
+            return null;
         }
 
-        internal ItemContainerGenerator Generator
+        return panel.TemplatedParent as ItemsPresenter;
+    }
+
+    /// <summary>
+    /// Called when the Template's tree is about to be generated
+    /// </summary>
+    internal override void OnPreApplyTemplate()
+    {
+        base.OnPreApplyTemplate();
+        AttachToOwner();
+    }
+
+    public override void OnApplyTemplate()
+    {
+        // verify that the template produced a panel with no children
+        if (TemplateChild is not Panel panel || panel.HasChildren)
         {
-            get { return _generator; }
+            throw new InvalidOperationException(Strings.ItemsPanelNotSingleNode);
         }
 
-        // Internal Helper so the FrameworkElement could see this property
-        internal override FrameworkTemplate TemplateInternal
+        OnPanelChanged(this, EventArgs.Empty);
+
+        base.OnApplyTemplate();
+    }
+
+    /// <inheritdoc />
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        int count = VisualChildrenCount;
+
+        if (count > 0)
         {
-            get { return Template; }
-        }
-
-        // Internal Helper so the FrameworkElement could see the template cache
-        internal override FrameworkTemplate TemplateCache
-        {
-            get { return _templateCache; }
-            set { _templateCache = (ItemsPanelTemplate)value; }
-        }
-
-        /// <summary>
-        /// TemplateProperty
-        /// </summary>
-        internal static readonly DependencyProperty TemplateProperty =
-            DependencyProperty.Register(
-                nameof(Template),
-                typeof(ItemsPanelTemplate),
-                typeof(ItemsPresenter),
-                new PropertyMetadata(null, OnTemplateChanged));
-
-        /// <summary>
-        /// Template Property
-        /// </summary>
-        internal ItemsPanelTemplate Template
-        {
-            get { return _templateCache; }
-            set { SetValueInternal(TemplateProperty, value); }
-        }
-
-        private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ItemsPresenter ip = (ItemsPresenter)d;
-            ip.ClearPanel();
-            UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
-
-            ip.InvalidateMeasure();
-        }
-
-        private void ClearPanel()
-        {
-            Panel oldPanel = this.TemplateChild as Panel;
-            if (oldPanel != null)
+            if (GetVisualChild(0) is UIElement child)
             {
-                oldPanel.IsItemsHost = false;
+                child.Measure(availableSize);
+                return child.DesiredSize;
             }
         }
 
-        private void AttachToOwner()
-        {
-            ItemsControl owner = this.TemplatedParent as ItemsControl;
-            ItemContainerGenerator generator = null;
+        return new Size();
+    }
 
-            if (owner != null)
+    /// <inheritdoc />
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        int count = VisualChildrenCount;
+
+        if (count > 0)
+        {
+            if (GetVisualChild(0) is UIElement child)
             {
-                // top-level presenter - get information from ItemsControl
-                generator = owner.ItemContainerGenerator;
+                child.Arrange(new Rect(finalSize));
             }
-
-            this._owner = owner;
-            this.UseGenerator(generator);
-
-            ItemsPanelTemplate template = null;
-            if (this._owner != null)
-            {
-                // create the panel, based on ItemsControl.ItemsPanel
-                template = this._owner.ItemsPanel;
-            }
-
-            this.Template = template;
         }
-
-        private void UseGenerator(ItemContainerGenerator generator)
-        {
-            if (generator == this._generator)
-                return;
-
-            if (this._generator != null)
-                this._generator.PanelChanged -= new EventHandler(this.OnPanelChanged);
-
-            this._generator = generator;
-
-            if (this._generator != null)
-                this._generator.PanelChanged += new EventHandler(this.OnPanelChanged);
-        }
-
-        private void OnPanelChanged(object sender, EventArgs e)
-        {
-            // something has changed that affects the ItemsPresenter.
-            // Re-measure.  This will recalculate everything from scratch.
-            InvalidateMeasure();
-        }
-
-        internal static ItemsPresenter FromPanel(Panel panel)
-        {
-            if (panel == null)
-                return null;
-
-            return panel.TemplatedParent as ItemsPresenter;
-        }
-
-        /// <summary>
-        /// Called when the Template's tree is about to be generated
-        /// </summary>
-        internal override void OnPreApplyTemplate()
-        {
-            base.OnPreApplyTemplate();
-            this.AttachToOwner();
-        }
-
-        public override void OnApplyTemplate()
-        {
-            // verify that the template produced a panel with no children
-            Panel panel = this.TemplateChild as Panel;
-            if (panel == null || panel.HasChildren)
-            {
-                throw new InvalidOperationException("Content of ItemsPanelTemplate must be a single Panel (with no children).");
-            }
-
-            this.OnPanelChanged(this, EventArgs.Empty);
-
-            base.OnApplyTemplate();
-        }
-
-        /// <inheritdoc />
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            int count = VisualChildrenCount;
-
-            if (count > 0)
-            {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
-                {
-                    child.Measure(availableSize);
-                    return child.DesiredSize;
-                }
-            }
-
-            return new Size();
-        }
-
-        /// <inheritdoc />
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            int count = VisualChildrenCount;
-
-            if (count > 0)
-            {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
-                {
-                    child.Arrange(new Rect(finalSize));
-                }
-            }
-            return finalSize;
-        }
+        return finalSize;
     }
 }
