@@ -723,14 +723,14 @@ namespace System.Windows.Controls
 
         internal void InvalidateUI()
         {
-            if (_isModelInvalidated)
-            {
-                return;
-            }
-
             if (_notificationsSuspended > 0)
             {
                 _changesCount++;
+                return;
+            }
+
+            if (_isModelInvalidated)
+            {
                 return;
             }
 
