@@ -31,102 +31,130 @@ namespace OpenSilver.Compiler
                 return;
             }
 
-            switch (assemblyName)
+            if (string.Equals(assemblyName, "System.Windows", StringComparison.OrdinalIgnoreCase))
             {
-                case "System.Windows":
-                    assemblyName = "OpenSilver";
-                    return;
-                case "System.Windows.Browser":
-                    assemblyName = "OpenSilver.Browser";
-                    return;
-                case "System.Windows.Controls":
-                    assemblyName = "OpenSilver.Controls";
-                    return;
-                case "System.Windows.Controls.Data.Input":
-                    assemblyName = "OpenSilver.Controls.Data.Input";
-                    return;
-                case "System.Windows.Controls.Data":
-                    assemblyName = "OpenSilver.Controls.Data";
-                    return;
-                case "System.Windows.Controls.Data.Toolkit":
-                    assemblyName = "OpenSilver.Controls.Data.Toolkit";
-                    return;
-                case "System.Windows.Controls.Data.DataForm.Toolkit":
-                    assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
-                    return;
-                case "System.Windows.Controls.DataVisualization.Toolkit":
-                    assemblyName = "OpenSilver.Controls.DataVisualization.Toolkit";
-                    return;
-                case "System.Windows.Controls.Navigation":
-                    assemblyName = "OpenSilver.Controls.Navigation";
-                    return;
-                case "System.Windows.Controls.Input":
-                    assemblyName = "OpenSilver.Controls.Input";
-                    return;
-                case "System.Windows.Controls.Input.Toolkit":
-                    assemblyName = "OpenSilver.Controls.Input.Toolkit";
-                    return;
-                case "System.Windows.Controls.Layout.Toolkit":
-                    assemblyName = "OpenSilver.Controls.Layout.Toolkit";
-                    return;
-                case "System.Windows.Controls.Theming.Toolkit":
-                    assemblyName = "OpenSilver.Controls.Theming.Toolkit";
-                    return;
-                case "System.Windows.Controls.Theming.BubbleCreme":
-                    assemblyName = "OpenSilver.Controls.Theming.BubbleCreme";
-                    return;
-                case "System.Windows.Controls.Theming.BureauBlack":
-                    assemblyName = "OpenSilver.Controls.Theming.BureauBlack";
-                    return;
-                case "System.Windows.Controls.Theming.BureauBlue":
-                    assemblyName = "OpenSilver.Controls.Theming.BureauBlue";
-                    return;
-                case "System.Windows.Controls.Theming.ExpressionDark":
-                    assemblyName = "OpenSilver.Controls.Theming.ExpressionDark";
-                    return;
-                case "System.Windows.Controls.Theming.ExpressionLight":
-                    assemblyName = "OpenSilver.Controls.Theming.ExpressionLight";
-                    return;
-                case "System.Windows.Controls.Theming.RainierOrange":
-                    assemblyName = "OpenSilver.Controls.Theming.RainierOrange";
-                    return;
-                case "System.Windows.Controls.Theming.RainierPurple":
-                    assemblyName = "OpenSilver.Controls.Theming.RainierPurple";
-                    return;
-                case "System.Windows.Controls.Theming.ShinyBlue":
-                    assemblyName = "OpenSilver.Controls.Theming.ShinyBlue";
-                    return;
-                case "System.Windows.Controls.Theming.ShinyRed":
-                    assemblyName = "OpenSilver.Controls.Theming.ShinyRed";
-                    return;
-                case "System.Windows.Controls.Theming.TwilightBlue":
-                    assemblyName = "OpenSilver.Controls.Theming.TwilightBlue";
-                    return;
-                case "System.Windows.Controls.Theming.WhistlerBlue":
-                    assemblyName = "OpenSilver.Controls.Theming.WhistlerBlue";
-                    return;
-                case "System.Windows.Controls.Theming.SystemColors":
-                    assemblyName = "OpenSilver.Controls.Theming.SystemColors";
-                    return;
-                case "System.Windows.Controls.Toolkit":
-                    assemblyName = "OpenSilver.Controls.Toolkit";
-                    return;
-                case "System.Windows.Data":
-                    assemblyName = "OpenSilver.Data";
-                    return;
-                case "System.Windows.Interactivity":
-                    assemblyName = "OpenSilver.Interactivity";
-                    return;
-                case "Microsoft.Expression.Interactions":
-                    assemblyName = "OpenSilver.Expression.Interactions";
-                    return;
-                case "Microsoft.Expression.Effects":
-                    assemblyName = "OpenSilver.Expression.Effects";
-                    return;
-                case "System.Windows.Controls.DomainServices":
-                    assemblyName = "OpenRiaServices.Controls.DomainServices";
-                    namespaceName = "OpenRiaServices.Controls";
-                    return;
+                assemblyName = "OpenSilver";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Browser", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Browser";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Data.Input", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Data.Input";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Data", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Data";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Data.Toolkit", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Data.Toolkit";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Data.DataForm.Toolkit", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.DataVisualization.Toolkit", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.DataVisualization.Toolkit";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Navigation", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Navigation";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Input", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Input";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Input.Toolkit", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Input.Toolkit";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Layout.Toolkit", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Layout.Toolkit";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.Toolkit", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.Toolkit";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.BubbleCreme", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.BubbleCreme";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.BureauBlack", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.BureauBlack";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.BureauBlue", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.BureauBlue";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.ExpressionDark", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.ExpressionDark";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.ExpressionLight", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.ExpressionLight";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.RainierOrange", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.RainierOrange";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.RainierPurple", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.RainierPurple";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.ShinyBlue", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.ShinyBlue";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.ShinyRed", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.ShinyRed";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.TwilightBlue", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.TwilightBlue";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.WhistlerBlue", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.WhistlerBlue";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Theming.SystemColors", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Theming.SystemColors";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.Toolkit", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Controls.Toolkit";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Data", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Data";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Interactivity", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Interactivity";
+            }
+            else if (string.Equals(assemblyName, "Microsoft.Expression.Interactions", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Expression.Interactions";
+            }
+            else if (string.Equals(assemblyName, "Microsoft.Expression.Effects", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenSilver.Expression.Effects";
+            }
+            else if (string.Equals(assemblyName, "System.Windows.Controls.DomainServices", StringComparison.OrdinalIgnoreCase))
+            {
+                assemblyName = "OpenRiaServices.Controls.DomainServices";
+                namespaceName = "OpenRiaServices.Controls";
             }
         }
 

@@ -215,7 +215,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 AssemblyDefinition assembly = asmData.Assembly;
 
-                if (assemblyName != null && assembly.Name.Name != assemblyName)
+                if (assemblyName != null && !string.Equals(assembly.Name.Name, assemblyName, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
