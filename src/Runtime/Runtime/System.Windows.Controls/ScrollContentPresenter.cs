@@ -26,6 +26,11 @@ namespace System.Windows.Controls
         private ScrollData _scrollData;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ScrollContentPresenter"/> class.
+        /// </summary>
+        public ScrollContentPresenter() { }
+
+        /// <summary>
         /// Gets or sets the <see cref="ScrollViewer"/> element that controls scrolling
         /// behavior.
         /// </summary>
@@ -96,9 +101,10 @@ namespace System.Windows.Controls
         {
             if (!IsScrollClient) return;
 
-            if (_scrollData._canHorizontallyScroll && !DoubleUtil.AreClose(_scrollData._offset.X, offset))
+            double newValue = ValidateInputOffset(offset, nameof(HorizontalOffset));
+            if (_scrollData._canHorizontallyScroll && !DoubleUtil.AreClose(_scrollData._offset.X, newValue))
             {
-                _scrollData._offset.X = offset;
+                _scrollData._offset.X = newValue;
                 InvalidateArrange();
             }
         }
@@ -121,9 +127,10 @@ namespace System.Windows.Controls
         {
             if (!IsScrollClient) return;
 
-            if (_scrollData._canVerticallyScroll && !DoubleUtil.AreClose(_scrollData._offset.Y, offset))
+            double newValue = ValidateInputOffset(offset, nameof(VerticalOffset));
+            if (_scrollData._canVerticallyScroll && !DoubleUtil.AreClose(_scrollData._offset.Y, newValue))
             {
-                _scrollData._offset.Y = offset;
+                _scrollData._offset.Y = newValue;
                 InvalidateArrange();
             }
         }
@@ -159,11 +166,6 @@ namespace System.Windows.Controls
         /// The vertical size of the viewport.
         /// </returns>
         public double ViewportHeight => IsScrollClient ? _scrollData._viewport.Height : 0.0;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScrollContentPresenter"/> class.
-        /// </summary>
-        public ScrollContentPresenter() { }
 
         /// <summary>
         /// Builds the visual tree for the <see cref="ScrollContentPresenter"/>
@@ -297,7 +299,7 @@ namespace System.Windows.Controls
             _scrollData._viewport = viewport;
             _scrollData._extent = extents;
 
-            changed |= ClampOffsets();
+            changed |= CoerceOffsets();
 
             if (changed)
             {
@@ -305,24 +307,16 @@ namespace System.Windows.Controls
             }
         }
 
-        private bool ClampOffsets()
+        private bool CoerceOffsets()
         {
-            bool changed = false;
-            double result = CanHorizontallyScroll ? Math.Min(_scrollData._offset.X, ExtentWidth - ViewportWidth) : 0;
-            result = Math.Max(0, result);
-            if (!DoubleUtil.AreClose(result, _scrollData._computedOffset.X))
-            {
-                _scrollData._computedOffset.X = result;
-                changed = true;
-            }
+            Debug.Assert(IsScrollClient);
+            var computedOffset = new Vector(
+                CoerceOffset(_scrollData._offset.X, _scrollData._extent.Width, _scrollData._viewport.Width),
+                CoerceOffset(_scrollData._offset.Y, _scrollData._extent.Height, _scrollData._viewport.Height));
 
-            result = CanVerticallyScroll ? Math.Min(_scrollData._offset.Y, ExtentHeight - ViewportHeight) : 0;
-            result = Math.Max(0, result);
-            if (!DoubleUtil.AreClose(result, _scrollData._computedOffset.Y))
-            {
-                _scrollData._computedOffset.Y = result;
-                changed = true;
-            }
+            bool changed = !DoubleUtil.AreClose(_scrollData._computedOffset, computedOffset);
+            _scrollData._computedOffset = computedOffset;
+
             return changed;
         }
 
@@ -445,13 +439,37 @@ namespace System.Windows.Controls
             throw new NotImplementedException();
         }
 
+        internal static double ValidateInputOffset(double offset, string parameterName)
+        {
+            if (double.IsNaN(offset))
+            {
+                throw new ArgumentOutOfRangeException(parameterName, string.Format(Strings.ScrollViewer_CannotBeNaN, parameterName));
+            }
+
+            return Math.Max(0.0, offset);
+        }
+
+        // Returns an offset coerced into the [0, Extent - Viewport] range.
+        internal static double CoerceOffset(double offset, double extent, double viewport)
+        {
+            if (offset > extent - viewport)
+            {
+                offset = extent - viewport;
+            }
+            if (offset < 0)
+            {
+                offset = 0;
+            }
+            return offset;
+        }
+
         private sealed class ScrollData
         {
             internal ScrollViewer _scrollOwner;
             internal bool _canHorizontallyScroll;
             internal bool _canVerticallyScroll;
-            internal Point _offset;
-            internal Point _computedOffset;
+            internal Vector _offset;
+            internal Vector _computedOffset;
             internal Size _viewport;
             internal Size _extent;
         }

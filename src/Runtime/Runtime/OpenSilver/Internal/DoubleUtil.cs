@@ -193,6 +193,20 @@ namespace OpenSilver.Internal
         }
 
         /// <summary>
+        /// Compares two Vector instances for fuzzy equality.  This function
+        /// helps compensate for the fact that double values can 
+        /// acquire error when operated upon
+        /// </summary>
+        /// <param name='vector1'>The first Vector to compare</param>
+        /// <param name='vector2'>The second Vector to compare</param>
+        /// <returns>Whether or not the two Vector instances are equal</returns>
+        public static bool AreClose(Vector vector1, Vector vector2)
+        {
+            return DoubleUtil.AreClose(vector1.X, vector2.X) &&
+                   DoubleUtil.AreClose(vector1.Y, vector2.Y);
+        }
+
+        /// <summary>
         /// Compares two rectangles for fuzzy equality.  This function
         /// helps compensate for the fact that double values can 
         /// acquire error when operated upon

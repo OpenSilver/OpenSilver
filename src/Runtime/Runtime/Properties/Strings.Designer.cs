@@ -133,6 +133,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; parameter value cannot be NaN..
+        /// </summary>
+        internal static string ScrollViewer_CannotBeNaN {
+            get {
+                return ResourceManager.GetString("ScrollViewer_CannotBeNaN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot set read-only property SelectedItem..
         /// </summary>
         internal static string TreeView_OnSelectedItemPropertyChanged_InvalidWrite {

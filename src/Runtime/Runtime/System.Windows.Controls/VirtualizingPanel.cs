@@ -14,147 +14,123 @@
 using System.Collections.Specialized;
 using System.Windows.Controls.Primitives;
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Provides a framework for <see cref="Panel"/> elements that virtualize their visual children.
+/// </summary>
+public abstract class VirtualizingPanel : Panel
 {
     /// <summary>
-    /// Provides a framework for <see cref="Panel"/> elements that virtualize
-    /// their visual children.
+    /// Gets a value that identifies the <see cref="Controls.ItemContainerGenerator"/> for this <see cref="VirtualizingPanel"/>.
     /// </summary>
-    public abstract class VirtualizingPanel : Panel
+    /// <returns>
+    /// The <see cref="Controls.ItemContainerGenerator"/> for this <see cref="VirtualizingPanel"/>.
+    /// </returns>
+    public IItemContainerGenerator ItemContainerGenerator => Generator;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="VirtualizingPanel"/> class.
+    /// </summary>
+    protected VirtualizingPanel() { }
+
+    /// <summary>
+    /// Adds the specified <see cref="UIElement"/> to the <see cref="Panel.Children"/> collection of a 
+    /// <see cref="VirtualizingPanel"/> element.
+    /// </summary>
+    /// <param name="child">
+    /// The <see cref="UIElement"/> child to add to the collection.
+    /// </param>
+    protected void AddInternalChild(UIElement child) => Children.Add(child);
+
+    /// <summary>
+    /// Adds the specified <see cref="UIElement"/> to the collection of a <see cref="VirtualizingPanel"/> element 
+    /// at the specified index position.
+    /// </summary>
+    /// <param name="index">
+    /// The index position within the collection at which the child element is inserted.
+    /// </param>
+    /// <param name="child">
+    /// The <see cref="UIElement"/> child to add to the collection.
+    /// </param>
+    protected void InsertInternalChild(int index, UIElement child) => Children.Insert(index, child);
+
+    /// <summary>
+    /// Removes child elements from the <see cref="Panel.Children"/> collection.
+    /// </summary>
+    /// <param name="index">
+    /// The beginning index position within the collection at which the first child element is removed.
+    /// </param>
+    /// <param name="range">
+    /// The total number of child elements to remove from the collection.
+    /// </param>
+    protected void RemoveInternalChildRange(int index, int range)
     {
-        /// <summary>
-        /// Gets a value that identifies the <see cref="ItemContainerGenerator"/>
-        /// for this <see cref="VirtualizingPanel"/>.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="ItemContainerGenerator"/> for this <see cref="VirtualizingPanel"/>.
-        /// </returns>
-        public IItemContainerGenerator ItemContainerGenerator
+        for (int i = 0; i < range; i++)
         {
-            get
-            {
-                return Generator;
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VirtualizingPanel"/> class.
-        /// </summary>
-        protected VirtualizingPanel() { }
-
-        /// <summary>
-        /// Adds the specified <see cref="UIElement"/> to the <see cref="Panel.Children"/>
-        /// collection of a <see cref="VirtualizingPanel"/> element.
-        /// </summary>
-        /// <param name="child">
-        /// The <see cref="UIElement"/> child to add to the collection.
-        /// </param>
-        protected void AddInternalChild(UIElement @child)
-        {
-            Children.Add(child);
-        }
-
-        /// <summary>
-        /// Adds the specified <see cref="UIElement"/> to the collection of a <see cref="VirtualizingPanel"/>
-        /// element at the specified index position.
-        /// </summary>
-        /// <param name="index">
-        /// The index position within the collection at which the child element is inserted.
-        /// </param>
-        /// <param name="child">
-        /// The <see cref="UIElement"/> child to add to the collection.
-        /// </param>
-        protected void InsertInternalChild(int @index, UIElement @child)
-        {
-            Children.Insert(index, child);
-        }
-
-        /// <summary>
-        /// Removes child elements from the <see cref="Panel.Children"/> collection.
-        /// </summary>
-        /// <param name="index">
-        /// The beginning index position within the collection at which the first child element
-        /// is removed.
-        /// </param>
-        /// <param name="range">
-        /// The total number of child elements to remove from the collection.
-        /// </param>
-        protected void RemoveInternalChildRange(int @index, int @range)
-        {
-            for (int i = 0; i < range; i++)
-                Children.RemoveAt(index);
-        }
-
-        /// <summary>
-        /// Called when the <see cref="ItemsControl.Items"/> collection that is
-        /// associated with the <see cref="ItemsControl"/> for this <see cref="Panel"/>
-        /// changes.
-        /// </summary>
-        /// <param name="sender">
-        /// The <see cref="object"/> that raised the event.
-        /// </param>
-        /// <param name="args">
-        /// Provides data for the <see cref="ItemContainerGenerator.ItemsChanged"/>
-        /// event.
-        /// </param>
-        protected virtual void OnItemsChanged(object @sender, ItemsChangedEventArgs @args)
-        {
-        }
-
-        /// <summary>
-        /// Called when the collection of child elements is cleared by the base <see cref="Panel"/>
-        /// class.
-        /// </summary>
-        protected virtual void OnClearChildren()
-        {
-        }
-
-        /// <summary>
-        /// When implemented in a derived class, generates the item at the specified index
-        /// location and makes it visible.
-        /// </summary>
-        /// <param name="index">
-        /// The index position of the item that is generated and made visible.
-        /// </param>
-        protected virtual void BringIndexIntoView(int @index)
-        {
-        }
-
-        internal void BringIndexIntoViewInternal(int index)
-        {
-            BringIndexIntoView(index);
-        }
-
-        internal override void GenerateChildren()
-        {
-            // Do nothing. Subclasses will use the exposed generator to generate children.
-        }
-
-        // This method returns a bool to indicate if or not the panel layout is affected by this collection change
-        internal override bool OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
-        {
-            switch (args.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
-                case NotifyCollectionChangedAction.Move:
-                    // Don't allow Panel's code to run for add/remove/replace/move
-                    break;
-
-                default:
-                    base.OnItemsChangedInternal(sender, args);
-                    break;
-            }
-
-            OnItemsChanged(sender, args);
-
-            return true;
-        }
-
-        internal override void OnClearChildrenInternal()
-        {
-            OnClearChildren();
+            Children.RemoveAt(index);
         }
     }
+
+    /// <summary>
+    /// Called when the <see cref="ItemsControl.Items"/> collection that is associated with the <see cref="ItemsControl"/>
+    /// for this <see cref="Panel"/> changes.
+    /// </summary>
+    /// <param name="sender">
+    /// The <see cref="object"/> that raised the event.
+    /// </param>
+    /// <param name="args">
+    /// Provides data for the <see cref="ItemContainerGenerator.ItemsChanged"/> event.
+    /// </param>
+    protected virtual void OnItemsChanged(object sender, ItemsChangedEventArgs args)
+    {
+    }
+
+    /// <summary>
+    /// Called when the collection of child elements is cleared by the base <see cref="Panel"/> class.
+    /// </summary>
+    protected virtual void OnClearChildren()
+    {
+    }
+
+    /// <summary>
+    /// When implemented in a derived class, generates the item at the specified index location and makes it visible.
+    /// </summary>
+    /// <param name="index">
+    /// The index position of the item that is generated and made visible.
+    /// </param>
+    protected virtual void BringIndexIntoView(int index)
+    {
+    }
+
+    internal void BringIndexIntoViewInternal(int index) => BringIndexIntoView(index);
+
+    internal override void GenerateChildren()
+    {
+        // Do nothing. Subclasses will use the exposed generator to generate children.
+    }
+
+    // This method returns a bool to indicate if or not the panel layout is affected by this collection change
+    internal override bool OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
+    {
+        switch (args.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+            case NotifyCollectionChangedAction.Remove:
+            case NotifyCollectionChangedAction.Replace:
+            case NotifyCollectionChangedAction.Move:
+                // Don't allow Panel's code to run for add/remove/replace/move
+                break;
+
+            default:
+                base.OnItemsChangedInternal(sender, args);
+                break;
+        }
+
+        OnItemsChanged(sender, args);
+
+        return true;
+    }
+
+    internal override void OnClearChildrenInternal() => OnClearChildren();
 }

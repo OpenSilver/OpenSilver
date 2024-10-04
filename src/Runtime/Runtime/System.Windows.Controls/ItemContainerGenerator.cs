@@ -18,7 +18,7 @@ using System.Diagnostics;
 using System.Windows.Controls.Primitives;   // IItemContainerGenerator
 using System.Windows.Data;
 using System.Windows.Media;
-using CSHTML5.Internals.Controls;
+using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls
 {

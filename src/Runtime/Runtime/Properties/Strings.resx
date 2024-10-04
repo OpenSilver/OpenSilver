@@ -143,6 +143,9 @@
   <data name="PropertyNotReadable" xml:space="preserve">
     <value>The property named '{0}' on type '{1}' cannot be read.</value>
   </data>
+  <data name="ScrollViewer_CannotBeNaN" xml:space="preserve">
+    <value>'{0}' parameter value cannot be NaN.</value>
+  </data>
   <data name="TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite" xml:space="preserve">
     <value>Cannot set read-only property HasItems.</value>
     <comment>Exception thrown when the HasItems property is improperly set.</comment>

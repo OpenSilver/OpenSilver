@@ -231,14 +231,14 @@ namespace System.Windows.Controls.Primitives
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
-            FocusChanged(HasFocus());
+            FocusChanged(FocusManager.HasFocus(this, false));
         }
 
         /// <inheritdoc />
         protected override void OnLostFocus(RoutedEventArgs e)
         {
             base.OnLostFocus(e);
-            FocusChanged(HasFocus());
+            FocusChanged(FocusManager.HasFocus(this, false));
         }
 
         /// <inheritdoc />
@@ -301,18 +301,6 @@ namespace System.Windows.Controls.Primitives
         {
             Debug.Assert(stateName != null);
             return VisualStateManager.GoToState(this, stateName, useTransitions);
-        }
-
-        private bool HasFocus()
-        {
-            for (DependencyObject doh = FocusManager.GetFocusedElement() as DependencyObject;
-                doh != null;
-                doh = VisualTreeHelper.GetParent(doh))
-            {
-                if (ReferenceEquals(doh, this))
-                    return true;
-            }
-            return false;
         }
 
         /// <summary>

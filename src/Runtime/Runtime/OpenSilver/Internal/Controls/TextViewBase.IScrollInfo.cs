@@ -195,7 +195,7 @@ internal partial class TextViewBase : IScrollInfo
             invalidateScrollInfo = true;
         }
 
-        var offset = new Point(
+        var offset = new Vector(
             Math.Max(0, Math.Min(_scrollData.ExtentWidth - _scrollData.ViewportWidth, _scrollData.HorizontalOffset)),
             Math.Max(0, Math.Min(_scrollData.ExtentHeight - _scrollData.ViewportHeight, _scrollData.VerticalOffset)));
 
@@ -211,7 +211,7 @@ internal partial class TextViewBase : IScrollInfo
         }
     }
 
-    internal void UpdateOffsets(Point offset)
+    internal void UpdateOffsets(Vector offset)
     {
         Debug.Assert(IsScrollClient);
 
@@ -220,5 +220,22 @@ internal partial class TextViewBase : IScrollInfo
             _scrollData.Offset = offset;
             _scrollData.ScrollOwner?.InvalidateScrollInfo();
         }
+    }
+
+    private sealed class ScrollData
+    {
+        internal ScrollViewer ScrollOwner;
+        internal Size Viewport;
+        internal Size Extent;
+        internal Vector Offset;
+        internal bool CanHorizontallyScroll;
+        internal bool CanVerticallyScroll;
+
+        internal double HorizontalOffset => Offset.X;
+        internal double VerticalOffset => Offset.Y;
+        internal double ViewportWidth => Viewport.Width;
+        internal double ViewportHeight => Viewport.Height;
+        internal double ExtentWidth => Extent.Width;
+        internal double ExtentHeight => Extent.Height;
     }
 }

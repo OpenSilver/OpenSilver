@@ -76,7 +76,7 @@ internal sealed class RichTextViewManager
             double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft");
             double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop");
 
-            view.UpdateOffsets(new Point(scrollLeft, scrollTop));
+            view.UpdateOffsets(new Vector(scrollLeft, scrollTop));
         }
     }
 }

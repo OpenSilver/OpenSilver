@@ -117,7 +117,7 @@ internal sealed class TextViewManager
             double scrollLeft = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollLeft");
             double scrollTop = Interop.ExecuteJavaScriptDouble($"{sDiv}.scrollTop");
 
-            textview.UpdateOffsets(new Point(scrollLeft, scrollTop));
+            textview.UpdateOffsets(new Vector(scrollLeft, scrollTop));
         }
     }
 }

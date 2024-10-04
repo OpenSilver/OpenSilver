@@ -18,7 +18,6 @@ using System.Windows.Markup;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using CSHTML5.Internals.Controls;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml.Context;
 using OpenSilver.Internal.Controls;
