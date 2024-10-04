@@ -12,7 +12,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Net;
@@ -28,7 +27,6 @@ using System.Xml.Linq;
 using System.Xml;
 using System.Windows;
 using CSHTML5.Internal;
-using static System.ServiceModel.INTERNAL_WebMethodsCaller;
 using DataContractSerializerCustom = System.Runtime.Serialization.DataContractSerializer_CSHTML5Ver;
 using System.Globalization;
 
@@ -451,10 +449,7 @@ namespace System.ServiceModel
                     interfaceType,
                     methodReturnType,
                     knownTypes,
-                    faultException =>
-                    {
-                        throw faultException;
-                    },
+                    static faultException => throw faultException,
                     isXmlSerializer,
                     soapVersion);
 
@@ -785,10 +780,7 @@ namespace System.ServiceModel
                     interfaceType,
                     methodReturnType,
                     null,
-                    faultException =>
-                    {
-                        throw faultException;
-                    },
+                    faultException => throw faultException,
                     isXmlSerializer,
                     soapVersion);
             }
@@ -880,10 +872,7 @@ namespace System.ServiceModel
                     interfaceType,
                     methodReturnType,
                     null,
-                    faultException =>
-                    {
-                        throw faultException;
-                    },
+                    faultException => throw faultException,
                     isXmlSerializer,
                     soapVersion);
 
@@ -1147,10 +1136,7 @@ namespace System.ServiceModel
                         interfaceType,
                         requestResponseType,
                         knownTypes,
-                        faultException =>
-                        {
-                            taskCompletionSource.TrySetException(faultException);
-                        },
+                        faultException => taskCompletionSource.TrySetException(faultException),
                         isXmlSerializer,
                         soapVersion);
 
@@ -1179,10 +1165,7 @@ namespace System.ServiceModel
                         interfaceType,
                         requestResponseType,
                         knownTypes,
-                        faultException =>
-                        {
-                            taskCompletionSource.TrySetException(faultException);
-                        },
+                        faultException => taskCompletionSource.TrySetException(faultException),
                         isXmlSerializer,
                         soapVersion);
 
@@ -1199,7 +1182,7 @@ namespace System.ServiceModel
                 }
             }
 
-            private FaultException GetFaultException(string response, bool useXmlSerializerFormat)
+            private static FaultException GetFaultException(string response, bool useXmlSerializerFormat)
             {
                 const string ns = "http://schemas.xmlsoap.org/soap/envelope/";
 
@@ -1240,45 +1223,45 @@ namespace System.ServiceModel
                 var type = typeof(FaultException<>).MakeGenericType(detailType);
 
                 return (FaultException)Activator.CreateInstance(type, detail, reason, code, null);
-            }
 
-            private static Type ResolveType(XName name, bool useXmlSerializerFormat)
-            {
-                Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                for (int i = 0; i < assemblies.Length; ++i)
+                static Type ResolveType(XName name, bool useXmlSerializerFormat)
                 {
-                    Type[] types = assemblies[i].GetTypes();
-                    for (int j = 0; j < types.Length; ++j)
+                    Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    for (int i = 0; i < assemblies.Length; ++i)
                     {
-                        Type type = types[j];
-                        object[] attrs = type.GetCustomAttributes(typeof(DataContractAttribute), false);
-                        DataContractAttribute attr = attrs != null && attrs.Length > 0 ?
-                                                     (DataContractAttribute)attrs[0] :
-                                                     null;
-
-                        if (attr != null)
+                        Type[] types = assemblies[i].GetTypes();
+                        for (int j = 0; j < types.Length; ++j)
                         {
-                            bool nameMatch = attr.IsNameSetExplicitly ?
-                                         attr.Name == name.LocalName :
-                                         type.Name == name.LocalName;
+                            Type type = types[j];
+                            object[] attrs = type.GetCustomAttributes(typeof(DataContractAttribute), false);
+                            DataContractAttribute attr = attrs != null && attrs.Length > 0 ?
+                                                         (DataContractAttribute)attrs[0] :
+                                                         null;
 
-                            if(nameMatch)
+                            if (attr != null)
                             {
-                                bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
-                                    attr.Namespace == name.NamespaceName :
-                                    GetDefaultNamespace(type.Namespace, useXmlSerializerFormat) == name.NamespaceName;
+                                bool nameMatch = attr.IsNameSetExplicitly ?
+                                    attr.Name == name.LocalName :
+                                    type.Name == name.LocalName;
 
-                                if (namespaceMatch)
-                                    return type;
+                                if (nameMatch)
+                                {
+                                    bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
+                                        attr.Namespace == name.NamespaceName :
+                                        GetDefaultNamespace(type.Namespace, useXmlSerializerFormat) == name.NamespaceName;
+
+                                    if (namespaceMatch)
+                                        return type;
+                                }
                             }
                         }
                     }
-                }
 
-                throw new InvalidOperationException($"Could not resolve type {name}");
+                    throw new InvalidOperationException($"Could not resolve type {name}");
+                }
             }
 
-            private object ReadAndPrepareResponse(
+            private static object ReadAndPrepareResponse(
                 string responseAsString,
                 Type interfaceType,
                 Type requestResponseType,
@@ -1336,13 +1319,17 @@ namespace System.ServiceModel
                     NS = "http://www.w3.org/2003/05/soap-envelope";
                 }
 
-                XElement envelopeElement = DataContractSerializerCustom.ParseToXDocument(responseAsString).Root;
-                XElement headerElement = envelopeElement.Element(XName.Get("Header", NS));
-                XElement bodyElement = envelopeElement.Element(XName.Get("Body", NS));
+                XElement envelopeElement = null;
+                XElement headerElement = null;
+                XElement bodyElement = null;
 
                 // Error parsing, if applicable
                 if (soapVersion == "1.2")
                 {
+                    envelopeElement = DataContractSerializerCustom.ParseToXDocument(responseAsString).Root;
+                    headerElement = envelopeElement.Element(XName.Get("Header", NS));
+                    bodyElement = envelopeElement.Element(XName.Get("Body", NS));
+
                     XElement faultElement = bodyElement.Element(XName.Get("Fault", NS));
 
                     if (faultElement != null)
@@ -1375,51 +1362,6 @@ namespace System.ServiceModel
                         raiseFaultException(faultException);
                         return null;
                     }
-
-                    static object ParseException(XElement exceptionElement, string exceptionTypeName)
-                    {
-                        Type exceptionType = ResolveType(exceptionTypeName);
-
-                        object exception = Activator.CreateInstance(exceptionType);
-
-                        foreach (XElement element in exceptionElement.Elements())
-                        {
-                            PropertyInfo property = exceptionType.GetProperty(element.Name.LocalName);
-
-                            XAttribute isNullAttribute = element.Attributes().FirstOrDefault(a => a.Name.LocalName == "nil");
-                            if (isNullAttribute != null && isNullAttribute.Value == "true")
-                            {
-                                property.SetValue(exception, null);
-                            }
-                            else
-                            {
-                                if (property.Name == "InnerException")
-                                    property.SetValue(exception, ParseException(element, "SoaUnknownException"));
-                                else
-                                    property.SetValue(exception, element.Value);
-                            }
-                        }
-
-                        return exception;
-                    }
-
-                    static Type ResolveType(string name)
-                    {
-                        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                        int asemblyCount = assemblies.Length;
-                        for (int i = 0; i < asemblyCount; i++)
-                        {
-                            Type[] types = assemblies[i].GetTypes();
-                            int typeCount = types.Length;
-                            for (int j = 0; j < typeCount; j++)
-                            {
-                                if (types[j].Name == name)
-                                    return types[j];
-                            }
-                        }
-
-                        throw new InvalidOperationException($"Could not resolve type {name}");
-                    }
                 }
                 else
                 {
@@ -1436,174 +1378,277 @@ namespace System.ServiceModel
                     }
                 }
 
-                object requestResponse = null;
-
-                if (!requestResponseType.IsValueType)
+                if (requestResponseType.IsValueType)
                 {
-                    // we deserialize the response
-                    // in the case of an XmlSerializer:
-                    // - change the xsi:nil="true" or add the xsi namespace (probably better to add the namespace)
-                    // - directly use xDoc.Root instead of its Nodes (I think)
-                    // - change the type to deserialize to the type with the name : requestResponseType.Name + "Body"
-                    FieldInfo bodyFieldInfo = null;
-
-                    // we make sure this is not a method with no return type
-                    // Note: we test for the "Object" type since it is what we put instead of "void"
-                    // to allow passing it as Generic type argument when calling CallWebMethod.
-                    if (requestResponseType == typeof(object))
+                    return ReadResponseValueType(responseAsString, requestResponseType);
+                }
+                else
+                {
+                    if (envelopeElement is null)
                     {
-                        if (bodyElement != null && !bodyElement.Nodes().Any())
+                        envelopeElement = DataContractSerializerCustom.ParseToXDocument(responseAsString).Root;
+                        headerElement = envelopeElement.Element(XName.Get("Header", NS));
+                        bodyElement = envelopeElement.Element(XName.Get("Body", NS));
+                    }
+
+                    return ReadResponseReferenceType(
+                        envelopeElement,
+                        bodyElement,
+                        interfaceType,
+                        requestResponseType,
+                        knownTypes,
+                        isXmlSerializer,
+                        soapVersion);
+                }
+
+                static object ParseException(XElement exceptionElement, string exceptionTypeName)
+                {
+                    Type exceptionType = ResolveType(exceptionTypeName);
+
+                    object exception = Activator.CreateInstance(exceptionType);
+
+                    foreach (XElement element in exceptionElement.Elements())
+                    {
+                        PropertyInfo property = exceptionType.GetProperty(element.Name.LocalName);
+
+                        XAttribute isNullAttribute = element.Attributes().FirstOrDefault(a => a.Name.LocalName == "nil");
+                        if (isNullAttribute != null && isNullAttribute.Value == "true")
                         {
-                            // Note: there might be a more efficient way of checking if the method has a return 
-                            // type (possibly through a smart use of responseAsString.IndexOf but it seems 
-                            // complicated and not necessarily more efficient).
-                            // this is a method with no return type, there is no need to read the response 
-                            // after checking that there was no FaultException.
-                            return null;
-                        }
-                    }
-
-                    Type typeToDeserialize = requestResponseType;
-                    if (isXmlSerializer)
-                    {
-                        bodyFieldInfo = requestResponseType.GetField("Body");
-                        typeToDeserialize = bodyFieldInfo.FieldType;
-                    }
-
-                    // get the known types from the interface type
-                    var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
-                    types.AddRange(interfaceType.GetCustomAttributes<ServiceKnownTypeAttribute>(true).Select(o => o.Type));
-
-                    var deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
-                    XElement xElement = envelopeElement;
-
-                    //exclude the parts that are <Enveloppe><Body>... since they are useless 
-                    // and would keep the deserialization from working properly
-                    // they should always be the two outermost elements
-                    if (soapVersion == "1.1")
-                    {
-                        xElement = bodyElement ?? xElement;
-                    }
-                    else
-                    {
-                        xElement = bodyElement;
-                    }
-
-                    // we check if the type is defined in the next XElement because 
-                    // it changes the XElement we want to use in that case.
-                    // The reason is that the response uses one less XElement in the 
-                    // case where we use XmlSerializer and the method has the return 
-                    // Type object.
-                    bool isTypeSpecified =
-                        xElement.Attributes(XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance").GetName("type"))
-                                .Any();
-                    if (!isXmlSerializer || !isTypeSpecified)
-                    {
-                        // we are either not in the XmlSerializer version or we have 
-                        // the "extra" XElement so we move in once.
-                        xElement = xElement.Elements().FirstOrDefault() ?? xElement; //move inside of the <Body> tag
-                    }
-
-                    if (!isXmlSerializer)
-                    {
-                        if (typeToDeserialize.GetCustomAttribute<MessageContractAttribute>() != null)
-                        {
-                            // DataContractSerializer needs correct namespace instead of http://tempuri.org/
-                            XNamespace ns = GetDefaultNamespace(typeToDeserialize.Namespace, false);
-                            xElement.Name = ns + xElement.Name.LocalName;
-                            xElement.Attributes("xmlns").Remove();
-                            foreach (var childElement in xElement.Elements())
-                            {
-                                childElement.Name = ns + childElement.Name.LocalName;
-                            }
+                            property.SetValue(exception, null);
                         }
                         else
                         {
-                            xElement = xElement.Elements().FirstOrDefault() ?? xElement;
+                            if (property.Name == "InnerException")
+                                property.SetValue(exception, ParseException(element, "SoaUnknownException"));
+                            else
+                                property.SetValue(exception, element.Value);
                         }
-                        requestResponse = deSerializer.DeserializeFromXElement(xElement);
+                    }
+
+                    return exception;
+                }
+
+                static Type ResolveType(string name)
+                {
+                    Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    int asemblyCount = assemblies.Length;
+                    for (int i = 0; i < asemblyCount; i++)
+                    {
+                        Type[] types = assemblies[i].GetTypes();
+                        int typeCount = types.Length;
+                        for (int j = 0; j < typeCount; j++)
+                        {
+                            if (types[j].Name == name)
+                                return types[j];
+                        }
+                    }
+
+                    throw new InvalidOperationException($"Could not resolve type {name}");
+                }
+            }
+
+            private static object ReadResponseValueType(string responseAsString, Type requestResponseType)
+            {
+                Debug.Assert(requestResponseType.IsValueType);
+
+                object requestResponse = null;
+
+                // we remove the parts of the response string that are not the 
+                // response itself. That is, we remove the "<s:Body>" so as to 
+                // keep only its content
+                ReadOnlySpan<char> response = responseAsString.AsSpan();
+                ReadOnlySpan<char> keyWord = ":Body".AsSpan();
+                int i = response.IndexOf(keyWord);
+                int k = i + response.Slice(i).IndexOf('>');
+                response = response.Slice(k + 1);
+                i = response.LastIndexOf(keyWord);
+                k = response.Slice(0, i).LastIndexOf('<');
+                response = response.Slice(0, k);
+
+                // Here we are dealing with a value type.
+                // Example:
+                //     <METHODNAMEResponse xmlns="http://tempuri.org/">
+                //         <METHODNAMEResult>10</METHODNAMEResult>
+                //     </METHODNAMEResponse>
+
+
+                // we look for :nil="true". Since we have a value type, it will
+                // mean that the value type is nullable and the value is null
+                if (response.IndexOf(":nil=\"true\"".AsSpan()) == -1)
+                {
+                    // we remove the <MethodNameResponse> tag
+                    int ii = response.IndexOf('>');
+                    int jj = ii + 1 + response.Slice(ii + 1).IndexOf('>');
+                    int kk = jj + 1 + response.Slice(jj + 1).IndexOf('<');
+                    response = response.Slice(jj + 1, kk - jj - 1);
+
+                    //todo: support more value types?
+                    //todo: handle nullables that are null
+                    if (requestResponseType == typeof(int) || requestResponseType == typeof(int?))
+                    {
+                        requestResponse = int.Parse(response.ToString());
+                    }
+                    else if (requestResponseType == typeof(long) || requestResponseType == typeof(long?))
+                    {
+                        requestResponse = long.Parse(response.ToString());
+                    }
+                    else if (requestResponseType == typeof(bool) || requestResponseType == typeof(bool?))
+                    {
+                        requestResponse = bool.Parse(response.ToString());
+                    }
+                    else if (requestResponseType == typeof(float) || requestResponseType == typeof(float?))
+                    {
+                        requestResponse = float.Parse(response.ToString()); //todo: ensure this is the culture-invariant parsing!
+                    }
+                    else if (requestResponseType == typeof(double) || requestResponseType == typeof(double?))
+                    {
+                        requestResponse = double.Parse(response.ToString()); //todo: ensure this is the culture-invariant parsing!
+                    }
+                    else if (requestResponseType == typeof(decimal) || requestResponseType == typeof(decimal?))
+                    {
+                        requestResponse = decimal.Parse(response.ToString()); //todo: ensure this is the culture-invariant parsing!
+                    }
+                    else if (requestResponseType == typeof(char) || requestResponseType == typeof(char?))
+                    {
+                        requestResponse = (char)int.Parse(response.ToString()); //todo: support encodings
+                    }
+                    else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
+                    {
+                        requestResponse = DateTime.Parse(response.ToString(), CultureInfo.InvariantCulture);
+                    }
+                    else if (requestResponseType == typeof(TimeSpan) || requestResponseType == typeof(TimeSpan?))
+                    {
+                        requestResponse = XmlConvert.ToTimeSpan(response.ToString());
+                    }
+                    else if (requestResponseType.IsEnum)
+                    {
+                        requestResponse = Enum.Parse(requestResponseType, response.ToString());
+                    }
+                    else if (requestResponseType == typeof(void))
+                    {
+                        // Do nothing so null object will be returned
                     }
                     else
                     {
-                        requestResponse = Activator.CreateInstance(requestResponseType);
-                        object requestResponseBody = deSerializer.DeserializeFromXElement(xElement);
-                        bodyFieldInfo.SetValue(requestResponse, requestResponseBody);
+                        throw new NotSupportedException(
+                            $"The type '{requestResponseType}' is not supported in the current WCF implementation, string value is {response.ToString()}.");
                     }
                 }
                 else
                 {
-                    // we remove the parts of the response string that are not the 
-                    // response itself. That is, we remove the "<s:Body>" so as to 
-                    // keep only its content
-                    string keyWord = ":Body";
-                    int i = responseAsString.IndexOf(keyWord);
-                    int k = responseAsString.IndexOf('>', i);
-                    responseAsString = responseAsString.Remove(0, k + 1);
-                    i = responseAsString.LastIndexOf(keyWord);
-                    k = responseAsString.Substring(0, i).LastIndexOf('<');
-                    responseAsString = responseAsString.Remove(k);
-
-                    // Here we are dealing with a value type.
-                    // Example:
-                    //     <METHODNAMEResponse xmlns="http://tempuri.org/">
-                    //         <METHODNAMEResult>10</METHODNAMEResult>
-                    //     </METHODNAMEResponse>
-
-
-                    // we look for :nil="true". Since we have a value type, it will
-                    // mean that the value type is nullable and the value is null
-                    int indexOfNil = responseAsString.IndexOf(":nil=\"true\"");
-                    if (indexOfNil == -1)
+                    if (requestResponseType.FullName.StartsWith("System.Nullable`1"))
                     {
-                        // we remove the <MethodNameResponse> tag
-                        int ii = responseAsString.IndexOf('>', 0);
-                        int jj = responseAsString.IndexOf('>', ii + 1);
-                        int kk = responseAsString.IndexOf('<', jj + 1);
-                        responseAsString = responseAsString.Substring(jj + 1, (kk - jj - 1));
+                        return null;
+                    }
+                    else
+                    {
+                        return Activator.CreateInstance(requestResponseType);
+                    }
+                }
 
-                        //todo: support more value types?
-                        //todo: handle nullables that are null
-                        if (requestResponseType == typeof(int) || requestResponseType == typeof(int?))
-                            requestResponse = int.Parse(responseAsString);
-                        else if (requestResponseType == typeof(long) || requestResponseType == typeof(long?))
-                            requestResponse = long.Parse(responseAsString);
-                        else if (requestResponseType == typeof(bool) || requestResponseType == typeof(bool?))
-                            requestResponse = bool.Parse(responseAsString);
-                        else if (requestResponseType == typeof(float) || requestResponseType == typeof(float?))
-                            requestResponse = float.Parse(responseAsString); //todo: ensure this is the culture-invariant parsing!
-                        else if (requestResponseType == typeof(double) || requestResponseType == typeof(double?))
-                            requestResponse = double.Parse(responseAsString); //todo: ensure this is the culture-invariant parsing!
-                        else if (requestResponseType == typeof(decimal) || requestResponseType == typeof(decimal?))
-                            requestResponse = decimal.Parse(responseAsString); //todo: ensure this is the culture-invariant parsing!
-                        else if (requestResponseType == typeof(char) || requestResponseType == typeof(char?))
-                            requestResponse = (char)(int.Parse(responseAsString)); //todo: support encodings
-                        else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
-                            requestResponse = DateTime.Parse(responseAsString, CultureInfo.InvariantCulture);
-                        else if (requestResponseType == typeof(TimeSpan) || requestResponseType == typeof(TimeSpan?))
-                            requestResponse = XmlConvert.ToTimeSpan(responseAsString);
-                        else if (requestResponseType.IsEnum)
-                            requestResponse = Enum.Parse(requestResponseType, responseAsString);
-                        else if (requestResponseType == typeof(void))
+                return requestResponse;
+            }
+
+            private static object ReadResponseReferenceType(XElement envelopeElement,
+                XElement bodyElement,
+                Type interfaceType,
+                Type requestResponseType,
+                IReadOnlyList<Type> knownTypes,
+                bool isXmlSerializer,
+                string soapVersion)
+            {
+                Debug.Assert(!requestResponseType.IsValueType);
+
+                object requestResponse = null;
+
+                // we deserialize the response
+                // in the case of an XmlSerializer:
+                // - change the xsi:nil="true" or add the xsi namespace (probably better to add the namespace)
+                // - directly use xDoc.Root instead of its Nodes (I think)
+                // - change the type to deserialize to the type with the name : requestResponseType.Name + "Body"
+                FieldInfo bodyFieldInfo = null;
+
+                // we make sure this is not a method with no return type
+                // Note: we test for the "Object" type since it is what we put instead of "void"
+                // to allow passing it as Generic type argument when calling CallWebMethod.
+                if (requestResponseType == typeof(object))
+                {
+                    if (bodyElement != null && !bodyElement.Nodes().Any())
+                    {
+                        // Note: there might be a more efficient way of checking if the method has a return 
+                        // type (possibly through a smart use of responseAsString.IndexOf but it seems 
+                        // complicated and not necessarily more efficient).
+                        // this is a method with no return type, there is no need to read the response 
+                        // after checking that there was no FaultException.
+                        return null;
+                    }
+                }
+
+                Type typeToDeserialize = requestResponseType;
+                if (isXmlSerializer)
+                {
+                    bodyFieldInfo = requestResponseType.GetField("Body");
+                    typeToDeserialize = bodyFieldInfo.FieldType;
+                }
+
+                // get the known types from the interface type
+                var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
+                types.AddRange(interfaceType.GetCustomAttributes<ServiceKnownTypeAttribute>(true).Select(o => o.Type));
+
+                var deSerializer = new DataContractSerializerCustom(typeToDeserialize, types);
+                XElement xElement = envelopeElement;
+
+                //exclude the parts that are <Enveloppe><Body>... since they are useless 
+                // and would keep the deserialization from working properly
+                // they should always be the two outermost elements
+                if (soapVersion == "1.1")
+                {
+                    xElement = bodyElement ?? xElement;
+                }
+                else
+                {
+                    xElement = bodyElement;
+                }
+
+                // we check if the type is defined in the next XElement because 
+                // it changes the XElement we want to use in that case.
+                // The reason is that the response uses one less XElement in the 
+                // case where we use XmlSerializer and the method has the return 
+                // Type object.
+                bool isTypeSpecified =
+                    xElement.Attributes(XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance").GetName("type"))
+                            .Any();
+                if (!isXmlSerializer || !isTypeSpecified)
+                {
+                    // we are either not in the XmlSerializer version or we have 
+                    // the "extra" XElement so we move in once.
+                    xElement = xElement.Elements().FirstOrDefault() ?? xElement; //move inside of the <Body> tag
+                }
+
+                if (!isXmlSerializer)
+                {
+                    if (typeToDeserialize.GetCustomAttribute<MessageContractAttribute>() != null)
+                    {
+                        // DataContractSerializer needs correct namespace instead of http://tempuri.org/
+                        XNamespace ns = GetDefaultNamespace(typeToDeserialize.Namespace, false);
+                        xElement.Name = ns + xElement.Name.LocalName;
+                        xElement.Attributes("xmlns").Remove();
+                        foreach (var childElement in xElement.Elements())
                         {
-                            // Do nothing so null object will be returned
-                        }
-                        else
-                        {
-                            throw new NotSupportedException(
-                                $"The type '{requestResponseType}' is not supported in the current WCF implementation, string value is {responseAsString}.");
+                            childElement.Name = ns + childElement.Name.LocalName;
                         }
                     }
                     else
                     {
-                        if (requestResponseType.FullName.StartsWith("System.Nullable`1"))
-                        {
-                            return null;
-                        }
-                        else
-                        {
-                            return Activator.CreateInstance(requestResponseType);
-                        }
+                        xElement = xElement.Elements().FirstOrDefault() ?? xElement;
                     }
+                    requestResponse = deSerializer.DeserializeFromXElement(xElement);
+                }
+                else
+                {
+                    requestResponse = Activator.CreateInstance(requestResponseType);
+                    object requestResponseBody = deSerializer.DeserializeFromXElement(xElement);
+                    bodyFieldInfo.SetValue(requestResponse, requestResponseBody);
                 }
 
                 return requestResponse;

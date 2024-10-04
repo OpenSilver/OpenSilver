@@ -12,11 +12,7 @@
 *  
 \*====================================================================================*/
 
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace System.ServiceModel
@@ -385,16 +381,6 @@ namespace System.ServiceModel
                 webMethodName,
                 requestParameters,
                 soapVersion);
-        }
-
-        internal partial class WebMethodAsyncResult : INTERNAL_AsyncResult
-        {
-            public string XmlReturnedFromTheServer { get; set; }
-
-            public WebMethodAsyncResult(AsyncCallback callback, object state)
-                : base(callback, state)
-            {
-            }
         }
     }
 }

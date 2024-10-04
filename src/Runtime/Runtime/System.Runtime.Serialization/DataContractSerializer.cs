@@ -170,7 +170,16 @@ namespace System.Runtime.Serialization
 
         public object DeserializeFromXElement(XElement xElement)
         {
-            return DeserializeFromString(XElementToString(xElement));
+            using (var ms = new MemoryStream())
+            {
+                using (var xw = XmlWriter.Create(ms, DefaultXmlWriterSettings))
+                {
+                    xElement.Save(xw);
+                }
+
+                ms.Seek(0, SeekOrigin.Begin);
+                return DeserializePrivate(ms);
+            }
         }
 
         internal static string XElementToString(XElement xElement)
