@@ -93,10 +93,8 @@
   Get a consistent way to access the output directory, independent on whether OutputPath is Relative or Absolute:
   ============================================================-->
   <PropertyGroup>
-    <OutputAssemblyDirectory Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.[^:].*'))"
-        >$(MSBuildProjectDirectory)\$(OutputPath)</OutputAssemblyDirectory>
-    <OutputAssemblyDirectory Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.:.*'))"
-        >$(OutputPath)</OutputAssemblyDirectory>
+    <OutputAssemblyDirectory Condition="!$([System.IO.Path]::IsPathRooted('$(OutputPath)'))">$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(OutputPath)'))</OutputAssemblyDirectory>
+    <OutputAssemblyDirectory Condition="$([System.IO.Path]::IsPathRooted('$(OutputPath)'))">$(OutputPath)</OutputAssemblyDirectory>
   </PropertyGroup>
 
   <!--
