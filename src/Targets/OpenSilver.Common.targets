@@ -70,6 +70,7 @@
   ============================================================-->
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
+    <DefaultXamlRuntime>Wpf</DefaultXamlRuntime>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IsOpenSilver>true</IsOpenSilver>
     <IsSecondPass Condition="'$(IsSecondPass)'==''">False</IsSecondPass>
