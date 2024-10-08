@@ -22,5 +22,13 @@
         <TextBlock Text="- Left alignment, fixed size (width 100px height 50px), accepts return true, nowrap, both scrollbars visible" TextWrapping="Wrap" Margin="0,10,0,0"/>
         <TextBox HorizontalAlignment="Left" Width="100" Height="50" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"/>
         <TextBlock Text="At the time of writing, for a better user experience (because result is unfortunately not perfectly identical) the TextBox in CSHTML5 has the following difference compared to that of WPF: TextWrapping is Wrap by default." TextWrapping="Wrap" Width="400" Margin="0,10,0,0"/>
+
+        <TextBlock Text="Selection:" Margin="0,10,0,0"/>
+        <TextBlock Name="SelectionTextBlock" TextWrapping="Wrap"/>
+        <TextBlock Text="SelectionStart:"/>
+        <TextBlock Name="SelectionStartTextBlock"/>
+        <TextBlock Text="SelectionLength:"/>
+        <TextBlock Name="SelectionLengthTextBlock"/>
+        <TextBox Name="SelectionTextBox" SelectionChanged="TextBox_SelectionChanged"/>
     </StackPanel>
 </sdk:Page>
