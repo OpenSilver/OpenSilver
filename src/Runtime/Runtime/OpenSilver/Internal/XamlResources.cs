@@ -15,9 +15,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using OpenSilver.Internal.Xaml;
 using System.Windows;
 using System.Windows.Media;
+using OpenSilver.Internal.Xaml;
+using OpenSilver.Theming;
 
 namespace OpenSilver.Internal;
 
@@ -46,8 +47,7 @@ internal static class XamlResources
     private const string LIGHT_RESOURCE_THEME_KEY = "Light";
     private const string DARK_RESOURCE_THEME_KEY = "Dark";
 
-    private static readonly Dictionary<Assembly, ResourceDictionary> _dictionaries = new();
-    private static readonly Dictionary<Type, Style> _resourcesCache = new();
+    private static readonly GenericTheme _genericTheme = new();
     private static ResourceDictionary _defaultResources;
     private static ResourceDictionary _defaultThemeResourcesDictionary;
     private static Dictionary<char, List<string>> _charToSimpleHighContrastNames; //this dictionary serves to link the first letter of the theme-dependent resource to the simple high contrast names that start with that letter.
@@ -69,69 +69,14 @@ internal static class XamlResources
     /// <returns>The resource associated with the given key in the given assembly's resources.</returns>
     internal static Style FindStyleResourceInGenericXaml(Type typeKey)
     {
-        Debug.Assert(typeKey != null);
+        Debug.Assert(typeKey is not null);
 
-        if (!FindCachedResource(typeKey, out Style resource))
+        if (Application.Current?.Theme is Theme theme && theme.GetResource(typeKey) is Style themeStyle)
         {
-            resource = (Style)FindDictionaryResource(typeKey);
-            CacheResource(typeKey, resource);
+            return themeStyle;
         }
 
-        return resource;
-    }
-
-    private static Type GetGenericXamlFactoryForAssembly(Assembly assembly)
-    {
-        Debug.Assert(assembly != null);
-
-        string name = assembly.GetName().Name.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
-        string factoryName = XamlResourcesHelper.MakeTitleCase("ǀǀ" + name + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
-        return assembly.GetType(factoryName);
-    }
-
-    private static bool FindCachedResource(Type typeKey, out Style resource) => _resourcesCache.TryGetValue(typeKey, out resource);
-
-    private static void CacheResource(Type typeKey, Style resource) => _resourcesCache[typeKey] = resource;
-
-    private static object FindDictionaryResource(Type typeKey)
-    {
-        Debug.Assert(typeKey != null);
-
-        Assembly assembly = typeKey.Assembly;
-        if (!_dictionaries.TryGetValue(assembly, out ResourceDictionary rd))
-        {
-            rd = LoadGenericResourceDictionary(assembly);
-        }
-
-        return rd?[typeKey];
-    }
-
-    private static ResourceDictionary LoadGenericResourceDictionary(Assembly assembly)
-    {
-        ResourceDictionary rd = null;
-
-        Type factoryType = GetGenericXamlFactoryForAssembly(assembly);
-        if (factoryType != null)
-        {
-            IsSystemResourcesParsing = true;
-
-            try
-            {
-                if (Activator.CreateInstance(factoryType) is IXamlComponentLoader loader)
-                {
-                    rd = new ResourceDictionary();
-                    loader.LoadComponent(rd);
-                }
-            }
-            finally
-            {
-                IsSystemResourcesParsing = false;
-            }
-        }
-
-        _dictionaries.Add(assembly, rd);
-
-        return rd;
+        return _genericTheme.GetResource(typeKey) as Style;
     }
 
     internal static object FindBuiltInResource(object key)
@@ -383,5 +328,29 @@ internal static class XamlResources
                 { "SystemColorWindowColor", Color.FromUInt32(0xFFFFFFFF) },
                 { "SystemColorWindowTextColor", Color.FromUInt32(0xFF000000) }
             });
+    }
+
+    private sealed class GenericTheme : Theme
+    {
+        protected override ResourceDictionary GenerateResources(Assembly assembly)
+        {
+            if (GetGenericXamlFactoryForAssembly(assembly) is Type loaderType &&
+                Activator.CreateInstance(loaderType) is IXamlComponentLoader loader)
+            {
+                var resources = new ResourceDictionary();
+                loader.LoadComponent(resources);
+                return resources;
+            }
+            return null;
+        }
+
+        private static Type GetGenericXamlFactoryForAssembly(Assembly assembly)
+        {
+            Debug.Assert(assembly is not null);
+
+            string name = assembly.GetName().Name.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
+            string factoryName = XamlResourcesHelper.MakeTitleCase("ǀǀ" + name + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
+            return assembly.GetType(factoryName);
+        }
     }
 }

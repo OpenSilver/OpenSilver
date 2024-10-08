@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows;
 
 /// <summary>
@@ -37,7 +39,7 @@ public abstract class SetterBase : DependencyObject
     {
         if (_sealed)
         {
-            throw new InvalidOperationException("Cannot modify a 'SetterBase' after it is sealed.");
+            throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(SetterBase)));
         }
     }
 

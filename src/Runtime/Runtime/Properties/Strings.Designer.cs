@@ -70,6 +70,33 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This {0}&apos;s hierarchy of BasedOn references contains a loop..
+        /// </summary>
+        internal static string BasedOnHasLoop {
+            get {
+                return ResourceManager.GetString("BasedOnHasLoop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A {0} cannot be based on itself..
+        /// </summary>
+        internal static string CannotBeBasedOnSelf {
+            get {
+                return ResourceManager.GetString("CannotBeBasedOnSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot modify a &apos;{0}&apos; after it is sealed..
+        /// </summary>
+        internal static string CannotChangeAfterSealed {
+            get {
+                return ResourceManager.GetString("CannotChangeAfterSealed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot call Show() on a ChildWindow that is in the visual tree. ChildWindow should be the top-most element in the .xaml file..
         /// </summary>
         internal static string ChildWindow_InvalidOperation {

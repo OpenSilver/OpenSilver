@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Markup;
 using System.Xaml.Markup;
+using OpenSilver.Internal;
 using PropertyValue = (int PropertyIndex, object ValueInternal);
 
 namespace System.Windows;
@@ -79,7 +80,7 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
         {
             if (_sealed)
             {
-                throw new InvalidOperationException("Cannot modify a 'Style' after it is sealed.");
+                throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(Style)));
             }
 
             if (value == null)
@@ -104,7 +105,7 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
         {
             if (_sealed)
             {
-                throw new InvalidOperationException("Cannot modify a 'Style' after it is sealed.");
+                throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(Style)));
             }
 
             if (value == this)
@@ -112,7 +113,7 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
                 // Basing on self is not allowed.  This is a degenerate case
                 // of circular reference chain, the full check for circular
                 // reference is done in Seal().
-                throw new ArgumentException("A Style cannot be based on itself.");
+                throw new ArgumentException(string.Format(Strings.CannotBeBasedOnSelf, nameof(Style)));
             }
 
             _basedOn = value;
@@ -225,7 +226,7 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
         {
             // Uh-oh.  We've seen this Style before.  This means
             //  the BasedOn hierarchy contains a loop.
-            throw new InvalidOperationException("This Style's hierarchy of BasedOn references contains a loop.");
+            throw new InvalidOperationException(string.Format(Strings.BasedOnHasLoop, nameof(Style)));
         }
 
         // This does not really check for circular reference in all circumstances. This is accurate

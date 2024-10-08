@@ -113,7 +113,7 @@ namespace System.Windows
         {
             if (IsSealed())
             {
-                throw new InvalidOperationException($"Cannot modify a '{GetType().Name}' after it is sealed.");
+                throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, GetType().Name));
             }
         }
 

@@ -26,6 +26,7 @@ using System.ApplicationModel.Activation;
 using System.Windows.Input;
 using System.Windows.Threading;
 using CSHTML5.Internal;
+using OpenSilver.Theming;
 
 namespace System.Windows
 {
@@ -43,6 +44,7 @@ namespace System.Windows
         private ResourceDictionary _resources;
         private Dictionary<object, object> _implicitResourcesCache;
         private Host _host;
+        private Theme _theme;
 
         // Says if App.Resources has any implicit styles
         internal bool HasImplicitStylesInResources { get; set; }
@@ -105,6 +107,19 @@ namespace System.Windows
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());
             });
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="OpenSilver.Theming.Theme"/> used across this <see cref="Application"/>.
+        /// </summary>
+        public Theme Theme
+        {
+            get { return _theme; }
+            set
+            {
+                value?.Seal();
+                _theme = value;
+            }
         }
 
         /// <summary>

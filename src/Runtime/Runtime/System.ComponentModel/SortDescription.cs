@@ -12,7 +12,7 @@
 *  
 \*====================================================================================*/
 
-using System.Globalization;
+using OpenSilver.Internal;
 
 namespace System.ComponentModel
 {
@@ -65,7 +65,7 @@ namespace System.ComponentModel
             set
             {
                 if (_sealed)
-                    throw new InvalidOperationException(string.Format("Cannot modify a '{0}' after it is sealed.", "SortDescription"));
+                    throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(SortDescription)));
 
                 _propertyName = value;
             }
@@ -80,7 +80,7 @@ namespace System.ComponentModel
             set
             {
                 if (_sealed)
-                    throw new InvalidOperationException(string.Format("Cannot modify a '{0}' after it is sealed.", "SortDescription"));
+                    throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(SortDescription)));
 
                 if (value < ListSortDirection.Ascending || value > ListSortDirection.Descending)
                     throw new InvalidEnumArgumentException("value", (int)value, typeof(ListSortDirection));

@@ -121,6 +121,15 @@
     <value>Cannot perform operation.</value>
     <comment>Exception thrown by automation peers.</comment>
   </data>
+  <data name="BasedOnHasLoop" xml:space="preserve">
+    <value>This {0}'s hierarchy of BasedOn references contains a loop.</value>
+  </data>
+  <data name="CannotBeBasedOnSelf" xml:space="preserve">
+    <value>A {0} cannot be based on itself.</value>
+  </data>
+  <data name="CannotChangeAfterSealed" xml:space="preserve">
+    <value>Cannot modify a '{0}' after it is sealed.</value>
+  </data>
   <data name="ChildWindow_InvalidOperation" xml:space="preserve">
     <value>Cannot call Show() on a ChildWindow that is in the visual tree. ChildWindow should be the top-most element in the .xaml file.</value>
     <comment>Exception thrown when the ChildWindow is in the visual tree and Show() is called on it.</comment>

@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows;
 
 /// <summary>
@@ -84,7 +86,7 @@ public sealed class SetterBaseCollection : PresentationFrameworkCollection<Sette
     {
         if (_sealed)
         {
-            throw new InvalidOperationException($"Cannot modify a '{typeof(SetterBaseCollection).Name}' after it is sealed.");
+            throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(SetterBaseCollection)));
         }
     }
 }
