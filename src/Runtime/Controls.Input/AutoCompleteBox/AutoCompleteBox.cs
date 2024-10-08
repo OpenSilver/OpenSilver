@@ -1495,25 +1495,20 @@ namespace System.Windows.Controls
 
             if (hasFocus)
             {
-                // Disabling selecting text because the ACB TextBox has focus
-                // in OpenSilver even at the time when OnLostFocus is called.
-                // To reproduce this, put focus on ACB and try to place cursor in another TextBox.
-                //if (TextBox != null && TextBox.SelectionLength == 0)
-                //{
-                //    TextBox.SelectAll();
-                //}
+                if (TextBox != null && TextBox.SelectionLength == 0)
+                {
+                    TextBox.SelectAll();
+                }
             }
             else
             {
                 IsDropDownOpen = false;
                 _userCalledPopulate = false;
 
-                // Disable selecting text because when going from an ACB to another,
-                // the cursor will go to the start of the text, differently from in Silverlight.
-                //if (TextBox != null)
-                //{
-                //    TextBox.Select(TextBox.Text.Length, 0);
-                //}
+                if (TextBox != null)
+                {
+                    TextBox.Select(TextBox.Text.Length, 0);
+                }
             }
         }
 
@@ -1538,14 +1533,6 @@ namespace System.Windows.Controls
                 if (object.ReferenceEquals(focused, this))
                 {
                     return true;
-                }
-
-                // If focus is on the selector part of this control (in the dropdown),
-                // then true is returned as to not close the dropdown when scrolling with drag
-                if (SelectionAdapter is SelectorSelectionAdapter selectorSelectionAdapter &&
-                    object.ReferenceEquals(focused, selectorSelectionAdapter.SelectorControl))
-                {
-                    return true;    
                 }
 
                 // This helps deal with popups that may not be in the same 
@@ -2532,13 +2519,6 @@ namespace System.Windows.Controls
                 case Key.Enter:
                     OnAdapterSelectionComplete(this, new RoutedEventArgs());
                     e.Handled = true;
-                    break;
-
-                // Until tabbing sets focus to next element outside of ACB (instead of to the first
-                // item inside the dropdown) and closes the dropdown, completion is manually called below.
-                case Key.Tab:
-                    OnAdapterSelectionComplete(this, new RoutedEventArgs());
-                    e.Handled = false;
                     break;
 
                 default:
