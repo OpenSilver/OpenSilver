@@ -531,6 +531,7 @@ document.createInputManager = function (callback) {
 
         document.addEventListener('mousemove', function (e) {
             if (!e.isHandled) {
+                setModifiers(e);
                 const target = _mouseCapture;
                 if (target !== null) {
                     callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
@@ -596,6 +597,7 @@ document.createInputManager = function (callback) {
                 if (shouldIgnoreMouseEvent(e)) return;
 
                 e.isHandled = true;
+                setModifiers(e);
                 const target = _mouseCapture || e.target;
                 callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
             });
@@ -604,6 +606,7 @@ document.createInputManager = function (callback) {
                 // Zoom in/out request, takes priority over opensilver
                 if (e.ctrlKey) return;
                 e.isHandled = true;
+                setModifiers(e);
                 const target = _mouseCapture || e.target;
                 callback(getClosestElementId(target), EVENTS.WHEEL, e);
             });
@@ -612,6 +615,7 @@ document.createInputManager = function (callback) {
                 if (shouldIgnoreMouseEvent(e)) return;
 
                 e.isHandled = true;
+                setModifiers(e);
                 let id = (_mouseCapture === null || e.target === _mouseCapture) ? getClosestElementId(e.target) : '';
                 switch (e.button) {
                     case 0:
@@ -643,12 +647,14 @@ document.createInputManager = function (callback) {
 
             view.addEventListener('mouseenter', function (e) {
                 if (_mouseCapture === null || this === _mouseCapture) {
+                    setModifiers(e);
                     callback(getClosestElementId(this), EVENTS.MOUSE_ENTER, e);
                 }
             });
 
             view.addEventListener('mouseleave', function (e) {
                 if (_mouseCapture === null || this === _mouseCapture) {
+                    setModifiers(e);
                     callback(getClosestElementId(this), EVENTS.MOUSE_LEAVE, e);
                 }
             });
