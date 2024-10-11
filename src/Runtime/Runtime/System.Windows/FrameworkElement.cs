@@ -1146,6 +1146,55 @@ namespace System.Windows
 
         #endregion
 
+        #region ContextMenu
+
+        /// <summary>
+        /// Identifies the <see cref="ContextMenu"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ContextMenuProperty =
+            ContextMenuService.ContextMenuProperty.AddOwner(typeof(FrameworkElement));
+
+        /// <summary>
+        /// Gets or sets the context menu element that should appear whenever the context menu is requested 
+        /// through user interface (UI) from within this element.
+        /// </summary>
+        /// <returns>
+        /// The context menu assigned to this element.
+        /// </returns>
+        public ContextMenu ContextMenu
+        {
+            get => (ContextMenu)GetValue(ContextMenuProperty);
+            set => SetValueInternal(ContextMenuProperty, value);
+        }
+
+        /// <summary>
+        /// Occurs when any context menu on the element is opened.
+        /// </summary>
+        public event ContextMenuEventHandler ContextMenuOpening;
+
+        internal void OnContextMenuOpening(double x, double y)
+            => ContextMenuOpening?.Invoke(this, new ContextMenuEventArgs(x, y));
+
+        /// <summary>
+        /// Identifies the <see cref="ToolTip"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ToolTipProperty =
+            ToolTipService.ToolTipProperty.AddOwner(typeof(FrameworkElement));
+
+        /// <summary>
+        /// Gets or sets the tool-tip object that is displayed for this element in the user interface (UI).
+        /// </summary>
+        /// <returns>
+        /// The tooltip object.
+        /// </returns>
+        public object ToolTip
+        {
+            get => GetValue(ToolTipProperty);
+            set => SetValue(ToolTipProperty, value);
+        }
+
+        #endregion
+
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();

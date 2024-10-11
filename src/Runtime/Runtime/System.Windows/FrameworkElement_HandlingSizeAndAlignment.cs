@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
-using System.Windows.Controls;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -356,44 +355,6 @@ namespace System.Windows
         public double ActualHeight => ActualHeightInternal;
 
         internal virtual double ActualHeightInternal => RenderSize.Height;
-
-        #endregion
-
-
-        #region ContextMenu
-
-        /// <summary>
-        /// Gets or sets the context menu element that should appear whenever the context 
-        /// menu is requested through user interface (UI) from within this element.
-        /// </summary>
-        public ContextMenu ContextMenu
-        {
-            get { return (ContextMenu)GetValue(ContextMenuProperty); }
-            set { SetValueInternal(ContextMenuProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="ContextMenu"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ContextMenuProperty =
-            DependencyProperty.Register(
-                nameof(ContextMenu),
-                typeof(ContextMenu),
-                typeof(FrameworkElement),
-                new PropertyMetadata(null, OnContextMenuChanged));
-
-        private static void OnContextMenuChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ContextMenuService.SetContextMenu(d, (ContextMenu)e.NewValue);
-        }
-
-        /// <summary>
-        /// Occurs when any context menu on the element is opened.
-        /// </summary>
-        public event ContextMenuEventHandler ContextMenuOpening;
-
-        internal void OnContextMenuOpening(double x, double y)
-            => ContextMenuOpening?.Invoke(this, new ContextMenuEventArgs(x, y));
 
         #endregion
     }
