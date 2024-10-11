@@ -611,6 +611,7 @@ document.createInputManager = function (callback) {
             root.addEventListener('mousedown', function (e) {
                 if (shouldIgnoreMouseEvent(e)) return;
 
+                setModifiers(e);
                 e.isHandled = true;
                 let id = (_mouseCapture === null || e.target === _mouseCapture) ? getClosestElementId(e.target) : '';
                 switch (e.button) {
