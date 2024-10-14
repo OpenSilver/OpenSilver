@@ -26,7 +26,7 @@ namespace OpenSilver.Internal;
 // the Invalidation callbacks call Add / Remove.   But multi-threaded
 // access is not expected and so locks are not used.
 //
-internal class DependentList
+internal sealed class DependentList
 {
     private List<Dependent> _listStore;
 
@@ -36,24 +36,8 @@ internal class DependentList
 
     public Dependent this[int index]
     {
-        get
-        {
-            if (index < 0 || index >= Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
-            return _listStore[index];
-        }
-        set
-        {
-            if (index < 0 || index >= Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
-            _listStore[index] = value;
-        }
+        get => _listStore[index];
+        set => _listStore[index] = value;
     }
 
     public void Add(Dependent dependent)
@@ -62,15 +46,7 @@ internal class DependentList
         _listStore.Add(dependent);
     }
 
-    public void Remove(Dependent dependent)
-    {
-        _listStore?.Remove(dependent);
-    }
-
-    public void Clear()
-    {
-        _listStore = null;
-    }
+    public void Clear() => _listStore = null;
 
     public Dependent[] ToArray()
     {
@@ -88,14 +64,31 @@ internal class DependentList
         // which would cause building a list to cost O(N^2).  yuck!
         // Clean the list less often the longer it gets.
         if (Count == Capacity)
+        {
             CleanUpDeadWeakReferences();
+        }
 
         Add(new Dependent(expr));
     }
 
     public void Remove(DependencyPropertyChangedListener expr)
     {
-        Remove(new Dependent(expr));
+        if (_listStore is null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _listStore.Count; i++)
+        {
+            if (_listStore[i].TryGetExpr(out DependencyPropertyChangedListener ex))
+            {
+                if (ex == expr)
+                {
+                    _listStore.RemoveAt(i);
+                    break;
+                }
+            }
+        }
     }
 
     public bool IsEmpty
@@ -124,8 +117,7 @@ internal class DependentList
 
         for (int i = 0; i < snapList.Length; i++)
         {
-            //Expression expression = snapList[i].Expr;
-            if (snapList[i].Expr is DependencyPropertyChangedListener expression)
+            if (snapList[i].TryGetExpr(out DependencyPropertyChangedListener expression))
             {
                 expression.OnPropertyChanged(source, sourceArgs);
             }
@@ -209,34 +201,29 @@ internal class DependentList
             _previousEnd = end;
         }
 
-        public void Finish()
-        {
-            _listStore?.RemoveRange(_validItemCount, _listStore.Count - _validItemCount);
-        }
+        public void Finish() => _listStore?.RemoveRange(_validItemCount, _listStore.Count - _validItemCount);
     }
 }
 
 internal readonly struct Dependent
 {
-    private readonly WeakReference _wrEX;
-
-    public bool IsValid()
-    {
-        // Expression is never null (could Assert that but throw is fine)
-        return _wrEX.IsAlive;
-    }
+    private readonly WeakReference<DependencyPropertyChangedListener> _wrEX;
 
     public Dependent(DependencyPropertyChangedListener e)
     {
-        _wrEX = new WeakReference(e);
+        _wrEX = new(e);
     }
 
-    public DependencyPropertyChangedListener Expr => (DependencyPropertyChangedListener)_wrEX.Target;
+    public bool IsValid() => _wrEX.TryGetTarget(out _);
+
+    public bool TryGetExpr(out DependencyPropertyChangedListener expr) => _wrEX.TryGetTarget(out expr);
 
     public override bool Equals(object o)
     {
         if (o is not Dependent d)
+        {
             return false;
+        }
 
         // Not equal to Dead values.
         // This is assuming that at least one of the compared items is live.
@@ -244,31 +231,21 @@ internal readonly struct Dependent
         // and if you look at DependentList.Remove()'s arguments, it can only
         // be passed strong references.
         // Therefore: Items being removed (thus compared here) will not be dead.
-        if (!IsValid() || !d.IsValid())
-            return false;
-
-        if (_wrEX.Target != d._wrEX.Target)
-            return false;
-
-        return true;
+        return _wrEX.TryGetTarget(out var target1) &&
+               d._wrEX.TryGetTarget(out var target2) &&
+               target1 == target2;
     }
 
-    public static bool operator ==(Dependent first, Dependent second)
-    {
-        return first.Equals(second);
-    }
+    public static bool operator ==(Dependent first, Dependent second) => first.Equals(second);
 
-    public static bool operator !=(Dependent first, Dependent second)
-    {
-        return !first.Equals(second);
-    }
+    public static bool operator !=(Dependent first, Dependent second) => !first.Equals(second);
 
     // We don't expect to need this function. [Required when overriding Equals()]
     // Write a good HashCode anyway (if not a fast one)
     public override int GetHashCode()
     {
-        var ex = (DependencyPropertyChangedListener)_wrEX.Target;
-        int hashCode = (null == ex) ? 0 : ex.GetHashCode();
+        _wrEX.TryGetTarget(out DependencyPropertyChangedListener ex);
+        int hashCode = ex is null ? 0 : ex.GetHashCode();
 
         return hashCode;
     }

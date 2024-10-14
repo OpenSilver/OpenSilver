@@ -50,16 +50,15 @@ internal sealed class KeyboardNavigation
     private static readonly DependencyProperty TabOnceActiveElementProperty =
         DependencyProperty.RegisterAttached(
             "TabOnceActiveElement",
-            typeof(WeakReference),
+            typeof(WeakReference<DependencyObject>),
             typeof(KeyboardNavigation),
             null);
 
     internal static DependencyObject GetTabOnceActiveElement(DependencyObject d)
     {
-        WeakReference weakRef = (WeakReference)d.GetValue(TabOnceActiveElementProperty);
-        if (weakRef != null && weakRef.IsAlive)
+        var weakRef = (WeakReference<DependencyObject>)d.GetValue(TabOnceActiveElementProperty);
+        if (weakRef != null && weakRef.TryGetTarget(out DependencyObject activeElement))
         {
-            DependencyObject activeElement = weakRef.Target as DependencyObject;
             // Verify if the element is still in the same visual tree
             if (GetVisualRoot(activeElement) == GetVisualRoot(d))
                 return activeElement;
@@ -71,7 +70,7 @@ internal sealed class KeyboardNavigation
 
     internal static void SetTabOnceActiveElement(DependencyObject d, DependencyObject value)
     {
-        d.SetValueInternal(TabOnceActiveElementProperty, new WeakReference(value));
+        d.SetValueInternal(TabOnceActiveElementProperty, new WeakReference<DependencyObject>(value));
     }
 
     private DependencyObject GetActiveElement(DependencyObject d)

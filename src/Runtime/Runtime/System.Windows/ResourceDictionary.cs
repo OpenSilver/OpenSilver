@@ -55,11 +55,11 @@ namespace System.Windows
         //
         internal ResourceDictionary _parentDictionary;
 
-        private WeakReferenceList _ownerFEs = null;
-        private WeakReferenceList _ownerApps = null;
+        private WeakReferenceList<IInternalFrameworkElement> _ownerFEs = null;
+        private WeakReferenceList<Application> _ownerApps = null;
 
         // We store a weak reference so that the dictionary does not leak the owner.
-        private WeakReference _inheritanceContext;
+        private WeakReference<DependencyObject> _inheritanceContext;
 
         // a dummy DO, used as the InheritanceContext when the dictionary's owner is
         // not itself a DO
@@ -544,7 +544,7 @@ namespace System.Windows
                 // all the values in the dictionary that want one.
                 if (owner is DependencyObject inheritanceContext)
                 {
-                    _inheritanceContext = new WeakReference(inheritanceContext);
+                    _inheritanceContext = new WeakReference<DependencyObject>(inheritanceContext);
 
                     // set InheritanceContext for the existing values
                     AddInheritanceContextToValues();
@@ -552,7 +552,7 @@ namespace System.Windows
                 else
                 {
                     // if the first owner is ineligible, use a dummy
-                    _inheritanceContext = new WeakReference(DummyInheritanceContext);
+                    _inheritanceContext = new WeakReference<DependencyObject>(DummyInheritanceContext);
 
                     // set InheritanceContext for the existing values
                     AddInheritanceContextToValues();
@@ -574,7 +574,7 @@ namespace System.Windows
             {
                 if (_ownerFEs == null)
                 {
-                    _ownerFEs = new WeakReferenceList(1);
+                    _ownerFEs = new WeakReferenceList<IInternalFrameworkElement>(1);
                 }
                 else if (_ownerFEs.Contains(fe) && ContainsCycle(this))
                 {
@@ -595,7 +595,7 @@ namespace System.Windows
                 {
                     if (_ownerApps == null)
                     {
-                        _ownerApps = new WeakReferenceList(1);
+                        _ownerApps = new WeakReferenceList<Application>(1);
                     }
                     else if (_ownerApps.Contains(app) && ContainsCycle(this))
                     {
@@ -862,7 +862,7 @@ namespace System.Windows
             {
                 Debug.Assert(_ownerFEs.Count > 0);
 
-                mergedDictionary._ownerFEs ??= new WeakReferenceList(_ownerFEs.Count);
+                mergedDictionary._ownerFEs ??= new WeakReferenceList<IInternalFrameworkElement>(_ownerFEs.Count);
 
                 foreach (IInternalFrameworkElement fe in _ownerFEs)
                 {
@@ -877,7 +877,7 @@ namespace System.Windows
             {
                 Debug.Assert(_ownerApps.Count > 0);
 
-                mergedDictionary._ownerApps ??= new WeakReferenceList(_ownerApps.Count);
+                mergedDictionary._ownerApps ??= new WeakReferenceList<Application>(_ownerApps.Count);
 
                 foreach (Application app in _ownerApps)
                 {
@@ -935,7 +935,16 @@ namespace System.Windows
         #region Inheritance Context
 
         private new DependencyObject InheritanceContext
-            => _inheritanceContext != null ? (DependencyObject)_inheritanceContext.Target : null;
+        {
+            get
+            {
+                if (_inheritanceContext is not null && _inheritanceContext.TryGetTarget(out DependencyObject context))
+                {
+                    return context;
+                }
+                return null;
+            }
+        }
 
         //
         //  This method

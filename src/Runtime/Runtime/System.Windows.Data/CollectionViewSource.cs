@@ -603,19 +603,15 @@ namespace System.Windows.Data
         {
             public FilterStub(CollectionViewSource parent)
             {
-                _parent = new WeakReference(parent);
-                _filterWrapper = new Predicate<object>(WrapFilter);
+                _parent = new WeakReference<CollectionViewSource>(parent);
+                FilterWrapper = new Predicate<object>(WrapFilter);
             }
 
-            public Predicate<object> FilterWrapper
-            {
-                get { return _filterWrapper; }
-            }
+            public Predicate<object> FilterWrapper { get; }
 
-            bool WrapFilter(object item)
+            private bool WrapFilter(object item)
             {
-                CollectionViewSource parent = (CollectionViewSource)_parent.Target;
-                if (parent != null)
+                if (_parent.TryGetTarget(out CollectionViewSource parent))
                 {
                     return parent.WrapFilter(item);
                 }
@@ -625,8 +621,7 @@ namespace System.Windows.Data
                 }
             }
 
-            WeakReference _parent;
-            Predicate<object> _filterWrapper;
+            private readonly WeakReference<CollectionViewSource> _parent;
         }
 
 #endregion Private Types

@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
@@ -73,16 +73,13 @@ namespace System.Windows.Controls
 
         private static void Register(string groupName, RadioButton radioButton)
         {
-            if (_groupNameToElements == null)
-                _groupNameToElements = new Hashtable(1);
+            _groupNameToElements ??= new();
 
             lock (_groupNameToElements)
             {
-                ArrayList elements = (ArrayList)_groupNameToElements[groupName];
-
-                if (elements == null)
+                if (!_groupNameToElements.TryGetValue(groupName, out List<WeakReference<RadioButton>> elements))
                 {
-                    elements = new ArrayList(1);
+                    elements = new List<WeakReference<RadioButton>>(1);
                     _groupNameToElements[groupName] = elements;
                 }
                 else
@@ -91,11 +88,11 @@ namespace System.Windows.Controls
                     PurgeDead(elements, null);
                 }
 
-                elements.Add(new WeakReference(radioButton));
+                elements.Add(new WeakReference<RadioButton>(radioButton));
             }
             lock (_currentlyRegisteredGroupName)
             {
-                if (_currentlyRegisteredGroupName.TryGetValue(radioButton, out string val))
+                if (_currentlyRegisteredGroupName.TryGetValue(radioButton, out _))
                 {
                     _currentlyRegisteredGroupName.Remove(radioButton);
                 }
@@ -111,9 +108,7 @@ namespace System.Windows.Controls
             lock (_groupNameToElements)
             {
                 // Get all elements bound to this key and remove this element
-                ArrayList elements = (ArrayList)_groupNameToElements[groupName];
-
-                if (elements != null)
+                if (_groupNameToElements.TryGetValue(groupName, out List<WeakReference<RadioButton>> elements))
                 {
                     PurgeDead(elements, radioButton);
                     if (elements.Count == 0)
@@ -128,13 +123,12 @@ namespace System.Windows.Controls
             }
         }
 
-        private static void PurgeDead(ArrayList elements, object elementToRemove)
+        private static void PurgeDead(List<WeakReference<RadioButton>> elements, RadioButton elementToRemove)
         {
             for (int i = 0; i < elements.Count;)
             {
-                WeakReference weakReference = (WeakReference)elements[i];
-                object element = weakReference.Target;
-                if (element == null || element == elementToRemove)
+                WeakReference<RadioButton> weakReference = elements[i];
+                if (!weakReference.TryGetTarget(out RadioButton element) || element == elementToRemove)
                 {
                     elements.RemoveAt(i);
                 }
@@ -151,17 +145,16 @@ namespace System.Windows.Controls
             if (!string.IsNullOrEmpty(groupName))
             {
                 DependencyObject rootScope = VisualTreeHelper.GetRoot(this);
-                if (_groupNameToElements == null)
-                    _groupNameToElements = new Hashtable(1);
+                _groupNameToElements ??= new();
+
                 lock (_groupNameToElements)
                 {
                     // Get all elements bound to this key and remove this element
-                    ArrayList elements = (ArrayList)_groupNameToElements[groupName];
+                    List<WeakReference<RadioButton>> elements = _groupNameToElements[groupName];
                     for (int i = 0; i < elements.Count;)
                     {
-                        WeakReference weakReference = (WeakReference)elements[i];
-                        RadioButton rb = weakReference.Target as RadioButton;
-                        if (rb == null)
+                        WeakReference<RadioButton> weakReference = elements[i];
+                        if (!weakReference.TryGetTarget(out RadioButton rb))
                         {
                             // Remove dead instances
                             elements.RemoveAt(i);
@@ -264,9 +257,8 @@ namespace System.Windows.Controls
 
         #region private data
 
-        [ThreadStatic] private static Hashtable _groupNameToElements;
-        private static readonly ConditionalWeakTable<RadioButton, string> _currentlyRegisteredGroupName =
-            new ConditionalWeakTable<RadioButton, string>();
+        [ThreadStatic] private static Dictionary<string, List<WeakReference<RadioButton>>> _groupNameToElements;
+        private static readonly ConditionalWeakTable<RadioButton, string> _currentlyRegisteredGroupName = new();
 
         #endregion private data
     }

@@ -21,7 +21,7 @@ namespace System.Windows;
 /// </summary>
 public sealed class WindowCollection : ICollection
 {
-    private readonly WeakReferenceList _windows;
+    private readonly WeakReferenceList<Window> _windows;
 
     internal WindowCollection()
     {

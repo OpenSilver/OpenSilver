@@ -726,18 +726,17 @@ namespace System.Windows
         /// </returns>
         public object FindName(string name)
         {
-            if (name == null)
+            if (name is null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (TemplatedParent != null)
+            if (TemplatedParent is DependencyObject templatedParent)
             {
-                return (TemplatedParent as FrameworkElement)?.GetTemplateChild(name);
+                return (templatedParent as FrameworkElement)?.GetTemplateChild(name);
             }
 
-            INameScope nameScope = FindScope(this);
-            if (nameScope != null)
+            if (FindScope(this) is INameScope nameScope)
             {
                 return nameScope.FindName(name);
             }
@@ -747,10 +746,9 @@ namespace System.Windows
 
         internal static INameScope FindScope(FrameworkElement fe)
         {
-            while (fe != null)
+            while (fe is not null)
             {
-                INameScope nameScope = NameScope.GetNameScope(fe);
-                if (nameScope != null)
+                if (NameScope.GetNameScope(fe) is INameScope nameScope)
                 {
                     return nameScope;
                 }
@@ -769,8 +767,7 @@ namespace System.Windows
         /// <returns>The Named element.  Null if no element has this Name.</returns>
         internal DependencyObject GetTemplateChild(string childName)
         {
-            INameScope namescope = FrameworkTemplate.GetTemplateNameScope(this);
-            if (namescope != null)
+            if (FrameworkTemplate.GetTemplateNameScope(this) is INameScope namescope)
             {
                 return namescope.FindName(childName) as DependencyObject;
             }
