@@ -96,29 +96,29 @@ namespace OpenSilver.Internal
 
             string tokens = trimmedColor.Substring(3, trimmedColor.Length - 3);
 
-            char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-            string[] split = tokens.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            // The tokenizer helper will tokenize a list based on the IFormatProvider.
+            var th = new TokenizerHelper(tokens, formatProvider);
 
-            if (split.Length == 3)
-            {
-                return Color.FromScRgb(
-                    1.0f,
-                    Convert.ToSingle(split[0], formatProvider),
-                    Convert.ToSingle(split[1], formatProvider),
-                    Convert.ToSingle(split[2], formatProvider)
-                );
-            }
-            else if (split.Length == 4)
-            {
-                return Color.FromScRgb(
-                    Convert.ToSingle(split[0], formatProvider),
-                    Convert.ToSingle(split[1], formatProvider),
-                    Convert.ToSingle(split[2], formatProvider),
-                    Convert.ToSingle(split[3], formatProvider)
-                );
-            }
+            float f0 = Convert.ToSingle(th.NextTokenRequired(), formatProvider);
+            float f1 = Convert.ToSingle(th.NextTokenRequired(), formatProvider);
+            float f2 = Convert.ToSingle(th.NextTokenRequired(), formatProvider);
 
-            throw new FormatException(Strings.Parsers_IllegalToken);
+            if (th.NextToken())
+            {
+                float f3 = Convert.ToSingle(th.NextTokenRequired(), formatProvider);
+
+                // We should be out of tokens at this point
+                if (th.NextToken())
+                {
+                    throw new FormatException(Strings.Parsers_IllegalToken);
+                }
+
+                return Color.FromScRgb(f0, f1, f2, f3);
+            }
+            else
+            {
+                return Color.FromScRgb(1.0f, f0, f1, f2);
+            }
         }
 
         /// <summary>

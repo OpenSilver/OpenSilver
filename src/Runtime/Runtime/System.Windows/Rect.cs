@@ -157,24 +157,33 @@ public struct Rect : IFormattable
     /// </returns>
     public static Rect Parse(string source)
     {
-        if (source != null)
-        {
-            IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-            char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-            string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+        IFormatProvider formatProvider = CultureInfo.InvariantCulture;
 
-            if (split.Length == 4)
-            {
-                return new Rect(
-                    Convert.ToDouble(split[0], formatProvider),
-                    Convert.ToDouble(split[1], formatProvider),
-                    Convert.ToDouble(split[2], formatProvider),
-                    Convert.ToDouble(split[3], formatProvider)
-                );
-            }
+        var th = new TokenizerHelper(source, formatProvider);
+
+        Rect rect;
+
+        string firstToken = th.NextTokenRequired();
+
+        // The token will already have had whitespace trimmed so we can do a
+        // simple string compare.
+        if (firstToken == "Empty")
+        {
+            rect = Empty;
+        }
+        else
+        {
+            rect = new Rect(
+                Convert.ToDouble(firstToken, formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider));
         }
 
-        throw new FormatException($"'{source}' is not an eligible value for '{typeof(Rect)}'.");
+        // There should be no more tokens in this string.
+        th.LastTokenRequired();
+
+        return rect;
     }
 
     /// <summary>

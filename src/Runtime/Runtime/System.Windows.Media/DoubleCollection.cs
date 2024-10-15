@@ -14,62 +14,49 @@
 using System.Globalization;
 using OpenSilver.Internal;
 
-namespace System.Windows.Media
+namespace System.Windows.Media;
+
+/// <summary>
+/// Represents an ordered collection of Double values.
+/// </summary>
+public sealed class DoubleCollection : PresentationFrameworkCollection<double>
 {
+    public DoubleCollection() { }
+
     /// <summary>
-    /// Represents an ordered collection of Double values.
+    /// Converts a <see cref="string"/> representation of a collection of doubles into an equivalent <see cref="DoubleCollection"/>.
     /// </summary>
-    public sealed class DoubleCollection : PresentationFrameworkCollection<double>
+    /// <param name="source">
+    /// The <see cref="string"/> representation of the collection of doubles.
+    /// </param>
+    /// <returns>
+    /// Returns the equivalent <see cref="DoubleCollection"/>.
+    /// </returns>
+    public static DoubleCollection Parse(string source)
     {
-        public DoubleCollection() { }
+        IFormatProvider formatProvider = CultureInfo.InvariantCulture;
 
-        public static DoubleCollection Parse(string source)
+        var th = new TokenizerHelper(source, formatProvider);
+
+        var collection = new DoubleCollection();
+
+        while (th.NextToken())
         {
-            var db = new DoubleCollection();
-
-            if (source != null)
-            {
-                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 0; i < split.Length; i++)
-                {
-                    db.Add(Convert.ToDouble(split[i], formatProvider));
-                }
-            }
-
-            return db;
+            collection.Add(Convert.ToDouble(th.GetCurrentToken(), formatProvider));
         }
 
-        internal override void AddOverride(double value)
-        {
-            this.AddInternal(value);
-        }
-
-        internal override void ClearOverride()
-        {
-            this.ClearInternal();
-        }
-
-        internal override void InsertOverride(int index, double value)
-        {
-            this.InsertInternal(index, value);
-        }
-
-        internal override void RemoveAtOverride(int index)
-        {
-            this.RemoveAtInternal(index);
-        }
-
-        internal override double GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
-
-        internal override void SetItemOverride(int index, double value)
-        {
-            this.SetItemInternal(index, value);
-        }
+        return collection;
     }
+
+    internal override void AddOverride(double value) => AddInternal(value);
+
+    internal override void ClearOverride() => ClearInternal();
+
+    internal override void InsertOverride(int index, double value) => InsertInternal(index, value);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtInternal(index);
+
+    internal override double GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void SetItemOverride(int index, double value) => SetItemInternal(index, value);
 }

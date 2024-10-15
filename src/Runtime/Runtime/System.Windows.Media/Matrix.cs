@@ -80,31 +80,35 @@ public struct Matrix : IFormattable
     /// </returns>
     public static Matrix Parse(string source)
     {
-        if (source != null)
+        IFormatProvider formatProvider = CultureInfo.InvariantCulture;
+
+        var th = new TokenizerHelper(source, formatProvider);
+
+        Matrix value;
+
+        string firstToken = th.NextTokenRequired();
+
+        // The token will already have had whitespace trimmed so we can do a
+        // simple string compare.
+        if (firstToken == "Identity")
         {
-            if (source == "Identity")
-            {
-                return Identity;
-            }
-
-            IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-            char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-            string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
-            if (split.Length == 6)
-            {
-                return new Matrix(
-                    Convert.ToDouble(split[0], formatProvider),
-                    Convert.ToDouble(split[1], formatProvider),
-                    Convert.ToDouble(split[2], formatProvider),
-                    Convert.ToDouble(split[3], formatProvider),
-                    Convert.ToDouble(split[4], formatProvider),
-                    Convert.ToDouble(split[5], formatProvider)
-                );
-            }
+            value = Identity;
+        }
+        else
+        {
+            value = new Matrix(
+                Convert.ToDouble(firstToken, formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider));
         }
 
-        throw new FormatException($"'{source}' is not an eligible value for a Matrix.");
+        // There should be no more tokens in this string.
+        th.LastTokenRequired();
+
+        return value;
     }
 
     /// <summary>

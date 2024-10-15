@@ -59,22 +59,31 @@ public struct Size : IFormattable
     /// </returns>
     public static Size Parse(string source)
     {
-        if (source != null)
-        {
-            IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-            char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-            string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+        IFormatProvider formatProvider = CultureInfo.InvariantCulture;
 
-            if (split.Length == 2)
-            {
-                return new Size(
-                    Convert.ToDouble(split[0], formatProvider),
-                    Convert.ToDouble(split[1], formatProvider)
-                );
-            }
+        var th = new TokenizerHelper(source, formatProvider);
+
+        Size size;
+
+        string firstToken = th.NextTokenRequired();
+
+        // The token will already have had whitespace trimmed so we can do a
+        // simple string compare.
+        if (firstToken == "Empty")
+        {
+            size = Empty;
+        }
+        else
+        {
+            size = new Size(
+                Convert.ToDouble(firstToken, formatProvider),
+                Convert.ToDouble(th.NextTokenRequired(), formatProvider));
         }
 
-        throw new FormatException($"'{source}' is not an eligible value for a '{typeof(Size)}'.");
+        // There should be no more tokens in this string.
+        th.LastTokenRequired();
+
+        return size;
     }
 
     /// <summary>

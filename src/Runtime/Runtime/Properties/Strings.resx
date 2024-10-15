@@ -551,6 +551,18 @@
   <data name="Timing_SkipToFillDestinationIndefinite" xml:space="preserve">
     <value>Cannot call the Storyboard.SkipToFill method for a Storyboard that has a Duration or RepeatDuration of Forever, because this Storyboard will never reach its fill period.</value>
   </data>
+  <data name="TokenizerHelperEmptyToken" xml:space="preserve">
+    <value>Empty token encountered at position {0} while parsing '{1}'.</value>
+  </data>
+  <data name="TokenizerHelperExtraDataEncountered" xml:space="preserve">
+    <value>Extra data encountered at position {0} while parsing '{1}'.</value>
+  </data>
+  <data name="TokenizerHelperMissingEndQuote" xml:space="preserve">
+    <value>Missing end quote encountered while parsing '{0}'.</value>
+  </data>
+  <data name="TokenizerHelperPrematureStringTermination" xml:space="preserve">
+    <value>Premature string termination encountered while parsing '{0}'.</value>
+  </data>
   <data name="Transform_NotInvertible" xml:space="preserve">
     <value>Transform is not invertible.</value>
   </data>

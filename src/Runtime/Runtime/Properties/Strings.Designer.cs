@@ -1357,6 +1357,42 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Empty token encountered at position {0} while parsing &apos;{1}&apos;..
+        /// </summary>
+        internal static string TokenizerHelperEmptyToken {
+            get {
+                return ResourceManager.GetString("TokenizerHelperEmptyToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extra data encountered at position {0} while parsing &apos;{1}&apos;..
+        /// </summary>
+        internal static string TokenizerHelperExtraDataEncountered {
+            get {
+                return ResourceManager.GetString("TokenizerHelperExtraDataEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing end quote encountered while parsing &apos;{0}&apos;..
+        /// </summary>
+        internal static string TokenizerHelperMissingEndQuote {
+            get {
+                return ResourceManager.GetString("TokenizerHelperMissingEndQuote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Premature string termination encountered while parsing &apos;{0}&apos;..
+        /// </summary>
+        internal static string TokenizerHelperPrematureStringTermination {
+            get {
+                return ResourceManager.GetString("TokenizerHelperPrematureStringTermination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transform is not invertible..
         /// </summary>
         internal static string Transform_NotInvertible {

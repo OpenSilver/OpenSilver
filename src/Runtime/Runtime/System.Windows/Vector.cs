@@ -256,21 +256,18 @@ public struct Vector : IFormattable
     /// </returns>
     public static Vector Parse(string source)
     {
-        if (source != null)
-        {
-            IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-            char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-            string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+        IFormatProvider formatProvider = CultureInfo.InvariantCulture;
 
-            if (split.Length == 2)
-            {
-                return new Vector(
-                    Convert.ToDouble(split[0], formatProvider),
-                    Convert.ToDouble(split[1], formatProvider));
-            }
-        }
+        var th = new TokenizerHelper(source, formatProvider);
 
-        throw new FormatException($"'{source}' is not an eligible value for a '{typeof(Vector)}'.");
+        var vector = new Vector(
+            Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+            Convert.ToDouble(th.NextTokenRequired(), formatProvider));
+
+        // There should be no more tokens in this string.
+        th.LastTokenRequired();
+
+        return vector;
     }
 
     /// <summary>

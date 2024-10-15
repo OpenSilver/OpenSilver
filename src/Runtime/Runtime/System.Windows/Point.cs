@@ -56,22 +56,18 @@ public struct Point : IFormattable
     /// </exception>
     public static Point Parse(string source)
     {
-        if (source != null)
-        {
-            IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-            char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-            string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+        IFormatProvider formatProvider = CultureInfo.InvariantCulture;
 
-            if (split.Length == 2)
-            {
-                return new Point(
-                    Convert.ToDouble(split[0], formatProvider),
-                    Convert.ToDouble(split[1], formatProvider)
-                );
-            }
-        }
+        var th = new TokenizerHelper(source, formatProvider);
 
-        throw new FormatException($"'{source}' is not an eligible value for a '{typeof(Point)}'.");
+        var point = new Point(
+            Convert.ToDouble(th.NextTokenRequired(), formatProvider),
+            Convert.ToDouble(th.NextTokenRequired(), formatProvider));
+
+        // There should be no more tokens in this string.
+        th.LastTokenRequired();
+
+        return point;
     }
 
     /// <summary>

@@ -68,32 +68,22 @@ namespace System.Windows.Media
         /// </returns>
         public static PointCollection Parse(string source)
         {
-            var result = new PointCollection();
+            IFormatProvider formatProvider = CultureInfo.InvariantCulture;
 
-            if (source != null)
+            var th = new TokenizerHelper(source, formatProvider);
+
+            var collection = new PointCollection();
+
+            while (th.NextToken())
             {
-                IFormatProvider formatProvider = CultureInfo.InvariantCulture;
-                char[] separator = new char[2] { TokenizerHelper.GetNumericListSeparator(formatProvider), ' ' };
-                string[] split = source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+                var value = new Point(
+                    Convert.ToDouble(th.GetCurrentToken(), formatProvider),
+                    Convert.ToDouble(th.NextTokenRequired(), formatProvider));
 
-                // Points count needs to be an even number
-                if (split.Length % 2 == 1)
-                {
-                    throw new FormatException($"'{source}' is not an eligible value for a {typeof(PointCollection)}.");
-                }
-
-                for (int i = 0; i < split.Length; i += 2)
-                {
-                    result.Add(
-                        new Point(
-                            Convert.ToDouble(split[i], formatProvider),
-                            Convert.ToDouble(split[i + 1], formatProvider)
-                        )
-                    );
-                }
+                collection.Add(value);
             }
 
-            return result;
+            return collection;
         }
 
         internal event EventHandler Changed;
