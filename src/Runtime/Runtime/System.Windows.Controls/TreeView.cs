@@ -476,7 +476,7 @@ namespace System.Windows.Controls
         {
             if (e == null)
             {
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException(nameof(e));
             }
 
             base.OnItemsChanged(e);

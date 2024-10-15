@@ -77,9 +77,9 @@ namespace OpenSilver.Internal
 
 		public int Add(object value)
 		{
-			if (!(value is IApplicationService))
+			if (value is not IApplicationService)
             {
-				throw new NotSupportedException("Element declared as Application Service does not implement IApplicationService interface.");
+				throw new NotSupportedException(Strings.Application_ServiceMustImplementInterface);
             }
 
 			if (IsReadOnly)

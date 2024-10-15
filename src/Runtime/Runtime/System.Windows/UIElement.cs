@@ -116,7 +116,7 @@ namespace System.Windows
 
             if (child.InternalVisualParent is not null)
             {
-                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+                throw new ArgumentException(Strings.UIElement_HasParent);
             }
 
             HasVisualChildren = true;
@@ -154,7 +154,7 @@ namespace System.Windows
 
             if (child.InternalVisualParent != this)
             {
-                throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
+                throw new ArgumentException(Strings.UIElement_NotChild);
             }
 
             if (VisualChildrenCount == 0)
@@ -234,7 +234,7 @@ namespace System.Windows
 
             if (child.VisualParent != null)
             {
-                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+                throw new ArgumentException(Strings.UIElement_HasParent);
             }
 
             HasVisualChildren = true;
@@ -262,7 +262,7 @@ namespace System.Windows
 
             if (child.VisualParent != this)
             {
-                throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
+                throw new ArgumentException(Strings.UIElement_NotChild);
             }
 
             if (VisualChildrenCount == 0)
@@ -1215,7 +1215,7 @@ namespace System.Windows
 
             if (ancestor is not UIElement)
             {
-                throw new ArgumentException("ancestor must be a UIElement.");
+                throw new ArgumentException(string.Format(Strings.UIElement_NotAnUIElement, nameof(ancestor)));
             }
 
             // Walk up the parent chain of the descendant until we run out

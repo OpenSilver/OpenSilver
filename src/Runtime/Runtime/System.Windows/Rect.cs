@@ -111,12 +111,12 @@ public struct Rect : IFormattable
     {
         if (width < 0)
         {
-            throw new ArgumentException("Width must be non-negative.", nameof(width));
+            throw new ArgumentException(Strings.Size_WidthAndHeightCannotBeNegative, nameof(width));
         }
 
         if (height < 0)
         {
-            throw new ArgumentException("Height must be non-negative.", nameof(height));
+            throw new ArgumentException(Strings.Size_WidthAndHeightCannotBeNegative, nameof(height));
         }
 
         _x = x;
@@ -241,7 +241,7 @@ public struct Rect : IFormattable
         {
             if (value < 0)
             {
-                throw new ArgumentException("Height cannot be lower than 0");
+                throw new ArgumentException(Strings.Size_HeightCannotBeNegative);
             }
 
             _height = value;
@@ -309,7 +309,7 @@ public struct Rect : IFormattable
         {
             if (value < 0)
             {
-                throw new ArgumentException("Width cannot be lower than 0");
+                throw new ArgumentException(Strings.Size_WidthCannotBeNegative);
             }
 
             _width = value;
@@ -636,7 +636,7 @@ public struct Rect : IFormattable
     {
         if (IsEmpty)
         {
-            throw new InvalidOperationException("Cannot call this method on the Empty Rect.");
+            throw new InvalidOperationException(Strings.Rect_CannotCallMethod);
         }
 
         _x -= width;
@@ -726,7 +726,7 @@ public struct Rect : IFormattable
     {
         if (IsEmpty)
         {
-            throw new InvalidOperationException("Cannot call this method on the Empty Rect.");
+            throw new InvalidOperationException(Strings.Rect_CannotCallMethod);
         }
 
         _x += offsetX;
@@ -746,7 +746,7 @@ public struct Rect : IFormattable
     {
         if (IsEmpty)
         {
-            throw new InvalidOperationException("Cannot call this method on the Empty Rect.");
+            throw new InvalidOperationException(Strings.Rect_CannotCallMethod);
         }
 
         _x += offsetVector._x;

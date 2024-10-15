@@ -37,7 +37,7 @@ internal sealed class CollectionChangedHelper
             // (e.g. Selector.SelectedItems).
             if (CollectionChanged?.GetInvocationList().Length > 1)
             {
-                throw new InvalidOperationException("Reentrancy not allowed");
+                throw new InvalidOperationException(Strings.PresentationFrameworkCollectionReentrancyNotAllowed);
             }
         }
     }

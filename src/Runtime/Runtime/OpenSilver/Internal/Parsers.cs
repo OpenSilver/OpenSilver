@@ -42,7 +42,7 @@ namespace OpenSilver.Internal
                 return (intChar - s_aUpper + 10);
             }
 
-            throw new FormatException("Token is not valid.");
+            throw new FormatException(Strings.Parsers_IllegalToken);
         }
 
         private static Color ParseHexColor(string trimmedColor)
@@ -91,7 +91,7 @@ namespace OpenSilver.Internal
         {
             if (!trimmedColor.StartsWith("sc#", StringComparison.Ordinal))
             {
-                throw new FormatException("Token is not valid.");
+                throw new FormatException(Strings.Parsers_IllegalToken);
             }
 
             string tokens = trimmedColor.Substring(3, trimmedColor.Length - 3);
@@ -118,7 +118,7 @@ namespace OpenSilver.Internal
                 );
             }
 
-            throw new FormatException("Token is not valid.");
+            throw new FormatException(Strings.Parsers_IllegalToken);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace OpenSilver.Internal
 
                 if (!Enum.TryParse(trimmedColor, true, out Colors.KnownColor kc))
                 {
-                    throw new FormatException("Token is not valid.");
+                    throw new FormatException(Strings.Parsers_IllegalToken);
                 }
 
                 return Color.FromUInt32((uint)kc);

@@ -55,8 +55,8 @@ namespace System.Windows
         //
         internal ResourceDictionary _parentDictionary;
 
-        private WeakReferenceList<IInternalFrameworkElement> _ownerFEs = null;
-        private WeakReferenceList<Application> _ownerApps = null;
+        private WeakReferenceList<IInternalFrameworkElement> _ownerFEs;
+        private WeakReferenceList<Application> _ownerApps;
 
         // We store a weak reference so that the dictionary does not leak the owner.
         private WeakReference<DependencyObject> _inheritanceContext;
@@ -216,11 +216,11 @@ namespace System.Windows
                 case Type type:
                     if (value is not Style style)
                     {
-                        throw new ArgumentException("For a Type key the value must be a Style.");
+                        throw new ArgumentException(Strings.ResourceDictionaryValueMustBeStyle);
                     }
                     if (style.TargetType != type)
                     {
-                        throw new ArgumentException("For a Type key the Style value must have TargetType which is equals to key.");
+                        throw new ArgumentException(Strings.ResourceDictionaryValueMustBeStyleWithCorrectTargetType);
                     }
                     isImplicitStyle = true;
                     break;
@@ -228,7 +228,7 @@ namespace System.Windows
                 case DataTemplateKey:
                     if (value is not DataTemplate)
                     {
-                        throw new ArgumentException("For a key of the type DataTemplateKey, value must be a DataTemplate.");
+                        throw new ArgumentException(Strings.ResourceDictionaryValueMustBeDataTemplate);
                     }
                     isImplicitDataTemplate = true;
                     break;
@@ -237,12 +237,12 @@ namespace System.Windows
                     break;
 
                 default:
-                    throw new ArgumentException("Key must be a Type, a DataTemplateKey or a String.");
+                    throw new ArgumentException(Strings.ResourceDictionaryKeyMustBeTypeOrString);
             }
 
             if (value is null)
             {
-                throw new NotSupportedException("Null value not supported in a ResourceDictionary.");
+                throw new NotSupportedException(Strings.ResourceDictionaryNullValueNotSupported);
             }
 
             AddInternal(key, value, isImplicitStyle, isImplicitDataTemplate);
@@ -267,7 +267,7 @@ namespace System.Windows
         {
             if (value is null)
             {
-                throw new NotSupportedException("Null value not supported in a ResourceDictionary.");
+                throw new NotSupportedException(Strings.ResourceDictionaryNullValueNotSupported);
             }
 
             AddInternal(key, value, false, false);
@@ -449,7 +449,7 @@ namespace System.Windows
             // Nested BeginInits on the same instance aren't permitted
             if (IsInitializePending)
             {
-                throw new InvalidOperationException("Cannot have nested BeginInit calls on the same instance.");
+                throw new InvalidOperationException(Strings.NestedBeginInitNotSupported);
             }
 
             IsInitializePending = true;
@@ -467,7 +467,7 @@ namespace System.Windows
         {
             if (!IsInitializePending)
             {
-                throw new InvalidOperationException("Must call BeginInit before EndInit.");
+                throw new InvalidOperationException(Strings.EndInitWithoutBeginInitNotSupported);
             }
             Debug.Assert(IsInitialized == false, "Dictionary should not be initialized when EndInit is called");
 
@@ -578,7 +578,7 @@ namespace System.Windows
                 }
                 else if (_ownerFEs.Contains(fe) && ContainsCycle(this))
                 {
-                    throw new InvalidOperationException("The merged dictionary is invalid. Either a ResourceDictionary is being placed into its own MergedDictionaries collection or a it is being added to the same MergedDictionary collection twice.");
+                    throw new InvalidOperationException(Strings.ResourceDictionaryInvalidMergedDictionary);
                 }
 
                 // Propagate the HasImplicitStyles flag to the new owner
@@ -599,7 +599,7 @@ namespace System.Windows
                     }
                     else if (_ownerApps.Contains(app) && ContainsCycle(this))
                     {
-                        throw new InvalidOperationException("The merged dictionary is invalid. Either a ResourceDictionary is being placed into its own MergedDictionaries collection or a it is being added to the same MergedDictionary collection twice.");
+                        throw new InvalidOperationException(Strings.ResourceDictionaryInvalidMergedDictionary);
                     }
 
                     // Propagate the HasImplicitStyles flag to the new owner
@@ -1067,7 +1067,7 @@ namespace System.Windows
                 // Note: Silverlight does not support null values in a 
                 // ResourceDictionary but WPF does.
                 //
-                throw new NotSupportedException("Null value not supported in a ResourceDictionary.");
+                throw new NotSupportedException(Strings.ResourceDictionaryNullValueNotSupported);
             }
 
             if (!_baseDictionary.TryGetValue(key, out object oldItem) || oldItem != value)
@@ -1305,7 +1305,7 @@ namespace System.Windows
         public void RegisterName(string name, object scopedElement)
         {
             if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
-                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
+                throw new ArgumentException(string.Format(Strings.NameScopeDuplicateNamesNotAllowed, name));
 
             _nameScopeDictionary[name] = scopedElement;
         }
@@ -1317,7 +1317,7 @@ namespace System.Windows
         public void UnregisterName(string name)
         {
             if (!_nameScopeDictionary.ContainsKey(name))
-                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
+                throw new ArgumentException(string.Format(Strings.NameScopeNameNotFound, name));
 
             _nameScopeDictionary.Remove(name);
         }

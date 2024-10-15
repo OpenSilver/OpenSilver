@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -144,7 +145,7 @@ namespace System.Windows
         {
             if (weightValue < 1 || weightValue > 999)
             {
-                throw new ArgumentOutOfRangeException(nameof(weightValue), "The parameter value must be between '1' and '999'.");
+                throw new ArgumentOutOfRangeException(nameof(weightValue), string.Format(Strings.ParameterMustBeBetween, 1, 999));
             }
 
             return new FontWeight(weightValue);

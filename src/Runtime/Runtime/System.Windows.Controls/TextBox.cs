@@ -17,6 +17,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Input;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Media;
 
@@ -524,7 +525,7 @@ namespace System.Windows.Controls
             {
                 if (value < 0)
                 {
-                    throw new ArgumentOutOfRangeException("SelectionStart cannot be lower than 0");
+                    throw new ArgumentOutOfRangeException(Strings.ParameterCannotBeNegative);
                 }
 
                 if (_textViewHost is not null)
@@ -541,7 +542,7 @@ namespace System.Windows.Controls
             {
                 if (value < 0)
                 {
-                    throw new ArgumentOutOfRangeException("SelectionLength cannot be lower than 0");
+                    throw new ArgumentOutOfRangeException(Strings.ParameterCannotBeNegative);
                 }
 
                 if (_textViewHost is not null)

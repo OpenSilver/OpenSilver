@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Data;
 
 namespace OpenSilver.Internal.Data
 {
@@ -67,7 +66,7 @@ namespace OpenSilver.Internal
         {
             if (list == null)
             {
-                throw new ArgumentNullException("list");
+                throw new ArgumentNullException(nameof(list));
             }
 
             IComparer<T> comparerT = comparer as IComparer<T>;
@@ -83,7 +82,7 @@ namespace OpenSilver.Internal
         {
             if (list == null)
             {
-                throw new ArgumentNullException("list");
+                throw new ArgumentNullException(nameof(list));
             }
 
             IComparer<T> comparerT = comparer as IComparer<T>;

@@ -11,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -55,15 +55,15 @@ namespace System.Windows
                 throw GetConvertFromException(value);
             }
 
-            if (!(value is string s))
+            if (value is not string s)
             {
-                throw new ArgumentException("The object passed to 'ConvertFrom' is not a valid type.", nameof(value));
+                throw new ArgumentException(string.Format(Strings.General_BadType, nameof(ConvertFrom)), nameof(value));
             }
 
-            FontStretch fontStretch = new FontStretch();
+            var fontStretch = new FontStretch();
             if (!FontStretches.FontStretchStringToKnownStretch(s, culture, ref fontStretch))
             {
-                throw new FormatException("Token is not valid.");
+                throw new FormatException(Strings.Parsers_IllegalToken);
             }
 
             return fontStretch;

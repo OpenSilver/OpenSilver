@@ -13,6 +13,7 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
@@ -91,7 +92,7 @@ namespace System.Windows.Controls
                 }
                 else
                 {
-                    throw new InvalidOperationException("Cannot insert in a selection when selection is in progress. Use Add method.");
+                    throw new InvalidOperationException(Strings.InsertInDeferSelectionActive);
                 }
             }
             else
@@ -111,7 +112,7 @@ namespace System.Windows.Controls
             CheckReadOnly();
             if (_updatingSelectedItems)
             {
-                throw new InvalidOperationException("Cannot set an item in a selection when selection is in progress. Use Add or Remove method.");
+                throw new InvalidOperationException(Strings.SetInDeferSelectionActive);
             }
             else
             {
@@ -134,7 +135,7 @@ namespace System.Windows.Controls
             {
                 if (_updatingSelectedItems)
                 {
-                    throw new InvalidOperationException("Cannot move an item in a selection when selection is in progress.");
+                    throw new InvalidOperationException(Strings.MoveInDeferSelectionActive);
                 }
                 else
                 {
@@ -195,7 +196,7 @@ namespace System.Windows.Controls
         {
             if (_selector.SelectionChange.IsActive || _updatingSelectedItems)
             {
-                throw new InvalidOperationException("Cannot begin a new selection while a selection is in progress.");
+                throw new InvalidOperationException(Strings.DeferSelectionActive);
             }
             _updatingSelectedItems = true;
             _selector.SelectionChange.Begin();
@@ -208,7 +209,7 @@ namespace System.Windows.Controls
         {
             if (!_selector.SelectionChange.IsActive || !_updatingSelectedItems)
             {
-                throw new InvalidOperationException("Cannot end a selection when no selection is in progress.");
+                throw new InvalidOperationException(Strings.DeferSelectionNotActive);
             }
             _updatingSelectedItems = false;
             _selector.SelectionChange.End();
@@ -232,7 +233,7 @@ namespace System.Windows.Controls
         {
             if (!_selector.SelectionChange.IsActive || !_updatingSelectedItems)
             {
-                throw new InvalidOperationException("Cannot end a selection when no selection is in progress.");
+                throw new InvalidOperationException(Strings.DeferSelectionNotActive);
             }
 
             _selector.SelectionChange.Select(info, true /* assumeInItemsCollection */);
@@ -245,7 +246,7 @@ namespace System.Windows.Controls
         {
             if (!_selector.SelectionChange.IsActive || !_updatingSelectedItems)
             {
-                throw new InvalidOperationException("Cannot end a selection when no selection is in progress.");
+                throw new InvalidOperationException(Strings.DeferSelectionNotActive);
             }
 
             _selector.SelectionChange.Unselect(info);
@@ -267,7 +268,7 @@ namespace System.Windows.Controls
         {
             if (!_selector.CanSelectMultiple && !_selector.SelectionChange.IsActive)
             {
-                throw new InvalidOperationException("Can only change SelectedItems collection in multiple selection modes. Use SelectedItem in single select modes.");
+                throw new InvalidOperationException(Strings.ChangingCollectionNotSupported);
             }
         }
     }

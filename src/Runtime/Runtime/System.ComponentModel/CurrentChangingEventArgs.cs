@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 
 namespace System.ComponentModel
 {
@@ -87,7 +87,7 @@ namespace System.ComponentModel
                 }
                 else if (value)
                 {
-                    throw new InvalidOperationException("The CollectionView that originates this CurrentChanging event is in a state that does not allow the event to be canceled. Check CurrentChangingEventArgs.IsCancelable before assigning to this CurrentChangingEventArgs.Cancel property.");
+                    throw new InvalidOperationException(Strings.CurrentChangingCannotBeCanceled);
                 }
             }
         }
@@ -106,5 +106,4 @@ namespace System.ComponentModel
     ///     The delegate to use for handlers that receive the CurrentChanging event.
     /// </summary>
     public delegate void CurrentChangingEventHandler(object sender, CurrentChangingEventArgs e);
-
 }

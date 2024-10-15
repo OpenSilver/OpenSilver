@@ -50,8 +50,7 @@ internal sealed class DependencyObjectType
 
         if (!typeof(DependencyObject).IsAssignableFrom(systemType))
         {
-            throw new ArgumentException(
-                string.Format("'{0}' type does not have a matching DependencyObjectType.", systemType.Name));
+            throw new ArgumentException(string.Format(Strings.DTypeNotSupportForSystemType, systemType.Name));
         }
 
         return FromSystemTypeInternal(systemType);

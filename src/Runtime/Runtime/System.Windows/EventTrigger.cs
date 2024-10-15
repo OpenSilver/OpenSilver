@@ -138,7 +138,7 @@ namespace System.Windows
             }
             else
             {
-                throw new InvalidOperationException("Triggers collection members must be of type EventTrigger.");
+                throw new InvalidOperationException(Strings.TriggersSupportsEventTriggersOnly);
             }
         }
 
@@ -174,7 +174,7 @@ namespace System.Windows
             }
             else
             {
-                throw new InvalidOperationException("Triggers collection members must be of type EventTrigger.");
+                throw new InvalidOperationException(Strings.TriggersSupportsEventTriggersOnly);
             }
         }
 

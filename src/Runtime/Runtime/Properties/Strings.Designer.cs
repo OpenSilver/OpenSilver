@@ -61,6 +61,33 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Added item does not appear at given index &apos;{0}&apos;..
+        /// </summary>
+        internal static string AddedItemNotAtIndex {
+            get {
+                return ResourceManager.GetString("AddedItemNotAtIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A collection Add event refers to item that does not belong to collection..
+        /// </summary>
+        internal static string AddedItemNotInCollection {
+            get {
+                return ResourceManager.GetString("AddedItemNotInCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Element declared as Application Service does not implement IApplicationService interface..
+        /// </summary>
+        internal static string Application_ServiceMustImplementInterface {
+            get {
+                return ResourceManager.GetString("Application_ServiceMustImplementInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot perform operation..
         /// </summary>
         internal static string Automation_OperationCannotBePerformed {
@@ -79,11 +106,38 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BindingCollection does not support items of type {0}. Only Binding is allowed..
+        /// </summary>
+        internal static string BindingCollectionContainsNonBinding {
+            get {
+                return ResourceManager.GetString("BindingCollectionContainsNonBinding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CancelEdit is not supported for the current edit item..
+        /// </summary>
+        internal static string CancelEditNotSupported {
+            get {
+                return ResourceManager.GetString("CancelEditNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A {0} cannot be based on itself..
         /// </summary>
         internal static string CannotBeBasedOnSelf {
             get {
                 return ResourceManager.GetString("CannotBeBasedOnSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Element cannot be its own parent..
+        /// </summary>
+        internal static string CannotBeSelfParent {
+            get {
+                return ResourceManager.GetString("CannotBeSelfParent", resourceCulture);
             }
         }
         
@@ -97,11 +151,497 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Editing the NewItem placeholder is not allowed..
+        /// </summary>
+        internal static string CannotEditPlaceholder {
+            get {
+                return ResourceManager.GetString("CannotEditPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; view does not support filtering..
+        /// </summary>
+        internal static string CannotFilterView {
+            get {
+                return ResourceManager.GetString("CannotFilterView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find removed item..
+        /// </summary>
+        internal static string CannotFindRemovedItem {
+            get {
+                return ResourceManager.GetString("CannotFindRemovedItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; view does not support grouping..
+        /// </summary>
+        internal static string CannotGroupView {
+            get {
+                return ResourceManager.GetString("CannotGroupView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property cannot be set in the current element&apos;s Style..
+        /// </summary>
+        internal static string CannotHavePropertyInStyle {
+            get {
+                return ResourceManager.GetString("CannotHavePropertyInStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot modify the logical children for this node at this time because a tree walk is in progress..
+        /// </summary>
+        internal static string CannotModifyLogicalChildrenDuringTreeWalk {
+            get {
+                return ResourceManager.GetString("CannotModifyLogicalChildrenDuringTreeWalk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot Move items to an unknown position (-1)..
+        /// </summary>
+        internal static string CannotMoveToUnknownPosition {
+            get {
+                return ResourceManager.GetString("CannotMoveToUnknownPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ItemsHost panel cannot use VirtualizationMode == Recycling because the IGeneratorHost.GetContainerForItemOverride method returns containers that have different types..
+        /// </summary>
+        internal static string CannotRecyleHeterogeneousTypes {
+            get {
+                return ResourceManager.GetString("CannotRecyleHeterogeneousTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Range of Remove({0},{1}) cannot include items without a corresponding user interface element..
+        /// </summary>
+        internal static string CannotRemoveUnrealizedItems {
+            get {
+                return ResourceManager.GetString("CannotRemoveUnrealizedItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item is not selectable..
+        /// </summary>
+        internal static string CannotSelectNotSelectableItem {
+            get {
+                return ResourceManager.GetString("CannotSelectNotSelectableItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; view does not support sorting..
+        /// </summary>
+        internal static string CannotSortView {
+            get {
+                return ResourceManager.GetString("CannotSortView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Items collection must be empty before using ItemsSource..
+        /// </summary>
+        internal static string CannotUseItemsSource {
+            get {
+                return ResourceManager.GetString("CannotUseItemsSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Binding cannot be changed after it has been used..
+        /// </summary>
+        internal static string ChangeSealedBinding {
+            get {
+                return ResourceManager.GetString("ChangeSealedBinding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can only change SelectedItems collection in multiple selection modes. Use SelectedItem in single select modes..
+        /// </summary>
+        internal static string ChangingCollectionNotSupported {
+            get {
+                return ResourceManager.GetString("ChangingCollectionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot change modal state while the ChildWindow is open..
+        /// </summary>
+        internal static string ChildWindow_CannotChangeModalState {
+            get {
+                return ResourceManager.GetString("ChildWindow_CannotChangeModalState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot call Show() on a ChildWindow that is in the visual tree. ChildWindow should be the top-most element in the .xaml file..
         /// </summary>
         internal static string ChildWindow_InvalidOperation {
             get {
                 return ResourceManager.GetString("ChildWindow_InvalidOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to After a CollectionChange.Add event, Items collection does not contain the added item &apos;{0}&apos;.\n This could happen if the event sender supplied incorrect information in CollectionChangedEventArgs..
+        /// </summary>
+        internal static string CollectionAddEventMissingItem {
+            get {
+                return ResourceManager.GetString("CollectionAddEventMissingItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; index in collection change event is not valid for collection of size &apos;{1}&apos;..
+        /// </summary>
+        internal static string CollectionChangeIndexOutOfRange {
+            get {
+                return ResourceManager.GetString("CollectionChangeIndexOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of elements in source Enumerable is greater than available space from index to the end of destination array..
+        /// </summary>
+        internal static string CopyToNotEnoughSpace {
+            get {
+                return ResourceManager.GetString("CopyToNotEnoughSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CollectionView that originates this CurrentChanging event is in a state that does not allow the event to be canceled. Check CurrentChangingEventArgs.IsCancelable before assigning to this CurrentChangingEventArgs.Cancel property..
+        /// </summary>
+        internal static string CurrentChangingCannotBeCanceled {
+            get {
+                return ResourceManager.GetString("CurrentChangingCannotBeCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cyclic reference found while evaluating the Style property on element &apos;{0}&apos;..
+        /// </summary>
+        internal static string CyclicStyleReferenceDetected {
+            get {
+                return ResourceManager.GetString("CyclicStyleReferenceDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cyclic reference found while evaluating the ThemeStyle property on element &apos;{0}&apos;..
+        /// </summary>
+        internal static string CyclicThemeStyleReferenceDetected {
+            get {
+                return ResourceManager.GetString("CyclicThemeStyleReferenceDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot automatically generate a valid default value for property &apos;{0}&apos;. Specify a default value explicitly when owner type &apos;{1}&apos; is registering this DependencyProperty..
+        /// </summary>
+        internal static string DefaultValueAutoAssignFailed {
+            get {
+                return ResourceManager.GetString("DefaultValueAutoAssignFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default value for &apos;{0}&apos; property is not valid because ValidateValueCallback failed..
+        /// </summary>
+        internal static string DefaultValueInvalid {
+            get {
+                return ResourceManager.GetString("DefaultValueInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An Expression object is not a valid default value for a DependencyProperty..
+        /// </summary>
+        internal static string DefaultValueMayNotBeExpression {
+            get {
+                return ResourceManager.GetString("DefaultValueMayNotBeExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default value type does not match type of property &apos;{0}&apos;..
+        /// </summary>
+        internal static string DefaultValuePropertyTypeMismatch {
+            get {
+                return ResourceManager.GetString("DefaultValuePropertyTypeMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deferring loader &apos;{0}&apos; requires that &apos;{1}&apos; be implemented in the IServiceProvider..
+        /// </summary>
+        internal static string DeferringLoaderNoContext {
+            get {
+                return ResourceManager.GetString("DeferringLoaderNoContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deferring loader &apos;{0}&apos; does not support the Save operation..
+        /// </summary>
+        internal static string DeferringLoaderNoSave {
+            get {
+                return ResourceManager.GetString("DeferringLoaderNoSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot begin a new selection while a selection is in progress..
+        /// </summary>
+        internal static string DeferSelectionActive {
+            get {
+                return ResourceManager.GetString("DeferSelectionActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot end a selection when no selection is in progress..
+        /// </summary>
+        internal static string DeferSelectionNotActive {
+            get {
+                return ResourceManager.GetString("DeferSelectionNotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot set both DisplayMemberPath and ItemTemplate..
+        /// </summary>
+        internal static string DisplayMemberPathAndItemTemplateDefined {
+            get {
+                return ResourceManager.GetString("DisplayMemberPathAndItemTemplateDefined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; type does not have a matching DependencyObjectType..
+        /// </summary>
+        internal static string DTypeNotSupportForSystemType {
+            get {
+                return ResourceManager.GetString("DTypeNotSupportForSystemType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must call BeginInit before EndInit..
+        /// </summary>
+        internal static string EndInitWithoutBeginInitNotSupported {
+            get {
+                return ResourceManager.GetString("EndInitWithoutBeginInitNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No current object to return..
+        /// </summary>
+        internal static string Enumerator_VerifyContext {
+            get {
+                return ResourceManager.GetString("Enumerator_VerifyContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enumerator is located before the first element of the collection or after the last element..
+        /// </summary>
+        internal static string EnumeratorInvalidOperation {
+            get {
+                return ResourceManager.GetString("EnumeratorInvalidOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collection was modified; enumeration operation may not execute..
+        /// </summary>
+        internal static string EnumeratorVersionChanged {
+            get {
+                return ResourceManager.GetString("EnumeratorVersionChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot promote from Hashtable..
+        /// </summary>
+        internal static string FrugalMap_CannotPromoteBeyondHashtable {
+            get {
+                return ResourceManager.GetString("FrugalMap_CannotPromoteBeyondHashtable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot promote from &apos;{0}&apos; to &apos;{1}&apos; because the target map is too small..
+        /// </summary>
+        internal static string FrugalMap_TargetMapCannotHoldAllData {
+            get {
+                return ResourceManager.GetString("FrugalMap_TargetMapCannotHoldAllData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The object passed to &apos;{0}&apos; is not a valid type..
+        /// </summary>
+        internal static string General_BadType {
+            get {
+                return ResourceManager.GetString("General_BadType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected object of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string General_Expected_Type {
+            get {
+                return ResourceManager.GetString("General_Expected_Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The transform is not defined for the point..
+        /// </summary>
+        internal static string GeneralTransform_TransformFailed {
+            get {
+                return ResourceManager.GetString("GeneralTransform_TransformFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot call StartAt when content generation is in progress..
+        /// </summary>
+        internal static string GenerationInProgress {
+            get {
+                return ResourceManager.GetString("GenerationInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must call GenerateNext while content generation is in progress..
+        /// </summary>
+        internal static string GenerationNotInProgress {
+            get {
+                return ResourceManager.GetString("GenerationNotInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot modify &apos;{0}&apos; in read-only state..
+        /// </summary>
+        internal static string GridCollection_CannotModifyReadOnly {
+            get {
+                return ResourceManager.GetString("GridCollection_CannotModifyReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Handler type is mismatched..
+        /// </summary>
+        internal static string HandlerTypeIllegal {
+            get {
+                return ResourceManager.GetString("HandlerTypeIllegal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified element is already the logical child of another element. Disconnect it first..
+        /// </summary>
+        internal static string HasLogicalParent {
+            get {
+                return ResourceManager.GetString("HasLogicalParent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If SortDescriptions is overridden in derived classes, then must also override &apos;{0}&apos;..
+        /// </summary>
+        internal static string ImplementOtherMembersWithSort {
+            get {
+                return ResourceManager.GetString("ImplementOtherMembersWithSort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot insert in a selection when selection is in progress. Use Add method..
+        /// </summary>
+        internal static string InsertInDeferSelectionActive {
+            get {
+                return ResourceManager.GetString("InsertInDeferSelectionActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; parameter cannot be Infinity..
+        /// </summary>
+        internal static string InvalidCtorParameterNoInfinity {
+            get {
+                return ResourceManager.GetString("InvalidCtorParameterNoInfinity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; parameter cannot be NaN..
+        /// </summary>
+        internal static string InvalidCtorParameterNoNaN {
+            get {
+                return ResourceManager.GetString("InvalidCtorParameterNoNaN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; parameter is not valid. Valid values are GridUnitType.Auto, GridUnitType.Pixel, or GridUnitType.Star..
+        /// </summary>
+        internal static string InvalidCtorParameterUnknownGridUnitType {
+            get {
+                return ResourceManager.GetString("InvalidCtorParameterUnknownGridUnitType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; cursor type is not valid..
+        /// </summary>
+        internal static string InvalidCursorType {
+            get {
+                return ResourceManager.GetString("InvalidCursorType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid value for property &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidPropertyValue {
+            get {
+                return ResourceManager.GetString("InvalidPropertyValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; value is not valid. It must contain one, two, or four delimited Lengths..
+        /// </summary>
+        internal static string InvalidStringThickness {
+            get {
+                return ResourceManager.GetString("InvalidStringThickness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested TextDecorationCollection string is not valid: &apos;{0}&apos;..
+        /// </summary>
+        internal static string InvalidTextDecorationCollectionString {
+            get {
+                return ResourceManager.GetString("InvalidTextDecorationCollectionString", resourceCulture);
             }
         }
         
@@ -124,6 +664,51 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead..
+        /// </summary>
+        internal static string ItemsSourceInUse {
+            get {
+                return ResourceManager.GetString("ItemsSourceInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; string cannot be converted to Length..
+        /// </summary>
+        internal static string LengthFormatError {
+            get {
+                return ResourceManager.GetString("LengthFormatError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can only call SelectAll when SelectionMode is Multiple or Extended..
+        /// </summary>
+        internal static string ListBoxSelectAllSelectionMode {
+            get {
+                return ResourceManager.GetString("ListBoxSelectAllSelectionMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree..
+        /// </summary>
+        internal static string LogicalTreeLoop {
+            get {
+                return ResourceManager.GetString("LogicalTreeLoop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A &apos;{0}&apos; cannot be set on the &apos;{1}&apos; property of type &apos;{2}&apos;. A &apos;{0}&apos; can only be set on a DependencyProperty of a DependencyObject..
+        /// </summary>
+        internal static string MarkupExtensionDynamicOrBindingOnClrProp {
+            get {
+                return ResourceManager.GetString("MarkupExtensionDynamicOrBindingOnClrProp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Markup extension &apos;{0}&apos; requires &apos;{1}&apos; be implemented in the IServiceProvider for ProvideValue..
         /// </summary>
         internal static string MarkupExtensionNoContext1 {
@@ -142,11 +727,254 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resource markup extension must have ResourceKey property set before ProvideValue can be called..
+        /// </summary>
+        internal static string MarkupExtensionResourceKey {
+            get {
+                return ResourceManager.GetString("MarkupExtensionResourceKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not allowed during an AddNew or EditItem transaction..
+        /// </summary>
+        internal static string MemberNotAllowedDuringAddOrEdit {
+            get {
+                return ResourceManager.GetString("MemberNotAllowedDuringAddOrEdit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not allowed during a transaction begun by &apos;{1}&apos;..
+        /// </summary>
+        internal static string MemberNotAllowedDuringTransaction {
+            get {
+                return ResourceManager.GetString("MemberNotAllowedDuringTransaction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not allowed for this view..
+        /// </summary>
+        internal static string MemberNotAllowedForView {
+            get {
+                return ResourceManager.GetString("MemberNotAllowedForView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RoutedEvent in RoutedEventArgs and EventRoute are mismatched..
+        /// </summary>
+        internal static string Mismatched_RoutedEvent {
+            get {
+                return ResourceManager.GetString("Mismatched_RoutedEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot move an item in a selection when selection is in progress..
+        /// </summary>
+        internal static string MoveInDeferSelectionActive {
+            get {
+                return ResourceManager.GetString("MoveInDeferSelectionActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot set MultiBinding because MultiValueConverter must be specified..
+        /// </summary>
+        internal static string MultiBindingHasNoConverter {
+            get {
+                return ResourceManager.GetString("MultiBindingHasNoConverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can only base on a Style with target type that is base type &apos;{0}&apos;..
+        /// </summary>
+        internal static string MustBaseOnStyleOfABaseType {
+            get {
+                return ResourceManager.GetString("MustBaseOnStyleOfABaseType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot register duplicate Name &apos;{0}&apos; in this scope..
+        /// </summary>
+        internal static string NameScopeDuplicateNamesNotAllowed {
+            get {
+                return ResourceManager.GetString("NameScopeDuplicateNamesNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; Name is not found..
+        /// </summary>
+        internal static string NameScopeNameNotFound {
+            get {
+                return ResourceManager.GetString("NameScopeNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No NameScope found to {1} the Name &apos;{0}&apos;..
+        /// </summary>
+        internal static string NameScopeNotFound {
+            get {
+                return ResourceManager.GetString("NameScopeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot have nested BeginInit calls on the same instance..
+        /// </summary>
+        internal static string NestedBeginInitNotSupported {
+            get {
+                return ResourceManager.GetString("NestedBeginInitNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot change or check the contents or Current position of CollectionView while Refresh is being deferred..
+        /// </summary>
+        internal static string NoCheckOrChangeWhenDeferred {
+            get {
+                return ResourceManager.GetString("NoCheckOrChangeWhenDeferred", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot set UpdateSourceTrigger on inner Binding of MultiBinding. Only the default Immediate UpdateSourceTrigger is valid..
+        /// </summary>
+        internal static string NoUpdateSourceTriggerForInnerBindingOfMultiBinding {
+            get {
+                return ResourceManager.GetString("NoUpdateSourceTriggerForInnerBindingOfMultiBinding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must have non-null value for &apos;{0}&apos;..
+        /// </summary>
+        internal static string NullPropertyIllegal {
+            get {
+                return ResourceManager.GetString("NullPropertyIllegal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata override and base metadata must be of the same type or derived type..
+        /// </summary>
+        internal static string OverridingMetadataDoesNotMatchBaseMetadataType {
+            get {
+                return ResourceManager.GetString("OverridingMetadataDoesNotMatchBaseMetadataType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A panel with IsItemsHost=&quot;true&quot; is not nested in an ItemsControl. Panel must be nested in ItemsControl to get and show items..
+        /// </summary>
+        internal static string Panel_ItemsControlNotFound {
+            get {
+                return ResourceManager.GetString("Panel_ItemsControlNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be provided when instantiating &apos;{1}&apos;..
+        /// </summary>
+        internal static string Panel_NoNullVisualParent {
+            get {
+                return ResourceManager.GetString("Panel_NoNullVisualParent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Panel must have IsItemsHost set to true..
+        /// </summary>
+        internal static string PanelIsNotItemsHost {
+            get {
+                return ResourceManager.GetString("PanelIsNotItemsHost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter must be greater than or equal to zero..
+        /// </summary>
+        internal static string ParameterCannotBeNegative {
+            get {
+                return ResourceManager.GetString("ParameterCannotBeNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parameter value must be between &apos;{0}&apos; and &apos;{1}&apos;..
+        /// </summary>
+        internal static string ParameterMustBeBetween {
+            get {
+                return ResourceManager.GetString("ParameterMustBeBetween", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected token &apos;{0}&apos; encountered at position &apos;{1}&apos;..
+        /// </summary>
+        internal static string Parser_UnexpectedToken {
+            get {
+                return ResourceManager.GetString("Parser_UnexpectedToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot convert the value in attribute &apos;{0}&apos; to object of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string ParserCannotConvertPropertyValue {
+            get {
+                return ResourceManager.GetString("ParserCannotConvertPropertyValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find resource named &apos;{0}&apos;. Resource names are case sensitive..
         /// </summary>
         internal static string ParserNoResource {
             get {
                 return ResourceManager.GetString("ParserNoResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Token is not valid..
+        /// </summary>
+        internal static string Parsers_IllegalToken {
+            get {
+                return ResourceManager.GetString("Parsers_IllegalToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot change collection during a CollectionChanged event..
+        /// </summary>
+        internal static string PresentationFrameworkCollectionReentrancyNotAllowed {
+            get {
+                return ResourceManager.GetString("PresentationFrameworkCollectionReentrancyNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property was already registered by &apos;{1}&apos;..
+        /// </summary>
+        internal static string PropertyAlreadyRegistered {
+            get {
+                return ResourceManager.GetString("PropertyAlreadyRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property cannot be data-bound..
+        /// </summary>
+        internal static string PropertyNotBindable {
+            get {
+                return ResourceManager.GetString("PropertyNotBindable", resourceCulture);
             }
         }
         
@@ -160,11 +988,389 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This method overrides metadata only on read-only properties. This property is not read-only..
+        /// </summary>
+        internal static string PropertyNotReadOnly {
+            get {
+                return ResourceManager.GetString("PropertyNotReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Range actions are not supported..
+        /// </summary>
+        internal static string RangeActionsNotSupported {
+            get {
+                return ResourceManager.GetString("RangeActionsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property was registered as read-only and cannot be modified without an authorization key..
+        /// </summary>
+        internal static string ReadOnlyChangeNotAllowed {
+            get {
+                return ResourceManager.GetString("ReadOnlyChangeNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property key is not authorized to modify property &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReadOnlyKeyNotAuthorized {
+            get {
+                return ResourceManager.GetString("ReadOnlyKeyNotAuthorized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property key is not authorized to override metadata of property &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReadOnlyOverrideKeyNotAuthorized {
+            get {
+                return ResourceManager.GetString("ReadOnlyOverrideKeyNotAuthorized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property was registered as read-only and its metadata cannot be overridden without an authorization key..
+        /// </summary>
+        internal static string ReadOnlyOverrideNotAllowed {
+            get {
+                return ResourceManager.GetString("ReadOnlyOverrideNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot call this method on the Empty Rect..
+        /// </summary>
+        internal static string Rect_CannotCallMethod {
+            get {
+                return ResourceManager.GetString("Rect_CannotCallMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collection Remove event must specify item position..
+        /// </summary>
+        internal static string RemovedItemNotFound {
+            get {
+                return ResourceManager.GetString("RemovedItemNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GeneratorPosition &apos;{0},{1}&apos; passed to Remove does not have Offset equal to 0..
+        /// </summary>
+        internal static string RemoveRequiresOffsetZero {
+            get {
+                return ResourceManager.GetString("RemoveRequiresOffsetZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; Count passed to Remove must be positive..
+        /// </summary>
+        internal static string RemoveRequiresPositiveCount {
+            get {
+                return ResourceManager.GetString("RemoveRequiresPositiveCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removing the NewItem placeholder is not allowed..
+        /// </summary>
+        internal static string RemovingPlaceholder {
+            get {
+                return ResourceManager.GetString("RemovingPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The merged dictionary is invalid. Either a ResourceDictionary is being placed into its own MergedDictionaries collection or a it is being added to the same MergedDictionary collection twice..
+        /// </summary>
+        internal static string ResourceDictionaryInvalidMergedDictionary {
+            get {
+                return ResourceManager.GetString("ResourceDictionaryInvalidMergedDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Key must be a Type, a DataTemplateKey or a String..
+        /// </summary>
+        internal static string ResourceDictionaryKeyMustBeTypeOrString {
+            get {
+                return ResourceManager.GetString("ResourceDictionaryKeyMustBeTypeOrString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Null value not supported in a ResourceDictionary..
+        /// </summary>
+        internal static string ResourceDictionaryNullValueNotSupported {
+            get {
+                return ResourceManager.GetString("ResourceDictionaryNullValueNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For a key of the type DataTemplateKey, value must be a DataTemplate..
+        /// </summary>
+        internal static string ResourceDictionaryValueMustBeDataTemplate {
+            get {
+                return ResourceManager.GetString("ResourceDictionaryValueMustBeDataTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For a Type key the value must be a Style..
+        /// </summary>
+        internal static string ResourceDictionaryValueMustBeStyle {
+            get {
+                return ResourceManager.GetString("ResourceDictionaryValueMustBeStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For a Type key the Style value must have TargetType which is equals to key..
+        /// </summary>
+        internal static string ResourceDictionaryValueMustBeStyleWithCorrectTargetType {
+            get {
+                return ResourceManager.GetString("ResourceDictionaryValueMustBeStyleWithCorrectTargetType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; parameter value cannot be NaN..
         /// </summary>
         internal static string ScrollViewer_CannotBeNaN {
             get {
                 return ResourceManager.GetString("ScrollViewer_CannotBeNaN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; parameter has value &apos;{1}&apos;, which is not in the valid range of &apos;{2}&apos; to &apos;{3}&apos;..
+        /// </summary>
+        internal static string ScrollViewer_OutOfRange {
+            get {
+                return ResourceManager.GetString("ScrollViewer_OutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot set an item in a selection when selection is in progress. Use Add or Remove method..
+        /// </summary>
+        internal static string SetInDeferSelectionActive {
+            get {
+                return ResourceManager.GetString("SetInDeferSelectionActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot set Expression. It is marked as non shareable and is already in use..
+        /// </summary>
+        internal static string SharingNonSharableExpression {
+            get {
+                return ResourceManager.GetString("SharingNonSharableExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Height must be non-negative..
+        /// </summary>
+        internal static string Size_HeightCannotBeNegative {
+            get {
+                return ResourceManager.GetString("Size_HeightCannotBeNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Width and Height must be non-negative..
+        /// </summary>
+        internal static string Size_WidthAndHeightCannotBeNegative {
+            get {
+                return ResourceManager.GetString("Size_WidthAndHeightCannotBeNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Width must be non-negative..
+        /// </summary>
+        internal static string Size_WidthCannotBeNegative {
+            get {
+                return ResourceManager.GetString("Size_WidthCannotBeNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; name cannot be found in the name scope of &apos;{1}&apos;..
+        /// </summary>
+        internal static string Storyboard_NameNotFound {
+            get {
+                return ResourceManager.GetString("Storyboard_NameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No applicable name scope exists to resolve the name &apos;{0}&apos;..
+        /// </summary>
+        internal static string Storyboard_NoNameScope {
+            get {
+                return ResourceManager.GetString("Storyboard_NoNameScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No target was specified for &apos;{0}&apos;..
+        /// </summary>
+        internal static string Storyboard_NoTarget {
+            get {
+                return ResourceManager.GetString("Storyboard_NoTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; target object Name found but the object is not a valid target type..
+        /// </summary>
+        internal static string Storyboard_TargetNameNotDependencyObject {
+            get {
+                return ResourceManager.GetString("Storyboard_TargetNameNotDependencyObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must specify TargetProperty for &apos;{0}&apos;..
+        /// </summary>
+        internal static string Storyboard_TargetPropertyRequired {
+            get {
+                return ResourceManager.GetString("Storyboard_TargetPropertyRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter cannot be a zero-length string..
+        /// </summary>
+        internal static string StringEmpty {
+            get {
+                return ResourceManager.GetString("StringEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A style intended for type &apos;{0}&apos; cannot be applied to type &apos;{1}&apos;..
+        /// </summary>
+        internal static string StyleForWrongType {
+            get {
+                return ResourceManager.GetString("StyleForWrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; TargetType does not match type of element &apos;{1}&apos;..
+        /// </summary>
+        internal static string StyleTargetTypeMismatchWithElement {
+            get {
+                return ResourceManager.GetString("StyleTargetTypeMismatchWithElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression type is not a valid Style value..
+        /// </summary>
+        internal static string StyleValueOfExpressionNotSupported {
+            get {
+                return ResourceManager.GetString("StyleValueOfExpressionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property value must be greater than or equal to zero or indefinite..
+        /// </summary>
+        internal static string Timing_InvalidArgNonNegative {
+            get {
+                return ResourceManager.GetString("Timing_InvalidArgNonNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation is not allowed on a non-root Storyboard..
+        /// </summary>
+        internal static string Timing_MustBeRoot {
+            get {
+                return ResourceManager.GetString("Timing_MustBeRoot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to return a TimeSpan property value for a Duration value of &apos;{0}&apos;. Check the HasTimeSpan property before requesting the TimeSpan property value from a Duration..
+        /// </summary>
+        internal static string Timing_NotTimeSpan {
+            get {
+                return ResourceManager.GetString("Timing_NotTimeSpan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid IterationCount value for a RepeatBehavior structure. An IterationCount value must represent a number that is greater than or equal to zero but not infinite..
+        /// </summary>
+        internal static string Timing_RepeatBehaviorInvalidIterationCount {
+            get {
+                return ResourceManager.GetString("Timing_RepeatBehaviorInvalidIterationCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid RepeatDuration value for a RepeatBehavior structure. A RepeatDuration value must be a TimeSpan value greater than or equal to zero ticks..
+        /// </summary>
+        internal static string Timing_RepeatBehaviorInvalidRepeatDuration {
+            get {
+                return ResourceManager.GetString("Timing_RepeatBehaviorInvalidRepeatDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; RepeatBehavior does not represent an iteration count and does not have an IterationCount value..
+        /// </summary>
+        internal static string Timing_RepeatBehaviorNotIterationCount {
+            get {
+                return ResourceManager.GetString("Timing_RepeatBehaviorNotIterationCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; RepeatBehavior does not represent a repeat duration and does not have a RepeatDuration value..
+        /// </summary>
+        internal static string Timing_RepeatBehaviorNotRepeatDuration {
+            get {
+                return ResourceManager.GetString("Timing_RepeatBehaviorNotRepeatDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot call the Storyboard.SkipToFill method for a Storyboard that has a Duration or RepeatDuration of Forever, because this Storyboard will never reach its fill period..
+        /// </summary>
+        internal static string Timing_SkipToFillDestinationIndefinite {
+            get {
+                return ResourceManager.GetString("Timing_SkipToFillDestinationIndefinite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transform is not invertible..
+        /// </summary>
+        internal static string Transform_NotInvertible {
+            get {
+                return ResourceManager.GetString("Transform_NotInvertible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Potential cycle in tree found while building the event route..
+        /// </summary>
+        internal static string TreeLoop {
+            get {
+                return ResourceManager.GetString("TreeLoop", resourceCulture);
             }
         }
         
@@ -201,6 +1407,159 @@ namespace OpenSilver.Internal {
         internal static string TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite {
             get {
                 return ResourceManager.GetString("TreeViewItem_OnIsSelectionActivePropertyChanged_InvalidWrite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Triggers collection members must be of type EventTrigger..
+        /// </summary>
+        internal static string TriggersSupportsEventTriggersOnly {
+            get {
+                return ResourceManager.GetString("TriggersSupportsEventTriggersOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Two-way binding requires Path..
+        /// </summary>
+        internal static string TwoWayBindingNeedsPath {
+            get {
+                return ResourceManager.GetString("TwoWayBindingNeedsPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata is already associated with a type and property. A new one must be created..
+        /// </summary>
+        internal static string TypeMetadataAlreadyInUse {
+            get {
+                return ResourceManager.GetString("TypeMetadataAlreadyInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PropertyMetadata is already registered for type &apos;{0}&apos;..
+        /// </summary>
+        internal static string TypeMetadataAlreadyRegistered {
+            get {
+                return ResourceManager.GetString("TypeMetadataAlreadyRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot change property metadata after it has been associated with a property..
+        /// </summary>
+        internal static string TypeMetadataCannotChangeAfterUse {
+            get {
+                return ResourceManager.GetString("TypeMetadataCannotChangeAfterUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; type must derive from DependencyObject..
+        /// </summary>
+        internal static string TypeMustBeDependencyObjectDerived {
+            get {
+                return ResourceManager.GetString("TypeMustBeDependencyObjectDerived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot perform operation..
+        /// </summary>
+        internal static string UIA_OperationCannotBePerformed {
+            get {
+                return ResourceManager.GetString("UIA_OperationCannotBePerformed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must disconnect specified child from current parent UIElement before attaching to new parent UIElement..
+        /// </summary>
+        internal static string UIElement_HasParent {
+            get {
+                return ResourceManager.GetString("UIElement_HasParent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot call Arrange on a UIElement with infinite size or NaN. Parent of type &apos;{0}&apos; invokes the UIElement. Arrange called on element of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string UIElement_Layout_InfinityArrange {
+            get {
+                return ResourceManager.GetString("UIElement_Layout_InfinityArrange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UIElement.Measure(availableSize) cannot be called with NaN size..
+        /// </summary>
+        internal static string UIElement_Layout_NaNMeasure {
+            get {
+                return ResourceManager.GetString("UIElement_Layout_NaNMeasure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout measurement override of element &apos;{0}&apos; should not return NaN values as its DesiredSize..
+        /// </summary>
+        internal static string UIElement_Layout_NaNReturned {
+            get {
+                return ResourceManager.GetString("UIElement_Layout_NaNReturned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout measurement override of element &apos;{0}&apos; should not return PositiveInfinity as its DesiredSize, even if Infinity is passed in as available size..
+        /// </summary>
+        internal static string UIElement_Layout_PositiveInfinityReturned {
+            get {
+                return ResourceManager.GetString("UIElement_Layout_PositiveInfinityReturned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not an UIElement..
+        /// </summary>
+        internal static string UIElement_NotAnUIElement {
+            get {
+                return ResourceManager.GetString("UIElement_NotAnUIElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified UIElement is not a child of this UIElement..
+        /// </summary>
+        internal static string UIElement_NotChild {
+            get {
+                return ResourceManager.GetString("UIElement_NotChild", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected collection change action &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnexpectedCollectionChangeAction {
+            get {
+                return ResourceManager.GetString("UnexpectedCollectionChangeAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter is unexpected type &apos;{0}&apos;. Expected type is &apos;{1}&apos;..
+        /// </summary>
+        internal static string UnexpectedParameterType {
+            get {
+                return ResourceManager.GetString("UnexpectedParameterType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; language tag must be empty or must conform to grammar defined in IETF RFC 3066..
+        /// </summary>
+        internal static string XmlLangMalformed {
+            get {
+                return ResourceManager.GetString("XmlLangMalformed", resourceCulture);
             }
         }
     }

@@ -848,8 +848,7 @@ namespace System.Windows
 
             if (dp.ReadOnly)
             {
-                throw new InvalidOperationException(
-                    string.Format("'{0}' property was registered as read-only and cannot be modified without an authorization key.", dp.Name));
+                throw new InvalidOperationException(string.Format(Strings.ReadOnlyChangeNotAllowed, dp.Name));
             }
 
             // Get type-specific metadata for this property

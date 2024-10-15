@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Controls
 {
     /// <summary>
@@ -93,7 +95,7 @@ namespace System.Windows.Controls
         {
             if (AreDefinitionsLocked())
             {
-                throw new InvalidOperationException("Cannot modify 'RowDefinitionCollection' in read-only state.");
+                throw new InvalidOperationException(string.Format(Strings.GridCollection_CannotModifyReadOnly, nameof(RowDefinitionCollection)));
             }
         }
 

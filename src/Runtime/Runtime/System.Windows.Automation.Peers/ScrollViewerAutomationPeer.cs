@@ -14,6 +14,7 @@
 using System.Globalization;
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
+using OpenSilver.Internal;
 
 namespace System.Windows.Automation.Peers
 {
@@ -113,7 +114,7 @@ namespace System.Windows.Automation.Peers
 
             if (scrollHorizontally && !HorizontallyScrollable || scrollVertically && !VerticallyScrollable)
             {
-                throw new InvalidOperationException("Cannot perform operation.");
+                throw new InvalidOperationException(Strings.UIA_OperationCannotBePerformed);
             }
 
             switch (horizontalAmount)
@@ -133,7 +134,7 @@ namespace System.Windows.Automation.Peers
                 case ScrollAmount.NoAmount:
                     break;
                 default:
-                    throw new InvalidOperationException("Cannot perform operation.");
+                    throw new InvalidOperationException(Strings.UIA_OperationCannotBePerformed);
             }
 
             switch (verticalAmount)
@@ -153,7 +154,7 @@ namespace System.Windows.Automation.Peers
                 case ScrollAmount.NoAmount:
                     break;
                 default:
-                    throw new InvalidOperationException("Cannot perform operation.");
+                    throw new InvalidOperationException(Strings.UIA_OperationCannotBePerformed);
             }
         }
 
@@ -178,15 +179,14 @@ namespace System.Windows.Automation.Peers
 
             if (scrollHorizontally && !HorizontallyScrollable || scrollVertically && !VerticallyScrollable)
             {
-                throw new InvalidOperationException("Cannot perform operation.");
+                throw new InvalidOperationException(Strings.UIA_OperationCannotBePerformed);
             }
 
             if (scrollHorizontally && (horizontalPercent < 0.0) || (horizontalPercent > 100.0))
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(horizontalPercent),
-                    string.Format(
-                        "'{0}' parameter has value '{1}', which is not in the valid range of '{2}' to '{3}'.",
+                    string.Format(Strings.ScrollViewer_OutOfRange,
                         nameof(horizontalPercent),
                         horizontalPercent.ToString(CultureInfo.InvariantCulture),
                         "0",
@@ -196,8 +196,7 @@ namespace System.Windows.Automation.Peers
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(verticalPercent),
-                    string.Format(
-                        "'{0}' parameter has value '{1}', which is not in the valid range of '{2}' to '{3}'.",
+                    string.Format(Strings.ScrollViewer_OutOfRange,
                         nameof(verticalPercent),
                         verticalPercent.ToString(CultureInfo.InvariantCulture),
                         "0",

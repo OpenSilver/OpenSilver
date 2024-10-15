@@ -59,7 +59,7 @@ namespace System.Windows.Media
 
             if (null == s)
             {
-                throw new ArgumentException(string.Format("The object passed to '{0}' is not a valid type.", "ConvertFrom"), nameof(value));
+                throw new ArgumentException(string.Format(Strings.General_BadType, nameof(ConvertFrom)), nameof(value));
             }
 
             return Parsers.ParseColor(s, culture);

@@ -38,7 +38,7 @@ namespace System.ComponentModel
         public SortDescription(string propertyName, ListSortDirection direction)
         {
             if (direction != ListSortDirection.Ascending && direction != ListSortDirection.Descending)
-                throw new InvalidEnumArgumentException("direction", (int)direction, typeof(ListSortDirection));
+                throw new InvalidEnumArgumentException(nameof(direction), (int)direction, typeof(ListSortDirection));
 
             _propertyName = propertyName;
             _direction = direction;
@@ -83,7 +83,7 @@ namespace System.ComponentModel
                     throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(SortDescription)));
 
                 if (value < ListSortDirection.Ascending || value > ListSortDirection.Descending)
-                    throw new InvalidEnumArgumentException("value", (int)value, typeof(ListSortDirection));
+                    throw new InvalidEnumArgumentException(nameof(value), (int)value, typeof(ListSortDirection));
 
                 _direction = value;
             }

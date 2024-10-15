@@ -319,8 +319,7 @@ public sealed class Storyboard : Timeline
                     if (targetObject is not IFrameworkElement)
                     {
                         // The containing object is not an FE.
-                        throw new InvalidOperationException(
-                            $"No target was specified for '{currentTimeline.GetType()}'.");
+                        throw new InvalidOperationException(string.Format(Strings.Storyboard_NoTarget, currentTimeline.GetType()));
                     }
                 }
             }
@@ -328,8 +327,7 @@ public sealed class Storyboard : Timeline
             // See if we have a property name to use.
             if (currentPropertyPath == null)
             {
-                throw new InvalidOperationException(
-                    $"Must specify TargetProperty for '{currentTimeline.GetType()}'.");
+                throw new InvalidOperationException(string.Format(Strings.Storyboard_TargetPropertyRequired, currentTimeline.GetType()));
             }
 
             currentClock.SetParent(parentClock);
@@ -378,21 +376,18 @@ public sealed class Storyboard : Timeline
         }
         else
         {
-            throw new InvalidOperationException(
-                $"No applicable name scope exists to resolve the name '{targetName}'.");
+            throw new InvalidOperationException(string.Format(Strings.Storyboard_NoNameScope, targetName));
         }
 
         if (namedObject == null)
         {
-            throw new InvalidOperationException(
-                $"'{targetName}' name cannot be found in the name scope of '{fe.GetType()}'.");
+            throw new InvalidOperationException(string.Format(Strings.Storyboard_NameNotFound, targetName, fe.GetType()));
         }
 
         targetObject = namedObject as DependencyObject;
         if (targetObject == null)
         {
-            throw new InvalidOperationException(
-                $"'{targetName}' target object Name found but the object is not a valid target type.");
+            throw new InvalidOperationException(string.Format(Strings.Storyboard_TargetNameNotDependencyObject, targetName));
         }
 
         return targetObject;

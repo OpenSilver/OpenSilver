@@ -15,6 +15,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data;
@@ -203,7 +204,7 @@ public class MultiBinding : BindingBase
     {
         if (Converter is null && string.IsNullOrEmpty(StringFormat))
         {
-            throw new InvalidOperationException("Cannot set MultiBinding because MultiValueConverter must be specified.");
+            throw new InvalidOperationException(Strings.MultiBindingHasNoConverter);
         }
 
         for (int i = 0; i < Bindings.Count; ++i)
@@ -221,8 +222,7 @@ public class MultiBinding : BindingBase
             if (binding.UpdateSourceTrigger != UpdateSourceTrigger.PropertyChanged &&
                 binding.UpdateSourceTrigger != UpdateSourceTrigger.Default)
             {
-                throw new InvalidOperationException(
-                    "Cannot set UpdateSourceTrigger on inner Binding of MultiBinding. Only the default Immediate UpdateSourceTrigger is valid.");
+                throw new InvalidOperationException(Strings.NoUpdateSourceTriggerForInnerBindingOfMultiBinding);
             }
         }
     }

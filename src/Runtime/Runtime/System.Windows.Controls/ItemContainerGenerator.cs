@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Windows.Controls.Primitives;   // IItemContainerGenerator
 using System.Windows.Data;
 using System.Windows.Media;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls
@@ -97,7 +98,7 @@ namespace System.Windows.Controls
         ItemContainerGenerator IItemContainerGenerator.GetItemContainerGeneratorForPanel(Panel panel)
         {
             if (!panel.IsItemsHost)
-                throw new ArgumentException("Panel must have IsItemsHost set to true.", "panel");
+                throw new ArgumentException(Strings.PanelIsNotItemsHost, nameof(panel));
 
             // if panel came from an ItemsPresenter, use its generator
             ItemsPresenter ip = ItemsPresenter.FromPanel(panel);
@@ -123,7 +124,7 @@ namespace System.Windows.Controls
         IDisposable IItemContainerGenerator.StartAt(GeneratorPosition position, GeneratorDirection direction, bool allowStartAtRealizedItem)
         {
             if (_generator != null)
-                throw new InvalidOperationException("Cannot call StartAt when content generation is in progress.");
+                throw new InvalidOperationException(Strings.GenerationInProgress);
 
             _generator = new Generator(this, position, direction, allowStartAtRealizedItem);
             return _generator;
@@ -132,7 +133,7 @@ namespace System.Windows.Controls
         DependencyObject IItemContainerGenerator.GenerateNext(out bool isNewlyRealized)
         {
             if (_generator == null)
-                throw new InvalidOperationException("Must call GenerateNext while content generation is in progress.");
+                throw new InvalidOperationException(Strings.GenerationNotInProgress);
 
             return _generator.GenerateNext(false, out isNewlyRealized);
         }
@@ -171,9 +172,9 @@ namespace System.Windows.Controls
         private void Remove(GeneratorPosition position, int count, bool isRecycling)
         {
             if (position.Offset != 0)
-                throw new ArgumentException(string.Format("GeneratorPosition '{0},{1}' passed to Remove does not have Offset equal to 0.", position.Index, position.Offset), "position");
+                throw new ArgumentException(string.Format(Strings.RemoveRequiresOffsetZero, position.Index, position.Offset), nameof(position));
             if (count <= 0)
-                throw new ArgumentException(string.Format("'{0}' Count passed to Remove must be positive.", count), "count");
+                throw new ArgumentException(string.Format(Strings.RemoveRequiresPositiveCount, count), nameof(count));
 
             if (_itemMap == null)
             {
@@ -201,7 +202,7 @@ namespace System.Windows.Controls
             for (; block != _itemMap; block = block.Next)
             {
                 if (!(block is RealizedItemBlock))
-                    throw new InvalidOperationException(string.Format("Range of Remove({0},{1}) cannot include items without a corresponding user interface element.", index, count));
+                    throw new InvalidOperationException(string.Format(Strings.CannotRemoveUnrealizedItems, index, count));
 
                 if (offsetR < block.ContainerCount)
                     break;
@@ -229,7 +230,7 @@ namespace System.Windows.Controls
                     }
                     else if (_containerType != container.GetType())
                     {
-                        throw new InvalidOperationException("ItemsHost panel cannot use VirtualizationMode == Recycling because the IGeneratorHost.GetContainerForItemOverride method returns containers that have different types.");
+                        throw new InvalidOperationException(Strings.CannotRecyleHeterogeneousTypes);
                     }
 
                     _recyclableContainers.Enqueue(container);
@@ -458,7 +459,7 @@ namespace System.Windows.Controls
         public object ItemFromContainer(DependencyObject container)
         {
             if (container == null)
-                throw new ArgumentNullException("container");
+                throw new ArgumentNullException(nameof(container));
 
             object item = container.ReadLocalValue(ItemForItemContainerProperty);
 
@@ -507,7 +508,7 @@ namespace System.Windows.Controls
         {
             if (container == null)
             {
-                throw new ArgumentNullException("container");
+                throw new ArgumentNullException(nameof(container));
             }
 
             int index;
@@ -1456,7 +1457,7 @@ namespace System.Windows.Controls
             {
                 // There's no way of knowing which unrealized block it belonged to, so
                 // the data structure can't be updated correctly.  Sound the alarm.
-                throw new InvalidOperationException("Cannot find removed item.");
+                throw new InvalidOperationException(Strings.CannotFindRemovedItem);
             }
         }
 
@@ -1563,7 +1564,7 @@ namespace System.Windows.Controls
             {
                 index = ItemsInternal.IndexOf(item);
                 if (index < 0)
-                    throw new InvalidOperationException(string.Format("After a CollectionChange.Add event, Items collection does not contain the added item '{0}'.\n This could happen if the event sender supplied incorrect information in CollectionChangedEventArgs.", item));
+                    throw new InvalidOperationException(string.Format(Strings.CollectionAddEventMissingItem, item));
             }
         }
 
@@ -1577,25 +1578,25 @@ namespace System.Windows.Controls
             {
                 case NotifyCollectionChangedAction.Add:
                     if (args.NewItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     OnItemAdded(args.NewItems[0], args.NewStartingIndex);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     if (args.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     OnItemRemoved(args.OldItems[0], args.OldStartingIndex);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
                     if (args.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     OnItemReplaced(args.OldItems[0], args.NewItems[0], args.NewStartingIndex);
                     break;
 
                 case NotifyCollectionChangedAction.Move:
                     if (args.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     OnItemMoved(args.OldItems[0], args.OldStartingIndex, args.NewStartingIndex);
                     break;
 
@@ -1604,7 +1605,7 @@ namespace System.Windows.Controls
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", args.Action));
+                    throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, args.Action));
             }
         }
 

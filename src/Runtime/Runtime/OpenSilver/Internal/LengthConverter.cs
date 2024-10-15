@@ -163,7 +163,7 @@ internal sealed class LengthConverter : TypeConverter
         }
         catch (FormatException)
         {
-            throw new FormatException($"'{valueString}' string cannot be converted to Length.");
+            throw new FormatException(string.Format(Strings.LengthFormatError, valueString));
         }
     }
 

@@ -41,7 +41,7 @@ public struct Size : IFormattable
     {
         if (width < 0 || height < 0)
         {
-            throw new ArgumentException("Width and Height cannot be negative.");
+            throw new ArgumentException(Strings.Size_WidthAndHeightCannotBeNegative);
         }
 
         _width = width;
@@ -112,7 +112,7 @@ public struct Size : IFormattable
         {
             if (value < 0)
             {
-                throw new ArgumentException("Height cannot be negative.");
+                throw new ArgumentException(Strings.Size_HeightCannotBeNegative);
             }
 
             _height = value;
@@ -136,7 +136,7 @@ public struct Size : IFormattable
         {
             if (value < 0)
             {
-                throw new ArgumentException("Width cannot be negative.");
+                throw new ArgumentException(Strings.Size_WidthCannotBeNegative);
             }
 
             _width = value;

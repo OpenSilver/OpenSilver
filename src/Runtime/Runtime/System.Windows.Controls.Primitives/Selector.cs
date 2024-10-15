@@ -601,7 +601,7 @@ namespace System.Windows.Controls.Primitives
             {
                 case NotifyCollectionChangedAction.Add:
                     if (e.NewItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
 
                     SelectionChange.Begin();
 
@@ -622,14 +622,14 @@ namespace System.Windows.Controls.Primitives
 
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
 
                     RemoveFromSelection(e);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
                     if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
 
                     // RemoveFromSelection works, with one wrinkle.  If the
                     // replaced item was selected, the old item is in _selectedItems,
@@ -692,7 +692,7 @@ namespace System.Windows.Controls.Primitives
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                    throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, e.Action));
             }
         }
 
@@ -1014,7 +1014,7 @@ namespace System.Windows.Controls.Primitives
 
             if (selectable == false && selected)
             {
-                throw new InvalidOperationException("Item is not selectable.");
+                throw new InvalidOperationException(Strings.CannotSelectNotSelectableItem);
             }
 
             SelectionChange.Begin();
@@ -1124,7 +1124,7 @@ namespace System.Windows.Controls.Primitives
 
             if (!CanSelectMultiple)
             {
-                throw new InvalidOperationException("Can only change SelectedItems collection in multiple selection modes. Use SelectedItem in single select modes.");
+                throw new InvalidOperationException(Strings.ChangingCollectionNotSupported);
             }
 
             SelectionChange.Begin();
@@ -1136,14 +1136,14 @@ namespace System.Windows.Controls.Primitives
                 {
                     case NotifyCollectionChangedAction.Add:
                         if (e.NewItems.Count != 1)
-                            throw new NotSupportedException("Range actions are not supported.");
+                            throw new NotSupportedException(Strings.RangeActionsNotSupported);
 
                         SelectionChange.Select(NewUnresolvedItemInfo(e.NewItems[0]), false /* assumeInItemsCollection */);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
                         if (e.OldItems.Count != 1)
-                            throw new NotSupportedException("Range actions are not supported.");
+                            throw new NotSupportedException(Strings.RangeActionsNotSupported);
 
                         SelectionChange.Unselect(NewUnresolvedItemInfo(e.OldItems[0]));
                         break;
@@ -1165,7 +1165,7 @@ namespace System.Windows.Controls.Primitives
 
                     case NotifyCollectionChangedAction.Replace:
                         if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
-                            throw new NotSupportedException("Range actions are not supported.");
+                            throw new NotSupportedException(Strings.RangeActionsNotSupported);
 
                         SelectionChange.Unselect(NewUnresolvedItemInfo(e.OldItems[0]));
                         SelectionChange.Select(NewUnresolvedItemInfo(e.NewItems[0]), false /* assumeInItemsCollection */);
@@ -1175,7 +1175,7 @@ namespace System.Windows.Controls.Primitives
                         break; // order within SelectedItems doesn't matter
 
                     default:
-                        throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                        throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, e.Action));
                 }
 
                 SelectionChange.End();

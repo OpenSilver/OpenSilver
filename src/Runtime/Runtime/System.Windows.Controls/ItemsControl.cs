@@ -725,8 +725,7 @@ namespace System.Windows.Controls
                 // verify style is appropriate before applying it
                 if (!style.TargetType.IsInstanceOfType(container))
                 {
-                    throw new InvalidOperationException(
-                        $"A style intended for type '{style.TargetType.Name}' cannot be applied to type '{container.GetType().Name}'.");
+                    throw new InvalidOperationException(string.Format(Strings.StyleForWrongType, style.TargetType.Name, container.GetType().Name));
                 }
 
                 feContainer.Style = style;
@@ -830,7 +829,7 @@ namespace System.Windows.Controls
 
             if (this.ItemTemplate != null && !string.IsNullOrWhiteSpace(this.DisplayMemberPath))
             {
-                throw new InvalidOperationException("Cannot set both DisplayMemberPath and ItemTemplate.");
+                throw new InvalidOperationException(Strings.DisplayMemberPathAndItemTemplateDefined);
             }
 
             DataTemplate template = this.SelectTemplate(element, item);

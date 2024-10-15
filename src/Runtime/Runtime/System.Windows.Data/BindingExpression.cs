@@ -56,7 +56,7 @@ namespace System.Windows.Data
         {
             if (dp.ReadOnly)
             {
-                throw new ArgumentException($"'{dp.Name}' property cannot be data-bound.", nameof(dp));
+                throw new ArgumentException(string.Format(Strings.PropertyNotBindable, dp.Name), nameof(dp));
             }
 
             // create the BindingExpression
@@ -65,7 +65,7 @@ namespace System.Windows.Data
             // Two-way Binding with an empty path makes no sense
             if (bindExpr.IsReflective && (binding.Path.Path == string.Empty || binding.Path.Path == "."))
             {
-                throw new InvalidOperationException("Two-way binding requires Path.");
+                throw new InvalidOperationException(Strings.TwoWayBindingNeedsPath);
             }
 
             return bindExpr;

@@ -392,7 +392,7 @@ public struct Matrix : IFormattable
 
         if (DoubleUtil.IsZero(determinant))
         {
-            throw new InvalidOperationException("Transform is not invertible.");
+            throw new InvalidOperationException(Strings.Transform_NotInvertible);
         }
 
         // Inversion does not change the type of a matrix.

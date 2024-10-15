@@ -162,7 +162,7 @@ namespace System.Windows.Controls
             }
             else
             {
-                throw new NotSupportedException("Can only call SelectAll when SelectionMode is Multiple or Extended.");
+                throw new NotSupportedException(Strings.ListBoxSelectAllSelectionMode);
             }
         }
 

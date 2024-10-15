@@ -69,7 +69,7 @@ internal sealed class WeakReferenceList<T> : CopyOnWriteList<WeakReference<T>>, 
 
         object IEnumerator.Current => Current;
 
-        public T Current => _current ?? throw new InvalidOperationException("No current object to return.");
+        public T Current => _current ?? throw new InvalidOperationException(Strings.Enumerator_VerifyContext);
 
         public bool MoveNext()
         {

@@ -181,7 +181,7 @@ internal abstract class TimelineClock
         Duration effectiveDuration = EffectiveDuration;
         if (effectiveDuration == Duration.Forever)
         {
-            throw new InvalidOperationException("Cannot determine Storyboard Duration.");
+            throw new InvalidOperationException(Strings.Timing_SkipToFillDestinationIndefinite);
         }
 
         InternalSeek(effectiveDuration.TimeSpan + BeginTime, true);
@@ -416,7 +416,7 @@ internal abstract class TimelineClock
     {
         if (!IsRoot)
         {
-            throw new InvalidOperationException("Operation is not allowed on a non-root Storyboard.");
+            throw new InvalidOperationException(Strings.Timing_MustBeRoot);
         }
     }
 

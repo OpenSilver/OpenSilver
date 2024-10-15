@@ -161,14 +161,14 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
         //  can't be checked until Style is sealed.
         if (_targetType == null)
         {
-            throw new InvalidOperationException("Must have non-null value for 'TargetType'.");
+            throw new InvalidOperationException(string.Format(Strings.NullPropertyIllegal, nameof(TargetType)));
         }
 
         if (_basedOn != null)
         {
             if (_basedOn.TargetType == null || !_basedOn.TargetType.IsAssignableFrom(_targetType))
             {
-                throw new InvalidOperationException($"Can only base on a Style with target type that is base type '{_targetType.Name}'.");
+                throw new InvalidOperationException(string.Format(Strings.MustBaseOnStyleOfABaseType, _targetType.Name));
             }
         }
 
@@ -198,14 +198,13 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
     {
         if (TargetType == null)
         {
-            throw new InvalidOperationException("Must have non-null value for TargetType.");
+            throw new InvalidOperationException(string.Format(Strings.NullPropertyIllegal, nameof(TargetType)));
         }
 
         Type elementType = element.GetType();
         if (!TargetType.IsAssignableFrom(elementType))
         {
-            throw new InvalidOperationException(
-                $"'{TargetType.Name}' TargetType does not match type of element '{elementType.Name}'.");
+            throw new InvalidOperationException(string.Format(Strings.StyleTargetTypeMismatchWithElement, TargetType.Name, elementType.Name));
         }
     }
 

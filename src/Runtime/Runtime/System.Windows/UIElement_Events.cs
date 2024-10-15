@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -127,7 +128,7 @@ namespace System.Windows
 
             if (!routedEvent.IsLegalHandler(handler))
             {
-                throw new ArgumentException("Handler type is mismatched.");
+                throw new ArgumentException(Strings.HandlerTypeIllegal);
             }
 
             EnsureEventHandlersStore();
@@ -169,7 +170,7 @@ namespace System.Windows
 
             if (!routedEvent.IsLegalHandler(handler))
             {
-                throw new ArgumentException("Handler type is mismatched.");
+                throw new ArgumentException(Strings.HandlerTypeIllegal);
             }
 
             EventHandlersStore store = _eventHandlersStore;
@@ -218,7 +219,7 @@ namespace System.Windows
 
             if (args.RoutedEvent != route.RoutedEvent)
             {
-                throw new ArgumentException("RoutedEvent in RoutedEventArgs and EventRoute are mismatched.");
+                throw new ArgumentException(Strings.Mismatched_RoutedEvent);
             }
 
             if (args.RoutedEvent.RoutingStrategy == RoutingStrategy.Direct)
@@ -243,7 +244,7 @@ namespace System.Windows
                     // that we will process.
                     if (cElements++ > MAX_ELEMENTS_IN_ROUTE)
                     {
-                        throw new InvalidOperationException("Potential cycle in tree found while building the event route.");
+                        throw new InvalidOperationException(Strings.TreeLoop);
                     }
 
                     // Invoke BuildRouteCore

@@ -40,7 +40,7 @@ namespace System.Windows.Data
         internal CollectionView(IEnumerable collection, int moveToFirst)
         {
             if (collection == null)
-                throw new ArgumentNullException("collection");
+                throw new ArgumentNullException(nameof(collection));
 
             SetFlag(CollectionViewFlags.AllowsCrossThreadChanges, false);
 
@@ -101,7 +101,7 @@ namespace System.Windows.Data
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
 
                 if (_culture != value)
                 {
@@ -317,7 +317,7 @@ namespace System.Windows.Data
         {
             IEditableCollectionView ecv = this as IEditableCollectionView;
             if (ecv != null && (ecv.IsAddingNew || ecv.IsEditingItem))
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "DeferRefresh"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(DeferRefresh)));
 
             ++_deferLevel;
             return new DeferHelper(this);
@@ -435,7 +435,7 @@ namespace System.Windows.Data
             VerifyRefreshNotDeferred();
 
             if (position < -1 || position > Count)
-                throw new ArgumentOutOfRangeException("position");
+                throw new ArgumentOutOfRangeException(nameof(position));
 
             // ignore request to move onto the placeholder
             IEditableCollectionView ecv = this as IEditableCollectionView;
@@ -506,7 +506,7 @@ namespace System.Windows.Data
         {
             IEditableCollectionView ecv = this as IEditableCollectionView;
             if (ecv != null && (ecv.IsAddingNew || ecv.IsEditingItem))
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Refresh"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(Refresh)));
 
             RefreshInternal();
         }
@@ -586,7 +586,7 @@ namespace System.Windows.Data
         {
             // only check lower bound because Count could be expensive
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             return EnumerableWrapper[index];
         }
@@ -722,7 +722,7 @@ namespace System.Windows.Data
         protected virtual void RefreshOverride()
         {
             if (SortDescriptions.Count > 0)
-                throw new InvalidOperationException(string.Format("If SortDescriptions is overridden in derived classes, then must also override '{0}'.", "Refresh()"));
+                throw new InvalidOperationException(string.Format(Strings.ImplementOtherMembersWithSort, "Refresh()"));
 
             object oldCurrentItem = _currentItem;
             bool oldIsCurrentAfterLast = CheckFlag(CollectionViewFlags.IsCurrentAfterLast);
@@ -777,7 +777,7 @@ namespace System.Windows.Data
             VerifyRefreshNotDeferred();
 
             if (SortDescriptions.Count > 0)
-                throw new InvalidOperationException(string.Format("If SortDescriptions is overridden in derived classes, then must also override '{0}'.", "GetEnumerator()"));
+                throw new InvalidOperationException(string.Format(Strings.ImplementOtherMembersWithSort, "GetEnumerator()"));
 
             return EnumerableWrapper.GetEnumerator();
         }
@@ -795,7 +795,7 @@ namespace System.Windows.Data
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             if (args == null)
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(args));
 
             unchecked
             { ++_timestamp; }    // invalidate enumerators because of a change
@@ -909,7 +909,7 @@ namespace System.Windows.Data
         protected virtual void OnCurrentChanging(CurrentChangingEventArgs args)
         {
             if (args == null)
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(args));
 
             if (_currentChangedMonitor.Busy)
             {
@@ -1134,7 +1134,7 @@ namespace System.Windows.Data
             // state of the underlying data.
 
             if (IsRefreshDeferred)
-                throw new InvalidOperationException("Cannot change or check the contents or Current position of CollectionView while Refresh is being deferred.");
+                throw new InvalidOperationException(Strings.NoCheckOrChangeWhenDeferred);
         }
 
         internal void InvalidateEnumerableWrapper()
@@ -1346,7 +1346,7 @@ namespace System.Windows.Data
             public bool MoveNext()
             {
                 if (_timestamp != _collectionView.Timestamp)
-                    throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
+                    throw new InvalidOperationException(Strings.EnumeratorVersionChanged);
 
                 switch (_position)
                 {
@@ -1525,33 +1525,33 @@ namespace System.Windows.Data
             {
                 case NotifyCollectionChangedAction.Add:
                     if (e.NewItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     if (e.OldStartingIndex < 0)
-                        throw new InvalidOperationException("Collection Remove event must specify item position.");
+                        throw new InvalidOperationException(Strings.RemovedItemNotFound);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
                     if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     break;
 
                 case NotifyCollectionChangedAction.Move:
                     if (e.NewItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     if (e.NewStartingIndex < 0)
-                        throw new InvalidOperationException("Cannot Move items to an unknown position (-1).");
+                        throw new InvalidOperationException(Strings.CannotMoveToUnknownPosition);
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                    throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, e.Action));
             }
         }
 

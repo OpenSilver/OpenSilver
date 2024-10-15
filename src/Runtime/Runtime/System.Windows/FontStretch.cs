@@ -11,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -105,7 +105,7 @@ namespace System.Windows
         {
             if (stretchValue < 1 || stretchValue > 9)
             {
-                throw new ArgumentOutOfRangeException(nameof(stretchValue), "The parameter value must be between '1' and '9'.");
+                throw new ArgumentOutOfRangeException(nameof(stretchValue), string.Format(Strings.ParameterMustBeBetween, 1, 9));
             }
 
             return new FontStretch(stretchValue);

@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Windows;
+using OpenSilver.Internal;
 
 namespace OpenSilver.Utility
 {
@@ -155,9 +156,7 @@ namespace OpenSilver.Utility
             else
             {
                 // newMap is smaller than previous map
-                throw new ArgumentException(
-                    string.Format("Cannot promote from '{0}' to '{1}' because the target map is too small.", ToString(), newMap.ToString()),
-                    nameof(newMap));
+                throw new ArgumentException(string.Format(Strings.FrugalMap_TargetMapCannotHoldAllData, ToString(), newMap.ToString()), nameof(newMap));
             }
         }
 
@@ -262,7 +261,7 @@ namespace OpenSilver.Utility
         public override void Promote(FrugalMapBase newMap)
         {
             // Should never get here
-            throw new InvalidOperationException("Cannot promote from Hashtable.");
+            throw new InvalidOperationException(Strings.FrugalMap_CannotPromoteBeyondHashtable);
         }
 
         // Size of this data store
@@ -439,9 +438,7 @@ namespace OpenSilver.Utility
                     continue;
                 }
                 // newMap is smaller than previous map
-                throw new ArgumentException(
-                    string.Format("Cannot promote from '{0}' to '{1}' because the target map is too small.", ToString(), newMap.ToString()),
-                    nameof(newMap));
+                throw new ArgumentException(string.Format(Strings.FrugalMap_TargetMapCannotHoldAllData, ToString(), newMap.ToString()), nameof(newMap));
             }
         }
 
@@ -552,7 +549,7 @@ namespace OpenSilver.Utility
                         }
                         else
                         {
-                            throw new InvalidOperationException("Cannot promote from Hashtable.");
+                            throw new InvalidOperationException(Strings.FrugalMap_CannotPromoteBeyondHashtable);
                         }
 
                         // Extract the values from the old store and insert them into the new store

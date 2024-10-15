@@ -13,6 +13,7 @@
 
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
+using OpenSilver.Internal;
 
 namespace System.Windows.Automation.Peers
 {
@@ -78,8 +79,7 @@ namespace System.Windows.Automation.Peers
         /// </summary>
         /// <param name="val">Value to set the UI to, as an object</param>
         /// <returns>true if the UI element was successfully set to the specified value</returns>
-        void IRangeValueProvider.SetValue(double val)
-            => throw new InvalidOperationException("Cannot perform operation.");
+        void IRangeValueProvider.SetValue(double val) => throw new InvalidOperationException(Strings.UIA_OperationCannotBePerformed);
 
         /// <summary>
         /// Indicates that the value can only be read, not modified.

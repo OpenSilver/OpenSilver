@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Controls;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data
@@ -160,7 +161,7 @@ namespace System.Windows.Data
             VerifyRefreshNotDeferred();
 
             if (position < -1 || position > InternalCount)
-                throw new ArgumentOutOfRangeException("position");
+                throw new ArgumentOutOfRangeException(nameof(position));
 
 
             if (position != CurrentPosition || !IsCurrentInSync)
@@ -399,7 +400,7 @@ namespace System.Windows.Data
             set
             {
                 if (IsAddingNew || IsEditingItem)
-                    throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Filter"));
+                    throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(Filter)));
 
                 base.Filter = value;
             }
@@ -421,7 +422,7 @@ namespace System.Windows.Data
             set
             {
                 if (IsAddingNew || IsEditingItem)
-                    throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "CustomSort"));
+                    throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(CustomSort)));
                 _customSort = value;
 
                 SetSortDescriptions(null);
@@ -443,7 +444,7 @@ namespace System.Windows.Data
                 if (!CanGroup)
                     throw new NotSupportedException();
                 if (IsAddingNew || IsEditingItem)
-                    throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Grouping"));
+                    throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, "Grouping"));
 
                 _group.GroupBySelector = value;
 
@@ -502,7 +503,7 @@ namespace System.Windows.Data
                 VerifyRefreshNotDeferred();
 
                 if (value != _newItemPlaceholderPosition && IsAddingNew)
-                    throw new InvalidOperationException(string.Format("'{0}' is not allowed during a transaction begun by '{1}'.", "NewItemPlaceholderPosition", "AddNew"));
+                    throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(NewItemPlaceholderPosition), nameof(AddNew)));
 
                 if (value != _newItemPlaceholderPosition && _isRemoving)
                 {
@@ -676,7 +677,7 @@ namespace System.Windows.Data
             CommitNew();        // implicitly close a previous AddNew
 
             if (!CanAddNew)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed for this view.", "AddNew"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedForView, nameof(AddNew)));
 
             return AddNewCommon(_itemConstructor.Invoke(null));
         }
@@ -699,7 +700,7 @@ namespace System.Windows.Data
             CommitNew();        // implicitly close a previous AddNew
 
             if (!CanAddNewItem)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed for this view.", "AddNewItem"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedForView, nameof(AddNewItem)));
 
             return AddNewCommon(newItem);
         }
@@ -784,7 +785,7 @@ namespace System.Windows.Data
         public void CommitNew()
         {
             if (IsEditingItem)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during a transaction begun by '{1}'.", "CommitNew", "EditItem"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CommitNew), nameof(EditItem)));
             VerifyRefreshNotDeferred();
 
             if (_newItem == NoNewItem)
@@ -900,7 +901,7 @@ namespace System.Windows.Data
         public void CancelNew()
         {
             if (IsEditingItem)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during a transaction begun by '{1}'.", "CancelNew", "EditItem"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CancelNew), nameof(EditItem)));
             VerifyRefreshNotDeferred();
 
             if (_newItem == NoNewItem)
@@ -1006,7 +1007,7 @@ namespace System.Windows.Data
         public void RemoveAt(int index)
         {
             if (IsEditingItem || IsAddingNew)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "RemoveAt"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(RemoveAt)));
             VerifyRefreshNotDeferred();
 
             RemoveImpl(GetItemAt(index), index);
@@ -1018,7 +1019,7 @@ namespace System.Windows.Data
         public void Remove(object item)
         {
             if (IsEditingItem || IsAddingNew)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Remove"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(Remove)));
             VerifyRefreshNotDeferred();
 
             int index = InternalIndexOf(item);
@@ -1031,7 +1032,7 @@ namespace System.Windows.Data
         void RemoveImpl(object item, int index)
         {
             if (item == CollectionView.NewItemPlaceholder)
-                throw new InvalidOperationException("Removing the NewItem placeholder is not allowed.");
+                throw new InvalidOperationException(Strings.RemovingPlaceholder);
 
             // the pending changes may have moved (or even removed) the
             // item.   Verify the index.
@@ -1101,7 +1102,7 @@ namespace System.Windows.Data
             VerifyRefreshNotDeferred();
 
             if (item == NewItemPlaceholder)
-                throw new ArgumentException("Editing the NewItem placeholder is not allowed.", "item");
+                throw new ArgumentException(Strings.CannotEditPlaceholder, nameof(item));
 
             if (IsAddingNew)
             {
@@ -1129,7 +1130,7 @@ namespace System.Windows.Data
         public void CommitEdit()
         {
             if (IsAddingNew)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during a transaction begun by '{1}'.", "CommitEdit", "AddNew"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CommitEdit), nameof(AddNew)));
             VerifyRefreshNotDeferred();
 
             if (_editItem == null)
@@ -1238,7 +1239,7 @@ namespace System.Windows.Data
         public void CancelEdit()
         {
             if (IsAddingNew)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during a transaction begun by '{1}'.", "CancelEdit", "AddNew"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CancelEdit), nameof(AddNew)));
             VerifyRefreshNotDeferred();
 
             if (_editItem == null)
@@ -1252,7 +1253,7 @@ namespace System.Windows.Data
                 ieo.CancelEdit();
             }
             else
-                throw new InvalidOperationException("CancelEdit is not supported for the current edit item.");
+                throw new InvalidOperationException(Strings.CancelEditNotSupported);
         }
 
         private void ImplicitlyCancelEdit()
@@ -1348,7 +1349,7 @@ namespace System.Windows.Data
         protected override void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             if (args == null)
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(args));
 
             ValidateCollectionChangedEventArgs(args);
 
@@ -2086,7 +2087,7 @@ namespace System.Windows.Data
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                    throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, e.Action));
 
             }
         }
@@ -2169,31 +2170,31 @@ namespace System.Windows.Data
             {
                 case NotifyCollectionChangedAction.Add:
                     if (e.NewItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
                     if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     break;
 
                 case NotifyCollectionChangedAction.Move:
                     if (e.NewItems.Count != 1)
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     if (e.NewStartingIndex < 0)
-                        throw new InvalidOperationException("Cannot Move items to an unknown position (-1).");
+                        throw new InvalidOperationException(Strings.CannotMoveToUnknownPosition);
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
+                    throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, e.Action));
             }
         }
 
@@ -2300,21 +2301,21 @@ namespace System.Windows.Data
 
             // validate input
             if (index < -1 || index > ilFull.Count)
-                throw new InvalidOperationException(string.Format("'{0}' index in collection change event is not valid for collection of size '{1}'.", index, ilFull.Count));
+                throw new InvalidOperationException(string.Format(Strings.CollectionChangeIndexOutOfRange, index, ilFull.Count));
 
             if (action == NotifyCollectionChangedAction.Add)
             {
                 if (index >= 0)
                 {
                     if (!ItemsControl.EqualsEx(item, ilFull[index]))
-                        throw new InvalidOperationException(string.Format("Added item does not appear at given index '{0}'.", index));
+                        throw new InvalidOperationException(string.Format(Strings.AddedItemNotAtIndex, index));
                 }
                 else
                 {
                     // event didn't specify index - determine it the hard way
                     index = ilFull.IndexOf(item);
                     if (index < 0)
-                        throw new InvalidOperationException("A collection Add event refers to item that does not belong to collection.");
+                        throw new InvalidOperationException(Strings.AddedItemNotInCollection);
                 }
             }
 
@@ -2540,7 +2541,7 @@ namespace System.Windows.Data
         private void SortDescriptionsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (IsAddingNew || IsEditingItem)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Sorting"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, "Sorting"));
 
             // adding to SortDescriptions overrides custom sort
             if (_sort.Count > 0)
@@ -2629,7 +2630,7 @@ namespace System.Windows.Data
         void OnGroupByChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (IsAddingNew || IsEditingItem)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Grouping"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, "Grouping"));
 
             // This is a huge change.  Just refresh the view.
             RefreshOrDefer();
@@ -2639,7 +2640,7 @@ namespace System.Windows.Data
         void OnGroupDescriptionChanged(object sender, EventArgs e)
         {
             if (IsAddingNew || IsEditingItem)
-                throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Grouping"));
+                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, "Grouping"));
 
             // This is a huge change.  Just refresh the view.
             RefreshOrDefer();

@@ -306,7 +306,7 @@ namespace System.Windows.Controls
                 cw.IsModal = (bool)e.OldValue;
                 cw._ignoreIsModalChanged = false;
 
-                throw new InvalidOperationException("Cannot change IsModal when ChildWindow is open.");
+                throw new InvalidOperationException(SR.ChildWindow_CannotChangeModalState);
             }
 
             if ((bool)e.NewValue)

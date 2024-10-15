@@ -17,6 +17,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls.Primitives;
 
@@ -310,7 +311,7 @@ internal sealed class TransformLayer : PopupLayer
 
         if (child.InternalVisualParent is not null)
         {
-            throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+            throw new ArgumentException(Strings.UIElement_HasParent);
         }
 
         HasVisualChildren = true;

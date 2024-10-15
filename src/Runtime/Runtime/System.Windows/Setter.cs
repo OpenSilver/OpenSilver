@@ -17,6 +17,7 @@ using System.Xaml.Markup;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows;
 
@@ -98,9 +99,9 @@ public sealed class Setter : SetterBase, ISupportInitialize
                 return;
             }
 
-            if (value is BindingExpression)
+            if (value is Expression)
             {
-                throw new ArgumentException("BindingExpression type is not a valid Style value.");
+                throw new ArgumentException(Strings.StyleValueOfExpressionNotSupported);
             }
 
             _value = value;
@@ -120,7 +121,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
         if (dp == null)
         {
-            throw new ArgumentException("Must have non-null value for 'Setter.Property'.");
+            throw new ArgumentException(string.Format(Strings.NullPropertyIllegal, "Setter.Property"));
         }
 
         if (dp.IsObjectType || !dp.IsValidValue(value))
@@ -149,7 +150,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
 
     private void CheckValidProperty(DependencyProperty property)
     {
-        if (property == null)
+        if (property is null)
         {
             throw new ArgumentNullException(nameof(property));
         }
@@ -158,8 +159,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
         {
             // Note: Silverlight allows this, but will crash as soon as
             // the style is used 2 times in the visual tree.
-            throw new InvalidOperationException(
-                $"'{FrameworkElement.NameProperty.Name}' property cannot be set in the current element's Style.");
+            throw new InvalidOperationException(string.Format(Strings.CannotHavePropertyInStyle, FrameworkElement.NameProperty.Name));
         }
     }
 

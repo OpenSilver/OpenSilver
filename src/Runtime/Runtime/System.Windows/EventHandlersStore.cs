@@ -11,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -54,7 +54,7 @@ namespace System.Windows
             }
             if (!routedEvent.IsLegalHandler(handler))
             {
-                throw new ArgumentException("Handler type is mismatched.");
+                throw new ArgumentException(Strings.HandlerTypeIllegal);
             }
 
             // Create a new RoutedEventHandler
@@ -91,7 +91,7 @@ namespace System.Windows
             }
             if (!routedEvent.IsLegalHandler(handler))
             {
-                throw new ArgumentException("Handler type is mismatched.");
+                throw new ArgumentException(Strings.HandlerTypeIllegal);
             }
 
             if (_entries.TryGetValue(routedEvent, out List<RoutedEventHandlerInfo> handlers) && handlers != null)

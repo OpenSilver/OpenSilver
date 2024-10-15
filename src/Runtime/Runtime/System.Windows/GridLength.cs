@@ -13,6 +13,7 @@
 
 using System;
 using System.Globalization;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -54,11 +55,11 @@ namespace System.Windows
         {
             if (double.IsNaN(value))
             {
-                throw new ArgumentException($"'{value}' parameter cannot be NaN.", nameof(value));
+                throw new ArgumentException(string.Format(Strings.InvalidCtorParameterNoNaN, nameof(value)));
             }
             if (double.IsInfinity(value))
             {
-                throw new ArgumentException($"'{value}' parameter cannot be Infinity.", nameof(value));
+                throw new ArgumentException(string.Format(Strings.InvalidCtorParameterNoInfinity, nameof(value)));
             }
             if (value < 0.0)
             {
@@ -68,9 +69,7 @@ namespace System.Windows
                 && type != GridUnitType.Pixel
                 && type != GridUnitType.Star)
             {
-                throw new ArgumentException(
-                    $"'{type}' parameter is not valid. Valid values are GridUnitType.Auto, GridUnitType.Pixel, or GridUnitType.Star.",
-                    nameof(type));
+                throw new ArgumentException(string.Format(Strings.InvalidCtorParameterUnknownGridUnitType, nameof(type)));
             }
 
             _unitValue = type == GridUnitType.Auto ? 1.0 : value;

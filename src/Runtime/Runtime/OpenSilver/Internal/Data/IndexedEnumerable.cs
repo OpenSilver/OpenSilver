@@ -209,7 +209,7 @@ namespace OpenSilver.Internal.Data
 
                 if (index < 0)
                 {
-                    throw new ArgumentOutOfRangeException("index"); // validating the index argument
+                    throw new ArgumentOutOfRangeException(nameof(index)); // validating the index argument
                 }
 
                 int moveBy = (index - _cachedIndex);
@@ -242,7 +242,7 @@ namespace OpenSilver.Internal.Data
                 // moved beyond the end of the enumerator?
                 if (moveBy != 0)
                 {
-                    throw new ArgumentOutOfRangeException("index"); // validating the index argument
+                    throw new ArgumentOutOfRangeException(nameof(index)); // validating the index argument
                 }
 
                 CacheCurrentItem(index, _enumerator.Current);
@@ -319,7 +319,7 @@ namespace OpenSilver.Internal.Data
                     {
                         // The number of elements in the source ICollection is greater than
                         // the available space from index to the end of the destination array.
-                        throw new ArgumentException("Number of elements in source Enumerable is greater than available space from index to the end of destination array.", "index");
+                        throw new ArgumentException(Strings.CopyToNotEnoughSpace, nameof(index));
                     }
                 }
             }
@@ -707,7 +707,7 @@ namespace OpenSilver.Internal.Data
             void IEnumerator.Reset()
             {
                 if (_indexedEnumerable._enumerable == null)
-                    throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
+                    throw new InvalidOperationException(Strings.EnumeratorVersionChanged);
 
                 Dispose();
                 _enumerator = _enumerable.GetEnumerator();
@@ -718,7 +718,7 @@ namespace OpenSilver.Internal.Data
                 bool returnValue;
 
                 if (_indexedEnumerable._enumerable == null)
-                    throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
+                    throw new InvalidOperationException(Strings.EnumeratorVersionChanged);
 
                 if (_filterCallback == null)
                 {

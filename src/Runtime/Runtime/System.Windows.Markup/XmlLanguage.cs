@@ -13,6 +13,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using OpenSilver.Internal;
 
 namespace System.Windows.Markup
 {
@@ -157,7 +158,7 @@ namespace System.Windows.Markup
         {
             if (ietfLanguageTag == null)
             {
-                throw new ArgumentNullException("ietfLanguageTag");
+                throw new ArgumentNullException(nameof(ietfLanguageTag));
             }
 
             if (ietfLanguageTag.Length > 0)
@@ -241,7 +242,7 @@ namespace System.Windows.Markup
 
         private static void ThrowParseException(string ietfLanguageTag)
         {
-            throw new ArgumentException($"'{ietfLanguageTag}' language tag must be empty or must conform to grammar defined in IETF RFC 3066.", nameof(ietfLanguageTag));
+            throw new ArgumentException(string.Format(Strings.XmlLangMalformed, ietfLanguageTag), nameof(ietfLanguageTag));
         }
 
         // throws if there is a non-7-bit ascii character

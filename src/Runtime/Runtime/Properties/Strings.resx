@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddedItemNotAtIndex" xml:space="preserve">
+    <value>Added item does not appear at given index '{0}'.</value>
+  </data>
+  <data name="AddedItemNotInCollection" xml:space="preserve">
+    <value>A collection Add event refers to item that does not belong to collection.</value>
+  </data>
+  <data name="Application_ServiceMustImplementInterface" xml:space="preserve">
+    <value>Element declared as Application Service does not implement IApplicationService interface.</value>
+  </data>
   <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
     <value>Cannot perform operation.</value>
     <comment>Exception thrown by automation peers.</comment>
@@ -124,15 +133,186 @@
   <data name="BasedOnHasLoop" xml:space="preserve">
     <value>This {0}'s hierarchy of BasedOn references contains a loop.</value>
   </data>
+  <data name="BindingCollectionContainsNonBinding" xml:space="preserve">
+    <value>BindingCollection does not support items of type {0}. Only Binding is allowed.</value>
+  </data>
+  <data name="CancelEditNotSupported" xml:space="preserve">
+    <value>CancelEdit is not supported for the current edit item.</value>
+  </data>
   <data name="CannotBeBasedOnSelf" xml:space="preserve">
     <value>A {0} cannot be based on itself.</value>
+  </data>
+  <data name="CannotBeSelfParent" xml:space="preserve">
+    <value>Element cannot be its own parent.</value>
   </data>
   <data name="CannotChangeAfterSealed" xml:space="preserve">
     <value>Cannot modify a '{0}' after it is sealed.</value>
   </data>
+  <data name="CannotEditPlaceholder" xml:space="preserve">
+    <value>Editing the NewItem placeholder is not allowed.</value>
+  </data>
+  <data name="CannotFilterView" xml:space="preserve">
+    <value>'{0}' view does not support filtering.</value>
+  </data>
+  <data name="CannotFindRemovedItem" xml:space="preserve">
+    <value>Cannot find removed item.</value>
+  </data>
+  <data name="CannotGroupView" xml:space="preserve">
+    <value>'{0}' view does not support grouping.</value>
+  </data>
+  <data name="CannotHavePropertyInStyle" xml:space="preserve">
+    <value>'{0}' property cannot be set in the current element's Style.</value>
+  </data>
+  <data name="CannotModifyLogicalChildrenDuringTreeWalk" xml:space="preserve">
+    <value>Cannot modify the logical children for this node at this time because a tree walk is in progress.</value>
+  </data>
+  <data name="CannotMoveToUnknownPosition" xml:space="preserve">
+    <value>Cannot Move items to an unknown position (-1).</value>
+  </data>
+  <data name="CannotRecyleHeterogeneousTypes" xml:space="preserve">
+    <value>ItemsHost panel cannot use VirtualizationMode == Recycling because the IGeneratorHost.GetContainerForItemOverride method returns containers that have different types.</value>
+  </data>
+  <data name="CannotRemoveUnrealizedItems" xml:space="preserve">
+    <value>Range of Remove({0},{1}) cannot include items without a corresponding user interface element.</value>
+  </data>
+  <data name="CannotSelectNotSelectableItem" xml:space="preserve">
+    <value>Item is not selectable.</value>
+  </data>
+  <data name="CannotSortView" xml:space="preserve">
+    <value>'{0}' view does not support sorting.</value>
+  </data>
+  <data name="CannotUseItemsSource" xml:space="preserve">
+    <value>Items collection must be empty before using ItemsSource.</value>
+  </data>
+  <data name="ChangeSealedBinding" xml:space="preserve">
+    <value>Binding cannot be changed after it has been used.</value>
+  </data>
+  <data name="ChangingCollectionNotSupported" xml:space="preserve">
+    <value>Can only change SelectedItems collection in multiple selection modes. Use SelectedItem in single select modes.</value>
+  </data>
+  <data name="ChildWindow_CannotChangeModalState" xml:space="preserve">
+    <value>Cannot change modal state while the ChildWindow is open.</value>
+  </data>
   <data name="ChildWindow_InvalidOperation" xml:space="preserve">
     <value>Cannot call Show() on a ChildWindow that is in the visual tree. ChildWindow should be the top-most element in the .xaml file.</value>
     <comment>Exception thrown when the ChildWindow is in the visual tree and Show() is called on it.</comment>
+  </data>
+  <data name="CollectionAddEventMissingItem" xml:space="preserve">
+    <value>After a CollectionChange.Add event, Items collection does not contain the added item '{0}'.\n This could happen if the event sender supplied incorrect information in CollectionChangedEventArgs.</value>
+  </data>
+  <data name="CollectionChangeIndexOutOfRange" xml:space="preserve">
+    <value>'{0}' index in collection change event is not valid for collection of size '{1}'.</value>
+  </data>
+  <data name="CopyToNotEnoughSpace" xml:space="preserve">
+    <value>Number of elements in source Enumerable is greater than available space from index to the end of destination array.</value>
+  </data>
+  <data name="CurrentChangingCannotBeCanceled" xml:space="preserve">
+    <value>The CollectionView that originates this CurrentChanging event is in a state that does not allow the event to be canceled. Check CurrentChangingEventArgs.IsCancelable before assigning to this CurrentChangingEventArgs.Cancel property.</value>
+  </data>
+  <data name="CyclicStyleReferenceDetected" xml:space="preserve">
+    <value>Cyclic reference found while evaluating the Style property on element '{0}'.</value>
+  </data>
+  <data name="CyclicThemeStyleReferenceDetected" xml:space="preserve">
+    <value>Cyclic reference found while evaluating the ThemeStyle property on element '{0}'.</value>
+  </data>
+  <data name="DefaultValueAutoAssignFailed" xml:space="preserve">
+    <value>Cannot automatically generate a valid default value for property '{0}'. Specify a default value explicitly when owner type '{1}' is registering this DependencyProperty.</value>
+  </data>
+  <data name="DefaultValueInvalid" xml:space="preserve">
+    <value>Default value for '{0}' property is not valid because ValidateValueCallback failed.</value>
+  </data>
+  <data name="DefaultValueMayNotBeExpression" xml:space="preserve">
+    <value>An Expression object is not a valid default value for a DependencyProperty.</value>
+  </data>
+  <data name="DefaultValuePropertyTypeMismatch" xml:space="preserve">
+    <value>Default value type does not match type of property '{0}'.</value>
+  </data>
+  <data name="DeferringLoaderNoContext" xml:space="preserve">
+    <value>Deferring loader '{0}' requires that '{1}' be implemented in the IServiceProvider.</value>
+  </data>
+  <data name="DeferringLoaderNoSave" xml:space="preserve">
+    <value>Deferring loader '{0}' does not support the Save operation.</value>
+  </data>
+  <data name="DeferSelectionActive" xml:space="preserve">
+    <value>Cannot begin a new selection while a selection is in progress.</value>
+  </data>
+  <data name="DeferSelectionNotActive" xml:space="preserve">
+    <value>Cannot end a selection when no selection is in progress.</value>
+  </data>
+  <data name="DisplayMemberPathAndItemTemplateDefined" xml:space="preserve">
+    <value>Cannot set both DisplayMemberPath and ItemTemplate.</value>
+  </data>
+  <data name="DTypeNotSupportForSystemType" xml:space="preserve">
+    <value>'{0}' type does not have a matching DependencyObjectType.</value>
+  </data>
+  <data name="EndInitWithoutBeginInitNotSupported" xml:space="preserve">
+    <value>Must call BeginInit before EndInit.</value>
+  </data>
+  <data name="EnumeratorInvalidOperation" xml:space="preserve">
+    <value>Enumerator is located before the first element of the collection or after the last element.</value>
+  </data>
+  <data name="EnumeratorVersionChanged" xml:space="preserve">
+    <value>Collection was modified; enumeration operation may not execute.</value>
+  </data>
+  <data name="Enumerator_VerifyContext" xml:space="preserve">
+    <value>No current object to return.</value>
+  </data>
+  <data name="FrugalMap_CannotPromoteBeyondHashtable" xml:space="preserve">
+    <value>Cannot promote from Hashtable.</value>
+  </data>
+  <data name="FrugalMap_TargetMapCannotHoldAllData" xml:space="preserve">
+    <value>Cannot promote from '{0}' to '{1}' because the target map is too small.</value>
+  </data>
+  <data name="GeneralTransform_TransformFailed" xml:space="preserve">
+    <value>The transform is not defined for the point.</value>
+  </data>
+  <data name="General_BadType" xml:space="preserve">
+    <value>The object passed to '{0}' is not a valid type.</value>
+  </data>
+  <data name="General_Expected_Type" xml:space="preserve">
+    <value>Expected object of type '{0}'.</value>
+  </data>
+  <data name="GenerationInProgress" xml:space="preserve">
+    <value>Cannot call StartAt when content generation is in progress.</value>
+  </data>
+  <data name="GenerationNotInProgress" xml:space="preserve">
+    <value>Must call GenerateNext while content generation is in progress.</value>
+  </data>
+  <data name="GridCollection_CannotModifyReadOnly" xml:space="preserve">
+    <value>Cannot modify '{0}' in read-only state.</value>
+  </data>
+  <data name="HandlerTypeIllegal" xml:space="preserve">
+    <value>Handler type is mismatched.</value>
+  </data>
+  <data name="HasLogicalParent" xml:space="preserve">
+    <value>Specified element is already the logical child of another element. Disconnect it first.</value>
+  </data>
+  <data name="ImplementOtherMembersWithSort" xml:space="preserve">
+    <value>If SortDescriptions is overridden in derived classes, then must also override '{0}'.</value>
+  </data>
+  <data name="InsertInDeferSelectionActive" xml:space="preserve">
+    <value>Cannot insert in a selection when selection is in progress. Use Add method.</value>
+  </data>
+  <data name="InvalidCtorParameterNoInfinity" xml:space="preserve">
+    <value>'{0}' parameter cannot be Infinity.</value>
+  </data>
+  <data name="InvalidCtorParameterNoNaN" xml:space="preserve">
+    <value>'{0}' parameter cannot be NaN.</value>
+  </data>
+  <data name="InvalidCtorParameterUnknownGridUnitType" xml:space="preserve">
+    <value>'{0}' parameter is not valid. Valid values are GridUnitType.Auto, GridUnitType.Pixel, or GridUnitType.Star.</value>
+  </data>
+  <data name="InvalidCursorType" xml:space="preserve">
+    <value>'{0}' cursor type is not valid.</value>
+  </data>
+  <data name="InvalidPropertyValue" xml:space="preserve">
+    <value>'{0}' is not a valid value for property '{1}'.</value>
+  </data>
+  <data name="InvalidStringThickness" xml:space="preserve">
+    <value>'{0}' value is not valid. It must contain one, two, or four delimited Lengths.</value>
+  </data>
+  <data name="InvalidTextDecorationCollectionString" xml:space="preserve">
+    <value>The requested TextDecorationCollection string is not valid: '{0}'.</value>
   </data>
   <data name="ItemsPanelNotAPanel" xml:space="preserve">
     <value>VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.</value>
@@ -140,20 +320,242 @@
   <data name="ItemsPanelNotSingleNode" xml:space="preserve">
     <value>VisualTree of ItemsPanelTemplate must be a single element.</value>
   </data>
+  <data name="ItemsSourceInUse" xml:space="preserve">
+    <value>Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.</value>
+  </data>
+  <data name="LengthFormatError" xml:space="preserve">
+    <value>'{0}' string cannot be converted to Length.</value>
+  </data>
+  <data name="ListBoxSelectAllSelectionMode" xml:space="preserve">
+    <value>Can only call SelectAll when SelectionMode is Multiple or Extended.</value>
+  </data>
+  <data name="LogicalTreeLoop" xml:space="preserve">
+    <value>Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree.</value>
+  </data>
+  <data name="MarkupExtensionDynamicOrBindingOnClrProp" xml:space="preserve">
+    <value>A '{0}' cannot be set on the '{1}' property of type '{2}'. A '{0}' can only be set on a DependencyProperty of a DependencyObject.</value>
+  </data>
   <data name="MarkupExtensionNoContext1" xml:space="preserve">
     <value>Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.</value>
   </data>
   <data name="MarkupExtensionNoContext2" xml:space="preserve">
     <value>Markup extension '{0}' requires '{1}' or '{2}' be implemented in the IServiceProvider for ProvideValue.</value>
   </data>
+  <data name="MarkupExtensionResourceKey" xml:space="preserve">
+    <value>Resource markup extension must have ResourceKey property set before ProvideValue can be called.</value>
+  </data>
+  <data name="MemberNotAllowedDuringAddOrEdit" xml:space="preserve">
+    <value>'{0}' is not allowed during an AddNew or EditItem transaction.</value>
+  </data>
+  <data name="MemberNotAllowedDuringTransaction" xml:space="preserve">
+    <value>'{0}' is not allowed during a transaction begun by '{1}'.</value>
+  </data>
+  <data name="MemberNotAllowedForView" xml:space="preserve">
+    <value>'{0}' is not allowed for this view.</value>
+  </data>
+  <data name="Mismatched_RoutedEvent" xml:space="preserve">
+    <value>RoutedEvent in RoutedEventArgs and EventRoute are mismatched.</value>
+  </data>
+  <data name="MoveInDeferSelectionActive" xml:space="preserve">
+    <value>Cannot move an item in a selection when selection is in progress.</value>
+  </data>
+  <data name="MultiBindingHasNoConverter" xml:space="preserve">
+    <value>Cannot set MultiBinding because MultiValueConverter must be specified.</value>
+  </data>
+  <data name="MustBaseOnStyleOfABaseType" xml:space="preserve">
+    <value>Can only base on a Style with target type that is base type '{0}'.</value>
+  </data>
+  <data name="NameScopeDuplicateNamesNotAllowed" xml:space="preserve">
+    <value>Cannot register duplicate Name '{0}' in this scope.</value>
+  </data>
+  <data name="NameScopeNameNotFound" xml:space="preserve">
+    <value>'{0}' Name is not found.</value>
+  </data>
+  <data name="NameScopeNotFound" xml:space="preserve">
+    <value>No NameScope found to {1} the Name '{0}'.</value>
+  </data>
+  <data name="NestedBeginInitNotSupported" xml:space="preserve">
+    <value>Cannot have nested BeginInit calls on the same instance.</value>
+  </data>
+  <data name="NoCheckOrChangeWhenDeferred" xml:space="preserve">
+    <value>Cannot change or check the contents or Current position of CollectionView while Refresh is being deferred.</value>
+  </data>
+  <data name="NoUpdateSourceTriggerForInnerBindingOfMultiBinding" xml:space="preserve">
+    <value>Cannot set UpdateSourceTrigger on inner Binding of MultiBinding. Only the default Immediate UpdateSourceTrigger is valid.</value>
+  </data>
+  <data name="NullPropertyIllegal" xml:space="preserve">
+    <value>Must have non-null value for '{0}'.</value>
+  </data>
+  <data name="OverridingMetadataDoesNotMatchBaseMetadataType" xml:space="preserve">
+    <value>Metadata override and base metadata must be of the same type or derived type.</value>
+  </data>
+  <data name="PanelIsNotItemsHost" xml:space="preserve">
+    <value>Panel must have IsItemsHost set to true.</value>
+  </data>
+  <data name="Panel_ItemsControlNotFound" xml:space="preserve">
+    <value>A panel with IsItemsHost="true" is not nested in an ItemsControl. Panel must be nested in ItemsControl to get and show items.</value>
+  </data>
+  <data name="Panel_NoNullVisualParent" xml:space="preserve">
+    <value>'{0}' must be provided when instantiating '{1}'.</value>
+  </data>
+  <data name="ParameterCannotBeNegative" xml:space="preserve">
+    <value>Parameter must be greater than or equal to zero.</value>
+  </data>
+  <data name="ParameterMustBeBetween" xml:space="preserve">
+    <value>The parameter value must be between '{0}' and '{1}'.</value>
+  </data>
+  <data name="ParserCannotConvertPropertyValue" xml:space="preserve">
+    <value>Cannot convert the value in attribute '{0}' to object of type '{1}'.</value>
+  </data>
   <data name="ParserNoResource" xml:space="preserve">
     <value>Cannot find resource named '{0}'. Resource names are case sensitive.</value>
+  </data>
+  <data name="Parsers_IllegalToken" xml:space="preserve">
+    <value>Token is not valid.</value>
+  </data>
+  <data name="Parser_UnexpectedToken" xml:space="preserve">
+    <value>Unexpected token '{0}' encountered at position '{1}'.</value>
+  </data>
+  <data name="PresentationFrameworkCollectionReentrancyNotAllowed" xml:space="preserve">
+    <value>Cannot change collection during a CollectionChanged event.</value>
+  </data>
+  <data name="PropertyAlreadyRegistered" xml:space="preserve">
+    <value>'{0}' property was already registered by '{1}'.</value>
+  </data>
+  <data name="PropertyNotBindable" xml:space="preserve">
+    <value>'{0}' property cannot be data-bound.</value>
   </data>
   <data name="PropertyNotReadable" xml:space="preserve">
     <value>The property named '{0}' on type '{1}' cannot be read.</value>
   </data>
+  <data name="PropertyNotReadOnly" xml:space="preserve">
+    <value>This method overrides metadata only on read-only properties. This property is not read-only.</value>
+  </data>
+  <data name="RangeActionsNotSupported" xml:space="preserve">
+    <value>Range actions are not supported.</value>
+  </data>
+  <data name="ReadOnlyChangeNotAllowed" xml:space="preserve">
+    <value>'{0}' property was registered as read-only and cannot be modified without an authorization key.</value>
+  </data>
+  <data name="ReadOnlyKeyNotAuthorized" xml:space="preserve">
+    <value>Property key is not authorized to modify property '{0}'.</value>
+  </data>
+  <data name="ReadOnlyOverrideKeyNotAuthorized" xml:space="preserve">
+    <value>Property key is not authorized to override metadata of property '{0}'.</value>
+  </data>
+  <data name="ReadOnlyOverrideNotAllowed" xml:space="preserve">
+    <value>'{0}' property was registered as read-only and its metadata cannot be overridden without an authorization key.</value>
+  </data>
+  <data name="Rect_CannotCallMethod" xml:space="preserve">
+    <value>Cannot call this method on the Empty Rect.</value>
+  </data>
+  <data name="RemovedItemNotFound" xml:space="preserve">
+    <value>Collection Remove event must specify item position.</value>
+  </data>
+  <data name="RemoveRequiresOffsetZero" xml:space="preserve">
+    <value>GeneratorPosition '{0},{1}' passed to Remove does not have Offset equal to 0.</value>
+  </data>
+  <data name="RemoveRequiresPositiveCount" xml:space="preserve">
+    <value>'{0}' Count passed to Remove must be positive.</value>
+  </data>
+  <data name="RemovingPlaceholder" xml:space="preserve">
+    <value>Removing the NewItem placeholder is not allowed.</value>
+  </data>
+  <data name="ResourceDictionaryInvalidMergedDictionary" xml:space="preserve">
+    <value>The merged dictionary is invalid. Either a ResourceDictionary is being placed into its own MergedDictionaries collection or a it is being added to the same MergedDictionary collection twice.</value>
+  </data>
+  <data name="ResourceDictionaryKeyMustBeTypeOrString" xml:space="preserve">
+    <value>Key must be a Type, a DataTemplateKey or a String.</value>
+  </data>
+  <data name="ResourceDictionaryNullValueNotSupported" xml:space="preserve">
+    <value>Null value not supported in a ResourceDictionary.</value>
+  </data>
+  <data name="ResourceDictionaryValueMustBeDataTemplate" xml:space="preserve">
+    <value>For a key of the type DataTemplateKey, value must be a DataTemplate.</value>
+  </data>
+  <data name="ResourceDictionaryValueMustBeStyle" xml:space="preserve">
+    <value>For a Type key the value must be a Style.</value>
+  </data>
+  <data name="ResourceDictionaryValueMustBeStyleWithCorrectTargetType" xml:space="preserve">
+    <value>For a Type key the Style value must have TargetType which is equals to key.</value>
+  </data>
   <data name="ScrollViewer_CannotBeNaN" xml:space="preserve">
     <value>'{0}' parameter value cannot be NaN.</value>
+  </data>
+  <data name="ScrollViewer_OutOfRange" xml:space="preserve">
+    <value>'{0}' parameter has value '{1}', which is not in the valid range of '{2}' to '{3}'.</value>
+  </data>
+  <data name="SetInDeferSelectionActive" xml:space="preserve">
+    <value>Cannot set an item in a selection when selection is in progress. Use Add or Remove method.</value>
+  </data>
+  <data name="SharingNonSharableExpression" xml:space="preserve">
+    <value>Cannot set Expression. It is marked as non shareable and is already in use.</value>
+  </data>
+  <data name="Size_HeightCannotBeNegative" xml:space="preserve">
+    <value>Height must be non-negative.</value>
+  </data>
+  <data name="Size_WidthAndHeightCannotBeNegative" xml:space="preserve">
+    <value>Width and Height must be non-negative.</value>
+  </data>
+  <data name="Size_WidthCannotBeNegative" xml:space="preserve">
+    <value>Width must be non-negative.</value>
+  </data>
+  <data name="Storyboard_NameNotFound" xml:space="preserve">
+    <value>'{0}' name cannot be found in the name scope of '{1}'.</value>
+  </data>
+  <data name="Storyboard_NoNameScope" xml:space="preserve">
+    <value>No applicable name scope exists to resolve the name '{0}'.</value>
+  </data>
+  <data name="Storyboard_NoTarget" xml:space="preserve">
+    <value>No target was specified for '{0}'.</value>
+  </data>
+  <data name="Storyboard_TargetNameNotDependencyObject" xml:space="preserve">
+    <value>'{0}' target object Name found but the object is not a valid target type.</value>
+  </data>
+  <data name="Storyboard_TargetPropertyRequired" xml:space="preserve">
+    <value>Must specify TargetProperty for '{0}'.</value>
+  </data>
+  <data name="StringEmpty" xml:space="preserve">
+    <value>Parameter cannot be a zero-length string.</value>
+  </data>
+  <data name="StyleForWrongType" xml:space="preserve">
+    <value>A style intended for type '{0}' cannot be applied to type '{1}'.</value>
+  </data>
+  <data name="StyleTargetTypeMismatchWithElement" xml:space="preserve">
+    <value>'{0}' TargetType does not match type of element '{1}'.</value>
+  </data>
+  <data name="StyleValueOfExpressionNotSupported" xml:space="preserve">
+    <value>Expression type is not a valid Style value.</value>
+  </data>
+  <data name="Timing_InvalidArgNonNegative" xml:space="preserve">
+    <value>Property value must be greater than or equal to zero or indefinite.</value>
+  </data>
+  <data name="Timing_MustBeRoot" xml:space="preserve">
+    <value>Operation is not allowed on a non-root Storyboard.</value>
+  </data>
+  <data name="Timing_NotTimeSpan" xml:space="preserve">
+    <value>Unable to return a TimeSpan property value for a Duration value of '{0}'. Check the HasTimeSpan property before requesting the TimeSpan property value from a Duration.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorInvalidIterationCount" xml:space="preserve">
+    <value>'{0}' is not a valid IterationCount value for a RepeatBehavior structure. An IterationCount value must represent a number that is greater than or equal to zero but not infinite.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorInvalidRepeatDuration" xml:space="preserve">
+    <value>'{0}' is not a valid RepeatDuration value for a RepeatBehavior structure. A RepeatDuration value must be a TimeSpan value greater than or equal to zero ticks.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorNotIterationCount" xml:space="preserve">
+    <value>'{0}' RepeatBehavior does not represent an iteration count and does not have an IterationCount value.</value>
+  </data>
+  <data name="Timing_RepeatBehaviorNotRepeatDuration" xml:space="preserve">
+    <value>'{0}' RepeatBehavior does not represent a repeat duration and does not have a RepeatDuration value.</value>
+  </data>
+  <data name="Timing_SkipToFillDestinationIndefinite" xml:space="preserve">
+    <value>Cannot call the Storyboard.SkipToFill method for a Storyboard that has a Duration or RepeatDuration of Forever, because this Storyboard will never reach its fill period.</value>
+  </data>
+  <data name="Transform_NotInvertible" xml:space="preserve">
+    <value>Transform is not invertible.</value>
+  </data>
+  <data name="TreeLoop" xml:space="preserve">
+    <value>Potential cycle in tree found while building the event route.</value>
   </data>
   <data name="TreeViewItem_OnHasItemsPropertyChanged_InvalidWrite" xml:space="preserve">
     <value>Cannot set read-only property HasItems.</value>
@@ -170,5 +572,56 @@
   <data name="TreeView_OnSelectedValuePropertyChanged_InvalidWrite" xml:space="preserve">
     <value>Cannot set read-only property SelectedValue.</value>
     <comment>Exception thrown when the SelectedValue property is improperly set.</comment>
+  </data>
+  <data name="TriggersSupportsEventTriggersOnly" xml:space="preserve">
+    <value>Triggers collection members must be of type EventTrigger.</value>
+  </data>
+  <data name="TwoWayBindingNeedsPath" xml:space="preserve">
+    <value>Two-way binding requires Path.</value>
+  </data>
+  <data name="TypeMetadataAlreadyInUse" xml:space="preserve">
+    <value>Metadata is already associated with a type and property. A new one must be created.</value>
+  </data>
+  <data name="TypeMetadataAlreadyRegistered" xml:space="preserve">
+    <value>PropertyMetadata is already registered for type '{0}'.</value>
+  </data>
+  <data name="TypeMetadataCannotChangeAfterUse" xml:space="preserve">
+    <value>Cannot change property metadata after it has been associated with a property.</value>
+  </data>
+  <data name="TypeMustBeDependencyObjectDerived" xml:space="preserve">
+    <value>'{0}' type must derive from DependencyObject.</value>
+  </data>
+  <data name="UIA_OperationCannotBePerformed" xml:space="preserve">
+    <value>Cannot perform operation.</value>
+  </data>
+  <data name="UIElement_HasParent" xml:space="preserve">
+    <value>Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.</value>
+  </data>
+  <data name="UIElement_Layout_InfinityArrange" xml:space="preserve">
+    <value>Cannot call Arrange on a UIElement with infinite size or NaN. Parent of type '{0}' invokes the UIElement. Arrange called on element of type '{1}'.</value>
+  </data>
+  <data name="UIElement_Layout_NaNMeasure" xml:space="preserve">
+    <value>UIElement.Measure(availableSize) cannot be called with NaN size.</value>
+  </data>
+  <data name="UIElement_Layout_NaNReturned" xml:space="preserve">
+    <value>Layout measurement override of element '{0}' should not return NaN values as its DesiredSize.</value>
+  </data>
+  <data name="UIElement_Layout_PositiveInfinityReturned" xml:space="preserve">
+    <value>Layout measurement override of element '{0}' should not return PositiveInfinity as its DesiredSize, even if Infinity is passed in as available size.</value>
+  </data>
+  <data name="UIElement_NotAnUIElement" xml:space="preserve">
+    <value>'{0}' is not an UIElement.</value>
+  </data>
+  <data name="UIElement_NotChild" xml:space="preserve">
+    <value>Specified UIElement is not a child of this UIElement.</value>
+  </data>
+  <data name="UnexpectedCollectionChangeAction" xml:space="preserve">
+    <value>Unexpected collection change action '{0}'.</value>
+  </data>
+  <data name="UnexpectedParameterType" xml:space="preserve">
+    <value>Parameter is unexpected type '{0}'. Expected type is '{1}'.</value>
+  </data>
+  <data name="XmlLangMalformed" xml:space="preserve">
+    <value>'{0}' language tag must be empty or must conform to grammar defined in IETF RFC 3066.</value>
   </data>
 </root>

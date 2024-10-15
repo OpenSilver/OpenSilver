@@ -37,16 +37,14 @@ internal sealed class TemplateContentLoader : XamlDeferringLoader
 
     public override XamlReader Save(object value, IServiceProvider serviceProvider)
     {
-        throw new NotSupportedException(
-            $"Deferring loader '{typeof(TemplateContentLoader).Name}' does not support the Save operation.");
+        throw new NotSupportedException(string.Format(Strings.DeferringLoaderNoSave, typeof(TemplateContentLoader).Name));
     }
 
     private static T RequireService<T>(IServiceProvider provider) where T : class
     {
         if (provider.GetService(typeof(T)) is not T result)
         {
-            throw new InvalidOperationException(
-                $"Deferring loader '{typeof(TemplateContentLoader).Name}' requires that '{typeof(T).Name}' be implemented in the IServiceProvider.");
+            throw new InvalidOperationException(string.Format(Strings.DeferringLoaderNoContext, typeof(TemplateContentLoader).Name, typeof(T).Name));
         }
         return result;
     }

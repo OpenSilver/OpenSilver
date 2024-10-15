@@ -313,7 +313,7 @@ namespace System.Windows.Controls
             if (itemsOwner == null)
             {
                 // This can happen if IsItemsHost=true, but the panel is not nested in an ItemsControl
-                throw new InvalidOperationException("A panel with IsItemsHost=\"true\" is not nested in an ItemsControl. Panel must be nested in ItemsControl to get and show items.");
+                throw new InvalidOperationException(Strings.Panel_ItemsControlNotFound);
             }
 
             IItemContainerGenerator itemsOwnerGenerator = itemsOwner.ItemContainerGenerator;

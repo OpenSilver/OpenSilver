@@ -11,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -57,12 +57,12 @@ namespace System.Windows
 
             if (value is not string s)
             {
-                throw new ArgumentException("The object passed to 'ConvertFrom' is not a valid type.", nameof(value));
+                throw new ArgumentException(string.Format(Strings.General_BadType, nameof(ConvertFrom)), nameof(value));
             }
 
             if (!FontWeights.FontWeightStringToKnownWeight(s, culture, out FontWeight fontWeight))
             {
-                throw new FormatException("Token is not valid.");
+                throw new FormatException(Strings.Parsers_IllegalToken);
             }
 
             return fontWeight;

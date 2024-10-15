@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows.Media

@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Collections;
-using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.ComponentModel;
@@ -198,7 +197,7 @@ namespace System.Windows
                 // might be iterating during a property invalidation tree walk.
                 if (IsLogicalChildrenIterationInProgress)
                 {
-                    throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
+                    throw new InvalidOperationException(Strings.CannotModifyLogicalChildrenDuringTreeWalk);
                 }
 
                 HasLogicalChildren = true;
@@ -225,7 +224,7 @@ namespace System.Windows
                 // might be iterating during a property invalidation tree walk.
                 if (IsLogicalChildrenIterationInProgress)
                 {
-                    throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
+                    throw new InvalidOperationException(Strings.CannotModifyLogicalChildrenDuringTreeWalk);
                 }
 
                 if (child is IInternalFrameworkElement fe && fe.Parent == this)
@@ -254,13 +253,13 @@ namespace System.Windows
             // Logical Parent must first be dropped before you are attached to a newParent
             if (Parent != null && newParent != null && Parent != newParent)
             {
-                throw new InvalidOperationException("Specified element is already the logical child of another element. Disconnect it first.");
+                throw new InvalidOperationException(Strings.HasLogicalParent);
             }
 
             // Trivial check to avoid loops
             if (newParent == this)
             {
-                throw new InvalidOperationException("Element cannot be its own parent.");
+                throw new InvalidOperationException(Strings.CannotBeSelfParent);
             }
 
             DependencyObject oldParent = Parent;
@@ -785,7 +784,7 @@ namespace System.Windows
             }
             else
             {
-                throw new InvalidOperationException(string.Format("No NameScope found to {1} the Name '{0}'.", name, "register"));
+                throw new InvalidOperationException(string.Format(Strings.NameScopeNotFound, name, "register"));
             }
         }
 
@@ -799,7 +798,7 @@ namespace System.Windows
             }
             else
             {
-                throw new InvalidOperationException(string.Format("No NameScope found to {1} the Name '{0}'.", name, "unregister"));
+                throw new InvalidOperationException(string.Format(Strings.NameScopeNotFound, name, "unregister"));
             }
         }
 

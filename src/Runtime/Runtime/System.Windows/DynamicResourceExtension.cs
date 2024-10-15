@@ -14,6 +14,7 @@
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Xaml.Markup;
+using OpenSilver.Internal;
 
 namespace System.Windows;
 
@@ -60,7 +61,7 @@ public class DynamicResourceExtension : MarkupExtension
     {
         if (ResourceKey is null)
         {
-            throw new InvalidOperationException("Resource markup extension must have ResourceKey property set before ProvideValue can be called.");
+            throw new InvalidOperationException(Strings.MarkupExtensionResourceKey);
         }
 
         if (serviceProvider is not null)

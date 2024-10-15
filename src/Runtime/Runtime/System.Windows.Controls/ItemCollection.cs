@@ -45,7 +45,7 @@ namespace System.Windows.Controls
         {
             if (IsUsingItemsSource)
             {
-                throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
+                throw new InvalidOperationException(Strings.ItemsSourceInUse);
             }
 
             _collectionChanged.CheckReentrancy();
@@ -72,7 +72,7 @@ namespace System.Windows.Controls
         {
             if (IsUsingItemsSource)
             {
-                throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
+                throw new InvalidOperationException(Strings.ItemsSourceInUse);
             }
 
             _collectionChanged.CheckReentrancy();
@@ -91,7 +91,7 @@ namespace System.Windows.Controls
         {
             if (IsUsingItemsSource)
             {
-                throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
+                throw new InvalidOperationException(Strings.ItemsSourceInUse);
             }
 
             _collectionChanged.CheckReentrancy();
@@ -106,7 +106,7 @@ namespace System.Windows.Controls
         {
             if (IsUsingItemsSource)
             {
-                throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
+                throw new InvalidOperationException(Strings.ItemsSourceInUse);
             }
 
             _collectionChanged.CheckReentrancy();
@@ -124,7 +124,7 @@ namespace System.Windows.Controls
         {
             if (IsUsingItemsSource)
             {
-                throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
+                throw new InvalidOperationException(Strings.ItemsSourceInUse);
             }
 
             _collectionChanged.CheckReentrancy();
@@ -159,7 +159,7 @@ namespace System.Windows.Controls
         {
             if (!IsUsingItemsSource && Count != 0)
             {
-                throw new InvalidOperationException("Items collection must be empty before using ItemsSource.");
+                throw new InvalidOperationException(Strings.CannotUseItemsSource);
             }
 
             int previousCount = Count;
@@ -219,14 +219,14 @@ namespace System.Windows.Controls
                 case NotifyCollectionChangedAction.Add:
                     if (e.NewItems.Count != 1)
                     {
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems.Count != 1)
                     {
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     }
                     break;
 
@@ -234,7 +234,7 @@ namespace System.Windows.Controls
                 case NotifyCollectionChangedAction.Move:
                     if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
                     {
-                        throw new NotSupportedException("Range actions are not supported.");
+                        throw new NotSupportedException(Strings.RangeActionsNotSupported);
                     }
                     break;
 
@@ -242,7 +242,7 @@ namespace System.Windows.Controls
                     break;
 
                 default:
-                    throw new NotSupportedException($"Unexpected collection change action '{e.Action}'.");
+                    throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, e.Action));
             }
         }
 

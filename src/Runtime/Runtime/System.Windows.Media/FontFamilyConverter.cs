@@ -13,6 +13,7 @@
 
 using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 
 namespace System.Windows.Media
 {
@@ -67,18 +68,18 @@ namespace System.Windows.Media
         {
             if (null == value)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             FontFamily fontFamily = value as FontFamily;
             if (fontFamily == null)
             {
-                throw new ArgumentException(string.Format("Expected object of type '{0}'.", "FontFamily"), "value");
+                throw new ArgumentException(string.Format(Strings.General_Expected_Type, nameof(FontFamily)), nameof(value));
             }
 
             if (null == destinationType)
             {
-                throw new ArgumentNullException("destinationType");
+                throw new ArgumentNullException(nameof(destinationType));
             }
 
             if (destinationType == typeof(string))

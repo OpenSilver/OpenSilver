@@ -13,6 +13,7 @@
 
 using System.ComponentModel;
 using System.Text;
+using OpenSilver.Internal;
 
 namespace System.Windows.Media.Animation;
 
@@ -42,9 +43,7 @@ public struct RepeatBehavior : IFormattable
             || double.IsNaN(count)
             || count < 0.0)
         {
-            throw new ArgumentOutOfRangeException(
-                nameof(count),
-                $"'{count}' is not a valid IterationCount value for a RepeatBehavior structure. An IterationCount value must represent a number that is greater than or equal to zero but not infinite.");
+            throw new ArgumentOutOfRangeException(nameof(count), string.Format(Strings.Timing_RepeatBehaviorInvalidIterationCount, count));
         }
 
         _repeatDuration = new TimeSpan(0);
@@ -67,9 +66,7 @@ public struct RepeatBehavior : IFormattable
     {
         if (duration < new TimeSpan(0))
         {
-            throw new ArgumentOutOfRangeException(nameof(duration),
-                string.Format("'{0}' is not a valid RepeatDuration value for a RepeatBehavior structure. A RepeatDuration value must be a TimeSpan value greater than or equal to zero ticks.", duration)
-            );
+            throw new ArgumentOutOfRangeException(nameof(duration), string.Format(Strings.Timing_RepeatBehaviorInvalidRepeatDuration, duration));
         }
 
         _iterationCount = 0.0;
@@ -105,8 +102,7 @@ public struct RepeatBehavior : IFormattable
         {
             if (_type != RepeatBehaviorType.Count)
             {
-                throw new InvalidOperationException(
-                    $"'{this}' RepeatBehavior does not represent an iteration count and does not have an IterationCount value.");
+                throw new InvalidOperationException(string.Format(Strings.Timing_RepeatBehaviorNotIterationCount, this));
             }
 
             return _iterationCount;
@@ -130,8 +126,7 @@ public struct RepeatBehavior : IFormattable
         {
             if (_type != RepeatBehaviorType.Duration)
             {
-                throw new InvalidOperationException(
-                    $"'{this}' RepeatBehavior does not represent a repeat duration and does not have a RepeatDuration value.");
+                throw new InvalidOperationException(string.Format(Strings.Timing_RepeatBehaviorNotRepeatDuration, this));
             }
 
             return _repeatDuration;

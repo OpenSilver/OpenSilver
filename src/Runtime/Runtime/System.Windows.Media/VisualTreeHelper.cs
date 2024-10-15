@@ -18,7 +18,6 @@ using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
-using DotNetForHtml5.Core;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -105,7 +104,7 @@ namespace System.Windows.Media
                 return uie.VisualChildrenCount;
             }
 
-            throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+            throw new InvalidOperationException(string.Format(Strings.UIElement_NotAnUIElement, nameof(reference)));
         }
 
         /// <summary>
@@ -121,7 +120,7 @@ namespace System.Windows.Media
         {
             if (reference is null)
             {
-                throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+                throw new ArgumentNullException(nameof(reference));
             }
 
             return reference.InternalVisualChildrenCount;
@@ -140,14 +139,14 @@ namespace System.Windows.Media
                 return uie.GetVisualChild(childIndex);
             }
             
-            throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+            throw new InvalidOperationException(string.Format(Strings.UIElement_NotAnUIElement, nameof(reference)));
         }
 
         public static DependencyObject GetChild(UIElement reference, int childIndex)
         {
             if (reference is null)
             {
-                throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+                throw new ArgumentNullException(nameof(reference));
             }
 
             return reference.InternalGetVisualChild(childIndex);

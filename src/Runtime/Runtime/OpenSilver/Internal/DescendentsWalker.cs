@@ -284,7 +284,7 @@ internal struct DescendentsWalker<T>
         {
             // We suspect a loop here because the recursion
             // depth has exceeded the MAX_TREE_DEPTH expected
-            throw new InvalidOperationException("Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree.");
+            throw new InvalidOperationException(Strings.LogicalTreeLoop);
         }
     }
 
@@ -301,7 +301,7 @@ internal struct DescendentsWalker<T>
         {
             // We suspect a loop here because the recursion
             // depth has exceeded the MAX_TREE_DEPTH expected
-            throw new InvalidOperationException("Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree.");
+            throw new InvalidOperationException(Strings.LogicalTreeLoop);
         }
     }
 

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Xaml;
+using OpenSilver.Internal;
 
 namespace System.Windows.Markup
 {
@@ -135,7 +136,7 @@ namespace System.Windows.Markup
             }
             else
             {
-                throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. The source is not a string.");
+                throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
             }
 
             // Still don't have a Type so we need to loop up the chain and grab Style.TargetType,
@@ -143,7 +144,7 @@ namespace System.Windows.Markup
             {
                 if (serviceProvider.GetService(typeof(IXamlSchemaContextProvider)) is not IXamlSchemaContextProvider ixscp)
                 {
-                    throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. IXamlSchemaContextProvider is null.");
+                    throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
                 }
 
                 XamlSchemaContext schemaContext = ixscp.SchemaContext;
@@ -153,7 +154,7 @@ namespace System.Windows.Markup
 
                 if (serviceProvider.GetService(typeof(IAmbientProvider)) is not IAmbientProvider ambientProvider)
                 {
-                    throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. IAmbientProvider is null.");
+                    throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
                 }
 
                 AmbientPropertyValue firstAmbientValue = ambientProvider.GetFirstAmbientValue(ceilingTypes, styleTargetType);
@@ -165,7 +166,7 @@ namespace System.Windows.Markup
                     }
                     else
                     {
-                        throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. Cannot find a type.");
+                        throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
                     }
                 }
             }
@@ -175,7 +176,7 @@ namespace System.Windows.Markup
                 return DependencyProperty.FromName(property, type);
             }
 
-            throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}.");
+            throw new NotSupportedException(string.Format(Strings.ParserCannotConvertPropertyValue, "Property", typeof(DependencyProperty).FullName));
         }
     }
 }

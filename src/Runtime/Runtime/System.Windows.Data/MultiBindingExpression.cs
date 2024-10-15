@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data;
@@ -42,7 +43,7 @@ public sealed class MultiBindingExpression : BindingExpressionBase
     {
         if (dp.ReadOnly)
         {
-            throw new ArgumentException($"'{dp.Name}' property cannot be data-bound.", nameof(dp));
+            throw new ArgumentException(string.Format(Strings.PropertyNotBindable, dp.Name), nameof(dp));
         }
 
         // create the BindingExpression

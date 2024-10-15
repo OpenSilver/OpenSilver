@@ -14,6 +14,7 @@
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using OpenSilver.Internal;
 
 namespace System.Windows.Automation.Peers
 {
@@ -93,7 +94,7 @@ namespace System.Windows.Automation.Peers
         {
             if (((RadioButton)Owner).IsChecked != true)
             {
-                throw new InvalidOperationException("Cannot perform operation.");
+                throw new InvalidOperationException(Strings.UIA_OperationCannotBePerformed);
             }
         }
 
@@ -104,7 +105,7 @@ namespace System.Windows.Automation.Peers
         {
             if (((RadioButton)Owner).IsChecked == true)
             {
-                throw new InvalidOperationException("Cannot perform operation.");
+                throw new InvalidOperationException(Strings.UIA_OperationCannotBePerformed);
             }
         }
 

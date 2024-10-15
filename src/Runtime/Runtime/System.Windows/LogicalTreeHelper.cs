@@ -13,6 +13,7 @@
 
 using System.Collections;
 using System.Diagnostics;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
 namespace System.Windows;
@@ -43,9 +44,14 @@ public static class LogicalTreeHelper
             throw new ArgumentNullException(nameof(logicalTreeNode));
         }
 
-        if (string.IsNullOrEmpty(elementName))
+        if (elementName is null)
         {
-            throw new ArgumentException("The value cannot be an empty string.", nameof(elementName));
+            throw new ArgumentNullException(nameof(elementName));
+        }
+
+        if (elementName.Length == 0)
+        {
+            throw new ArgumentException(Strings.StringEmpty, nameof(elementName));
         }
 
         DependencyObject namedElement = null;

@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 

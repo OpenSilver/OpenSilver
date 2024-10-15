@@ -113,7 +113,7 @@
     <Compile Include="System.Windows\TreeChangeInfo.cs" />
     <Compile Include="System.Windows\UIElement.TransformToVisual.cs" />
     <Compile Include="System.Windows\ValidateValueCallback.cs" />
-    <Compile Include="Core\Main\WeakReferenceList.cs" />
+    <Compile Include="OpenSilver\Internal\WeakReferenceList.cs" />
     <Compile Include="Diagnostics\DebugInfo.cs" />
     <Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
     <Compile Include="OpenSilver\DumpHelper.cs" />

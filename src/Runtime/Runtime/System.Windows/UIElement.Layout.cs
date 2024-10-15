@@ -134,8 +134,9 @@ namespace System.Windows
             {
                 //enforce that Measure can not receive NaN size .
                 if (double.IsNaN(availableSize.Width) || double.IsNaN(availableSize.Height))
-                    throw new InvalidOperationException(
-                        "UIElement.Measure(availableSize) cannot be called with NaN size.");
+                {
+                    throw new InvalidOperationException(Strings.UIElement_Layout_NaNMeasure);
+                }
 
                 bool neverMeasured = NeverMeasured;
                 
@@ -216,15 +217,15 @@ namespace System.Windows
                 //enforce that MeasureCore can not return PositiveInfinity size even if given Infinte availabel size.
                 //Note: NegativeInfinity can not be returned by definition of Size structure.
                 if (double.IsPositiveInfinity(desiredSize.Width) || double.IsPositiveInfinity(desiredSize.Height))
-                    throw new InvalidOperationException(string.Format(
-                        "Layout measurement override of element '{0}' should not return PositiveInfinity as its DesiredSize, even if Infinity is passed in as available size.",
-                        GetType().FullName));
+                {
+                    throw new InvalidOperationException(string.Format(Strings.UIElement_Layout_PositiveInfinityReturned, GetType().FullName));
+                }
 
                 //enforce that MeasureCore can not return NaN size .
                 if (double.IsNaN(desiredSize.Width) || double.IsNaN(desiredSize.Height))
-                    throw new InvalidOperationException(string.Format(
-                        "Layout measurement override of element '{0}' should not return NaN values as its DesiredSize.",
-                        GetType().FullName));
+                {
+                    throw new InvalidOperationException(string.Format(Strings.UIElement_Layout_NaNReturned, GetType().FullName));
+                }
 
                 //reset measure dirtiness
                 
@@ -301,10 +302,11 @@ namespace System.Windows
                     || double.IsNaN(finalRect.Height))
                 {
                     DependencyObject parent = GetLayoutParent(this);
-                    throw new InvalidOperationException(string.Format(
-                        "Cannot call Arrange on a UIElement with infinite size or NaN. Parent of type '{0}' invokes the UIElement. Arrange called on element of type '{1}'.",
-                        parent == null ? string.Empty : parent.GetType().FullName,
-                        GetType().FullName));
+                    throw new InvalidOperationException(
+                        string.Format(
+                            Strings.UIElement_Layout_InfinityArrange,
+                            parent == null ? string.Empty : parent.GetType().FullName,
+                            GetType().FullName));
                 }
 
                 if (!IsVisible || ReadVisualFlag(VisualFlags.IsLayoutSuspended))

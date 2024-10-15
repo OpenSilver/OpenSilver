@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Xaml;
 using System.Xaml.Schema;
+using OpenSilver.Internal;
 
 namespace System.Windows.Markup
 {
@@ -173,9 +174,7 @@ namespace System.Windows.Markup
             static NotSupportedException NotSupported()
             {
                 return new NotSupportedException(
-                    string.Format("Cannot convert the value in attribute '{0}' to object of type '{1}'.",
-                        nameof(Setter.Value),
-                        typeof(object).FullName));
+                    string.Format(Strings.ParserCannotConvertPropertyValue, nameof(Setter.Value), typeof(object).FullName));
             }
         }
     }

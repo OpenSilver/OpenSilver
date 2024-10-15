@@ -15,6 +15,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 namespace System.Windows.Media
 {
@@ -61,8 +62,7 @@ namespace System.Windows.Media
                         // Also, if the next token isn't 0 or 1, this too is illegal
                         if ((curIndex == pathString.Length) || ((pathString[curIndex] != '0') && (pathString[curIndex] != '1')))
                         {
-                            //throw new FormatException(SR.Get(SRID.Parsers_IllegalToken));
-                            throw new FormatException("Parsers Illegal Token");
+                            throw new FormatException(Strings.Parsers_IllegalToken);
                         }
 
                         fillRule = pathString[curIndex] == '0' ? FillRule.EvenOdd : FillRule.Nonzero;
@@ -113,8 +113,7 @@ namespace System.Windows.Media
         /// </summary>
         private void ThrowBadToken()
         {
-            //throw new System.FormatException(SR.Get(SRID.Parser_UnexpectedToken, _pathString, _curIndex - 1));
-            throw new FormatException(string.Format("Parser Unexpected Token in string \"{0}\" at position {1}.", this._pathString, this._curIndex - 1));
+            throw new FormatException(string.Format(Strings.Parser_UnexpectedToken, _pathString, _curIndex - 1));
         }
 
         private bool More()
@@ -326,8 +325,7 @@ namespace System.Windows.Media
                 }
                 catch (FormatException except)
                 {
-                    //throw new FormatException(SR.Get(SRID.Parser_UnexpectedToken, _pathString, start), except);
-                    throw new FormatException(string.Format("Parser Unexpected Token in string \"{0}\" at position {1}.", this._pathString, start), except);
+                    throw new FormatException(string.Format(Strings.Parser_UnexpectedToken, _pathString, start), except);
                 }
             }
         }

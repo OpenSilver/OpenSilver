@@ -13,6 +13,7 @@
 
 using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -107,7 +108,7 @@ namespace System.Windows
                     return null;
 
                 default:
-                    throw new FormatException($"Failed to create a '{typeof(TextDecorationCollection)}' from '{source}'");
+                    throw new FormatException(string.Format(Strings.InvalidTextDecorationCollectionString, source));
             }
         }
     }

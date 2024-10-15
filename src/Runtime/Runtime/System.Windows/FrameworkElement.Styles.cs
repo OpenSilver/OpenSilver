@@ -11,10 +11,10 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Media;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -138,7 +138,7 @@ namespace System.Windows
             }
             else
             {
-                throw new InvalidOperationException($"Cyclic reference found while evaluating the ThemeStyle property on element '{this}'.");
+                throw new InvalidOperationException(string.Format(Strings.CyclicThemeStyleReferenceDetected, this));
             }
         }
 
@@ -168,7 +168,7 @@ namespace System.Windows
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Cyclic reference found while evaluating the Style property on element '{this}'.");
+                    throw new InvalidOperationException(string.Format(Strings.CyclicStyleReferenceDetected, this));
                 }
             }
         }

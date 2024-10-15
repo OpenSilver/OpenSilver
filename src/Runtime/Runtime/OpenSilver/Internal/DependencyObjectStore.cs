@@ -600,7 +600,7 @@ internal static class DependencyObjectStore
 
             if (expression.IsAttached)
             {
-                throw new InvalidOperationException($"Cannot attach an instance of '{expression}' multiple times");
+                throw new InvalidOperationException(Strings.SharingNonSharableExpression);
             }
 
             expression.MarkAttached();
@@ -784,8 +784,7 @@ internal static class DependencyObjectStore
 
         if (!isValidValue)
         {
-            throw new ArgumentException(
-                $"'{value}' is not a valid value for property '{dp.Name}'.");
+            throw new ArgumentException(string.Format(Strings.InvalidPropertyValue, value, dp.Name));
         }
     }
 }

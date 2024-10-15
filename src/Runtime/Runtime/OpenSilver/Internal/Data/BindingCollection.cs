@@ -93,8 +93,7 @@ internal sealed class BindingCollection : Collection<BindingBase>
         // for V1, we only allow Binding as an item of BindingCollection.
         if (binding is not Binding)
         {
-            throw new NotSupportedException(
-                $"BindingCollection does not support items of type {binding.GetType().Name}. Only Binding is allowed.");
+            throw new NotSupportedException(string.Format(Strings.BindingCollectionContainsNonBinding, binding.GetType().Name));
         }
     }
 

@@ -358,7 +358,7 @@ namespace System.Windows
 
             if (name.Length == 0)
             {
-                throw new ArgumentException("Parameter cannot be a zero-length string.");
+                throw new ArgumentException(Strings.StringEmpty);
             }
 
             if (ownerType == null)
@@ -452,8 +452,7 @@ namespace System.Windows
                 !validateValueCallback(defaultValue))
             {
                 // Didn't work - require the caller to specify one.
-                throw new ArgumentException(
-                    string.Format("Cannot automatically generate a valid default value for property '{0}'. Specify a default value explicitly when owner type '{1}' is registering this DependencyProperty.", name, ownerType.Name));
+                throw new ArgumentException(string.Format(Strings.DefaultValueAutoAssignFailed, name, ownerType.Name));
             }
 
             return new PropertyMetadata(defaultValue);
@@ -494,15 +493,14 @@ namespace System.Windows
             // Ensure default value is the correct type
             if (!IsValidType(defaultValue, propertyType))
             {
-                throw new ArgumentException(
-                    string.Format("Default value type does not match type of property '{0}'.", propertyName));
+                throw new ArgumentException(string.Format(Strings.DefaultValuePropertyTypeMismatch, propertyName));
             }
 
             // An Expression used as default value won't behave as expected since
             //  it doesn't get evaluated.  We explicitly fail it here.
-            if (defaultValue is BindingExpression)
+            if (defaultValue is Expression)
             {
-                throw new ArgumentException("A BindingExpression object is not a valid default value for a DependencyProperty.");
+                throw new ArgumentException(Strings.DefaultValueMayNotBeExpression);
             }
 
             // After checking for correct type, check default value against
@@ -510,8 +508,7 @@ namespace System.Windows
             if (validateValueCallback != null &&
                 !validateValueCallback(defaultValue))
             {
-                throw new ArgumentException(
-                    string.Format("Default value for '{0}' property is not valid because ValidateValueCallback failed.", propertyName));
+                throw new ArgumentException(string.Format(Strings.DefaultValueInvalid, propertyName));
             }
         }
 
@@ -538,12 +535,12 @@ namespace System.Windows
 
             if (typeMetadata.Sealed)
             {
-                throw new ArgumentException("Metadata is already associated with a type and property. A new one must be created.");
+                throw new ArgumentException(Strings.TypeMetadataAlreadyInUse);
             }
 
             if (!typeof(DependencyObject).IsAssignableFrom(forType))
             {
-                throw new ArgumentException(string.Format("'{0}' type must derive from DependencyObject.", forType.Name));
+                throw new ArgumentException(string.Format(Strings.TypeMustBeDependencyObjectDerived, forType.Name));
             }
 
             // Ensure default value is a correct value (if it was supplied,
@@ -565,7 +562,7 @@ namespace System.Windows
             // the base metadata
             if (!baseMetadata.GetType().IsAssignableFrom(typeMetadata.GetType()))
             {
-                throw new ArgumentException("Metadata override and base metadata must be of the same type or derived type.");
+                throw new ArgumentException(Strings.OverridingMetadataDoesNotMatchBaseMetadataType);
             }
         }
 
@@ -592,8 +589,7 @@ namespace System.Windows
             if (ReadOnly)
             {
                 // Readonly and no DependencyPropertyKey - not allowed.
-                throw new InvalidOperationException(
-                    string.Format("'{0}' property was registered as read-only and its metadata cannot be overridden without an authorization key.", Name));
+                throw new InvalidOperationException(string.Format(Strings.ReadOnlyOverrideNotAllowed, Name));
             }
 
             ProcessOverrideMetadata(forType, typeMetadata, dType, baseMetadata);
@@ -631,16 +627,14 @@ namespace System.Windows
 
                 if (key.DependencyProperty != this)
                 {
-                    throw new ArgumentException(
-                        string.Format("Property key is not authorized to override metadata of property '{0}'.", Name));
+                    throw new ArgumentException(string.Format(Strings.ReadOnlyOverrideKeyNotAuthorized, Name));
                 }
 
                 VerifyReadOnlyKey(key);
             }
             else
             {
-                throw new InvalidOperationException(
-                    "This method overrides metadata only on read-only properties. This property is not read-only.");
+                throw new InvalidOperationException(Strings.PropertyNotReadOnly);
             }
 
             // Either the property doesn't require a key, or the key match was
@@ -668,7 +662,7 @@ namespace System.Windows
                 }
                 else
                 {
-                    throw new ArgumentException(string.Format("PropertyMetadata is already registered for type '{0}'.", forType.Name));
+                    throw new ArgumentException(string.Format(Strings.TypeMetadataAlreadyRegistered, forType.Name));
                 }
             }
 
@@ -892,8 +886,7 @@ namespace System.Windows
             {
                 if (PropertyFromName.ContainsKey(key))
                 {
-                    throw new ArgumentException(
-                        string.Format("'{0}' property was already registered by '{1}'.", Name, ownerType.Name));
+                    throw new ArgumentException(string.Format(Strings.PropertyAlreadyRegistered, Name, ownerType.Name));
                 }
             }
 
@@ -1054,7 +1047,7 @@ namespace System.Windows
 
             if (_readOnlyKey != candidateKey)
             {
-                throw new ArgumentException(string.Format("Property key is not authorized to modify property '{0}'.", Name));
+                throw new ArgumentException(string.Format(Strings.ReadOnlyKeyNotAuthorized, Name));
             }
         }
 

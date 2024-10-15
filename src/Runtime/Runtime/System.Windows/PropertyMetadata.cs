@@ -523,7 +523,7 @@ namespace System.Windows
         {
             if (Sealed)
             {
-                throw new InvalidOperationException("Cannot change property metadata after it has been associated with a property.");
+                throw new InvalidOperationException(Strings.TypeMetadataCannotChangeAfterUse);
             }
         }
 

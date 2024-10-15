@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data
@@ -92,7 +93,8 @@ namespace System.Windows.Data
                     typeof(CollectionViewSource),
                     new PropertyMetadata(
                             (object)null,
-                            new PropertyChangedCallback(OnSourceChanged)));
+                            new PropertyChangedCallback(OnSourceChanged)),
+                    new ValidateValueCallback(IsSourceValid));
 
         /// <summary>
         /// Gets or sets the collection object from which to create this view.
@@ -127,10 +129,6 @@ namespace System.Windows.Data
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             CollectionViewSource ctrl = (CollectionViewSource)d;
-            if (!IsSourceValid(e.NewValue))
-            {
-                throw new InvalidOperationException("Unsupported type of source for a collection view.");
-            }
 
             ctrl.OnSourceChanged(e.OldValue, e.NewValue);
             ctrl.EnsureView();
@@ -472,7 +470,7 @@ namespace System.Windows.Data
                     }
                 }
                 else if (SortDescriptions.Count > 0)
-                    throw new InvalidOperationException(string.Format("'{0}' view does not support sorting.", view));
+                    throw new InvalidOperationException(string.Format(Strings.CannotSortView, view));
 
                 // Filter
                 Predicate<object> filter;
@@ -490,7 +488,7 @@ namespace System.Windows.Data
                     view.Filter = filter;
                 }
                 else if (filter != null)
-                    throw new InvalidOperationException(string.Format("'{0}' view does not support filtering.", view));
+                    throw new InvalidOperationException(string.Format(Strings.CannotFilterView, view));
 
                 // GroupBy
                 if (view.CanGroup)
@@ -502,7 +500,7 @@ namespace System.Windows.Data
                     }
                 }
                 else if (GroupDescriptions.Count > 0)
-                    throw new InvalidOperationException(string.Format("'{0}' view does not support grouping.", view));
+                    throw new InvalidOperationException(string.Format(Strings.CannotGroupView, view));
             }
         }
 

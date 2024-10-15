@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Xaml;
+using OpenSilver.Internal;
 
 namespace System.Windows.Data;
 
@@ -154,7 +155,7 @@ public abstract class BindingBase : MarkupExtension
     {
         if (_isSealed)
         {
-            throw new InvalidOperationException("Binding cannot be changed after it has been used.");
+            throw new InvalidOperationException(Strings.ChangeSealedBinding);
         }
     }
 
@@ -313,7 +314,11 @@ public abstract class BindingBase : MarkupExtension
                          !memberType.IsAssignableFrom(markupExtension.GetType()))
                     {
                         throw new XamlParseException(
-                            $"A '{markupExtension.GetType().Name}' cannot be set on the '{targetMember.Name}' property of type '{targetType.Name}'. A '{markupExtension.GetType().Name}' can only be set on a DependencyProperty of a DependencyObject.");
+                            string.Format(
+                                Strings.MarkupExtensionDynamicOrBindingOnClrProp,
+                                markupExtension.GetType().Name,
+                                targetMember.Name,
+                                targetType.Name));
                     }
                 }
             }

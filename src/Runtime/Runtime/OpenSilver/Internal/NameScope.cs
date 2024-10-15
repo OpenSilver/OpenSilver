@@ -51,7 +51,7 @@ namespace OpenSilver.Internal
 
             if (name == string.Empty)
             {
-                throw new ArgumentException("Name cannot be an empty string.", nameof(name));
+                throw new ArgumentException(Strings.StringEmpty, nameof(name));
             }
 
             if (_nameMap == null)
@@ -65,9 +65,7 @@ namespace OpenSilver.Internal
                 {
                     if (scopedElement != nameContext)
                     {
-                        throw new ArgumentException(
-                            string.Format("Cannot register duplicate name '{0}' in this scope.", name)
-                        );
+                        throw new ArgumentException(string.Format(Strings.NameScopeDuplicateNamesNotAllowed, name));
                     }
                 }
                 else
@@ -86,12 +84,12 @@ namespace OpenSilver.Internal
 
             if (name == string.Empty)
             {
-                throw new ArgumentException("Name cannot be an empty string.", nameof(name));
+                throw new ArgumentException(Strings.StringEmpty, nameof(name));
             }
 
             if (_nameMap == null || !_nameMap.Remove(name))
             {
-                throw new ArgumentException(string.Format("Name '{0}' was not found.", name), nameof(name));
+                throw new ArgumentException(string.Format(Strings.NameScopeNameNotFound, name), nameof(name));
             }
         }
 

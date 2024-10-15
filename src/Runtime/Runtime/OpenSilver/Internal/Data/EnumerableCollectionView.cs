@@ -425,13 +425,13 @@ namespace OpenSilver.Internal.Data
 
                 case NotifyCollectionChangedAction.Remove:
                     if (args.OldStartingIndex < 0)
-                        throw new InvalidOperationException("Collection Remove event must specify item position.");
+                        throw new InvalidOperationException(Strings.RemovedItemNotFound);
 
                     for (int i = args.OldItems.Count - 1, index = args.OldStartingIndex + i; i >= 0; --i, --index)
                     {
                         if (!ItemsControl.EqualsEx(args.OldItems[i], _snapshot[index]))
                             // 
-                            throw new InvalidOperationException(string.Format("Added item does not appear at given index '{0}'.", index));
+                            throw new InvalidOperationException(string.Format(Strings.AddedItemNotAtIndex, index));
                         _snapshot.RemoveAt(index);
                     }
                     break;
@@ -441,14 +441,14 @@ namespace OpenSilver.Internal.Data
                     {
                         if (!ItemsControl.EqualsEx(args.OldItems[i], _snapshot[index]))
                             // 
-                            throw new InvalidOperationException(string.Format("Added item does not appear at given index '{0}'.", index));
+                            throw new InvalidOperationException(string.Format(Strings.AddedItemNotAtIndex, index));
                         _snapshot[index] = args.NewItems[i];
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Move:
                     if (args.NewStartingIndex < 0)
-                        throw new InvalidOperationException("Cannot Move items to an unknown position (-1).");
+                        throw new InvalidOperationException(Strings.CannotMoveToUnknownPosition);
 
                     if (args.OldStartingIndex < args.NewStartingIndex)
                     {
@@ -460,7 +460,7 @@ namespace OpenSilver.Internal.Data
                         {
                             if (!ItemsControl.EqualsEx(args.OldItems[i], _snapshot[oldIndex]))
                                 // 
-                                throw new InvalidOperationException(string.Format("Added item does not appear at given index '{0}'.", oldIndex));
+                                throw new InvalidOperationException(string.Format(Strings.AddedItemNotAtIndex, oldIndex));
                             _snapshot.Move(oldIndex, newIndex);
                         }
                     }
@@ -474,7 +474,7 @@ namespace OpenSilver.Internal.Data
                         {
                             if (!ItemsControl.EqualsEx(args.OldItems[i], _snapshot[oldIndex]))
                                 // 
-                                throw new InvalidOperationException(string.Format("Added item does not appear at given index '{0}'.", oldIndex));
+                                throw new InvalidOperationException(string.Format(Strings.AddedItemNotAtIndex, oldIndex));
                             _snapshot.Move(oldIndex, newIndex);
                         }
                     }

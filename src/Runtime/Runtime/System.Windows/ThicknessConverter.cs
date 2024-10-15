@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text;
@@ -134,17 +133,14 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(destinationType));
             }
 
-            if (!(value is Thickness))
+            if (value is not Thickness thickness)
             {
-                throw new ArgumentException(
-                    string.Format("Parameter is unexpected type '{0}'. Expected type is '{1}'.", value.GetType(), typeof(Thickness)), 
-                    nameof(value)
-                );
+                throw new ArgumentException(string.Format(Strings.UnexpectedParameterType, value.GetType(), typeof(Thickness)), nameof(value));
             }
 
             if (destinationType == typeof(string))
             { 
-                return ToString((Thickness)value, cultureInfo); 
+                return ToString(thickness, cultureInfo); 
             }
 
             throw GetConvertToException(value, destinationType);
@@ -206,9 +202,7 @@ namespace System.Windows
                 }
             }
 
-            throw new FormatException(
-                string.Format("'{0}' value is not valid. It must contain one, two, or four delimited Lengths.", s)
-            );
+            throw new FormatException(string.Format(Strings.InvalidStringThickness, s));
         }
     }
 }

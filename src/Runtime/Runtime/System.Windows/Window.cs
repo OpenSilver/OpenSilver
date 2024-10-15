@@ -328,7 +328,7 @@ namespace System.Windows
         {
             if (dependencyObject is not UIElement uie)
             {
-                throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
+                throw new InvalidOperationException(string.Format(Strings.UIElement_NotAnUIElement, nameof(dependencyObject)));
             }
 
             return GetWindow(uie);

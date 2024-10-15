@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -37,7 +37,7 @@ namespace System.Windows
         {
             if (timeSpan < TimeSpan.Zero)
             {
-                throw new ArgumentException("Property value must be greater than or equal to zero or indefinite.", nameof(timeSpan));
+                throw new ArgumentException(Strings.Timing_InvalidArgNonNegative, nameof(timeSpan));
             }
 
             _durationType = DurationType.TimeSpan;
@@ -88,10 +88,7 @@ namespace System.Windows
                 }
                 else
                 {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            "Unable to return a TimeSpan property value for a Duration value of '{0}'. Check the HasTimeSpan property before requesting the TimeSpan property value from a Duration.",
-                            this));
+                    throw new InvalidOperationException(string.Format(Strings.Timing_NotTimeSpan, this));
                 }
             }
         }
@@ -237,7 +234,7 @@ namespace System.Windows
         {
             if (timeSpan < TimeSpan.Zero)
             {
-                throw new ArgumentException("Property value must be greater than or equal to zero or indefinite.", nameof(timeSpan));
+                throw new ArgumentException(Strings.Timing_InvalidArgNonNegative, nameof(timeSpan));
             }
 
             return new Duration(timeSpan);

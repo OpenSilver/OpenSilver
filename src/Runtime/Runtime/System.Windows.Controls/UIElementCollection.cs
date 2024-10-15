@@ -29,7 +29,7 @@ namespace System.Windows.Controls
         {
             if (visualParent == null)
             {
-                throw new ArgumentNullException($"'{nameof(visualParent)}' must be provided when instantiating '{GetType()}'");
+                throw new ArgumentNullException(string.Format(Strings.Panel_NoNullVisualParent, nameof(visualParent), GetType()));
             }
 
             VisualParent = visualParent;

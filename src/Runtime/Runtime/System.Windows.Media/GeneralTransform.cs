@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Media
 {
     /// <summary>
@@ -45,7 +47,7 @@ namespace System.Windows.Media
         {
             if (!TryTransform(point, out Point transformedPoint))
             {
-                throw new InvalidOperationException("The transform is not defined for the point.");
+                throw new InvalidOperationException(Strings.GeneralTransform_TransformFailed);
             }
 
             return transformedPoint;

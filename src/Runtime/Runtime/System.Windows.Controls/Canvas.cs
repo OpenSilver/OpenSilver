@@ -11,11 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
-using System.Linq;
-using System.Windows.Documents;
 using System.Windows.Media;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls

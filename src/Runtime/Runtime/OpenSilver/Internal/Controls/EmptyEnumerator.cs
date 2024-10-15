@@ -151,7 +151,7 @@ namespace OpenSilver.Internal.Controls
                 }
 
                 // Fall through -- can't enumerate (before beginning or after end)
-                throw new InvalidOperationException("Enumerator is located before the first element of the collection or after the last element.");
+                throw new InvalidOperationException(Strings.EnumeratorInvalidOperation);
                 // above exception is part of the IEnumerator.Current contract when moving beyond begin/end
             }
         }
@@ -194,7 +194,7 @@ namespace OpenSilver.Internal.Controls
             // If the content has changed, then throw an exception
             if (!IsUnchanged)
             {
-                throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
+                throw new InvalidOperationException(Strings.EnumeratorVersionChanged);
             }
         }
 
