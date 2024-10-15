@@ -28,6 +28,66 @@ internal static class AnimatedTypeHelpers
     internal static double InterpolateDouble(double from, double to, double progress) =>
         from + ((to - from) * progress);
 
+    internal static short InterpolateInt16(short from, short to, double progress)
+    {
+        if (progress == 0.0)
+        {
+            return from;
+        }
+        else if (progress == 1.0)
+        {
+            return to;
+        }
+        else
+        {
+            double addend = to - from;
+            addend *= progress;
+            addend += (addend > 0.0) ? 0.5 : -0.5;
+
+            return (short)(from + (short)addend);
+        }
+    }
+
+    internal static int InterpolateInt32(int from, int to, double progress)
+    {
+        if (progress == 0.0)
+        {
+            return from;
+        }
+        else if (progress == 1.0)
+        {
+            return to;
+        }
+        else
+        {
+            double addend = to - from;
+            addend *= progress;
+            addend += (addend > 0.0) ? 0.5 : -0.5;
+
+            return from + (int)addend;
+        }
+    }
+
+    internal static long InterpolateInt64(long from, long to, double progress)
+    {
+        if (progress == 0.0)
+        {
+            return from;
+        }
+        else if (progress == 1.0)
+        {
+            return to;
+        }
+        else
+        {
+            double addend = to - from;
+            addend *= progress;
+            addend += (addend > 0.0) ? 0.5 : -0.5;
+
+            return from + (long)addend;
+        }
+    }
+
     internal static Point InterpolatePoint(Point from, Point to, double progress) =>
         new(from.X + (to.X - from.X) * progress, from.Y + (to.Y - from.Y) * progress);
 }

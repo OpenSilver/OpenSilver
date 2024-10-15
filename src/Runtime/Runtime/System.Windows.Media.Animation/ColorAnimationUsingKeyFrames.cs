@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -53,4 +54,36 @@ public class ColorAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAnimatio
 
     internal override TimelineClock CreateClock(bool isRoot) =>
         new AnimationClock<Color>(this, isRoot, new KeyFramesAnimator<Color>(this));
+}
+
+/// <summary>
+/// Represents a collection of <see cref="ColorKeyFrame" /> objects 
+/// that can be individually accessed by index. 
+/// </summary>
+public sealed class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>, IKeyFrameCollection<Color>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ColorKeyFrameCollection"/> class.
+    /// </summary>
+    public ColorKeyFrameCollection() { }
+
+    internal ColorKeyFrameCollection(ColorAnimationUsingKeyFrames owner)
+    {
+        Debug.Assert(owner is not null);
+        owner.ProvideSelfAsInheritanceContext(this, null);
+    }
+
+    internal override void AddOverride(ColorKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
+
+    internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+    internal override void InsertOverride(int index, ColorKeyFrame keyFrame) => InsertDependencyObjectInternal(index, keyFrame);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+    internal override ColorKeyFrame GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void SetItemOverride(int index, ColorKeyFrame keyFrame) => SetItemDependencyObjectInternal(index, keyFrame);
+
+    IKeyFrame<Color> IKeyFrameCollection<Color>.this[int index] => GetItemInternal(index);
 }

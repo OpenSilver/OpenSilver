@@ -82,3 +82,32 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
         }
     }
 }
+
+/// <summary>
+/// Represents a collection of <see cref="ObjectKeyFrame"/> objects that can be 
+/// individually accessed by index.
+/// </summary>
+public sealed class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>, IKeyFrameCollection<object>
+{
+    public ObjectKeyFrameCollection() { }
+
+    internal ObjectKeyFrameCollection(ObjectAnimationUsingKeyFrames owner)
+    {
+        Debug.Assert(owner != null);
+        owner.ProvideSelfAsInheritanceContext(this, null);
+    }
+
+    internal override void AddOverride(ObjectKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
+
+    internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+    internal override void InsertOverride(int index, ObjectKeyFrame keyFrame) => InsertDependencyObjectInternal(index, keyFrame);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+    internal override ObjectKeyFrame GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void SetItemOverride(int index, ObjectKeyFrame keyFrame) => SetItemDependencyObjectInternal(index, keyFrame);
+
+    IKeyFrame<object> IKeyFrameCollection<object>.this[int index] => GetItemInternal(index);
+}

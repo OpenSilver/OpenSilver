@@ -15,7 +15,6 @@ using OpenSilver.Internal.Media.Animation;
 
 namespace System.Windows.Media.Animation;
 
-
 /// <summary>
 /// Animates the value of a System.Double property between two target values using
 /// linear interpolation over a specified <see cref="Timeline.Duration"/>.

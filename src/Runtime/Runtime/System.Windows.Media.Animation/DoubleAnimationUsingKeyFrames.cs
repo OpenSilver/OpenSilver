@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -51,4 +52,36 @@ public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<double>(this, isRoot, new KeyFramesAnimator<double>(this));
+}
+
+/// <summary>
+/// Represents a collection of <see cref="DoubleKeyFrame"/> objects that can 
+/// be individually accessed by index.
+/// </summary>
+public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>, IKeyFrameCollection<double>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DoubleKeyFrameCollection"/> class.
+    /// </summary>
+    public DoubleKeyFrameCollection() { }
+
+    internal DoubleKeyFrameCollection(DoubleAnimationUsingKeyFrames owner)
+    {
+        Debug.Assert(owner is not null);
+        owner.ProvideSelfAsInheritanceContext(this, null);
+    }
+
+    internal override void AddOverride(DoubleKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
+
+    internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+    internal override void InsertOverride(int index, DoubleKeyFrame keyFrame) => InsertDependencyObjectInternal(index, keyFrame);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+    internal override DoubleKeyFrame GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void SetItemOverride(int index, DoubleKeyFrame keyFrame) => SetItemDependencyObjectInternal(index, keyFrame);
+
+    IKeyFrame<double> IKeyFrameCollection<double>.this[int index] => GetItemInternal(index);
 }

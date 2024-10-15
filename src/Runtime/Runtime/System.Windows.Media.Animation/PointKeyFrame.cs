@@ -16,11 +16,43 @@ using OpenSilver.Internal.Media.Animation;
 namespace System.Windows.Media.Animation;
 
 /// <summary>
-/// Defines an animation segment with its own target value and interpolation method
-/// for a <see cref="PointAnimationUsingKeyFrames"/>.
+/// Defines an animation segment with its own target value and interpolation method for a 
+/// <see cref="PointAnimationUsingKeyFrames"/>.
 /// </summary>
 public abstract class PointKeyFrame : DependencyObject, IKeyFrame<Point>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PointKeyFrame"/> class.
+    /// </summary>
+    protected PointKeyFrame() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PointKeyFrame"/> class that has the specified target <see cref="Value"/>.
+    /// </summary>
+    /// <param name="value">
+    /// The <see cref="Value"/> of the new <see cref="PointKeyFrame"/> instance.
+    /// </param>
+    protected PointKeyFrame(Point value)
+    {
+        Value = value;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PointKeyFrame"/> class that has the specified target <see cref="Value"/>
+    /// and <see cref="KeyTime"/>.
+    /// </summary>
+    /// <param name="value">
+    /// The <see cref="Value"/> of the new <see cref="PointKeyFrame"/> instance.
+    /// </param>
+    /// <param name="keyTime">
+    /// The <see cref="KeyTime"/> of the new <see cref="PointKeyFrame"/> instance.
+    /// </param>
+    protected PointKeyFrame(Point value, KeyTime keyTime)
+    {
+        Value = value;
+        KeyTime = keyTime;
+    }
+
     /// <summary>
     /// Identifies the <see cref="KeyTime"/> dependency property.
     /// </summary>
@@ -114,4 +146,279 @@ public abstract class PointKeyFrame : DependencyObject, IKeyFrame<Point>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
     internal virtual Point InterpolateValueCore(Point baseValue, double keyFrameProgress) => baseValue;
+}
+
+/// <summary>
+/// Animates from the <see cref="Point"/> value of the previous key frame to its own <see cref="PointKeyFrame.Value"/> 
+/// using discrete frames.
+/// </summary>
+public sealed class DiscretePointKeyFrame : PointKeyFrame
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiscretePointKeyFrame"/> class.
+    /// </summary>
+    public DiscretePointKeyFrame() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiscretePointKeyFrame"/> class with the specified ending value.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    public DiscretePointKeyFrame(Point value)
+        : base(value)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiscretePointKeyFrame"/> class with the specified ending value and key time.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    /// <param name="keyTime">
+    /// Key time for the key frame. The key time determines when the target value is reached which is also when the key frame ends.
+    /// </param>
+    public DiscretePointKeyFrame(Point value, KeyTime keyTime)
+        : base(value, keyTime)
+    {
+    }
+
+    /// <inheritdoc />
+    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
+        keyFrameProgress switch
+        {
+            < 1.0 => baseValue,
+            _ => Value
+        };
+}
+
+/// <summary>
+/// Animates from the <see cref="Point"/> value of the previous key frame to its own <see cref="PointKeyFrame.Value"/> 
+/// using linear interpolation.
+/// </summary>
+public sealed class LinearPointKeyFrame : PointKeyFrame
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LinearPointKeyFrame"/> class.
+    /// </summary>
+    public LinearPointKeyFrame() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LinearPointKeyFrame"/> class with the specified ending value.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    public LinearPointKeyFrame(Point value)
+        : base(value)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LinearPointKeyFrame"/> class with the specified ending value and key time.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    /// <param name="keyTime">
+    /// Key time for the key frame. The key time determines when the target value is reached which is also when the key frame ends.
+    /// </param>
+    public LinearPointKeyFrame(Point value, KeyTime keyTime)
+        : base(value, keyTime)
+    {
+    }
+
+    /// <inheritdoc />
+    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
+        keyFrameProgress switch
+        {
+            0.0 => baseValue,
+            1.0 => Value,
+            _ => AnimatedTypeHelpers.InterpolatePoint(baseValue, Value, keyFrameProgress)
+        };
+}
+
+/// <summary>
+/// Defines a property that enables you to associate an easing function with a <see cref="PointAnimationUsingKeyFrames"/> 
+/// key-frame animation.
+/// </summary>
+public sealed class EasingPointKeyFrame : PointKeyFrame
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EasingPointKeyFrame"/> class.
+    /// </summary>
+    public EasingPointKeyFrame() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EasingPointKeyFrame"/> class with the specified <see cref="Point"/> value.
+    /// </summary>
+    /// <param name="value">
+    /// The initial <see cref="Point"/> value.
+    /// </param>
+    public EasingPointKeyFrame(Point value)
+        : base(value)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EasingPointKeyFrame"/> class with the specified <see cref="Point"/> value 
+    /// and key time.
+    /// </summary>
+    /// <param name="value">
+    /// The initial <see cref="Point"/> value.
+    /// </param>
+    /// <param name="keyTime">
+    /// The initial key time.
+    /// </param>
+    public EasingPointKeyFrame(Point value, KeyTime keyTime)
+        : base(value, keyTime)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EasingPointKeyFrame"/> class with the specified <see cref="Point"/> value, 
+    /// key time, and easing function.
+    /// </summary>
+    /// <param name="value">
+    /// The initial <see cref="Point"/> value.
+    /// </param>
+    /// <param name="keyTime">
+    /// The initial key time.
+    /// </param>
+    /// <param name="easingFunction">
+    /// The easing function.
+    /// </param>
+    public EasingPointKeyFrame(Point value, KeyTime keyTime, IEasingFunction easingFunction)
+        : base(value, keyTime)
+    {
+        EasingFunction = easingFunction;
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="EasingFunction"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty EasingFunctionProperty =
+        DependencyProperty.Register(
+            nameof(EasingFunction),
+            typeof(IEasingFunction),
+            typeof(EasingPointKeyFrame),
+            null);
+
+    /// <summary>
+    /// Gets or sets the easing function that is applied to the key frame.
+    /// </summary>
+    /// <returns>
+    /// The easing function that is applied to the key frame.
+    /// </returns>
+    public IEasingFunction EasingFunction
+    {
+        get => (IEasingFunction)GetValue(EasingFunctionProperty);
+        set => SetValueInternal(EasingFunctionProperty, value);
+    }
+
+    /// <inheritdoc />
+    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress)
+    {
+        if (EasingFunction is IEasingFunction easingFunction)
+        {
+            keyFrameProgress = easingFunction.Ease(keyFrameProgress);
+        }
+
+        return keyFrameProgress switch
+        {
+            0.0 => baseValue,
+            1.0 => Value,
+            _ => AnimatedTypeHelpers.InterpolatePoint(baseValue, Value, keyFrameProgress)
+        };
+    }
+}
+
+/// <summary>
+/// Animates from the <see cref="Point"/> value of the previous key frame to its own <see cref="PointKeyFrame.Value"/> 
+/// using splined interpolation.
+/// </summary>
+public sealed class SplinePointKeyFrame : PointKeyFrame
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SplinePointKeyFrame"/> class.
+    /// </summary>
+    public SplinePointKeyFrame() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SplinePointKeyFrame"/> class with the specified ending value.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    public SplinePointKeyFrame(Point value)
+        : base(value)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SplinePointKeyFrame"/> class with the specified ending value and key time.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    /// <param name="keyTime">
+    /// Key time for the key frame. The key time determines when the target value is reached, which is also when the key frame ends.
+    /// </param>
+    public SplinePointKeyFrame(Point value, KeyTime keyTime)
+        : base(value, keyTime)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SplinePointKeyFrame"/> class with the specified ending value, key time, 
+    /// and <see cref="Animation.KeySpline"/>.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    /// <param name="keyTime">
+    /// Key time for the key frame. The key time determines when the target value is reached, which is also when the key frame ends.
+    /// </param>
+    /// <param name="keySpline">
+    /// <see cref="Animation.KeySpline"/> for the key frame. The <see cref="Animation.KeySpline"/> represents a Bezier curve that 
+    /// defines animation progress of the key frame.
+    /// </param>
+    public SplinePointKeyFrame(Point value, KeyTime keyTime, KeySpline keySpline)
+        : base(value, keyTime)
+    {
+        KeySpline = keySpline;
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="KeySpline" /> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty KeySplineProperty =
+        DependencyProperty.Register(
+            nameof(KeySpline),
+            typeof(KeySpline),
+            typeof(SplinePointKeyFrame),
+            new PropertyMetadata(new KeySpline()));
+
+    /// <summary>
+    /// Gets or sets the two control points that define animation progress for this key frame.
+    /// </summary>
+    /// <returns>
+    /// The two control points that specify the cubic Bezier curve that defines the progress of 
+    /// the key frame.
+    /// </returns>
+    public KeySpline KeySpline
+    {
+        get => (KeySpline)GetValue(KeySplineProperty);
+        set => SetValueInternal(KeySplineProperty, value);
+    }
+
+    /// <inheritdoc />
+    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
+        keyFrameProgress switch
+        {
+            0.0 => baseValue,
+            1.0 => Value,
+            _ => AnimatedTypeHelpers.InterpolatePoint(baseValue, Value, KeySpline.GetSplineProgress(KeySpline, keyFrameProgress)),
+        };
 }

@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -46,4 +47,33 @@ public sealed class PointAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
 
     internal override TimelineClock CreateClock(bool isRoot) =>
         new AnimationClock<Point>(this, isRoot, new KeyFramesAnimator<Point>(this));
+}
+
+/// <summary>
+/// Represents a collection of <see cref="PointKeyFrame"/> objects that can 
+/// be individually accessed by index.
+/// </summary>
+public sealed class PointKeyFrameCollection : PresentationFrameworkCollection<PointKeyFrame>, IKeyFrameCollection<Point>
+{
+    public PointKeyFrameCollection() { }
+
+    internal PointKeyFrameCollection(PointAnimationUsingKeyFrames owner)
+    {
+        Debug.Assert(owner is not null);
+        owner.ProvideSelfAsInheritanceContext(this, null);
+    }
+
+    internal override void AddOverride(PointKeyFrame value) => AddDependencyObjectInternal(value);
+
+    internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+    internal override PointKeyFrame GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void InsertOverride(int index, PointKeyFrame value) => InsertDependencyObjectInternal(index, value);
+
+    internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+    internal override void SetItemOverride(int index, PointKeyFrame value) => SetItemDependencyObjectInternal(index, value);
+
+    IKeyFrame<Point> IKeyFrameCollection<Point>.this[int index] => GetItemInternal(index);
 }

@@ -16,11 +16,42 @@ using OpenSilver.Internal.Media.Animation;
 namespace System.Windows.Media.Animation;
 
 /// <summary>
-/// Defines an animation segment with its own target value and interpolation method
-/// for an <see cref="ObjectAnimationUsingKeyFrames"/>.
+/// Defines an animation segment with its own target value and interpolation method for an <see cref="ObjectAnimationUsingKeyFrames"/>.
 /// </summary>
 public abstract class ObjectKeyFrame : DependencyObject, IKeyFrame<object>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObjectKeyFrame"/> class.
+    /// </summary>
+    protected ObjectKeyFrame() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObjectKeyFrame"/> class that has the specified target <see cref="Value"/>.
+    /// </summary>
+    /// <param name="value">
+    /// The <see cref="Value"/> of the new <see cref="ObjectKeyFrame"/> instance.
+    /// </param>
+    protected ObjectKeyFrame(object value)
+    {
+        Value = value;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObjectKeyFrame"/> class that has the specified target <see cref="Value"/>
+    /// and <see cref="KeyTime"/>.
+    /// </summary>
+    /// <param name="value">
+    /// The <see cref="Value"/> of the new <see cref="ObjectKeyFrame"/> instance.
+    /// </param>
+    /// <param name="keyTime">
+    /// The <see cref="KeyTime"/> of the new <see cref="ObjectKeyFrame"/> instance.
+    /// </param>
+    protected ObjectKeyFrame(object value, KeyTime keyTime)
+    {
+        Value = value;
+        KeyTime = keyTime;
+    }
+
     /// <summary>
     /// Identifies the <see cref="KeyTime"/> dependency property.
     /// </summary>
@@ -108,4 +139,49 @@ public abstract class ObjectKeyFrame : DependencyObject, IKeyFrame<object>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
     internal virtual object InterpolateValueCore(object baseValue, double keyFrameProgress) => baseValue;
+}
+
+/// <summary>
+/// Animates from the <see cref="object"/> value of the previous key frame to its own <see cref="ObjectKeyFrame.Value"/> 
+/// using discrete values.
+/// </summary>
+public sealed class DiscreteObjectKeyFrame : ObjectKeyFrame
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiscreteObjectKeyFrame"/> class.
+    /// </summary>
+    public DiscreteObjectKeyFrame() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiscreteObjectKeyFrame"/> class with the specified ending value.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    public DiscreteObjectKeyFrame(object value)
+        : base(value)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiscreteObjectKeyFrame"/> class with the specified ending value and key time.
+    /// </summary>
+    /// <param name="value">
+    /// Ending value (also known as "target value") for the key frame.
+    /// </param>
+    /// <param name="keyTime">
+    /// Key time for the key frame. The key time determines when the target value is reached which is also when the key frame ends.
+    /// </param>
+    public DiscreteObjectKeyFrame(object value, KeyTime keyTime)
+        : base(value, keyTime)
+    {
+    }
+
+    /// <inheritdoc />
+    internal override object InterpolateValueCore(object baseValue, double keyFrameProgress) =>
+        keyFrameProgress switch
+        {
+            < 1.0 => baseValue,
+            _ => Value
+        };
 }

@@ -224,7 +224,7 @@ internal static class MatrixUtil
                 return;
 #if DEBUG
             default:
-                Debug.Fail("Matrix multiply hit an invalid case: " + combinedType);
+                System.Diagnostics.Debug.Fail("Matrix multiply hit an invalid case: " + combinedType);
                 break;
 #endif
         }
