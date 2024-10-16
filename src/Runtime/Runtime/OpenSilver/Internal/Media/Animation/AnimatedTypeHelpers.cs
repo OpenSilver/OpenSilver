@@ -28,6 +28,15 @@ internal static class AnimatedTypeHelpers
     internal static double InterpolateDouble(double from, double to, double progress) =>
         from + ((to - from) * progress);
 
+    internal static float InterpolateSingle(float from, float to, double progress) =>
+        from + (float)((to - from) * progress);
+
+    internal static decimal InterpolateDecimal(decimal from, decimal to, double progress) =>
+        from + ((to - from) * (decimal)progress);
+
+    internal static byte InterpolateByte(byte from, byte to, double progress) =>
+        (byte)(from + (int)((to - from + (double)0.5) * progress));
+
     internal static short InterpolateInt16(short from, short to, double progress)
     {
         if (progress == 0.0)
@@ -90,4 +99,24 @@ internal static class AnimatedTypeHelpers
 
     internal static Point InterpolatePoint(Point from, Point to, double progress) =>
         new(from.X + (to.X - from.X) * progress, from.Y + (to.Y - from.Y) * progress);
+
+    internal static Size InterpolateSize(Size from, Size to, double progress) =>
+        (Size)InterpolateVector((Vector)from, (Vector)to, progress);
+
+    internal static Vector InterpolateVector(Vector from, Vector to, double progress) =>
+        from + ((to - from) * progress);
+
+    internal static Thickness InterpolateThickness(Thickness from, Thickness to, double progress) =>
+        new Thickness(
+            InterpolateDouble(from.Left, to.Left, progress),
+            InterpolateDouble(from.Top, to.Top, progress),
+            InterpolateDouble(from.Right, to.Right, progress),
+            InterpolateDouble(from.Bottom, to.Bottom, progress));
+
+    internal static Rect InterpolateRect(Rect from, Rect to, double progress) =>
+        new Rect(
+            InterpolateDouble(from.X, to.X, progress),
+            InterpolateDouble(from.Y, to.Y, progress),
+            InterpolateDouble(from.Width, to.Width, progress),
+            InterpolateDouble(from.Height, to.Height, progress));
 }
