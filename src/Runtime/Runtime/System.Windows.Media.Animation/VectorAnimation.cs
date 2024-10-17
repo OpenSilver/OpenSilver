@@ -128,7 +128,7 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
     public Vector? By
     {
         get => (Vector?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
     public Vector? From
     {
         get => (Vector?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
     public Vector? To
     {
         get => (Vector?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

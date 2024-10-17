@@ -73,7 +73,7 @@ public abstract class Int16KeyFrame : DependencyObject, IKeyFrame<short>
     public KeyTime KeyTime
     {
         get => (KeyTime)GetValue(KeyTimeProperty);
-        set => SetValue(KeyTimeProperty, value);
+        set => SetValueInternal(KeyTimeProperty, value);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public abstract class Int16KeyFrame : DependencyObject, IKeyFrame<short>
     public short Value
     {
         get => (short)GetValue(ValueProperty);
-        set => SetValue(ValueProperty, value);
+        set => SetValueInternal(ValueProperty, value);
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public sealed class EasingInt16KeyFrame : Int16KeyFrame
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <inheritdoc />
@@ -406,7 +406,7 @@ public sealed class SplineInt16KeyFrame : Int16KeyFrame
     public KeySpline KeySpline
     {
         get => (KeySpline)GetValue(KeySplineProperty);
-        set => SetValue(KeySplineProperty, value);
+        set => SetValueInternal(KeySplineProperty, value);
     }
 
     /// <inheritdoc />

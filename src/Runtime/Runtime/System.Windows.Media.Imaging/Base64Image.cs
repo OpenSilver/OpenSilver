@@ -49,7 +49,7 @@ public sealed class Base64Image : ImageSource
     public string DataURL
     {
         get => (string)GetValue(DataURLProperty);
-        set => SetValue(DataURLProperty, value);
+        set => SetValueInternal(DataURLProperty, value);
     }
 
     private static void OnDataUrlChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

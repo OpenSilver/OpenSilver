@@ -40,7 +40,7 @@ public sealed class InlineImageContainer : Inline
     public ImageSource Source
     {
         get => (ImageSource)GetValue(SourceProperty);
-        set => SetValue(SourceProperty, value);
+        set => SetValueInternal(SourceProperty, value);
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public sealed class InlineImageContainer : Inline
     public Stretch Stretch
     {
         get => (Stretch)GetValue(StretchProperty);
-        set => SetValue(StretchProperty, value);
+        set => SetValueInternal(StretchProperty, value);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public sealed class InlineImageContainer : Inline
     public double Width
     {
         get => (double)GetValue(WidthProperty);
-        set => SetValue(WidthProperty, value);
+        set => SetValueInternal(WidthProperty, value);
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public sealed class InlineImageContainer : Inline
     public double Height
     {
         get => (double)GetValue(HeightProperty);
-        set => SetValue(HeightProperty, value);
+        set => SetValueInternal(HeightProperty, value);
     }
 
     private static bool IsWidthHeightValid(object value)

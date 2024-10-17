@@ -116,7 +116,7 @@ public sealed class BitmapImage : BitmapSource
     public BitmapCreateOptions CreateOptions
     {
         get => (BitmapCreateOptions)GetValue(CreateOptionsProperty);
-        set => SetValue(CreateOptionsProperty, value);
+        set => SetValueInternal(CreateOptionsProperty, value);
     }
 
     /// <summary>

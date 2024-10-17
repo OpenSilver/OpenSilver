@@ -128,7 +128,7 @@ public sealed class SizeAnimation : AnimationTimeline, IFromByToAnimation<Size>
     public Size? By
     {
         get => (Size?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public sealed class SizeAnimation : AnimationTimeline, IFromByToAnimation<Size>
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public sealed class SizeAnimation : AnimationTimeline, IFromByToAnimation<Size>
     public Size? From
     {
         get => (Size?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public sealed class SizeAnimation : AnimationTimeline, IFromByToAnimation<Size>
     public Size? To
     {
         get => (Size?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

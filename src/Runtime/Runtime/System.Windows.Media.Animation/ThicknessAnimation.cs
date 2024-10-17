@@ -128,7 +128,7 @@ public sealed class ThicknessAnimation : AnimationTimeline, IFromByToAnimation<T
     public Thickness? By
     {
         get => (Thickness?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public sealed class ThicknessAnimation : AnimationTimeline, IFromByToAnimation<T
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public sealed class ThicknessAnimation : AnimationTimeline, IFromByToAnimation<T
     public Thickness? From
     {
         get => (Thickness?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public sealed class ThicknessAnimation : AnimationTimeline, IFromByToAnimation<T
     public Thickness? To
     {
         get => (Thickness?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

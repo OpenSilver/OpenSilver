@@ -73,7 +73,7 @@ public abstract class RectKeyFrame : DependencyObject, IKeyFrame<Rect>
     public KeyTime KeyTime
     {
         get => (KeyTime)GetValue(KeyTimeProperty);
-        set => SetValue(KeyTimeProperty, value);
+        set => SetValueInternal(KeyTimeProperty, value);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public abstract class RectKeyFrame : DependencyObject, IKeyFrame<Rect>
     public Rect Value
     {
         get => (Rect)GetValue(ValueProperty);
-        set => SetValue(ValueProperty, value);
+        set => SetValueInternal(ValueProperty, value);
     }
 
     object IKeyFrame.Value
@@ -309,7 +309,7 @@ public sealed class EasingRectKeyFrame : RectKeyFrame
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <inheritdoc />
@@ -404,7 +404,7 @@ public sealed class SplineRectKeyFrame : RectKeyFrame
     public KeySpline KeySpline
     {
         get => (KeySpline)GetValue(KeySplineProperty);
-        set => SetValue(KeySplineProperty, value);
+        set => SetValueInternal(KeySplineProperty, value);
     }
 
     /// <inheritdoc />

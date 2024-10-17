@@ -127,7 +127,7 @@ public sealed class SingleAnimation : AnimationTimeline, IFromByToAnimation<floa
     public float? By
     {
         get => (float?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public sealed class SingleAnimation : AnimationTimeline, IFromByToAnimation<floa
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -171,7 +171,7 @@ public sealed class SingleAnimation : AnimationTimeline, IFromByToAnimation<floa
     public float? From
     {
         get => (float?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public sealed class SingleAnimation : AnimationTimeline, IFromByToAnimation<floa
     public float? To
     {
         get => (float?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

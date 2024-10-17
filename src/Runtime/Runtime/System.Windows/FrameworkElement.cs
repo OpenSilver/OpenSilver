@@ -1186,7 +1186,7 @@ namespace System.Windows
         public object ToolTip
         {
             get => GetValue(ToolTipProperty);
-            set => SetValue(ToolTipProperty, value);
+            set => SetValueInternal(ToolTipProperty, value);
         }
 
         #endregion

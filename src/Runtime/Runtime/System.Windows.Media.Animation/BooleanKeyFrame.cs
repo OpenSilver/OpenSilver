@@ -74,7 +74,7 @@ public abstract class BooleanKeyFrame : DependencyObject, IKeyFrame<bool>
     public KeyTime KeyTime
     {
         get => (KeyTime)GetValue(KeyTimeProperty);
-        set => SetValue(KeyTimeProperty, value);
+        set => SetValueInternal(KeyTimeProperty, value);
     }
 
     /// <summary>

@@ -46,7 +46,7 @@ public sealed class Glyphs : FrameworkElement
     public Brush Fill
     {
         get => (Brush)GetValue(FillProperty);
-        set => SetValue(FillProperty, value);
+        set => SetValueInternal(FillProperty, value);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public sealed class Glyphs : FrameworkElement
     public double FontRenderingEmSize
     {
         get => (double)GetValue(FontRenderingEmSizeProperty);
-        set => SetValue(FontRenderingEmSizeProperty, value);
+        set => SetValueInternal(FontRenderingEmSizeProperty, value);
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public sealed class Glyphs : FrameworkElement
     public Uri FontUri
     {
         get => (Uri)GetValue(FontUriProperty);
-        set => SetValue(FontUriProperty, value);
+        set => SetValueInternal(FontUriProperty, value);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public sealed class Glyphs : FrameworkElement
     public string Indices
     {
         get => (string)GetValue(IndicesProperty);
-        set => SetValue(IndicesProperty, value);
+        set => SetValueInternal(IndicesProperty, value);
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public sealed class Glyphs : FrameworkElement
     public double OriginX
     {
         get => (double)GetValue(OriginXProperty);
-        set => SetValue(OriginXProperty, value);
+        set => SetValueInternal(OriginXProperty, value);
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public sealed class Glyphs : FrameworkElement
     public double OriginY
     {
         get => (double)GetValue(OriginYProperty);
-        set => SetValue(OriginYProperty, value);
+        set => SetValueInternal(OriginYProperty, value);
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ public sealed class Glyphs : FrameworkElement
     public StyleSimulations StyleSimulations
     {
         get => (StyleSimulations)GetValue(StyleSimulationsProperty);
-        set => SetValue(StyleSimulationsProperty, value);
+        set => SetValueInternal(StyleSimulationsProperty, value);
     }
 
     /// <summary>
@@ -202,7 +202,7 @@ public sealed class Glyphs : FrameworkElement
     public string UnicodeString
     {
         get => (string)GetValue(UnicodeStringProperty);
-        set => SetValue(UnicodeStringProperty, value);
+        set => SetValueInternal(UnicodeStringProperty, value);
     }
 
     /// <summary>

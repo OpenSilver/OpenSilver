@@ -127,7 +127,7 @@ public sealed class RectAnimation : AnimationTimeline, IFromByToAnimation<Rect>
     public Rect? By
     {
         get => (Rect?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public sealed class RectAnimation : AnimationTimeline, IFromByToAnimation<Rect>
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -171,7 +171,7 @@ public sealed class RectAnimation : AnimationTimeline, IFromByToAnimation<Rect>
     public Rect? From
     {
         get => (Rect?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public sealed class RectAnimation : AnimationTimeline, IFromByToAnimation<Rect>
     public Rect? To
     {
         get => (Rect?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

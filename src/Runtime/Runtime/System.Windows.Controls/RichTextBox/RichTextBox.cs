@@ -111,7 +111,7 @@ namespace System.Windows.Controls
         public ScrollBarVisibility VerticalScrollBarVisibility
         {
             get => (ScrollBarVisibility)GetValue(VerticalScrollBarVisibilityProperty);
-            set => SetValue(VerticalScrollBarVisibilityProperty, value);
+            set => SetValueInternal(VerticalScrollBarVisibilityProperty, value);
         }
 
         private static void OnVerticalScrollBarVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -142,7 +142,7 @@ namespace System.Windows.Controls
         public ScrollBarVisibility HorizontalScrollBarVisibility
         {
             get => (ScrollBarVisibility)GetValue(HorizontalScrollBarVisibilityProperty);
-            set => SetValue(HorizontalScrollBarVisibilityProperty, value);
+            set => SetValueInternal(HorizontalScrollBarVisibilityProperty, value);
         }
 
         private static void OnHorizontalScrollBarVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

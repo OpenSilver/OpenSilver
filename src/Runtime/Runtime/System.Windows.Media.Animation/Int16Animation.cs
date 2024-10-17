@@ -133,7 +133,7 @@ public sealed class Int16Animation : AnimationTimeline, IFromByToAnimation<short
     public short? By
     {
         get => (short?)GetValue(ByProperty);
-        set => SetValue(ByProperty, value);
+        set => SetValueInternal(ByProperty, value);
     }
 
     /// <summary>
@@ -155,7 +155,7 @@ public sealed class Int16Animation : AnimationTimeline, IFromByToAnimation<short
     public IEasingFunction EasingFunction
     {
         get => (IEasingFunction)GetValue(EasingFunctionProperty);
-        set => SetValue(EasingFunctionProperty, value);
+        set => SetValueInternal(EasingFunctionProperty, value);
     }
 
     /// <summary>
@@ -177,7 +177,7 @@ public sealed class Int16Animation : AnimationTimeline, IFromByToAnimation<short
     public short? From
     {
         get => (short?)GetValue(FromProperty);
-        set => SetValue(FromProperty, value);
+        set => SetValueInternal(FromProperty, value);
     }
 
     /// <summary>
@@ -199,7 +199,7 @@ public sealed class Int16Animation : AnimationTimeline, IFromByToAnimation<short
     public short? To
     {
         get => (short?)GetValue(ToProperty);
-        set => SetValue(ToProperty, value);
+        set => SetValueInternal(ToProperty, value);
     }
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>

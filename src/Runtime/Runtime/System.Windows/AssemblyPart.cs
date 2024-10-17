@@ -42,7 +42,7 @@ public sealed class AssemblyPart : DependencyObject
     public string Source
     {
         get => (string)GetValue(SourceProperty);
-        set => SetValue(SourceProperty, value);
+        set => SetValueInternal(SourceProperty, value);
     }
 
     /// <summary>
