@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -39,8 +38,15 @@ public sealed class BooleanAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
     /// </returns>
     public BooleanKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new BooleanKeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<bool> IKeyFrameAnimation<bool>.KeyFrames => _frames;
@@ -50,6 +56,21 @@ public sealed class BooleanAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<bool>(this, isRoot, new KeyFramesAnimator<bool>(this));
+
+    private void SetKeyFrames(BooleanKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -61,12 +82,6 @@ public sealed class BooleanKeyFrameCollection : PresentationFrameworkCollection<
     /// Initializes a new instance of the <see cref="BooleanKeyFrameCollection"/> class.
     /// </summary>
     public BooleanKeyFrameCollection() { }
-
-    internal BooleanKeyFrameCollection(BooleanAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(BooleanKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

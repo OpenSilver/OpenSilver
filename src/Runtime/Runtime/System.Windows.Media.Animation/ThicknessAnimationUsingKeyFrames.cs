@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -38,8 +37,15 @@ public sealed class ThicknessAnimationUsingKeyFrames : AnimationTimeline, IKeyFr
     /// </returns>
     public ThicknessKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new ThicknessKeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<Thickness> IKeyFrameAnimation<Thickness>.KeyFrames => _frames;
@@ -49,6 +55,21 @@ public sealed class ThicknessAnimationUsingKeyFrames : AnimationTimeline, IKeyFr
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<Thickness>(this, isRoot, new KeyFramesAnimator<Thickness>(this));
+
+    private void SetKeyFrames(ThicknessKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -60,12 +81,6 @@ public sealed class ThicknessKeyFrameCollection : PresentationFrameworkCollectio
     /// Initializes a new instance of the <see cref="ThicknessKeyFrameCollection"/> class.
     /// </summary>
     public ThicknessKeyFrameCollection() { }
-
-    internal ThicknessKeyFrameCollection(ThicknessAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(ThicknessKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

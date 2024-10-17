@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -38,7 +37,18 @@ public sealed class PointAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
     /// The collection of <see cref="PointKeyFrame"/> objects that define
     /// the animation. The default is an empty collection.
     /// </returns>
-    public PointKeyFrameCollection KeyFrames => _frames ??= new PointKeyFrameCollection(this);
+    public PointKeyFrameCollection KeyFrames
+    {
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
+    }
 
     IKeyFrameCollection<Point> IKeyFrameAnimation<Point>.KeyFrames => _frames;
 
@@ -47,21 +57,32 @@ public sealed class PointAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
 
     internal override TimelineClock CreateClock(bool isRoot) =>
         new AnimationClock<Point>(this, isRoot, new KeyFramesAnimator<Point>(this));
+
+    private void SetKeyFrames(PointKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
-/// Represents a collection of <see cref="PointKeyFrame"/> objects that can 
-/// be individually accessed by index.
+/// Represents a collection of <see cref="PointKeyFrame"/> objects that can be individually accessed by index.
 /// </summary>
 public sealed class PointKeyFrameCollection : PresentationFrameworkCollection<PointKeyFrame>, IKeyFrameCollection<Point>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PointKeyFrameCollection"/> class.
+    /// </summary>
     public PointKeyFrameCollection() { }
-
-    internal PointKeyFrameCollection(PointAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(PointKeyFrame value) => AddDependencyObjectInternal(value);
 

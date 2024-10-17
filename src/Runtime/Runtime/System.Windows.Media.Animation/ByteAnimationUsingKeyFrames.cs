@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -38,8 +37,15 @@ public sealed class ByteAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
     /// </returns>
     public ByteKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new ByteKeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<byte> IKeyFrameAnimation<byte>.KeyFrames => _frames;
@@ -49,6 +55,21 @@ public sealed class ByteAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<byte>(this, isRoot, new KeyFramesAnimator<byte>(this));
+
+    private void SetKeyFrames(ByteKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -60,12 +81,6 @@ public sealed class ByteKeyFrameCollection : PresentationFrameworkCollection<Byt
     /// Initializes a new instance of the <see cref="ByteKeyFrameCollection"/> class.
     /// </summary>
     public ByteKeyFrameCollection() { }
-
-    internal ByteKeyFrameCollection(ByteAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(ByteKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

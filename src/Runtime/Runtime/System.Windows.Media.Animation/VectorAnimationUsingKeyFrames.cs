@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -38,8 +37,15 @@ public sealed class VectorAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     /// </returns>
     public VectorKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new VectorKeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<Vector> IKeyFrameAnimation<Vector>.KeyFrames => _frames;
@@ -49,6 +55,21 @@ public sealed class VectorAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<Vector>(this, isRoot, new KeyFramesAnimator<Vector>(this));
+
+    private void SetKeyFrames(VectorKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -60,12 +81,6 @@ public sealed class VectorKeyFrameCollection : PresentationFrameworkCollection<V
     /// Initializes a new instance of the <see cref="VectorKeyFrameCollection"/> class.
     /// </summary>
     public VectorKeyFrameCollection() { }
-
-    internal VectorKeyFrameCollection(VectorAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(VectorKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

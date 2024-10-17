@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -39,8 +38,15 @@ public sealed class Int16AnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
     /// </returns>
     public Int16KeyFrameCollection KeyFrames
     {
-        get => _frames ??= new Int16KeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<short> IKeyFrameAnimation<short>.KeyFrames => _frames;
@@ -50,6 +56,21 @@ public sealed class Int16AnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<short>(this, isRoot, new KeyFramesAnimator<short>(this));
+
+    private void SetKeyFrames(Int16KeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -61,12 +82,6 @@ public sealed class Int16KeyFrameCollection : PresentationFrameworkCollection<In
     /// Initializes a new instance of the <see cref="Int16KeyFrameCollection"/> class.
     /// </summary>
     public Int16KeyFrameCollection() { }
-
-    internal Int16KeyFrameCollection(Int16AnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(Int16KeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

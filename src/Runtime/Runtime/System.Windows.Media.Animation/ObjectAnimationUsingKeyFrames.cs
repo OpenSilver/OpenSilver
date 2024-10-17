@@ -41,7 +41,18 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     /// The collection of <see cref="ObjectKeyFrame"/> objects that
     /// define the animation. The default is an empty collection.
     /// </returns>
-    public ObjectKeyFrameCollection KeyFrames => _frames ??= new ObjectKeyFrameCollection(this);
+    public ObjectKeyFrameCollection KeyFrames
+    {
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
+    }
 
     IKeyFrameCollection<object> IKeyFrameAnimation<object>.KeyFrames => _frames;
 
@@ -50,6 +61,21 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<object>(this, isRoot, new ObjectKeyFramesAnimator(this));
+
+    private void SetKeyFrames(ObjectKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 
     private sealed class ObjectKeyFramesAnimator : IValueAnimator<object>
     {
@@ -84,18 +110,14 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 }
 
 /// <summary>
-/// Represents a collection of <see cref="ObjectKeyFrame"/> objects that can be 
-/// individually accessed by index.
+/// Represents a collection of <see cref="ObjectKeyFrame"/> objects that can be individually accessed by index.
 /// </summary>
 public sealed class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>, IKeyFrameCollection<object>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObjectKeyFrameCollection"/> class.
+    /// </summary>
     public ObjectKeyFrameCollection() { }
-
-    internal ObjectKeyFrameCollection(ObjectAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner != null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(ObjectKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

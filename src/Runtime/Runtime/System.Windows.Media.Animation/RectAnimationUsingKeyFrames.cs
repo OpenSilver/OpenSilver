@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -38,8 +37,15 @@ public sealed class RectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
     /// </returns>
     public RectKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new RectKeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<Rect> IKeyFrameAnimation<Rect>.KeyFrames => _frames;
@@ -49,6 +55,21 @@ public sealed class RectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<Rect>(this, isRoot, new KeyFramesAnimator<Rect>(this));
+
+    private void SetKeyFrames(RectKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -60,12 +81,6 @@ public sealed class RectKeyFrameCollection : PresentationFrameworkCollection<Rec
     /// Initializes a new instance of the <see cref="RectKeyFrameCollection"/> class.
     /// </summary>
     public RectKeyFrameCollection() { }
-
-    internal RectKeyFrameCollection(RectAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(RectKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -38,8 +37,15 @@ public sealed class DecimalAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
     /// </returns>
     public DecimalKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new DecimalKeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<decimal> IKeyFrameAnimation<decimal>.KeyFrames => _frames;
@@ -49,6 +55,21 @@ public sealed class DecimalAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<decimal>(this, isRoot, new KeyFramesAnimator<decimal>(this));
+
+    private void SetKeyFrames(DecimalKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -60,12 +81,6 @@ public sealed class DecimalKeyFrameCollection : PresentationFrameworkCollection<
     /// Initializes a new instance of the <see cref="DecimalKeyFrameCollection"/> class.
     /// </summary>
     public DecimalKeyFrameCollection() { }
-
-    internal DecimalKeyFrameCollection(DecimalAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(DecimalKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

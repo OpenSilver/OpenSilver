@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -40,9 +38,15 @@ public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     /// </returns>
     public DoubleKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new DoubleKeyFrameCollection(this);
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<double> IKeyFrameAnimation<double>.KeyFrames => _frames;
@@ -52,11 +56,25 @@ public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<double>(this, isRoot, new KeyFramesAnimator<double>(this));
+
+    private void SetKeyFrames(DoubleKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
-/// Represents a collection of <see cref="DoubleKeyFrame"/> objects that can 
-/// be individually accessed by index.
+/// Represents a collection of <see cref="DoubleKeyFrame"/> objects that can be individually accessed by index.
 /// </summary>
 public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>, IKeyFrameCollection<double>
 {
@@ -64,12 +82,6 @@ public sealed class DoubleKeyFrameCollection : PresentationFrameworkCollection<D
     /// Initializes a new instance of the <see cref="DoubleKeyFrameCollection"/> class.
     /// </summary>
     public DoubleKeyFrameCollection() { }
-
-    internal DoubleKeyFrameCollection(DoubleAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(DoubleKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 

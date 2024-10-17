@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System.Diagnostics;
 using System.Windows.Markup;
 using OpenSilver.Internal.Media.Animation;
 
@@ -38,8 +37,15 @@ public sealed class MatrixAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     /// </returns>
     public MatrixKeyFrameCollection KeyFrames
     {
-        get => _frames ??= new MatrixKeyFrameCollection(this);
-        set => _frames = value;
+        get
+        {
+            if (_frames is null)
+            {
+                SetKeyFrames(new());
+            }
+            return _frames;
+        }
+        set { SetKeyFrames(value); }
     }
 
     IKeyFrameCollection<Matrix> IKeyFrameAnimation<Matrix>.KeyFrames => _frames;
@@ -49,6 +55,21 @@ public sealed class MatrixAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     internal sealed override TimelineClock CreateClock(bool isRoot) =>
        new AnimationClock<Matrix>(this, isRoot, new KeyFramesAnimator<Matrix>(this));
+
+    private void SetKeyFrames(MatrixKeyFrameCollection keyFrames)
+    {
+        if (_frames is not null)
+        {
+            RemoveSelfAsInheritanceContext(_frames, null);
+        }
+
+        _frames = keyFrames;
+
+        if (_frames is not null)
+        {
+            ProvideSelfAsInheritanceContext(_frames, null);
+        }
+    }
 }
 
 /// <summary>
@@ -60,12 +81,6 @@ public sealed class MatrixKeyFrameCollection : PresentationFrameworkCollection<M
     /// Initializes a new instance of the <see cref="MatrixKeyFrameCollection"/> class.
     /// </summary>
     public MatrixKeyFrameCollection() { }
-
-    internal MatrixKeyFrameCollection(MatrixAnimationUsingKeyFrames owner)
-    {
-        Debug.Assert(owner is not null);
-        owner.ProvideSelfAsInheritanceContext(this, null);
-    }
 
     internal override void AddOverride(MatrixKeyFrame keyFrame) => AddDependencyObjectInternal(keyFrame);
 
