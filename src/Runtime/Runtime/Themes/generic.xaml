@@ -577,14 +577,11 @@
                                                 </animation:DiscreteObjectKeyFrame.Value>
                                             </animation:DiscreteObjectKeyFrame>
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -688,14 +685,11 @@
                                                 <EventTrigger.Actions>
                                                     <animation:BeginStoryboard>
                                                         <animation:Storyboard>
-                                                            <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                                     animation:Storyboard.TargetProperty="IsHitTestVisible">
-                                                                <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                                    <animation:DiscreteObjectKeyFrame.Value>
-                                                                        <sys:Boolean>true</sys:Boolean>
-                                                                    </animation:DiscreteObjectKeyFrame.Value>
-                                                                </animation:DiscreteObjectKeyFrame>
-                                                            </animation:ObjectAnimationUsingKeyFrames>
+                                                            <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                                      animation:Storyboard.TargetProperty="IsHitTestVisible">
+                                                                <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                                                   Value="True" />
+                                                            </animation:BooleanAnimationUsingKeyFrames>
                                                         </animation:Storyboard>
                                                     </animation:BeginStoryboard>
                                                 </EventTrigger.Actions>
@@ -874,14 +868,11 @@
                                                 </animation:DiscreteObjectKeyFrame.Value>
                                             </animation:DiscreteObjectKeyFrame>
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -973,14 +964,11 @@
                                                 <EventTrigger.Actions>
                                                     <animation:BeginStoryboard>
                                                         <animation:Storyboard>
-                                                            <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                                     animation:Storyboard.TargetProperty="IsHitTestVisible">
-                                                                <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                                    <animation:DiscreteObjectKeyFrame.Value>
-                                                                        <sys:Boolean>true</sys:Boolean>
-                                                                    </animation:DiscreteObjectKeyFrame.Value>
-                                                                </animation:DiscreteObjectKeyFrame>
-                                                            </animation:ObjectAnimationUsingKeyFrames>
+                                                            <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                                      animation:Storyboard.TargetProperty="IsHitTestVisible">
+                                                                <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                                                   Value="True" />
+                                                            </animation:BooleanAnimationUsingKeyFrames>
                                                         </animation:Storyboard>
                                                     </animation:BeginStoryboard>
                                                 </EventTrigger.Actions>
@@ -1449,14 +1437,11 @@
                                                 </animation:DiscreteObjectKeyFrame.Value>
                                             </animation:DiscreteObjectKeyFrame>
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -1509,14 +1494,11 @@
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
-                                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                                 animation:Storyboard.TargetProperty="IsHitTestVisible">
-                                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                                    <sys:Boolean>true</sys:Boolean>
-                                                                </animation:DiscreteObjectKeyFrame.Value>
-                                                            </animation:DiscreteObjectKeyFrame>
-                                                        </animation:ObjectAnimationUsingKeyFrames>
+                                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                                  animation:Storyboard.TargetProperty="IsHitTestVisible">
+                                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                                               Value="True" />
+                                                        </animation:BooleanAnimationUsingKeyFrames>
                                                     </animation:Storyboard>
                                                 </animation:BeginStoryboard>
                                             </EventTrigger.Actions>
@@ -1633,14 +1615,11 @@
                                                 </animation:DiscreteObjectKeyFrame.Value>
                                             </animation:DiscreteObjectKeyFrame>
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -1687,14 +1666,11 @@
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
-                                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                                 animation:Storyboard.TargetProperty="IsHitTestVisible">
-                                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                                    <sys:Boolean>true</sys:Boolean>
-                                                                </animation:DiscreteObjectKeyFrame.Value>
-                                                            </animation:DiscreteObjectKeyFrame>
-                                                        </animation:ObjectAnimationUsingKeyFrames>
+                                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                                  animation:Storyboard.TargetProperty="IsHitTestVisible">
+                                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                                               Value="True" />
+                                                        </animation:BooleanAnimationUsingKeyFrames>
                                                     </animation:Storyboard>
                                                 </animation:BeginStoryboard>
                                             </EventTrigger.Actions>
@@ -1936,14 +1912,11 @@
                                                 </animation:DiscreteObjectKeyFrame.Value>
                                             </animation:DiscreteObjectKeyFrame>
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -1976,14 +1949,11 @@
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
-                                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                                 animation:Storyboard.TargetProperty="IsHitTestVisible">
-                                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                                    <sys:Boolean>true</sys:Boolean>
-                                                                </animation:DiscreteObjectKeyFrame.Value>
-                                                            </animation:DiscreteObjectKeyFrame>
-                                                        </animation:ObjectAnimationUsingKeyFrames>
+                                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                                  animation:Storyboard.TargetProperty="IsHitTestVisible">
+                                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                                               Value="True" />
+                                                        </animation:BooleanAnimationUsingKeyFrames>
                                                     </animation:Storyboard>
                                                 </animation:BeginStoryboard>
                                             </EventTrigger.Actions>
@@ -2303,14 +2273,11 @@
                                                 </animation:DiscreteObjectKeyFrame.Value>
                                             </animation:DiscreteObjectKeyFrame>
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -2377,14 +2344,11 @@
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
-                                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
-                                                                                                 animation:Storyboard.TargetProperty="IsHitTestVisible">
-                                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                                    <sys:Boolean>true</sys:Boolean>
-                                                                </animation:DiscreteObjectKeyFrame.Value>
-                                                            </animation:DiscreteObjectKeyFrame>
-                                                        </animation:ObjectAnimationUsingKeyFrames>
+                                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="validationTooltip"
+                                                                                                  animation:Storyboard.TargetProperty="IsHitTestVisible">
+                                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                                               Value="True" />
+                                                        </animation:BooleanAnimationUsingKeyFrames>
                                                     </animation:Storyboard>
                                                 </animation:BeginStoryboard>
                                             </EventTrigger.Actions>
@@ -4594,11 +4558,11 @@
                                             <animation:DiscreteObjectKeyFrame KeyTime="0"
                                                                               Value="{markup:Null}" />
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="Overlay"
-                                                                                 animation:Storyboard.TargetProperty="IsHitTestVisible">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0"
-                                                                              Value="False" />
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="Overlay"
+                                                                                  animation:Storyboard.TargetProperty="IsHitTestVisible">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="False" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -4801,14 +4765,11 @@
                                             <animation:DiscreteObjectKeyFrame KeyTime="0"
                                                                               Value="Visible" />
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="ValidationToolTip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="ValidationToolTip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -4982,14 +4943,11 @@
                                             <animation:DiscreteObjectKeyFrame KeyTime="0"
                                                                               Value="Visible" />
                                         </animation:ObjectAnimationUsingKeyFrames>
-                                        <animation:ObjectAnimationUsingKeyFrames animation:Storyboard.TargetName="ValidationToolTip"
-                                                                                 animation:Storyboard.TargetProperty="IsOpen">
-                                            <animation:DiscreteObjectKeyFrame KeyTime="0">
-                                                <animation:DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </animation:DiscreteObjectKeyFrame.Value>
-                                            </animation:DiscreteObjectKeyFrame>
-                                        </animation:ObjectAnimationUsingKeyFrames>
+                                        <animation:BooleanAnimationUsingKeyFrames animation:Storyboard.TargetName="ValidationToolTip"
+                                                                                  animation:Storyboard.TargetProperty="IsOpen">
+                                            <animation:DiscreteBooleanKeyFrame KeyTime="0"
+                                                                               Value="True" />
+                                        </animation:BooleanAnimationUsingKeyFrames>
                                     </animation:Storyboard>
                                 </VisualState>
                             </VisualStateGroup>

@@ -107,30 +107,24 @@
                             <VisualStateGroup x:Name="BusyStatusStates">
                                 <VisualState x:Name="Idle">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                                       Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="content"
-                                                                       Storyboard.TargetProperty="(Control.IsEnabled)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>True</sys:Boolean>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00"
+                                                                        Duration="00:00:00.001"
+                                                                        Storyboard.TargetName="content"
+                                                                        Storyboard.TargetProperty="(Control.IsEnabled)">
+                                            <DiscreteBooleanKeyFrame KeyTime="00:00:00"
+                                                                     Value="True" />
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Busy">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                                       Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="content"
-                                                                       Storyboard.TargetProperty="(Control.IsEnabled)">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <sys:Boolean>False</sys:Boolean>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00"
+                                                                        Duration="00:00:00.001"
+                                                                        Storyboard.TargetName="content"
+                                                                        Storyboard.TargetProperty="(Control.IsEnabled)">
+                                            <DiscreteBooleanKeyFrame KeyTime="00:00:00"
+                                                                     Value="False" />
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -1075,18 +1069,14 @@
                                             <DiscreteObjectKeyFrame KeyTime="0"
                                                                     Value="{StaticResource ExpanderUpHeaderTemplate}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="rd0"
                                                                        Storyboard.TargetProperty="Height">
@@ -1109,18 +1099,14 @@
                                             <DiscreteObjectKeyFrame KeyTime="0"
                                                                     Value="{StaticResource ExpanderLeftHeaderTemplate}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="rd0"
                                                                        Storyboard.TargetProperty="Height">
@@ -1142,18 +1128,14 @@
                                             <DiscreteObjectKeyFrame KeyTime="0"
                                                                     Value="{StaticResource ExpanderRightHeaderTemplate}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="rd0"
                                                                        Storyboard.TargetProperty="Height">

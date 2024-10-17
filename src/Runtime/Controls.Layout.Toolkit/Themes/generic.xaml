@@ -41,34 +41,26 @@
                                 </vsm:VisualStateGroup.Transitions>
                                 <vsm:VisualState x:Name="ExpandDown">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="0" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
                                         <ObjectAnimationUsingKeyFrames BeginTime="0"
                                                                        Duration="0"
                                                                        Storyboard.TargetName="cd0"
@@ -92,34 +84,26 @@
                                 </vsm:VisualState>
                                 <vsm:VisualState x:Name="ExpandUp">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="1" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="0" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="1" />
                                         <ObjectAnimationUsingKeyFrames BeginTime="0"
                                                                        Duration="0"
                                                                        Storyboard.TargetName="cd0"
@@ -143,34 +127,26 @@
                                 </vsm:VisualState>
                                 <vsm:VisualState x:Name="ExpandLeft">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="1" />
                                         <ObjectAnimationUsingKeyFrames BeginTime="0"
                                                                        Duration="0"
                                                                        Storyboard.TargetName="rd0"
@@ -206,34 +182,26 @@
                                 </vsm:VisualState>
                                 <vsm:VisualState x:Name="ExpandRight">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="icon"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="0"
-                                                                       Duration="0"
-                                                                       Storyboard.TargetName="header"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="0" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="icon"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="1" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="0" />
+                                        <Int32Animation BeginTime="0"
+                                                        Duration="0"
+                                                        Storyboard.TargetName="header"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
                                         <ObjectAnimationUsingKeyFrames BeginTime="0"
                                                                        Duration="0"
                                                                        Storyboard.TargetName="rd0"
@@ -682,22 +650,22 @@
                                 </vsm:VisualStateGroup.Transitions>
                                 <vsm:VisualState x:Name="Locked">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="IsEnabled">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="False" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Duration="0"
+                                                                        Storyboard.TargetName="ExpanderButton"
+                                                                        Storyboard.TargetProperty="IsEnabled">
+                                            <DiscreteBooleanKeyFrame KeyTime="0"
+                                                                     Value="False" />
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
                                 <vsm:VisualState x:Name="Unlocked">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="IsEnabled">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="True" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Duration="0"
+                                                                        Storyboard.TargetName="ExpanderButton"
+                                                                        Storyboard.TargetProperty="IsEnabled">
+                                            <DiscreteBooleanKeyFrame KeyTime="0"
+                                                                     Value="True" />
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
@@ -724,18 +692,14 @@
                                 </vsm:VisualState>
                                 <vsm:VisualState x:Name="ExpandUp">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="rd0"
                                                                        Storyboard.TargetProperty="Height">
@@ -752,43 +716,30 @@
                                 </vsm:VisualState>
                                 <vsm:VisualState x:Name="ExpandLeft">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.ColumnSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.ColumnSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.RowSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="2" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.RowSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="2" />
-                                        </ObjectAnimationUsingKeyFrames>
-
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.ColumnSpan)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.ColumnSpan)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.RowSpan)"
+                                                        To="2" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.RowSpan)"
+                                                        To="2" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="rd0"
                                                                        Storyboard.TargetProperty="Height">
@@ -805,43 +756,30 @@
                                 </vsm:VisualState>
                                 <vsm:VisualState x:Name="ExpandRight">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.ColumnSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.ColumnSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpanderButton"
-                                                                       Storyboard.TargetProperty="(Grid.RowSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="2" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.RowSpan)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="2" />
-                                        </ObjectAnimationUsingKeyFrames>
-
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Row)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Duration="0"
-                                                                       Storyboard.TargetName="ExpandSite"
-                                                                       Storyboard.TargetProperty="(Grid.Column)">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="1" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.ColumnSpan)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.ColumnSpan)"
+                                                        To="1" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpanderButton"
+                                                        Storyboard.TargetProperty="(Grid.RowSpan)"
+                                                        To="2" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.RowSpan)"
+                                                        To="2" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Row)"
+                                                        To="0" />
+                                        <Int32Animation Duration="0"
+                                                        Storyboard.TargetName="ExpandSite"
+                                                        Storyboard.TargetProperty="(Grid.Column)"
+                                                        To="1" />
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="rd0"
                                                                        Storyboard.TargetProperty="Height">

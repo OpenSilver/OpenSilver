@@ -256,12 +256,12 @@
                                 <VisualState x:Name="ReadOnly" />
                                 <VisualState x:Name="Empty">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
-                                                                       Storyboard.TargetProperty="IsHitTestVisible"
-                                                                       Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="False" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                        Storyboard.TargetProperty="IsHitTestVisible"
+                                                                        Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0"
+                                                                     Value="False" />
+                                        </BooleanAnimationUsingKeyFrames>
                                         <DoubleAnimation Duration="0"
                                                          Storyboard.TargetName="ContentPresenter"
                                                          Storyboard.TargetProperty="Opacity"
@@ -270,12 +270,12 @@
                                 </VisualState>
                                 <VisualState x:Name="Edit">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="EditButton"
-                                                                       Storyboard.TargetProperty="IsEnabled"
-                                                                       Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="false" />
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="EditButton"
+                                                                        Storyboard.TargetProperty="IsEnabled"
+                                                                        Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0"
+                                                                     Value="false" />
+                                        </BooleanAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CommitButton"
                                                                        Storyboard.TargetProperty="Visibility"
                                                                        Duration="0">
@@ -680,9 +680,9 @@
                                                       Margin="12,12,6,12" />
                                 </ScrollViewer>
                                 <sdk:ValidationSummary x:Name="ValidationSummary"
-                                                   Grid.Row="2"
-                                                   MaxHeight="100"
-                                                   BorderThickness="0" />
+                                                       Grid.Row="2"
+                                                       MaxHeight="100"
+                                                       BorderThickness="0" />
                                 <StackPanel Grid.Row="3"
                                             Orientation="Horizontal"
                                             HorizontalAlignment="Right">

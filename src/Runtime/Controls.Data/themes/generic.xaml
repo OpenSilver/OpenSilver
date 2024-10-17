@@ -856,17 +856,17 @@
                             <vsm:VisualStateGroup x:Name="MoveStates">
                                 <vsm:VisualState x:Name="MoveEnabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CurrentPageTextBox" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="True"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="CurrentPageTextBox" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="True"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
 
                                 <vsm:VisualState x:Name="MoveDisabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CurrentPageTextBox" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="False"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="CurrentPageTextBox" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="False"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
@@ -875,17 +875,17 @@
                             <vsm:VisualStateGroup x:Name="MoveFirstStates">
                                 <vsm:VisualState x:Name="MoveFirstEnabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FirstPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="True"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="FirstPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="True"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
 
                                 <vsm:VisualState x:Name="MoveFirstDisabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FirstPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="False"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="FirstPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="False"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
@@ -894,17 +894,17 @@
                             <vsm:VisualStateGroup x:Name="MovePreviousStates">
                                 <vsm:VisualState x:Name="MovePreviousEnabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PreviousPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="True"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="PreviousPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="True"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
 
                                 <vsm:VisualState x:Name="MovePreviousDisabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PreviousPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="False"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="PreviousPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="False"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
@@ -913,17 +913,17 @@
                             <vsm:VisualStateGroup x:Name="MoveNextStates">
                                 <vsm:VisualState x:Name="MoveNextEnabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NextPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="True"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="NextPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="True"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
 
                                 <vsm:VisualState x:Name="MoveNextDisabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NextPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="False"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="NextPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="False"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
@@ -932,17 +932,17 @@
                             <vsm:VisualStateGroup x:Name="MoveLastStates">
                                 <vsm:VisualState x:Name="MoveLastEnabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LastPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="True"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="LastPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="True"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
 
                                 <vsm:VisualState x:Name="MoveLastDisabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LastPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="False"/>
-                                        </ObjectAnimationUsingKeyFrames>
+                                        <BooleanAnimationUsingKeyFrames Storyboard.TargetName="LastPageButton" Storyboard.TargetProperty="IsEnabled" Duration="0">
+                                            <DiscreteBooleanKeyFrame KeyTime="0" Value="False"/>
+                                        </BooleanAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
