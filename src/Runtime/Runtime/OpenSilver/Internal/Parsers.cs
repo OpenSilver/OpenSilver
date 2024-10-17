@@ -105,7 +105,7 @@ namespace OpenSilver.Internal
 
             if (th.NextToken())
             {
-                float f3 = Convert.ToSingle(th.NextTokenRequired(), formatProvider);
+                float f3 = Convert.ToSingle(th.GetCurrentToken(), formatProvider);
 
                 // We should be out of tokens at this point
                 if (th.NextToken())
