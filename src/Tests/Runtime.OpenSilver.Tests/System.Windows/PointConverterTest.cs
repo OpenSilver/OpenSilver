@@ -97,9 +97,9 @@ namespace System.Windows.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_Should_Throw_FormatException()
+        public void ConvertFrom_String_Should_Throw_InvalidOperationException()
         {
-            Assert.ThrowsException<FormatException>(
+            Assert.ThrowsException<InvalidOperationException>(
                 () => Converter.ConvertFrom("1,1,1")
             );
         }
