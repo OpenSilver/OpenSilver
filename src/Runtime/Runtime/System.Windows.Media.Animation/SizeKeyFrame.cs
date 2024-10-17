@@ -120,7 +120,7 @@ public abstract class SizeKeyFrame : DependencyObject, IKeyFrame<Size>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    Size IKeyFrame<Size>.InterpolateValue(Size baseValue, double keyFrameProgress)
+    public Size InterpolateValue(Size baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class SizeKeyFrame : DependencyObject, IKeyFrame<Size>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual Size InterpolateValueCore(Size baseValue, double keyFrameProgress) => baseValue;
+    protected virtual Size InterpolateValueCore(Size baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteSizeKeyFrame : SizeKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Size InterpolateValueCore(Size baseValue, double keyFrameProgress) =>
+    protected override Size InterpolateValueCore(Size baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -227,7 +227,7 @@ public sealed class LinearSizeKeyFrame : SizeKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Size InterpolateValueCore(Size baseValue, double keyFrameProgress) =>
+    protected override Size InterpolateValueCore(Size baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -313,7 +313,7 @@ public sealed class EasingSizeKeyFrame : SizeKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Size InterpolateValueCore(Size baseValue, double keyFrameProgress)
+    protected override Size InterpolateValueCore(Size baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -408,7 +408,7 @@ public sealed class SplineSizeKeyFrame : SizeKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Size InterpolateValueCore(Size baseValue, double keyFrameProgress) =>
+    protected override Size InterpolateValueCore(Size baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

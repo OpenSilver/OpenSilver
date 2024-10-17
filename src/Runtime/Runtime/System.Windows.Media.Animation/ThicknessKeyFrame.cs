@@ -120,7 +120,7 @@ public abstract class ThicknessKeyFrame : DependencyObject, IKeyFrame<Thickness>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    Thickness IKeyFrame<Thickness>.InterpolateValue(Thickness baseValue, double keyFrameProgress)
+    public Thickness InterpolateValue(Thickness baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class ThicknessKeyFrame : DependencyObject, IKeyFrame<Thickness>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) => baseValue;
+    protected virtual Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteThicknessKeyFrame : ThicknessKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) =>
+    protected override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -227,7 +227,7 @@ public sealed class LinearThicknessKeyFrame : ThicknessKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) =>
+    protected override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -313,7 +313,7 @@ public sealed class EasingThicknessKeyFrame : ThicknessKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress)
+    protected override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -408,7 +408,7 @@ public sealed class SplineThicknessKeyFrame : ThicknessKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) =>
+    protected override Thickness InterpolateValueCore(Thickness baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

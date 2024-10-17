@@ -120,7 +120,7 @@ public abstract class VectorKeyFrame : DependencyObject, IKeyFrame<Vector>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    Vector IKeyFrame<Vector>.InterpolateValue(Vector baseValue, double keyFrameProgress)
+    public Vector InterpolateValue(Vector baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class VectorKeyFrame : DependencyObject, IKeyFrame<Vector>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) => baseValue;
+    protected virtual Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteVectorKeyFrame : VectorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) =>
+    protected override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -227,7 +227,7 @@ public sealed class LinearVectorKeyFrame : VectorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) =>
+    protected override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -313,7 +313,7 @@ public sealed class EasingVectorKeyFrame : VectorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress)
+    protected override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -408,7 +408,7 @@ public sealed class SplineVectorKeyFrame : VectorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) =>
+    protected override Vector InterpolateValueCore(Vector baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

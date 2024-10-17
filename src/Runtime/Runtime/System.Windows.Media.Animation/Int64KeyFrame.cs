@@ -123,7 +123,7 @@ public abstract class Int64KeyFrame : DependencyObject, IKeyFrame<long>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    long IKeyFrame<long>.InterpolateValue(long baseValue, double keyFrameProgress)
+    public long InterpolateValue(long baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -145,7 +145,7 @@ public abstract class Int64KeyFrame : DependencyObject, IKeyFrame<long>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual long InterpolateValueCore(long baseValue, double keyFrameProgress) => baseValue;
+    protected virtual long InterpolateValueCore(long baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -185,7 +185,7 @@ public sealed class DiscreteInt64KeyFrame : Int64KeyFrame
     }
 
     /// <inheritdoc />
-    internal override long InterpolateValueCore(long baseValue, double keyFrameProgress) =>
+    protected override long InterpolateValueCore(long baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -230,7 +230,7 @@ public sealed class LinearInt64KeyFrame : Int64KeyFrame
     }
 
     /// <inheritdoc />
-    internal override long InterpolateValueCore(long baseValue, double keyFrameProgress) =>
+    protected override long InterpolateValueCore(long baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -317,7 +317,7 @@ public sealed class EasingInt64KeyFrame : Int64KeyFrame
     }
 
     /// <inheritdoc />
-    internal override long InterpolateValueCore(long baseValue, double keyFrameProgress)
+    protected override long InterpolateValueCore(long baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -412,7 +412,7 @@ public sealed class SplineInt64KeyFrame : Int64KeyFrame
     }
 
     /// <inheritdoc />
-    internal override long InterpolateValueCore(long baseValue, double keyFrameProgress) =>
+    protected override long InterpolateValueCore(long baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

@@ -120,7 +120,7 @@ public abstract class CharKeyFrame : DependencyObject, IKeyFrame<char>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    char IKeyFrame<char>.InterpolateValue(char baseValue, double keyFrameProgress)
+    public char InterpolateValue(char baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class CharKeyFrame : DependencyObject, IKeyFrame<char>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual char InterpolateValueCore(char baseValue, double keyFrameProgress) => baseValue;
+    protected virtual char InterpolateValueCore(char baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteCharKeyFrame : CharKeyFrame
     }
 
     /// <inheritdoc />
-    internal override char InterpolateValueCore(char baseValue, double keyFrameProgress) =>
+    protected override char InterpolateValueCore(char baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,

@@ -120,7 +120,7 @@ public abstract class SingleKeyFrame : DependencyObject, IKeyFrame<float>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    float IKeyFrame<float>.InterpolateValue(float baseValue, double keyFrameProgress)
+    public float InterpolateValue(float baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class SingleKeyFrame : DependencyObject, IKeyFrame<float>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual float InterpolateValueCore(float baseValue, double keyFrameProgress) => baseValue;
+    protected virtual float InterpolateValueCore(float baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteSingleKeyFrame : SingleKeyFrame
     }
 
     /// <inheritdoc />
-    internal override float InterpolateValueCore(float baseValue, double keyFrameProgress) =>
+    protected override float InterpolateValueCore(float baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -227,7 +227,7 @@ public sealed class LinearSingleKeyFrame : SingleKeyFrame
     }
 
     /// <inheritdoc />
-    internal override float InterpolateValueCore(float baseValue, double keyFrameProgress) =>
+    protected override float InterpolateValueCore(float baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -313,7 +313,7 @@ public sealed class EasingSingleKeyFrame : SingleKeyFrame
     }
 
     /// <inheritdoc />
-    internal override float InterpolateValueCore(float baseValue, double keyFrameProgress)
+    protected override float InterpolateValueCore(float baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -408,7 +408,7 @@ public sealed class SplineSingleKeyFrame : SingleKeyFrame
     }
 
     /// <inheritdoc />
-    internal override float InterpolateValueCore(float baseValue, double keyFrameProgress) =>
+    protected override float InterpolateValueCore(float baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

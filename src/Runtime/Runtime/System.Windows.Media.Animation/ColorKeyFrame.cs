@@ -122,7 +122,7 @@ public abstract class ColorKeyFrame : DependencyObject, IKeyFrame<Color>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    Color IKeyFrame<Color>.InterpolateValue(Color baseValue, double keyFrameProgress)
+    public Color InterpolateValue(Color baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -145,7 +145,7 @@ public abstract class ColorKeyFrame : DependencyObject, IKeyFrame<Color>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual Color InterpolateValueCore(Color baseValue, double keyFrameProgress) => baseValue;
+    protected virtual Color InterpolateValueCore(Color baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -185,7 +185,7 @@ public sealed class DiscreteColorKeyFrame : ColorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Color InterpolateValueCore(Color baseValue, double keyFrameProgress) =>
+    protected override Color InterpolateValueCore(Color baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -230,7 +230,7 @@ public sealed class LinearColorKeyFrame : ColorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Color InterpolateValueCore(Color baseValue, double keyFrameProgress) =>
+    protected override Color InterpolateValueCore(Color baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -316,7 +316,7 @@ public sealed class EasingColorKeyFrame : ColorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Color InterpolateValueCore(Color baseValue, double keyFrameProgress)
+    protected override Color InterpolateValueCore(Color baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -412,7 +412,7 @@ public sealed class SplineColorKeyFrame : ColorKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Color InterpolateValueCore(Color baseValue, double keyFrameProgress) =>
+    protected override Color InterpolateValueCore(Color baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

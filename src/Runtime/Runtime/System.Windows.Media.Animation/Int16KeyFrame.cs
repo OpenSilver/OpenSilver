@@ -123,7 +123,7 @@ public abstract class Int16KeyFrame : DependencyObject, IKeyFrame<short>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    short IKeyFrame<short>.InterpolateValue(short baseValue, double keyFrameProgress)
+    public short InterpolateValue(short baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -145,7 +145,7 @@ public abstract class Int16KeyFrame : DependencyObject, IKeyFrame<short>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual short InterpolateValueCore(short baseValue, double keyFrameProgress) => baseValue;
+    protected virtual short InterpolateValueCore(short baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -185,7 +185,7 @@ public sealed class DiscreteInt16KeyFrame : Int16KeyFrame
     }
 
     /// <inheritdoc />
-    internal override short InterpolateValueCore(short baseValue, double keyFrameProgress) =>
+    protected override short InterpolateValueCore(short baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -230,7 +230,7 @@ public sealed class LinearInt16KeyFrame : Int16KeyFrame
     }
 
     /// <inheritdoc />
-    internal override short InterpolateValueCore(short baseValue, double keyFrameProgress) =>
+    protected override short InterpolateValueCore(short baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -316,7 +316,7 @@ public sealed class EasingInt16KeyFrame : Int16KeyFrame
     }
 
     /// <inheritdoc />
-    internal override short InterpolateValueCore(short baseValue, double keyFrameProgress)
+    protected override short InterpolateValueCore(short baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -410,7 +410,7 @@ public sealed class SplineInt16KeyFrame : Int16KeyFrame
     }
 
     /// <inheritdoc />
-    internal override short InterpolateValueCore(short baseValue, double keyFrameProgress) =>
+    protected override short InterpolateValueCore(short baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

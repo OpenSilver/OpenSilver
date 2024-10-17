@@ -120,7 +120,7 @@ public abstract class DecimalKeyFrame : DependencyObject, IKeyFrame<decimal>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    decimal IKeyFrame<decimal>.InterpolateValue(decimal baseValue, double keyFrameProgress)
+    public decimal InterpolateValue(decimal baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class DecimalKeyFrame : DependencyObject, IKeyFrame<decimal>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) => baseValue;
+    protected virtual decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteDecimalKeyFrame : DecimalKeyFrame
     }
 
     /// <inheritdoc />
-    internal override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) =>
+    protected override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -227,7 +227,7 @@ public sealed class LinearDecimalKeyFrame : DecimalKeyFrame
     }
 
     /// <inheritdoc />
-    internal override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) =>
+    protected override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -313,7 +313,7 @@ public sealed class EasingDecimalKeyFrame : DecimalKeyFrame
     }
 
     /// <inheritdoc />
-    internal override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress)
+    protected override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -408,7 +408,7 @@ public sealed class SplineDecimalKeyFrame : DecimalKeyFrame
     }
 
     /// <inheritdoc />
-    internal override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) =>
+    protected override decimal InterpolateValueCore(decimal baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

@@ -120,7 +120,7 @@ public abstract class RectKeyFrame : DependencyObject, IKeyFrame<Rect>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    Rect IKeyFrame<Rect>.InterpolateValue(Rect baseValue, double keyFrameProgress)
+    public Rect InterpolateValue(Rect baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class RectKeyFrame : DependencyObject, IKeyFrame<Rect>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) => baseValue;
+    protected virtual Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteRectKeyFrame : RectKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) =>
+    protected override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -227,7 +227,7 @@ public sealed class LinearRectKeyFrame : RectKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) =>
+    protected override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -313,7 +313,7 @@ public sealed class EasingRectKeyFrame : RectKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress)
+    protected override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -408,7 +408,7 @@ public sealed class SplineRectKeyFrame : RectKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) =>
+    protected override Rect InterpolateValueCore(Rect baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

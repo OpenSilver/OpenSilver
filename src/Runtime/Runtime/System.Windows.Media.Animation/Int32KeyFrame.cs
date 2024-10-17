@@ -125,7 +125,7 @@ public abstract class Int32KeyFrame : DependencyObject, IKeyFrame<int>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    int IKeyFrame<int>.InterpolateValue(int baseValue, double keyFrameProgress)
+    public int InterpolateValue(int baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -148,7 +148,7 @@ public abstract class Int32KeyFrame : DependencyObject, IKeyFrame<int>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual int InterpolateValueCore(int baseValue, double keyFrameProgress) => baseValue;
+    protected virtual int InterpolateValueCore(int baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -190,7 +190,7 @@ public sealed class DiscreteInt32KeyFrame : Int32KeyFrame
     }
 
     /// <inheritdoc />
-    internal override int InterpolateValueCore(int baseValue, double keyFrameProgress) =>
+    protected override int InterpolateValueCore(int baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -235,7 +235,7 @@ public sealed class LinearInt32KeyFrame : Int32KeyFrame
     }
 
     /// <inheritdoc />
-    internal override int InterpolateValueCore(int baseValue, double keyFrameProgress) =>
+    protected override int InterpolateValueCore(int baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -322,7 +322,7 @@ public sealed class EasingInt32KeyFrame : Int32KeyFrame
     }
 
     /// <inheritdoc />
-    internal override int InterpolateValueCore(int baseValue, double keyFrameProgress)
+    protected override int InterpolateValueCore(int baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -417,7 +417,7 @@ public sealed class SplineInt32KeyFrame : Int32KeyFrame
     }
 
     /// <inheritdoc />
-    internal override int InterpolateValueCore(int baseValue, double keyFrameProgress) =>
+    protected override int InterpolateValueCore(int baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

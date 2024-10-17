@@ -120,7 +120,7 @@ public abstract class ByteKeyFrame : DependencyObject, IKeyFrame<byte>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    byte IKeyFrame<byte>.InterpolateValue(byte baseValue, double keyFrameProgress)
+    public byte InterpolateValue(byte baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class ByteKeyFrame : DependencyObject, IKeyFrame<byte>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual byte InterpolateValueCore(byte baseValue, double keyFrameProgress) => baseValue;
+    protected virtual byte InterpolateValueCore(byte baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteByteKeyFrame : ByteKeyFrame
     }
 
     /// <inheritdoc />
-    internal override byte InterpolateValueCore(byte baseValue, double keyFrameProgress) =>
+    protected override byte InterpolateValueCore(byte baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -227,7 +227,7 @@ public sealed class LinearByteKeyFrame : ByteKeyFrame
     }
 
     /// <inheritdoc />
-    internal override byte InterpolateValueCore(byte baseValue, double keyFrameProgress) =>
+    protected override byte InterpolateValueCore(byte baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -313,7 +313,7 @@ public sealed class EasingByteKeyFrame : ByteKeyFrame
     }
 
     /// <inheritdoc />
-    internal override byte InterpolateValueCore(byte baseValue, double keyFrameProgress)
+    protected override byte InterpolateValueCore(byte baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -408,7 +408,7 @@ public sealed class SplineByteKeyFrame : ByteKeyFrame
     }
 
     /// <inheritdoc />
-    internal override byte InterpolateValueCore(byte baseValue, double keyFrameProgress) =>
+    protected override byte InterpolateValueCore(byte baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

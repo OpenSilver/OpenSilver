@@ -115,7 +115,7 @@ public abstract class ObjectKeyFrame : DependencyObject, IKeyFrame<object>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    object IKeyFrame<object>.InterpolateValue(object baseValue, double keyFrameProgress)
+    public object InterpolateValue(object baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -138,7 +138,7 @@ public abstract class ObjectKeyFrame : DependencyObject, IKeyFrame<object>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual object InterpolateValueCore(object baseValue, double keyFrameProgress) => baseValue;
+    protected virtual object InterpolateValueCore(object baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -178,7 +178,7 @@ public sealed class DiscreteObjectKeyFrame : ObjectKeyFrame
     }
 
     /// <inheritdoc />
-    internal override object InterpolateValueCore(object baseValue, double keyFrameProgress) =>
+    protected override object InterpolateValueCore(object baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,

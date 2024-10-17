@@ -121,7 +121,7 @@ public abstract class BooleanKeyFrame : DependencyObject, IKeyFrame<bool>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    bool IKeyFrame<bool>.InterpolateValue(bool baseValue, double keyFrameProgress)
+    public bool InterpolateValue(bool baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -143,7 +143,7 @@ public abstract class BooleanKeyFrame : DependencyObject, IKeyFrame<bool>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual bool InterpolateValueCore(bool baseValue, double keyFrameProgress) => baseValue;
+    protected virtual bool InterpolateValueCore(bool baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -183,7 +183,7 @@ public sealed class DiscreteBooleanKeyFrame : BooleanKeyFrame
     }
 
     /// <inheritdoc />
-    internal override bool InterpolateValueCore(bool baseValue, double keyFrameProgress) =>
+    protected override bool InterpolateValueCore(bool baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,

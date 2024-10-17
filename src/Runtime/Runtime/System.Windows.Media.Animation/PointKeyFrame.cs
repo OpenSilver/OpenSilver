@@ -122,7 +122,7 @@ public abstract class PointKeyFrame : DependencyObject, IKeyFrame<Point>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    Point IKeyFrame<Point>.InterpolateValue(Point baseValue, double keyFrameProgress)
+    public Point InterpolateValue(Point baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -145,7 +145,7 @@ public abstract class PointKeyFrame : DependencyObject, IKeyFrame<Point>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual Point InterpolateValueCore(Point baseValue, double keyFrameProgress) => baseValue;
+    protected virtual Point InterpolateValueCore(Point baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -185,7 +185,7 @@ public sealed class DiscretePointKeyFrame : PointKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
+    protected override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
@@ -230,7 +230,7 @@ public sealed class LinearPointKeyFrame : PointKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
+    protected override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,
@@ -318,7 +318,7 @@ public sealed class EasingPointKeyFrame : PointKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress)
+    protected override Point InterpolateValueCore(Point baseValue, double keyFrameProgress)
     {
         if (EasingFunction is IEasingFunction easingFunction)
         {
@@ -414,7 +414,7 @@ public sealed class SplinePointKeyFrame : PointKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
+    protected override Point InterpolateValueCore(Point baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             0.0 => baseValue,

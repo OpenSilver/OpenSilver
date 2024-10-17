@@ -120,7 +120,7 @@ public abstract class MatrixKeyFrame : DependencyObject, IKeyFrame<Matrix>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Occurs if keyFrameProgress is not between 0.0 and 1.0, inclusive.
     /// </exception>
-    Matrix IKeyFrame<Matrix>.InterpolateValue(Matrix baseValue, double keyFrameProgress)
+    public Matrix InterpolateValue(Matrix baseValue, double keyFrameProgress)
     {
         if (keyFrameProgress < 0.0 || keyFrameProgress > 1.0)
         {
@@ -142,7 +142,7 @@ public abstract class MatrixKeyFrame : DependencyObject, IKeyFrame<Matrix>
     /// <returns>
     /// The output value of this key frame given the specified base value and progress.
     /// </returns>
-    internal virtual Matrix InterpolateValueCore(Matrix baseValue, double keyFrameProgress) => baseValue;
+    protected virtual Matrix InterpolateValueCore(Matrix baseValue, double keyFrameProgress) => baseValue;
 }
 
 /// <summary>
@@ -182,7 +182,7 @@ public sealed class DiscreteMatrixKeyFrame : MatrixKeyFrame
     }
 
     /// <inheritdoc />
-    internal override Matrix InterpolateValueCore(Matrix baseValue, double keyFrameProgress) =>
+    protected override Matrix InterpolateValueCore(Matrix baseValue, double keyFrameProgress) =>
         keyFrameProgress switch
         {
             < 1.0 => baseValue,
