@@ -1,0 +1,76 @@
+﻿<!-- 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildThisFileDirectory)/OpenSilver.SharedBuildTasks.Config.targets" />
+
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)../tools/$(_OpenSilverCompilerSharedBuildTasksAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesExtractorAndCopier" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)../tools/$(_OpenSilverCompilerSharedBuildTasksAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <SkipOpenSilverUpdates Condition="'$(SkipOpenSilverUpdates)' == ''">false</SkipOpenSilverUpdates>
+    <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)' == ''">resources/</Cshtml5OutputResourcesPath>
+  </PropertyGroup>
+
+  <Target Name="_CheckPkgCompatibility" BeforeTargets="Build">
+
+    <Updates Condition="'$(SkipOpenSilverUpdates)' == 'false'" PackagePath="$(MSBuildThisFileDirectory)../"/>
+
+    <Exec Condition="'$(OpenSilverType)' == '' Or $(OpenSilverType)&lt;2"
+          Command="explorer.exe https://opensilver.net/how-to-migrate-to-1-0-0-alpha-007-or-newer/" Timeout="2000" ContinueOnError="True" />
+    <Error Condition="'$(OpenSilverType)' == '' Or $(OpenSilverType)&lt;2"
+           Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/how-to-migrate-to-1-0-0-alpha-007-or-newer/" />
+    <Exec Condition="$(OpenSilverType)&lt;3"
+          Command="explorer.exe https://opensilver.net/alpha19-2/" Timeout="2000" ContinueOnError="True" />
+    <Error Condition="$(OpenSilverType)&lt;3"
+           Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/alpha19-2/" />
+    <Exec Condition="$(OpenSilverType)&lt;4"
+          Command="explorer.exe https://opensilver.net/permalinks/update/alpha20.aspx" Timeout="2000" ContinueOnError="True" />
+    <Error Condition="$(OpenSilverType)&lt;4"
+           Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx" />
+    <Exec Condition="$(OpenSilverType)&lt;5"
+          Command="explorer.exe https://opensilver.net/2-0/" Timeout="2000" ContinueOnError="True" />
+    <Error Condition="$(OpenSilverType)&lt;5"
+           Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/2-0/" />
+    <Exec Condition="$(OpenSilverType)&lt;6"
+          Command="explorer.exe https://opensilver.net/upgrade-to-2.2/" Timeout="2000" ContinueOnError="True" />
+    <Error Condition="$(OpenSilverType)&lt;6"
+           Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-2.2/" />
+    <Exec Condition="$(OpenSilverType)&lt;7"
+          Command="explorer.exe https://opensilver.net/upgrade-to-3.1/" Timeout="2000" ContinueOnError="True" />
+    <Error Condition="$(OpenSilverType)&lt;7"
+           Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-3.1/" />
+
+  </Target>
+
+  <Target Name="_CopyWasmResources" BeforeTargets="PostBuildEvent">
+    
+    <ItemGroup>
+      <_OpenSilverScripts Include="$(MSBuildThisFileDirectory)../content/**/*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_OpenSilverScripts)"
+          SkipUnchangedFiles="true"
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/libs/" />
+
+    <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
+                                 OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/" />
+
+  </Target>
+
+</Project>

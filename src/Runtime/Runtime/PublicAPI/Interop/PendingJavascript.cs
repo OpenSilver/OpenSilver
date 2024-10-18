@@ -35,24 +35,14 @@ namespace CSHTML5.Internal
 
     internal sealed class PendingJavascript : IPendingJavascript
     {
-        private const string CallJSMethodNameAsync = "callJSUnmarshalledHeap";
-        private const string CallJSMethodNameSync = "callJSUnmarshalled_v2";
-
-        private readonly IWebAssemblyExecutionHandler _webAssemblyExecutionHandler;
+        private readonly INativeMethods _nativeMethods;
         private readonly CharArrayBuilder _charArrayBuilder;
 
         private byte[] _buffer = Array.Empty<byte>();
 
-        public PendingJavascript(IWebAssemblyExecutionHandler webAssemblyExecutionHandler, CharArrayBuilder buffer)
+        public PendingJavascript(INativeMethods nativeMethods, CharArrayBuilder buffer)
         {
-            if (webAssemblyExecutionHandler == null)
-            {
-                throw new ArgumentNullException(nameof(webAssemblyExecutionHandler));
-            }
-
-            CheckWasmExecutionHandler(webAssemblyExecutionHandler);
-
-            _webAssemblyExecutionHandler = webAssemblyExecutionHandler ?? throw new ArgumentNullException(nameof(webAssemblyExecutionHandler));
+            _nativeMethods = nativeMethods ?? throw new ArgumentNullException(nameof(nativeMethods));
             _charArrayBuilder = buffer ?? throw new ArgumentNullException(nameof(buffer));
         }
 
@@ -73,38 +63,15 @@ namespace CSHTML5.Internal
             int bytesLength = Encoding.Unicode.GetBytes(_charArrayBuilder.Buffer, 0, _charArrayBuilder.Length, _buffer, 0);
             _charArrayBuilder.Reset();
 
-            _webAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(CallJSMethodNameAsync, _buffer, bytesLength);
+            _nativeMethods.InvokePendingJS(_buffer, bytesLength);
         }
 
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
         {
             // IMPORTANT: wantsResult is passed on to JS, so that it will know if it needs to pass anything back to us
             // (optimization, when we don't care for the result)
-            var result = _webAssemblyExecutionHandler.InvokeUnmarshalled<string, int, bool, object>(CallJSMethodNameSync, javascript, referenceId, wantsResult);
+            var result = _nativeMethods.InvokeJS(javascript, referenceId, wantsResult);
             return wantsResult ? result : null;
-        }
-
-        private static void CheckWasmExecutionHandler(IWebAssemblyExecutionHandler wasmExecutionHandler)
-        {
-            // breaking change for projects using 1.2.* pre-releases of OpenSilver:
-            //
-            // in order to fix https://github.com/OpenSilver/OpenSilver/issues/758, I had to rename the callJSUnmarshalled JS function
-            // there was no way to differentiate between a legacy call to callJSUnmarshalled and an existing call to it
-            //
-            // the new version of the function has 2 extra args, but when called from C#, the extra args would have default values, not 'undeclared'
-            FieldInfo field = wasmExecutionHandler.GetType()
-                .GetField("MethodName", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (field == null)
-            {
-                // Allow null for unit tests
-                return;
-            }
-
-            if (field.GetValue(null).ToString() != CallJSMethodNameSync)
-            {
-                throw new ArgumentException($"Change UnmarshalledJavaScriptExecutionHandler.MethodName to '{CallJSMethodNameSync}'");
-            }
         }
     }
 

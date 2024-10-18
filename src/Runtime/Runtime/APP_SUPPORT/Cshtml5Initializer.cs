@@ -11,22 +11,29 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.ComponentModel;
 using DotNetForHtml5.Core;
+using OpenSilver.Internal;
 
-namespace DotNetForHtml5
+namespace DotNetForHtml5;
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public static class Cshtml5Initializer
 {
-    public static class Cshtml5Initializer
-    {
-        public static void Initialize(IWebAssemblyExecutionHandler executionHandler)
-        {
-            Initialize((IJavaScriptExecutionHandler)executionHandler);
-        }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static void Initialize(INativeMethods nativeMethods) => Initialize((IJavaScriptExecutionHandler)nativeMethods);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void Initialize(IJavaScriptExecutionHandler executionHandler)
-        {
-            INTERNAL_Simulator.JavaScriptExecutionHandler = executionHandler;
-        }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use Cshtml5Initializer.Initialize(IWebAssemblyExecutionHandler2) instead.", true)]
+    public static void Initialize(IWebAssemblyExecutionHandler executionHandler)
+    {
+        Initialize((IJavaScriptExecutionHandler)executionHandler);
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static void Initialize(IJavaScriptExecutionHandler executionHandler)
+    {
+        INTERNAL_Simulator.JavaScriptExecutionHandler = executionHandler;
     }
 }

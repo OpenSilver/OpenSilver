@@ -579,6 +579,8 @@ namespace System.Windows
         /// to ensure correction functioning of the application.
         /// </summary>
         /// <param name="entryPoint"></param>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RunApplication(Action entryPoint) => entryPoint();
     }
 }

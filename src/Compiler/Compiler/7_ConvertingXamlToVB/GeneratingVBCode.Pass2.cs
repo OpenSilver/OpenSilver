@@ -205,7 +205,6 @@ namespace OpenSilver.Compiler
             private readonly string _assemblyNameWithoutExtension;
             private readonly string _rootNamespace;
             private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
-            private readonly string _outputResourcesPath;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
@@ -213,8 +212,7 @@ namespace OpenSilver.Compiler
                 string assemblyNameWithoutExtension,
                 string rootNamespace,
                 AssembliesInspector reflectionOnSeparateAppDomain,
-                ConversionSettings settings,
-                string outputResourcesPath)
+                ConversionSettings settings)
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
@@ -223,7 +221,6 @@ namespace OpenSilver.Compiler
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _rootNamespace = rootNamespace;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
-                _outputResourcesPath = outputResourcesPath;
             }
 
             public string Generate() => GenerateImpl(new GeneratorContext());
@@ -292,7 +289,6 @@ namespace OpenSilver.Compiler
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"Global.{_settings.Metadata.SystemWindowsNS}.Application",
-                        isApp ? $"Global.CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = \"{_outputResourcesPath}\"" : string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);

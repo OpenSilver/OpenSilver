@@ -2,8 +2,7 @@
   "solution": {
     "path": "..\\..\\src\\OpenSilver.sln",
     "projects": [
-      "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
-      "Compiler\\Compiler.ResourcesExtractor\\Compiler.ResourcesExtractor.OpenSilver.csproj",
+      "Compiler\\Compiler.SharedBuildTasks\\Compiler.SharedBuildTasks.OpenSilver.csproj",
       "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
       "Simulator\\Simulator\\Simulator.OpenSilver.csproj"
     ]

@@ -13,10 +13,15 @@
 \*====================================================================================*/
 
 
+using OpenSilver.Internal;
+using System;
+using System.ComponentModel;
 using Microsoft.JSInterop;
 
 namespace DotNetForHtml5
 {
+    [Obsolete(Helper.ObsoleteMemberMessage, true)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class JavaScriptExecutionHandler : IJavaScriptExecutionHandler
     {
         public IJSRuntime JSRuntime { get; set; }

@@ -102,7 +102,6 @@ namespace OpenSilver.Compiler
                     // Create the "IntializeComponent()" method:
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         $"global.{_settings.Metadata.SystemWindowsNS}.Application",
-                        string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
                         new List<string>());

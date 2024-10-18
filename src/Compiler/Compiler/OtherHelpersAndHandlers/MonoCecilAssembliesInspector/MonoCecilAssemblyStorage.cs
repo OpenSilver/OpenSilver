@@ -16,11 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Mono.Cecil;
 
-#if RESOURCESEXTRACTOR
-namespace OpenSilver.Compiler.Resources
-#else
 namespace OpenSilver.Compiler
-#endif
 {
     public class MonoCecilAssemblyStorage : IDisposable
     {
