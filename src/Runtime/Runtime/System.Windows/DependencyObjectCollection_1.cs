@@ -259,7 +259,7 @@ namespace System.Windows
 
         internal DependencyObjectCollectionInternal(DependencyObject owner)
         {
-            _collectionChanged = new();
+            _collectionChanged = new(owner);
             owner.ProvideSelfAsInheritanceContext(this, null);
             IsInheritanceContextSealed = true;
         }

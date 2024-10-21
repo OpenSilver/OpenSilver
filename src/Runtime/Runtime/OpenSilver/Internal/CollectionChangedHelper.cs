@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace OpenSilver.Internal;
 
@@ -20,7 +21,14 @@ internal sealed class CollectionChangedHelper
 {
     private static readonly NotifyCollectionChangedEventArgs ResetCollectionChanged = new(NotifyCollectionChangedAction.Reset);
 
+    private readonly object _owner;
     private int _blockReentrancyCount;
+
+    public CollectionChangedHelper(object owner)
+    {
+        Debug.Assert(owner is not null);
+        _owner = owner;
+    }
 
     internal event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -79,7 +87,7 @@ internal sealed class CollectionChangedHelper
         _blockReentrancyCount++;
         try
         {
-            handler(this, e);
+            handler(_owner, e);
         }
         finally
         {

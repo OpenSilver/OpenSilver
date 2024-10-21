@@ -28,7 +28,7 @@ namespace System.Windows.Ink
         /// </summary>
         public StrokeCollection()
         {
-            _collectionChanged = new();
+            _collectionChanged = new(this);
         }
 
         internal event NotifyCollectionChangedEventHandler CollectionChanged

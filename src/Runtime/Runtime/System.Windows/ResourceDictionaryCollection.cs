@@ -26,7 +26,7 @@ namespace System.Windows
         {
             Debug.Assert(owner != null, "ResourceDictionaryCollection's owner cannot be null");
             _owner = owner;
-            _collectionChanged = new();
+            _collectionChanged = new(this);
         }
 
         internal event NotifyCollectionChangedEventHandler CollectionChanged

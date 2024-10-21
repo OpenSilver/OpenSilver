@@ -140,7 +140,7 @@ namespace System.Windows.Controls
         {
             add
             {
-                _collectionChanged ??= new();
+                _collectionChanged ??= new(this);
                 _collectionChanged.CollectionChanged += value;
             }
             remove

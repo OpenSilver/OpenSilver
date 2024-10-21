@@ -34,7 +34,7 @@ namespace System.Windows.Controls
         internal ItemCollection(IInternalFrameworkElement parent)
         {
             _modelParent = parent;
-            _collectionChanged = new();
+            _collectionChanged = new(this);
         }
 
         internal override bool IsFixedSizeImpl => IsUsingItemsSource;

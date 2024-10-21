@@ -28,7 +28,7 @@ namespace System.Windows.Input
         /// </summary>
         public StylusPointCollection()
         {
-            _collectionChanged = new();
+            _collectionChanged = new(this);
         }
 
         /// <summary>
