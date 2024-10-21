@@ -332,6 +332,9 @@
   <data name="LogicalTreeLoop" xml:space="preserve">
     <value>Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree.</value>
   </data>
+  <data name="MarkupExtensionBadStatic" xml:space="preserve">
+    <value>'{0}' StaticExtension value cannot be resolved to an enumeration, static field, or static property.</value>
+  </data>
   <data name="MarkupExtensionDynamicOrBindingOnClrProp" xml:space="preserve">
     <value>A '{0}' cannot be set on the '{1}' property of type '{2}'. A '{0}' can only be set on a DependencyProperty of a DependencyObject.</value>
   </data>
@@ -343,6 +346,9 @@
   </data>
   <data name="MarkupExtensionResourceKey" xml:space="preserve">
     <value>Resource markup extension must have ResourceKey property set before ProvideValue can be called.</value>
+  </data>
+  <data name="MarkupExtensionStaticMember" xml:space="preserve">
+    <value>StaticExtension must have Member property set before ProvideValue can be called.</value>
   </data>
   <data name="MemberNotAllowedDuringAddOrEdit" xml:space="preserve">
     <value>'{0}' is not allowed during an AddNew or EditItem transaction.</value>

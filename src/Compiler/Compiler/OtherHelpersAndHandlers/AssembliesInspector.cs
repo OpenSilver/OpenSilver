@@ -14,6 +14,7 @@
 using System;
 using System.Reflection;
 using System.Xml.Linq;
+using Mono.Cecil;
 using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 
 namespace OpenSilver.Compiler
@@ -109,5 +110,17 @@ namespace OpenSilver.Compiler
 
         public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
             => _monoCecilVersion.GetField(fieldName, namespaceName, typeName, assemblyName);
+
+        public TypeDefinition GetTypeDefinition(string namespaceName, string typeName, string assemblyName)
+            => _monoCecilVersion.FindType(namespaceName, typeName, assemblyName);
+
+        public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+            => _monoCecilVersion.GetEnumValue(enumType, name, ignoreCase, allowIntegerValue);
+
+        public FieldDefinition GetField(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
+            => MonoCecilAssembliesInspectorImpl.FindFieldDeep(type, name, out _, false, staticOnly, publicOnly);
+
+        public PropertyDefinition GetProperty(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
+            => MonoCecilAssembliesInspectorImpl.FindPropertyGetterDeep(type, name, out _, staticOnly, publicOnly);
     }
 }

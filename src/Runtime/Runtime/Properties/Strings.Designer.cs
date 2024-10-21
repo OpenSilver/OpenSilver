@@ -700,6 +700,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; StaticExtension value cannot be resolved to an enumeration, static field, or static property..
+        /// </summary>
+        internal static string MarkupExtensionBadStatic {
+            get {
+                return ResourceManager.GetString("MarkupExtensionBadStatic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A &apos;{0}&apos; cannot be set on the &apos;{1}&apos; property of type &apos;{2}&apos;. A &apos;{0}&apos; can only be set on a DependencyProperty of a DependencyObject..
         /// </summary>
         internal static string MarkupExtensionDynamicOrBindingOnClrProp {
@@ -732,6 +741,15 @@ namespace OpenSilver.Internal {
         internal static string MarkupExtensionResourceKey {
             get {
                 return ResourceManager.GetString("MarkupExtensionResourceKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to StaticExtension must have Member property set before ProvideValue can be called..
+        /// </summary>
+        internal static string MarkupExtensionStaticMember {
+            get {
+                return ResourceManager.GetString("MarkupExtensionStaticMember", resourceCulture);
             }
         }
         

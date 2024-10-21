@@ -14,12 +14,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using Mono.Cecil;
+using OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector;
 using OpenSilver.Internal;
 
 namespace OpenSilver.Compiler
@@ -1124,6 +1127,48 @@ namespace GlobalResource
                                 }
                                 //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new global.System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
                             }
+                            else if (GeneratingCode.IsStaticExtension(child, _settings))
+                            {
+                                string staticMemberName = ResolveStaticExtension(child);
+
+                                if (isAttachedProperty)
+                                {
+                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                        propertyName,
+                                        element.Name.NamespaceName,
+                                        typeName,
+                                        out string propertyTypeNS,
+                                        out string propertyTypeName,
+                                        out _,
+                                        out _,
+                                        assemblyNameIfAny,
+                                        isAttached: true);
+
+                                    string type = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                        elementName.Namespace.NamespaceName,
+                                        elementName.LocalName,
+                                        assemblyNameIfAny);
+
+                                    parameters.StringBuilder.AppendLine(
+                                        $"{type}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, ({staticMemberName} :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
+                                }
+                                else
+                                {
+                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                        propertyName,
+                                        parent.Name.NamespaceName,
+                                        parent.Name.LocalName,
+                                        out string propertyTypeNS,
+                                        out string propertyTypeName,
+                                        out _,
+                                        out _,
+                                        assemblyNameIfAny,
+                                        isAttached: false);
+
+                                    parameters.StringBuilder.AppendLine(
+                                        $"{parentElementUniqueNameOrThisKeyword}.{propertyName} <- ({staticMemberName} :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)}");
+                                }
+                            }
                             else
                             {
                                 //------------------------------
@@ -2068,6 +2113,76 @@ if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThi
 
             private string GetCSharpEquivalentOfXamlTypeAsString(XName xName, bool ifTypeNotFoundTryGuessing = false)
                 => GetCSharpEquivalentOfXamlTypeAsString(xName, ifTypeNotFoundTryGuessing, out _, out _, out _);
+
+            private string ResolveStaticExtension(XElement element)
+            {
+                if (element.Attribute("Member") is not XAttribute member)
+                {
+                    throw new XamlParseException("StaticExtension must have Member property set.");
+                }
+
+                string fieldString;
+                string typeNameForError = null;
+                TypeDefinition type;
+
+                if (element.Attribute("MemberType") is XAttribute typeAttribute)
+                {
+                    type = GetTypeDefinitionFromString(element, typeAttribute.Value);
+                    fieldString = member.Value;
+                    typeNameForError = type.ConvertToString(SupportedLanguage.FSharp);
+                }
+                else
+                {
+                    int dotIndex = member.Value.IndexOf('.');
+                    if (dotIndex < 0)
+                    {
+                        throw new XamlParseException($"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+                    }
+
+                    // Pull out the type substring (this will include any XML prefix, e.g. "av:Button")
+                    string typeString = member.Value.Substring(0, dotIndex);
+                    if (string.IsNullOrEmpty(typeString))
+                    {
+                        throw new XamlParseException($"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+                    }
+
+                    type = GetTypeDefinitionFromString(element, typeString);
+
+                    // Get the member name substring.
+                    fieldString = member.Value.Substring(dotIndex + 1, member.Value.Length - dotIndex - 1);
+                    if (string.IsNullOrEmpty(typeString))
+                    {
+                        throw new XamlParseException($"'{member.Value}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+                    }
+                }
+
+                if (type.IsEnum)
+                {
+                    return _reflectionOnSeparateAppDomain.GetEnumValue(type, fieldString, false, false);
+                }
+
+                if (_reflectionOnSeparateAppDomain.GetField(type, fieldString, true, true) is FieldDefinition staticField)
+                {
+                    return $"global.{staticField.DeclaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticField.Name}";
+                }
+
+                if (_reflectionOnSeparateAppDomain.GetProperty(type, fieldString, true, true) is PropertyDefinition staticProperty)
+                {
+                    return $"global.{staticProperty.DeclaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticProperty.Name}";
+                }
+
+                throw new XamlParseException(
+                    $"'{(typeNameForError is not null ? $"{typeNameForError}.{member.Value}" : member.Value)}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+            }
+
+            private TypeDefinition GetTypeDefinitionFromString(XElement element, string value)
+            {
+                Debug.Assert(value is not null);
+
+                GetClrNamespaceAndLocalName(value, element, out string namespaceName, out string typeName, out string assemblyName);
+
+                return _reflectionOnSeparateAppDomain.GetTypeDefinition(namespaceName, typeName, assemblyName);
+            }
         }
     }
 }

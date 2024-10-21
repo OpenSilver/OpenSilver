@@ -14,6 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -170,7 +171,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
         }
 
-        private TypeDefinition FindType(string namespaceName, string typeName, string assemblyName = null,
+        internal TypeDefinition FindType(string namespaceName, string typeName, string assemblyName = null,
             bool doNotRaiseExceptionIfNotFound = false)
         {
             // Fix the namespace:
@@ -318,7 +319,37 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return null;
         }
 
-        private static FieldDefinition FindFieldDeep(TypeDefinition elementType, string propertyName,
+        internal static PropertyDefinition FindPropertyGetterDeep(TypeDefinition type, string name, out TypeReference ownerElementType,
+            bool staticOnly = false, bool publicOnly = false)
+        {
+            ownerElementType = type;
+            while (ownerElementType != null)
+            {
+                var resolved = ownerElementType.ResolveOrThrow();
+                var propertyDefinition = resolved.Properties.FirstOrDefault(p =>
+                {
+                    if (p.Name != name)
+                    {
+                        return false;
+                    }
+
+                    if (p.GetMethod is MethodDefinition getMethod)
+                    {
+                        return (!staticOnly || getMethod.IsStatic) && (!publicOnly || getMethod.IsPublic);
+                    }
+
+                    return false;
+                });
+
+                if (propertyDefinition != null) return propertyDefinition;
+
+                ownerElementType = resolved.BaseType?.PopulateGeneric(type, ownerElementType);
+            }
+
+            return null;
+        }
+
+        internal static FieldDefinition FindFieldDeep(TypeDefinition elementType, string propertyName,
             out TypeReference ownerElementType, bool ignoreCase = false, bool staticOnly = false, bool publicOnly = false)
         {
             ownerElementType = elementType;
@@ -849,24 +880,33 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var type = FindType(namespaceName, enumName, assembly)
                 ?? throw new XamlParseException($"Type '{enumName}' not found in namespace '{namespaceName}'.");
 
+            return GetEnumValue(type, name, ignoreCase, allowIntegerValue);
+        }
+
+        public string GetEnumValue(TypeDefinition enumType, string name, bool ignoreCase, bool allowIntegerValue)
+        {
+            Debug.Assert(enumType is not null && enumType.IsEnum);
+
+            name = name.Trim();
+
             string prefix = GetGlobalPrefixFromCompilerType();
-            var field = FindFieldDeep(type, name, out _, ignoreCase, true, true);
+            var field = FindFieldDeep(enumType, name, out _, ignoreCase, true, true);
 
             if (_compilerType == SupportedLanguage.CSharp)
             {
                 if (field is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(_compilerType)}.{field.Name}";
+                    return $"{prefix}{enumType.ConvertToString(_compilerType)}.{field.Name}";
                 }
                 if (allowIntegerValue)
                 {
                     if (long.TryParse(name, out var l))
                     {
-                        return $"({prefix}{type.ConvertToString(_compilerType)}){l}";
+                        return $"({prefix}{enumType.ConvertToString(_compilerType)}){l}";
                     }
                     if (ulong.TryParse(name, out var ul))
                     {
-                        return $"({prefix}{type.ConvertToString(_compilerType)}){ul}";
+                        return $"({prefix}{enumType.ConvertToString(_compilerType)}){ul}";
                     }
                 }
             }
@@ -874,17 +914,17 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 if (field is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(_compilerType)}.{field.Name}";
+                    return $"{prefix}{enumType.ConvertToString(_compilerType)}.{field.Name}";
                 }
                 if (allowIntegerValue)
                 {
                     if (long.TryParse(name, out var l))
                     {
-                        return $"CType({l}, {prefix}{type.ConvertToString(_compilerType)})";
+                        return $"CType({l}, {prefix}{enumType.ConvertToString(_compilerType)})";
                     }
                     if (ulong.TryParse(name, out var ul))
                     {
-                        return $"CType({ul}, {prefix}{type.ConvertToString(_compilerType)})";
+                        return $"CType({ul}, {prefix}{enumType.ConvertToString(_compilerType)})";
                     }
                 }
             }
@@ -892,25 +932,25 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             {
                 if (field is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(_compilerType)}.{field.Name}";
+                    return $"{prefix}{enumType.ConvertToString(_compilerType)}.{field.Name}";
                 }
 
                 // At F#, Enum works like property
-                var property = FindPropertyDeep(type, name, out _);
+                var property = FindPropertyDeep(enumType, name, out _);
                 if (property is not null)
                 {
-                    return $"{prefix}{type.ConvertToString(_compilerType)}.{property.Name}";
+                    return $"{prefix}{enumType.ConvertToString(_compilerType)}.{property.Name}";
                 }
 
                 if (allowIntegerValue)
                 {
                     if (long.TryParse(name, out var l))
                     {
-                        return $"enum<{prefix}{type.ConvertToString(_compilerType)}> {1}";
+                        return $"enum<{prefix}{enumType.ConvertToString(_compilerType)}> {1}";
                     }
                     if (ulong.TryParse(name, out var ul))
                     {
-                        return $"enum<{prefix}{type.ConvertToString(_compilerType)}> {ul}";
+                        return $"enum<{prefix}{enumType.ConvertToString(_compilerType)}> {ul}";
                     }
                 }
             }
