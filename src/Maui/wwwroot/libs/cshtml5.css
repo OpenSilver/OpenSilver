@@ -1,0 +1,134 @@
+
+/*===================================================================================
+*
+*   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
+*
+*   This file is part of both the OpenSilver Runtime (https://opensilver.net), which
+*   is licensed under the MIT license (https://opensource.org/licenses/MIT), and the
+*   CSHTML5 Runtime (http://cshtml5.com), which is dual-licensed (MIT + commercial).
+*
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*
+\*====================================================================================*/
+
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+
+body {
+    background-color: white;
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    width: 100%;
+    font-size: 11px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    cursor: default;
+    font-family: 'Segoe UI', Verdana, 'DejaVu Sans', Lucida, 'MS Sans Serif', sans-serif;
+    -webkit-touch-callout: none; /* prevents callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none; /* prevents webkit from resizing text to fit */
+    -webkit-user-select: text; /* 'none' prevents copy paste. 'text' allows it. */
+}
+
+.opensilver-mouse-captured {
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Chrome, Safari, and Opera */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
+.uielement-collapsed {
+    display: none !important;
+}
+
+.uielement-unarranged {
+    opacity: 0 !important;
+}
+
+.opensilver-hyperlink {
+    cursor: pointer;
+}
+
+.opensilver-hyperlink:hover {
+    color: var(--mouse-over-color, rgb(237, 110, 0)) !important;
+    text-decoration: var(--mouse-over-decoration, underline) !important;
+}
+
+.opensilver-uielement {
+    position: absolute;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 0;
+    outline: none;
+}
+
+.opensilver-shape {
+    pointer-events: none !important;
+    fill: none; /* CSS default value is black */
+    fill-rule: evenodd; /* CSS default value is nonzero, and evenodd is the default value of every shape */
+    stroke: none; /* CSS default value is black */
+    stroke-miterlimit: 10; /* CSS default value is 4 */
+}
+
+.opensilver-border {
+    border-style: solid;
+    border-color: transparent; /* CSS default value matches the color property (currentcolor) */
+    border-width: 0px; /* CSS default value is medium */
+    background-clip: padding-box !important;
+}
+
+.opensilver-popup {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: clip;
+}
+
+.opensilver-inkpresenter {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    pointer-events: none;
+}
+
+.opensilver-textblock {
+    text-overflow: ellipsis;
+    text-align: start;
+    white-space: pre;
+    overflow: visible;
+}
+
+.opensilver-textelement {
+    line-height: var(--line-stacking-strategy, normal);
+}
+
+/* Media query used for printing (cf. "CSHTML5.Native.Html.Printing.PrintManager") */
+@media print {
+    body {
+        -webkit-print-color-adjust: exact;
+    }
+
+        body * {
+            visibility: hidden;
+        }
+
+    .section-to-print, .section-to-print * {
+        visibility: visible;
+    }
+
+    .section-to-print {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+    }
+}
