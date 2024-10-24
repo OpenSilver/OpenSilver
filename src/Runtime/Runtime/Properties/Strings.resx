@@ -350,6 +350,12 @@
   <data name="MarkupExtensionStaticMember" xml:space="preserve">
     <value>StaticExtension must have Member property set before ProvideValue can be called.</value>
   </data>
+  <data name="MarkupExtensionTypeName" xml:space="preserve">
+    <value>TypeExtension must have TypeName property set before ProvideValue can be called.</value>
+  </data>
+  <data name="MarkupExtensionTypeNameBad" xml:space="preserve">
+    <value>'{0}' string is not valid for type.</value>
+  </data>
   <data name="MemberNotAllowedDuringAddOrEdit" xml:space="preserve">
     <value>'{0}' is not allowed during an AddNew or EditItem transaction.</value>
   </data>

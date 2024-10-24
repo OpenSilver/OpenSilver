@@ -754,6 +754,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TypeExtension must have TypeName property set before ProvideValue can be called..
+        /// </summary>
+        internal static string MarkupExtensionTypeName {
+            get {
+                return ResourceManager.GetString("MarkupExtensionTypeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; string is not valid for type..
+        /// </summary>
+        internal static string MarkupExtensionTypeNameBad {
+            get {
+                return ResourceManager.GetString("MarkupExtensionTypeNameBad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not allowed during an AddNew or EditItem transaction..
         /// </summary>
         internal static string MemberNotAllowedDuringAddOrEdit {

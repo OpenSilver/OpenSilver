@@ -1096,6 +1096,48 @@ namespace OpenSilver.Compiler
                                         $"{parentElementUniqueNameOrThisKeyword}.{propertyName} = ({GetFullTypeName(propertyTypeNS, propertyTypeName)})(object){staticMemberName};");
                                 }
                             }
+                            else if (GeneratingCode.IsTypeExtension(child, _settings))
+                            {
+                                string resolvedTypeName = ResolveTypeExtension(child);
+
+                                if (isAttachedProperty)
+                                {
+                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                        propertyName,
+                                        element.Name.NamespaceName,
+                                        typeName,
+                                        out string propertyTypeNS,
+                                        out string propertyTypeName,
+                                        out _,
+                                        out _,
+                                        assemblyNameIfAny,
+                                        isAttached: true);
+
+                                    string type = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                        elementName.Namespace.NamespaceName,
+                                        elementName.LocalName,
+                                        assemblyNameIfAny);
+
+                                    parameters.StringBuilder.AppendLine(
+                                        $"{type}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, ({GetFullTypeName(propertyTypeNS, propertyTypeName)})(object)typeof(global::{resolvedTypeName}));");
+                                }
+                                else
+                                {
+                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                        propertyName,
+                                        parent.Name.NamespaceName,
+                                        parent.Name.LocalName,
+                                        out string propertyTypeNS,
+                                        out string propertyTypeName,
+                                        out _,
+                                        out _,
+                                        assemblyNameIfAny,
+                                        isAttached: false);
+
+                                    parameters.StringBuilder.AppendLine(
+                                        $"{parentElementUniqueNameOrThisKeyword}.{propertyName} = ({GetFullTypeName(propertyTypeNS, propertyTypeName)})(object)typeof(global::{resolvedTypeName});");
+                                }
+                            }
                             else
                             {
                                 //------------------------------
@@ -2098,6 +2140,21 @@ if (!{RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKe
 
                 throw new XamlParseException(
                     $"'{(typeNameForError is not null ? $"{typeNameForError}.{member.Value}" : member.Value)}' StaticExtension value cannot be resolved to an enumeration, static field, or static property");
+            }
+
+            private string ResolveTypeExtension(XElement element)
+            {
+                if (element.Attribute("Type") is XAttribute typeAttribute)
+                {
+                    return GetTypeDefinitionFromString(element, typeAttribute.Value).ConvertToString(SupportedLanguage.CSharp);
+                }
+
+                if (element.Attribute("TypeName") is not XAttribute typeNameAttribute)
+                {
+                    throw new XamlParseException("TypeExtension must have TypeName property set.");
+                }
+
+                return GetTypeDefinitionFromString(element, typeNameAttribute.Value).ConvertToString(SupportedLanguage.CSharp);
             }
 
             private TypeDefinition GetTypeDefinitionFromString(XElement element, string value)
