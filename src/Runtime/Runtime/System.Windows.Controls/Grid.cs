@@ -414,8 +414,7 @@ namespace System.Windows.Controls
 
         private bool IsWithoutRowAndColumnDefinitions()
         {
-            return (RowDefinitions == null || RowDefinitions.Count == 0) &&
-                   (ColumnDefinitions == null || ColumnDefinitions.Count == 0);
+            return (_rows is null || _rows.Count == 0) && (_columns == null || _columns.Count == 0);
         }
 
         internal void InvalidateDefinitions()
@@ -436,24 +435,24 @@ namespace System.Windows.Controls
         {
             Debug.Assert(!IsWithoutRowAndColumnDefinitions());
 
-            if (RowDefinitions == null || RowDefinitions.Count == 0)
+            if (_rows == null || _rows.Count == 0)
             {
                 //empty collection defaults to single row
                 m_pRows = new List<RowDefinition>() { new RowDefinition() };
             }
             else
             {
-                m_pRows = RowDefinitions.InternalItems;
+                m_pRows = _rows.InternalItems;
             }
 
-            if (ColumnDefinitions == null || ColumnDefinitions.Count == 0)
+            if (_columns is null || _columns.Count == 0)
             {
                 //empty collection defaults to single row
                 m_pColumns = new List<ColumnDefinition> { new ColumnDefinition() };
             }
             else
             {
-                m_pColumns = ColumnDefinitions.InternalItems;
+                m_pColumns = _columns.InternalItems;
             }
         }
 
