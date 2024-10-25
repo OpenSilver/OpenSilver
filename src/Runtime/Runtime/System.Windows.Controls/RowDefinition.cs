@@ -13,209 +13,154 @@
 
 using System.ComponentModel;
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Defines row-specific properties that apply to <see cref="Grid"/> elements.
+/// </summary>
+public sealed class RowDefinition : DefinitionBase
 {
     /// <summary>
-    /// Defines row-specific properties that apply to <see cref="Grid"/> elements.
+    /// Initializes a new instance of the <see cref="RowDefinition"/> class.
     /// </summary>
-    public sealed class RowDefinition : DependencyObject, IDefinitionBase
+    public RowDefinition()
+        : base(ThisIsRowDefinition)
     {
-        private GridUnitType _effectiveUnitType;
-        private double _effectiveMinSize;
-        private double _sizeCache;
-        private double _finalOffset;
-        private double _actualHeight;
-        private Grid _parent;
+    }
 
-        public RowDefinition()
+    /// <summary>
+    /// Returns a copy of this <see cref="RowDefinition"/>.
+    /// </summary>
+    public RowDefinition Clone() =>
+        new()
         {
-            _effectiveMinSize = 0;
-            _effectiveUnitType = GridUnitType.Auto;
-            _finalOffset = 0;
-            _sizeCache = 0;
-        }
+            MinHeight = MinHeight,
+            MaxHeight = MaxHeight,
+            Height = Height.Clone()
+        };
 
-        /// <summary>
-        /// Returns a copy of this <see cref="RowDefinition"/>.
-        /// </summary>
-        public RowDefinition Clone() =>
-            new()
+    /// <summary>
+    /// Gets or sets a value that represents the maximum height of a <see cref="RowDefinition"/>.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="double"/> that represents the maximum height.
+    /// </returns>
+    public double MaxHeight
+    {
+        get => (double)GetValue(MaxHeightProperty);
+        set => SetValueInternal(MaxHeightProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="MaxHeight"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty MaxHeightProperty =
+        DependencyProperty.Register(
+            nameof(MaxHeight),
+            typeof(double),
+            typeof(RowDefinition),
+            new PropertyMetadata(double.PositiveInfinity, OnUserMaxSizePropertyChanged),
+            FrameworkElement.IsMaxWidthHeightValid);
+
+    /// <summary>
+    /// Gets or sets a value that represents the minimum allowed height of a <see cref="RowDefinition"/>.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="double"/> that represents the minimum allowed height. The default value is 0.
+    /// </returns>
+    public double MinHeight
+    {
+        get => (double)GetValue(MinHeightProperty);
+        set => SetValueInternal(MinHeightProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="MinHeight"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty MinHeightProperty =
+        DependencyProperty.Register(
+            nameof(MinHeight),
+            typeof(double),
+            typeof(RowDefinition),
+            new PropertyMetadata(0d, OnUserMinSizePropertyChanged),
+            FrameworkElement.IsMinWidthHeightValid);
+
+    /// <summary>
+    /// Gets the calculated height of a <see cref="RowDefinition"/> element,
+    /// or sets the <see cref="GridLength"/> value of a row that is defined by the <see cref="RowDefinition"/>.
+    /// </summary>
+    /// <returns>
+    /// The <see cref="GridLength"/> that represents the height of the row. The default value is 1.0.
+    /// </returns>
+    public GridLength Height
+    {
+        get => (GridLength)GetValue(HeightProperty);
+        set => SetValueInternal(HeightProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="Height"/> dependency property.
+    /// </summary>
+    public static readonly DependencyProperty HeightProperty =
+        DependencyProperty.Register(
+            nameof(Height),
+            typeof(GridLength),
+            typeof(RowDefinition),
+            new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), OnUserSizePropertyChanged));
+
+    private static readonly DependencyPropertyKey ActualHeightPropertyKey =
+        DependencyProperty.RegisterReadOnly(
+            nameof(ActualHeight),
+            typeof(double),
+            typeof(RowDefinition),
+            _actualHeightMetadata);
+
+    private static readonly ReadOnlyPropertyMetadata _actualHeightMetadata = new(0.0, GetActualHeight);
+
+    private static object GetActualHeight(DependencyObject d) => ((RowDefinition)d).ActualHeight;
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static readonly DependencyProperty ActualHeightProperty = ActualHeightPropertyKey.DependencyProperty;
+
+    /// <summary>
+    /// Gets a value that represents the calculated height of the <see cref="RowDefinition"/>.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="double"/> that represents the calculated height in pixels. The default value is 0.
+    /// </returns>
+    public double ActualHeight
+    {
+        get
+        {
+            double value = 0.0;
+
+            if (InParentLogicalTree)
             {
-                MinHeight = MinHeight,
-                MaxHeight = MaxHeight,
-                Height = Height.Clone()
-            };
-
-        /// <summary>
-        /// Gets or sets a value that represents the maximum height of a <see cref="RowDefinition"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="double"/> that represents the maximum height.
-        /// </returns>
-        public double MaxHeight
-        {
-            get => (double)GetValue(MaxHeightProperty);
-            set => SetValueInternal(MaxHeightProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="MaxHeight"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MaxHeightProperty =
-            DependencyProperty.Register(
-                nameof(MaxHeight),
-                typeof(double),
-                typeof(RowDefinition),
-                new PropertyMetadata(double.PositiveInfinity, OnMaxHeightChanged),
-                FrameworkElement.IsMaxWidthHeightValid);
-
-        private static void OnMaxHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((RowDefinition)d)._parent?.InvalidateMeasure();
-        }
-
-        /// <summary>
-        /// Gets or sets a value that represents the minimum allowed height of a <see cref="RowDefinition"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="double"/> that represents the minimum allowed height. The default value is 0.
-        /// </returns>
-        public double MinHeight
-        {
-            get => (double)GetValue(MinHeightProperty);
-            set => SetValueInternal(MinHeightProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="MinHeight"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MinHeightProperty =
-            DependencyProperty.Register(
-                nameof(MinHeight),
-                typeof(double),
-                typeof(RowDefinition),
-                new PropertyMetadata(0d, OnMinHeightChanged),
-                FrameworkElement.IsMinWidthHeightValid);
-
-        private static void OnMinHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((RowDefinition)d)._parent?.InvalidateMeasure();
-        }
-
-        /// <summary>
-        /// Gets the calculated height of a <see cref="RowDefinition"/> element,
-        /// or sets the <see cref="GridLength"/> value of a row that is defined by the <see cref="RowDefinition"/>.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="GridLength"/> that represents the height of the row. The default value is 1.0.
-        /// </returns>
-        public GridLength Height
-        {
-            get => (GridLength)GetValue(HeightProperty);
-            set => SetValueInternal(HeightProperty, value);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Height"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty HeightProperty =
-            DependencyProperty.Register(
-                nameof(Height),
-                typeof(GridLength),
-                typeof(RowDefinition),
-                new PropertyMetadata(new GridLength(1.0, GridUnitType.Star), OnHeightChanged));
-
-        private static void OnHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((RowDefinition)d)._parent?.InvalidateMeasure();
-        }
-
-        private static readonly PropertyMetadata _actualHeightMetadata = new ReadOnlyPropertyMetadata(0.0, GetActualHeight);
-
-        private static readonly DependencyPropertyKey ActualHeightPropertyKey =
-            DependencyProperty.RegisterReadOnly(
-                nameof(ActualHeight),
-                typeof(double),
-                typeof(ColumnDefinition),
-                _actualHeightMetadata);
-
-        private static object GetActualHeight(DependencyObject d)
-        {
-            RowDefinition row = (RowDefinition)d;
-            return row._actualHeight;
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty ActualHeightProperty = ActualHeightPropertyKey.DependencyProperty;
-
-        /// <summary>
-        /// Gets a value that represents the calculated height of the <see cref="RowDefinition"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="double"/> that represents the calculated height in pixels. The default value is 0.
-        /// </returns>
-        public double ActualHeight
-        {
-            get => _actualHeight;
-            set
-            {
-                double previousHeight = _actualHeight;
-                if (previousHeight != value)
-                {
-                    _actualHeight = value;
-                    NotifyPropertyChange(
-                        new DependencyPropertyChangedEventArgs(
-                            previousHeight,
-                            value,
-                            ActualHeightProperty,
-                            _actualHeightMetadata));
-                }
+                value = Parent.GetFinalRowDefinitionHeight(Index);
             }
+
+            return value;
         }
+    }
 
-        internal void SetParent(Grid parent) => _parent = parent;
-
-        double IDefinitionBase.MinLength => MinHeight;
-
-        double IDefinitionBase.MaxLength => MaxHeight;
-
-        GridLength IDefinitionBase.Length => Height;
-
-        double IDefinitionBase.GetUserMaxSize() => MaxHeight;
-
-        double IDefinitionBase.GetUserMinSize() => MinHeight;
-
-        GridUnitType IDefinitionBase.GetUserSizeType() => Height.GridUnitType;
-
-        double IDefinitionBase.GetUserSizeValue() => Height.Value;
-
-        void IDefinitionBase.UpdateEffectiveMinSize(double newValue) => _effectiveMinSize = Math.Max(_effectiveMinSize, newValue);
-
-        void IDefinitionBase.SetEffectiveUnitType(GridUnitType type) => _effectiveUnitType = type;
-
-        void IDefinitionBase.SetEffectiveMinSize(double value) => _effectiveMinSize = value;
-
-        double IDefinitionBase.GetEffectiveMinSize() => _effectiveMinSize;
-
-        GridUnitType IDefinitionBase.GetEffectiveUnitType() => _effectiveUnitType;
-
-        void IDefinitionBase.SetMeasureArrangeSize(double value) => ActualHeight = value;
-
-        double IDefinitionBase.GetMeasureArrangeSize() => ActualHeight;
-
-        void IDefinitionBase.SetSizeCache(double value) => _sizeCache = value;
-
-        double IDefinitionBase.GetSizeCache() => _sizeCache;
-
-        double IDefinitionBase.GetPreferredSize()
+    /// <summary>
+    /// Gets a value that represents the offset value of this <see cref="RowDefinition"/>.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="double"/> that represents the offset of the row. The default value is 0.0.
+    /// </returns>
+    public double Offset
+    {
+        get
         {
-            double actualHeight = ActualHeight;
-            return (_effectiveUnitType != GridUnitType.Auto && _effectiveMinSize < actualHeight)
-                ? actualHeight : _effectiveMinSize;
+            double value = 0.0;
+
+            if (Index != 0)
+            {
+                value = FinalOffset;
+            }
+
+            return value;
         }
-
-        double IDefinitionBase.GetFinalOffset() => _finalOffset;
-
-        void IDefinitionBase.SetFinalOffset(double value) => _finalOffset = value;
     }
 }

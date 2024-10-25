@@ -130,6 +130,8 @@ namespace System.Windows
             //
             PropagateResumeLayout(this, child);
 
+            // Fire notifications
+            OnVisualChildrenChanged(child, null);
             child.OnVisualParentChanged(null);
         }
 
@@ -169,6 +171,7 @@ namespace System.Windows
             PropagateSuspendLayout(child);
 
             child.OnVisualParentChanged(this);
+            OnVisualChildrenChanged(null, child);
         }
 
         /// <summary>
@@ -200,6 +203,17 @@ namespace System.Windows
                 }
             }
         }
+
+        /// <summary>
+        /// Called when the visual element collection of the visual object is modified.
+        /// </summary>
+        /// <param name="visualAdded">
+        /// The <see cref="UIElement"/> that was added to the collection.
+        /// </param>
+        /// <param name="visualRemoved">
+        /// The <see cref="UIElement"/> that was removed from the collection.
+        /// </param>
+        protected internal virtual void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved) { }
 
         /// <Summary>
         /// Flag to check if this visual has any children

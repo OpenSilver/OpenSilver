@@ -13,1763 +13,3033 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Media;
-using OpenSilver.Buffers;
+using OpenSilver.Internal;
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Defines a flexible grid area that consists of columns and rows.
+/// </summary>
+public class Grid : Panel
 {
     /// <summary>
-    /// Defines a flexible grid area that consists of columns and rows. Child elements
-    /// of the Grid are measured and arranged according to their row/column assignments
-    /// and internal partial class logic.
+    /// Initializes a new instance of the <see cref="Grid"/> class.
     /// </summary>
-    /// <example>
-    /// You can add a Grid with two rows and columns to the XAML as follows:
-    /// <code lang="XAML" xml:space="preserve">
-    /// <Grid Width="300"
-    ///       Height="200"
-    ///       Background="Blue"
-    ///       HorizontalAlignment="Left">
-    ///     <Grid.RowDefinitions>
-    ///         <RowDefinition Height="40"/>
-    ///         <RowDefinition Height="*"/>
-    ///     </Grid.RowDefinitions>
-    ///     <Grid.ColumnDefinitions>
-    ///         <ColumnDefinition Width="70"/>
-    ///         <ColumnDefinition Width="*"/>
-    ///     </Grid.ColumnDefinitions>
-    ///         <!--Children here.-->
-    ///     </Grid>
-    /// </code>
-    /// Or in C#:
-    /// <code lang="C#">
-    /// Grid myGrid = new Grid();
-    /// myGrid.Width = 300;
-    /// myGrid.Height = 200;
-    /// myGrid.Background = new SolidColorBrush(Windows.UI.Colors.Blue);
-    /// myGrid.HorizontalAlignment = HorizontalAlignment.Left;
-    /// 
-    /// //We create and add the rows and columns:
-    /// //First column:
-    /// ColumnDefinition columnDefinition = new ColumnDefinition();
-    /// columnDefinition.Width = new GridLength(70, GridUnitType.Pixel);
-    /// myGrid.ColumnDefinitions.Add(columnDefinition);
-    /// //Second column:
-    /// ColumnDefinition columnDefinition2 = new ColumnDefinition();
-    /// columnDefinition2.Width = new GridLength(1, GridUnitType.Star);
-    /// myGrid.ColumnDefinitions.Add(columnDefinition2);
-    /// 
-    /// //First row:
-    /// RowDefinition rowDefinition = new RowDefinition();
-    /// rowDefinition.Height = new GridLength(40, GridUnitType.Pixel);
-    /// myGrid.RowDefinitions.Add(rowDefinition);
-    /// //Second Row:
-    /// RowDefinition rowDefinition2 = new RowDefinition();
-    /// rowDefinition2.Height = new GridLength(1, GridUnitType.Star);
-    /// myGrid.RowDefinitions.Add(rowDefinition2);
-    /// 
-    /// //Do not forget to add the Grid to the visual tree.
-    /// </code>
-    /// </example>
-    public class Grid : Panel
+    public Grid() { }
+
+    /// <summary>
+    /// Identifies the Grid.Column attached property.
+    /// </summary>
+    public static readonly DependencyProperty ColumnProperty =
+        DependencyProperty.RegisterAttached(
+            "Column",
+            typeof(int),
+            typeof(Grid),
+            new FrameworkPropertyMetadata(0, OnCellAttachedPropertyChanged),
+            IsIntValueNotNegative);
+
+    /// <summary>
+    /// Gets the value of the Grid.Column attached property from a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element from which to read the property value.
+    /// </param>
+    /// <returns>
+    /// The value of the Grid.Column attached property.
+    /// </returns>
+    public static int GetColumn(UIElement element)
     {
-        private ColumnDefinitionCollection _columns;
-        private RowDefinitionCollection _rows;
-
-        /// <summary>
-        /// Initializes a new instance of the Grid class.
-        /// </summary>
-        public Grid() { }
-
-        /// <summary>
-        /// Gets a list of ColumnDefinition objects defined on this instance of Grid.
-        /// </summary>
-        public ColumnDefinitionCollection ColumnDefinitions => _columns ??= new ColumnDefinitionCollection(this);
-
-        /// <summary>
-        /// Gets a list of RowDefinition objects defined on this instance of Grid.
-        /// </summary>
-        public RowDefinitionCollection RowDefinitions => _rows ??= new RowDefinitionCollection(this);
-
-        /// <summary>
-        /// Sets the value of the Grid.Row XAML attached property on the specified FrameworkElement.
-        /// </summary>
-        /// <param name="element">The target element on which to set the Grid.Row XAML attached property.</param>
-        /// <param name="value">The property value to set.</param>
-        public static void SetRow(UIElement element, int value)
+        if (element is null)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            element.SetValueInternal(RowProperty, value);
+            throw new ArgumentNullException(nameof(element));
         }
 
-        /// <summary>
-        /// Gets the value of the Grid.Row XAML attached property from the specified
-        /// FrameworkElement.
-        /// </summary>
-        /// <param name="element">The element from which to read the property value.</param>
-        /// <returns>The value of the Grid.Row XAML attached property on the target element.</returns>
-        public static int GetRow(UIElement element)
-        {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+        return (int)element.GetValue(ColumnProperty);
+    }
 
-            return (int)element.GetValue(RowProperty);
+    /// <summary>
+    /// Sets the value of the Grid.Column attached property to a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element on which to set the Grid.Column attached property.
+    /// </param>
+    /// <param name="value">
+    /// The property value to set.
+    /// </param>
+    public static void SetColumn(UIElement element, int value)
+    {
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
         }
 
-        /// <summary>
-        /// Identifies the Grid.Row XAML attached property.
-        /// </summary>
-        public static readonly DependencyProperty RowProperty =
-            DependencyProperty.RegisterAttached(
-                "Row",
-                typeof(int),
-                typeof(UIElement),
-                new PropertyMetadata(0, OnCellAttachedPropertyChanged),
-                IsIntValueNotNegative);
+        element.SetValueInternal(ColumnProperty, value);
+    }
 
-        public static void SetRowSpan(UIElement element, int value)
+    /// <summary>
+    /// Identifies the Grid.Row attached property.
+    /// </summary>
+    public static readonly DependencyProperty RowProperty =
+        DependencyProperty.RegisterAttached(
+            "Row",
+            typeof(int),
+            typeof(Grid),
+            new FrameworkPropertyMetadata(0, OnCellAttachedPropertyChanged),
+            IsIntValueNotNegative);
+
+    /// <summary>
+    /// Gets the value of the Grid.Row attached property from a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element from which to read the property value.
+    /// </param>
+    /// <returns>
+    /// The value of the Grid.Row attached property.
+    /// </returns>
+    public static int GetRow(UIElement element)
+    {
+        if (element is null)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            element.SetValueInternal(RowSpanProperty, value);
+            throw new ArgumentNullException(nameof(element));
         }
 
-        public static int GetRowSpan(UIElement element)
-        {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+        return (int)element.GetValue(RowProperty);
+    }
 
-            return (int)element.GetValue(RowSpanProperty);
+    /// <summary>
+    /// Sets the value of the Grid.Row attached property to a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element on which to set the attached property.
+    /// </param>
+    /// <param name="value">
+    /// The property value to set.
+    /// </param>
+    public static void SetRow(UIElement element, int value)
+    {
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
         }
 
-        public static readonly DependencyProperty RowSpanProperty =
-            DependencyProperty.RegisterAttached(
-                "RowSpan",
-                typeof(int),
-                typeof(UIElement),
-                new PropertyMetadata(1, OnCellAttachedPropertyChanged),
-                IsIntValueGreaterThanZero);
+        element.SetValueInternal(RowProperty, value);
+    }
 
-        /// <summary>
-        /// Sets the value of the Grid.Column XAML attached property on the specified FrameworkElement.
-        /// </summary>
-        /// <param name="element">The target element on which to set the Grid.Row XAML attached property.</param>
-        /// <param name="value">The property value to set.</param>
-        public static void SetColumn(UIElement element, int value)
+    /// <summary>
+    /// Identifies the Grid.ColumnSpan attached property.
+    /// </summary>
+    public static readonly DependencyProperty ColumnSpanProperty =
+        DependencyProperty.RegisterAttached(
+            "ColumnSpan",
+            typeof(int),
+            typeof(Grid),
+            new FrameworkPropertyMetadata(1, OnCellAttachedPropertyChanged),
+            IsIntValueGreaterThanZero);
+
+    /// <summary>
+    /// Gets the value of the Grid.ColumnSpan attached property from a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element from which to read the property value.
+    /// </param>
+    /// <returns>
+    /// The value of the Grid.ColumnSpan attached property.
+    /// </returns>
+    public static int GetColumnSpan(UIElement element)
+    {
+        if (element is null)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            element.SetValueInternal(ColumnProperty, value);
+            throw new ArgumentNullException(nameof(element));
         }
 
-        /// <summary>
-        /// Gets the value of the Grid.Column XAML attached property from the specified
-        /// FrameworkElement.
-        /// </summary>
-        /// <param name="element">The element from which to read the property value.</param>
-        /// <returns>The value of the Grid.Column XAML attached property on the target element.</returns>
-        public static int GetColumn(UIElement element)
-        {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+        return (int)element.GetValue(ColumnSpanProperty);
+    }
 
-            return (int)element.GetValue(ColumnProperty);
+    /// <summary>
+    /// Sets the value of the Grid.ColumnSpan attached property to a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element on which to set the Grid.ColumnSpan attached property.
+    /// </param>
+    /// <param name="value">
+    /// The property value to set.
+    /// </param>
+    public static void SetColumnSpan(UIElement element, int value)
+    {
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
         }
 
-        /// <summary>
-        /// Identifies the Grid.Column XAML attached property
-        /// </summary>
-        public static readonly DependencyProperty ColumnProperty =
-            DependencyProperty.RegisterAttached(
-                "Column",
-                typeof(int),
-                typeof(UIElement),
-                new PropertyMetadata(0, OnCellAttachedPropertyChanged),
-                IsIntValueNotNegative);
+        element.SetValueInternal(ColumnSpanProperty, value);
+    }
 
-        public static void SetColumnSpan(UIElement element, int value)
+    /// <summary>
+    /// Identifies the Grid.RowSpan attached property.
+    /// </summary>
+    public static readonly DependencyProperty RowSpanProperty =
+        DependencyProperty.RegisterAttached(
+            "RowSpan",
+            typeof(int),
+            typeof(Grid),
+            new FrameworkPropertyMetadata(1, OnCellAttachedPropertyChanged),
+            IsIntValueGreaterThanZero);
+
+    /// <summary>
+    /// Gets the value of the Grid.RowSpan attached property from a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element from which to read the property value.
+    /// </param>
+    /// <returns>
+    /// The value of the Grid.RowSpan attached property.
+    /// </returns>
+    public static int GetRowSpan(UIElement element)
+    {
+        if (element is null)
         {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            element.SetValueInternal(ColumnSpanProperty, value);
+            throw new ArgumentNullException(nameof(element));
         }
 
-        public static int GetColumnSpan(UIElement element)
-        {
-            if (element == null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
+        return (int)element.GetValue(RowSpanProperty);
+    }
 
-            return (int)element.GetValue(ColumnSpanProperty);
+    /// <summary>
+    /// Sets the value of the Grid.RowSpan attached property to a given <see cref="UIElement"/>.
+    /// </summary>
+    /// <param name="element">
+    /// The element on which to set the Grid.RowSpan attached property.
+    /// </param>
+    /// <param name="value">
+    /// The property value to set.
+    /// </param>
+    public static void SetRowSpan(UIElement element, int value)
+    {
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
         }
 
-        public static readonly DependencyProperty ColumnSpanProperty =
-            DependencyProperty.RegisterAttached(
-                "ColumnSpan",
-                typeof(int),
-                typeof(UIElement),
-                new PropertyMetadata(1, OnCellAttachedPropertyChanged),
-                IsIntValueGreaterThanZero);
+        element.SetValueInternal(RowSpanProperty, value);
+    }
 
-        private static void OnCellAttachedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    /// <summary>
+    /// Identifies the <see cref="ShowGridLines"/> dependency property.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public static readonly DependencyProperty ShowGridLinesProperty =
+        DependencyProperty.Register(
+            nameof(ShowGridLines),
+            typeof(bool),
+            typeof(Grid),
+            new FrameworkPropertyMetadata(BooleanBoxes.FalseBox, OnShowGridLinesPropertyChanged));
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether grid lines are visible within this <see cref="Grid"/>.
+    /// </summary>
+    /// <returns>
+    /// true if grid lines are visible; otherwise, false. The default value is false.
+    /// </returns>
+    [OpenSilver.NotImplemented]
+    public bool ShowGridLines
+    {
+        get => (bool)GetValue(ShowGridLinesProperty);
+        set => SetValueInternal(ShowGridLinesProperty, value);
+    }
+
+    /// <summary>
+    /// Gets a <see cref="ColumnDefinitionCollection"/> defined on this instance of <see cref="Grid"/>.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="ColumnDefinitionCollection"/> defined on this instance of <see cref="Grid"/>.
+    /// </returns>
+    public ColumnDefinitionCollection ColumnDefinitions
+    {
+        get
         {
-            if (d is UIElement child &&
-                VisualTreeHelper.GetParent(child) is Grid grid)
-            {
-                grid.InvalidateMeasure();
-            }
+            _data ??= new ExtendedData();
+            _data.ColumnDefinitions ??= new(this);
+
+            return _data.ColumnDefinitions;
         }
+    }
 
-        private static bool IsIntValueNotNegative(object value) => (int)value >= 0;
-
-        private static bool IsIntValueGreaterThanZero(object value) => (int)value > 0;
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty ShowGridLinesProperty =
-            DependencyProperty.Register(
-                nameof(ShowGridLines),
-                typeof(bool),
-                typeof(Grid),
-                new PropertyMetadata(false));
-
-        [OpenSilver.NotImplemented]
-        public bool ShowGridLines
+    /// <summary>
+    /// Gets a <see cref="RowDefinitionCollection"/> defined on this instance of <see cref="Grid"/>.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="RowDefinitionCollection"/> defined on this instance of <see cref="Grid"/>.
+    /// </returns>
+    public RowDefinitionCollection RowDefinitions
+    {
+        get
         {
-            get => (bool)GetValue(ShowGridLinesProperty);
-            set => SetValueInternal(ShowGridLinesProperty, value);
+            _data ??= new ExtendedData();
+            _data.RowDefinitions ??= new(this);
+
+            return _data.RowDefinitions;
         }
+    }
 
-        // private
-        private List<RowDefinition> m_pRows;         // Effective row collection.
-        private List<ColumnDefinition> m_pColumns;   // Effective column collection.
+    /// <summary>
+    /// Measures the children of a <see cref="Grid"/> in anticipation of arranging them during the <see cref="ArrangeOverride(Size)"/> pass.
+    /// </summary>
+    /// <param name="constraint">
+    /// Indicates an upper limit size that should not be exceeded.
+    /// </param>
+    /// <returns>
+    /// <see cref="Size"/> that represents the required size to arrange child content.
+    /// </returns>
+    protected override Size MeasureOverride(Size constraint)
+    {
+        Size gridDesiredSize;
+        ExtendedData extData = ExtData;
 
-        // Grid classifies cells into four groups based on their column/row
-        // type. The following diagram depicts all the possible combinations
-        // and their corresponding cell group:
-        // 
-        //                  Px      Auto     Star
-        //              +--------+--------+--------+
-        //              |        |        |        |
-        //           Px |    1   |    1   |    3   |
-        //              |        |        |        |
-        //              +--------+--------+--------+
-        //              |        |        |        |
-        //         Auto |    1   |    1   |    3   |
-        //              |        |        |        |
-        //              +--------+--------+--------+
-        //              |        |        |        |
-        //         Star |    4   |    2   |    4   |
-        //              |        |        |        |
-        //              +--------+--------+--------+
-        //
-        private struct CellGroups
+        try
         {
-            internal int group1;
-            internal int group2;
-            internal int group3;
-            internal int group4;
-        }
+            ListenToNotifications = true;
+            MeasureOverrideInProgress = true;
 
-        private enum GridFlags : byte
-        {
-            None = 0x00,
-            HasStarRows = 0x01,
-            HasStarColumns = 0x02,
-            HasAutoRowsAndStarColumn = 0x04,
-            DefinitionsChanged = 0x08,
-            MeasureOverrideInProgress = 0x10,
-            ArrangeOverrideInProgress = 0x20,
-        }
-
-        private GridFlags m_gridFlags = GridFlags.None;
-
-        [Flags]
-        private enum CellUnitTypes : byte
-        {
-            None = 0x00,
-            Auto = 0x01,
-            Star = 0x02,
-            Pixel = 0x04,
-        };
-
-        private struct CellCache
-        {
-            internal UIElement m_child;
-
-            // Index of the next cell in the group.
-            internal int m_next;
-
-            // Union of the different height unit types across the row
-            // definitions within the row span of this cell.
-            internal CellUnitTypes m_rowHeightTypes;
-
-            // Union of the different width unit types across the column
-            // definitions within the column span of this cell.
-            internal CellUnitTypes m_columnWidthTypes;
-
-            internal static bool IsStar(CellUnitTypes unitTypes)
+            if (extData is null)
             {
-                return (unitTypes & CellUnitTypes.Star) == CellUnitTypes.Star;
-            }
+                gridDesiredSize = new Size();
+                List<UIElement> children = InternalChildren;
 
-            internal static bool IsAuto(CellUnitTypes unitTypes)
-            {
-                return (unitTypes & CellUnitTypes.Auto) == CellUnitTypes.Auto;
-            }
-        };
-
-        private struct SpanStoreEntry
-        {
-            internal SpanStoreEntry(int spanStart, int spanCount, double desiredSize, bool isColumnDefinition)
-            {
-                m_spanStart = spanStart;
-                m_spanCount = spanCount;
-                m_desiredSize = desiredSize;
-                m_isColumnDefinition = isColumnDefinition;
-            }
-
-            // Starting index of the cell.
-            internal int m_spanStart;
-
-            // Span value of the cell.
-            internal int m_spanCount;
-
-            // DesiredSize of the element in the cell.
-            internal double m_desiredSize;
-
-            internal bool m_isColumnDefinition;
-        }
-
-        // This is a temporary storage that is released after arrange.
-        // Note the ScopeExit in ArrangeOveride
-        private IDefinitionBase[] m_ppTempDefinitions; // Temporary definitions storage.
-        private int m_cTempDefinitions; // Size in elements of temporary definitions storage
-
-        internal bool MeasureOverrideInProgress
-        {
-            get { return HasGridFlags(GridFlags.MeasureOverrideInProgress); }
-            set
-            {
-                if (value)
+                for (int i = 0, count = children.Count; i < count; ++i)
                 {
-                    SetGridFlags(GridFlags.MeasureOverrideInProgress);
+                    UIElement child = children[i];
+                    child.Measure(constraint);
+                    gridDesiredSize.Width = Math.Max(gridDesiredSize.Width, child.DesiredSize.Width);
+                    gridDesiredSize.Height = Math.Max(gridDesiredSize.Height, child.DesiredSize.Height);
                 }
-                else
-                {
-                    ClearGridFlags(GridFlags.MeasureOverrideInProgress);
-                }
-            }
-        }
-
-        internal bool ArrangeOverrideInProgress
-        {
-            get { return HasGridFlags(GridFlags.ArrangeOverrideInProgress); }
-            set
-            {
-                if (value)
-                {
-                    SetGridFlags(GridFlags.ArrangeOverrideInProgress);
-                }
-                else
-                {
-                    ClearGridFlags(GridFlags.ArrangeOverrideInProgress);
-                }
-            }
-        }
-
-        private void SetGridFlags(GridFlags mask)
-        {
-            m_gridFlags |= mask;
-        }
-
-        private void ClearGridFlags(GridFlags mask)
-        {
-            m_gridFlags &= ~mask;
-        }
-
-        private bool HasGridFlags(GridFlags mask)
-        {
-            return (m_gridFlags & mask) == mask;
-        }
-
-        private bool IsWithoutRowAndColumnDefinitions()
-        {
-            return (_rows is null || _rows.Count == 0) && (_columns == null || _columns.Count == 0);
-        }
-
-        internal void InvalidateDefinitions()
-        {
-            SetGridFlags(GridFlags.DefinitionsChanged);
-            InvalidateMeasure();
-        }
-
-        //------------------------------------------------------------------------
-        //
-        //  Method:   ValidateDefinitionStructure
-        //
-        //  Synopsis: Initializes m_pRows and  m_pColumns either to user supplied ColumnDefinitions collection
-        //                 or to a default single element collection. This is the only method where user supplied
-        //                 row or column definitions is directly used. All other must use m_pRows/m_pColumns
-        //------------------------------------------------------------------------
-        private void InitializeDefinitionStructure()
-        {
-            Debug.Assert(!IsWithoutRowAndColumnDefinitions());
-
-            if (_rows == null || _rows.Count == 0)
-            {
-                //empty collection defaults to single row
-                m_pRows = new List<RowDefinition>() { new RowDefinition() };
             }
             else
             {
-                m_pRows = _rows.InternalItems;
-            }
+                bool sizeToContentU = double.IsPositiveInfinity(constraint.Width);
+                bool sizeToContentV = double.IsPositiveInfinity(constraint.Height);
 
-            if (_columns is null || _columns.Count == 0)
-            {
-                //empty collection defaults to single row
-                m_pColumns = new List<ColumnDefinition> { new ColumnDefinition() };
-            }
-            else
-            {
-                m_pColumns = _columns.InternalItems;
-            }
-        }
-
-        // Sets the initial, effective values of an IEnumerable<IDefinitionBase> .
-        private static void ValidateDefinitions<T>(
-            List<T> definitions,
-            bool treatStarAsAuto)
-            where T : IDefinitionBase
-        {
-            //for (auto & cdo : definitions)
-            foreach (IDefinitionBase def in definitions)
-            {
-                var userSize = double.PositiveInfinity;
-                var userMinSize = def.GetUserMinSize();
-                var userMaxSize = def.GetUserMaxSize();
-
-                switch (def.GetUserSizeType())
+                // Clear index information and rounding errors
+                if (RowDefinitionCollectionDirty || ColumnDefinitionCollectionDirty)
                 {
-                    case GridUnitType.Pixel:
-                        userSize = def.GetUserSizeValue();
-                        userMinSize = Math.Max(userMinSize, Math.Min(userSize, userMaxSize));
-                        def.SetEffectiveUnitType(GridUnitType.Pixel);
-                        break;
-                    case GridUnitType.Auto:
-                        def.SetEffectiveUnitType(GridUnitType.Auto);
-                        break;
-                    case GridUnitType.Star:
-                        if (treatStarAsAuto)
-                        {
-                            def.SetEffectiveUnitType(GridUnitType.Auto);
-                        }
-                        else
-                        {
-                            def.SetEffectiveUnitType(GridUnitType.Star);
-                        }
+                    if (_definitionIndices is not null)
+                    {
+                        Array.Clear(_definitionIndices, 0, _definitionIndices.Length);
+                        _definitionIndices = null;
+                    }
 
-                        break;
-                    default:
-                        break;
+#if false
+                    if (UseLayoutRounding)
+                    {
+                        if (_roundingErrors is not null)
+                        {
+                            Array.Clear(_roundingErrors, 0, _roundingErrors.Length);
+                            _roundingErrors = null;
+                        }
+                    }
+#endif
                 }
 
-                def.SetEffectiveMinSize(userMinSize);
-                def.SetMeasureArrangeSize(Math.Max(userMinSize, Math.Min(userSize, userMaxSize)));
-            }
-        }
+                ValidateDefinitionsUStructure();
+                ValidateDefinitionsLayout(DefinitionsU, sizeToContentU);
 
-        // Gets the union of the length types for a given range of definitions.
-        private static CellUnitTypes GetLengthTypeForRange<T>(
-            List<T> definitions,
-            int start,
-            int count)
-            where T : IDefinitionBase
-        {
-            Debug.Assert((count > 0) && ((start + count) <= definitions.Count));
+                ValidateDefinitionsVStructure();
+                ValidateDefinitionsLayout(DefinitionsV, sizeToContentV);
 
-            CellUnitTypes unitTypes = CellUnitTypes.None;
-            int index = start + count - 1;
+                CellsStructureDirty |= (SizeToContentU != sizeToContentU) || (SizeToContentV != sizeToContentV);
 
-            do
-            {
-                var def = definitions[index];
-                switch (def.GetEffectiveUnitType())
-                {
-                    case GridUnitType.Auto:
-                        unitTypes |= CellUnitTypes.Auto;
-                        break;
-                    case GridUnitType.Pixel:
-                        unitTypes |= CellUnitTypes.Pixel;
-                        break;
-                    case GridUnitType.Star:
-                        unitTypes |= CellUnitTypes.Star;
-                        break;
-                }
-            } while (index > 0 && --index >= start);
+                SizeToContentU = sizeToContentU;
+                SizeToContentV = sizeToContentV;
 
-            return unitTypes;
-        }
+                ValidateCells();
 
-        private CellGroups ValidateCells(
-            List<UIElement> children,
-            ref StackVector<CellCache> cellCacheVector)
-        {
-            m_gridFlags = GridFlags.None;
+                Debug.Assert(DefinitionsU.Count > 0 && DefinitionsV.Count > 0);
 
-            CellGroups cellGroups;
-            cellGroups.group1 = int.MaxValue;
-            cellGroups.group2 = int.MaxValue;
-            cellGroups.group3 = int.MaxValue;
-            cellGroups.group4 = int.MaxValue;
-
-            var childrenCount = children.Count;
-
-            var childIndex = childrenCount;
-            while (childIndex-- > 0)
-            {
-                UIElement currentChild = children[childIndex];
-                ref CellCache cell = ref cellCacheVector[childIndex];
-
-                cell.m_child = currentChild;
-                cell.m_rowHeightTypes = GetLengthTypeForRange(m_pRows, GetRowIndex(currentChild), GetRowSpanAdjusted(currentChild));
-                cell.m_columnWidthTypes = GetLengthTypeForRange(m_pColumns, GetColumnIndex(currentChild), GetColumnSpanAdjusted(currentChild));
-
-                // Grid classifies cells into four groups based on their column/row
-                // type. The following diagram depicts all the possible combinations
-                // and their corresponding cell group:
+                //  Grid classifies cells into four groups depending on
+                //  the column / row type a cell belongs to (number corresponds to
+                //  group number):
                 //
-                //                  Px      Auto     Star
-                //              +--------+--------+--------+
-                //              |        |        |        |
-                //           Px |    1   |    1   |    3   |
-                //              |        |        |        |
-                //              +--------+--------+--------+
-                //              |        |        |        |
-                //         Auto |    1   |    1   |    3   |
-                //              |        |        |        |
-                //              +--------+--------+--------+
-                //              |        |        |        |
-                //         Star |    4   |    2   |    4   |
-                //              |        |        |        |
-                //              +--------+--------+--------+
-
-                if (!CellCache.IsStar(cell.m_rowHeightTypes))
-                {
-                    if (!CellCache.IsStar(cell.m_columnWidthTypes))
-                    {
-                        cell.m_next = cellGroups.group1;
-                        cellGroups.group1 = childIndex;
-                    }
-                    else
-                    {
-                        cell.m_next = cellGroups.group3;
-                        cellGroups.group3 = childIndex;
-
-                        if (CellCache.IsAuto(cell.m_rowHeightTypes))
-                        {
-                            // Remember that this Grid has at least one Auto row;
-                            // useful for detecting cyclic dependency while measuring.
-                            SetGridFlags(GridFlags.HasAutoRowsAndStarColumn);
-                        }
-                    }
-                }
-                else
-                {
-                    SetGridFlags(GridFlags.HasStarRows);
-
-                    if (CellCache.IsAuto(cell.m_columnWidthTypes) && !CellCache.IsStar(cell.m_columnWidthTypes))
-                    {
-                        cell.m_next = cellGroups.group2;
-                        cellGroups.group2 = childIndex;
-                    }
-                    else
-                    {
-                        cell.m_next = cellGroups.group4;
-                        cellGroups.group4 = childIndex;
-                    }
-                }
-
-                if (CellCache.IsStar(cell.m_columnWidthTypes))
-                {
-                    SetGridFlags(GridFlags.HasStarColumns);
-                }
-            }
-
-            return cellGroups;
-        }
-
-        // Get the row index of a child.
-        private int GetRowIndex(UIElement child)
-        {
-            return Math.Min(GetRow(child), m_pRows.Count - 1);
-        }
-
-        // Get the column index of a child.
-        private int GetColumnIndex(UIElement child)
-        {
-            return Math.Min(GetColumn(child), m_pColumns.Count - 1);
-        }
-
-        private int GetRowSpanAdjusted(UIElement child)
-        {
-            return Math.Min(GetRowSpan(child), m_pRows.Count - GetRowIndex(child));
-        }
-
-        private int GetColumnSpanAdjusted(UIElement child)
-        {
-            return Math.Min(GetColumnSpan(child), m_pColumns.Count - GetColumnIndex(child));
-        }
-
-        private IDefinitionBase GetRowNoRef(UIElement pChild)
-        {
-            int index = GetRowIndex(pChild);
-            if (index < m_pRows.Count)
-            {
-                return m_pRows[index];
-            }
-            return null;
-        }
-
-        private IDefinitionBase GetColumnNoRef(UIElement pChild)
-        {
-            int index = GetColumnIndex(pChild);
-            if (index < m_pColumns.Count)
-            {
-                return m_pColumns[index];
-            }
-            return null;
-        }
-
-        // Adds a span entry to the list.
-        private static void RegisterSpan(
-            ref StackVector<SpanStoreEntry> spanStore,
-            int spanStart,
-            int spanCount,
-            double desiredSize,
-            bool isColumnDefinition)
-        {
-            // If an entry already exists with the same row/column index and span, 
-            // then update the desired size stored in the entry.
-
-            for (int i = 0; i < spanStore.Count; i++)
-            {
-                ref SpanStoreEntry it = ref spanStore[i];
-
-                if (it.m_isColumnDefinition == isColumnDefinition && it.m_spanStart == spanStart && it.m_spanCount == spanCount)
-                {
-                    if (it.m_desiredSize < desiredSize)
-                    {
-                        it.m_desiredSize = desiredSize;
-                    }
-                    return;
-                }
-            }
-
-            spanStore.PushBack(new SpanStoreEntry(spanStart, spanCount, desiredSize, isColumnDefinition));
-        }
-
-        private void MeasureCellsGroup(
-            int cellsHead, //cell group number
-            int cellCount, //elements in the cell
-            double rowSpacing,
-            double columnSpacing,
-            bool ignoreColumnDesiredSize,
-            bool forceRowToInfinity,
-            ref StackVector<CellCache> cellCacheVector,
-            ref StackVector<SpanStoreEntry> spanStore)
-        {
-            spanStore = new StackVector<SpanStoreEntry>(16);
-
-            if (cellsHead >= cellCount)
-            {
-                return;
-            }
-
-            do
-            {
-                CellCache cell = cellCacheVector[cellsHead];
-                UIElement pChild = cell.m_child;
-
-                MeasureCell(pChild, cell.m_rowHeightTypes, cell.m_columnWidthTypes, forceRowToInfinity, rowSpacing,
-                    columnSpacing);
-                //If a span exists, add to span store for delayed processing. processing is done when
-                //all the desired sizes for a given definition index and span value are known.
-
-                if (!ignoreColumnDesiredSize)
-                {
-                    int columnSpan = GetColumnSpanAdjusted(pChild);
-                    //pChild.EnsureLayoutStorage();
-                    if (columnSpan == 1)
-                    {
-                        IDefinitionBase pChildColumn = GetColumnNoRef(pChild);
-                        pChildColumn.UpdateEffectiveMinSize(pChild.DesiredSize.Width);
-                    }
-                    else
-                    {
-                        RegisterSpan(
-                            ref spanStore,
-                            GetColumnIndex(pChild),
-                            columnSpan,
-                            pChild.DesiredSize.Width,
-                            true /* isColumnDefinition */);
-                    }
-                }
-
-                if (!forceRowToInfinity)
-                {
-                    int rowSpan = GetRowSpanAdjusted(pChild);
-                    //pChild.EnsureLayoutStorage();
-                    if (rowSpan == 1)
-                    {
-                        IDefinitionBase pChildRow = GetRowNoRef(pChild);
-                        pChildRow.UpdateEffectiveMinSize(pChild.DesiredSize.Height);
-                    }
-                    else
-                    {
-                        RegisterSpan(
-                            ref spanStore,
-                            GetRowIndex(pChild),
-                            rowSpan,
-                            pChild.DesiredSize.Height,
-                            false /* isColumnDefinition */);
-                    }
-                }
-
-                cellsHead = cellCacheVector[cellsHead].m_next;
-
-            } while (cellsHead < cellCount);
-
-            //Go through the spanned rows/columns allocating sizes.
-            foreach (var entry in spanStore)
-            {
-                if (entry.m_isColumnDefinition)
-                {
-                    EnsureMinSizeInDefinitionRange(
-                        m_pColumns,
-                        entry.m_spanStart,
-                        entry.m_spanCount,
-                        columnSpacing,
-                        entry.m_desiredSize);
-                }
-                else
-                {
-                    EnsureMinSizeInDefinitionRange(
-                        m_pRows,
-                        entry.m_spanStart,
-                        entry.m_spanCount,
-                        rowSpacing,
-                        entry.m_desiredSize);
-                }
-            }
-
-            // Return allocated memory to the pool
-            spanStore.Dispose();
-        }
-
-        //------------------------------------------------------------------------
-        //
-        //  Method:   EnsureTempDefinitionsStorage
-        //
-        //  Synopsis:  allocates memory for temporary definitions storage.
-        //
-        //------------------------------------------------------------------------
-        private void EnsureTempDefinitionsStorage(int minCount)
-        {
-            if (m_ppTempDefinitions == null || m_cTempDefinitions < minCount)
-            {
-                m_ppTempDefinitions = new IDefinitionBase[minCount];
-                m_cTempDefinitions = minCount;
-            }
-        }
-
-        //------------------------------------------------------------------------
-        //
-        //  Method:   SortDefinitionsForSpanPreferredDistribution
-        //
-        //  Synopsis: Sort definitions for span processing, for the case when the element
-        //                  desired Size is greater than rangeMinSize but less than rangePreferredSize.
-        //
-        //------------------------------------------------------------------------
-        private static void SortDefinitionsForSpanPreferredDistribution(
-            IDefinitionBase[] ppDefinitions,
-            int cDefinitions)
-        {
-            IDefinitionBase pTemp;
-
-            for (int i = 1, j; i < cDefinitions; i++)
-            {
-                pTemp = ppDefinitions[i];
-                for (j = i; j > 0; j--)
-                {
-                    if (pTemp.GetUserSizeType() == GridUnitType.Auto)
-                    {
-                        if (ppDefinitions[j - 1].GetUserSizeType() == GridUnitType.Auto)
-                        {
-                            if (pTemp.GetEffectiveMinSize() >= ppDefinitions[j - 1].GetEffectiveMinSize())
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (ppDefinitions[j - 1].GetUserSizeType() != GridUnitType.Auto)
-                        {
-                            if (pTemp.GetPreferredSize() >= ppDefinitions[j - 1].GetPreferredSize())
-                            {
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    ppDefinitions[j] = ppDefinitions[j - 1];
-                }
-
-                ppDefinitions[j] = pTemp;
-            }
-        }
-
-        //------------------------------------------------------------------------
-        //
-        //  Method:   SortDefinitionsForSpanMaxSizeDistribution
-        //
-        //  Synopsis: Sort definitions for span processing, for the case when the element
-        //                  desired Size is greater than rangePreferredSize but less than rangeMaxSize.
-        //
-        //------------------------------------------------------------------------
-        private static void SortDefinitionsForSpanMaxSizeDistribution(
-            IDefinitionBase[] ppDefinitions,
-            int cDefinitions)
-        {
-            IDefinitionBase pTemp;
-
-            for (int i = 1, j; i < cDefinitions; i++)
-            {
-                pTemp = ppDefinitions[i];
-                for (j = i; j > 0; j--)
-                {
-                    if (pTemp.GetUserSizeType() == GridUnitType.Auto)
-                    {
-                        if (ppDefinitions[j - 1].GetUserSizeType() == GridUnitType.Auto)
-                        {
-                            if (pTemp.GetSizeCache() >= ppDefinitions[j - 1].GetSizeCache())
-                            {
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (ppDefinitions[j - 1].GetUserSizeType() != GridUnitType.Auto)
-                        {
-                            if (pTemp.GetSizeCache() >= ppDefinitions[j - 1].GetSizeCache())
-                            {
-                                break;
-                            }
-                        }
-                    }
-
-                    ppDefinitions[j] = ppDefinitions[j - 1];
-                }
-
-                ppDefinitions[j] = pTemp;
-            }
-        }
-
-
-        //------------------------------------------------------------------------
-        //
-        //  Method: SortDefinitionsForOverflowSizeDistribution
-        //
-        //  Synopsis: Sort definitions for final size processing in ArrangeOverride, for the case
-        //                 when the combined size of all definitions across a dimension exceeds the
-        //                 finalSize in that dimension.
-        //
-        //------------------------------------------------------------------------
-        private static void SortDefinitionsForOverflowSizeDistribution(
-            IDefinitionBase[] ppDefinitions,
-            int cDefinitions)
-        {
-            IDefinitionBase pTemp;
-
-            // use insertion sort...it is stable...
-            for (int i = 1, j; i < cDefinitions; i++)
-            {
-                pTemp = ppDefinitions[i];
-                for (j = i; j > 0; j--)
-                {
-                    if ((pTemp.GetMeasureArrangeSize() - pTemp.GetEffectiveMinSize())
-                        >= (ppDefinitions[j - 1].GetMeasureArrangeSize() - ppDefinitions[j - 1].GetEffectiveMinSize()))
-                    {
-                        break;
-                    }
-
-                    ppDefinitions[j] = ppDefinitions[j - 1];
-                }
-
-                ppDefinitions[j] = pTemp;
-            }
-        }
-
-
-        //------------------------------------------------------------------------
-        //
-        //  Method: SortDefinitionsForStarSizeDistribution
-        //
-        //  Synopsis: Sort definitions for distributing star space.
-        //
-        //------------------------------------------------------------------------
-        private static void SortDefinitionsForStarSizeDistribution(
-            IDefinitionBase[] ppDefinitions,
-            int cDefinitions
-        )
-        {
-            IDefinitionBase pTemp;
-
-            // use insertion sort...it is stable...
-            for (int i = 1, j; i < cDefinitions; i++)
-            {
-                pTemp = ppDefinitions[i];
-                for (j = i; j > 0; j--)
-                {
-                    // Use >= instead of > to keep sort stable. If > is used,
-                    // sort will not be stable & size will distributed in a different
-                    // order than WPF.
-                    if (pTemp.GetSizeCache() >= ppDefinitions[j - 1].GetSizeCache())
-                    {
-                        break;
-                    }
-
-                    ppDefinitions[j] = ppDefinitions[j - 1];
-                }
-
-                ppDefinitions[j] = pTemp;
-            }
-        }
-
-        //------------------------------------------------------------------------
-        //
-        //  Method:   EnsureMinSizeInDefinitionRange
-        //
-        //  Synopsis:  Distributes min size back to definition array's range.
-        //
-        //------------------------------------------------------------------------
-        private void EnsureMinSizeInDefinitionRange<T>(
-            List<T> definitions,
-            int spanStart,
-            int spanCount,
-            double spacing,
-            double childDesiredSize)
-            where T : IDefinitionBase
-        {
-            Debug.Assert((spanCount > 1) && (spanStart + spanCount) <= definitions.Count);
-            // The spacing between definitions that this element spans through must not
-            // be distributed.
-            double requestedSize = Math.Max((childDesiredSize - spacing * (spanCount - 1)), 0.0f);
-
-            //  No need to process if asked to distribute "zero".
-            if (requestedSize <= double.Epsilon)
-            {
-                return;
-            }
-
-            int spanEnd = spanStart + spanCount;
-            int autoDefinitionsCount = 0;
-            double rangeMinSize = 0.0f;
-            double rangeMaxSize = 0.0f;
-            double rangePreferredSize = 0.0f;
-            double maxMaxSize = 0.0f;
-
-            EnsureTempDefinitionsStorage(spanCount);
-
-            // First, we need to obtain the necessary information:
-            // a) Sum up the sizes in the range.
-            // b) Cache the maximum size into SizeCache.
-            // c) Obtain max of MaxSizes.
-            // d) Count the number of var definitions in the range.
-            // e) Prepare indices.
-            for (int i = spanStart; i < spanEnd; i++)
-            {
-                var def = definitions[i];
-                double effectiveMinSize = def.GetEffectiveMinSize();
-                double preferredSize = def.GetPreferredSize();
-                double maxSize = Math.Max(def.GetUserMaxSize(), effectiveMinSize);
-                rangeMinSize += effectiveMinSize;
-                rangePreferredSize += preferredSize;
-                rangeMaxSize += maxSize;
-
-                // Sanity check: effectiveMinSize must always be the smallest value, maxSize
-                // must be the largest one, and the preferredSize should fall in between.
-                Debug.Assert(effectiveMinSize <= preferredSize
-                       && preferredSize <= maxSize
-                       && rangeMinSize <= rangePreferredSize
-                       && rangePreferredSize <= rangeMaxSize);
-
-                def.SetSizeCache(maxSize);
-                maxMaxSize = Math.Max(maxMaxSize, maxSize);
-
-                if (def.GetUserSizeType() == GridUnitType.Auto)
-                {
-                    autoDefinitionsCount++;
-                }
-
-                m_ppTempDefinitions[i - spanStart] = def;
-            }
-
-            if (requestedSize <= rangeMinSize)
-            {
-                // No need to process if the range is already big enough.
-                return;
-            }
-            else if (requestedSize <= rangePreferredSize)
-            {
-                // If the requested size fits within the preferred size of the range,
-                // we distribute the space following this logic:
-                // - Do not distribute into Auto definitions; they should continue to
-                //   stay "tight".
-                // - For all non-Auto definitions, distribute to equi-size min sizes
-                //   without exceeding the preferred size of the definition.
+                //                   Px      Auto     Star
+                //               +--------+--------+--------+
+                //               |        |        |        |
+                //            Px |    1   |    1   |    3   |
+                //               |        |        |        |
+                //               +--------+--------+--------+
+                //               |        |        |        |
+                //          Auto |    1   |    1   |    3   |
+                //               |        |        |        |
+                //               +--------+--------+--------+
+                //               |        |        |        |
+                //          Star |    4   |    2   |    4   |
+                //               |        |        |        |
+                //               +--------+--------+--------+
                 //
-                // In order to achieve this, the definitions are sorted in a way so
-                // that all Auto definitions go first, then the other definitions
-                // follow in ascending order of PreferredSize.
-                double sizeToDistribute = requestedSize;
-                SortDefinitionsForSpanPreferredDistribution(m_ppTempDefinitions, spanCount);
-
-                // Process Auto definitions.
-                for (int i = 0; i < autoDefinitionsCount; i++)
-                {
-                    var def = m_ppTempDefinitions[i];
-                    Debug.Assert(def.GetUserSizeType() == GridUnitType.Auto);
-
-                    sizeToDistribute -= def.GetEffectiveMinSize();
-                }
-
-                // Process the remaining, non-Auto definitions, distributing
-                // the requested size among them.
-                for (int i = autoDefinitionsCount; i < spanCount; i++)
-                {
-                    var def = m_ppTempDefinitions[i];
-                    Debug.Assert(def.GetUserSizeType() != GridUnitType.Auto);
-
-                    double newMinSize = Math.Min((sizeToDistribute / (spanCount - i)), def.GetPreferredSize());
-                    def.UpdateEffectiveMinSize(newMinSize);
-                    sizeToDistribute -= newMinSize;
-
-                    // Stop if there's no more space to distribute.
-                    if (sizeToDistribute < double.Epsilon)
-                    {
-                        break;
-                    }
-                }
-            }
-            else if (requestedSize <= rangeMaxSize)
-            {
-                // If the requested size is larger than the preferred size of the range
-                // but still fits within the max size of the range, we distribute the
-                // space following this logic:
-                // - Do not distribute into Auto definitions if possible; they should
-                //   continue to stay "tight".
-                // - For all non-Auto definitions, distribute to equi-size min sizes
-                //   without exceeding the max size.
+                //  The group number indicates the order in which cells are measured.
+                //  Certain order is necessary to be able to dynamically resolve star
+                //  columns / rows sizes which are used as input for measuring of
+                //  the cells belonging to them.
                 //
-                // In order to achieve this, the definitions are sorted in a way so
-                // that all non-Auto definitions go first, followed by the Auto
-                // definitions, and all of them in ascending order of MaxSize, which
-                // is currently stored in the size cache of each definition.
-                double sizeToDistribute = requestedSize - rangePreferredSize;
-                SortDefinitionsForSpanMaxSizeDistribution(m_ppTempDefinitions, spanCount);
+                //  However, there are cases when topology of a grid causes cyclical
+                //  size dependences. For example:
+                //
+                //
+                //                         column width="Auto"      column width="*"
+                //                      +----------------------+----------------------+
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //  row height="Auto"   |                      |      cell 1 2        |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      +----------------------+----------------------+
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //  row height="*"      |       cell 2 1       |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      |                      |                      |
+                //                      +----------------------+----------------------+
+                //
+                //  In order to accurately calculate constraint width for "cell 1 2"
+                //  (which is the remaining of grid's available width and calculated
+                //  value of Auto column), "cell 2 1" needs to be calculated first,
+                //  as it contributes to the Auto column's calculated value.
+                //  At the same time in order to accurately calculate constraint
+                //  height for "cell 2 1", "cell 1 2" needs to be calcualted first,
+                //  as it contributes to Auto row height, which is used in the
+                //  computation of Star row resolved height.
+                //
+                //  to "break" this cyclical dependency we are making (arbitrary)
+                //  decision to treat cells like "cell 2 1" as if they appear in Auto
+                //  rows. And then recalculate them one more time when star row
+                //  heights are resolved.
+                //
+                //  (Or more strictly) the code below implement the following logic:
+                //
+                //                       +---------+
+                //                       |  enter  |
+                //                       +---------+
+                //                            |
+                //                            V
+                //                    +----------------+
+                //                    | Measure Group1 |
+                //                    +----------------+
+                //                            |
+                //                            V
+                //                          / - \
+                //                        /       \
+                //                  Y   /    Can    \    N
+                //            +--------|   Resolve   |-----------+
+                //            |         \  StarsV?  /            |
+                //            |           \       /              |
+                //            |             \ - /                |
+                //            V                                  V
+                //    +----------------+                       / - \
+                //    | Resolve StarsV |                     /       \
+                //    +----------------+               Y   /    Can    \    N
+                //            |                      +----|   Resolve   |------+
+                //            V                      |     \  StarsU?  /       |
+                //    +----------------+             |       \       /         |
+                //    | Measure Group2 |             |         \ - /           |
+                //    +----------------+             |                         V
+                //            |                      |                 +-----------------+
+                //            V                      |                 | Measure Group2' |
+                //    +----------------+             |                 +-----------------+
+                //    | Resolve StarsU |             |                         |
+                //    +----------------+             V                         V
+                //            |              +----------------+        +----------------+
+                //            V              | Resolve StarsU |        | Resolve StarsU |
+                //    +----------------+     +----------------+        +----------------+
+                //    | Measure Group3 |             |                         |
+                //    +----------------+             V                         V
+                //            |              +----------------+        +----------------+
+                //            |              | Measure Group3 |        | Measure Group3 |
+                //            |              +----------------+        +----------------+
+                //            |                      |                         |
+                //            |                      V                         V
+                //            |              +----------------+        +----------------+
+                //            |              | Resolve StarsV |        | Resolve StarsV |
+                //            |              +----------------+        +----------------+
+                //            |                      |                         |
+                //            |                      |                         V
+                //            |                      |                +------------------+
+                //            |                      |                | Measure Group2'' |
+                //            |                      |                +------------------+
+                //            |                      |                         |
+                //            +----------------------+-------------------------+
+                //                                   |
+                //                                   V
+                //                           +----------------+
+                //                           | Measure Group4 |
+                //                           +----------------+
+                //                                   |
+                //                                   V
+                //                               +--------+
+                //                               |  exit  |
+                //                               +--------+
+                //
+                //  where:
+                //  *   all [Measure GroupN] - regular children measure process -
+                //      each cell is measured given contraint size as an input
+                //      and each cell's desired size is accumulated on the
+                //      corresponding column / row;
+                //  *   [Measure Group2'] - is when each cell is measured with
+                //      infinit height as a constraint and a cell's desired
+                //      height is ignored;
+                //  *   [Measure Groups''] - is when each cell is measured (second
+                //      time during single Grid.MeasureOverride) regularly but its
+                //      returned width is ignored;
+                //
+                //  This algorithm is believed to be as close to ideal as possible.
+                //  It has the following drawbacks:
+                //  *   cells belonging to Group2 can be called to measure twice;
+                //  *   iff during second measure a cell belonging to Group2 returns
+                //      desired width greater than desired width returned the first
+                //      time, such a cell is going to be clipped, even though it
+                //      appears in Auto column.
+                //
 
-                int nonAutoDefinitionsCount = spanCount - autoDefinitionsCount;
-                for (int i = 0; i < spanCount; i++)
+                MeasureCellsGroup(extData.CellGroup1, constraint, false, false);
+
+                //  after Group1 is measured,  only Group3 may have cells belonging to Auto rows.
+                bool canResolveStarsV = !HasGroup3CellsInAutoRows;
+
+                if (canResolveStarsV)
                 {
-                    var def = m_ppTempDefinitions[i];
-                    double newMinSize = def.GetPreferredSize();
-
-                    if (i < nonAutoDefinitionsCount)
+                    if (HasStarCellsV)
                     {
-                        // Processing non-Auto definitions.
-                        Debug.Assert(def.GetUserSizeType() != GridUnitType.Auto);
-                        newMinSize += sizeToDistribute / (nonAutoDefinitionsCount - i);
+                        ResolveStar(DefinitionsV, constraint.Height);
                     }
-                    else
+                    MeasureCellsGroup(extData.CellGroup2, constraint, false, false);
+                    if (HasStarCellsU)
                     {
-                        // Processing the remaining, Auto definitions.
-                        Debug.Assert(def.GetUserSizeType() == GridUnitType.Auto);
-                        newMinSize += sizeToDistribute / (spanCount - i);
+                        ResolveStar(DefinitionsU, constraint.Width);
                     }
-
-                    // Cache PreferredSize and update MinSize.
-                    double preferredSize = def.GetPreferredSize();
-                    newMinSize = Math.Min(newMinSize, def.GetSizeCache());
-                    def.UpdateEffectiveMinSize(newMinSize);
-
-                    sizeToDistribute -= def.GetEffectiveMinSize() - preferredSize;
-
-                    // Stop if there's no more space to distribute.
-                    if (sizeToDistribute < double.Epsilon)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                // If the requested size is larger than the max size of the range, we
-                // distribute the space following this logic:
-                // - For all definitions, distribute to equi-size min sizes.
-                double equallyDistributedSize = requestedSize / spanCount;
-
-                if ((equallyDistributedSize < maxMaxSize) && ((maxMaxSize - equallyDistributedSize) > double.Epsilon))
-                {
-                    // If equi-size is less than the maximum of max sizes, then
-                    // we distribute space so that smaller definitions grow
-                    // faster than larger ones.
-                    double totalRemainingSize = maxMaxSize * spanCount - rangeMaxSize;
-                    double sizeToDistribute = requestedSize - rangeMaxSize;
-
-                    Debug.Assert(double.IsInfinity(totalRemainingSize)
-                           && totalRemainingSize > 0
-                           && double.IsInfinity(sizeToDistribute)
-                           && sizeToDistribute > 0);
-
-                    for (int i = 0; i < spanCount; i++)
-                    {
-                        var def = m_ppTempDefinitions[i];
-                        double deltaSize = (maxMaxSize - def.GetSizeCache()) * sizeToDistribute / totalRemainingSize;
-                        def.UpdateEffectiveMinSize(def.GetSizeCache() + deltaSize);
-                    }
+                    MeasureCellsGroup(extData.CellGroup3, constraint, false, false);
                 }
                 else
                 {
-                    // If equi-size is greater or equal to the maximum of max sizes,
-                    // then all definitions receive equi-size as their min sizes.
-                    for (int i = 0; i < spanCount; i++)
+                    //  if at least one cell exists in Group2, it must be measured before
+                    //  StarsU can be resolved.
+                    bool canResolveStarsU = extData.CellGroup2 > PrivateCells.Length;
+                    if (canResolveStarsU)
                     {
-                        m_ppTempDefinitions[i].UpdateEffectiveMinSize(equallyDistributedSize);
+                        if (HasStarCellsU)
+                        {
+                            ResolveStar(DefinitionsU, constraint.Width);
+                        }
+                        MeasureCellsGroup(extData.CellGroup3, constraint, false, false);
+                        if (HasStarCellsV)
+                        {
+                            ResolveStar(DefinitionsV, constraint.Height);
+                        }
                     }
+                    else
+                    {
+                        // This is a revision to the algorithm employed for the cyclic
+                        // dependency case described above. We now repeatedly
+                        // measure Group3 and Group2 until their sizes settle. We
+                        // also use a count heuristic to break a loop in case of one.
+
+                        bool hasDesiredSizeUChanged = false;
+                        int cnt = 0;
+
+                        // Cache Group2MinWidths & Group3MinHeights
+                        double[] group2MinSizes = CacheMinSizes(extData.CellGroup2, false);
+                        double[] group3MinSizes = CacheMinSizes(extData.CellGroup3, true);
+
+                        MeasureCellsGroup(extData.CellGroup2, constraint, false, true);
+
+                        do
+                        {
+                            if (hasDesiredSizeUChanged)
+                            {
+                                // Reset cached Group3Heights
+                                ApplyCachedMinSizes(group3MinSizes, true);
+                            }
+
+                            if (HasStarCellsU)
+                            {
+                                ResolveStar(DefinitionsU, constraint.Width);
+                            }
+                            MeasureCellsGroup(extData.CellGroup3, constraint, false, false);
+
+                            // Reset cached Group2Widths
+                            ApplyCachedMinSizes(group2MinSizes, false);
+
+                            if (HasStarCellsV)
+                            {
+                                ResolveStar(DefinitionsV, constraint.Height);
+                            }
+                            MeasureCellsGroup(extData.CellGroup2, constraint, cnt == c_layoutLoopMaxCount, false, out hasDesiredSizeUChanged);
+                        }
+                        while (hasDesiredSizeUChanged && ++cnt <= c_layoutLoopMaxCount);
+                    }
+                }
+
+                MeasureCellsGroup(extData.CellGroup4, constraint, false, false);
+
+                gridDesiredSize = new Size(CalculateDesiredSize(DefinitionsU), CalculateDesiredSize(DefinitionsV));
+            }
+        }
+        finally
+        {
+            MeasureOverrideInProgress = false;
+        }
+
+        return gridDesiredSize;
+    }
+
+    /// <summary>
+    /// Arranges the content of a <see cref="Grid"/> element.
+    /// </summary>
+    /// <param name="arrangeSize">
+    /// Specifies the size this <see cref="Grid"/> element should use to arrange its child elements.
+    /// </param>
+    /// <returns>
+    /// <see cref="Size"/> that represents the arranged size of this Grid element and its children.
+    /// </returns>
+    protected override Size ArrangeOverride(Size arrangeSize)
+    {
+        try
+        {
+            ArrangeOverrideInProgress = true;
+
+            if (_data is null)
+            {
+                List<UIElement> children = InternalChildren;
+
+                for (int i = 0, count = children.Count; i < count; ++i)
+                {
+                    UIElement child = children[i];
+                    child.Arrange(new Rect(arrangeSize));
+                }
+            }
+            else
+            {
+                Debug.Assert(DefinitionsU.Count > 0 && DefinitionsV.Count > 0);
+
+                SetFinalSize(DefinitionsU, arrangeSize.Width, true);
+                SetFinalSize(DefinitionsV, arrangeSize.Height, false);
+
+                List<UIElement> children = InternalChildren;
+
+                for (int currentCell = 0; currentCell < PrivateCells.Length; ++currentCell)
+                {
+                    UIElement cell = children[currentCell];
+
+                    int columnIndex = PrivateCells[currentCell].ColumnIndex;
+                    int rowIndex = PrivateCells[currentCell].RowIndex;
+                    int columnSpan = PrivateCells[currentCell].ColumnSpan;
+                    int rowSpan = PrivateCells[currentCell].RowSpan;
+
+                    var cellRect = new Rect(
+                        columnIndex == 0 ? 0.0 : DefinitionsU[columnIndex].FinalOffset,
+                        rowIndex == 0 ? 0.0 : DefinitionsV[rowIndex].FinalOffset,
+                        GetFinalSizeForRange(DefinitionsU, columnIndex, columnSpan),
+                        GetFinalSizeForRange(DefinitionsV, rowIndex, rowSpan));
+
+                    cell.Arrange(cellRect);
                 }
             }
         }
-        private void MeasureCell(
-            UIElement child,
-            CellUnitTypes rowHeightTypes,
-            CellUnitTypes columnWidthTypes,
-            bool forceRowToInfinity,
-            double rowSpacing,
-            double columnSpacing)
+        finally
         {
-            Size availableSize = new Size();
+            SetValid();
+            ArrangeOverrideInProgress = false;
+        }
+        return arrangeSize;
+    }
 
-            if (CellCache.IsAuto(columnWidthTypes) && !CellCache.IsStar(columnWidthTypes))
+    /// <summary>
+    /// Called when the visual children of a <see cref="Grid"/> element change.
+    /// </summary>
+    /// <param name="visualAdded">
+    /// Identifies the visual child that's added.
+    /// </param>
+    /// <param name="visualRemoved">
+    /// Identifies the visual child that's removed.
+    /// </param>
+    protected internal override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
+    {
+        CellsStructureDirty = true;
+        base.OnVisualChildrenChanged(visualAdded, visualRemoved);
+    }
+
+    /// <summary>
+    ///     Invalidates grid caches and makes the grid dirty for measure.
+    /// </summary>
+    internal void Invalidate()
+    {
+        CellsStructureDirty = true;
+        InvalidateMeasure();
+    }
+
+    /// <summary>
+    ///     Returns final width for a column.
+    /// </summary>
+    /// <remarks>
+    ///     Used from public ColumnDefinition ActualWidth. Calculates final width using offset data.
+    /// </remarks>
+    internal double GetFinalColumnDefinitionWidth(int columnIndex)
+    {
+        double value = 0.0;
+
+        Debug.Assert(_data is not null);
+
+        //  actual value calculations require structure to be up-to-date
+        if (!ColumnDefinitionCollectionDirty)
+        {
+            List<ColumnDefinition> definitions = DefinitionsU;
+            value = definitions[(columnIndex + 1) % definitions.Count].FinalOffset;
+            if (columnIndex != 0)
             {
-                // If this cell belongs to at least one Auto column and not a single
-                // Star column, then it should be measured freely to fit its content.
-                // In other words, we must give it an infinite available width.
-                availableSize.Width = double.PositiveInfinity;
+                value -= definitions[columnIndex].FinalOffset;
+            }
+        }
+        return value;
+    }
+
+    /// <summary>
+    ///     Returns final height for a row.
+    /// </summary>
+    /// <remarks>
+    ///     Used from public RowDefinition ActualHeight. Calculates final height using offset data.
+    /// </remarks>
+    internal double GetFinalRowDefinitionHeight(int rowIndex)
+    {
+        double value = 0.0;
+
+        Debug.Assert(_data is not null);
+
+        //  actual value calculations require structure to be up-to-date
+        if (!RowDefinitionCollectionDirty)
+        {
+            List<RowDefinition> definitions = DefinitionsV;
+            value = definitions[(rowIndex + 1) % definitions.Count].FinalOffset;
+            if (rowIndex != 0)
+            {
+                value -= definitions[rowIndex].FinalOffset;
+            }
+        }
+        return value;
+    }
+
+    /// <summary>
+    /// Convenience accessor to MeasureOverrideInProgress bit flag.
+    /// </summary>
+    internal bool MeasureOverrideInProgress
+    {
+        get => CheckFlagsAnd(Flags.MeasureOverrideInProgress);
+        set => SetFlags(value, Flags.MeasureOverrideInProgress);
+    }
+
+    /// <summary>
+    /// Convenience accessor to ArrangeOverrideInProgress bit flag.
+    /// </summary>
+    internal bool ArrangeOverrideInProgress
+    {
+        get => CheckFlagsAnd(Flags.ArrangeOverrideInProgress);
+        set => SetFlags(value, Flags.ArrangeOverrideInProgress);
+    }
+
+    /// <summary>
+    /// Convenience accessor to ValidDefinitionsUStructure bit flag.
+    /// </summary>
+    internal bool ColumnDefinitionCollectionDirty
+    {
+        get => !CheckFlagsAnd(Flags.ValidDefinitionsUStructure);
+        set => SetFlags(!value, Flags.ValidDefinitionsUStructure);
+    }
+
+    /// <summary>
+    /// Convenience accessor to ValidDefinitionsVStructure bit flag.
+    /// </summary>
+    internal bool RowDefinitionCollectionDirty
+    {
+        get => !CheckFlagsAnd(Flags.ValidDefinitionsVStructure);
+        set => SetFlags(!value, Flags.ValidDefinitionsVStructure);
+    }
+
+    /// <summary>
+    /// Lays out cells according to rows and columns, and creates lookup grids.
+    /// </summary>
+    private void ValidateCells()
+    {
+        if (CellsStructureDirty)
+        {
+            ValidateCellsCore();
+            CellsStructureDirty = false;
+        }
+    }
+
+    /// <summary>
+    /// ValidateCellsCore
+    /// </summary>
+    private void ValidateCellsCore()
+    {
+        List<UIElement> children = InternalChildren;
+        ExtendedData extData = ExtData;
+
+        extData.CellCachesCollection = new CellCache[children.Count];
+        extData.CellGroup1 = int.MaxValue;
+        extData.CellGroup2 = int.MaxValue;
+        extData.CellGroup3 = int.MaxValue;
+        extData.CellGroup4 = int.MaxValue;
+
+        bool hasStarCellsU = false;
+        bool hasStarCellsV = false;
+        bool hasGroup3CellsInAutoRows = false;
+
+        for (int i = PrivateCells.Length - 1; i >= 0; --i)
+        {
+            UIElement child = children[i];
+
+            var cell = new CellCache();
+
+            //
+            //  read and cache child positioning properties
+            //
+
+            //  read indices from the corresponding properties
+            //      clamp to value < number_of_columns
+            //      column >= 0 is guaranteed by property value validation callback
+            cell.ColumnIndex = Math.Min(GetColumn(child), DefinitionsU.Count - 1);
+            //      clamp to value < number_of_rows
+            //      row >= 0 is guaranteed by property value validation callback
+            cell.RowIndex = Math.Min(GetRow(child), DefinitionsV.Count - 1);
+
+            //  read span properties
+            //      clamp to not exceed beyond right side of the grid
+            //      column_span > 0 is guaranteed by property value validation callback
+            cell.ColumnSpan = Math.Min(GetColumnSpan(child), DefinitionsU.Count - cell.ColumnIndex);
+
+            //      clamp to not exceed beyond bottom side of the grid
+            //      row_span > 0 is guaranteed by property value validation callback
+            cell.RowSpan = Math.Min(GetRowSpan(child), DefinitionsV.Count - cell.RowIndex);
+
+            Debug.Assert(0 <= cell.ColumnIndex && cell.ColumnIndex < DefinitionsU.Count);
+            Debug.Assert(0 <= cell.RowIndex && cell.RowIndex < DefinitionsV.Count);
+
+            //
+            //  calculate and cache length types for the child
+            //
+
+            cell.SizeTypeU = GetLengthTypeForRange(DefinitionsU, cell.ColumnIndex, cell.ColumnSpan);
+            cell.SizeTypeV = GetLengthTypeForRange(DefinitionsV, cell.RowIndex, cell.RowSpan);
+
+            hasStarCellsU |= cell.IsStarU;
+            hasStarCellsV |= cell.IsStarV;
+
+            //
+            //  distribute cells into four groups.
+            //
+
+            if (!cell.IsStarV)
+            {
+                if (!cell.IsStarU)
+                {
+                    cell.Next = extData.CellGroup1;
+                    extData.CellGroup1 = i;
+                }
+                else
+                {
+                    cell.Next = extData.CellGroup3;
+                    extData.CellGroup3 = i;
+
+                    //  remember if this cell belongs to auto row
+                    hasGroup3CellsInAutoRows |= cell.IsAutoV;
+                }
             }
             else
             {
-                availableSize.Width = GetAvailableSizeForRange(
-                    m_pColumns,
-                    GetColumnIndex(child),
-                    GetColumnSpanAdjusted(child),
-                    columnSpacing);
+                if (cell.IsAutoU
+                    //  note below: if spans through Star column it is NOT Auto
+                    && !cell.IsStarU)
+                {
+                    cell.Next = extData.CellGroup2;
+                    extData.CellGroup2 = i;
+                }
+                else
+                {
+                    cell.Next = extData.CellGroup4;
+                    extData.CellGroup4 = i;
+                }
             }
 
-            if (forceRowToInfinity
-                || (CellCache.IsAuto(rowHeightTypes) && !CellCache.IsStar(rowHeightTypes)))
+            PrivateCells[i] = cell;
+        }
+
+        HasStarCellsU = hasStarCellsU;
+        HasStarCellsV = hasStarCellsV;
+        HasGroup3CellsInAutoRows = hasGroup3CellsInAutoRows;
+    }
+
+    /// <summary>
+    /// Initializes DefinitionsU memeber either to user supplied ColumnDefinitions collection
+    /// or to a default single element collection. DefinitionsU gets trimmed to size.
+    /// </summary>
+    /// <remarks>
+    /// This is one of two methods, where ColumnDefinitions and DefinitionsU are directly accessed.
+    /// All the rest measure / arrange / render code must use DefinitionsU.
+    /// </remarks>
+    private void ValidateDefinitionsUStructure()
+    {
+        if (ColumnDefinitionCollectionDirty)
+        {
+            ExtendedData extData = ExtData;
+
+            if (extData.ColumnDefinitions is null)
             {
-                // If this cell belongs to at least one Auto row and not a single Star
-                // row, then it should be measured freely to git its content. In other
-                // words, we must give it an infinite available height.
-                availableSize.Height = double.PositiveInfinity;
+                extData.DefinitionsU ??= new(1) { new ColumnDefinition() };
             }
             else
             {
-                availableSize.Height = GetAvailableSizeForRange(
-                    m_pRows,
-                    GetRowIndex(child),
-                    GetRowSpanAdjusted(child),
-                    rowSpacing);
+                extData.ColumnDefinitions.InternalItems.TrimExcess();
+
+                if (extData.ColumnDefinitions.Count == 0)
+                {
+                    //  if column definitions collection is empty
+                    //  mockup array with one column
+                    extData.DefinitionsU = new(1) { new ColumnDefinition() };
+                }
+                else
+                {
+                    extData.DefinitionsU = extData.ColumnDefinitions.InternalItems;
+                }
             }
 
-            child.Measure(availableSize);
+            ColumnDefinitionCollectionDirty = false;
+        }
 
+        Debug.Assert(ExtData.DefinitionsU is not null && ExtData.DefinitionsU.Count > 0);
+    }
+
+    /// <summary>
+    /// Initializes DefinitionsV memeber either to user supplied RowDefinitions collection
+    /// or to a default single element collection. DefinitionsV gets trimmed to size.
+    /// </summary>
+    /// <remarks>
+    /// This is one of two methods, where RowDefinitions and DefinitionsV are directly accessed.
+    /// All the rest measure / arrange / render code must use DefinitionsV.
+    /// </remarks>
+    private void ValidateDefinitionsVStructure()
+    {
+        if (RowDefinitionCollectionDirty)
+        {
+            ExtendedData extData = ExtData;
+
+            if (extData.RowDefinitions is null)
+            {
+                extData.DefinitionsV ??= new(1) { new RowDefinition() };
+            }
+            else
+            {
+                extData.RowDefinitions.InternalItems.TrimExcess();
+
+                if (extData.RowDefinitions.Count == 0)
+                {
+                    //  if row definitions collection is empty
+                    //  mockup array with one row
+                    extData.DefinitionsV = new(1) { new RowDefinition() };
+                }
+                else
+                {
+                    extData.DefinitionsV = extData.RowDefinitions.InternalItems;
+                }
+            }
+
+            RowDefinitionCollectionDirty = false;
+        }
+
+        Debug.Assert(ExtData.DefinitionsV is not null && ExtData.DefinitionsV.Count > 0);
+    }
+
+    /// <summary>
+    /// Validates layout time size type information on given array of definitions.
+    /// Sets MinSize and MeasureSizes.
+    /// </summary>
+    /// <param name="definitions">Array of definitions to update.</param>
+    /// <param name="treatStarAsAuto">if "true" then star definitions are treated as Auto.</param>
+    private void ValidateDefinitionsLayout<T>(
+        List<T> definitions,
+        bool treatStarAsAuto)
+        where T : DefinitionBase
+    {
+        for (int i = 0; i < definitions.Count; ++i)
+        {
+            definitions[i].OnBeforeLayout(this);
+
+            double userMinSize = definitions[i].UserMinSize;
+            double userMaxSize = definitions[i].UserMaxSize;
+            double userSize = 0;
+
+            switch (definitions[i].UserSize.GridUnitType)
+            {
+                case GridUnitType.Pixel:
+                    definitions[i].SizeType = LayoutTimeSizeType.Pixel;
+                    userSize = definitions[i].UserSize.Value;
+                    // this was brought with NewLayout and defeats squishy behavior
+                    userMinSize = Math.Max(userMinSize, Math.Min(userSize, userMaxSize));
+                    break;
+                case GridUnitType.Auto:
+                    definitions[i].SizeType = LayoutTimeSizeType.Auto;
+                    userSize = double.PositiveInfinity;
+                    break;
+                case GridUnitType.Star:
+                    if (treatStarAsAuto)
+                    {
+                        definitions[i].SizeType = LayoutTimeSizeType.Auto;
+                        userSize = double.PositiveInfinity;
+                    }
+                    else
+                    {
+                        definitions[i].SizeType = LayoutTimeSizeType.Star;
+                        userSize = double.PositiveInfinity;
+                    }
+                    break;
+                default:
+                    Debug.Assert(false);
+                    break;
+            }
+
+            definitions[i].UpdateMinSize(userMinSize);
+            definitions[i].MeasureSize = Math.Max(userMinSize, Math.Min(userSize, userMaxSize));
+        }
+    }
+
+    private double[] CacheMinSizes(int cellsHead, bool isRows)
+    {
+        double[] minSizes = isRows ? new double[DefinitionsV.Count] : new double[DefinitionsU.Count];
+
+        for (int j = 0; j < minSizes.Length; j++)
+        {
+            minSizes[j] = -1;
+        }
+
+        int i = cellsHead;
+        do
+        {
+            if (isRows)
+            {
+                minSizes[PrivateCells[i].RowIndex] = DefinitionsV[PrivateCells[i].RowIndex].RawMinSize;
+            }
+            else
+            {
+                minSizes[PrivateCells[i].ColumnIndex] = DefinitionsU[PrivateCells[i].ColumnIndex].RawMinSize;
+            }
+
+            i = PrivateCells[i].Next;
+        } while (i < PrivateCells.Length);
+
+        return minSizes;
+    }
+
+    private void ApplyCachedMinSizes(double[] minSizes, bool isRows)
+    {
+        for (int i = 0; i < minSizes.Length; i++)
+        {
+            if (DoubleUtil.GreaterThanOrClose(minSizes[i], 0))
+            {
+                if (isRows)
+                {
+                    DefinitionsV[i].SetMinSize(minSizes[i]);
+                }
+                else
+                {
+                    DefinitionsU[i].SetMinSize(minSizes[i]);
+                }
+            }
+        }
+    }
+
+    private void MeasureCellsGroup(
+        int cellsHead,
+        Size referenceSize,
+        bool ignoreDesiredSizeU,
+        bool forceInfinityV)
+    {
+        MeasureCellsGroup(cellsHead, referenceSize, ignoreDesiredSizeU, forceInfinityV, out _);
+    }
+
+    /// <summary>
+    /// Measures one group of cells.
+    /// </summary>
+    /// <param name="cellsHead">Head index of the cells chain.</param>
+    /// <param name="referenceSize">Reference size for spanned cells
+    /// calculations.</param>
+    /// <param name="ignoreDesiredSizeU">When "true" cells' desired
+    /// width is not registered in columns.</param>
+    /// <param name="forceInfinityV">Passed through to MeasureCell.
+    /// When "true" cells' desired height is not registered in rows.</param>
+    /// <param name="hasDesiredSizeUChanged"></param>
+    private void MeasureCellsGroup(
+        int cellsHead,
+        Size referenceSize,
+        bool ignoreDesiredSizeU,
+        bool forceInfinityV,
+        out bool hasDesiredSizeUChanged)
+    {
+        hasDesiredSizeUChanged = false;
+
+        if (cellsHead >= PrivateCells.Length)
+        {
             return;
         }
 
-        // Accumulates available size information for a given range of definitions.
-        private static double GetAvailableSizeForRange<T>(
-            List<T> definitions,
-            int start,
-            int count,
-            double spacing)
-            where T : IDefinitionBase
+        List<UIElement> children = InternalChildren;
+        Dictionary<SpanKey, double> spanStore = null;
+        bool ignoreDesiredSizeV = forceInfinityV;
+
+        int i = cellsHead;
+        do
         {
-            Debug.Assert((count > 0) && ((start + count) <= definitions.Count));
+            double oldWidth = children[i].DesiredSize.Width;
 
-            double availableSize = 0.0f;
-            int index = start + count - 1;
+            MeasureCell(i, forceInfinityV);
 
-            do
+            hasDesiredSizeUChanged |= !DoubleUtil.AreClose(oldWidth, children[i].DesiredSize.Width);
+
+            if (!ignoreDesiredSizeU)
             {
-                var def = definitions[index];
-                availableSize += (def.GetEffectiveUnitType() == GridUnitType.Auto)
-                    ? def.GetEffectiveMinSize()
-                    : def.GetMeasureArrangeSize();
-            } while (index > 0 && --index >= start);
+                if (PrivateCells[i].ColumnSpan == 1)
+                {
+                    DefinitionsU[PrivateCells[i].ColumnIndex].UpdateMinSize(Math.Min(children[i].DesiredSize.Width, DefinitionsU[PrivateCells[i].ColumnIndex].UserMaxSize));
+                }
+                else
+                {
+                    RegisterSpan(
+                        ref spanStore,
+                        PrivateCells[i].ColumnIndex,
+                        PrivateCells[i].ColumnSpan,
+                        true,
+                        children[i].DesiredSize.Width);
+                }
+            }
 
-            availableSize += spacing * (count - 1);
+            if (!ignoreDesiredSizeV)
+            {
+                if (PrivateCells[i].RowSpan == 1)
+                {
+                    DefinitionsV[PrivateCells[i].RowIndex].UpdateMinSize(Math.Min(children[i].DesiredSize.Height, DefinitionsV[PrivateCells[i].RowIndex].UserMaxSize));
+                }
+                else
+                {
+                    RegisterSpan(
+                        ref spanStore,
+                        PrivateCells[i].RowIndex,
+                        PrivateCells[i].RowSpan,
+                        false,
+                        children[i].DesiredSize.Height);
+                }
+            }
 
-            return availableSize;
+            i = PrivateCells[i].Next;
+        } while (i < PrivateCells.Length);
+
+        if (spanStore is not null)
+        {
+            foreach (var e in spanStore)
+            {
+                SpanKey key = e.Key;
+                double requestedSize = e.Value;
+
+                if (key.U)
+                {
+                    EnsureMinSizeInDefinitionRange(
+                        DefinitionsU,
+                        key.Start,
+                        key.Count,
+                        requestedSize,
+                        referenceSize.Width);
+                }
+                else
+                {
+                    EnsureMinSizeInDefinitionRange(
+                        DefinitionsV,
+                        key.Start,
+                        key.Count,
+                        requestedSize,
+                        referenceSize.Height);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Helper method to register a span information for delayed processing.
+    /// </summary>
+    /// <param name="store">Reference to a hashtable object used as storage.</param>
+    /// <param name="start">Span starting index.</param>
+    /// <param name="count">Span count.</param>
+    /// <param name="u"><c>true</c> if this is a column span. <c>false</c> if this is a row span.</param>
+    /// <param name="value">Value to store. If an entry already exists the biggest value is stored.</param>
+    private static void RegisterSpan(
+        ref Dictionary<SpanKey, double> store,
+        int start,
+        int count,
+        bool u,
+        double value)
+    {
+        store ??= new Dictionary<SpanKey, double>();
+
+        var key = new SpanKey(start, count, u);
+
+        if (!store.TryGetValue(key, out double o) || value > o)
+        {
+            store[key] = value;
+        }
+    }
+
+    /// <summary>
+    /// Takes care of measuring a single cell.
+    /// </summary>
+    /// <param name="cell">Index of the cell to measure.</param>
+    /// <param name="forceInfinityV">If "true" then cell is always
+    /// calculated to infinite height.</param>
+    private void MeasureCell(
+        int cell,
+        bool forceInfinityV)
+    {
+        double cellMeasureWidth;
+        double cellMeasureHeight;
+
+        if (PrivateCells[cell].IsAutoU && !PrivateCells[cell].IsStarU)
+        {
+            //  if cell belongs to at least one Auto column and not a single Star column
+            //  then it should be calculated "to content", thus it is possible to "shortcut"
+            //  calculations and simply assign PositiveInfinity here.
+            cellMeasureWidth = double.PositiveInfinity;
+        }
+        else
+        {
+            //  otherwise...
+            cellMeasureWidth = GetMeasureSizeForRange(
+                                    DefinitionsU,
+                                    PrivateCells[cell].ColumnIndex,
+                                    PrivateCells[cell].ColumnSpan);
         }
 
-        //------------------------------------------------------------------------
-        //
-        //  Method:   ResolveStar
-        //
-        //  Synopsis:  Resolves Star's for given array of definitions during measure pass
-        //
-        //------------------------------------------------------------------------
-        private void ResolveStar<T>(
-            List<T> definitions, //the definitions collection
-            double availableSize //the total available size across this dimension
-        ) where T : IDefinitionBase
+        if (forceInfinityV)
         {
-            int cStarDefinitions = 0;
-            double takenSize = 0.0f;
-            double effectiveAvailableSize = availableSize;
+            cellMeasureHeight = double.PositiveInfinity;
+        }
+        else if (PrivateCells[cell].IsAutoV && !PrivateCells[cell].IsStarV)
+        {
+            //  if cell belongs to at least one Auto row and not a single Star row
+            //  then it should be calculated "to content", thus it is possible to "shortcut"
+            //  calculations and simply assign PositiveInfinity here.
+            cellMeasureHeight = double.PositiveInfinity;
+        }
+        else
+        {
+            cellMeasureHeight = GetMeasureSizeForRange(
+                                    DefinitionsV,
+                                    PrivateCells[cell].RowIndex,
+                                    PrivateCells[cell].RowSpan);
+        }
 
-            EnsureTempDefinitionsStorage(definitions.Count);
+        UIElement child = InternalChildren[cell];
+        child.Measure(new Size(cellMeasureWidth, cellMeasureHeight));
+    }
 
-            for (int i = 0; i < definitions.Count; i++)
+
+    /// <summary>
+    /// Calculates one dimensional measure size for given definitions' range.
+    /// </summary>
+    /// <param name="definitions">Source array of definitions to read values from.</param>
+    /// <param name="start">Starting index of the range.</param>
+    /// <param name="count">Number of definitions included in the range.</param>
+    /// <returns>Calculated measure size.</returns>
+    /// <remarks>
+    /// For "Auto" definitions MinWidth is used in place of PreferredSize.
+    /// </remarks>
+    private double GetMeasureSizeForRange<T>(
+        List<T> definitions,
+        int start,
+        int count)
+        where T : DefinitionBase
+    {
+        Debug.Assert(0 < count && 0 <= start && (start + count) <= definitions.Count);
+
+        double measureSize = 0;
+        int i = start + count - 1;
+
+        do
+        {
+            measureSize += (definitions[i].SizeType == LayoutTimeSizeType.Auto)
+                ? definitions[i].MinSize
+                : definitions[i].MeasureSize;
+        } while (--i >= start);
+
+        return measureSize;
+    }
+
+    /// <summary>
+    /// Accumulates length type information for given definition's range.
+    /// </summary>
+    /// <param name="definitions">Source array of definitions to read values from.</param>
+    /// <param name="start">Starting index of the range.</param>
+    /// <param name="count">Number of definitions included in the range.</param>
+    /// <returns>Length type for given range.</returns>
+    private LayoutTimeSizeType GetLengthTypeForRange<T>(
+        List<T> definitions,
+        int start,
+        int count)
+        where T : DefinitionBase
+    {
+        Debug.Assert(0 < count && 0 <= start && (start + count) <= definitions.Count);
+
+        LayoutTimeSizeType lengthType = LayoutTimeSizeType.None;
+        int i = start + count - 1;
+
+        do
+        {
+            lengthType |= definitions[i].SizeType;
+        } while (--i >= start);
+
+        return lengthType;
+    }
+
+    /// <summary>
+    /// Distributes min size back to definition array's range.
+    /// </summary>
+    /// <param name="start">Start of the range.</param>
+    /// <param name="count">Number of items in the range.</param>
+    /// <param name="requestedSize">Minimum size that should "fit" into the definitions range.</param>
+    /// <param name="definitions">Definition array receiving distribution.</param>
+    /// <param name="percentReferenceSize">Size used to resolve percentages.</param>
+    private void EnsureMinSizeInDefinitionRange<T>(
+        List<T> definitions,
+        int start,
+        int count,
+        double requestedSize,
+        double percentReferenceSize)
+        where T : DefinitionBase
+    {
+        Debug.Assert(1 < count && 0 <= start && (start + count) <= definitions.Count);
+
+        //  avoid processing when asked to distribute "0"
+        if (!IsZero(requestedSize))
+        {
+            DefinitionBase[] tempDefinitions = TempDefinitions; //  temp array used to remember definitions for sorting
+            int end = start + count;
+            int autoDefinitionsCount = 0;
+            double rangeMinSize = 0;
+            double rangePreferredSize = 0;
+            double rangeMaxSize = 0;
+            double maxMaxSize = 0;                              //  maximum of maximum sizes
+
+            //  first accumulate the necessary information:
+            //  a) sum up the sizes in the range;
+            //  b) count the number of auto definitions in the range;
+            //  c) initialize temp array
+            //  d) cache the maximum size into SizeCache
+            //  e) accumulate max of max sizes
+            for (int i = start; i < end; ++i)
             {
-                //if star definition, setup values for distribution calculation
+                double minSize = definitions[i].MinSize;
+                double preferredSize = definitions[i].PreferredSize;
+                double maxSize = Math.Max(definitions[i].UserMaxSize, minSize);
 
-                IDefinitionBase pDef = definitions[i];
+                rangeMinSize += minSize;
+                rangePreferredSize += preferredSize;
+                rangeMaxSize += maxSize;
 
-                if (pDef.GetEffectiveUnitType() == GridUnitType.Star)
+                definitions[i].SizeCache = maxSize;
+
+                //  sanity check: no matter what, but min size must always be the smaller;
+                //  max size must be the biggest; and preferred should be in between
+                Debug.Assert(minSize <= preferredSize
+                            && preferredSize <= maxSize
+                            && rangeMinSize <= rangePreferredSize
+                            && rangePreferredSize <= rangeMaxSize);
+
+                if (maxMaxSize < maxSize) maxMaxSize = maxSize;
+                if (definitions[i].UserSize.IsAuto) autoDefinitionsCount++;
+                tempDefinitions[i - start] = definitions[i];
+            }
+
+            //  avoid processing if the range already big enough
+            if (requestedSize > rangeMinSize)
+            {
+                if (requestedSize <= rangePreferredSize)
                 {
-                    m_ppTempDefinitions[cStarDefinitions++] = pDef;
+                    //
+                    //  requestedSize fits into preferred size of the range.
+                    //  distribute according to the following logic:
+                    //  * do not distribute into auto definitions - they should continue to stay "tight";
+                    //  * for all non-auto definitions distribute to equi-size min sizes, without exceeding preferred size.
+                    //
+                    //  in order to achieve that, definitions are sorted in a way that all auto definitions
+                    //  are first, then definitions follow ascending order with PreferredSize as the key of sorting.
+                    //
+                    double sizeToDistribute;
+                    int i;
 
-                    // Note that this user value is in star units and not pixel units,
-                    // and thus, there is no need to layout-round.
-                    double starValue = pDef.GetUserSizeValue();
-
-                    if (starValue < double.Epsilon)
+                    Array.Sort(tempDefinitions, 0, count, s_spanPreferredDistributionOrderComparer);
+                    for (i = 0, sizeToDistribute = requestedSize; i < autoDefinitionsCount; ++i)
                     {
-                        pDef.SetMeasureArrangeSize(0.0f);
-                        pDef.SetSizeCache(0.0f);
+                        //  sanity check: only auto definitions allowed in this loop
+                        Debug.Assert(tempDefinitions[i].UserSize.IsAuto);
+
+                        //  adjust sizeToDistribute value by subtracting auto definition min size
+                        sizeToDistribute -= (tempDefinitions[i].MinSize);
+                    }
+
+                    for (; i < count; ++i)
+                    {
+                        //  sanity check: no auto definitions allowed in this loop
+                        Debug.Assert(!tempDefinitions[i].UserSize.IsAuto);
+
+                        double newMinSize = Math.Min(sizeToDistribute / (count - i), tempDefinitions[i].PreferredSize);
+                        if (newMinSize > tempDefinitions[i].MinSize)
+                        {
+                            tempDefinitions[i].UpdateMinSize(newMinSize);
+                        }
+                        sizeToDistribute -= newMinSize;
+                    }
+
+                    //  sanity check: requested size must all be distributed
+                    Debug.Assert(IsZero(sizeToDistribute));
+                }
+                else if (requestedSize <= rangeMaxSize)
+                {
+                    //
+                    //  requestedSize bigger than preferred size, but fit into max size of the range.
+                    //  distribute according to the following logic:
+                    //  * do not distribute into auto definitions, if possible - they should continue to stay "tight";
+                    //  * for all non-auto definitions distribute to euqi-size min sizes, without exceeding max size.
+                    //
+                    //  in order to achieve that, definitions are sorted in a way that all non-auto definitions
+                    //  are last, then definitions follow ascending order with MaxSize as the key of sorting.
+                    //
+                    double sizeToDistribute;
+                    int i;
+
+                    Array.Sort(tempDefinitions, 0, count, s_spanMaxDistributionOrderComparer);
+                    for (i = 0, sizeToDistribute = requestedSize - rangePreferredSize; i < count - autoDefinitionsCount; ++i)
+                    {
+                        //  sanity check: no auto definitions allowed in this loop
+                        Debug.Assert(!tempDefinitions[i].UserSize.IsAuto);
+
+                        double preferredSize = tempDefinitions[i].PreferredSize;
+                        double newMinSize = preferredSize + sizeToDistribute / (count - autoDefinitionsCount - i);
+                        tempDefinitions[i].UpdateMinSize(Math.Min(newMinSize, tempDefinitions[i].SizeCache));
+                        sizeToDistribute -= tempDefinitions[i].MinSize - preferredSize;
+                    }
+
+                    for (; i < count; ++i)
+                    {
+                        //  sanity check: only auto definitions allowed in this loop
+                        Debug.Assert(tempDefinitions[i].UserSize.IsAuto);
+
+                        double preferredSize = tempDefinitions[i].MinSize;
+                        double newMinSize = preferredSize + sizeToDistribute / (count - i);
+                        tempDefinitions[i].UpdateMinSize(Math.Min(newMinSize, tempDefinitions[i].SizeCache));
+                        sizeToDistribute -= tempDefinitions[i].MinSize - preferredSize;
+                    }
+
+                    //  sanity check: requested size must all be distributed
+                    Debug.Assert(IsZero(sizeToDistribute));
+                }
+                else
+                {
+                    //
+                    //  requestedSize bigger than max size of the range.
+                    //  distribute according to the following logic:
+                    //  * for all definitions distribute to equi-size min sizes.
+                    //
+                    double equalSize = requestedSize / count;
+
+                    if (equalSize < maxMaxSize && !AreClose(equalSize, maxMaxSize))
+                    {
+                        //  equi-size is less than maximum of maxSizes.
+                        //  in this case distribute so that smaller definitions grow faster than
+                        //  bigger ones.
+                        double totalRemainingSize = maxMaxSize * count - rangeMaxSize;
+                        double sizeToDistribute = requestedSize - rangeMaxSize;
+
+                        //  sanity check: totalRemainingSize and sizeToDistribute must be real positive numbers
+                        Debug.Assert(!double.IsInfinity(totalRemainingSize)
+                                    && !double.IsNaN(totalRemainingSize)
+                                    && totalRemainingSize > 0
+                                    && !double.IsInfinity(sizeToDistribute)
+                                    && !double.IsNaN(sizeToDistribute)
+                                    && sizeToDistribute > 0);
+
+                        for (int i = 0; i < count; ++i)
+                        {
+                            double deltaSize = (maxMaxSize - tempDefinitions[i].SizeCache) * sizeToDistribute / totalRemainingSize;
+                            tempDefinitions[i].UpdateMinSize(tempDefinitions[i].SizeCache + deltaSize);
+                        }
                     }
                     else
                     {
-                        //clipping by a max to avoid overflow when all the star values are added up.
-                        starValue = Math.Min(starValue, int.MaxValue);
-
-                        pDef.SetMeasureArrangeSize(starValue);
-
-                        // Note that this user value is used for a computation that is cached
-                        // and then used in the call to CGrid.DistributeStarSpace below for
-                        // further calculations where the final result is layout-rounded as
-                        // appropriate. In other words, it doesn't seem like we need to apply
-                        // layout-rounding just yet.
-                        double maxSize = Math.Min(int.MaxValue,
-                            Math.Max(pDef.GetEffectiveMinSize(), pDef.GetUserMaxSize()));
-                        pDef.SetSizeCache(maxSize / starValue);
-                    }
-                }
-                else
-                {
-                    //if not star definition, reduce the size available to star definitions
-                    if (pDef.GetEffectiveUnitType() == GridUnitType.Pixel)
-                    {
-                        takenSize += pDef.GetMeasureArrangeSize();
-                    }
-                    else if (pDef.GetEffectiveUnitType() == GridUnitType.Auto)
-                    {
-                        takenSize += pDef.GetEffectiveMinSize();
-                    }
-                }
-            }
-
-            DistributeStarSpace(m_ppTempDefinitions, cStarDefinitions, effectiveAvailableSize - takenSize, ref takenSize);
-        }
-
-        //------------------------------------------------------------------------
-        //
-        //  Method:   DistributeStarSpace
-        //
-        //  Synopsis:  Distributes available space between star definitions.
-        //
-        //------------------------------------------------------------------------
-        private static void DistributeStarSpace(
-            IDefinitionBase[] ppStarDefinitions,
-            int cStarDefinitions,
-            double availableSize,
-            ref double pTotalResolvedSize)
-        {
-            double resolvedSize;
-            double starValue;
-            double totalStarResolvedSize = 0.0f;
-
-            if (cStarDefinitions < 0)
-            {
-                return;
-            }
-
-            //sorting definitions for order of space allocation. definition with the lowest
-            //maxSize to starValue ratio gets the size first.
-            SortDefinitionsForStarSizeDistribution(ppStarDefinitions, cStarDefinitions);
-
-            double allStarWeights = 0.0f;
-            int i = cStarDefinitions;
-
-            while (i > 0)
-            {
-                i--;
-                allStarWeights += ppStarDefinitions[i].GetMeasureArrangeSize();
-                //store partial sum of weights
-                ppStarDefinitions[i].SetSizeCache(allStarWeights);
-            }
-
-            i = 0;
-            while (i < cStarDefinitions)
-            {
-                resolvedSize = 0.0f;
-                starValue = ppStarDefinitions[i].GetMeasureArrangeSize();
-
-                if (starValue == 0.0f)
-                {
-                    resolvedSize = ppStarDefinitions[i].GetEffectiveMinSize();
-                }
-                else
-                {
-                    resolvedSize = Math.Max(availableSize - totalStarResolvedSize, 0.0f) *
-                                   (starValue / ppStarDefinitions[i].GetSizeCache());
-                    resolvedSize = Math.Max(ppStarDefinitions[i].GetEffectiveMinSize(),
-                        Math.Min(resolvedSize, ppStarDefinitions[i].GetUserMaxSize()));
-                }
-
-                ppStarDefinitions[i].SetMeasureArrangeSize(resolvedSize);
-                totalStarResolvedSize += resolvedSize;
-
-                i++;
-            }
-
-            pTotalResolvedSize += totalStarResolvedSize;
-        }
-
-        // Calculates the desired size of the Grid minus its BorderThickness and
-        // Padding assuming all the cells have already been measured.
-        private static double GetDesiredInnerSize<T>(List<T> definitions)
-            where T : IDefinitionBase
-        {
-            double desiredSize = 0.0f;
-
-            for (int i = 0; i < definitions.Count; ++i)
-            {
-                var def = definitions[i];
-                desiredSize += def.GetEffectiveMinSize();
-            }
-
-            return desiredSize;
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            StackVector<CellCache> cellCacheVector = default;
-            StackVector<SpanStoreEntry> spanStore = default;
-
-            bool gotException = true;
-            Size desiredSize;
-
-            MeasureOverrideInProgress = true;
-            try
-            {
-                desiredSize = InnerMeasureOverride(availableSize, ref cellCacheVector, ref spanStore);
-                gotException = false;
-            }
-            finally
-            {
-                MeasureOverrideInProgress = false;
-                if (gotException)
-                {
-                    cellCacheVector.Dispose();
-                    spanStore.Dispose();
-                }
-            }
-
-            return desiredSize;
-        }
-
-        private Size InnerMeasureOverride(
-            Size availableSize,
-            ref StackVector<CellCache> cellCacheVector,
-            ref StackVector<SpanStoreEntry> spanStore)
-        {
-            double rowSpacing = 0;
-            double columnSpacing = 0;
-
-            Size desiredSize = new Size();
-
-            Size innerAvailableSize = new Size(availableSize.Width, availableSize.Height);
-
-            if (IsWithoutRowAndColumnDefinitions())
-            {
-                // If this Grid has no user-defined rows or columns, it is possible
-                // to shortcut this MeasureOverride.
-                List<UIElement> children = InternalChildren;
-                for (int i = 0; i < children.Count; i++)
-                {
-                    UIElement child = children[i];
-                    child.Measure(availableSize);
-
-                    Size childDesiredSize = child.DesiredSize;
-                    desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
-                    desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
-                }
-            }
-            else
-            {
-                if (HasGridFlags(GridFlags.DefinitionsChanged))
-                {
-                    ClearGridFlags(GridFlags.DefinitionsChanged);
-                    InitializeDefinitionStructure();
-                }
-
-                ValidateDefinitions(m_pRows, availableSize.Height == double.PositiveInfinity /* treatStarAsAuto */);
-                ValidateDefinitions(m_pColumns, availableSize.Width == double.PositiveInfinity /* treatStarAsAuto */);
-
-                double combinedRowSpacing = rowSpacing * (m_pRows.Count - 1);
-                double combinedColumnSpacing = columnSpacing * (m_pColumns.Count - 1);
-                innerAvailableSize.Width -= combinedColumnSpacing;
-                innerAvailableSize.Height -= combinedRowSpacing;
-
-                List<UIElement> children = InternalChildren;
-                int childrenCount = children.Count;
-
-                cellCacheVector = new StackVector<CellCache>(16, childrenCount);
-                CellGroups cellGroups = ValidateCells(children, ref cellCacheVector);
-
-                // Measure Group1. After Group1 is measured, only Group3 can have
-                // cells belonging to var rows.
-                MeasureCellsGroup(cellGroups.group1, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
-
-                // After Group1 is measured, only Group3 may have cells belonging to
-                // Auto rows.
-                if (!HasGridFlags(GridFlags.HasAutoRowsAndStarColumn))
-                {
-                    // We have no cyclic dependency; resolve star row/var column first.
-                    if (HasGridFlags(GridFlags.HasStarRows))
-                    {
-                        ResolveStar(m_pRows, innerAvailableSize.Height);
-                    }
-
-                    // Measure Group2.
-                    MeasureCellsGroup(cellGroups.group2, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
-
-                    if (HasGridFlags(GridFlags.HasStarColumns))
-                    {
-                        ResolveStar(m_pColumns, innerAvailableSize.Width);
-                    }
-
-                    // Measure Group3.
-                    MeasureCellsGroup(cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
-                }
-                else
-                {
-                    // If at least one cell exists in Group2, it must be measured
-                    // before star columns can be resolved.
-                    if (cellGroups.group2 > childrenCount)
-                    {
-                        if (HasGridFlags(GridFlags.HasStarColumns))
+                        //
+                        //  equi-size is greater or equal to maximum of max sizes.
+                        //  all definitions receive equalSize as their mim sizes.
+                        //
+                        for (int i = 0; i < count; ++i)
                         {
-                            ResolveStar(m_pColumns, innerAvailableSize.Width);
+                            tempDefinitions[i].UpdateMinSize(equalSize);
                         }
+                    }
+                }
+            }
+        }
+    }
 
-                        // Measure Group3.
-                        MeasureCellsGroup(cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
+    /// <summary>
+    /// Resolves Star's for given array of definitions.
+    /// </summary>
+    /// <param name="definitions">Array of definitions to resolve stars.</param>
+    /// <param name="availableSize">All available size.</param>
+    /// <remarks>
+    /// Must initialize LayoutSize for all Star entries in given array of definitions.
+    /// </remarks>
+    private void ResolveStar<T>(
+        List<T> definitions,
+        double availableSize)
+        where T : DefinitionBase
+    {
+        ResolveStarMaxDiscrepancy(definitions, availableSize);
+    }
 
-                        if (HasGridFlags(GridFlags.HasStarRows))
+    // new implementation as of 4.7.  Several improvements:
+    // 1. Allocate to *-defs hitting their min or max constraints, before allocating
+    //      to other *-defs.  A def that hits its min uses more space than its
+    //      proportional share, reducing the space available to everyone else.
+    //      The legacy algorithm deducted this space only from defs processed
+    //      after the min;  the new algorithm deducts it proportionally from all
+    //      defs.   This avoids the "*-defs exceed available space" problem,
+    //      and other related problems where *-defs don't receive proportional
+    //      allocations even though no constraints are preventing it.
+    // 2. When multiple defs hit min or max, resolve the one with maximum
+    //      discrepancy (defined below).   This avoids discontinuities - small
+    //      change in available space resulting in large change to one def's allocation.
+    // 3. Correct handling of large *-values, including Infinity.
+    private void ResolveStarMaxDiscrepancy<T>(
+        List<T> definitions,
+        double availableSize)
+        where T : DefinitionBase
+    {
+        int defCount = definitions.Count;
+        DefinitionBase[] tempDefinitions = TempDefinitions;
+        int minCount = 0, maxCount = 0;
+        double takenSize = 0;
+        double totalStarWeight = 0.0;
+        int starCount = 0;      // number of unresolved *-definitions
+        double scale = 1.0;     // scale factor applied to each *-weight;  negative means "Infinity is present"
+
+        // Phase 1.  Determine the maximum *-weight and prepare to adjust *-weights
+        double maxStar = 0.0;
+        for (int i = 0; i < defCount; ++i)
+        {
+            DefinitionBase def = definitions[i];
+
+            if (def.SizeType == LayoutTimeSizeType.Star)
+            {
+                ++starCount;
+                def.MeasureSize = 1.0;  // meaning "not yet resolved in phase 3"
+                if (def.UserSize.Value > maxStar)
+                {
+                    maxStar = def.UserSize.Value;
+                }
+            }
+        }
+
+        if (double.IsPositiveInfinity(maxStar))
+        {
+            // negative scale means one or more of the weights was Infinity
+            scale = -1.0;
+        }
+        else if (starCount > 0)
+        {
+            // if maxStar * starCount > Double.Max, summing all the weights could cause
+            // floating-point overflow.  To avoid that, scale the weights by a factor to keep
+            // the sum within limits.  Choose a power of 2, to preserve precision.
+            double power = Math.Floor(Math.Log(double.MaxValue / maxStar / starCount, 2.0));
+            if (power < 0.0)
+            {
+                scale = Math.Pow(2.0, power - 4.0); // -4 is just for paranoia
+            }
+        }
+
+        // normally Phases 2 and 3 execute only once.  But certain unusual combinations of weights
+        // and constraints can defeat the algorithm, in which case we repeat Phases 2 and 3.
+        // More explanation below...
+        for (bool runPhase2and3 = true; runPhase2and3;)
+        {
+            // Phase 2.   Compute total *-weight W and available space S.
+            // For *-items that have Min or Max constraints, compute the ratios used to decide
+            // whether proportional space is too big or too small and add the item to the
+            // corresponding list.  (The "min" list is in the first half of tempDefinitions,
+            // the "max" list in the second half.  TempDefinitions has capacity at least
+            // 2*defCount, so there's room for both lists.)
+            totalStarWeight = 0.0;
+            takenSize = 0.0;
+            minCount = maxCount = 0;
+
+            for (int i = 0; i < defCount; ++i)
+            {
+                DefinitionBase def = definitions[i];
+
+                switch (def.SizeType)
+                {
+                    case LayoutTimeSizeType.Auto:
+                        takenSize += definitions[i].MinSize;
+                        break;
+                    case LayoutTimeSizeType.Pixel:
+                        takenSize += def.MeasureSize;
+                        break;
+                    case LayoutTimeSizeType.Star:
+                        if (def.MeasureSize < 0.0)
                         {
-                            ResolveStar(m_pRows, innerAvailableSize.Height);
+                            takenSize += -def.MeasureSize;  // already resolved
                         }
+                        else
+                        {
+                            double starWeight = StarWeight(def, scale);
+                            totalStarWeight += starWeight;
+
+                            if (def.MinSize > 0.0)
+                            {
+                                // store ratio w/min in MeasureSize (for now)
+                                tempDefinitions[minCount++] = def;
+                                def.MeasureSize = starWeight / def.MinSize;
+                            }
+
+                            double effectiveMaxSize = Math.Max(def.MinSize, def.UserMaxSize);
+                            if (!double.IsPositiveInfinity(effectiveMaxSize))
+                            {
+                                // store ratio w/max in SizeCache (for now)
+                                tempDefinitions[defCount + maxCount++] = def;
+                                def.SizeCache = starWeight / effectiveMaxSize;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            // Phase 3.  Resolve *-items whose proportional sizes are too big or too small.
+            int minCountPhase2 = minCount, maxCountPhase2 = maxCount;
+            double takenStarWeight = 0.0;
+            double remainingAvailableSize = availableSize - takenSize;
+            double remainingStarWeight = totalStarWeight - takenStarWeight;
+            Array.Sort(tempDefinitions, 0, minCount, s_minRatioComparer);
+            Array.Sort(tempDefinitions, defCount, maxCount, s_maxRatioComparer);
+
+            while (minCount + maxCount > 0 && remainingAvailableSize > 0.0)
+            {
+                // the calculation
+                //            remainingStarWeight = totalStarWeight - takenStarWeight
+                // is subject to catastrophic cancellation if the two terms are nearly equal,
+                // which leads to meaningless results.   Check for that, and recompute from
+                // the remaining definitions.   [This leads to quadratic behavior in really
+                // pathological cases - but they'd never arise in practice.]
+                const double starFactor = 1.0 / 256.0;      // lose more than 8 bits of precision -> recalculate
+                if (remainingStarWeight < totalStarWeight * starFactor)
+                {
+                    takenStarWeight = 0.0;
+                    totalStarWeight = 0.0;
+
+                    for (int i = 0; i < defCount; ++i)
+                    {
+                        DefinitionBase def = definitions[i];
+                        if (def.SizeType == LayoutTimeSizeType.Star && def.MeasureSize > 0.0)
+                        {
+                            totalStarWeight += StarWeight(def, scale);
+                        }
+                    }
+
+                    remainingStarWeight = totalStarWeight - takenStarWeight;
+                }
+
+                double minRatio = (minCount > 0) ? tempDefinitions[minCount - 1].MeasureSize : double.PositiveInfinity;
+                double maxRatio = (maxCount > 0) ? tempDefinitions[defCount + maxCount - 1].SizeCache : -1.0;
+
+                // choose the def with larger ratio to the current proportion ("max discrepancy")
+                double proportion = remainingStarWeight / remainingAvailableSize;
+                bool? chooseMin = Choose(minRatio, maxRatio, proportion);
+
+                // if no def was chosen, advance to phase 4;  the current proportion doesn't
+                // conflict with any min or max values.
+                if (!(chooseMin.HasValue))
+                {
+                    break;
+                }
+
+                // get the chosen definition and its resolved size
+                DefinitionBase resolvedDef;
+                double resolvedSize;
+                if (chooseMin == true)
+                {
+                    resolvedDef = tempDefinitions[minCount - 1];
+                    resolvedSize = resolvedDef.MinSize;
+                    --minCount;
+                }
+                else
+                {
+                    resolvedDef = tempDefinitions[defCount + maxCount - 1];
+                    resolvedSize = Math.Max(resolvedDef.MinSize, resolvedDef.UserMaxSize);
+                    --maxCount;
+                }
+
+                // resolve the chosen def, deduct its contributions from W and S.
+                // Defs resolved in phase 3 are marked by storing the negative of their resolved
+                // size in MeasureSize, to distinguish them from a pending def.
+                takenSize += resolvedSize;
+                resolvedDef.MeasureSize = -resolvedSize;
+                takenStarWeight += StarWeight(resolvedDef, scale);
+                --starCount;
+
+                remainingAvailableSize = availableSize - takenSize;
+                remainingStarWeight = totalStarWeight - takenStarWeight;
+
+                // advance to the next candidate defs, removing ones that have been resolved.
+                // Both counts are advanced, as a def might appear in both lists.
+                while (minCount > 0 && tempDefinitions[minCount - 1].MeasureSize < 0.0)
+                {
+                    --minCount;
+                    tempDefinitions[minCount] = null;
+                }
+                while (maxCount > 0 && tempDefinitions[defCount + maxCount - 1].MeasureSize < 0.0)
+                {
+                    --maxCount;
+                    tempDefinitions[defCount + maxCount] = null;
+                }
+            }
+
+            // decide whether to run Phase2 and Phase3 again.  There are 3 cases:
+            // 1. There is space available, and *-defs remaining.  This is the
+            //      normal case - move on to Phase 4 to allocate the remaining
+            //      space proportionally to the remaining *-defs.
+            // 2. There is space available, but no *-defs.  This implies at least one
+            //      def was resolved as 'max', taking less space than its proportion.
+            //      If there are also 'min' defs, reconsider them - we can give
+            //      them more space.   If not, all the *-defs are 'max', so there's
+            //      no way to use all the available space.
+            // 3. We allocated too much space.   This implies at least one def was
+            //      resolved as 'min'.  If there are also 'max' defs, reconsider
+            //      them, otherwise the over-allocation is an inevitable consequence
+            //      of the given min constraints.
+            // Note that if we return to Phase2, at least one *-def will have been
+            // resolved.  This guarantees we don't run Phase2+3 infinitely often.
+            runPhase2and3 = false;
+            if (starCount == 0 && takenSize < availableSize)
+            {
+                // if no *-defs remain and we haven't allocated all the space, reconsider the defs
+                // resolved as 'min'.   Their allocation can be increased to make up the gap.
+                for (int i = minCount; i < minCountPhase2; ++i)
+                {
+                    if (tempDefinitions[i] is DefinitionBase def)
+                    {
+                        def.MeasureSize = 1.0;      // mark as 'not yet resolved'
+                        ++starCount;
+                        runPhase2and3 = true;       // found a candidate, so re-run Phases 2 and 3
+                    }
+                }
+            }
+
+            if (takenSize > availableSize)
+            {
+                // if we've allocated too much space, reconsider the defs
+                // resolved as 'max'.   Their allocation can be decreased to make up the gap.
+                for (int i = maxCount; i < maxCountPhase2; ++i)
+                {
+                    if (tempDefinitions[defCount + i] is DefinitionBase def)
+                    {
+                        def.MeasureSize = 1.0;      // mark as 'not yet resolved'
+                        ++starCount;
+                        runPhase2and3 = true;    // found a candidate, so re-run Phases 2 and 3
+                    }
+                }
+            }
+        }
+
+        // Phase 4.  Resolve the remaining defs proportionally.
+        starCount = 0;
+        for (int i = 0; i < defCount; ++i)
+        {
+            DefinitionBase def = definitions[i];
+
+            if (def.SizeType == LayoutTimeSizeType.Star)
+            {
+                if (def.MeasureSize < 0.0)
+                {
+                    // this def was resolved in phase 3 - fix up its measure size
+                    def.MeasureSize = -def.MeasureSize;
+                }
+                else
+                {
+                    // this def needs resolution, add it to the list, sorted by *-weight
+                    tempDefinitions[starCount++] = def;
+                    def.MeasureSize = StarWeight(def, scale);
+                }
+            }
+        }
+
+        if (starCount > 0)
+        {
+            Array.Sort(tempDefinitions, 0, starCount, s_starWeightComparer);
+
+            // compute the partial sums of *-weight, in increasing order of weight
+            // for minimal loss of precision.
+            totalStarWeight = 0.0;
+            for (int i = 0; i < starCount; ++i)
+            {
+                DefinitionBase def = tempDefinitions[i];
+                totalStarWeight += def.MeasureSize;
+                def.SizeCache = totalStarWeight;
+            }
+
+            // resolve the defs, in decreasing order of weight
+            for (int i = starCount - 1; i >= 0; --i)
+            {
+                DefinitionBase def = tempDefinitions[i];
+                double resolvedSize = (def.MeasureSize > 0.0) ? Math.Max(availableSize - takenSize, 0.0) * (def.MeasureSize / def.SizeCache) : 0.0;
+
+                // min and max should have no effect by now, but just in case...
+                resolvedSize = Math.Min(resolvedSize, def.UserMaxSize);
+                resolvedSize = Math.Max(def.MinSize, resolvedSize);
+
+                def.MeasureSize = resolvedSize;
+                takenSize += resolvedSize;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Calculates desired size for given array of definitions.
+    /// </summary>
+    /// <param name="definitions">Array of definitions to use for calculations.</param>
+    /// <returns>Desired size.</returns>
+    private double CalculateDesiredSize<T>(
+        List<T> definitions)
+        where T : DefinitionBase
+    {
+        double desiredSize = 0;
+
+        for (int i = 0; i < definitions.Count; ++i)
+        {
+            desiredSize += definitions[i].MinSize;
+        }
+
+        return desiredSize;
+    }
+
+    /// <summary>
+    /// Calculates and sets final size for all definitions in the given array.
+    /// </summary>
+    /// <param name="definitions">Array of definitions to process.</param>
+    /// <param name="finalSize">Final size to lay out to.</param>
+    /// <param name="columns">True if sizing row definitions, false for columns</param>
+    private void SetFinalSize<T>(
+        List<T> definitions,
+        double finalSize,
+        bool columns)
+        where T : DefinitionBase
+    {
+        SetFinalSizeMaxDiscrepancy(definitions, finalSize, columns);
+    }
+
+    // new implementation, as of 4.7.  This incorporates the same algorithm
+    // as in ResolveStarMaxDiscrepancy.  It differs in the same way that SetFinalSizeLegacy
+    // differs from ResolveStarLegacy, namely (a) leaves results in def.SizeCache
+    // instead of def.MeasureSize, (b) implements LayoutRounding if requested,
+    // (c) stores intermediate results differently.
+    // The LayoutRounding logic is improved:
+    // 1. Use pre-rounded values during proportional allocation.  This avoids the
+    //      same kind of problems arising from interaction with min/max that
+    //      motivated the new algorithm in the first place.
+    // 2. Use correct "nudge" amount when distributing roundoff space.   This
+    //      comes into play at high DPI - greater than 134.
+    // 3. Applies rounding only to real pixel values (not to ratios)
+    private void SetFinalSizeMaxDiscrepancy<T>(
+        List<T> definitions,
+        double finalSize,
+        bool columns)
+        where T : DefinitionBase
+    {
+        int defCount = definitions.Count;
+        int[] definitionIndices = DefinitionIndices;
+        int minCount = 0, maxCount = 0;
+        double takenSize = 0.0;
+        double totalStarWeight = 0.0;
+        int starCount = 0;      // number of unresolved *-definitions
+        double scale = 1.0;   // scale factor applied to each *-weight;  negative means "Infinity is present"
+
+        // Phase 1.  Determine the maximum *-weight and prepare to adjust *-weights
+        double maxStar = 0.0;
+        for (int i = 0; i < defCount; ++i)
+        {
+            DefinitionBase def = definitions[i];
+
+            if (def.UserSize.IsStar)
+            {
+                ++starCount;
+                def.MeasureSize = 1.0;  // meaning "not yet resolved in phase 3"
+                if (def.UserSize.Value > maxStar)
+                {
+                    maxStar = def.UserSize.Value;
+                }
+            }
+        }
+
+        if (double.IsPositiveInfinity(maxStar))
+        {
+            // negative scale means one or more of the weights was Infinity
+            scale = -1.0;
+        }
+        else if (starCount > 0)
+        {
+            // if maxStar * starCount > Double.Max, summing all the weights could cause
+            // floating-point overflow.  To avoid that, scale the weights by a factor to keep
+            // the sum within limits.  Choose a power of 2, to preserve precision.
+            double power = Math.Floor(Math.Log(double.MaxValue / maxStar / starCount, 2.0));
+            if (power < 0.0)
+            {
+                scale = Math.Pow(2.0, power - 4.0); // -4 is just for paranoia
+            }
+        }
+
+
+        // normally Phases 2 and 3 execute only once.  But certain unusual combinations of weights
+        // and constraints can defeat the algorithm, in which case we repeat Phases 2 and 3.
+        // More explanation below...
+        for (bool runPhase2and3 = true; runPhase2and3;)
+        {
+            // Phase 2.   Compute total *-weight W and available space S.
+            // For *-items that have Min or Max constraints, compute the ratios used to decide
+            // whether proportional space is too big or too small and add the item to the
+            // corresponding list.  (The "min" list is in the first half of definitionIndices,
+            // the "max" list in the second half.  DefinitionIndices has capacity at least
+            // 2*defCount, so there's room for both lists.)
+            totalStarWeight = 0.0;
+            takenSize = 0.0;
+            minCount = maxCount = 0;
+
+            for (int i = 0; i < defCount; ++i)
+            {
+                DefinitionBase def = definitions[i];
+
+                if (def.UserSize.IsStar)
+                {
+                    Debug.Assert(!def.IsShared, "*-defs cannot be shared");
+
+                    if (def.MeasureSize < 0.0)
+                    {
+                        takenSize += -def.MeasureSize;  // already resolved
                     }
                     else
                     {
-                        // We have a cyclic dependency; measure Group2 for their
-                        // widths, while setting the row heights to infinity.
-                        MeasureCellsGroup(cellGroups.group2, childrenCount, rowSpacing, columnSpacing, false, true, ref cellCacheVector, ref spanStore);
+                        double starWeight = StarWeight(def, scale);
+                        totalStarWeight += starWeight;
 
-                        if (HasGridFlags(GridFlags.HasStarColumns))
+                        if (def.MinSizeForArrange > 0.0)
                         {
-                            ResolveStar(m_pColumns, innerAvailableSize.Width);
+                            // store ratio w/min in MeasureSize (for now)
+                            definitionIndices[minCount++] = i;
+                            def.MeasureSize = starWeight / def.MinSizeForArrange;
                         }
 
-                        // Measure Group3.
-                        MeasureCellsGroup(cellGroups.group3, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
-
-                        if (HasGridFlags(GridFlags.HasStarRows))
+                        double effectiveMaxSize = Math.Max(def.MinSizeForArrange, def.UserMaxSize);
+                        if (!double.IsPositiveInfinity(effectiveMaxSize))
                         {
-                            ResolveStar(m_pRows, innerAvailableSize.Height);
+                            // store ratio w/max in SizeCache (for now)
+                            definitionIndices[defCount + maxCount++] = i;
+                            def.SizeCache = starWeight / effectiveMaxSize;
                         }
-
-                        // Now, Measure Group2 again for their heights and ignore their widths.
-                        MeasureCellsGroup(cellGroups.group2, childrenCount, rowSpacing, columnSpacing, true, false, ref cellCacheVector, ref spanStore);
-                    }
-                }
-
-                // Finally, measure Group4.
-                MeasureCellsGroup(cellGroups.group4, childrenCount, rowSpacing, columnSpacing, false, false, ref cellCacheVector, ref spanStore);
-
-                desiredSize.Width = GetDesiredInnerSize(m_pColumns) + combinedColumnSpacing;
-                desiredSize.Height = GetDesiredInnerSize(m_pRows) + combinedRowSpacing;
-
-                // Return memory to the array pool
-                cellCacheVector.Dispose();
-            }
-
-            return desiredSize;
-        }
-
-        //------------------------------------------------------------------------
-        //
-        //  Method:   CGrid.SetFinalSize
-        //
-        //  Synopsis:
-        //      Computes the offsets and sizes for each row and column
-        //
-        //------------------------------------------------------------------------
-        private void SetFinalSize<T>(List<T> definitions, double finalSize)
-            where T : IDefinitionBase
-        {
-            double allPreferredArrangeSize = 0;
-            int cStarDefinitions = 0;
-            int cNonStarDefinitions = definitions.Count;
-
-            EnsureTempDefinitionsStorage(definitions.Count);
-
-            for (int i = 0; i < definitions.Count; i++)
-            {
-                IDefinitionBase pDef = definitions[i];
-
-                if (pDef.GetUserSizeType() == GridUnitType.Star)
-                {
-                    //if star definition, setup values for distribution calculation
-
-                    m_ppTempDefinitions[cStarDefinitions++] = pDef;
-
-                    // Note that this user value is in star units and not pixel units,
-                    // and thus, there is no need to layout-round.
-                    double starValue = pDef.GetUserSizeValue();
-
-                    if (starValue < double.Epsilon)
-                    {
-                        //cache normalized star value temporary into MeasureSize
-                        pDef.SetMeasureArrangeSize(0.0f);
-                        pDef.SetSizeCache(0.0f);
-                    }
-                    else
-                    {
-                        //clipping by a max to avoid overflow when all the star values are added up.
-                        starValue = Math.Min(starValue, int.MaxValue);
-
-                        //cache normalized star value temporary into MeasureSize
-                        pDef.SetMeasureArrangeSize(starValue);
-
-                        // Note that this user value is used for a computation that is cached
-                        // and then used in the call to CGrid.DistributeStarSpace below for
-                        // further calculations where the final result is layout-rounded as
-                        // appropriate. In other words, it doesn't seem like we need to apply
-                        // layout-rounding just yet.
-                        double maxSize = Math.Min(int.MaxValue,
-                            Math.Max(pDef.GetEffectiveMinSize(), pDef.GetUserMaxSize()));
-                        pDef.SetSizeCache(maxSize / starValue);
                     }
                 }
                 else
                 {
-                    //if not star definition, reduce the size available to star definitions
-                    double userSize = 0.0f;
-                    double userMaxSize = pDef.GetUserMaxSize();
+                    double userSize = 0;
 
-                    m_ppTempDefinitions[--cNonStarDefinitions] = pDef;
-
-                    switch (pDef.GetUserSizeType())
+                    switch (def.UserSize.GridUnitType)
                     {
                         case GridUnitType.Pixel:
-                            userSize = pDef.GetUserSizeValue();
+                            userSize = def.UserSize.Value;
                             break;
+
                         case GridUnitType.Auto:
-                            userSize = pDef.GetEffectiveMinSize();
+                            userSize = def.MinSizeForArrange;
                             break;
                     }
 
-                    pDef.SetMeasureArrangeSize(Math.Max(pDef.GetEffectiveMinSize(), Math.Min(userSize, userMaxSize)));
-                    allPreferredArrangeSize += pDef.GetMeasureArrangeSize();
+                    double userMaxSize;
+
+                    if (def.IsShared)
+                    {
+                        //  overriding userMaxSize effectively prevents squishy-ness.
+                        //  this is a "solution" to avoid shared definitions from been sized to
+                        //  different final size at arrange time, if / when different grids receive
+                        //  different final sizes.
+                        userMaxSize = userSize;
+                    }
+                    else
+                    {
+                        userMaxSize = def.UserMaxSize;
+                    }
+
+                    def.SizeCache = Math.Max(def.MinSizeForArrange, Math.Min(userSize, userMaxSize));
+                    takenSize += def.SizeCache;
                 }
             }
 
-            //distribute available space among star definitions.
-            DistributeStarSpace(m_ppTempDefinitions, cStarDefinitions, finalSize - allPreferredArrangeSize, ref allPreferredArrangeSize);
+            // Phase 3.  Resolve *-items whose proportional sizes are too big or too small.
+            int minCountPhase2 = minCount, maxCountPhase2 = maxCount;
+            double takenStarWeight = 0.0;
+            double remainingAvailableSize = finalSize - takenSize;
+            double remainingStarWeight = totalStarWeight - takenStarWeight;
 
-            //if the combined size of all definitions exceeds the finalSize, take the difference away.
-            if ((allPreferredArrangeSize > finalSize) && Math.Abs(allPreferredArrangeSize - finalSize) > double.Epsilon)
+            Array.Sort(definitionIndices, 0, minCount, new MinRatioIndexComparer<T>(definitions));
+            Array.Sort(definitionIndices, defCount, maxCount, new MaxRatioIndexComparer<T>(definitions));
+
+            while (minCount + maxCount > 0 && remainingAvailableSize > 0.0)
             {
-                //sort definitions to define an order for space distribution.
-                SortDefinitionsForOverflowSizeDistribution(m_ppTempDefinitions, definitions.Count);
-                double sizeToDistribute = finalSize - allPreferredArrangeSize;
-
-                for (int i = 0; i < definitions.Count; i++)
+                // the calculation
+                //            remainingStarWeight = totalStarWeight - takenStarWeight
+                // is subject to catastrophic cancellation if the two terms are nearly equal,
+                // which leads to meaningless results.   Check for that, and recompute from
+                // the remaining definitions.   [This leads to quadratic behavior in really
+                // pathological cases - but they'd never arise in practice.]
+                const double starFactor = 1.0 / 256.0;      // lose more than 8 bits of precision -> recalculate
+                if (remainingStarWeight < totalStarWeight * starFactor)
                 {
-                    double finalSize2 = m_ppTempDefinitions[i].GetMeasureArrangeSize() +
-                                       (sizeToDistribute / (definitions.Count - i));
+                    takenStarWeight = 0.0;
+                    totalStarWeight = 0.0;
 
-                    finalSize2 = Math.Max(finalSize2, m_ppTempDefinitions[i].GetEffectiveMinSize());
-                    finalSize2 = Math.Min(finalSize2, m_ppTempDefinitions[i].GetMeasureArrangeSize());
-                    sizeToDistribute -= (finalSize2 - m_ppTempDefinitions[i].GetMeasureArrangeSize());
-                    m_ppTempDefinitions[i].SetMeasureArrangeSize(finalSize2);
+                    for (int i = 0; i < defCount; ++i)
+                    {
+                        DefinitionBase def = definitions[i];
+                        if (def.UserSize.IsStar && def.MeasureSize > 0.0)
+                        {
+                            totalStarWeight += StarWeight(def, scale);
+                        }
+                    }
+
+                    remainingStarWeight = totalStarWeight - takenStarWeight;
+                }
+
+                double minRatio = (minCount > 0) ? definitions[definitionIndices[minCount - 1]].MeasureSize : double.PositiveInfinity;
+                double maxRatio = (maxCount > 0) ? definitions[definitionIndices[defCount + maxCount - 1]].SizeCache : -1.0;
+
+                // choose the def with larger ratio to the current proportion ("max discrepancy")
+                double proportion = remainingStarWeight / remainingAvailableSize;
+                bool? chooseMin = Choose(minRatio, maxRatio, proportion);
+
+                // if no def was chosen, advance to phase 4;  the current proportion doesn't
+                // conflict with any min or max values.
+                if (!chooseMin.HasValue)
+                {
+                    break;
+                }
+
+                // get the chosen definition and its resolved size
+                int resolvedIndex;
+                DefinitionBase resolvedDef;
+                double resolvedSize;
+                if (chooseMin == true)
+                {
+                    resolvedIndex = definitionIndices[minCount - 1];
+                    resolvedDef = definitions[resolvedIndex];
+                    resolvedSize = resolvedDef.MinSizeForArrange;
+                    --minCount;
+                }
+                else
+                {
+                    resolvedIndex = definitionIndices[defCount + maxCount - 1];
+                    resolvedDef = definitions[resolvedIndex];
+                    resolvedSize = Math.Max(resolvedDef.MinSizeForArrange, resolvedDef.UserMaxSize);
+                    --maxCount;
+                }
+
+                // resolve the chosen def, deduct its contributions from W and S.
+                // Defs resolved in phase 3 are marked by storing the negative of their resolved
+                // size in MeasureSize, to distinguish them from a pending def.
+                takenSize += resolvedSize;
+                resolvedDef.MeasureSize = -resolvedSize;
+                takenStarWeight += StarWeight(resolvedDef, scale);
+                --starCount;
+
+                remainingAvailableSize = finalSize - takenSize;
+                remainingStarWeight = totalStarWeight - takenStarWeight;
+
+                // advance to the next candidate defs, removing ones that have been resolved.
+                // Both counts are advanced, as a def might appear in both lists.
+                while (minCount > 0 && definitions[definitionIndices[minCount - 1]].MeasureSize < 0.0)
+                {
+                    --minCount;
+                    definitionIndices[minCount] = -1;
+                }
+                while (maxCount > 0 && definitions[definitionIndices[defCount + maxCount - 1]].MeasureSize < 0.0)
+                {
+                    --maxCount;
+                    definitionIndices[defCount + maxCount] = -1;
                 }
             }
 
-            //Process definitions in original order to calculate offsets
-            IDefinitionBase currDefinition = definitions[0];
-            currDefinition.SetFinalOffset(0.0f);
+            // decide whether to run Phase2 and Phase3 again.  There are 3 cases:
+            // 1. There is space available, and *-defs remaining.  This is the
+            //      normal case - move on to Phase 4 to allocate the remaining
+            //      space proportionally to the remaining *-defs.
+            // 2. There is space available, but no *-defs.  This implies at least one
+            //      def was resolved as 'max', taking less space than its proportion.
+            //      If there are also 'min' defs, reconsider them - we can give
+            //      them more space.   If not, all the *-defs are 'max', so there's
+            //      no way to use all the available space.
+            // 3. We allocated too much space.   This implies at least one def was
+            //      resolved as 'min'.  If there are also 'max' defs, reconsider
+            //      them, otherwise the over-allocation is an inevitable consequence
+            //      of the given min constraints.
+            // Note that if we return to Phase2, at least one *-def will have been
+            // resolved.  This guarantees we don't run Phase2+3 infinitely often.
+            runPhase2and3 = false;
 
-            for (int i = 0; i < definitions.Count - 1; i++)
+            if (takenSize < finalSize)
             {
-                IDefinitionBase nextDefinition = definitions[i + 1];
-                nextDefinition.SetFinalOffset(currDefinition.GetFinalOffset() + currDefinition.GetMeasureArrangeSize());
-                currDefinition = nextDefinition;
-            }
-        }
-
-        // Accumulates final size information for a given range of definitions.
-        private static double GetFinalSizeForRange<T>(
-            List<T> definitions,
-            int start,
-            int count,
-            double spacing)
-            where T : IDefinitionBase
-        {
-            Debug.Assert((count > 0) && ((start + count) <= definitions.Count));
-
-            double finalSize = 0.0f;
-            int index = start + count - 1;
-
-            do
-            {
-                var def = definitions[index];
-                finalSize += def.GetMeasureArrangeSize();
-            } while (index > 0 && --index >= start);
-
-            finalSize += spacing * (count - 1);
-
-            return finalSize;
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            if (HasGridFlags(GridFlags.DefinitionsChanged))
-            {
-                // A call to .Measure() is required before arranging children
-                // When the DefinitionsChanged is set, the measure is already invalidated
-                return default(Size);  // Returning (0, 0)
-            }
-
-            ArrangeOverrideInProgress = true;
-            try
-            {
-                return InnerArrangeOverride(finalSize);
-            }
-            finally
-            {
-                ArrangeOverrideInProgress = false;
-                m_ppTempDefinitions = null;
-                m_cTempDefinitions = 0;
-            }
-        }
-
-        private Size InnerArrangeOverride(Size finalSize)
-        {
-            Rect innerRect = new Rect(0, 0, finalSize.Width, finalSize.Height);
-
-            if (IsWithoutRowAndColumnDefinitions())
-            {
-                // If this Grid has no user-defined rows or columns, it is possible
-                // to shortcut this ArrangeOverride.
-                List<UIElement> children = InternalChildren;
-                for (int i = 0; i < children.Count; i++)
+                if (DoubleUtil.AreClose(takenSize, finalSize) && minCountPhase2 > 0)
                 {
-                    UIElement currentChild = children[i];
-                    currentChild.Arrange(innerRect);
+                    // if very small (~ 2.2204460492503131e-016) remaining size is available
+                    // adding it to size of smallest width column resolved as 'min'.
+                    DefinitionBase resolvedDef = definitions[definitionIndices[minCountPhase2 - 1]];
+                    resolvedDef.MeasureSize -= (finalSize - takenSize);
+                    takenSize = finalSize;
+                    remainingAvailableSize = 0.0;
+                }
+            }
+
+            if (starCount == 0 && takenSize < finalSize)
+            {
+                // if no *-defs remain and we haven't allocated all the space, reconsider the defs
+                // resolved as 'min'.   Their allocation can be increased to make up the gap.
+                for (int i = minCount; i < minCountPhase2; ++i)
+                {
+                    if (definitionIndices[i] >= 0)
+                    {
+                        DefinitionBase def = definitions[definitionIndices[i]];
+                        def.MeasureSize = 1.0;      // mark as 'not yet resolved'
+                        ++starCount;
+                        runPhase2and3 = true;       // found a candidate, so re-run Phases 2 and 3
+                    }
+                }
+            }
+
+            if (takenSize > finalSize)
+            {
+                // if we've allocated too much space, reconsider the defs
+                // resolved as 'max'.   Their allocation can be decreased to make up the gap.
+                for (int i = maxCount; i < maxCountPhase2; ++i)
+                {
+                    if (definitionIndices[defCount + i] >= 0)
+                    {
+                        DefinitionBase def = definitions[definitionIndices[defCount + i]];
+                        def.MeasureSize = 1.0;      // mark as 'not yet resolved'
+                        ++starCount;
+                        runPhase2and3 = true;    // found a candidate, so re-run Phases 2 and 3
+                    }
+                }
+            }
+        }
+
+        // Phase 4.  Resolve the remaining defs proportionally.
+        starCount = 0;
+        for (int i = 0; i < defCount; ++i)
+        {
+            DefinitionBase def = definitions[i];
+
+            if (def.UserSize.IsStar)
+            {
+                if (def.MeasureSize < 0.0)
+                {
+                    // this def was resolved in phase 3 - fix up its size
+                    def.SizeCache = -def.MeasureSize;
+                }
+                else
+                {
+                    // this def needs resolution, add it to the list, sorted by *-weight
+                    definitionIndices[starCount++] = i;
+                    def.MeasureSize = StarWeight(def, scale);
+                }
+            }
+        }
+
+        if (starCount > 0)
+        {
+            Array.Sort(definitionIndices, 0, starCount, new StarWeightIndexComparer<T>(definitions));
+
+            // compute the partial sums of *-weight, in increasing order of weight
+            // for minimal loss of precision.
+            totalStarWeight = 0.0;
+            for (int i = 0; i < starCount; ++i)
+            {
+                DefinitionBase def = definitions[definitionIndices[i]];
+                totalStarWeight += def.MeasureSize;
+                def.SizeCache = totalStarWeight;
+            }
+
+            // resolve the defs, in decreasing order of weight.
+            for (int i = starCount - 1; i >= 0; --i)
+            {
+                DefinitionBase def = definitions[definitionIndices[i]];
+                double resolvedSize = (def.MeasureSize > 0.0) ? Math.Max(finalSize - takenSize, 0.0) * (def.MeasureSize / def.SizeCache) : 0.0;
+
+                // min and max should have no effect by now, but just in case...
+                resolvedSize = Math.Min(resolvedSize, def.UserMaxSize);
+                resolvedSize = Math.Max(def.MinSizeForArrange, resolvedSize);
+
+                // Use the raw (unrounded) sizes to update takenSize, so that
+                // proportions are computed in the same terms as in phase 3;
+                // this avoids errors arising from min/max constraints.
+                takenSize += resolvedSize;
+                def.SizeCache = resolvedSize;
+            }
+        }
+
+#if false
+        // Phase 5.  Apply layout rounding.  We do this after fully allocating
+        // unrounded sizes, to avoid breaking assumptions in the previous phases
+        if (UseLayoutRounding)
+        {
+            DpiScale dpiScale = GetDpi();
+            double dpi = columns ? dpiScale.DpiScaleX : dpiScale.DpiScaleY;
+            double[] roundingErrors = RoundingErrors;
+            double roundedTakenSize = 0.0;
+
+            // round each of the allocated sizes, keeping track of the deltas
+            for (int i = 0; i < definitions.Count; ++i)
+            {
+                DefinitionBase def = definitions[i];
+                double roundedSize = UIElement.RoundLayoutValue(def.SizeCache, dpi);
+                roundingErrors[i] = (roundedSize - def.SizeCache);
+                def.SizeCache = roundedSize;
+                roundedTakenSize += roundedSize;
+            }
+
+            // The total allocation might differ from finalSize due to rounding
+            // effects.  Tweak the allocations accordingly.
+
+            // Theoretical and historical note.  The problem at hand - allocating
+            // space to columns (or rows) with *-weights, min and max constraints,
+            // and layout rounding - has a long history.  Especially the special
+            // case of 50 columns with min=1 and available space=435 - allocating
+            // seats in the U.S. House of Representatives to the 50 states in
+            // proportion to their population.  There are numerous algorithms
+            // and papers dating back to the 1700's, including the book:
+            // Balinski, M. and H. Young, Fair Representation, Yale University Press, New Haven, 1982.
+            //
+            // One surprising result of all this research is that *any* algorithm
+            // will suffer from one or more undesirable features such as the
+            // "population paradox" or the "Alabama paradox", where (to use our terminology)
+            // increasing the available space by one pixel might actually decrease
+            // the space allocated to a given column, or increasing the weight of
+            // a column might decrease its allocation.   This is worth knowing
+            // in case someone complains about this behavior;  it's not a bug so
+            // much as something inherent to the problem.  Cite the book mentioned
+            // above or one of the 100s of references, and resolve as WontFix.
+            //
+            // Fortunately, our scenarios tend to have a small number of columns (~10 or fewer)
+            // each being allocated a large number of pixels (~50 or greater), and
+            // people don't even notice the kind of 1-pixel anomolies that are
+            // theoretically inevitable, or don't care if they do.  At least they shouldn't
+            // care - no one should be using the results WPF's grid layout to make
+            // quantitative decisions; its job is to produce a reasonable display, not
+            // to allocate seats in Congress.
+            //
+            // Our algorithm is more susceptible to paradox than the one currently
+            // used for Congressional allocation ("Huntington-Hill" algorithm), but
+            // it is faster to run:  O(N log N) vs. O(S * N), where N=number of
+            // definitions, S = number of available pixels.  And it produces
+            // adequate results in practice, as mentioned above.
+            //
+            // To reiterate one point:  all this only applies when layout rounding
+            // is in effect.  When fractional sizes are allowed, the algorithm
+            // behaves as well as possible, subject to the min/max constraints
+            // and precision of floating-point computation.  (However, the resulting
+            // display is subject to anti-aliasing problems.   TANSTAAFL.)
+
+            if (!AreClose(roundedTakenSize, finalSize))
+            {
+                // Compute deltas
+                for (int i = 0; i < definitions.Count; ++i)
+                {
+                    definitionIndices[i] = i;
+                }
+
+                // Sort rounding errors
+                Array.Sort(definitionIndices, 0, definitions.Count, new RoundingErrorIndexComparer(roundingErrors));
+                double adjustedSize = roundedTakenSize;
+                double dpiIncrement = 1.0 / dpi;
+
+                if (roundedTakenSize > finalSize)
+                {
+                    int i = definitions.Count - 1;
+                    while ((adjustedSize > finalSize && !AreClose(adjustedSize, finalSize)) && i >= 0)
+                    {
+                        DefinitionBase definition = definitions[definitionIndices[i]];
+                        double final = definition.SizeCache - dpiIncrement;
+                        final = Math.Max(final, definition.MinSizeForArrange);
+                        if (final < definition.SizeCache)
+                        {
+                            adjustedSize -= dpiIncrement;
+                        }
+                        definition.SizeCache = final;
+                        i--;
+                    }
+                }
+                else if (roundedTakenSize < finalSize)
+                {
+                    int i = 0;
+                    while ((adjustedSize < finalSize && !AreClose(adjustedSize, finalSize)) && i < definitions.Count)
+                    {
+                        DefinitionBase definition = definitions[definitionIndices[i]];
+                        double final = definition.SizeCache + dpiIncrement;
+                        final = Math.Max(final, definition.MinSizeForArrange);
+                        if (final > definition.SizeCache)
+                        {
+                            adjustedSize += dpiIncrement;
+                        }
+                        definition.SizeCache = final;
+                        i++;
+                    }
+                }
+            }
+        }
+#endif
+
+        // Phase 6.  Compute final offsets
+        definitions[0].FinalOffset = 0.0;
+        for (int i = 0; i < definitions.Count; ++i)
+        {
+            definitions[(i + 1) % definitions.Count].FinalOffset = definitions[i].FinalOffset + definitions[i].SizeCache;
+        }
+    }
+
+    /// <summary>
+    /// Choose the ratio with maximum discrepancy from the current proportion.
+    /// Returns:
+    ///     true    if proportion fails a min constraint but not a max, or
+    ///                 if the min constraint has higher discrepancy
+    ///     false   if proportion fails a max constraint but not a min, or
+    ///                 if the max constraint has higher discrepancy
+    ///     null    if proportion doesn't fail a min or max constraint
+    /// The discrepancy is the ratio of the proportion to the max- or min-ratio.
+    /// When both ratios hit the constraint,  minRatio &lt; proportion &lt; maxRatio,
+    /// and the minRatio has higher discrepancy if
+    ///         (proportion / minRatio) &gt; (maxRatio / proportion)
+    /// </summary>
+    private static bool? Choose(double minRatio, double maxRatio, double proportion)
+    {
+        if (minRatio < proportion)
+        {
+            if (maxRatio > proportion)
+            {
+                // compare proportion/minRatio : maxRatio/proportion, but
+                // do it carefully to avoid floating-point overflow or underflow
+                // and divide-by-0.
+                double minPower = Math.Floor(Math.Log(minRatio, 2.0));
+                double maxPower = Math.Floor(Math.Log(maxRatio, 2.0));
+                double f = Math.Pow(2.0, Math.Floor((minPower + maxPower) / 2.0));
+                if ((proportion / f) * (proportion / f) > (minRatio / f) * (maxRatio / f))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
             else
             {
-                double rowSpacing = 0;
-                double columnSpacing = 0;
-                double combinedRowSpacing = rowSpacing * (m_pRows.Count - 1);
-                double combinedColumnSpacing = columnSpacing * (m_pColumns.Count - 1);
+                return true;
+            }
+        }
+        else if (maxRatio > proportion)
+        {
+            return false;
+        }
 
-                // Given an effective final size, compute the offsets and sizes of each
-                // row and column, including the resdistribution of Star sizes based on
-                // the new width and height.
-                SetFinalSize(m_pRows, (double)innerRect.Height - combinedRowSpacing);
-                SetFinalSize(m_pColumns, (double)innerRect.Width - combinedColumnSpacing);
+        return null;
+    }
 
-                List<UIElement> children = InternalChildren;
-                for (int i = 0; i < children.Count; i++)
+    /// <summary>
+    /// Calculates final (aka arrange) size for given range.
+    /// </summary>
+    /// <param name="definitions">Array of definitions to process.</param>
+    /// <param name="start">Start of the range.</param>
+    /// <param name="count">Number of items in the range.</param>
+    /// <returns>Final size.</returns>
+    private double GetFinalSizeForRange<T>(
+        List<T> definitions,
+        int start,
+        int count)
+        where T : DefinitionBase
+    {
+        double size = 0;
+        int i = start + count - 1;
+
+        do
+        {
+            size += definitions[i].SizeCache;
+        } while (--i >= start);
+
+        return size;
+    }
+
+    /// <summary>
+    /// Clears dirty state for the grid and its columns / rows
+    /// </summary>
+    private void SetValid()
+    {
+        if (ExtData is ExtendedData extData)
+        {
+            //                for (int i = 0; i < PrivateColumnCount; ++i) DefinitionsU[i].SetValid ();
+            //                for (int i = 0; i < PrivateRowCount; ++i) DefinitionsV[i].SetValid ();
+
+            if (extData.TempDefinitions is not null)
+            {
+                //  TempDefinitions has to be cleared to avoid "memory leaks"
+                Array.Clear(extData.TempDefinitions, 0, Math.Max(DefinitionsU.Count, DefinitionsV.Count));
+                extData.TempDefinitions = null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// SetFlags is used to set or unset one or multiple
+    /// flags on the object.
+    /// </summary>
+    private void SetFlags(bool value, Flags flags) => _flags = value ? (_flags | flags) : (_flags & (~flags));
+
+    /// <summary>
+    /// CheckFlagsAnd returns <c>true</c> if all the flags in the
+    /// given bitmask are set on the object.
+    /// </summary>
+    private bool CheckFlagsAnd(Flags flags) => (_flags & flags) == flags;
+
+    /// <summary>
+    /// <see cref="PropertyMetadata.PropertyChangedCallback"/>
+    /// </summary>
+    private static void OnShowGridLinesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        Grid grid = (Grid)d;
+
+#if false
+        if (grid.ExtData is not null    // trivial grid is 1 by 1. there is no grid lines anyway
+            && grid.ListenToNotifications)
+        {
+            grid.InvalidateVisual();
+        }
+#endif
+
+        grid.SetFlags((bool)e.NewValue, Flags.ShowGridLinesPropertyValue);
+    }
+
+    /// <summary>
+    /// <see cref="PropertyMetadata.PropertyChangedCallback"/>
+    /// </summary>
+    private static void OnCellAttachedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is UIElement child &&
+            VisualTreeHelper.GetParent(child) is Grid grid &&
+            grid.ExtData is not null &&
+            grid.ListenToNotifications)
+        {
+            grid.CellsStructureDirty = true;
+            grid.InvalidateMeasure();
+        }
+    }
+
+    /// <summary>
+    /// <see cref="DependencyProperty.ValidateValueCallback"/>
+    /// </summary>
+    private static bool IsIntValueNotNegative(object value) => (int)value >= 0;
+
+    /// <summary>
+    /// <see cref="DependencyProperty.ValidateValueCallback"/>
+    /// </summary>
+    private static bool IsIntValueGreaterThanZero(object value) => (int)value > 0;
+
+    /// <summary>
+    /// Helper for Comparer methods.
+    /// </summary>
+    /// <returns>
+    /// true iff one or both of x and y are null, in which case result holds
+    /// the relative sort order.
+    /// </returns>
+    private static bool CompareNullRefs(object x, object y, out int result)
+    {
+        result = 2;
+
+        if (x is null)
+        {
+            if (y is null)
+            {
+                result = 0;
+            }
+            else
+            {
+                result = -1;
+            }
+        }
+        else
+        {
+            if (y is null)
+            {
+                result = 1;
+            }
+        }
+
+        return result != 2;
+    }
+
+    /// <summary>
+    /// Private version returning array of column definitions.
+    /// </summary>
+    private List<ColumnDefinition> DefinitionsU => ExtData.DefinitionsU;
+
+    /// <summary>
+    /// Private version returning array of row definitions.
+    /// </summary>
+    private List<RowDefinition> DefinitionsV => ExtData.DefinitionsV;
+
+    /// <summary>
+    /// Helper accessor to layout time array of definitions.
+    /// </summary>
+    private DefinitionBase[] TempDefinitions
+    {
+        get
+        {
+            ExtendedData extData = ExtData;
+            int requiredLength = Math.Max(DefinitionsU.Count, DefinitionsV.Count) * 2;
+
+            if (extData.TempDefinitions is null || extData.TempDefinitions.Length < requiredLength)
+            {
+                if (Thread.GetData(s_tempDefinitionsDataSlot) is not WeakReference<DefinitionBase[]> tempDefinitionsWeakRef)
                 {
-                    UIElement currentChild = children[i];
-                    IDefinitionBase row = GetRowNoRef(currentChild);
-                    IDefinitionBase column = GetColumnNoRef(currentChild);
-                    int columnIndex = GetColumnIndex(currentChild);
-                    int rowIndex = GetRowIndex(currentChild);
-
-                    Rect arrangeRect = new Rect();
-                    arrangeRect.X = column.GetFinalOffset() + innerRect.X + (columnSpacing * columnIndex);
-                    arrangeRect.Y = row.GetFinalOffset() + innerRect.Y + (rowSpacing * rowIndex);
-                    arrangeRect.Width = GetFinalSizeForRange(m_pColumns, columnIndex, GetColumnSpanAdjusted(currentChild), columnSpacing);
-                    arrangeRect.Height = GetFinalSizeForRange(m_pRows, rowIndex, GetRowSpanAdjusted(currentChild), rowSpacing);
-
-                    currentChild.Arrange(arrangeRect);
+                    extData.TempDefinitions = new DefinitionBase[requiredLength];
+                    Thread.SetData(s_tempDefinitionsDataSlot, new WeakReference<DefinitionBase[]>(extData.TempDefinitions));
+                }
+                else
+                {
+                    if (!tempDefinitionsWeakRef.TryGetTarget(out extData.TempDefinitions) || extData.TempDefinitions.Length < requiredLength)
+                    {
+                        extData.TempDefinitions = new DefinitionBase[requiredLength];
+                        tempDefinitionsWeakRef.SetTarget(extData.TempDefinitions);
+                    }
                 }
             }
+            return extData.TempDefinitions;
+        }
+    }
 
-            Size newFinalSize = finalSize;
+    /// <summary>
+    /// Helper accessor to definition indices.
+    /// </summary>
+    private int[] DefinitionIndices
+    {
+        get
+        {
+            int requiredLength = Math.Max(Math.Max(DefinitionsU.Count, DefinitionsV.Count), 1) * 2;
 
-            return newFinalSize;
+            if (_definitionIndices is null || _definitionIndices.Length < requiredLength)
+            {
+                _definitionIndices = new int[requiredLength];
+            }
+
+            return _definitionIndices;
+        }
+    }
+
+#if false
+    /// <summary>
+    /// Helper accessor to rounding errors.
+    /// </summary>
+    private double[] RoundingErrors
+    {
+        get
+        {
+            int requiredLength = Math.Max(DefinitionsU.Count, DefinitionsV.Count);
+
+            if (_roundingErrors is null && requiredLength == 0)
+            {
+                _roundingErrors = new double[1];
+            }
+            else if (_roundingErrors is null || _roundingErrors.Length < requiredLength)
+            {
+                _roundingErrors = new double[requiredLength];
+            }
+            return _roundingErrors;
+        }
+    }
+#endif
+
+    /// <summary>
+    /// Private version returning array of cells.
+    /// </summary>
+    private CellCache[] PrivateCells => ExtData.CellCachesCollection;
+
+    /// <summary>
+    /// Convenience accessor to ValidCellsStructure bit flag.
+    /// </summary>
+    private bool CellsStructureDirty
+    {
+        get => !CheckFlagsAnd(Flags.ValidCellsStructure);
+        set => SetFlags(!value, Flags.ValidCellsStructure);
+    }
+
+    /// <summary>
+    /// Convenience accessor to ListenToNotifications bit flag.
+    /// </summary>
+    private bool ListenToNotifications
+    {
+        get => CheckFlagsAnd(Flags.ListenToNotifications);
+        set => SetFlags(value, Flags.ListenToNotifications);
+    }
+
+    /// <summary>
+    /// Convenience accessor to SizeToContentU bit flag.
+    /// </summary>
+    private bool SizeToContentU
+    {
+        get => CheckFlagsAnd(Flags.SizeToContentU);
+        set => SetFlags(value, Flags.SizeToContentU);
+    }
+
+    /// <summary>
+    /// Convenience accessor to SizeToContentV bit flag.
+    /// </summary>
+    private bool SizeToContentV
+    {
+        get => CheckFlagsAnd(Flags.SizeToContentV);
+        set => SetFlags(value, Flags.SizeToContentV);
+    }
+
+    /// <summary>
+    /// Convenience accessor to HasStarCellsU bit flag.
+    /// </summary>
+    private bool HasStarCellsU
+    {
+        get => CheckFlagsAnd(Flags.HasStarCellsU);
+        set => SetFlags(value, Flags.HasStarCellsU);
+    }
+
+    /// <summary>
+    /// Convenience accessor to HasStarCellsV bit flag.
+    /// </summary>
+    private bool HasStarCellsV
+    {
+        get => CheckFlagsAnd(Flags.HasStarCellsV);
+        set => SetFlags(value, Flags.HasStarCellsV);
+    }
+
+    /// <summary>
+    /// Convenience accessor to HasGroup3CellsInAutoRows bit flag.
+    /// </summary>
+    private bool HasGroup3CellsInAutoRows
+    {
+        get => CheckFlagsAnd(Flags.HasGroup3CellsInAutoRows);
+        set => SetFlags(value, Flags.HasGroup3CellsInAutoRows);
+    }
+
+    /// <summary>
+    /// fp version of <c>d == 0</c>.
+    /// </summary>
+    /// <param name="d">Value to check.</param>
+    /// <returns><c>true</c> if d == 0.</returns>
+    private static bool IsZero(double d) => Math.Abs(d) < c_epsilon;
+
+    /// <summary>
+    /// fp version of <c>d1 == d2</c>
+    /// </summary>
+    /// <param name="d1">First value to compare</param>
+    /// <param name="d2">Second value to compare</param>
+    /// <returns><c>true</c> if d1 == d2</returns>
+    private static bool AreClose(double d1, double d2) => Math.Abs(d1 - d2) < c_epsilon;
+
+    /// <summary>
+    /// Returns reference to extended data bag.
+    /// </summary>
+    private ExtendedData ExtData => _data;
+
+    /// <summary>
+    /// Returns *-weight, adjusted for scale computed during Phase 1
+    /// </summary>
+    private static double StarWeight(DefinitionBase def, double scale)
+    {
+        if (scale < 0.0)
+        {
+            // if one of the *-weights is Infinity, adjust the weights by mapping
+            // Infinty to 1.0 and everything else to 0.0:  the infinite items share the
+            // available space equally, everyone else gets nothing.
+            return double.IsPositiveInfinity(def.UserSize.Value) ? 1.0 : 0.0;
+        }
+        else
+        {
+            return def.UserSize.Value * scale;
+        }
+    }
+
+    private ExtendedData _data;                             //  extended data instantiated on demand, for non-trivial case handling only
+    private Flags _flags;                                   //  grid validity / property caches dirtiness flags
+
+    // Keeps track of definition indices.
+    private int[] _definitionIndices;
+
+#if false
+    // Stores unrounded values and rounding errors during layout rounding.
+    private double[] _roundingErrors;
+#endif
+
+    private const double c_epsilon = 1e-5;                  //  used in fp calculations
+    private const int c_layoutLoopMaxCount = 5;             // 5 is an arbitrary constant chosen to end the measure loop
+    private static readonly LocalDataStoreSlot s_tempDefinitionsDataSlot = Thread.AllocateDataSlot();
+    private static readonly Comparer<DefinitionBase> s_spanPreferredDistributionOrderComparer = Comparer<DefinitionBase>.Create(SpanPreferredDistributionOrderComparer);
+    private static readonly Comparer<DefinitionBase> s_spanMaxDistributionOrderComparer = Comparer<DefinitionBase>.Create(SpanMaxDistributionOrderComparer);
+    private static readonly Comparer<DefinitionBase> s_minRatioComparer = Comparer<DefinitionBase>.Create(MinRatioComparer);
+    private static readonly Comparer<DefinitionBase> s_maxRatioComparer = Comparer<DefinitionBase>.Create(MaxRatioComparer);
+    private static readonly Comparer<DefinitionBase> s_starWeightComparer = Comparer<DefinitionBase>.Create(StarWeightComparer);
+
+    /// <summary>
+    /// Extended data instantiated on demand, when grid handles non-trivial case.
+    /// </summary>
+    private sealed class ExtendedData
+    {
+        internal ColumnDefinitionCollection ColumnDefinitions;  //  collection of column definitions (logical tree support)
+        internal RowDefinitionCollection RowDefinitions;        //  collection of row definitions (logical tree support)
+        internal List<ColumnDefinition> DefinitionsU;                 //  collection of column definitions used during calc
+        internal List<RowDefinition> DefinitionsV;                 //  collection of row definitions used during calc
+        internal CellCache[] CellCachesCollection;              //  backing store for logical children
+        internal int CellGroup1;                                //  index of the first cell in first cell group
+        internal int CellGroup2;                                //  index of the first cell in second cell group
+        internal int CellGroup3;                                //  index of the first cell in third cell group
+        internal int CellGroup4;                                //  index of the first cell in forth cell group
+        internal DefinitionBase[] TempDefinitions;              //  temporary array used during layout for various purposes
+                                                                //  TempDefinitions.Length == Max(definitionsU.Length, definitionsV.Length)
+    }
+
+    /// <summary>
+    /// Grid validity / property caches dirtiness flags
+    /// </summary>
+    [Flags]
+    private enum Flags
+    {
+        //
+        //  the foolowing flags let grid tracking dirtiness in more granular manner:
+        //  * Valid???Structure flags indicate that elements were added or removed.
+        //  * Valid???Layout flags indicate that layout time portion of the information
+        //    stored on the objects should be updated.
+        //
+        ValidDefinitionsUStructure = 0x00000001,
+        ValidDefinitionsVStructure = 0x00000002,
+        ValidCellsStructure = 0x00000004,
+
+        //
+        //  boolean properties state
+        //
+        ShowGridLinesPropertyValue = 0x00000100,   //  show grid lines ?
+
+        //
+        //  boolean flags
+        //
+        ListenToNotifications = 0x00001000,   //  "0" when all notifications are ignored
+        SizeToContentU = 0x00002000,   //  "1" if calculating to content in U direction
+        SizeToContentV = 0x00004000,   //  "1" if calculating to content in V direction
+        HasStarCellsU = 0x00008000,   //  "1" if at least one cell belongs to a Star column
+        HasStarCellsV = 0x00010000,   //  "1" if at least one cell belongs to a Star row
+        HasGroup3CellsInAutoRows = 0x00020000,   //  "1" if at least one cell of group 3 belongs to an Auto row
+        MeasureOverrideInProgress = 0x00040000,   //  "1" while in the context of Grid.MeasureOverride
+        ArrangeOverrideInProgress = 0x00080000,   //  "1" while in the context of Grid.ArrangeOverride
+    }
+
+    /// <summary>
+    /// LayoutTimeSizeType is used internally and reflects layout-time size type.
+    /// </summary>
+    [Flags]
+    internal enum LayoutTimeSizeType : byte
+    {
+        None = 0x00,
+        Pixel = 0x01,
+        Auto = 0x02,
+        Star = 0x04,
+    }
+
+    /// <summary>
+    /// CellCache stored calculated values of
+    /// 1. attached cell positioning properties;
+    /// 2. size type;
+    /// 3. index of a next cell in the group;
+    /// </summary>
+    private struct CellCache
+    {
+        internal int ColumnIndex;
+        internal int RowIndex;
+        internal int ColumnSpan;
+        internal int RowSpan;
+        internal LayoutTimeSizeType SizeTypeU;
+        internal LayoutTimeSizeType SizeTypeV;
+        internal int Next;
+        internal bool IsStarU => (SizeTypeU & LayoutTimeSizeType.Star) != 0;
+        internal bool IsAutoU => (SizeTypeU & LayoutTimeSizeType.Auto) != 0;
+        internal bool IsStarV => (SizeTypeV & LayoutTimeSizeType.Star) != 0;
+        internal bool IsAutoV => (SizeTypeV & LayoutTimeSizeType.Auto) != 0;
+    }
+
+    /// <summary>
+    /// Helper class for representing a key for a span in hashtable.
+    /// </summary>
+    private readonly struct SpanKey
+    {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="start">Starting index of the span.</param>
+        /// <param name="count">Span count.</param>
+        /// <param name="u"><c>true</c> for columns; <c>false</c> for rows.</param>
+        internal SpanKey(int start, int count, bool u)
+        {
+            Start = start;
+            Count = count;
+            U = u;
+        }
+
+        /// <summary>
+        /// <see cref="object.GetHashCode"/>
+        /// </summary>
+        public override int GetHashCode()
+        {
+            int hash = Start ^ (Count << 2);
+
+            if (U) hash &= 0x7ffffff;
+            else hash |= 0x8000000;
+
+            return hash;
+        }
+
+        /// <summary>
+        /// <see cref="object.Equals(object)"/>
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            return obj is SpanKey sk &&
+                   sk.Start == Start &&
+                   sk.Count == Count &&
+                   sk.U == U;
+        }
+
+        /// <summary>
+        /// Returns start index of the span.
+        /// </summary>
+        internal readonly int Start;
+
+        /// <summary>
+        /// Returns span count.
+        /// </summary>
+        internal readonly int Count;
+
+        /// <summary>
+        /// Returns <c>true</c> if this is a column span.
+        /// <c>false</c> if this is a row span.
+        /// </summary>
+        internal readonly bool U;
+    }
+
+    private static int SpanPreferredDistributionOrderComparer(DefinitionBase x, DefinitionBase y)
+    {
+        if (!CompareNullRefs(x, y, out int result))
+        {
+            if (x.UserSize.IsAuto)
+            {
+                if (y.UserSize.IsAuto)
+                {
+                    result = x.MinSize.CompareTo(y.MinSize);
+                }
+                else
+                {
+                    result = -1;
+                }
+            }
+            else
+            {
+                if (y.UserSize.IsAuto)
+                {
+                    result = +1;
+                }
+                else
+                {
+                    result = x.PreferredSize.CompareTo(y.PreferredSize);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static int SpanMaxDistributionOrderComparer(DefinitionBase x, DefinitionBase y)
+    {
+        if (!CompareNullRefs(x, y, out int result))
+        {
+            if (x.UserSize.IsAuto)
+            {
+                if (y.UserSize.IsAuto)
+                {
+                    result = x.SizeCache.CompareTo(y.SizeCache);
+                }
+                else
+                {
+                    result = +1;
+                }
+            }
+            else
+            {
+                if (y.UserSize.IsAuto)
+                {
+                    result = -1;
+                }
+                else
+                {
+                    result = x.SizeCache.CompareTo(y.SizeCache);
+                }
+            }
+        }
+
+        return result;
+    }
+
+#if false
+    private sealed class RoundingErrorIndexComparer : IComparer<int>
+    {
+        private readonly double[] _errors;
+
+        internal RoundingErrorIndexComparer(double[] errors)
+        {
+            Debug.Assert(errors is not null);
+            _errors = errors;
+        }
+
+        public int Compare(int x, int y) => errors[x].CompareTo(errors[y]);
+    }
+#endif
+
+    /// <summary>
+    /// Sort by w/min (stored in MeasureSize), descending.
+    /// We query the list from the back, i.e. in ascending order of w/min.
+    /// </summary>
+    private static int MinRatioComparer(DefinitionBase x, DefinitionBase y)
+    {
+        if (!CompareNullRefs(y, x, out int result))
+        {
+            result = y.MeasureSize.CompareTo(x.MeasureSize);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Sort by w/max (stored in SizeCache), ascending.
+    /// We query the list from the back, i.e. in descending order of w/max.
+    /// </summary>
+    private static int MaxRatioComparer(DefinitionBase x, DefinitionBase y)
+    {
+        if (!CompareNullRefs(x, y, out int result))
+        {
+            result = x.SizeCache.CompareTo(y.SizeCache);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Sort by *-weight (stored in MeasureSize), ascending.
+    /// </summary>
+    private static int StarWeightComparer(DefinitionBase x, DefinitionBase y)
+    {
+        if (!CompareNullRefs(x, y, out int result))
+        {
+            result = x.MeasureSize.CompareTo(y.MeasureSize);
+        }
+
+        return result;
+    }
+
+    private sealed class MinRatioIndexComparer<T> : IComparer<int> where T : DefinitionBase
+    {
+        private readonly List<T> _definitions;
+
+        internal MinRatioIndexComparer(List<T> definitions)
+        {
+            Debug.Assert(definitions is not null);
+            _definitions = definitions;
+        }
+
+        public int Compare(int x, int y)
+        {
+            DefinitionBase definitionX = _definitions[x];
+            DefinitionBase definitionY = _definitions[y];
+
+            if (!CompareNullRefs(definitionY, definitionX, out int result))
+            {
+                result = definitionY.MeasureSize.CompareTo(definitionX.MeasureSize);
+            }
+
+            return result;
+        }
+    }
+
+    private sealed class MaxRatioIndexComparer<T> : IComparer<int> where T : DefinitionBase
+    {
+        private readonly List<T> _definitions;
+
+        internal MaxRatioIndexComparer(List<T> definitions)
+        {
+            Debug.Assert(definitions is not null);
+            _definitions = definitions;
+        }
+
+        public int Compare(int x, int y)
+        {
+            DefinitionBase definitionX = _definitions[x];
+            DefinitionBase definitionY = _definitions[y];
+
+            if (!CompareNullRefs(definitionX, definitionY, out int result))
+            {
+                result = definitionX.SizeCache.CompareTo(definitionY.SizeCache);
+            }
+
+            return result;
+        }
+    }
+
+    private sealed class StarWeightIndexComparer<T> : IComparer<int> where T : DefinitionBase
+    {
+        private readonly List<T> _definitions;
+
+        internal StarWeightIndexComparer(List<T> definitions)
+        {
+            Debug.Assert(definitions is not null);
+            _definitions = definitions;
+        }
+
+        public int Compare(int x, int y)
+        {
+            DefinitionBase definitionX = _definitions[x];
+            DefinitionBase definitionY = _definitions[y];
+
+            if (!CompareNullRefs(definitionX, definitionY, out int result))
+            {
+                result = definitionX.MeasureSize.CompareTo(definitionY.MeasureSize);
+            }
+
+            return result;
         }
     }
 }

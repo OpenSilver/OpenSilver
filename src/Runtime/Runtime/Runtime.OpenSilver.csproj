@@ -24,7 +24,6 @@
     <Compile Include="Core\Events\DOMEventManager.cs" />
     <Compile Include="Core\Main\CopyOnWriteList.cs" />
     <Compile Include="OpenSilver\Features.cs" />
-    <Compile Include="OpenSilver\Buffers\StackVector.cs" />
     <Compile Include="OpenSilver\Internal\Controls\IGeneratorHost.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ImageManager.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ScrollExtensions.cs" />
@@ -442,7 +441,7 @@
     <Compile Include="System.Windows.Controls\RangeObservableCollection.cs" />
     <Compile Include="System.Windows.Controls\ContentChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\ContentChangedEventHandler.cs" />
-    <Compile Include="System.Windows.Controls\IDefinitionBase.cs" />
+    <Compile Include="System.Windows.Controls\DefinitionBase.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\MediaElement.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
