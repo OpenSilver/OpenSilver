@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using OpenSilver.Internal.Data;
 
@@ -93,7 +94,7 @@ internal sealed class AnimationClock<TValue> : AnimationClock
                 switch (svi.type)
                 {
                     case PropertyNodeType.Property:
-                        DependencyProperty dp = DPFromName(svi.propertyName, target.GetType());
+                        DependencyProperty dp = DPFromName(svi.propertyName, svi.typeName, target.GetType());
                         var value = AsDependencyObject(target.GetValue(dp));
                         if (i == 0 && value is ICloneOnAnimation<DependencyObject> cloneable && !cloneable.IsClone)
                         {
@@ -122,7 +123,7 @@ internal sealed class AnimationClock<TValue> : AnimationClock
             }
 
             _target = target;
-            _dp = DPFromName(parts[parts.Count - 1].propertyName, target.GetType());
+            _dp = DPFromName(parts[parts.Count - 1].propertyName, parts[parts.Count - 1].typeName, target.GetType());
             _initialValue = (TValue)_target.GetValue(_dp);
             return;
         }
@@ -134,7 +135,32 @@ internal sealed class AnimationClock<TValue> : AnimationClock
         o as DependencyObject ??
         throw new InvalidOperationException($"'{o}' must be a DependencyObject.");
 
-    private static DependencyProperty DPFromName(string name, Type ownerType) =>
-        DependencyProperty.FromName(name, ownerType) ??
-        throw new InvalidOperationException($"No DependencyProperty named '{name}' could be found in '{ownerType}'.");
+    private static DependencyProperty DPFromName(string propertyName, string typeName, Type ownerType) =>
+        GetKnownProperty(propertyName, typeName) ??
+        DependencyProperty.FromName(propertyName, ownerType) ??
+        throw new InvalidOperationException($"No DependencyProperty named '{propertyName}' could be found in '{ownerType}'.");
+
+    // Workaround to resolve some common attached properties
+    private static DependencyProperty GetKnownProperty(string propertyName, string typeName)
+    {
+        return typeName switch
+        {
+            nameof(Grid) => propertyName switch
+            {
+                "Row" => Grid.RowProperty,
+                "Column" => Grid.ColumnProperty,
+                "RowSpan" => Grid.RowSpanProperty,
+                "ColumnSpan" => Grid.ColumnSpanProperty,
+                _ => null,
+            },
+            nameof(Canvas) => propertyName switch
+            {
+                "Left" => Canvas.LeftProperty,
+                "Top" => Canvas.TopProperty,
+                "ZIndex" => Canvas.ZIndexProperty,
+                _ => null,
+            },
+            _ => null,
+        };
+    }
 }

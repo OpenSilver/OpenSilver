@@ -87,13 +87,14 @@ namespace System.Windows
             var parser = new PropertyPathParser(path, false);
             while (true)
             {
-                switch (parser.Step(out _, out string property, out string index))
+                switch (parser.Step(out string typeName, out string property, out string index))
                 {
                     case PropertyNodeType.Property:
                     case PropertyNodeType.AttachedProperty:
                         steps.Add(new SourceValueInfo
                         {
                             type = PropertyNodeType.Property,
+                            typeName = typeName,
                             propertyName = property,
                         });
                         break;
@@ -120,6 +121,7 @@ namespace System.Windows
     internal struct SourceValueInfo
     {
         public PropertyNodeType type;
+        public string typeName;
         public string propertyName;
         public string param; // parameter for indexer
     }
