@@ -75,6 +75,50 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Returns the value of the <see cref="CharacterSpacing"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object from which to retrieve the value of the <see cref="CharacterSpacing"/> attached property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="CharacterSpacing"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static int GetCharacterSpacing(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (int)element.GetValue(CharacterSpacingProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="CharacterSpacing"/> attached property on a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object on which to set the value of the <see cref="CharacterSpacing"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetCharacterSpacing(DependencyObject element, int value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(CharacterSpacingProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="FontFamily"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
@@ -98,6 +142,50 @@ namespace System.Windows.Controls
         {
             get => (FontFamily)GetValue(FontFamilyProperty);
             set => SetValueInternal(FontFamilyProperty, value);
+        }
+
+        /// <summary>
+        /// Returns the value of the <see cref="FontFamily"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to retrieve the value of the <see cref="FontFamily"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="FontFamily"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static FontFamily GetFontFamily(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (FontFamily)element.GetValue(FontFamilyProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="FontFamily"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to set the value of the <see cref="FontFamily"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetFontFamily(DependencyObject element, FontFamily value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(FontFamilyProperty, value);
         }
 
         private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -126,6 +214,50 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Returns the value of the <see cref="FontSize"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to retrieve the value of the <see cref=" FontSize"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="FontSize"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static double GetFontSize(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (double)element.GetValue(FontSizeProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="FontSize"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to set the value of the <see cref="FontSize"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetFontSize(DependencyObject element, double value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(FontSizeProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="FontStretch"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
@@ -145,6 +277,52 @@ namespace System.Windows.Controls
         {
             get => (FontStretch)GetValue(FontStretchProperty);
             set => SetValueInternal(FontStretchProperty, value);
+        }
+
+        /// <summary>
+        /// Returns the value of the <see cref="FontStretch"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to retrieve the value of the <see cref="FontStretch"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="FontStretch"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        [OpenSilver.NotImplemented]
+        public static FontStretch GetFontStretch(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (FontStretch)element.GetValue(FontStretchProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="FontStretch"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to set the value of the <see cref="FontStretch"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        [OpenSilver.NotImplemented]
+        public static void SetFontStretch(DependencyObject element, FontStretch value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(FontStretchProperty, value);
         }
 
         /// <summary>
@@ -169,6 +347,50 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Returns the value of the <see cref="FontStyle"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to retrieve the value of the <see cref="FontStyle"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="FontStyle"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static FontStyle GetFontStyle(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (FontStyle)element.GetValue(FontStyleProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="FontStyle"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to set the value of the <see cref="FontStyle"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetFontStyle(DependencyObject element, FontStyle value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(FontStyleProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="FontWeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontWeightProperty =
@@ -189,6 +411,50 @@ namespace System.Windows.Controls
         {
             get => (FontWeight)GetValue(FontWeightProperty);
             set => SetValueInternal(FontWeightProperty, value);
+        }
+
+        /// <summary>
+        /// Returns the value of the <see cref="FontWeight"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to retrieve the value of the <see cref="FontWeight"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="FontWeight"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static FontWeight GetFontWeight(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (FontWeight)element.GetValue(FontWeightProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="FontWeight"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to set the value of the <see cref="FontWeight"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetFontWeight(DependencyObject element, FontWeight value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(FontWeightProperty, value);
         }
 
         /// <summary>
@@ -217,6 +483,50 @@ namespace System.Windows.Controls
         {
             get => (Brush)GetValue(ForegroundProperty);
             set => SetValueInternal(ForegroundProperty, value);
+        }
+
+        /// <summary>
+        /// Returns the value of the <see cref="Foreground"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to retrieve the value of the <see cref="Foreground"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="Foreground"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static Brush GetForeground(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (Brush)element.GetValue(ForegroundProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="Foreground"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object for which to set the value of the <see cref="Foreground"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetForeground(DependencyObject element, Brush value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(ForegroundProperty, value);
         }
 
         private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -278,6 +588,53 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Returns the value of the <see cref="LineHeight"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object from which to retrieve the value of the <see cref="LineHeight"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="LineHeight"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static double GetLineHeight(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (double)element.GetValue(LineHeightProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="LineHeight"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object on which to set the value of the <see cref="LineHeight"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// value is negative.
+        /// </exception>
+        public static void SetLineHeight(DependencyObject element, double value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(LineHeightProperty, value);
+        }
+
+        /// <summary>
         /// Identifies the <see cref="LineStackingStrategy"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty LineStackingStrategyProperty =
@@ -302,6 +659,50 @@ namespace System.Windows.Controls
         {
             get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
             set => SetValueInternal(LineStackingStrategyProperty, value);
+        }
+
+        /// <summary>
+        /// Returns the value of the <see cref="LineStackingStrategy"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object from which to retrieve the value of the <see cref="LineStackingStrategy"/> attached property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="LineStackingStrategy"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static LineStackingStrategy GetLineStackingStrategy(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (LineStackingStrategy)element.GetValue(LineStackingStrategyProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="LineStackingStrategy"/> attached property on a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object on which to set the value of the <see cref="LineStackingStrategy"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetLineStackingStrategy(DependencyObject element, LineStackingStrategy value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(LineStackingStrategyProperty, value);
         }
 
         /// <summary>
@@ -358,6 +759,50 @@ namespace System.Windows.Controls
         {
             get => (TextAlignment)GetValue(TextAlignmentProperty);
             set => SetValueInternal(TextAlignmentProperty, value);
+        }
+
+        /// <summary>
+        /// Returns the value of the <see cref="TextAlignment"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object from which to retrieve the value of the <see cref="TextAlignment"/> property.
+        /// </param>
+        /// <returns>
+        /// The current value of the <see cref="TextAlignment"/> attached property on the specified dependency object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static TextAlignment GetTextAlignment(DependencyObject element)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            return (TextAlignment)element.GetValue(TextAlignmentProperty);
+        }
+
+        /// <summary>
+        /// Sets the value of the <see cref="TextAlignment"/> attached property for a specified dependency object.
+        /// </summary>
+        /// <param name="element">
+        /// The dependency object on which to set the value of the <see cref="TextAlignment"/> property.
+        /// </param>
+        /// <param name="value">
+        /// The new value to set the property to.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// element is null.
+        /// </exception>
+        public static void SetTextAlignment(DependencyObject element, TextAlignment value)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.SetValueInternal(TextAlignmentProperty, value);
         }
 
         /// <summary>

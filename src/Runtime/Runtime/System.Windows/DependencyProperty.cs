@@ -1079,35 +1079,30 @@ namespace System.Windows
         /// <returns>Dependency property</returns>
         internal static DependencyProperty FromName(string name, Type ownerType)
         {
-            DependencyProperty dp = null;
+            DependencyProperty dp;
 
-            if (name == null)
+            if (name is null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (ownerType == null)
+            if (ownerType is null)
             {
                 throw new ArgumentNullException(nameof(ownerType));
             }
 
-            FromNameKey key = new FromNameKey(name, ownerType);
-
-            while ((dp == null) && (ownerType != null))
+            do
             {
                 // Ensure static constructor of type has run
                 RuntimeHelpers.RunClassConstructor(ownerType.TypeHandle);
 
-                // Locate property
-                key.UpdateNameKey(ownerType);
-
                 lock (Synchronized)
                 {
-                    PropertyFromName.TryGetValue(key, out dp);
+                    PropertyFromName.TryGetValue(new FromNameKey(name, ownerType), out dp);
                 }
 
                 ownerType = ownerType.BaseType;
-            }
+            } while (dp is null && ownerType is not null);
 
             return dp;
         }
@@ -1143,49 +1138,22 @@ namespace System.Windows
             return true;
         }
 
-        private sealed class FromNameKey
+        private readonly struct FromNameKey
         {
+            private readonly string _name;
+            private readonly Type _ownerType;
+
             public FromNameKey(string name, Type ownerType)
             {
                 _name = name;
                 _ownerType = ownerType;
-
-                _hashCode = _name.GetHashCode() ^ _ownerType.GetHashCode();
             }
 
-            public void UpdateNameKey(Type ownerType)
-            {
-                _ownerType = ownerType;
+            public override int GetHashCode() => _name.GetHashCode() ^ _ownerType.GetHashCode();
 
-                _hashCode = _name.GetHashCode() ^ _ownerType.GetHashCode();
-            }
+            public override bool Equals(object o) => o is FromNameKey key && Equals(key);
 
-            public override int GetHashCode()
-            {
-                return _hashCode;
-            }
-
-            public override bool Equals(object o)
-            {
-                if (o is FromNameKey key)
-                {
-                    return Equals(key);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            public bool Equals(FromNameKey key)
-            {
-                return (_name.Equals(key._name) && (_ownerType == key._ownerType));
-            }
-
-            private readonly string _name;
-            private Type _ownerType;
-
-            private int _hashCode;
+            public bool Equals(FromNameKey key) => _name.Equals(key._name) && _ownerType == key._ownerType;
         }
 
         private DependencyProperty(
@@ -1276,7 +1244,7 @@ namespace System.Windows
         private static int GlobalIndexCount;
 
         // Global, cross-object synchronization
-        private static object Synchronized = new object();
+        private static readonly object Synchronized = new object();
 
         // Nullable Type
         private static readonly Type NullableType = typeof(Nullable<>);

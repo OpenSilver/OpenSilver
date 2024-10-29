@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media.Animation;
 using OpenSilver.Internal.Data;
 
@@ -145,22 +146,79 @@ internal sealed class AnimationClock<TValue> : AnimationClock
     {
         return typeName switch
         {
-            nameof(Grid) => propertyName switch
-            {
-                "Row" => Grid.RowProperty,
-                "Column" => Grid.ColumnProperty,
-                "RowSpan" => Grid.RowSpanProperty,
-                "ColumnSpan" => Grid.ColumnSpanProperty,
-                _ => null,
-            },
-            nameof(Canvas) => propertyName switch
-            {
-                "Left" => Canvas.LeftProperty,
-                "Top" => Canvas.TopProperty,
-                "ZIndex" => Canvas.ZIndexProperty,
-                _ => null,
-            },
+            nameof(Grid) => GetKnownGridProperty(propertyName),
+            nameof(Canvas) => GetKnownCanvasProperty(propertyName),
+            nameof(TextBlock) => GetKnownTextBlockProperty(propertyName),
+            nameof(TextElement) or nameof(Inline) or nameof(Run) or nameof(Span) => GetKnownTextElementProperty(propertyName),
+            nameof(Block) or nameof(Paragraph) => GetKnownBlockProperty(propertyName),
             _ => null,
+        };
+    }
+
+    private static DependencyProperty GetKnownGridProperty(string name)
+    {
+        return name switch
+        {
+            "Row" => Grid.RowProperty,
+            "Column" => Grid.ColumnProperty,
+            "RowSpan" => Grid.RowSpanProperty,
+            "ColumnSpan" => Grid.ColumnSpanProperty,
+            _ => null,
+        };
+    }
+
+    private static DependencyProperty GetKnownCanvasProperty(string name)
+    {
+        return name switch
+        {
+            "Left" => Canvas.LeftProperty,
+            "Top" => Canvas.TopProperty,
+            "ZIndex" => Canvas.ZIndexProperty,
+            _ => null,
+        };
+    }
+
+    private static DependencyProperty GetKnownTextBlockProperty(string name)
+    {
+        return name switch
+        {
+            nameof(TextBlock.CharacterSpacing) => TextBlock.CharacterSpacingProperty,
+            nameof(TextBlock.FontFamily) => TextBlock.FontFamilyProperty,
+            nameof(TextBlock.FontSize) => TextBlock.FontSizeProperty,
+            nameof(TextBlock.FontStretch) => TextBlock.FontStretchProperty,
+            nameof(TextBlock.FontStyle) => TextBlock.FontStyleProperty,
+            nameof(TextBlock.FontWeight) => TextBlock.FontWeightProperty,
+            nameof(TextBlock.Foreground) => TextBlock.ForegroundProperty,
+            nameof(TextBlock.LineHeight) => TextBlock.LineHeightProperty,
+            nameof(TextBlock.LineStackingStrategy) => TextBlock.LineStackingStrategyProperty,
+            nameof(TextBlock.TextAlignment) => TextBlock.TextAlignmentProperty,
+            _ => null,
+        };
+    }
+
+    private static DependencyProperty GetKnownTextElementProperty(string name)
+    {
+        return name switch
+        {
+            nameof(TextElement.CharacterSpacing) => TextElement.CharacterSpacingProperty,
+            nameof(TextElement.FontFamily) => TextElement.FontFamilyProperty,
+            nameof(TextElement.FontSize) => TextElement.FontSizeProperty,
+            nameof(TextElement.FontStretch) => TextElement.FontStretchProperty,
+            nameof(TextElement.FontStyle) => TextElement.FontStyleProperty,
+            nameof(TextElement.FontWeight) => TextElement.FontWeightProperty,
+            nameof(TextElement.Foreground) => TextElement.ForegroundProperty,
+            _ => null,
+        };
+    }
+
+    private static DependencyProperty GetKnownBlockProperty(string name)
+    {
+        return name switch
+        {
+            nameof(Block.LineHeight) => Block.LineHeightProperty,
+            nameof(Block.LineStackingStrategy) => Block.LineStackingStrategyProperty,
+            nameof(Block.TextAlignment) => Block.TextAlignmentProperty,
+            _ => GetKnownTextElementProperty(name),
         };
     }
 }
