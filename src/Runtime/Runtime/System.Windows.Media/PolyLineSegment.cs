@@ -93,7 +93,7 @@ namespace System.Windows.Media
 
             var points = Points;
 
-            for (var i = 0; i < points.Count; i++)
+            for (var i = 0; i < points.InternalCount; i++)
             {
                 yield return points[i].X.ToString(formatProvider);
                 yield return points[i].Y.ToString(formatProvider);

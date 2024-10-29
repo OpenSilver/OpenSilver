@@ -43,7 +43,7 @@ namespace System.Windows
             AddInternal(value);
             value._parentDictionary = _owner;
 
-            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, InternalCount - 1);
         }
 
         internal override void ClearOverride()

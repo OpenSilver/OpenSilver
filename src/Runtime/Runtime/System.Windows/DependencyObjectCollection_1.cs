@@ -75,7 +75,7 @@ namespace System.Windows
         /// <summary>
         /// Gets the number of objects in the collection.
         /// </summary>
-        public int Count => _collection.Count;
+        public int Count => _collection.InternalCount;
 
         /// <summary>
         /// Gets a value that indicates whether the collection can be modified.
@@ -274,7 +274,7 @@ namespace System.Windows
         {
             _collectionChanged.CheckReentrancy();
             AddDependencyObjectInternal(value);
-            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, InternalCount - 1);
         }
 
         internal override void ClearOverride()

@@ -918,7 +918,7 @@ namespace System.Windows
 
         private bool ContainsCycle(ResourceDictionary origin)
         {
-            for (int i = 0; i < MergedDictionaries.Count; i++)
+            for (int i = 0; i < MergedDictionaries.InternalCount; i++)
             {
                 ResourceDictionary mergedDictionary = MergedDictionaries[i];
                 if (mergedDictionary == origin || mergedDictionary.ContainsCycle(origin))

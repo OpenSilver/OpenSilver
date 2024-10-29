@@ -44,11 +44,11 @@ namespace System.Windows.Ink
         /// </exception>
         public Stroke(StylusPointCollection stylusPoints)
         {
-            if (stylusPoints == null)
+            if (stylusPoints is null)
             {
                 throw new ArgumentNullException(nameof(stylusPoints));
             }
-            if (stylusPoints.Count == 0)
+            if (stylusPoints.InternalCount == 0)
             {
                 throw new ArgumentException(nameof(stylusPoints));
             }

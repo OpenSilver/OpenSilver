@@ -105,7 +105,7 @@ public sealed class Paragraph : Block
         set => _inlines.IsModel = value;
     }
 
-    protected sealed override int VisualChildrenCount => Inlines.Count;
+    protected sealed override int VisualChildrenCount => Inlines.InternalCount;
 
     protected sealed override UIElement GetVisualChild(int index)
     {
@@ -114,6 +114,6 @@ public sealed class Paragraph : Block
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        return Inlines[index];
+        return Inlines.InternalItems[index];
     }
 }

@@ -36,7 +36,7 @@ public sealed class RowDefinitionCollection : PresentationFrameworkCollection<Ro
     {
         VerifyWriteAccess();
 
-        PrivateConnectChild(Count, value);
+        PrivateConnectChild(InternalCount, value);
         AddInternal(value);
 
         PrivateOnModified();

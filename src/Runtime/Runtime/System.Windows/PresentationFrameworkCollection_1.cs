@@ -60,7 +60,7 @@ namespace System.Windows
         /// <summary>
         /// Gets the number of elements contained in the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
-        public int Count => CountInternal;
+        public int Count => CountImpl;
 
         /// <summary>
         /// Gets or sets the element at the specified index.
@@ -295,12 +295,7 @@ namespace System.Windows
 
         internal virtual bool IsReadOnlyImpl => false;
 
-        /// <summary>
-        /// Get the Count of the underlying <see cref="List{T}"/> collection.
-        /// This property returns the same value as the Count property and is only here
-        /// for performances.
-        /// </summary>
-        internal virtual int CountInternal => _items.Count;
+        internal virtual int CountImpl => _items.Count;
 
         internal virtual void CopyToImpl(T[] array, int index) => _items.CopyTo(array, index);
 
@@ -323,14 +318,26 @@ namespace System.Windows
         internal List<T> InternalItems => _items;
 
         /// <summary>
+        /// Get the number of elements contained in the underlying <see cref="List{T}"/> used 
+        /// to back this collection.
+        /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT</b>: This property is dangerous because it does not always return the
+        /// actual count of the collection. This can happen with an <see cref="Controls.ItemCollection"/>
+        /// populated with an items source. This property aims at improving performances by reducing
+        /// the amount of virtual calls to the Count property.
+        /// </remarks>
+        internal int InternalCount => _items.Count;
+
+        /// <summary>
         /// Call the Add method of underlying <see cref="List{T}"/> collection.
         /// </summary>
         /// <param name="value"></param>
         internal void AddInternal(T value)
         {
-            int previousCount = Count;
+            int previousCount = InternalCount;
             _items.Add(value);
-            UpdateCountProperty(previousCount, Count);
+            UpdateCountProperty(previousCount, InternalCount);
         }
 
         /// <summary>
@@ -338,9 +345,9 @@ namespace System.Windows
         /// </summary>
         internal void ClearInternal()
         {
-            int previousCount = Count;
+            int previousCount = InternalCount;
             _items.Clear();
-            UpdateCountProperty(previousCount, Count);
+            UpdateCountProperty(previousCount, InternalCount);
         }
 
         /// <summary>
@@ -348,9 +355,9 @@ namespace System.Windows
         /// </summary>
         internal void InsertInternal(int index, T value)
         {
-            int previousCount = Count;
+            int previousCount = InternalCount;
             _items.Insert(index, value);
-            UpdateCountProperty(previousCount, Count);
+            UpdateCountProperty(previousCount, InternalCount);
         }
 
         /// <summary>
@@ -358,9 +365,9 @@ namespace System.Windows
         /// </summary>
         internal void RemoveAtInternal(int index)
         {
-            int previousCount = Count;
+            int previousCount = InternalCount;
             _items.RemoveAt(index);
-            UpdateCountProperty(previousCount, Count);
+            UpdateCountProperty(previousCount, InternalCount);
         }
 
         /// <summary>

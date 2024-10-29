@@ -384,7 +384,7 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (Blocks.Count > 0 && Application.Current is Application app)
+                if (Blocks.InternalCount > 0 && Application.Current is Application app)
                 {
                     return app.MainWindow.TextMeasurementService.MeasureBaseline(GetFonts(this));
                 }
@@ -479,7 +479,7 @@ namespace System.Windows.Controls
 
         protected override Size ArrangeOverride(Size finalSize) => finalSize;
 
-        protected sealed override int VisualChildrenCount => Blocks.Count;
+        protected sealed override int VisualChildrenCount => Blocks.InternalCount;
 
         protected sealed override UIElement GetVisualChild(int index)
         {

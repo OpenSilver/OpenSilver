@@ -422,7 +422,7 @@ namespace System.Windows.Controls
 
             try
             {
-                if (tb.Inlines.Count == 1 && tb.Inlines[0] is Run singleRun)
+                if (tb.Inlines.InternalCount == 1 && tb.Inlines.InternalItems[0] is Run singleRun)
                 {
                     singleRun.Text = text;
                 }
@@ -664,7 +664,7 @@ namespace System.Windows.Controls
 
         internal sealed override bool EnablePointerEventsCore => true;
 
-        protected override int VisualChildrenCount => Inlines.Count;
+        protected override int VisualChildrenCount => Inlines.InternalCount;
 
         protected override UIElement GetVisualChild(int index)
         {

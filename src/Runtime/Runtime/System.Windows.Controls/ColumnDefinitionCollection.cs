@@ -36,7 +36,7 @@ public sealed class ColumnDefinitionCollection : PresentationFrameworkCollection
     {
         VerifyWriteAccess();
 
-        PrivateConnectChild(Count, value);
+        PrivateConnectChild(InternalCount, value);
         AddInternal(value);
 
         PrivateOnModified();

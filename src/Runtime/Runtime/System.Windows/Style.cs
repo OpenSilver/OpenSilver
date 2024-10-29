@@ -247,7 +247,7 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
 
     private void ProcessSelfStyles()
     {
-        if (Setters.Count == 0)
+        if (_setters is null || _setters.InternalCount == 0)
         {
             EffectiveValues = _basedOn?.EffectiveValues ?? new(0);
             return;
@@ -290,9 +290,9 @@ public class Style : DependencyObject //was sealed but we unsealed it because te
     // events.
     private (PropertyValue[] PropertyValues, int Length) ProcessSetters()
     {
-        Debug.Assert(Setters.Count > 0);
+        Debug.Assert(_setters is not null && _setters.InternalCount > 0);
 
-        var setters = Setters.InternalItems;
+        var setters = _setters.InternalItems;
 
         int length = 0;
         var propertyValues = new PropertyValue[setters.Count];

@@ -763,7 +763,7 @@ internal sealed class RichTextBoxView : TextViewBase
     {
         return block switch
         {
-            Section section when section.Blocks.Count > 0 => GetDeltas(section.Blocks),
+            Section section when section.Blocks.InternalCount > 0 => GetDeltas(section.Blocks),
             Section section => GetDeltas(section.Blocks).Append(CloseBlock(section)),
             Paragraph paragraph => GetDeltas(paragraph.Inlines).Append(CloseBlock(paragraph)),
             _ => Enumerable.Empty<QuillDelta>(),

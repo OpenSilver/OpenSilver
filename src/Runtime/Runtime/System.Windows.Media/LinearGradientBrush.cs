@@ -449,7 +449,7 @@ namespace System.Windows.Media
 
         private string GetOffsetsString(double start, double end, string unit)
         {
-            Debug.Assert(GradientStops.Count > 0);
+            Debug.Assert(GradientStops.InternalCount > 0);
 
             Stop[] stops = GradientStops.GetSortedCollection();
 

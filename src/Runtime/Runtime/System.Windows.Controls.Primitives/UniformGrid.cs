@@ -157,7 +157,7 @@ namespace System.Windows.Controls.Primitives
             double maxChildDesiredHeight = 0.0;
 
             //  Measure each child, keeping track of maximum desired width and height.
-            for (int i = 0, count = Children.Count; i < count; ++i)
+            for (int i = 0, count = Children.InternalCount; i < count; ++i)
             {
                 UIElement child = Children[i];
 
@@ -249,7 +249,7 @@ namespace System.Windows.Controls.Primitives
                 int nonCollapsedCount = 0;
 
                 // First compute the actual # of non-collapsed children to be laid out
-                for (int i = 0, count = Children.Count; i < count; ++i)
+                for (int i = 0, count = Children.InternalCount; i < count; ++i)
                 {
                     UIElement child = Children[i];
                     if (child.Visibility != Visibility.Collapsed)

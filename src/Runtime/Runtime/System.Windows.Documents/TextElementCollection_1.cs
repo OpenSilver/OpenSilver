@@ -60,12 +60,12 @@ public abstract class TextElementCollection<T> : PresentationFrameworkCollection
         AddDependencyObjectInternal(value);
         SetVisualParent(value);
         value.IsModel = IsModel;
-        OnAdd(value, Count);
+        OnAdd(value, InternalCount);
     }
 
     internal sealed override void ClearOverride()
     {
-        if (Count > 0)
+        if (InternalCount > 0)
         {
             T[] oldItems = InternalItems.ToArray();
             ClearDependencyObjectInternal();

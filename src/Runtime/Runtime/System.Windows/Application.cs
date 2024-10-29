@@ -231,8 +231,8 @@ namespace System.Windows
             get
             {
                 ResourceDictionary resources = _resources;
-                return (resources != null &&
-                        ((resources.Count > 0) || (resources.MergedDictionaries.Count > 0)));
+                return resources != null &&
+                       (resources.Count > 0 || resources.MergedDictionaries.InternalCount > 0);
             }
         }
 

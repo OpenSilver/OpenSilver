@@ -53,7 +53,7 @@ namespace System.Windows.Controls
             SetModelParent(value);
             AddInternal(value);
 
-            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, InternalCount - 1);
         }
 
         internal override void CopyToImpl(object[] array, int index)
@@ -153,11 +153,11 @@ namespace System.Windows.Controls
 
         internal IList SourceList => _isUsingListWrapper ? _listWrapper : (IList)_itemsSource;
 
-        internal override int CountInternal => IsUsingItemsSource ? SourceList.Count : base.CountInternal;
+        internal override int CountImpl => IsUsingItemsSource ? SourceList.Count : base.CountImpl;
 
         internal void SetItemsSource(IEnumerable value)
         {
-            if (!IsUsingItemsSource && Count != 0)
+            if (!IsUsingItemsSource && InternalCount != 0)
             {
                 throw new InvalidOperationException(Strings.CannotUseItemsSource);
             }
@@ -173,7 +173,7 @@ namespace System.Windows.Controls
 
             InitializeSourceList(value);
 
-            UpdateCountProperty(previousCount, Count);
+            UpdateCountProperty(previousCount, SourceList.Count);
 
             _collectionChanged.OnCollectionReset();
         }
@@ -192,7 +192,7 @@ namespace System.Windows.Controls
                 IsUsingItemsSource = false;
                 _isUsingListWrapper = false;
 
-                UpdateCountProperty(previousCount, Count);
+                UpdateCountProperty(previousCount, InternalCount);
 
                 _collectionChanged.OnCollectionReset();
             }

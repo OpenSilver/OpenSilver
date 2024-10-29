@@ -52,14 +52,14 @@ namespace System.Windows.Controls
 
             VisualParent.InvalidateMeasure();
 
-            _collectionChanged?.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, Count - 1);
+            _collectionChanged?.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, InternalCount - 1);
         }
 
         internal sealed override void ClearOverride()
         {
             _collectionChanged?.CheckReentrancy();
 
-            int count = Count;
+            int count = InternalCount;
             if (count > 0)
             {
                 UIElement[] uies = InternalItems.ToArray();

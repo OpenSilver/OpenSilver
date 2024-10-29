@@ -535,7 +535,7 @@ namespace System.Windows.Controls
             {
                 if (Orientation == Orientation.Horizontal)
                 {
-                    if (templateGrid.ColumnDefinitions != null && templateGrid.ColumnDefinitions.Count == 3)
+                    if (templateGrid.ColumnDefinitions != null && templateGrid.ColumnDefinitions.InternalCount == 3)
                     {
                         templateGrid.ColumnDefinitions[0].Width = new GridLength(1, IsDirectionReversed ? GridUnitType.Star : GridUnitType.Auto);
                         templateGrid.ColumnDefinitions[2].Width = new GridLength(1, IsDirectionReversed ? GridUnitType.Auto : GridUnitType.Star);
@@ -556,7 +556,7 @@ namespace System.Windows.Controls
                 }
                 else
                 {
-                    if (templateGrid.RowDefinitions != null && templateGrid.RowDefinitions.Count == 3)
+                    if (templateGrid.RowDefinitions != null && templateGrid.RowDefinitions.InternalCount == 3)
                     {
                         templateGrid.RowDefinitions[0].Height = new GridLength(1, IsDirectionReversed ? GridUnitType.Auto : GridUnitType.Star);
                         templateGrid.RowDefinitions[2].Height = new GridLength(1, IsDirectionReversed ? GridUnitType.Star : GridUnitType.Auto);

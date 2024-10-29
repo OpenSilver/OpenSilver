@@ -148,7 +148,8 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
 
         private void DrawStroke(Stroke stroke)
         {
-            if (stroke.StylusPoints.Count <= 1)
+            var points = stroke.StylusPoints;
+            if (points.InternalCount <= 1)
             {
                 return;
             }
@@ -156,18 +157,14 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             string sCanvas = OpenSilver.Interop.GetVariableStringForJS(_canvasDom);
             var sb = new StringBuilder();
             sb.AppendLine($"(function(cvs) {{ const ctx = cvs.getContext('2d');");
-            //object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
-            var firstPoint = stroke.StylusPoints[0];
-            //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2);", context, firstPoint.X, firstPoint.Y);
+            var firstPoint = points[0];
             sb.AppendLine($"ctx.moveTo({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()});");
 
-            for (int i = 1; i < stroke.StylusPoints.Count; i++)
+            for (int i = 1; i < points.InternalCount; i++)
             {
-                //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.lineTo($1, $2);", context, stroke.StylusPoints[i].X, stroke.StylusPoints[i].Y);
-                sb.AppendLine($"ctx.lineTo({stroke.StylusPoints[i].X.ToInvariantString()}, {stroke.StylusPoints[i].Y.ToInvariantString()});");
+                sb.AppendLine($"ctx.lineTo({points[i].X.ToInvariantString()}, {points[i].Y.ToInvariantString()});");
             }
 
-            //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.stroke();", context);
             sb.AppendLine($"ctx.stroke(); }})({sCanvas})");
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(sb.ToString());
         }
@@ -187,9 +184,9 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
 
                     DrawStroke(_currentStroke);
 
-                    if (_currentStroke.StylusPoints.Count > 0)
+                    if (_currentStroke.StylusPoints.InternalCount > 0)
                     {
-                        _lastPos = _currentStroke.StylusPoints[_currentStroke.StylusPoints.Count - 1];
+                        _lastPos = _currentStroke.StylusPoints[_currentStroke.StylusPoints.InternalCount - 1];
                     }
 
                     _currentStroke.StylusPoints.CollectionChanged += OnStylusPointsCollectionChanged;
@@ -227,9 +224,9 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (_currentStroke.StylusPoints.Count > 1)
+                    if (_currentStroke.StylusPoints.InternalCount > 1)
                     {
-                        _mousePos = _currentStroke.StylusPoints[_currentStroke.StylusPoints.Count - 1];
+                        _mousePos = _currentStroke.StylusPoints[_currentStroke.StylusPoints.InternalCount - 1];
                         DrawCurrentPoint();
                     }
                     break;
@@ -242,7 +239,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
 
         private void DrawCurrentPoint()
         {
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this) || _currentStroke == null || _currentStroke.StylusPoints.Count <= 1)
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this) || _currentStroke == null || _currentStroke.StylusPoints.InternalCount <= 1)
             {
                 return;
             }

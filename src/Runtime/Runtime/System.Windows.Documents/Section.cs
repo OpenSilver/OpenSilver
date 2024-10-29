@@ -77,7 +77,7 @@ public sealed class Section : Block
         set => _blocks.IsModel = value;
     }
 
-    protected sealed override int VisualChildrenCount => Blocks.Count;
+    protected sealed override int VisualChildrenCount => Blocks.InternalCount;
 
     protected sealed override UIElement GetVisualChild(int index)
     {

@@ -90,14 +90,14 @@ namespace System.Windows.Media
             // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#quadratic_b%C3%A9zier_curve
             var points = Points;
 
-            if (points.Count % 2 != 0)
+            if (points.InternalCount % 2 != 0)
             {
                 throw new InvalidOperationException("PolyQuadraticBezierSegment points must use pair points.");
             }
 
             yield return "Q";
 
-            for (var i = 0; i < points.Count; i++)
+            for (var i = 0; i < points.InternalCount; i++)
             {
                 yield return points[i].X.ToString(formatProvider);
                 yield return points[i].Y.ToString(formatProvider);

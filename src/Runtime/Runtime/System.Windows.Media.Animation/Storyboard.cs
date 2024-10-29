@@ -338,7 +338,7 @@ public sealed class Storyboard : Timeline
             var storyboardClock = (StoryboardClock)currentClock;
             storyboardClock.SetParent(parentClock);
 
-            TimelineCollection childrenTimelines = storyboard.Children;
+            List<Timeline> childrenTimelines = storyboard.Children.InternalItems;
 
             for (int i = 0; i < childrenTimelines.Count; i++)
             {

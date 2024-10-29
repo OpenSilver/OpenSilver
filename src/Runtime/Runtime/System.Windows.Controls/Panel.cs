@@ -47,7 +47,7 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (_uiElementCollection is null || _uiElementCollection.Count == 0 || IsItemsHost)
+                if (_uiElementCollection is null || _uiElementCollection.InternalCount == 0 || IsItemsHost)
                 {
                     // empty panel or a panel being used as the items
                     // host has *no* logical children; give empty enumerator
@@ -70,13 +70,13 @@ namespace System.Windows.Controls
         {
             get
             {
-                if (_uiElementCollection == null)
+                if (_uiElementCollection is null)
                 {
                     return 0;
                 }
                 else
                 {
-                    return _uiElementCollection.Count;
+                    return _uiElementCollection.InternalCount;
                 }
             }
         }
@@ -92,12 +92,12 @@ namespace System.Windows.Controls
         /// </returns>
         protected override UIElement GetVisualChild(int index)
         {
-            if (_uiElementCollection == null)
+            if (_uiElementCollection is null)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            return _uiElementCollection[index];
+            return _uiElementCollection.InternalItems[index];
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace System.Windows.Controls
         /// </summary>
         internal IItemContainerGenerator Generator => _itemContainerGenerator;
 
-        internal bool HasChildren => _uiElementCollection is not null && _uiElementCollection.Count > 0;
+        internal bool HasChildren => _uiElementCollection is not null && _uiElementCollection.InternalCount > 0;
 
         /// <summary>
         /// Creates a new <see cref="UIElementCollection"/>.
@@ -372,7 +372,7 @@ namespace System.Windows.Controls
                 ((IItemContainerGenerator)_itemContainerGenerator).RemoveAll();
             }
 
-            if ((_uiElementCollection != null) && (_uiElementCollection.Count > 0))
+            if ((_uiElementCollection != null) && (_uiElementCollection.InternalCount > 0))
             {
                 _uiElementCollection.Clear();
                 OnClearChildrenInternal();

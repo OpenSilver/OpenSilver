@@ -904,7 +904,7 @@ public class Grid : Panel
             {
                 extData.ColumnDefinitions.InternalItems.TrimExcess();
 
-                if (extData.ColumnDefinitions.Count == 0)
+                if (extData.ColumnDefinitions.InternalCount == 0)
                 {
                     //  if column definitions collection is empty
                     //  mockup array with one column
@@ -944,7 +944,7 @@ public class Grid : Panel
             {
                 extData.RowDefinitions.InternalItems.TrimExcess();
 
-                if (extData.RowDefinitions.Count == 0)
+                if (extData.RowDefinitions.InternalCount == 0)
                 {
                     //  if row definitions collection is empty
                     //  mockup array with one row

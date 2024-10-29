@@ -27,7 +27,7 @@ public class InlineCollection : TextElementCollection<Inline>, IList
 
     public void Add(string text)
     {
-        if (text == null)
+        if (text is null)
         {
             throw new ArgumentNullException(nameof(text));
         }
@@ -45,6 +45,6 @@ public class InlineCollection : TextElementCollection<Inline>, IList
         };
 
         Add(inline);
-        return Count;
+        return InternalCount;
     }
 }

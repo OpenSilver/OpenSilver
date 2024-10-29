@@ -60,7 +60,7 @@ namespace System.Windows.Input
         {
             _collectionChanged.CheckReentrancy();
             AddInternal(point);
-            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, point, Count - 1);
+            _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, point, InternalCount - 1);
         }
 
         internal override void ClearOverride()
