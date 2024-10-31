@@ -270,12 +270,19 @@ namespace {namespaceStringIfAny}
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+/// <summary>
+/// {factoryName}
+/// </summary>
 [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
 #pragma warning disable CS0618
 public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>, {IXamlComponentLoaderClass}<{baseTypeFullName}>
 #pragma warning restore CS0618
 {{
+    /// <summary>
+    /// Instantiate
+    /// </summary>
+    [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
     public static object Instantiate()
     {{
         return CreateComponentImpl();

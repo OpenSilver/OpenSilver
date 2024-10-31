@@ -7,12 +7,30 @@ using System.ComponentModel;
 
 namespace System.Windows.Controls
 {
+    /// <summary>
+    /// Defines constants that describe how <see cref="DataGrid"/> elements, such as columns, are sized.
+    /// </summary>
     public enum DataGridLengthUnitType
     {
+        /// <summary>
+        /// The unit of measure is based on the size of the cells and the column header.
+        /// </summary>
         Auto = 0,
+        /// <summary>
+        /// The unit of measure is expressed in pixels.
+        /// </summary>
         Pixel = 1,
+        /// <summary>
+        /// The unit of measure is based on the size of the cells.
+        /// </summary>
         SizeToCells = 2,
+        /// <summary>
+        /// The unit of measure is based on the size of the column header.
+        /// </summary>
         SizeToHeader = 3,
+        /// <summary>
+        /// The unit of measure is a weighted proportion of the available space.
+        /// </summary>
         Star = 4
     }
 

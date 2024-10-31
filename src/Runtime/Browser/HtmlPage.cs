@@ -11,18 +11,15 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Browser.Internal;
 using CSHTML5.Internal;
-using CSHTML5.Types;
 
 namespace System.Windows.Browser
 {
+    /// <summary>
+    /// Permits access to, and manipulation of, the browser's Document Object Model (DOM).
+    /// </summary>
     public static class HtmlPage
     {
         private static HtmlElement _plugin;
@@ -38,9 +35,30 @@ namespace System.Windows.Browser
         /// </summary>
         public static HtmlDocument Document { get; } = new HtmlDocument(new DocumentRef());
 
+        /// <summary>
+        /// Indicates whether pop-up windows are allowed.
+        /// </summary>
+        /// <returns>
+        /// true if pop-up windows are allowed; otherwise, false.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public static bool IsPopupWindowAllowed => false;
 
+        /// <summary>
+        /// Opens a pop-up window.
+        /// </summary>
+        /// <param name="navigateToUri">
+        /// Specifies the Uniform Resource Identifier (URI) for the pop-up window.
+        /// </param>
+        /// <param name="target">
+        /// Specifies the window that will be opened.
+        /// </param>
+        /// <param name="options">
+        /// Specifies an <see cref="HtmlPopupWindowOptions"/> object that controls the pop-up window.
+        /// </param>
+        /// <returns>
+        /// A handle to the new window; or null.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
         {

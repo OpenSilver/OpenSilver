@@ -2,7 +2,6 @@
 
 namespace OpenSilver.Simulator.XamlInspection
 {
-    [ClassInterface(ClassInterfaceType.AutoDispatch)]
     [ComVisible(true)]
     public class XamlInspectorCallback
     {

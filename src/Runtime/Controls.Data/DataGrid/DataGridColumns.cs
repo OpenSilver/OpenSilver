@@ -19,6 +19,12 @@ namespace System.Windows.Controls
 
         #region Protected Methods
 
+        /// <summary>
+        /// Raises the <see cref="ColumnDisplayIndexChanged"/> event.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
         protected virtual void OnColumnDisplayIndexChanged(DataGridColumnEventArgs e)
         {
             EventHandler<DataGridColumnEventArgs> handler = this.ColumnDisplayIndexChanged;
@@ -28,6 +34,12 @@ namespace System.Windows.Controls
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="ColumnReordered"/> event.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
         protected internal virtual void OnColumnReordered(DataGridColumnEventArgs e)
         {
             this.EnsureVerticalGridLines();
@@ -39,6 +51,12 @@ namespace System.Windows.Controls
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="ColumnReordering"/> event.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
         protected internal virtual void OnColumnReordering(DataGridColumnReorderingEventArgs e)
         {
             EventHandler<DataGridColumnReorderingEventArgs> handler = this.ColumnReordering;

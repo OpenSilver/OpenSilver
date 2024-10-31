@@ -29,7 +29,6 @@ namespace OpenSilver.Simulator.XamlInspection
     public partial class XamlInspectionTreeView : UserControl
     {
         XamlPropertiesPane _xamlPropertiesPane;
-        bool _hasBeenFullyExpanded;
         TreeNode _selectedTreeNode;
         TreeNode _nodeBranchPreviouslyMarked;
         ContextMenu _ContextMenu;
@@ -74,7 +73,6 @@ namespace OpenSilver.Simulator.XamlInspection
         public bool TryRefresh(Assembly entryPointAssembly, XamlPropertiesPane xamlPropertiesPane)
         {
             _xamlPropertiesPane = xamlPropertiesPane;
-            _hasBeenFullyExpanded = false;
 
             var isSuccess = XamlInspectionHelper.TryInitializeTreeView(XamlTree);
 
@@ -119,7 +117,6 @@ namespace OpenSilver.Simulator.XamlInspection
                 if (treeViewItem != null)
                     treeViewItem.ExpandSubtree();
             }
-            _hasBeenFullyExpanded = true;
         }
 
         public void CollapseAllNodes()
@@ -136,7 +133,6 @@ namespace OpenSilver.Simulator.XamlInspection
             }
 
             XamlTree.SelectedItemChanged += TreeView_SelectedItemChanged;
-            _hasBeenFullyExpanded = false;
         }
 
         public void ExpandToNode(TreeNode fromNode, TreeNode toNode)

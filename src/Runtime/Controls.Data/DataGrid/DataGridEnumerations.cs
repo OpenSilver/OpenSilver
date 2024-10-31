@@ -29,18 +29,17 @@ namespace System.Windows.Controls
     }
 
     /// <summary>
-    /// Used to specify action to take out of edit mode.
+    /// Specifies constants that define what action was taken to end an edit.
     /// </summary>
-    /// <QualityBand>Mature</QualityBand>
     public enum DataGridEditAction
     {
         /// <summary>
-        /// Cancel the changes.
+        /// The edit was canceled.
         /// </summary>
         Cancel,
 
         /// <summary>
-        /// Commit edited value.
+        /// The edit was committed.
         /// </summary>
         Commit
     }
@@ -54,22 +53,41 @@ namespace System.Windows.Controls
     }
 
     /// <summary>
-    /// Determines whether the inner cells' vertical/horizontal gridlines are shown or not.
+    /// Specifies constants that define which grid lines separating <see cref="DataGrid"/> inner cells are shown.
     /// </summary>
-    /// <QualityBand>Mature</QualityBand>
     [Flags]
     public enum DataGridGridLinesVisibility
     {
+        /// <summary>
+        /// No grid lines are shown.
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// Only horizontal grid lines, which separate rows, are shown.
+        /// </summary>
         Horizontal = 1,
+        /// <summary>
+        /// Only vertical grid lines, which separate columns, are shown.
+        /// </summary>
         Vertical = 2,
+        /// <summary>
+        /// Both horizontal and vertical grid lines are shown.
+        /// </summary>
         All = 3,
     }
 
-    /// <QualityBand>Mature</QualityBand>
+    /// <summary>
+    /// Specifies constants that define whether editing is enabled on a cell level or on a row level.
+    /// </summary>
     public enum DataGridEditingUnit
     {
+        /// <summary>
+        /// Cell editing is enabled.
+        /// </summary>
         Cell = 0,
+        /// <summary>
+        /// Row editing is enabled.
+        /// </summary>
         Row = 1,
     }
 
@@ -101,12 +119,23 @@ namespace System.Windows.Controls
         None = 0x00
     }
 
-    /// <QualityBand>Mature</QualityBand>
+    /// <summary>
+    /// Specifies constants that define when <see cref="DataGrid"/> row details are displayed.
+    /// </summary>
     public enum DataGridRowDetailsVisibilityMode
     {
-        Collapsed = 2,          // Show no details.  Developer is in charge of toggling visibility.
-        Visible = 1,	        // Show the details section for all rows.
-        VisibleWhenSelected = 0	// Show the details section only for the selected row(s).
+        /// <summary>
+        /// The row details section is displayed only for selected rows.
+        /// </summary>
+        VisibleWhenSelected = 0,
+        /// <summary>
+        /// The row details section is displayed for all rows.
+        /// </summary>
+        Visible = 1,
+        /// <summary>
+        /// The row details section is not displayed for any rows.
+        /// </summary>
+        Collapsed = 2,
     }
 
     /// <summary>
@@ -122,12 +151,17 @@ namespace System.Windows.Controls
     }
 
     /// <summary>
-    /// Determines the selection model
+    /// Specifies constants that define the <see cref="DataGrid"/> selection modes.
     /// </summary>
-    /// <QualityBand>Mature</QualityBand>
     public enum DataGridSelectionMode
     {
+        /// <summary>
+        /// The user can select multiple items while holding down the SHIFT or CTRL keys.
+        /// </summary>
         Extended = 0,
+        /// <summary>
+        /// The user can select only one item at a time.
+        /// </summary>
         Single = 1
     }
 }

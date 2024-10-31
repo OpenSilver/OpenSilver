@@ -300,12 +300,19 @@ End Namespace
 '------------------------------------------------------------------------------
 
 Namespace Global
+    ''' <summary>
+    ''' {factoryName}
+    ''' </summary>
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>
     <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)>
     Public NotInheritable Class {factoryName}
 #Disable Warning BC40008
         Implements {IXamlComponentFactoryClass}(Of {componentTypeFullName}), {IXamlComponentLoaderClass}(Of {baseTypeFullName})
 #Enable Warning BC40008
+        ''' <summary>
+        ''' Instantiate
+        ''' </summary>
+        <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)>
         Public Shared Function Instantiate() As Object
             Return CreateComponentImpl()
         End Function

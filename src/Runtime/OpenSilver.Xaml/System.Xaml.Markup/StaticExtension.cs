@@ -165,7 +165,7 @@ public class StaticExtension : MarkupExtension
     /// <summary>
     /// Return false if a public static field or property with the same
     /// name cannot be found.
-    /// <summary>
+    /// </summary>
     private bool GetFieldOrPropertyValue(Type type, string name, out object value)
     {
         Type currentType = type;

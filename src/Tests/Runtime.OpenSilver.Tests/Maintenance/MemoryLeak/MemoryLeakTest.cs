@@ -477,10 +477,14 @@ public class MemoryLeakTest
 
     private class MyViewModelWithValidation : MyViewModel, INotifyDataErrorInfo
     {
-        public bool HasErrors => false;
+        bool INotifyDataErrorInfo.HasErrors => false;
 
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        event EventHandler<DataErrorsChangedEventArgs> INotifyDataErrorInfo.ErrorsChanged
+        {
+            add { }
+            remove { }
+        }
 
-        public IEnumerable GetErrors(string propertyName) => Enumerable.Empty<object>();
+        IEnumerable INotifyDataErrorInfo.GetErrors(string propertyName) => Enumerable.Empty<object>();
     }
 }

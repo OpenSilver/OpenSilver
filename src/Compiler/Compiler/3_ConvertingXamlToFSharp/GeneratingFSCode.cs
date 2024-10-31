@@ -256,9 +256,16 @@ type {className}() =
 #nowarn ""0067""
 #nowarn ""0044""
 
+/// <summary>
+/// {factoryName}
+/// </summary>
 [<global.System.Diagnostics.DebuggerNonUserCode>]
 [<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]
 type {factoryName}() =
+    /// <summary>
+    /// Instantiate
+    /// </summary>
+    [<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Never)>]
     static member public Instantiate(): obj =
         {factoryName}.CreateComponentImpl()
     interface {IXamlComponentFactoryClass}<{componentTypeFullName}> with

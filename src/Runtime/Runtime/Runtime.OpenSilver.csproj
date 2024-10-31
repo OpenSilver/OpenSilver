@@ -10,6 +10,7 @@
     <EnableDefaultItems>false</EnableDefaultItems>
     <DefineTrace>true</DefineTrace>
     <LangVersion>latest</LangVersion>
+    <EnableServiceReferenceFixer>false</EnableServiceReferenceFixer>
   </PropertyGroup>
 
   <ItemGroup>

@@ -24,9 +24,10 @@ namespace System.Windows.Media.Imaging.Tests
             // has been disposed of
             image.Source = bitmapImage;
 
-            (image.Source as BitmapImage).INTERNAL_StreamAsBase64String
+            bitmapImage.GetDataStringAsync(image)
+                .Result
                 .Should()
-                .Be(Base64ImageExample);
+                .EndWith(Base64ImageExample);
         }
     }
 }

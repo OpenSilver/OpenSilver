@@ -65,7 +65,9 @@ namespace Microsoft.Expression.Interactivity.Media
     /// <summary>
     /// An action that will change the state of a targeted storyboard when invoked.
     /// </summary>
+#if false
     [CLSCompliant(false)]
+#endif
     public class ControlStoryboardAction : StoryboardAction
     {
         private bool isPaused;

@@ -165,6 +165,15 @@ namespace System.Windows.Controls
 
         #region Methods
 
+        /// <summary>
+        /// Ends the edit on a data grid cell and reverts any changes.
+        /// </summary>
+        /// <param name="editingElement">
+        /// The element that the column displays for a cell in editing mode.
+        /// </param>
+        /// <param name="uneditedValue">
+        /// The value of the data prior to the edit.
+        /// </param>
         protected override void CancelCellEdit(FrameworkElement editingElement, object uneditedValue)
         {
             editingElement = GenerateEditingElement(null, null);

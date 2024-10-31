@@ -80,7 +80,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets the actual size of the bubble data point.
         /// </summary>
-        public new double ActualSize
+        public double ActualSize
         {
             get { return (double)GetValue(ActualSizeProperty); }
             set { SetValue(ActualSizeProperty, value); }

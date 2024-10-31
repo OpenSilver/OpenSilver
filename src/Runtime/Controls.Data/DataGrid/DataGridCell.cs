@@ -43,6 +43,9 @@ namespace System.Windows.Controls
 
         #endregion Data
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataGridCell"/> class.
+        /// </summary>
         public DataGridCell()
         {
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridCell_MouseLeftButtonDown), true);

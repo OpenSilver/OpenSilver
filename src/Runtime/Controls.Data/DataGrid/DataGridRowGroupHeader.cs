@@ -305,6 +305,15 @@ namespace System.Windows.Controls
             }
         }
 
+        /// <summary>
+        /// Arranges the contents of the <see cref="DataGridRowGroupHeader"/>.
+        /// </summary>
+        /// <param name="finalSize">
+        /// The final area within the parent that this element should use to arrange itself and its children.
+        /// </param>
+        /// <returns>
+        /// The actual size used by the <see cref="DataGridRowGroupHeader"/>.
+        /// </returns>
         protected override Size ArrangeOverride(Size finalSize)
         {
             if (this.OwningGrid == null)

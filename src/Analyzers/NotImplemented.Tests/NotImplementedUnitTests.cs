@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Testing;
 namespace OpenSilver.Analyzers.Test
 {
     [TestClass]
-    public class NotImplementedUnitTest : CSharpAnalyzerVerifier<NotImplementedAnalyzer, MSTestVerifier>
+    public class NotImplementedUnitTest : CSharpAnalyzerVerifier<NotImplementedAnalyzer, DefaultVerifier>
     {
         private const string NotImplementedAttribute = @"
         namespace OpenSilver

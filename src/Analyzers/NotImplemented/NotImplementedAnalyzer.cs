@@ -25,7 +25,7 @@ namespace OpenSilver.Analyzers
     {
         private const string Title = "OpenSilver type or member is not implemented";
 
-        private const string MessageFormat = "{0} is not implemented.";
+        private const string MessageFormat = "{0} is not implemented";
 
         private const string Description = "This member or type is not implemented and might not behave as expected.";
 

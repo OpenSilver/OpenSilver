@@ -11,7 +11,9 @@ namespace System.Windows.Interactivity
     /// <summary>
     /// Provides design tools information about what <see cref="TriggerBase"/> to instantiate for a given action or command.
     /// </summary>
+#if false
     [CLSCompliant(false)]
+#endif
     [AttributeUsage(AttributeTargets.Class |
                     AttributeTargets.Property,
                     AllowMultiple = true)]
