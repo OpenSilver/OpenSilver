@@ -35,6 +35,7 @@
     <Compile Include="OpenSilver\Internal\Documents\TextContainerInlineImageContainer.cs" />
     <Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
     <Compile Include="OpenSilver\Internal\ITemplateContent.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\AnimationClock.T.cs" />
     <Compile Include="OpenSilver\Internal\Storage.cs" />
     <Compile Include="OpenSilver\Internal\DependencyObjectStore.cs" />
     <Compile Include="OpenSilver\Internal\Controls\EmptyEnumerator.cs" />
