@@ -467,7 +467,8 @@ namespace System.Windows.Controls
             nameof(DisplayMode),
             typeof(CalendarMode),
             typeof(Calendar),
-            new PropertyMetadata(OnDisplayModePropertyChanged));
+            new PropertyMetadata(CalendarMode.Month, OnDisplayModePropertyChanged),
+            IsValidDisplayMode);
 
         /// <summary>
         /// DisplayModeProperty property changed handler.
@@ -482,66 +483,56 @@ namespace System.Windows.Controls
             CalendarMode oldMode = (CalendarMode) e.OldValue;
             CalendarItem monthControl = c.MonthControl;
 
-            if (!CalendarExtensions.IsHandlerSuspended(c, Calendar.DisplayModeProperty))
+            if (monthControl != null)
             {
-                if (IsValidDisplayMode(mode))
+                switch (oldMode)
                 {
-                    if (monthControl != null)
-                    {
-                        switch (oldMode)
+                    case CalendarMode.Month:
                         {
-                            case CalendarMode.Month:
-                                {
-                                    c.SelectedYear = c.DisplayDateInternal;
-                                    c.SelectedMonth = c.DisplayDateInternal;
-                                    break;
-                                }
-                            case CalendarMode.Year:
-                                {
-                                    c.DisplayDate = c.SelectedMonth;
-                                    c.SelectedYear = c.SelectedMonth;
-                                    break;
-                                }
-                            case CalendarMode.Decade:
-                                {
-                                    c.DisplayDate = c.SelectedYear;
-                                    c.SelectedMonth = c.SelectedYear;
-                                    break;
-                                }
+                            c.SelectedYear = c.DisplayDateInternal;
+                            c.SelectedMonth = c.DisplayDateInternal;
+                            break;
                         }
-
-                        switch (mode)
+                    case CalendarMode.Year:
                         {
-                            case CalendarMode.Month:
-                                {
-                                    c.OnMonthClick();
-                                    break;
-                                }
-                            case CalendarMode.Year:
-                            case CalendarMode.Decade:
-                                {
-                                    c.OnHeaderClick();
-                                    break;
-                                }
+                            c.DisplayDate = c.SelectedMonth;
+                            c.SelectedYear = c.SelectedMonth;
+                            break;
                         }
-                    }
-                    c.OnDisplayModeChanged(new CalendarModeChangedEventArgs((CalendarMode)e.OldValue, mode));
+                    case CalendarMode.Decade:
+                        {
+                            c.DisplayDate = c.SelectedYear;
+                            c.SelectedMonth = c.SelectedYear;
+                            break;
+                        }
                 }
-                else
+
+                switch (mode)
                 {
-                    CalendarExtensions.SetValueNoCallback(c, Calendar.DisplayModeProperty, e.OldValue);
-                    throw new ArgumentOutOfRangeException(nameof(d), Resource.Calendar_OnDisplayModePropertyChanged_InvalidValue);
+                    case CalendarMode.Month:
+                        {
+                            c.OnMonthClick();
+                            break;
+                        }
+                    case CalendarMode.Year:
+                    case CalendarMode.Decade:
+                        {
+                            c.OnHeaderClick();
+                            break;
+                        }
                 }
             }
+            c.OnDisplayModeChanged(new CalendarModeChangedEventArgs((CalendarMode)e.OldValue, mode));
         }
 
         /// <summary>
         /// Inherited code: Requires comment.
         /// </summary>
-        /// <param name="mode">Inherited code: Requires comment 1.</param>
+        /// <param name="value">Inherited code: Requires comment 1.</param>
         /// <returns>Inherited code: Requires comment 2.</returns>
-        private static bool IsValidDisplayMode(CalendarMode mode)
+        private static bool IsValidDisplayMode(object value)
         {
+            CalendarMode mode = (CalendarMode)value;
             return mode == CalendarMode.Month
                 || mode == CalendarMode.Year
                 || mode == CalendarMode.Decade;
@@ -665,7 +656,8 @@ namespace System.Windows.Controls
             nameof(SelectionMode),
             typeof(CalendarSelectionMode),
             typeof(Calendar),
-            new PropertyMetadata(OnSelectionModeChanged));
+            new PropertyMetadata(CalendarSelectionMode.SingleDate, OnSelectionModeChanged),
+            IsValidSelectionMode);
 
         /// <summary>
         /// Inherited code: Requires comment.
@@ -677,15 +669,8 @@ namespace System.Windows.Controls
             Calendar c = d as Calendar;
             Debug.Assert(c != null, "c should not be null!");
 
-            if (IsValidSelectionMode(e.NewValue))
-            {
-                CalendarExtensions.SetValueNoCallback(c, Calendar.SelectedDateProperty, null);
-                c.SelectedDates.Clear();
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(d), Resource.Calendar_OnSelectionModeChanged_InvalidValue);
-            }
+            CalendarExtensions.SetValueNoCallback(c, Calendar.SelectedDateProperty, null);
+            c.SelectedDates.Clear();
         }
 
         /// <summary>

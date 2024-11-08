@@ -10,7 +10,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Automation.Peers;
-using System.Windows.Controls.Common;
 using System.Windows.Controls.Primitives;
 using System.Windows.Navigation;
 using OpenSilver.Internal.Navigation;
@@ -214,15 +213,17 @@ namespace System.Windows.Controls
 
 #region CanGoBack Dependency Property
 
-        /// <summary>
-        /// The DependencyProperty for the CanGoBack property.
-        /// </summary>
-        public static readonly DependencyProperty CanGoBackProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey CanGoBackPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 "CanGoBack",
                 typeof(bool),
                 typeof(Frame),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(false));
+
+        /// <summary>
+        /// The DependencyProperty for the CanGoBack property.
+        /// </summary>
+        public static readonly DependencyProperty CanGoBackProperty = CanGoBackPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that indicates whether there is at least one entry in the back navigation history.
@@ -230,22 +231,24 @@ namespace System.Windows.Controls
         public bool CanGoBack
         {
             get { return (bool)this.GetValue(CanGoBackProperty); }
-            internal set { this.SetValueNoCallback(CanGoBackProperty, value); }
+            internal set { this.SetValue(CanGoBackPropertyKey, value); }
         }
 
 #endregion
 
 #region CanGoForward Dependency Property
 
-        /// <summary>
-        /// The DependencyProperty for the CanGoForward property.
-        /// </summary>
-        public static readonly DependencyProperty CanGoForwardProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey CanGoForwardPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 "CanGoForward",
                 typeof(bool),
                 typeof(Frame),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(false));
+
+        /// <summary>
+        /// The DependencyProperty for the CanGoForward property.
+        /// </summary>
+        public static readonly DependencyProperty CanGoForwardProperty = CanGoForwardPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that indicates whether there is at least one entry in the forward navigation history.
@@ -253,22 +256,24 @@ namespace System.Windows.Controls
         public bool CanGoForward
         {
             get { return (bool)this.GetValue(CanGoForwardProperty); }
-            internal set { this.SetValueNoCallback(CanGoForwardProperty, value); }
+            internal set { this.SetValue(CanGoForwardPropertyKey, value); }
         }
 
 #endregion
 
 #region CurrentSource Dependency Property
 
-        /// <summary>
-        /// The DependencyProperty for the CurrentSource property.
-        /// </summary>
-        public static readonly DependencyProperty CurrentSourceProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey CurrentSourcePropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 "CurrentSource",
                 typeof(Uri),
                 typeof(Frame),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(false));
+
+        /// <summary>
+        /// The DependencyProperty for the CurrentSource property.
+        /// </summary>
+        public static readonly DependencyProperty CurrentSourceProperty = CurrentSourcePropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets the uniform resource identifier (URI) of the content that was last navigated to.
@@ -281,7 +286,7 @@ namespace System.Windows.Controls
         public Uri CurrentSource
         {
             get { return this.GetValue(CurrentSourceProperty) as Uri; }
-            internal set { this.SetValueNoCallback(CurrentSourceProperty, value); }
+            internal set { this.SetValue(CurrentSourcePropertyKey, value); }
         }
 
 #endregion
@@ -363,7 +368,8 @@ namespace System.Windows.Controls
                 "CacheSize",
                 typeof(int),
                 typeof(Frame),
-                new PropertyMetadata(DefaultCacheSize, new PropertyChangedCallback(CacheSizePropertyChanged)));
+                new PropertyMetadata(DefaultCacheSize, new PropertyChangedCallback(CacheSizePropertyChanged)),
+                IsValidCacheSize);
 
         /// <summary>
         /// Gets or sets the number of pages that can be cached for the frame.
@@ -378,30 +384,23 @@ namespace System.Windows.Controls
         {
             Frame frame = (Frame)depObj;
 
-            if (!frame.AreHandlersSuspended())
+            if (frame._navigationService != null && frame._navigationService.Cache != null)
             {
                 int newCacheSize = (int)e.NewValue;
-                if (newCacheSize < 0)
-                {
-                    frame.SetValueNoCallback(CacheSizeProperty, e.OldValue);
-                    throw new InvalidOperationException(
-                        string.Format(CultureInfo.InvariantCulture,
-                                      Resource.Frame_CacheSizeMustBeGreaterThanOrEqualToZero,
-                                      "CacheSize"));
-                }
-
-                if (frame._navigationService != null && frame._navigationService.Cache != null)
-                {
-                    frame._navigationService.Cache.ChangeCacheSize(newCacheSize);
-                }
+                frame._navigationService.Cache.ChangeCacheSize(newCacheSize);
             }
+        }
+
+        private static bool IsValidCacheSize(object value)
+        {
+            return (int)value >= 0;
         }
 
 #endregion
 
-#endregion
+        #endregion
 
-#region Properties
+        #region Properties
 
         internal NavigationService NavigationService
         {
@@ -531,25 +530,6 @@ namespace System.Windows.Controls
                 this._updatingSourceFromNavigationService = true;
                 this.SetValue(SourceProperty, newSource);
                 this._updatingSourceFromNavigationService = false;
-            }
-        }
-
-        /// <summary>
-        /// Called when a Read-Only dependency property is changed
-        /// </summary>
-        /// <param name="depObj">The dependency object</param>
-        /// <param name="e">The event arguments</param>
-        private static void OnReadOnlyPropertyChanged(DependencyObject depObj, DependencyPropertyChangedEventArgs e)
-        {
-            Frame frame = depObj as Frame;
-            if (frame != null && !frame.AreHandlersSuspended())
-            {
-                frame.SetValueNoCallback(e.Property, e.OldValue);
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        Resource.UnderlyingPropertyIsReadOnly,
-                        e.Property.ToString()));
             }
         }
 

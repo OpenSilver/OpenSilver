@@ -1115,35 +1115,23 @@ namespace System.Windows.Controls
                     {
                         VisualStates.GoToState(this, true, VisualStates.StateInvalid, VisualStates.StateValid);
                     }
-                    this.SetValueNoCallback(IsValidProperty, value);
+                    this.SetValue(IsValidPropertyKey, value);
                 }
             }
         }
 
-        /// <summary>
-        /// Identifies the IsValid dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IsValidProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey IsValidPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 "IsValid",
                 typeof(bool),
                 typeof(DataGrid),
-                new PropertyMetadata(true, (OnIsValidPropertyChanged)));
+                new PropertyMetadata(true));
 
         /// <summary>
-        /// IsValidProperty property changed handler.
+        /// Identifies the IsValid dependency property.
         /// </summary>
-        /// <param name="d">DataGrid that changed its IsValid.</param>
-        /// <param name="e">DependencyPropertyChangedEventArgs.</param>
-        private static void OnIsValidPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            DataGrid dataGrid = (DataGrid)d;
-            if (!dataGrid.AreHandlersSuspended())
-            {
-                dataGrid.SetValueNoCallback(DataGrid.IsValidProperty, e.OldValue);
-                throw DataGridError.DataGrid.UnderlyingPropertyIsReadOnly("IsValid");
-            }
-        }
+        public static readonly DependencyProperty IsValidProperty = IsValidPropertyKey.DependencyProperty;
+
         #endregion IsValid
 
         #region ItemsSource

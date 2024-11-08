@@ -8,13 +8,10 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel;
-using System.Globalization;
-using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Automation.Peers;
 using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
-using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 
 namespace System.Windows.Controls
 {
@@ -182,15 +179,17 @@ namespace System.Windows.Controls
 
 #region IsFocused
 
+        private static readonly DependencyPropertyKey IsFocusedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "IsFocused",
+                typeof(bool),
+                typeof(DescriptionViewer),
+                new PropertyMetadata(false));
+
         /// <summary>
         /// Identifies the IsFocused dependency property
         /// </summary>
-        public static readonly DependencyProperty IsFocusedProperty =
-            DependencyProperty.Register(
-            "IsFocused",
-            typeof(bool),
-            typeof(DescriptionViewer),
-            new PropertyMetadata(false, OnIsFocusedPropertyChanged));
+        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         ///   Gets a value that indicates whether the <see cref="DescriptionViewer.Target" /> 
@@ -199,32 +198,24 @@ namespace System.Windows.Controls
         protected bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
-            private set { this.SetValueNoCallback(IsFocusedProperty, value); }
-        }
-
-        private static void OnIsFocusedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Label label = d as Label;
-            if (label != null && !label.AreHandlersSuspended())
-            {
-                label.SetValueNoCallback(DescriptionViewer.IsFocusedProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "IsFocused"));
-            }
+            private set { this.SetValue(IsFocusedPropertyKey, value); }
         }
 
 #endregion IsFocused
 
 #region IsValid
 
+        private static readonly DependencyPropertyKey IsValidPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "IsValid",
+                typeof(bool),
+                typeof(DescriptionViewer),
+                new PropertyMetadata(true));
+
         /// <summary>
         /// Identifies the IsValid dependency property
         /// </summary>
-        public static readonly DependencyProperty IsValidProperty =
-            DependencyProperty.Register(
-            "IsValid",
-            typeof(bool),
-            typeof(DescriptionViewer),
-            new PropertyMetadata(true, OnIsValidPropertyChanged));
+        public static readonly DependencyProperty IsValidProperty = IsValidPropertyKey.DependencyProperty;
 
         /// <summary>
         ///   Gets a value that indicates whether the <see cref="DescriptionViewer.Target" /> field data is valid. 
@@ -232,17 +223,7 @@ namespace System.Windows.Controls
         public bool IsValid
         {
             get { return (bool)GetValue(IsValidProperty); }
-            private set { this.SetValueNoCallback(IsValidProperty, value); }
-        }
-
-        private static void OnIsValidPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            DescriptionViewer dv = d as DescriptionViewer;
-            if (dv != null && !dv.AreHandlersSuspended())
-            {
-                dv.SetValueNoCallback(DescriptionViewer.IsValidProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "IsValid"));
-            }
+            private set { this.SetValue(IsValidPropertyKey, value); }
         }
 
 #endregion IsValid

@@ -417,34 +417,21 @@ namespace System.Windows.Controls
             }
             internal set
             {
-                this.SetValueNoCallback(IsValidProperty, value);
+                this.SetValue(IsValidPropertyKey, value);
             }
         }
+
+        private static readonly DependencyPropertyKey IsValidPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "IsValid",
+                typeof(bool),
+                typeof(DataGridRow),
+                new PropertyMetadata(true));
 
         /// <summary>
         /// Identifies the IsValid dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsValidProperty =
-            DependencyProperty.Register(
-                "IsValid",
-                typeof(bool),
-                typeof(DataGridRow),
-                new PropertyMetadata(true, (OnIsValidPropertyChanged)));
-
-        /// <summary>
-        /// IsValidProperty property changed handler.
-        /// </summary>
-        /// <param name="d">DataGridRow that changed its IsValid.</param>
-        /// <param name="e">DependencyPropertyChangedEventArgs.</param>
-        private static void OnIsValidPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            DataGridRow dataGridRow = (DataGridRow)d;
-            if (!dataGridRow.AreHandlersSuspended())
-            {
-                dataGridRow.SetValueNoCallback(DataGridRow.IsValidProperty, e.OldValue);
-                throw DataGridError.DataGrid.UnderlyingPropertyIsReadOnly("IsValid");
-            }
-        }
+        public static readonly DependencyProperty IsValidProperty = IsValidPropertyKey.DependencyProperty;
         #endregion IsValid
 
         #endregion

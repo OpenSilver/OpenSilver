@@ -23,7 +23,6 @@
   <ItemGroup>
     <Compile Include="Automation\DescriptionViewerAutomationPeer.cs" />
     <Compile Include="Automation\ValidationSummaryAutomationPeer.cs" />
-    <Compile Include="Common\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <DesignTime>True</DesignTime>

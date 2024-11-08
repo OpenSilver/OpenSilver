@@ -12,7 +12,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -232,15 +231,17 @@ namespace System.Windows.Controls
 
 #region HasErrors
 
+        private static readonly DependencyPropertyKey HasErrorsPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "HasErrors",
+                typeof(bool),
+                typeof(ValidationSummary),
+                new PropertyMetadata(false));
+
         /// <summary>
         /// Identifies the HasErrors dependency property
         /// </summary>
-        public static readonly DependencyProperty HasErrorsProperty =
-            DependencyProperty.Register(
-            "HasErrors",
-            typeof(bool),
-            typeof(ValidationSummary),
-            new PropertyMetadata(false, OnHasErrorsPropertyChanged));
+        public static readonly DependencyProperty HasErrorsProperty = HasErrorsPropertyKey.DependencyProperty;
 
         /// <summary>
         ///   Gets or sets a value that indicates whether the <see cref="ValidationSummary" /> has errors. 
@@ -248,32 +249,24 @@ namespace System.Windows.Controls
         public bool HasErrors
         {
             get { return (bool)GetValue(HasErrorsProperty); }
-            internal set { this.SetValueNoCallback(HasErrorsProperty, value); }
-        }
-
-        private static void OnHasErrorsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ValidationSummary vs = d as ValidationSummary;
-            if (vs != null && !vs.AreHandlersSuspended())
-            {
-                vs.SetValueNoCallback(ValidationSummary.HasErrorsProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "HasErrors"));
-            }
+            internal set { this.SetValue(HasErrorsPropertyKey, value); }
         }
 
 #endregion HasErrors
 
 #region HasDisplayedErrors
 
+        private static readonly DependencyPropertyKey HasDisplayedErrorsPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "HasDisplayedErrors",
+                typeof(bool),
+                typeof(ValidationSummary),
+                new PropertyMetadata(false));
+
         /// <summary>
         /// Identifies the HasDisplayedErrors dependency property
         /// </summary>
-        public static readonly DependencyProperty HasDisplayedErrorsProperty =
-            DependencyProperty.Register(
-            "HasDisplayedErrors",
-            typeof(bool),
-            typeof(ValidationSummary),
-            new PropertyMetadata(false, OnHasDisplayedErrorsPropertyChanged));
+        public static readonly DependencyProperty HasDisplayedErrorsProperty = HasDisplayedErrorsPropertyKey.DependencyProperty;
 
         /// <summary>
         ///   Gets or sets a value that indicates whether the 
@@ -282,17 +275,7 @@ namespace System.Windows.Controls
         public bool HasDisplayedErrors
         {
             get { return (bool)GetValue(HasDisplayedErrorsProperty); }
-            internal set { this.SetValueNoCallback(HasDisplayedErrorsProperty, value); }
-        }
-
-        private static void OnHasDisplayedErrorsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ValidationSummary vs = d as ValidationSummary;
-            if (vs != null && !vs.AreHandlersSuspended())
-            {
-                vs.SetValueNoCallback(ValidationSummary.HasDisplayedErrorsProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "HasDisplayedErrors"));
-            }
+            internal set { this.SetValue(HasDisplayedErrorsPropertyKey, value); }
         }
 
 #endregion HasDisplayedErrors

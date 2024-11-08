@@ -22,7 +22,6 @@
     <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
       <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
     </Compile>
-    <Compile Include="System\Windows\Controls\Common\DependencyObjectExtensions.cs" />
     <Compile Include="System\Windows\Navigation\INavigationContentLoader.cs" />
     <Compile Include="System\Windows\Navigation\LoadResult.cs" />
     <Compile Include="System\Windows\Navigation\NavigationCacheMode.cs" />

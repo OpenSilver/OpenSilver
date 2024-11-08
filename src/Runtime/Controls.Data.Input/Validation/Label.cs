@@ -10,10 +10,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.Windows.Data;
-using System.Windows.Controls.Common;
-using resources = OpenSilver.Internal.Controls.Data.Input.Resources;
 using InternalVisualStates = System.Windows.Controls.Internal.VisualStates;
 
 namespace System.Windows.Controls
@@ -149,15 +146,17 @@ namespace System.Windows.Controls
 
         #region IsValid
 
+        private static readonly DependencyPropertyKey IsValidPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "IsValid",
+                typeof(bool),
+                typeof(Label),
+                new PropertyMetadata(true));
+
         /// <summary>
         /// Identifies the IsValid dependency property
         /// </summary>
-        public static readonly DependencyProperty IsValidProperty =
-            DependencyProperty.Register(
-            "IsValid",
-            typeof(bool),
-            typeof(Label),
-            new PropertyMetadata(true, OnIsValidPropertyChanged));
+        public static readonly DependencyProperty IsValidProperty = IsValidPropertyKey.DependencyProperty;
 
         /// <summary>
         ///   Gets a value that indicates whether 
@@ -166,17 +165,7 @@ namespace System.Windows.Controls
         public bool IsValid
         {
             get { return (bool)GetValue(IsValidProperty); }
-            private set { this.SetValueNoCallback(IsValidProperty, value); }
-        }
-
-        private static void OnIsValidPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Label label = d as Label;
-            if (label != null && !label.AreHandlersSuspended())
-            {
-                label.SetValueNoCallback(Label.IsValidProperty, e.OldValue);
-                throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, resources.UnderlyingPropertyIsReadOnly, "IsValid"));
-            }
+            private set { this.SetValue(IsValidPropertyKey, value); }
         }
 
         #endregion IsValid

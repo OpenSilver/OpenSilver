@@ -149,55 +149,65 @@ namespace System.Windows.Controls
                 typeof(DataPager),
                 new PropertyMetadata(OnAutoEllipsisPropertyChanged));
 
-        /// <summary>
-        /// Identifies the CanChangePage dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CanChangePageProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey CanChangePagePropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 "CanChangePage",
                 typeof(bool),
                 typeof(DataPager),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(false));
+
+        /// <summary>
+        /// Identifies the CanChangePage dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CanChangePageProperty = CanChangePagePropertyKey.DependencyProperty;
+
+        private static readonly DependencyPropertyKey CanMoveToFirstPagePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "CanMoveToFirstPage",
+                typeof(bool),
+                typeof(DataPager),
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Identifies the CanMoveToFirstPage dependency property.
         /// </summary>
-        public static readonly DependencyProperty CanMoveToFirstPageProperty =
-            DependencyProperty.Register(
-                "CanMoveToFirstPage",
+        public static readonly DependencyProperty CanMoveToFirstPageProperty = CanMoveToFirstPagePropertyKey.DependencyProperty;
+
+        private static readonly DependencyPropertyKey CanMoveToLastPagePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "CanMoveToLastPage",
                 typeof(bool),
                 typeof(DataPager),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Identifies the CanMoveToLastPage dependency property.
         /// </summary>
-        public static readonly DependencyProperty CanMoveToLastPageProperty =
-            DependencyProperty.Register(
-                "CanMoveToLastPage",
+        public static readonly DependencyProperty CanMoveToLastPageProperty = CanMoveToLastPagePropertyKey.DependencyProperty;
+
+        private static readonly DependencyPropertyKey CanMoveToNextPagePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "CanMoveToNextPage",
                 typeof(bool),
                 typeof(DataPager),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Identifies the CanMoveToNextPage dependency property.
         /// </summary>
-        public static readonly DependencyProperty CanMoveToNextPageProperty =
-            DependencyProperty.Register(
-                "CanMoveToNextPage",
+        public static readonly DependencyProperty CanMoveToNextPageProperty = CanMoveToNextPagePropertyKey.DependencyProperty;
+
+        private static readonly DependencyPropertyKey CanMoveToPreviousPagePropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "CanMoveToPreviousPage",
                 typeof(bool),
                 typeof(DataPager),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Identifies the CanMoveToPreviousPage dependency property.
         /// </summary>
-        public static readonly DependencyProperty CanMoveToPreviousPageProperty =
-            DependencyProperty.Register(
-                "CanMoveToPreviousPage",
-                typeof(bool),
-                typeof(DataPager),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+        public static readonly DependencyProperty CanMoveToPreviousPageProperty = CanMoveToPreviousPagePropertyKey.DependencyProperty;
 
         /// <summary>
         /// Identifies the DisplayMode dependency property.
@@ -207,7 +217,8 @@ namespace System.Windows.Controls
                 "DisplayMode",
                 typeof(PagerDisplayMode),
                 typeof(DataPager),
-                new PropertyMetadata(DATAPAGER_defaultDisplayMode, OnDisplayModePropertyChanged));
+                new PropertyMetadata(DATAPAGER_defaultDisplayMode, OnDisplayModePropertyChanged),
+                IsValidDisplayMode);
 
         /// <summary>
         /// Identifies the IsTotalItemCountFixed dependency property.
@@ -219,15 +230,17 @@ namespace System.Windows.Controls
                 typeof(DataPager),
                 new PropertyMetadata(OnIsTotalItemCountFixedPropertyChanged));
 
-        /// <summary>
-        /// Identifies the ItemCount dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ItemCountProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey ItemCountPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 "ItemCount",
                 typeof(int),
                 typeof(DataPager),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(0));
+
+        /// <summary>
+        /// Identifies the ItemCount dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ItemCountProperty = ItemCountPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Identifies the NumericButtonCount dependency property.
@@ -237,7 +250,8 @@ namespace System.Windows.Controls
                 "NumericButtonCount",
                 typeof(int),
                 typeof(DataPager),
-                new PropertyMetadata(DATAPAGER_defaultNumericButtonCount, OnNumericButtonCountPropertyChanged));
+                new PropertyMetadata(DATAPAGER_defaultNumericButtonCount, OnNumericButtonCountPropertyChanged),
+                IsValidNumericButtonCount);
 
         /// <summary>
         /// Identifies the NumericButtonStyle dependency property.
@@ -249,15 +263,17 @@ namespace System.Windows.Controls
                 typeof(DataPager),
                 new PropertyMetadata(OnNumericButtonStylePropertyChanged));
 
-        /// <summary>
-        /// Identifies the PageCount dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PageCountProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey PageCountPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 "PageCount",
                 typeof(int),
                 typeof(DataPager),
-                new PropertyMetadata(OnReadOnlyPropertyChanged));
+                new PropertyMetadata(0));
+
+        /// <summary>
+        /// Identifies the PageCount dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PageCountProperty = PageCountPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Identifies the PageIndex dependency property.
@@ -481,7 +497,7 @@ namespace System.Windows.Controls
 
             private set
             {
-                this.SetValueNoCallback(CanChangePageProperty, value);
+                this.SetValue(CanChangePagePropertyKey, value);
             }
         }
 
@@ -498,7 +514,7 @@ namespace System.Windows.Controls
 
             private set
             {
-                this.SetValueNoCallback(CanMoveToFirstPageProperty, value);
+                this.SetValue(CanMoveToFirstPagePropertyKey, value);
             }
         }
 
@@ -515,7 +531,7 @@ namespace System.Windows.Controls
 
             private set
             {
-                this.SetValueNoCallback(CanMoveToLastPageProperty, value);
+                this.SetValue(CanMoveToLastPagePropertyKey, value);
             }
         }
 
@@ -532,7 +548,7 @@ namespace System.Windows.Controls
 
             private set
             {
-                this.SetValueNoCallback(CanMoveToNextPageProperty, value);
+                this.SetValue(CanMoveToNextPagePropertyKey, value);
             }
         }
 
@@ -549,7 +565,7 @@ namespace System.Windows.Controls
 
             private set
             {
-                this.SetValueNoCallback(CanMoveToPreviousPageProperty, value);
+                this.SetValue(CanMoveToPreviousPagePropertyKey, value);
             }
         }
 
@@ -598,7 +614,7 @@ namespace System.Windows.Controls
 
             private set
             {
-                this.SetValueNoCallback(ItemCountProperty, value);
+                this.SetValue(ItemCountPropertyKey, value);
             }
         }
 
@@ -663,7 +679,7 @@ namespace System.Windows.Controls
 
             private set
             {
-                this.SetValueNoCallback(PageCountProperty, value);
+                this.SetValue(PageCountPropertyKey, value);
             }
         }
 
@@ -906,21 +922,19 @@ namespace System.Windows.Controls
         private static void OnDisplayModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DataPager pager = d as DataPager;
-            if (!pager.AreHandlersSuspended())
-            {
-                if (!Enum.IsDefined(typeof(PagerDisplayMode), e.NewValue))
-                {
-                    pager.SetValueNoCallback(e.Property, e.OldValue);
-                    throw new ArgumentException(
-                        string.Format(CultureInfo.InvariantCulture,
-                            Resource.InvalidEnumArgumentException_InvalidEnumArgument,
-                            "value",
-                            e.NewValue.ToString(),
-                            typeof(PagerDisplayMode).Name));
-                }
+            pager.UpdateControl();
+        }
 
-                pager.UpdateControl();
-            }
+        private static bool IsValidDisplayMode(object value)
+        {
+            PagerDisplayMode mode = (PagerDisplayMode)value;
+
+            return mode == PagerDisplayMode.FirstLastNumeric ||
+                   mode == PagerDisplayMode.FirstLastPreviousNext ||
+                   mode == PagerDisplayMode.FirstLastPreviousNextNumeric ||
+                   mode == PagerDisplayMode.Numeric ||
+                   mode == PagerDisplayMode.PreviousNext ||
+                   mode == PagerDisplayMode.PreviousNextNumeric;
         }
 
         /// <summary>
@@ -942,23 +956,13 @@ namespace System.Windows.Controls
         private static void OnNumericButtonCountPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DataPager pager = d as DataPager;
+            pager.UpdateButtonCount();
+        }
 
-            if (!pager.AreHandlersSuspended())
-            {
-                if ((int)e.NewValue < 0)
-                {
-                    pager.SetValueNoCallback(e.Property, e.OldValue);
-                    throw new ArgumentOutOfRangeException(
-                        "value",
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            PagerResources.ValueMustBeGreaterThanOrEqualTo,
-                            "NumericButtonCount",
-                            0));
-                }
-
-                pager.UpdateButtonCount();
-            }
+        private static bool IsValidNumericButtonCount(object value)
+        {
+            int count = (int)value;
+            return count >= 0;
         }
 
         /// <summary>
@@ -1109,25 +1113,6 @@ namespace System.Windows.Controls
             DataPager pager = d as DataPager;
             // Push the new foreground into the numeric toggle buttons
             pager.UpdateNumericButtonsForeground();
-        }
-
-        /// <summary>
-        /// Called when a Read-Only dependency property is changed
-        /// </summary>
-        /// <param name="d">DataPager that changed its read-only property.</param>
-        /// <param name="e">The DependencyPropertyChangedEventArgs for this event.</param>
-        private static void OnReadOnlyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            DataPager pager = d as DataPager;
-            if (pager != null && !pager.AreHandlersSuspended())
-            {
-                pager.SetValueNoCallback(e.Property, e.OldValue);
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        PagerResources.UnderlyingPropertyIsReadOnly,
-                        e.Property.ToString()));
-            }
         }
 
         /// <summary>
