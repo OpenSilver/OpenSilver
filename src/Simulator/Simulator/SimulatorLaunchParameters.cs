@@ -34,5 +34,11 @@ namespace OpenSilver.Simulator
         /// URL customization. If not specified, the URL <b>https://simulator.opensilver/</b> will be used.
         /// </summary>
         public string SimulatorUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the simulator saves and restores
+        /// the window's size and position between sessions.
+        /// </summary>
+        public bool PreserveWindowState { get; set; }
     }
 }
