@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OpenSilver.Simulator.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DotNetForHtml5.EmulatorWithoutJavascript.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="DisplaySize" Type="System.Int32" Scope="User">

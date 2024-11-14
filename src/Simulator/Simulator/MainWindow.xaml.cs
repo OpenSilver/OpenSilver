@@ -940,15 +940,12 @@ Click OK to continue.";
 
                 SetWebBrowserSize(double.NaN, double.NaN);
                 ContainerForMainWebBrowserAndHighlightElement.Margin = new Thickness(0, 0, 0, 0);
-                
-                if (_simulatorLaunchParameters?.PreserveWindowState != true)
+
+                await Dispatcher.BeginInvoke(() =>
                 {
-                    await Dispatcher.BeginInvoke(() =>
-                    {
-                        Width = 1024;
-                        Height = 768;
-                    });
-                }
+                    Width = 1024;
+                    Height = 768;
+                });
 
                 await SetTouchEmulation(false);
             }
@@ -1129,10 +1126,6 @@ Click OK to continue.";
 
         private void RestoreWindowState()
         {
-            if (_simulatorLaunchParameters?.PreserveWindowState != true)
-                return;
-
-            SizeToContent = SizeToContent.Manual;
             Left = Properties.Settings.Default.WindowPositionLeft;
             Top = Properties.Settings.Default.WindowPositionTop;
             Width = Properties.Settings.Default.WindowWidth;
@@ -1142,9 +1135,6 @@ Click OK to continue.";
 
         private void SaveWindowState()
         {
-            if (_simulatorLaunchParameters?.PreserveWindowState != true)
-                return;
-
             Properties.Settings.Default.WindowPositionLeft = Left;
             Properties.Settings.Default.WindowPositionTop = Top;
             Properties.Settings.Default.WindowWidth = Width;
