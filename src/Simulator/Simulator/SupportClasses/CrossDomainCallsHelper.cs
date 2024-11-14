@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Settings = OpenSilver.Simulator.Properties.Settings;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -30,15 +31,15 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         {
             get
             {
-                bool isBypassCORSErrors  = Properties.Settings.Default.IsBypassCORSErrors;
+                bool isBypassCORSErrors  = Settings.Default.IsBypassCORSErrors;
                 return isBypassCORSErrors;
             }
             set
             {
-                Properties.Settings.Default.IsBypassCORSErrors = value;
+                Settings.Default.IsBypassCORSErrors = value;
 
                 // SAVE:
-                Properties.Settings.Default.Save();
+                Settings.Default.Save();
 
                 MessageBox.Show("Please restart the Simulator for the changes to take effect.");
             }

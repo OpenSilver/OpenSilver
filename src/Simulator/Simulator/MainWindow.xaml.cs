@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Path = System.IO.Path;
+using Settings = OpenSilver.Simulator.Properties.Settings;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -160,6 +161,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            RestoreWindowState();
+
             while (_openSilverRuntimeDispatcher == null)
             {
                 await Task.Yield();
@@ -284,7 +287,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         private void SyncXamlInspectorVisibility()
         {
-            bool xamlInspectorVisible = Properties.Settings.Default.XamlInspectorVisible;
+            bool xamlInspectorVisible = Settings.Default.XamlInspectorVisible;
             if (xamlInspectorVisible &&
                 _entryPointAssembly != null &&
                 XamlInspectionTreeViewInstance.TryRefresh(_entryPointAssembly, XamlPropertiesPaneInstance))
@@ -833,6 +836,8 @@ Click OK to continue.";
             _javaScriptExecutionHandler.MarkWebControlAsDisposed();
             MainWebBrowser.Dispose();
 
+            SaveWindowState();
+
             // Kill the process to avoid having the Simulator process that remains open due to a MessageBox or something else:
             Application.Current.Shutdown();
         }
@@ -858,10 +863,10 @@ Click OK to continue.";
         private async void DisplaySize_Click(object sender, RoutedEventArgs e)
         {
             SaveDisplaySize();
-            await UpdateWebBrowserAndWebPageSizeBasedOnCurrentState();
+            await UpdateWebBrowserAndWebPageSizeBasedOnCurrentState(true);
         }
 
-        private async Task UpdateWebBrowserAndWebPageSizeBasedOnCurrentState()
+        private async Task UpdateWebBrowserAndWebPageSizeBasedOnCurrentState(bool forceResize = false)
         {
             if (DisplaySize_Phone.IsChecked == true)
             {
@@ -936,11 +941,15 @@ Click OK to continue.";
 
                 SetWebBrowserSize(double.NaN, double.NaN);
                 ContainerForMainWebBrowserAndHighlightElement.Margin = new Thickness(0, 0, 0, 0);
-                await Dispatcher.BeginInvoke(() =>
+
+                if (forceResize)
                 {
-                    Width = 1024;
-                    Height = 768;
-                });
+                    await Dispatcher.BeginInvoke(() =>
+                    {
+                        Width = 1024;
+                        Height = 768;
+                    });
+                }
 
                 await SetTouchEmulation(false);
             }
@@ -968,8 +977,8 @@ Click OK to continue.";
                 ButtonHideXamlTree.Visibility = Visibility.Visible;
 
                 // Save opened state
-                Properties.Settings.Default.XamlInspectorVisible = true;
-                Properties.Settings.Default.Save();
+                Settings.Default.XamlInspectorVisible = true;
+                Settings.Default.Save();
 
                 // We activate the element picker by default:
                 StartElementPickerForInspection();
@@ -1003,8 +1012,8 @@ Click OK to continue.";
             ColumnForXamlPropertiesPane.Width = GridLength.Auto;
 
             // Save closed state
-            Properties.Settings.Default.XamlInspectorVisible = false;
-            Properties.Settings.Default.Save();
+            Settings.Default.XamlInspectorVisible = false;
+            Settings.Default.Save();
 
             // Ensure that the element picker is not activated:
             StopElementPickerForInspection();
@@ -1042,7 +1051,7 @@ Click OK to continue.";
                 displaySize = 1;
             else if (DisplaySize_Desktop.IsChecked == true)
                 displaySize = 2;
-            Properties.Settings.Default.DisplaySize = displaySize;
+            Settings.Default.DisplaySize = displaySize;
 
             //-----------
             // Phone orientation (Portrait or Landscape)
@@ -1052,7 +1061,7 @@ Click OK to continue.";
                 displaySize_Phone_Orientation = 0;
             else if (DisplaySize_Phone_Landscape.IsChecked == true)
                 displaySize_Phone_Orientation = 1;
-            Properties.Settings.Default.DisplaySize_Phone_Orientation = displaySize_Phone_Orientation;
+            Settings.Default.DisplaySize_Phone_Orientation = displaySize_Phone_Orientation;
 
             //-----------
             // Tablet orientation (Portrait or Landscape)
@@ -1062,10 +1071,10 @@ Click OK to continue.";
                 displaySize_Tablet_Orientation = 0;
             else if (DisplaySize_Tablet_Landscape.IsChecked == true)
                 displaySize_Tablet_Orientation = 1;
-            Properties.Settings.Default.DisplaySize_Tablet_Orientation = displaySize_Tablet_Orientation;
+            Settings.Default.DisplaySize_Tablet_Orientation = displaySize_Tablet_Orientation;
 
             // SAVE:
-            Properties.Settings.Default.Save();
+            Settings.Default.Save();
         }
 
         void LoadDisplaySize()
@@ -1073,7 +1082,7 @@ Click OK to continue.";
             //-----------
             // Display size (Phone, Tablet, or Desktop)
             //-----------
-            int displaySize = Properties.Settings.Default.DisplaySize;
+            int displaySize = Settings.Default.DisplaySize;
             switch (displaySize)
             {
                 case 0:
@@ -1091,7 +1100,7 @@ Click OK to continue.";
             //-----------
             // Phone orientation (Portrait or Landscape)
             //-----------
-            int displaySize_Phone_Orientation = Properties.Settings.Default.DisplaySize_Phone_Orientation;
+            int displaySize_Phone_Orientation = Settings.Default.DisplaySize_Phone_Orientation;
             switch (displaySize_Phone_Orientation)
             {
                 case 1:
@@ -1106,7 +1115,7 @@ Click OK to continue.";
             //-----------
             // Tablet orientation (Portrait or Landscape)
             //-----------
-            int displaySize_Tablet_Orientation = Properties.Settings.Default.DisplaySize_Tablet_Orientation;
+            int displaySize_Tablet_Orientation = Settings.Default.DisplaySize_Tablet_Orientation;
             switch (displaySize_Tablet_Orientation)
             {
                 case 1:
@@ -1117,6 +1126,25 @@ Click OK to continue.";
                     DisplaySize_Tablet_Portrait.IsChecked = true;
                     break;
             }
+        }
+
+        private void RestoreWindowState()
+        {
+            Left = Settings.Default.WindowPositionLeft;
+            Top = Settings.Default.WindowPositionTop;
+            Width = Settings.Default.WindowWidth;
+            Height = Settings.Default.WindowHeight;
+            WindowState = Settings.Default.WindowState;
+        }
+
+        private void SaveWindowState()
+        {
+            Settings.Default.WindowPositionLeft = Left;
+            Settings.Default.WindowPositionTop = Top;
+            Settings.Default.WindowWidth = Width;
+            Settings.Default.WindowHeight = Height;
+            Settings.Default.WindowState = WindowState;
+            Settings.Default.Save();
         }
 
         #region Element Picker for XAML Inspection
