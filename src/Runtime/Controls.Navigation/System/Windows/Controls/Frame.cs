@@ -268,7 +268,7 @@ namespace System.Windows.Controls
                 "CurrentSource",
                 typeof(Uri),
                 typeof(Frame),
-                new PropertyMetadata(false));
+                new PropertyMetadata((object)null));
 
         /// <summary>
         /// The DependencyProperty for the CurrentSource property.
