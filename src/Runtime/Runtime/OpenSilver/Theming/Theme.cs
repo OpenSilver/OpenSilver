@@ -112,8 +112,12 @@ public abstract class Theme
     {
         Debug.Assert(typeKey is not null);
 
-        ResourceDictionary resources = GetOrCreateResourceDictionary(typeKey.Assembly);
-        return resources?[typeKey];
+        if (GetOrCreateResourceDictionary(typeKey.Assembly) is ResourceDictionary resources)
+        {
+            return FetchResource(resources, typeKey);
+        }
+
+        return null;
     }
 
     private ResourceDictionary GetOrCreateResourceDictionary(Assembly assembly)
@@ -150,6 +154,25 @@ public abstract class Theme
         }
 
         return resources;
+    }
+
+    private static object FetchResource(ResourceDictionary resources, object key)
+    {
+        object resource = resources[key];
+
+        if (resource is Style style)
+        {
+            style.Seal();
+
+            // Check if the theme style has the OverridesDefaultStyle property set on any of its setters.
+            // It is an error to specify the OverridesDefaultStyle in your own ThemeStyle.
+            if (style.EffectiveValues.ContainsKey(FrameworkElement.OverridesDefaultStyleProperty.GlobalIndex))
+            {
+                throw new InvalidOperationException(Strings.CannotHaveOverridesDefaultStyleInThemeStyle);
+            }
+        }
+
+        return resource;
     }
 
     /// <summary>

@@ -160,6 +160,9 @@
   <data name="CannotGroupView" xml:space="preserve">
     <value>'{0}' view does not support grouping.</value>
   </data>
+  <data name="CannotHaveOverridesDefaultStyleInThemeStyle" xml:space="preserve">
+    <value>Cannot set OverridesDefaultStyle property in the default Style.</value>
+  </data>
   <data name="CannotHavePropertyInStyle" xml:space="preserve">
     <value>'{0}' property cannot be set in the current element's Style.</value>
   </data>

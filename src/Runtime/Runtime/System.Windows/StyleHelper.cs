@@ -117,11 +117,13 @@ namespace System.Windows
 
             // Fetch the DefaultStyleKey and the self Style for
             // the given FrameworkElement
-            object themeStyleKey = fe.GetValue(FrameworkElement.DefaultStyleKeyProperty);
-            Style oldThemeStyle = fe.ThemeStyle;
+            object themeStyleKey = fe.DefaultStyleKey;
+            bool overridesDefaultStyle = fe.OverridesDefaultStyle;
             Style newThemeStyle = null;
 
-            if (themeStyleKey is Type typeKey)
+            // Don't lookup properties from the themes if user has specified OverridesDefaultStyle or
+            // DefaultStyleKey is null.
+            if (!overridesDefaultStyle && themeStyleKey is Type typeKey)
             {
                 // Regular lookup based on the DefaultStyleKey. Involves locking and Hashtable lookup
                 newThemeStyle = XamlResources.FindStyleResourceInGenericXaml(typeKey);
@@ -137,12 +139,6 @@ namespace System.Windows
                         newThemeStyle = styleMetadata.DefaultValue as Style;
                     }
                 }
-            }
-
-            // Propagate change notification
-            if (oldThemeStyle != newThemeStyle)
-            {
-                FrameworkElement.OnThemeStyleChanged(fe, oldThemeStyle, newThemeStyle);
             }
 
             return newThemeStyle;

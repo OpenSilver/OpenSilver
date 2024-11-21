@@ -93,8 +93,7 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Identifies the <see cref="DefaultStyleKey"/> dependency
-        /// property.
+        /// Identifies the <see cref="DefaultStyleKey"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
             DependencyProperty.Register(
@@ -106,10 +105,35 @@ namespace System.Windows
         /// <summary>
         /// Gets or sets the key that references the default style for the control.
         /// </summary>
-        protected object DefaultStyleKey
+        protected internal object DefaultStyleKey
         {
-            get { return GetValue(DefaultStyleKeyProperty); }
-            set { SetValueInternal(DefaultStyleKeyProperty, value); }
+            get => GetValue(DefaultStyleKeyProperty);
+            set => SetValueInternal(DefaultStyleKeyProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="OverridesDefaultStyle"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OverridesDefaultStyleProperty =
+            DependencyProperty.Register(
+                nameof(OverridesDefaultStyle),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnThemeStyleKeyChanged));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether this element incorporates style properties from theme styles.
+        /// </summary>
+        /// <returns>
+        /// true if this element does not use theme style properties; all style-originating properties come from local 
+        /// application styles, and theme style properties do not apply. false if application styles apply first, and 
+        /// then theme styles apply for properties that were not specifically set in application styles. The default is 
+        /// false.
+        /// </returns>
+        public bool OverridesDefaultStyle
+        {
+            get => (bool)GetValue(OverridesDefaultStyleProperty);
+            set => SetValueInternal(OverridesDefaultStyleProperty, value);
         }
 
         private static void OnThemeStyleKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -124,29 +148,25 @@ namespace System.Windows
         /// </summary>
         private void UpdateThemeStyleProperty()
         {
-            if (!IsThemeStyleUpdateInProgress)
-            {
-                IsThemeStyleUpdateInProgress = true;
-                try
-                {
-                    StyleHelper.GetThemeStyle(this);
-                }
-                finally
-                {
-                    IsThemeStyleUpdateInProgress = false;
-                }
-            }
-            else
+            if (IsThemeStyleUpdateInProgress)
             {
                 throw new InvalidOperationException(string.Format(Strings.CyclicThemeStyleReferenceDetected, this));
             }
-        }
 
-        // Invoked when the ThemeStyle property is changed
-        internal static void OnThemeStyleChanged(DependencyObject d, Style oldStyle, Style newStyle)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-            StyleHelper.UpdateThemeStyleCache(fe, oldStyle, newStyle, ref fe._themeStyleCache);
+            IsThemeStyleUpdateInProgress = true;
+            try
+            {
+                Style oldStyle = ThemeStyle;
+                Style newStyle = StyleHelper.GetThemeStyle(this);
+                if (oldStyle != newStyle)
+                {
+                    StyleHelper.UpdateThemeStyleCache(this, oldStyle, newStyle, ref _themeStyleCache);
+                }
+            }
+            finally
+            {
+                IsThemeStyleUpdateInProgress = false;
+            }
         }
 
         private void UpdateStyleProperty()

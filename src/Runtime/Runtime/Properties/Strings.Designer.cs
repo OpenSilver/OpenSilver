@@ -187,6 +187,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot set OverridesDefaultStyle property in the default Style..
+        /// </summary>
+        internal static string CannotHaveOverridesDefaultStyleInThemeStyle {
+            get {
+                return ResourceManager.GetString("CannotHaveOverridesDefaultStyleInThemeStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; property cannot be set in the current element&apos;s Style..
         /// </summary>
         internal static string CannotHavePropertyInStyle {
