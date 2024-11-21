@@ -86,8 +86,7 @@ namespace OpenSilver.Compiler
             string rootNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
-            ConversionSettings settings,
-            string outputResourcesPath)
+            ConversionSettings settings)
         {
             ICodeGenerator generator;
             if (isFirstPass)
@@ -107,8 +106,7 @@ namespace OpenSilver.Compiler
                     assemblyNameWithoutExtension,
                     rootNamespace,
                     reflectionOnSeparateAppDomain,
-                    settings,
-                    outputResourcesPath);
+                    settings);
             }
 
             return generator.Generate();
@@ -116,7 +114,6 @@ namespace OpenSilver.Compiler
 
         private static string CreateInitializeComponentMethod(
             string applicationTypeFullName,
-            string additionalCodeForApplication,
             string assemblyNameWithoutExtension,
             string fileNameWithPathRelativeToProjectRoot,
             List<string> findNameCalls)
@@ -139,7 +136,6 @@ namespace OpenSilver.Compiler
             End If
             _contentLoaded = True
 
-            {additionalCodeForApplication}
             {loadComponentCall}
             {string.Join(Environment.NewLine + "            ", findNameCalls)}
         End Sub

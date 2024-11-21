@@ -107,16 +107,13 @@ namespace Runtime.OpenSilver.Tests
         {
             Features.Interop.UseNewLineSeparator = true;
 
-            var javaScriptExecutionHandlerMock = new Mock<IWebAssemblyExecutionHandler>();
+            var javaScriptExecutionHandlerMock = new Mock<INativeMethods>();
             javaScriptExecutionHandlerMock
                 .Setup(x => x.ExecuteJavaScriptWithResult(It.IsAny<string>()))
                 .Returns<string>(ExecuteJsMock);
             javaScriptExecutionHandlerMock
-                .Setup(x => x.InvokeUnmarshalled<byte[], int, object>(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<int>()))
-                .Returns<string, byte[], int>((name, bytes, length) => ExecuteJsMock(Encoding.Unicode.GetString(bytes, 0, length)));
-            javaScriptExecutionHandlerMock
-                .Setup(x => x.InvokeUnmarshalled<string, int, bool, object>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
-                .Returns<string, string, int, bool>((name, js, refId, wantsResult) => ExecuteJsMock(js));
+                .Setup(x => x.InvokeJS(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns<string, int, bool>((js, refId, wantsResult) => ExecuteJsMock(js));
 
             var javaScriptExecutionHandler2 = javaScriptExecutionHandlerMock.Object;
             INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;

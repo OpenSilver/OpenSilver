@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Compiler.ResourcesExtractor\Compiler.ResourcesExtractor.OpenSilver.csproj" />
+    <ProjectReference Include="..\..\Compiler.SharedBuildTasks\Compiler.SharedBuildTasks.OpenSilver.csproj" />
     <ProjectReference Include="..\..\Compiler\Compiler.OpenSilver.csproj" />
     <ProjectReference Include="..\Experimental\Experimental.csproj" />
   </ItemGroup>

@@ -87,8 +87,7 @@ namespace OpenSilver.Compiler
             string assemblyNameWithoutExtension,
             AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
-            ConversionSettings settings,
-            string outputResourcesPath)
+            ConversionSettings settings)
         {
             ICodeGenerator generator;
             if (isFirstPass)
@@ -106,8 +105,7 @@ namespace OpenSilver.Compiler
                     fileNameWithPathRelativeToProjectRoot,
                     assemblyNameWithoutExtension,
                     reflectionOnSeparateAppDomain,
-                    settings,
-                    outputResourcesPath);
+                    settings);
             }
 
             return generator.Generate();
@@ -115,7 +113,6 @@ namespace OpenSilver.Compiler
 
         private static string CreateInitializeComponentMethod(
             string applicationTypeFullName,
-            string additionalCodeForApplication,
             string assemblyNameWithoutExtension,
             string fileNameWithPathRelativeToProjectRoot,
             List<string> findNameCalls)
@@ -139,7 +136,6 @@ namespace OpenSilver.Compiler
                 return;
             }}
             _contentLoaded = true;
-            {additionalCodeForApplication}
             {loadComponentCall}
             {string.Join(Environment.NewLine + "            ", findNameCalls)}
         }}

@@ -68,7 +68,7 @@ namespace OpenSilver
                     // since the remaining javascript can rely on the results from here
                     Interop.JavaScriptRuntime.Flush();
 
-                    await Interop.ExecuteJavaScriptAsync(_javascript.ToString(), 0, false);
+                    await Interop.ExecuteJavaScriptAsync(_javascript.ToString(), -1, false);
                 }
                 catch (Exception e)
                 {

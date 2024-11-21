@@ -1,0 +1,57 @@
+﻿<!-- 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildThisFileDirectory)/OpenSilver.SharedBuildTasks.Config.targets" />
+
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)../tools/$(_OpenSilverCompilerSharedBuildTasksAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesExtractorAndCopier" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)../tools/$(_OpenSilverCompilerSharedBuildTasksAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <Target Name="_RunBuildUpdates" BeforeTargets="Build">
+
+    <PropertyGroup>
+      <SkipOpenSilverUpdates Condition="'$(SkipOpenSilverUpdates)' == ''">false</SkipOpenSilverUpdates>
+    </PropertyGroup>
+
+    <Updates Condition="'$(PkgOpenSilver)' != '' And '$(SkipOpenSilverUpdates)' == 'false'" PackagePath="$(PkgOpenSilver)" />
+
+  </Target>
+
+  <Target Name="_CopyWasmResources" BeforeTargets="PostBuildEvent">
+
+    <PropertyGroup>
+      <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)' == ''">resources/</Cshtml5OutputResourcesPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_OpenSilverScripts Include="$(MSBuildThisFileDirectory)../content/**/*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_OpenSilverScripts)"
+          SkipUnchangedFiles="true"
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/libs/" />
+
+    <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
+                                 OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/" />
+
+  </Target>
+
+</Project>

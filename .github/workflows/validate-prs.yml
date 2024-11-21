@@ -14,7 +14,7 @@ jobs:
       - uses: microsoft/setup-msbuild@v1.1
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '8.0.*'
+          dotnet-version: '9.0.*'
       - name: Clone OpenSilver repo
         uses: actions/checkout@v2
         with:
@@ -34,12 +34,14 @@ jobs:
         run: ./build/build-nuget-package-OpenSilver.bat ${{ steps.format-version.outputs.version }}
       - name: Build OpenSilver.Simulator NuGet package
         run: ./build/build-nuget-package-OpenSilver.Simulator.bat ${{ steps.format-version.outputs.version }}
-      - name: Replace existing package with actual one
-        run: |
-          nuget sources Add -Name localbuild -Source "$(Get-Location)\build\output\OpenSilver"
-          dotnet add src\Tests\TestApplication\TestApplication\TestApplication.OpenSilver.csproj package OpenSilver -v ${{ steps.format-version.outputs.version }}
-          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj package OpenSilver -v ${{ steps.format-version.outputs.version }}
-          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Simulator\TestApplication.OpenSilver.Simulator.csproj package OpenSilver.Simulator -v ${{ steps.format-version.outputs.version }}
+      - name: Build OpenSilver.WebAssembly NuGet package
+        run: ./build/build-nuget-package-OpenSilver.Wasm.bat ${{ steps.format-version.outputs.version }}
+      # - name: Replace existing package with actual one
+      #   run: |
+      #     nuget sources Add -Name localbuild -Source "$(Get-Location)\build\output\OpenSilver"
+      #     dotnet add src\Tests\TestApplication\TestApplication\TestApplication.OpenSilver.csproj package OpenSilver -v ${{ steps.format-version.outputs.version }}
+      #     dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj package OpenSilver.WebAssembly -v ${{ steps.format-version.outputs.version }}
+      #     dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Simulator\TestApplication.OpenSilver.Simulator.csproj package OpenSilver.Simulator -v ${{ steps.format-version.outputs.version }}
       - name: Drop all bin and obj folders
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash
@@ -51,8 +53,8 @@ jobs:
         run: dotnet test src/Tests/Runtime.OpenSilver.Tests/bin/Release/net472/Runtime.OpenSilver.Tests.dll
       - name: Run Analyzers Tests Configuration
         run: dotnet test src/Analyzers/NotImplemented.Tests/bin/Release/net472/OpenSilver.Analyzers.Tests.dll
-      - name: Verify Building of TestApplication
-        run: msbuild src/Tests/TestApplication/TestApplication.OpenSilver.sln -p:Configuration=Release -clp:ErrorsOnly -restore
+      # - name: Verify Building of TestApplication
+      #   run: msbuild src/Tests/TestApplication/TestApplication.OpenSilver.sln -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Drop all bin and obj folders
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash

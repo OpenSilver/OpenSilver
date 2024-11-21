@@ -26,8 +26,7 @@ namespace OpenSilver.Compiler
             string rootNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
             XamlPreprocessorOptions options,
-            bool isFirstPass,
-            string outputResourcesPath)
+            bool isFirstPass)
         {
             ConversionSettings settings = ConversionSettings.CreateVisualBasicSettings(assemblyNameWithoutExtension, options);
 
@@ -67,8 +66,7 @@ namespace OpenSilver.Compiler
                 rootNamespace,
                 reflectionOnSeparateAppDomain,
                 isFirstPass,
-                settings,
-                outputResourcesPath);
+                settings);
         }
     }
 }

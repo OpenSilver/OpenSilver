@@ -85,16 +85,20 @@ public static partial class Interop
 
     internal static IPendingJavascript JavaScriptRuntime { get; private set; }
 
+    internal static INativeMethods NativeMethods { get; private set; }
+
     internal static void SetRuntime(IJavaScriptExecutionHandler jsRuntime)
     {
         Debug.Assert(jsRuntime is not null);
 
-        if (jsRuntime is IWebAssemblyExecutionHandler wasmHandler)
+        if (jsRuntime is INativeMethods nativeMethods)
         {
-            JavaScriptRuntime = new PendingJavascript(wasmHandler, _buffer);
+            NativeMethods = nativeMethods;
+            JavaScriptRuntime = new PendingJavascript(nativeMethods, _buffer);
         }
         else
         {
+            NativeMethods = new UnimplementedNativeMethods();
             JavaScriptRuntime = new PendingJavascriptSimulator(jsRuntime, _buffer);
         }
     }
@@ -496,5 +500,24 @@ public static partial class Interop
         public void AppendFormatted(string value) => _buffer.Append(value);
 
         public void AppendFormatted<T>(T value) => _buffer.Append(value.ToString());
+    }
+
+    private sealed class UnimplementedNativeMethods : INativeMethods
+    {
+        public void ExecuteJavaScript(string javaScriptToExecute) => throw new NotImplementedException();
+
+        public object ExecuteJavaScriptWithResult(string javaScriptToExecute) => throw new NotImplementedException();
+
+        public object InvokeJS(string javascript, int referenceId, bool wantsResult) => throw new NotImplementedException();
+
+        public void InvokePendingJS(byte[] bytes, int length) => throw new NotImplementedException();
+
+        public void WriteableBitmap_FillBufferInt32(int[] buffer) => throw new NotImplementedException();
+
+        public void WriteableBitmap_CreateFromBitmapSource(string data, Action<int, int, int> onSuccess, Action<string> onError)
+            => throw new NotImplementedException();
+
+        public void WriteableBitmap_RenderUIElement(string id, int width, int height, string transform, Action<int, int, int> onSuccess, Action<string> onError)
+            => throw new NotImplementedException();
     }
 }

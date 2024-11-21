@@ -20,10 +20,6 @@ SET currenttime=%time%
 
 FOR /F "delims=" %%a IN ('powershell -Command "[guid]::NewGuid().ToString('N')"') DO SET BUILD_UUID=%%a
 
-rem Create a Version.txt file with the date:
-MD %BUILD_DIR%\temp
-ECHO OpenSilver %PackageVersion% (%currentdate% %currenttime%)> %BUILD_DIR%\temp\Version.txt
-
 ECHO. 
 ECHO %ESC%[95mBuilding %ESC%[0mRelease %ESC%[95mconfiguration%ESC%[0m
 ECHO. 

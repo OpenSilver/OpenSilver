@@ -3,7 +3,8 @@
     "path": "..\\..\\src\\OpenSilver.sln",
     "projects": [
       "Compiler\\Compiler.SharedBuildTasks\\Compiler.SharedBuildTasks.OpenSilver.csproj",
-      "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
+      "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
+      "WebAssembly\\OpenSilver.WebAssembly\\OpenSilver.WebAssembly.csproj"
     ]
   }
 }

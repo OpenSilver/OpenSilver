@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' == ''">OpenSilver.Compiler.SharedBuildTasks</AssemblyName>
+    <AssemblyName Condition="'$(OpenSilverBuildUUID)' != ''">OpenSilver.Compiler.SharedBuildTasks.$(OpenSilverBuildUUID)</AssemblyName>
+    <RootNamespace>OpenSilver.Compiler.SharedBuildTasks</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.12.6" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Compiler.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Compiler\Helpers\ResourceIDHelper.cs" Link="ResourceIDHelper.cs" />
+    <Compile Include="..\Compiler\OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssemblyStorage.cs" Link="MonoCecilAssemblyStorage.cs" />
+    <Compile Include="..\Compiler\Helpers\TaskHelper.cs" Link="TaskHelper.cs" />
+  </ItemGroup>
+  
+    <Target Name="GenerateOpenSilverTargets" AfterTargets="PostBuildEvent" Condition="'$(OpenSilverBuildUUID)' != ''">
+
+    <PropertyGroup>
+      <_OpenSilverTargets>
+&lt;!--
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+--&gt;
+
+&lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;_OpenSilverCompilerSharedBuildTasksAssemblyName&gt;OpenSilver.Compiler.SharedBuildTasks.$(OpenSilverBuildUUID)&lt;/_OpenSilverCompilerSharedBuildTasksAssemblyName&gt;
+  &lt;/PropertyGroup&gt;
+  
+&lt;/Project&gt;
+      </_OpenSilverTargets>
+    </PropertyGroup>
+    
+    <WriteLinesToFile File="$(OutputPath)OpenSilver.SharedBuildTasks.Config.targets" Lines="$(_OpenSilverTargets)" Overwrite="true" />
+
+  </Target>
+
+</Project>

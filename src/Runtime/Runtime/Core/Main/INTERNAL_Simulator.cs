@@ -41,26 +41,26 @@ namespace DotNetForHtml5.Core
         /// </summary>
         public static Func<bool> WebControlDispatcherCheckAccess { get; internal set; }
 
+        private static IJavaScriptExecutionHandler _javaScriptExecutionHandler;
+
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler
         {
-            get => WebAssemblyExecutionHandler;
+            get => _javaScriptExecutionHandler;
             set
             {
+                if (_javaScriptExecutionHandler == value)
+                {
+                    return;
+                }
+
                 if (value is not null)
                 {
                     OpenSilver.Interop.SetRuntime(value);
                 }
-                
-                WebAssemblyExecutionHandler = value switch
-                {
-                    IWebAssemblyExecutionHandler wasmHandler => wasmHandler,
-                    IJavaScriptExecutionHandler jsHandler => new JSRuntimeWrapper(jsHandler),
-                    null => null,
-                };
+
+                _javaScriptExecutionHandler = value;
             }
         }
-
-        internal static IWebAssemblyExecutionHandler WebAssemblyExecutionHandler { get; private set; }
 
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]

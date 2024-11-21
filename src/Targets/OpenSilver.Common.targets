@@ -19,11 +19,9 @@
   ============================================================-->
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ServiceReferenceFixer" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.XamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.UpdateIncludesInFSharpProjectFile" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourceClassifier" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesGenerator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\$(_OpenSilverCompilerResourcesAssemblyName).dll" TaskName="OpenSilver.Compiler.Resources.ResourcesExtractorAndCopier" />
 
   <Import Project="$(MSBuildThisFileDirectory)\OpenSilver.GenerateAssemblyInfo.targets" />
 
@@ -77,14 +75,6 @@
     <OutputExtension Condition="'$(Language)' == 'C#'">cs</OutputExtension>
     <OutputExtension Condition="'$(Language)' == 'VB'">vb</OutputExtension>
     <OutputExtension Condition="'$(Language)' == 'F#'">fs</OutputExtension>
-    <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
-    <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
-    <IsRazorProject  Condition="'$(UsingMicrosoftNETSdkRazor)'=='true'">True</IsRazorProject>
-    <SkipResourcesExtractorAndCopier Condition="'$(SkipResourcesExtractorAndCopier)' == '' And '$(IsBrowserProject)' != 'True'">true</SkipResourcesExtractorAndCopier>
-    <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
-    <Cshtml5OutputRootPath Condition="'$(Cshtml5OutputRootPath)'==''">wwwroot\</Cshtml5OutputRootPath>
-    <!-- Default sub-path for output resources. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)'==''">resources/</Cshtml5OutputResourcesPath>
     <EnableServiceReferenceFixer Condition="'$(EnableServiceReferenceFixer)' == ''">true</EnableServiceReferenceFixer>
     <EnableServiceReferenceFixer Condition="'$(Language)' == 'F#'">false</EnableServiceReferenceFixer>
     <OpenSilverXamlPreprocessorOptions Condition=" '$(OpenSilverXamlPreprocessorOptions)' == '' ">Auto</OpenSilverXamlPreprocessorOptions>
@@ -164,43 +154,32 @@
     </PropertyGroup>
 
     <!--============================================================
-    Check if the project has a reference to WebAssembly:
-    ============================================================-->
-    <PropertyGroup>
-      <WebAssemblyFileName>Microsoft.AspNetCore.Components.WebAssembly</WebAssemblyFileName>
-    </PropertyGroup>
-
-    <CreateProperty
-        Value="True"
-        Condition="$([System.String]::Copy('%(Reference.Filename)').EndsWith('$(WebAssemblyFileName)'))" >
-      <Output
-        TaskParameter="Value"
-        PropertyName="HasReferenceToWebAssembly"/>
-    </CreateProperty>
-
-    <!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
-    <Exec Condition="'$(IsBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;2"
           Command="explorer.exe https://opensilver.net/how-to-migrate-to-1-0-0-alpha-007-or-newer/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(IsBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;2"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/how-to-migrate-to-1-0-0-alpha-007-or-newer/"/>
-    <Exec Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;3"
           Command="explorer.exe https://opensilver.net/alpha19-2/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;3"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/alpha19-2/"/>
-    <Exec Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
+    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;4"
           Command="explorer.exe https://opensilver.net/permalinks/update/alpha20.aspx" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
+    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;4"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx"/>
-    <Exec Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;5"
+    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;5"
           Command="explorer.exe https://opensilver.net/2-0/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;5"
+    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;5"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/2-0/"/>
-    <Exec Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;6"
+    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;6"
           Command="explorer.exe https://opensilver.net/upgrade-to-2.2/" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;6"
+    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;6"
            Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-2.2/"/>
+    <Exec Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;7"
+          Command="explorer.exe https://opensilver.net/upgrade-to-3.1/" Timeout="2000" ContinueOnError="True" />
+    <Error Condition="'$(OpenSilverType)' != '' And $(OpenSilverType)&lt;7"
+           Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/upgrade-to-3.1/" />
 
     <!--============================================================
       ServiceReferenceFixer (case insensitive) (only during Pass 2)
@@ -235,13 +214,6 @@
   ============================================================-->
   <Target Name="CSharpXamlForHtml5BeforeCompile_NotDesignTime">
     
-    <PropertyGroup>
-      <_OpenSilverPkgPath>$(PkgOpenSilver)</_OpenSilverPkgPath>
-    </PropertyGroup>
-
-    <Updates Condition="'$(IsBrowserProject)'=='True' AND '$(SkipOpenSilverUpdates)'==''"
-             PackagePath="$(_OpenSilverPkgPath)"/>
-
     <!--============================================================
       XamlPreprocessor (during Pass 1 and Pass 2)
       ============================================================-->
@@ -256,7 +228,6 @@
       AssemblyName="$(AssemblyName)"
       IsSecondPass="$(IsSecondPass)"
       VerifyHash="false"
-      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
       Language="$(Language)">
@@ -298,75 +269,13 @@
   BEFORE POST BUILD
   ============================================================-->
   <Target Name="CSharpXamlForHtml5BeforePostBuild" BeforeTargets="PostBuildEvent">
-    <Message
-          Text="OpenSilver Before post build. IsSecondPass=$(IsSecondPass)"
-          Importance="normal"/>
-    <ItemGroup>
-      <OutputAssembly Include="$(OutputAssemblyDirectory)\$(AssemblyName).dll" />
-    </ItemGroup>
 
-    <!--============================================================
-      Setting the proper path for copying the resources:
-      ============================================================-->
-    <PropertyGroup Condition="'$(IsBrowserProject)' == 'False'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
-      <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
-      <Cshtml5OutputRootPath>wwwroot\</Cshtml5OutputRootPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(IsBrowserProject)' == 'True'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
-      <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
-      <Cshtml5OutputRootPath>..\..\..\wwwroot\</Cshtml5OutputRootPath>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(IsBrowserProject)' == 'True' OR ('$(IsRazorProject)' == 'True' AND '$(HasReferenceToWebAssembly)' == 'True')">
-      <ShouldCopyJsCssFiles>True</ShouldCopyJsCssFiles>
-    </PropertyGroup>
-
-    <!--============================================================
-      Copying the js/css libraries that come with OpenSilver:
-      ============================================================-->
-    <ItemGroup Condition="'$(ShouldCopyJsCssFiles)' == 'True'">
-      <MySourceFiles Include="$(MSBuildThisFileDirectory)..\js_css\*"/>
-    </ItemGroup>
-
-    <!--<Message  Condition="'$(IsBrowserProject)' == 'True' And '$(IsSecondPass)'=='True'"
-                Text="Copying resources from &quot;$(MSBuildThisFileDirectory)&quot; to &quot;$(BaseIntermediateOutputPath)..\wwwroot\libs\&quot;"
-                Importance="normal"/>-->
-
-    <Message  Condition="'$(ShouldCopyJsCssFiles)' == 'True'"
-                Text="Copying OpenSilver's required js/css libraries."
-                Importance="normal"/>
-
-    <Copy Condition="'$(ShouldCopyJsCssFiles)' == 'True'"
-        SourceFiles="@(MySourceFiles)"
-        SkipUnchangedFiles="true"
-        DestinationFolder="$(BaseIntermediateOutputPath)..\wwwroot\libs\"
-        /><!-- Note: BaseIntermediateOutputPath is an absolute path to the project's obj folder.-->
-
-    <PropertyGroup>
-      <ResourcesSourceLocation>$(OutputAssemblyDirectory)</ResourcesSourceLocation>
-      <ResourcesSourceLocation Condition="('$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0') And '$(IsBrowserProject)' == 'True'">$(OutputAssemblyDirectory)\wwwroot\_framework</ResourcesSourceLocation>
-      <ResourcesRootOutput>$(Cshtml5OutputRootPath)</ResourcesRootOutput>
-      <ResourcesRootOutput Condition="('$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0') And '$(IsBrowserProject)' == 'True'">$(OutputAssemblyDirectory)\..\..\..\wwwroot\</ResourcesRootOutput>
-    </PropertyGroup>
-
-    <!--============================================================
-      ResourceExtractorAndCopier (only during Pass 1)
-      ============================================================-->
-    <ResourcesExtractorAndCopier
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
-      SourceAssembly="$(ResourcesSourceLocation)\$(AssemblyName).dll"
-      ResolvedReferences="@(ReferencePath)"
-      OutputRootPath="$(ResourcesRootOutput)"
-      OutputResourcesPath="$(Cshtml5OutputResourcesPath)" />
+    <Message Text="OpenSilver Before post build. IsSecondPass=$(IsSecondPass)" Importance="normal"/>
 
     <!--============================================================
       Launch the second pass (only during Pass 1)
       ============================================================-->
-    <MSBuild
-      Condition="'$(IsSecondPass)'!='True' And '$(IsBrowserProject)'!='True'"
-      Projects="$(MSBuildProjectFile)"
-      Properties="IsSecondPass=True"
-      />
+    <MSBuild Condition="'$(IsSecondPass)'!='True'" Projects="$(MSBuildProjectFile)" Properties="IsSecondPass=True" />
 
     <!--============================================================
       Enable the Post Build event only during Pass 2 (to avoid calling the Post Build event twice)
@@ -409,7 +318,6 @@
       AssemblyName="$(AssemblyName)"
       IsSecondPass="false"
       VerifyHash="false"
-      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       RootNamespace="$(RootNamespace)"
       Options="$(OpenSilverXamlPreprocessorOptions)"
       Language="$(Language)">

@@ -18,6 +18,7 @@
         <dependency id="Microsoft.Web.WebView2" version="1.0.2739.15" />
         <dependency id="Microsoft.Web.WebView2.DevToolsProtocolExtension" version="1.0.2271" />
         <dependency id="MahApps.Metro" version="2.4.10" />
+        <dependency id="System.Text.Json" version="9.0.0" />
         <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
       </group>
     </dependencies>
@@ -42,24 +43,24 @@
 
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
-    <file src="../../src/Compiler/Compiler/bin/$Configuration$/netstandard2.0/OpenSilver.Common.Config.targets" target="build/OpenSilver.Common.Config.targets" />
+    <file src="../../src/Compiler/Compiler.SharedBuildTasks/bin/$Configuration$/netstandard2.0/OpenSilver.SharedBuildTasks.Config.targets" target="build/OpenSilver.SharedBuildTasks.Config.targets" />
 
     <!-- OpenSilver HTML files -->
     <file src="../../src/Simulator/Simulator/simulator_root_opensilver.html" target="contentFiles/any/any/simulator_root.html" />
     <file src="../../src/Simulator/Simulator/interop_debug_root_opensilver.html" target="contentFiles/any/any/interop_debug_root.html" />
 
     <!-- OpenSilver compiler -->
-    <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/$Configuration$/netstandard2.0/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
-    <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/$Configuration$/netstandard2.0/OpenSilver.Compiler.Resources.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.Resources.$OpenSilverBuildUUID$.dll" />
+    <file src="../../src/Compiler/Compiler.SharedBuildTasks/bin/$Configuration$/netstandard2.0/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
+    <file src="../../src/Compiler/Compiler.SharedBuildTasks/bin/$Configuration$/netstandard2.0/OpenSilver.Compiler.SharedBuildTasks.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.SharedBuildTasks.$OpenSilverBuildUUID$.dll" />
 
     <!-- OpenSilver JS and CSS files -->
     <file src="../../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/any/js_css" />
     <file src="../../src/Runtime/Scripts/cshtml5.css" target="contentFiles/any/any/js_css" />
     <file src="../../src/Runtime/Scripts/cshtml5.js" target="contentFiles/any/any/js_css" />
-    <file src="../../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/any/js_css" />    
+    <file src="../../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/any/js_css" />
     <file src="../../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/any/js_css" />
     <file src="../../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/any/js_css" />
-	
+
     <!-- OpenSilver icon -->
     <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
   </files>

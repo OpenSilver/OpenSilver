@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Targets", "Targets", "{09E9
 		Targets\OpenSilver.GenerateAssemblyInfo.targets = Targets\OpenSilver.GenerateAssemblyInfo.targets
 		Targets\OpenSilver.Simulator.targets = Targets\OpenSilver.Simulator.targets
 		Targets\OpenSilver.targets = Targets\OpenSilver.targets
+		Targets\OpenSilver.WebAssembly.targets = Targets\OpenSilver.WebAssembly.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3731CAAC-26BC-476D-A6F5-B80507182818}"
@@ -70,8 +71,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experimental", "Compiler\Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compiler.OpenSilver", "Compiler\Compiler\Compiler.OpenSilver.csproj", "{669220B6-BE26-4155-92C4-C8A635C0B8CC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compiler.ResourcesExtractor.OpenSilver", "Compiler\Compiler.ResourcesExtractor\Compiler.ResourcesExtractor.OpenSilver.csproj", "{6F61ED5F-8C38-4443-B101-9AB9BF2CE80D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulator.OpenSilver", "Simulator\Simulator\Simulator.OpenSilver.csproj", "{C4F356FB-A607-432C-A7F0-03399A08EDFA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApplication.OpenSilver", "Tests\TestApplication\TestApplication\TestApplication.OpenSilver.csproj", "{3DD381BC-FDB4-4495-B587-70215B4781A7}"
@@ -123,6 +122,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data.OpenSilver", "Runtime\Data\Data.OpenSilver.csproj", "{7684E7CE-C72C-42EC-94B4-CE77B2C7E9FD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Browser.OpenSilver", "Runtime\Browser\Browser.OpenSilver.csproj", "{5BE991C3-6E28-46D7-953D-94D5D4AC131D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebAssembly", "WebAssembly", "{14B7A75E-0BDD-45A3-A645-9FEABE7811E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSilver.WebAssembly", "WebAssembly\OpenSilver.WebAssembly\OpenSilver.WebAssembly.csproj", "{C57535EA-4837-4C68-B389-3E3E7F16DEF0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compiler.SharedBuildTasks.OpenSilver", "Compiler\Compiler.SharedBuildTasks\Compiler.SharedBuildTasks.OpenSilver.csproj", "{839A56F5-C47E-4569-9A3A-9443EA8A262E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -194,10 +199,6 @@ Global
 		{669220B6-BE26-4155-92C4-C8A635C0B8CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{669220B6-BE26-4155-92C4-C8A635C0B8CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{669220B6-BE26-4155-92C4-C8A635C0B8CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6F61ED5F-8C38-4443-B101-9AB9BF2CE80D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F61ED5F-8C38-4443-B101-9AB9BF2CE80D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F61ED5F-8C38-4443-B101-9AB9BF2CE80D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F61ED5F-8C38-4443-B101-9AB9BF2CE80D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4F356FB-A607-432C-A7F0-03399A08EDFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4F356FB-A607-432C-A7F0-03399A08EDFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4F356FB-A607-432C-A7F0-03399A08EDFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -292,6 +293,14 @@ Global
 		{5BE991C3-6E28-46D7-953D-94D5D4AC131D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BE991C3-6E28-46D7-953D-94D5D4AC131D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BE991C3-6E28-46D7-953D-94D5D4AC131D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C57535EA-4837-4C68-B389-3E3E7F16DEF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C57535EA-4837-4C68-B389-3E3E7F16DEF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C57535EA-4837-4C68-B389-3E3E7F16DEF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C57535EA-4837-4C68-B389-3E3E7F16DEF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{839A56F5-C47E-4569-9A3A-9443EA8A262E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{839A56F5-C47E-4569-9A3A-9443EA8A262E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{839A56F5-C47E-4569-9A3A-9443EA8A262E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{839A56F5-C47E-4569-9A3A-9443EA8A262E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -318,7 +327,6 @@ Global
 		{21CACBB9-664A-42C7-89AB-79D5A9335039} = {52638437-9208-48A1-9A47-0DCA9D53782D}
 		{4B2AFEB2-D3D1-4558-93B3-D2D819B702CF} = {52638437-9208-48A1-9A47-0DCA9D53782D}
 		{669220B6-BE26-4155-92C4-C8A635C0B8CC} = {8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}
-		{6F61ED5F-8C38-4443-B101-9AB9BF2CE80D} = {8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}
 		{C4F356FB-A607-432C-A7F0-03399A08EDFA} = {F63723D0-B919-44EF-A4D9-AA405B4538C5}
 		{3DD381BC-FDB4-4495-B587-70215B4781A7} = {CD0D2100-A9DA-40FC-AEFE-95FF823739D7}
 		{364AED94-6D67-4DF2-814A-E09709CB8D29} = {CD0D2100-A9DA-40FC-AEFE-95FF823739D7}
@@ -345,6 +353,8 @@ Global
 		{56D0BA59-DAC9-4054-ADC0-0767D883344F} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{7684E7CE-C72C-42EC-94B4-CE77B2C7E9FD} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{5BE991C3-6E28-46D7-953D-94D5D4AC131D} = {5CABE705-CE13-456F-B02E-977B59D964FA}
+		{C57535EA-4837-4C68-B389-3E3E7F16DEF0} = {14B7A75E-0BDD-45A3-A645-9FEABE7811E1}
+		{839A56F5-C47E-4569-9A3A-9443EA8A262E} = {8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}

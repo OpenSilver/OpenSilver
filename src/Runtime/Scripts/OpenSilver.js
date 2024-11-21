@@ -13,54 +13,6 @@
 *
 \*====================================================================================*/
 
-window.getOSFilesLoadedPromise = (function () {
-    const styleheets = ['libs/cshtml5.css', 'libs/quill.core.css'];
-    const scripts = ['libs/cshtml5.js', 'libs/ResizeObserver.js', 'libs/quill.min.js', 'libs/html2canvas.js'];
-
-    const _promises = [];
-    const _timestamp = '?date=' + new Date().toISOString();
-
-    styleheets.forEach((name) => {
-        _promises.push(new Promise((resolve, reject) => {
-            const url = name + _timestamp;
-            const stylesheet = document.createElement('link');
-            stylesheet.setAttribute('rel', 'stylesheet');
-            stylesheet.setAttribute('type', 'text/css');
-            stylesheet.setAttribute('href', url);
-            stylesheet.onload = function () { resolve(url); }
-            stylesheet.onerror = function () {
-                console.error('Failed to load ' + name);
-                reject(url);
-            }
-            document.getElementsByTagName('head')[0].appendChild(stylesheet);
-        }));
-    });
-
-    scripts.forEach((name) => {
-        _promises.push(new Promise((resolve, reject) => {
-            const url = name + _timestamp;
-            const script = document.createElement('script');
-            script.setAttribute('type', 'application/javascript');
-            script.setAttribute('src', url);
-            script.onload = function () { resolve(url); };
-            script.onerror = function () {
-                console.error('Failed to load ' + name);
-                reject(url);
-            };
-            document.getElementsByTagName('head')[0].appendChild(script);
-        }));
-    });
-
-    return async function () {
-        try {
-            await Promise.all(_promises);
-            return true;
-        } catch (error) {
-            return false;
-        }
-    };
-})();
-
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";
     const opensilver_js_callback = "OnCallbackFromJavaScriptBrowser";
@@ -117,58 +69,130 @@ window.onCallBack = (function () {
     };
 })();
 
-window.callJS = function (javaScriptToExecute) {
-    var result = eval(javaScriptToExecute);
-    var resultType = typeof result;
-    if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-       return result;
-    } else if (result == null) {
-        return null;
-    } else {     
-        return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
+window._openSilverRuntime = (function () {
+    const _promises = [];
+    const _textDecoder = new TextDecoder('utf-16le');
+
+    (function () {
+        const styleheets = ['libs/cshtml5.css', 'libs/quill.core.css'];
+        const scripts = ['libs/cshtml5.js', 'libs/ResizeObserver.js', 'libs/quill.min.js', 'libs/html2canvas.js'];
+        const timestamp = '?date=' + new Date().toISOString();
+
+        styleheets.forEach((name) => {
+            _promises.push(new Promise((resolve, reject) => {
+                const url = name + timestamp;
+                const stylesheet = document.createElement('link');
+                stylesheet.setAttribute('rel', 'stylesheet');
+                stylesheet.setAttribute('type', 'text/css');
+                stylesheet.setAttribute('href', url);
+                stylesheet.onload = () => { resolve(url); };
+                stylesheet.onerror = () => { reject(url); };
+                document.getElementsByTagName('head')[0].appendChild(stylesheet);
+            }));
+        });
+
+        scripts.forEach((name) => {
+            _promises.push(new Promise((resolve, reject) => {
+                const url = name + timestamp;
+                const script = document.createElement('script');
+                script.setAttribute('type', 'application/javascript');
+                script.setAttribute('src', url);
+                script.onload = () => { resolve(url); };
+                script.onerror = () => { reject(url); };
+                document.getElementsByTagName('head')[0].appendChild(script);
+            }));
+        });
+    })();
+
+    return {
+        startAsync: async function () {
+            try {
+                await Promise.all(_promises);
+                return true;
+            } catch (error) {
+                console.error(error);
+                return false;
+            }
+        },
+        invokeJS: function (javaScriptToExecute, referenceId) {
+            const result = eval(javaScriptToExecute);
+
+            if (referenceId >= 0) {
+                document.jsObjRef[referenceId.toString()] = result;
+            }
+
+            const resultType = typeof result;
+            if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
+                return result;
+            } else if (result == null) {
+                return null;
+            } else {
+                return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
+            }
+        },
+        invokeJSVoid: function (javaScriptToExecute) {
+            eval(javaScriptToExecute);
+        },
+        invokePendingJS: function (span) {
+            const view = span._unsafe_create_view();
+            const javaScriptToExecute = _textDecoder.decode(view);
+            eval(javaScriptToExecute);
+        },
+        WBM: (function () {
+            let _tempPixelsData;
+
+            function smoothCanvasContext(ctx) {
+                ctx.imageSmoothingEnabled = true;
+                ctx.webkitImageSmoothingEnabled = true;
+                ctx.mozImageSmoothingEnabled = true;
+                ctx.msImageSmoothingEnabled = true;
+            }
+
+            return {
+                createFromBitmapSource: function (data, callback) {
+                    const img = new Image();
+                    img.src = data;
+                    img.onload = function () {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.height = img.height;
+                            canvas.width = img.width;
+                            const ctx = canvas.getContext('2d');
+                            smoothCanvasContext(ctx);
+                            ctx.drawImage(img, 0, 0);
+                            const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+                            _tempPixelsData = new Int32Array(imgData.data.buffer);
+                            callback(imgData.data.length, imgData.width, imgData.height);
+                        } catch (err) {
+                            console.error(err);
+                            callback(err.message);
+                        }
+                    }
+                },
+                renderUIElement: function (id, width, height, transform, callback) {
+                    const element = document.getElementById(id);
+                    const currentTransform = element.style.transform;
+                    element.style.transform = transform;
+                    html2canvas(element, { scale: 1 }).then(function (canvas) {
+                        try {
+                            const ctx = canvas.getContext('2d');
+                            smoothCanvasContext(ctx);
+                            const w = width > -1 ? width : canvas.width;
+                            const h = height > -1 ? height : canvas.height;
+                            const imgData = ctx.getImageData(0, 0, w, h);
+                            _tempPixelsData = new Int32Array(imgData.data.buffer);
+                            callback(imgData.data.length, imgData.width, imgData.height);
+                        } catch (err) {
+                            console.error(err);
+                            callback(err.message);
+                        }
+                    });
+                    element.style.transform = currentTransform;
+                },
+                fillInt32Buffer: function (buffer) {
+                    buffer.set(new Int32Array(_tempPixelsData), 0);
+                },
+            }
+        })(),
     }
-};
-
-window.callJSUnmarshalled = function (javaScriptToExecute) {
-    javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
-    var result = eval(javaScriptToExecute);
-    var resultType = typeof result;
-    if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-        return BINDING.js_to_mono_obj(result);
-    }
-    else if (result == null) {
-        return null;
-    } else {
-        return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
-    }
-};
-
-window.callJSUnmarshalled_v2 = function (javaScriptToExecute, referenceId, wantsResult) {
-    javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
-    var result = eval(javaScriptToExecute);
-
-    if (referenceId >= 0)
-        document.jsObjRef[referenceId.toString()] = result;
-
-    if (!wantsResult) 
-        return;
-
-    var resultType = typeof result;
-    if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-        return BINDING.js_to_mono_obj(result);
-    } else if (result == null) {
-        return null;
-    } else {
-        return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
-    }
-};
-
-// IMPORTANT: this doesn't return anything (this just executes the pending async JS)
-window.callJSUnmarshalledHeap = (function () {
-    const textDecoder = new TextDecoder('utf-16le');
-    return function (arrAddress, length) {
-        const byteArray = Module.HEAPU8.subarray(arrAddress + 16, arrAddress + 16 + length);
-        const javaScriptToExecute = textDecoder.decode(byteArray);
-        eval(javaScriptToExecute);
-    };
 })();
