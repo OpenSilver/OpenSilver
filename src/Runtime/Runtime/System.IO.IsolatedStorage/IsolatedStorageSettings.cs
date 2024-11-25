@@ -151,12 +151,7 @@ namespace System.IO.IsolatedStorage
         public object this[string key]
         {
             get => Interop.ExecuteJavaScriptString($"window.localStorage['{GetKeysPrefix() + key}']");
-            set
-            {
-                var val = value == null ? "null" : value.ToInvariantString();
-                var str = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(val);
-                Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = {@"""" + str + @""""}", false);
-            }
+            set => Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = \"{ConvertToString(value)}\"", false);
         }
 
         /// <summary>
@@ -166,9 +161,16 @@ namespace System.IO.IsolatedStorage
         /// <param name="value">The value to be stored.</param>
         public void Add(string key, object value)
         {
-            var val = value == null ? "null" : value.ToInvariantString();
-            var str = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(val);
-            Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = {@"""" + str + @""""}");
+            Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = \"{ConvertToString(value)}\"");
+        }
+
+        private static string ConvertToString(object value)
+        {
+            if (value is null)
+            {
+                return "null";
+            }
+            return INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(value.ToInvariantString());
         }
 
         /// <summary>
