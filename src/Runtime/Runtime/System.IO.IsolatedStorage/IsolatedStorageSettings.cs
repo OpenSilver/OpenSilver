@@ -14,6 +14,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
+using CSHTML5.Internal;
 using OpenSilver;
 using OpenSilver.Internal;
 
@@ -150,11 +151,7 @@ namespace System.IO.IsolatedStorage
         public object this[string key]
         {
             get => Interop.ExecuteJavaScriptString($"window.localStorage['{GetKeysPrefix() + key}']");
-            set
-            {
-                string sValue = Interop.GetVariableStringForJS(value);
-                Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = {sValue}", false);
-            }
+            set => Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = \"{ConvertToString(value)}\"", false);
         }
 
         /// <summary>
@@ -164,8 +161,16 @@ namespace System.IO.IsolatedStorage
         /// <param name="value">The value to be stored.</param>
         public void Add(string key, object value)
         {
-            string sValue = Interop.GetVariableStringForJS(value);
-            Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = {sValue}");
+            Interop.ExecuteJavaScriptVoid($"window.localStorage['{GetKeysPrefix() + key}'] = \"{ConvertToString(value)}\"");
+        }
+
+        private static string ConvertToString(object value)
+        {
+            if (value is null)
+            {
+                return "null";
+            }
+            return INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(value.ToInvariantString());
         }
 
         /// <summary>
