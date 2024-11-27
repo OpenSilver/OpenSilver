@@ -27,6 +27,8 @@ public sealed class Updates : Task
     [Required]
     public string PackagePath { get; set; }
 
+    public string IDE { get; set; }
+
     public override bool Execute()
     {
         Update("OpenSilver");
@@ -40,12 +42,14 @@ public sealed class Updates : Task
             string identifier = GetIdentifier();
             string productVersion = GetProductVersion();
             string date = DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss");
+            string os = Uri.EscapeDataString(Environment.OSVersion.ToString());
+            string ide = Uri.EscapeDataString(IDE ?? "");
 
             using var client = new HttpClient();
             await client.GetAsync(
                 new UriBuilder("https://opensilver-service.azurewebsites.net/api/Updates")
                 {
-                    Query = $"id={identifier}&productId={productId}&version={productVersion}&date={date}"
+                    Query = $"id={identifier}&productId={productId}&version={productVersion}&date={date}&os={os}&ide={ide}"
                 }.ToString());
         }
         catch { }
