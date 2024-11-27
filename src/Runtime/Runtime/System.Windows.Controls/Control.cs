@@ -473,12 +473,13 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
-        /// If control has a scrollviewer in its style and has a custom keyboard 
-        /// scrolling behavior when HandlesScrolling should return true.
-        /// Then ScrollViewer will not handle keyboard input and leave it up to 
-        /// the control.
+        /// Gets a value that indicates whether a control supports scrolling.
         /// </summary>
-        internal virtual bool HandlesScrolling => false;
+        /// <returns>
+        /// true if the control has a <see cref="ScrollViewer"/> in its style and has a 
+        /// custom keyboard scrolling behavior; otherwise, false.
+        /// </returns>
+        protected internal virtual bool HandlesScrolling => false;
 
         public override void OnApplyTemplate()
         {

@@ -50,7 +50,8 @@ namespace System.Windows.Controls
             DefaultStyleKey = typeof(ListBox);
         }
 
-        internal sealed override bool HandlesScrolling => true;
+        /// <inheritdoc />
+        protected internal override bool HandlesScrolling => true;
 
         internal sealed override ScrollViewer ScrollHost => _scrollHost;
 
