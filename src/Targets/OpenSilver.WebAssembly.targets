@@ -28,9 +28,10 @@
 
     <PropertyGroup>
       <SkipOpenSilverUpdates Condition="'$(SkipOpenSilverUpdates)' == ''">false</SkipOpenSilverUpdates>
+      <IDE Condition="'$(IDE)' == '' And '$(BuildingInsideVisualStudio)' == 'true'">VisualStudio</IDE>
     </PropertyGroup>
 
-    <Updates Condition="'$(PkgOpenSilver)' != '' And '$(SkipOpenSilverUpdates)' == 'false'" PackagePath="$(PkgOpenSilver)" />
+    <Updates Condition="'$(PkgOpenSilver)' != '' And '$(SkipOpenSilverUpdates)' == 'false'" PackagePath="$(PkgOpenSilver)" IDE="$(IDE)" />
 
   </Target>
 
