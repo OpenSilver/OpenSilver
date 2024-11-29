@@ -22,7 +22,7 @@ namespace OpenSilver.Internal.Media.Animation;
 
 internal abstract class TimelineClock
 {
-    private ClockHandle _handle;
+    private WeakReference<TimelineClock> _weakReference;
     private TimelineClock _parent;
     private ClockFlags _flags = 0;
 
@@ -233,7 +233,7 @@ internal abstract class TimelineClock
 
     protected abstract void OnStopCore();
 
-    internal ClockHandle Handle => ClockHandle.Get(this);
+    internal WeakReference<TimelineClock> WeakReference => _weakReference ??= new(this);
 
     internal TimeSpan BeginTime => Timeline.BeginTime ?? TimeSpan.Zero;
 
@@ -418,20 +418,6 @@ internal abstract class TimelineClock
         {
             throw new InvalidOperationException(Strings.Timing_MustBeRoot);
         }
-    }
-
-    internal sealed class ClockHandle
-    {
-        private readonly WeakReference<TimelineClock> _weakReference;
-
-        private ClockHandle(TimelineClock clock)
-        {
-            _weakReference = new(clock);
-        }
-
-        public static ClockHandle Get(TimelineClock clock) => clock._handle ??= new(clock);
-
-        public bool TryGetTarget(out TimelineClock clock) => _weakReference.TryGetTarget(out clock);
     }
 
     [Flags]

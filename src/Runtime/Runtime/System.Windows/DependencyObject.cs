@@ -338,7 +338,7 @@ namespace System.Windows
 
             if (GetStorage(dp, metadata, false) is Storage storage)
             {
-                if (storage.ClockHandle == clock.Handle)
+                if (storage.Clock == clock)
                 {
                     DependencyObjectStore.SetAnimatedValue(storage,
                         this,
@@ -357,7 +357,7 @@ namespace System.Windows
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
             Storage storage = GetStorage(dp, metadata, true);
-            storage.ClockHandle = clock.Handle;
+            storage.Clock = clock;
         }
 
         internal void DetachAnimationClock(DependencyProperty dp, AnimationClock clock)
@@ -369,9 +369,9 @@ namespace System.Windows
 
             if (GetStorage(dp, metadata, false) is Storage storage)
             {
-                if (storage.ClockHandle == clock.Handle)
+                if (storage.Clock == clock)
                 {
-                    storage.ClockHandle = null;
+                    storage.Clock = null;
                     DependencyObjectStore.ClearAnimatedValue(storage, this, dp, metadata);
                 }
             }

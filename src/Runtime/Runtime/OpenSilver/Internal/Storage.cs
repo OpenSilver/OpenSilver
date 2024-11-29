@@ -37,7 +37,7 @@ internal sealed class Storage
 
     internal EffectiveValueEntry Entry { get; set; }
 
-    internal TimelineClock.ClockHandle ClockHandle { get; set; }
+    internal TimelineClock Clock { get; set; }
 
     internal object LocalValue { get; set; }
 

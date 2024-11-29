@@ -20,21 +20,21 @@ namespace OpenSilver.Internal.Media.Animation;
 
 internal sealed class ClockCollection
 {
-    private readonly HashSet<TimelineClock.ClockHandle> _handles = new();
-    private readonly List<TimelineClock.ClockHandle> _deadHandles = new();
+    private readonly HashSet<WeakReference<TimelineClock>> _clocks = new();
+    private readonly List<WeakReference<TimelineClock>> _deadClocks = new();
 
-    public int Count => _handles.Count;
+    public int Count => _clocks.Count;
 
     public void Add(TimelineClock clock)
     {
         Debug.Assert(clock is not null);
-        _handles.Add(clock.Handle);
+        _clocks.Add(clock.WeakReference);
     }
 
     public bool Remove(TimelineClock clock)
     {
         Debug.Assert(clock is not null);
-        return InternalRemove(clock.Handle);
+        return InternalRemove(clock.WeakReference);
     }
 
     public Enumerator GetEnumerator() => new(this);
@@ -42,26 +42,26 @@ internal sealed class ClockCollection
     // Remove dead references
     internal void Purge()
     {
-        foreach (TimelineClock.ClockHandle handle in _deadHandles)
+        foreach (WeakReference<TimelineClock> weakReference in _deadClocks)
         {
-            InternalRemove(handle);
+            InternalRemove(weakReference);
         }
 
-        _deadHandles.Clear();
+        _deadClocks.Clear();
     }
 
-    private bool InternalRemove(TimelineClock.ClockHandle handle) => _handles.Remove(handle);
+    private bool InternalRemove(WeakReference<TimelineClock> weakReference) => _clocks.Remove(weakReference);
 
     public struct Enumerator : IEnumerator<TimelineClock>
     {
         private readonly ClockCollection _collection;
-        private HashSet<TimelineClock.ClockHandle>.Enumerator _enumerator;
+        private HashSet<WeakReference<TimelineClock>>.Enumerator _enumerator;
 
         public Enumerator(ClockCollection collection)
         {
             Debug.Assert(collection is not null);
             _collection = collection;
-            _enumerator = collection._handles.GetEnumerator();
+            _enumerator = collection._clocks.GetEnumerator();
             Current = null;
         }
 
@@ -71,10 +71,10 @@ internal sealed class ClockCollection
         {
             while (_enumerator.MoveNext())
             {
-                TimelineClock.ClockHandle handle = _enumerator.Current;
-                if (!handle.TryGetTarget(out TimelineClock clock))
+                WeakReference<TimelineClock> weakReference = _enumerator.Current;
+                if (!weakReference.TryGetTarget(out TimelineClock clock))
                 {
-                    _collection._deadHandles.Add(handle);
+                    _collection._deadClocks.Add(weakReference);
                     continue;
                 }
 

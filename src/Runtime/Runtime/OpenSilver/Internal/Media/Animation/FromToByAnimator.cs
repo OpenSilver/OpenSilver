@@ -18,7 +18,7 @@ using System.Windows.Media.Animation;
 namespace OpenSilver.Internal.Media.Animation;
 
 internal sealed class FromToByAnimator<T> : IValueAnimator<T>
-        where T : struct
+    where T : struct
 {
     private readonly IFromByToAnimation<T> _owner;
 
