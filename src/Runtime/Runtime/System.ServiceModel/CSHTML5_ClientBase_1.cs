@@ -1579,6 +1579,8 @@ namespace System.ServiceModel
                             requestResponse = (char)(int.Parse(responseAsString)); //todo: support encodings
                         else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
                             requestResponse = DateTime.Parse(responseAsString, CultureInfo.InvariantCulture);
+                        else if (requestResponseType == typeof(TimeSpan) || requestResponseType == typeof(TimeSpan?))
+                            requestResponse = XmlConvert.ToTimeSpan(responseAsString);
                         else if (requestResponseType.IsEnum)
                             requestResponse = Enum.Parse(requestResponseType, responseAsString);
                         else if (requestResponseType == typeof(void))
