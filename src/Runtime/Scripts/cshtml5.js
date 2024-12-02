@@ -310,7 +310,7 @@ document.arrangeEllipse = function (id, rx, ry, penThickness) {
 };
 
 document.getBBox = function (svgElement) {
-    if (svgElement) {
+    if (svgElement && svgElement instanceof SVGElement) {
         const bbox = svgElement.getBBox();
         return JSON.stringify({ X: bbox.x, Y: bbox.y, Width: bbox.width, Height: bbox.height, });
     }
