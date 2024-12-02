@@ -1049,7 +1049,7 @@ namespace System.ServiceModel
                                 {
                                     // we don't want to keep the "xmlns="http://schemas.microsoft.com/2003/10/Serialization/" 
                                     // because it breaks the request.
-                                    if (!currentAttribute.IsNamespaceDeclaration)
+                                    if (currentAttribute.Name.LocalName != "xmlns")
                                     {
                                         paramNameElement.Add(currentAttribute);
                                     }
