@@ -637,6 +637,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid value for the &apos;{1}.{2}&apos; property on a Setter..
+        /// </summary>
+        internal static string InvalidSetterValue {
+            get {
+                return ResourceManager.GetString("InvalidSetterValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; value is not valid. It must contain one, two, or four delimited Lengths..
         /// </summary>
         internal static string InvalidStringThickness {
@@ -1209,6 +1218,15 @@ namespace OpenSilver.Internal {
         internal static string SetInDeferSelectionActive {
             get {
                 return ResourceManager.GetString("SetInDeferSelectionActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid for Setter.Value. The only supported MarkupExtension types are DynamicResourceExtension and BindingBase or derived types..
+        /// </summary>
+        internal static string SetterValueOfMarkupExtensionNotSupported {
+            get {
+                return ResourceManager.GetString("SetterValueOfMarkupExtensionNotSupported", resourceCulture);
             }
         }
         

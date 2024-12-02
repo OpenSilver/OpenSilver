@@ -119,7 +119,7 @@ public sealed class Setter : SetterBase, ISupportInitialize
         DependencyProperty dp = Property;
         object value = Value;
 
-        if (dp == null)
+        if (dp is null)
         {
             throw new ArgumentException(string.Format(Strings.NullPropertyIllegal, "Setter.Property"));
         }
@@ -130,17 +130,24 @@ public sealed class Setter : SetterBase, ISupportInitialize
             {
                 case Color color:
                     if (dp.PropertyType == typeof(Brush))
+                    {
                         _value = new SolidColorBrush(color);
+                    }
                     break;
 
-                case Binding:
-                    // Bindings are allowed on setters, it will later be transformed into a BindingExpression
+                case MarkupExtension:
+                    // Bindings and dynamic resources are allowed on setters, they will later be transformed into an expression
+                    if (value is not BindingBase && value is not DynamicResourceExtension)
+                    {
+                        throw new ArgumentException(string.Format(Strings.SetterValueOfMarkupExtensionNotSupported, value.GetType().Name));
+                    }
                     break;
 
                 default:
                     if (!dp.IsObjectType)
-                        throw new ArgumentException(
-                            $"'{value}' is not a valid value for the '{dp.OwnerType}.{dp.Name}' property on a Setter.");
+                    {
+                        throw new ArgumentException(string.Format(Strings.InvalidSetterValue, value, dp.OwnerType, dp.Name));
+                    }
                     break;
             }
         }
@@ -187,9 +194,11 @@ public sealed class Setter : SetterBase, ISupportInitialize
             return;
         }
 
-        if (eventArgs.MarkupExtension is BindingBase binding)
+        MarkupExtension me = eventArgs.MarkupExtension;
+
+        if (me is DynamicResourceExtension || me is BindingBase)
         {
-            setter.Value = binding;
+            setter.Value = me;
             eventArgs.Handled = true;
         }
     }

@@ -1022,6 +1022,75 @@ End Sub
                                             _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
                                 }
                             }
+                            else if (GeneratingCode.IsDynamicResourceExtension(child, _settings))
+                            {
+                                //------------------------------
+                                // {DynamicResource}
+                                //------------------------------
+
+                                string dependencyPropertyName =
+                                    _reflectionOnSeparateAppDomain.GetField(
+                                        propertyName + "Property",
+                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
+                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
+                                        _assemblyNameWithoutExtension);
+
+                                string propertyTypeNamespace;
+                                string propertyTypeName;
+                                if (!isAttachedProperty)
+                                {
+                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
+                                        parent.Name.Namespace.NamespaceName,
+                                        parent.Name.LocalName,
+                                        out _,
+                                        out propertyTypeNamespace,
+                                        out propertyTypeName,
+                                        assemblyNameIfAny,
+                                        false);
+                                }
+                                else
+                                {
+                                    _reflectionOnSeparateAppDomain.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
+                                        elementName.Namespace.NamespaceName,
+                                        elementName.LocalName,
+                                        out _,
+                                        out propertyTypeNamespace,
+                                        out propertyTypeName,
+                                        assemblyNameIfAny);
+                                }
+
+                                if (dependencyPropertyName is null)
+                                {
+                                    string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                        elementName.Namespace.NamespaceName,
+                                        elementName.LocalName,
+                                        assemblyNameIfAny);
+
+                                    if (elementTypeInCSharp == $"Global.{_settings.Metadata.SystemWindowsNS}.Setter" && propertyName == "Value")
+                                    {
+                                        parameters.StringBuilder.AppendLine(
+                                            $"{parentElementUniqueNameOrThisKeyword}.{propertyName} = {GeneratingCode.GetUniqueName(child)}");
+                                    }
+                                    else
+                                    {
+                                        throw new XamlParseException(
+                                            $"A 'DynamicResourceExtension' cannot be set on the '{propertyName}' property of type '{elementTypeInCSharp.Substring("Global.".Length)}'. A 'DynamicResourceExtension' can only be set on a DependencyProperty of a DependencyObject, or the Setter.Value property.",
+                                            element);
+                                    }
+                                }
+                                else
+                                {
+                                    string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
+                                    string propertyTypeFullName = string.IsNullOrEmpty(propertyTypeNamespace) ?
+                                        $"Global.{propertyTypeName}" :
+                                        $"Global.{propertyTypeNamespace}.{propertyTypeName}";
+
+                                    parameters.StringBuilder.AppendLine($@"Dim {markupValue} As Object = Nothing
+If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, {markupValue})
+    {parentElementUniqueNameOrThisKeyword}.{propertyName} = CType({markupValue}, {propertyTypeFullName})
+End If");
+                                }
+                            }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
                             {
                                 var dependencyPropertyName =

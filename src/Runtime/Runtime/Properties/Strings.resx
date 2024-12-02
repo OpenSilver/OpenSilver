@@ -311,6 +311,9 @@
   <data name="InvalidPropertyValue" xml:space="preserve">
     <value>'{0}' is not a valid value for property '{1}'.</value>
   </data>
+  <data name="InvalidSetterValue" xml:space="preserve">
+    <value>'{0}' is not a valid value for the '{1}.{2}' property on a Setter.</value>
+  </data>
   <data name="InvalidStringThickness" xml:space="preserve">
     <value>'{0}' value is not valid. It must contain one, two, or four delimited Lengths.</value>
   </data>
@@ -502,6 +505,9 @@
   </data>
   <data name="SetInDeferSelectionActive" xml:space="preserve">
     <value>Cannot set an item in a selection when selection is in progress. Use Add or Remove method.</value>
+  </data>
+  <data name="SetterValueOfMarkupExtensionNotSupported" xml:space="preserve">
+    <value>'{0}' is not valid for Setter.Value. The only supported MarkupExtension types are DynamicResourceExtension and BindingBase or derived types.</value>
   </data>
   <data name="SharingNonSharableExpression" xml:space="preserve">
     <value>Cannot set Expression. It is marked as non shareable and is already in use.</value>

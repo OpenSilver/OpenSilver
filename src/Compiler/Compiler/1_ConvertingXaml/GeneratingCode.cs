@@ -167,5 +167,25 @@ namespace OpenSilver.Compiler
 
             return ns == "System.Windows.Markup" && assemblyName == "OpenSilver";
         }
+
+
+        public static bool IsDynamicResourceExtension(XElement element, ConversionSettings settings)
+        {
+            if (element.Name.LocalName != "DynamicResourceExtension")
+            {
+                return false;
+            }
+
+            if (element.Name.NamespaceName == DefaultXamlNamespace ||
+                element.Name.NamespaceName == LegacyXamlNamespace)
+            {
+                return true;
+            }
+
+            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
+                element.Name.NamespaceName, settings.EnableImplicitAssemblyRedirection);
+
+            return ns == "System.Windows" && assemblyName == "OpenSilver";
+        }
     }
 }

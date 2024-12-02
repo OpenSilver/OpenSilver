@@ -100,9 +100,13 @@ namespace System.Windows
                 foreach (var pValue in newStyleValues)
                 {
                     DependencyProperty dp = DependencyProperty.RegisteredPropertyList[pValue.Key];
-                    object value = pValue.Value is BindingBase binding ?
-                        binding.CreateBindingExpression(fe, dp, null) :
-                        pValue.Value;
+                    object value = pValue.Value switch
+                    {
+                        BindingBase bindingBase => bindingBase.CreateBindingExpression(fe, dp, null),
+                        DynamicResourceExtension dynamicResource => new ResourceReferenceExpression(dynamicResource.ResourceKey ??
+                            throw new InvalidOperationException(Strings.MarkupExtensionResourceKey)),
+                        _ => pValue.Value,
+                    };
 
                     setValue(fe, dp, value);
                 }
