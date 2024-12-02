@@ -45,6 +45,7 @@
     <file src="../../src/Runtime/Scripts/html2canvas.js" target="content/js" />
     <file src="../../src/Runtime/Scripts/quill.min.js" target="content/js" />
     <file src="../../src/Runtime/Scripts/quill.core.css" target="content/css" />
+    <file src="../../src/Runtime/Scripts/FileSaver.min.js" target="content/js" />
 
     <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />
   </files>

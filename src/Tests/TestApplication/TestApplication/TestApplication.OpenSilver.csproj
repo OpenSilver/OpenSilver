@@ -29,7 +29,7 @@
     <Compile Include="Tests\Events\KeyDownTest.xaml.cs" />
     <Compile Include="Tests\Events\XTextBox.cs" />
     <Compile Include="Tests\InkPresenterTest.xaml.cs" />
-    <Compile Include="Tests\OpenFileDialogTest.xaml.cs" />
+    <Compile Include="Tests\FileDialogTest.xaml.cs" />
     <Compile Include="Tests\PopupWindowTest.xaml.cs" />
     <Compile Include="Tests\PrintDocumentTest.xaml.cs" />
     <Compile Include="Registry\ITreeItem.cs" />
@@ -648,7 +648,7 @@
     <Page Include="Tests\InkPresenterTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tests\OpenFileDialogTest.xaml">
+    <Page Include="Tests\FileDialogTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\PopupWindowTest.xaml">

@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CBAC
 		Runtime\Scripts\quill.core.css = Runtime\Scripts\quill.core.css
 		Runtime\Scripts\quill.min.js = Runtime\Scripts\quill.min.js
 		Runtime\Scripts\ResizeObserver.js = Runtime\Scripts\ResizeObserver.js
+		Runtime\Scripts\FileSaver.min.js = Runtime\Scripts\FileSaver.min.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blend", "Blend", "{7152D73A-E43C-401B-A5B2-1401B4CBB82F}"
