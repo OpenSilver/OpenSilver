@@ -83,6 +83,7 @@ namespace System.Windows.Controls
                         VerticalAlignment = VerticalAlignment.Top,
                         HorizontalContentAlignment = HorizontalAlignment.Left,
                         VerticalContentAlignment = VerticalAlignment.Top,
+                        StaysWithinScreenBounds = true,
                     };
 
                     _parentPopup.DataContext = _owner?.DataContext;

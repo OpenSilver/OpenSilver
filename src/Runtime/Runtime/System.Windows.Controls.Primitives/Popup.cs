@@ -471,122 +471,117 @@ namespace System.Windows.Controls.Primitives
             if (Child is UIElement child)
             {
                 PlacementMode placement = Placement;
+                var root = Application.Current.Host.Content;
+                var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
+                InterestPoints targetInterestPoints = GetInterestPoints(placementTarget, Window.GetWindow(placementTarget));
+                InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.InternalGetVisualChild(0));
 
-                if (placement == PlacementMode.Mouse)
+                switch (placement)
                 {
-                    point = PopupService.MousePosition;
-                    point.Y += _cursorOffsetY;
+                    case PlacementMode.Mouse:
+                        point.X = PopupService.MousePosition.X;
+                        point.Y = PopupService.MousePosition.Y + _cursorOffsetY;
+                        break;
+                    case PlacementMode.Top:
+                        point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X;
+                        point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.BottomLeft.Y;
+                        break;
+                    case PlacementMode.Bottom:
+                        point.X = targetInterestPoints.BottomLeft.X;
+                        point.Y = targetInterestPoints.BottomLeft.Y;
+                        break;
+                    case PlacementMode.Left:
+                        point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.TopRight.X;
+                        point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.TopRight.Y;
+                        break;
+                    case PlacementMode.Right:
+                        point.X = targetInterestPoints.TopRight.X;
+                        point.Y = targetInterestPoints.TopRight.Y;
+                        break;
+                    default:
+                        throw new NotSupportedException($"PlacementMode '{placement}' is not supported");
                 }
-                else
+
+                Rect childBounds = GetBounds(childInterestPoints);
+                childBounds.X += childInterestPoints.TopLeft.X + point.X;
+                childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
+
+                if (childBounds.Y + childBounds.Height > windowBounds.Height)
                 {
-                    var root = Application.Current.Host.Content;
-                    var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
-                    InterestPoints targetInterestPoints = GetInterestPoints(placementTarget, Window.GetWindow(placementTarget));
-                    InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.InternalGetVisualChild(0));
-
-                    switch (placement)
+                    if (placement == PlacementMode.Bottom)
                     {
-                        case PlacementMode.Top:
-                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X;
-                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.BottomLeft.Y;
-                            break;
-                        case PlacementMode.Bottom:
-                            point.X = targetInterestPoints.BottomLeft.X;
-                            point.Y = targetInterestPoints.BottomLeft.Y;
-                            break;
-                        case PlacementMode.Left:
-                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.TopRight.X;
-                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.TopRight.Y;
-                            break;
-                        case PlacementMode.Right:
-                            point.X = targetInterestPoints.TopRight.X;
-                            point.Y = targetInterestPoints.TopRight.Y;
-                            break;
-                        default:
-                            throw new NotSupportedException($"PlacementMode '{placement}' is not supported");
+                        point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X;
+                        point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.BottomLeft.Y;
                     }
+                    else
+                    {
+                        point.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
+                    }
+                }
+                else if (childBounds.Y < 0)
+                {
+                    if (placement == PlacementMode.Top)
+                    {
+                        point.X = targetInterestPoints.BottomLeft.X;
+                        point.Y = targetInterestPoints.BottomLeft.Y;
+                    }
+                    else
+                    {
+                        point.Y -= childBounds.Y;
+                    }
+                }
 
-                    Rect childBounds = GetBounds(childInterestPoints);
-                    childBounds.X += childInterestPoints.TopLeft.X + point.X;
-                    childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
+                childBounds = GetBounds(childInterestPoints);
+                childBounds.X += childInterestPoints.TopLeft.X + point.X;
+                childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
 
+                if (childBounds.X + childBounds.Width > windowBounds.Width)
+                {
+                    if (placement == PlacementMode.Right)
+                    {
+                        point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.TopRight.X;
+                        point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.TopRight.Y;
+                    }
+                    else
+                    {
+                        point.X -= childBounds.X + childBounds.Width - windowBounds.Width;
+                    }
+                }
+                else if (childBounds.X < 0)
+                {
+                    if (placement == PlacementMode.Left)
+                    {
+                        point.X = targetInterestPoints.TopRight.X;
+                        point.Y = targetInterestPoints.TopRight.Y;
+                    }
+                    else
+                    {
+                        point.X -= childBounds.X;
+                    }
+                }
+
+                childBounds = GetBounds(childInterestPoints);
+                childBounds.X += childInterestPoints.TopLeft.X + point.X;
+                childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
+
+                if (StaysWithinScreenBounds)
+                {
                     if (childBounds.Y + childBounds.Height > windowBounds.Height)
                     {
-                        if (placement == PlacementMode.Bottom)
-                        {
-                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X;
-                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.BottomLeft.Y;
-                        }
-                        else
-                        {
-                            point.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
-                        }
+                        point.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
                     }
                     else if (childBounds.Y < 0)
                     {
-                        if (placement == PlacementMode.Top)
-                        {
-                            point.X = targetInterestPoints.BottomLeft.X;
-                            point.Y = targetInterestPoints.BottomLeft.Y;
-                        }
-                        else
-                        {
-                            point.Y -= childBounds.Y;
-                        }
+                        point.Y -= childBounds.Y;
                     }
-
-                    childBounds = GetBounds(childInterestPoints);
-                    childBounds.X += childInterestPoints.TopLeft.X + point.X;
-                    childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
 
                     if (childBounds.X + childBounds.Width > windowBounds.Width)
                     {
-                        if (placement == PlacementMode.Right)
-                        {
-                            point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.TopRight.X;
-                            point.Y = targetInterestPoints.TopLeft.Y + childInterestPoints.TopLeft.Y - childInterestPoints.TopRight.Y;
-                        }
-                        else
-                        {
-                            point.X -= childBounds.X + childBounds.Width - windowBounds.Width;
-                        }
+                        point.X -= childBounds.X + childBounds.Width - windowBounds.Width;
                     }
                     else if (childBounds.X < 0)
                     {
-                        if (placement == PlacementMode.Left)
-                        {
-                            point.X = targetInterestPoints.TopRight.X;
-                            point.Y = targetInterestPoints.TopRight.Y;
-                        }
-                        else
-                        {
-                            point.X -= childBounds.X;
-                        }
-                    }
-
-                    childBounds = GetBounds(childInterestPoints);
-                    childBounds.X += childInterestPoints.TopLeft.X + point.X;
-                    childBounds.Y += childInterestPoints.TopLeft.Y + point.Y;
-
-                    if (StaysWithinScreenBounds)
-                    {
-                        if (childBounds.Y + childBounds.Height > windowBounds.Height)
-                        {
-                            point.Y -= childBounds.Y + childBounds.Height - windowBounds.Height;
-                        }
-                        else if (childBounds.Y < 0)
-                        {
-                            point.Y -= childBounds.Y;
-                        }
-
-                        if (childBounds.X + childBounds.Width > windowBounds.Width)
-                        {
-                            point.X -= childBounds.X + childBounds.Width - windowBounds.Width;
-                        }
-                        else if (childBounds.X < 0)
-                        {
-                            point.X -= childBounds.X;
-                        }
+                        point.X -= childBounds.X;
                     }
                 }
             }
