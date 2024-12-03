@@ -52,16 +52,6 @@ internal static class XamlResources
     private static ResourceDictionary _defaultThemeResourcesDictionary;
     private static Dictionary<char, List<string>> _charToSimpleHighContrastNames; //this dictionary serves to link the first letter of the theme-dependent resource to the simple high contrast names that start with that letter.
 
-    internal static object FindResource(object resourceKey)
-    {
-        if (resourceKey is Type typeKey && FindStyleResourceInGenericXaml(typeKey) is object resource)
-        {
-            return resource;
-        }
-
-        return FindBuiltInResource(resourceKey);
-    }
-
     /// <summary>
     /// Tries to find the resourceKey in the Generic.xaml resources of the assembly. Note: the resource currently need to be defined in Project/Themes/generic.xaml
     /// </summary>
@@ -71,12 +61,12 @@ internal static class XamlResources
     {
         Debug.Assert(typeKey is not null);
 
-        if (Application.Current?.Theme is Theme theme && theme.GetResource(typeKey) is Style themeStyle)
+        if (Application.Current?.Theme is Theme theme && theme.GetTypedResource(typeKey) is Style themeStyle)
         {
             return themeStyle;
         }
 
-        return _genericTheme.GetResource(typeKey) as Style;
+        return _genericTheme.GetTypedResource(typeKey) as Style;
     }
 
     internal static object FindBuiltInResource(object key)

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using OpenSilver.Theming;
 
 namespace System.Windows;
 
@@ -178,6 +179,11 @@ internal sealed class ResourceReferenceExpression : Expression
         if (Application.Current is Application app)
         {
             if (app.HasResources && app.Resources.TryGetResource(resourceKey, out object resource))
+            {
+                return resource;
+            }
+
+            if (app.Theme is Theme theme && theme.TryGetResource(resourceKey, out resource))
             {
                 return resource;
             }

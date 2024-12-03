@@ -23,9 +23,11 @@ namespace OpenSilver.Theming;
 /// <summary>
 /// Provides a base class for defining themes.
 /// </summary>
-public abstract class Theme
+public abstract class Theme : IResourceDictionaryOwner
 {
-    private readonly Resources _resources;
+    private readonly Cache _cache;
+    private WeakReferenceList<Application> _apps;
+    private ResourceDictionary _resources;
     private Theme _basedOn;
 
     /// <summary>
@@ -33,7 +35,48 @@ public abstract class Theme
     /// </summary>
     protected Theme()
     {
-        _resources = new Resources();
+        _cache = new Cache();
+    }
+
+    /// <summary>
+    /// Gets or sets the locally-defined resource dictionary.
+    /// </summary>
+    /// <returns>
+    /// The current locally-defined dictionary of resources, where each resource can be accessed by key.
+    /// </returns>
+    public ResourceDictionary Resources
+    {
+        get
+        {
+            if (_resources is null)
+            {
+                _resources = new ResourceDictionary();
+                _resources.AddOwner(this);
+            }
+            return _resources;
+        }
+        set
+        {
+            if (_resources == value) return;
+
+            ResourceDictionary oldValue = _resources;
+            _resources = value;
+
+            // This theme is no longer an owner for the old ResourceDictionary
+            oldValue?.RemoveOwner(this);
+
+            if (value != null)
+            {
+                if (!value.ContainsOwner(this))
+                {
+                    // This theme is an owner for the new ResourceDictionary
+                    value.AddOwner(this);
+                }
+            }
+
+            // this notify all apps that Theme resources changed
+            InvalidateOwners(new ResourcesChangeInfo(oldValue, value));
+        }
     }
 
     /// <summary>
@@ -47,10 +90,7 @@ public abstract class Theme
         get { return _basedOn; }
         set
         {
-            if (IsSealed)
-            {
-                throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(Theme)));
-            }
+            CheckSealed();
 
             if (value == this)
             {
@@ -91,6 +131,20 @@ public abstract class Theme
     }
 
     /// <summary>
+    /// Throws an exception if the theme has already been sealed.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// The theme has already been sealed.
+    /// </exception>
+    protected void CheckSealed()
+    {
+        if (IsSealed)
+        {
+            throw new InvalidOperationException(string.Format(Strings.CannotChangeAfterSealed, nameof(Theme)));
+        }
+    }
+
+    /// <summary>
     /// Invoked after this theme becomes sealed.
     /// </summary>
     protected virtual void OnSealed() { }
@@ -106,7 +160,61 @@ public abstract class Theme
     /// </returns>
     protected abstract ResourceDictionary GenerateResources(Assembly assembly);
 
-    internal object GetResource(Type typeKey) => _resources.GetOrAddResource(typeKey, FindDictionaryResource);
+    internal void AddOwner(Application application)
+    {
+        Debug.Assert(_apps is null || !_apps.Contains(application));
+
+        _apps ??= new(1);
+        _apps.Add(application);
+    }
+
+    internal void RemoveOwner(Application application)
+    {
+        Debug.Assert(_apps is not null && _apps.Contains(application));
+
+        _apps.Remove(application);
+        if (_apps.Count == 0)
+        {
+            _apps = null;
+        }
+    }
+
+    void IResourceDictionaryOwner.SetResources(ResourceDictionary resourceDictionary) { }
+
+    void IResourceDictionaryOwner.OnResourcesChange(ResourcesChangeInfo info, bool shouldInvalidate, bool hasImplicitStyles)
+    {
+        if (shouldInvalidate)
+        {
+            InvalidateOwners(info);
+        }
+    }
+
+    private void InvalidateOwners(ResourcesChangeInfo info)
+    {
+        if (_apps is not null)
+        {
+            foreach (Application app in _apps)
+            {
+                app.InvalidateResourceReferences(info);
+            }
+        }
+    }
+
+    internal bool TryGetResource(object resourceKey, out object resource)
+    {
+        if (_resources is not null && _resources.TryGetResource(resourceKey, out resource))
+        {
+            return true;
+        }
+        if (_basedOn is not null)
+        {
+            return _basedOn.TryGetResource(resourceKey, out resource);
+        }
+        resource = null;
+        return false;
+    }
+
+    internal object GetTypedResource(Type typeKey) => _cache.GetOrAddResource(typeKey, FindDictionaryResource);
 
     private object FindDictionaryResource(Type typeKey)
     {
@@ -121,7 +229,7 @@ public abstract class Theme
     }
 
     private ResourceDictionary GetOrCreateResourceDictionary(Assembly assembly)
-        => _resources.GetOrAddResourceDictionary(assembly, CreateResourceDictionary);
+        => _cache.GetOrAddResourceDictionary(assembly, CreateResourceDictionary);
 
     private ResourceDictionary CreateResourceDictionary(Assembly assembly)
     {
@@ -203,14 +311,14 @@ public abstract class Theme
         }
     }
 
-    private sealed class Resources
+    private sealed class Cache
     {
-        private readonly ConcurrentDictionary<Assembly, ResourceDictionary> _resourceDictionaries = new();
-        private readonly ConcurrentDictionary<Type, object> _resourcesCache = new();
+        private readonly ConcurrentDictionary<Assembly, ResourceDictionary> _dictionaries = new();
+        private readonly ConcurrentDictionary<Type, object> _resources = new();
 
         public ResourceDictionary GetOrAddResourceDictionary(Assembly assembly, Func<Assembly, ResourceDictionary> valueFactory)
-            => _resourceDictionaries.GetOrAdd(assembly, valueFactory);
+            => _dictionaries.GetOrAdd(assembly, valueFactory);
 
-        public object GetOrAddResource(Type typeKey, Func<Type, object> valueFactory) => _resourcesCache.GetOrAdd(typeKey, valueFactory);
+        public object GetOrAddResource(Type typeKey, Func<Type, object> valueFactory) => _resources.GetOrAdd(typeKey, valueFactory);
     }
 }

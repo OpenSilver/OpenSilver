@@ -29,12 +29,11 @@ namespace System.Windows
     /// Alternatively you can access resources by traversing the dictionary at run
     /// time.
     /// </summary>
-    public class ResourceDictionary
-        : DependencyObject,
-          IDictionary<object, object>,
-          IDictionary,
-          ISupportInitialize,
-          INameScope
+    public partial class ResourceDictionary : DependencyObject,
+        IDictionary<object, object>,
+        IDictionary,
+        ISupportInitialize,
+        INameScope
     {
         #region Data
 
@@ -53,10 +52,9 @@ namespace System.Windows
         // one merged dictionary at a time, so we need to store a reference
         // to its parent dictionary in that case.
         //
-        internal ResourceDictionary _parentDictionary;
+        private ResourceDictionary _parentDictionary;
 
-        private WeakReferenceList<IInternalFrameworkElement> _ownerFEs;
-        private WeakReferenceList<Application> _ownerApps;
+        private WeakReferenceList<IResourceDictionaryOwner> _owners;
 
         // We store a weak reference so that the dictionary does not leak the owner.
         private WeakReference<DependencyObject> _inheritanceContext;
@@ -536,9 +534,11 @@ namespace System.Windows
         #region Helper Methods
 
         // Add an owner for this dictionary
-        internal void AddOwner(object owner)
+        internal void AddOwner(IResourceDictionaryOwner owner)
         {
-            if (_inheritanceContext == null)
+            Debug.Assert(owner is not null);
+
+            if (_inheritanceContext is null)
             {
                 // the first owner gets to be the InheritanceContext for
                 // all the values in the dictionary that want one.
@@ -570,47 +570,18 @@ namespace System.Windows
                 }
             }
 
-            if (owner is IInternalFrameworkElement fe)
+            if (_owners is null)
             {
-                if (_ownerFEs == null)
-                {
-                    _ownerFEs = new WeakReferenceList<IInternalFrameworkElement>(1);
-                }
-                else if (_ownerFEs.Contains(fe) && ContainsCycle(this))
-                {
-                    throw new InvalidOperationException(Strings.ResourceDictionaryInvalidMergedDictionary);
-                }
-
-                // Propagate the HasImplicitStyles flag to the new owner
-                if (HasImplicitStyles)
-                {
-                    fe.ShouldLookupImplicitStyles = true;
-                }
-
-                _ownerFEs.Add(fe);
+                _owners = new WeakReferenceList<IResourceDictionaryOwner>(1);
             }
-            else
+            else if (_owners.Contains(owner) && ContainsCycle(this))
             {
-                if (owner is Application app)
-                {
-                    if (_ownerApps == null)
-                    {
-                        _ownerApps = new WeakReferenceList<Application>(1);
-                    }
-                    else if (_ownerApps.Contains(app) && ContainsCycle(this))
-                    {
-                        throw new InvalidOperationException(Strings.ResourceDictionaryInvalidMergedDictionary);
-                    }
-
-                    // Propagate the HasImplicitStyles flag to the new owner
-                    if (HasImplicitStyles)
-                    {
-                        app.HasImplicitStylesInResources = true;
-                    }
-
-                    _ownerApps.Add(app);
-                }
+                throw new InvalidOperationException(Strings.ResourceDictionaryInvalidMergedDictionary);
             }
+
+            owner.SetResources(this);
+
+            _owners.Add(owner);
 
             AddOwnerToAllMergedDictionaries(owner);
 
@@ -620,33 +591,17 @@ namespace System.Windows
         }
 
         // Remove an owner for this dictionary
-        internal void RemoveOwner(object owner)
+        internal void RemoveOwner(IResourceDictionaryOwner owner)
         {
-            if (owner is IInternalFrameworkElement fe)
-            {
-                if (_ownerFEs != null)
-                {
-                    _ownerFEs.Remove(fe);
+            Debug.Assert(owner is not null);
 
-                    if (_ownerFEs.Count == 0)
-                    {
-                        _ownerFEs = null;
-                    }
-                }
-            }
-            else
+            if (_owners != null)
             {
-                if (owner is Application app)
-                {
-                    if (_ownerApps != null)
-                    {
-                        _ownerApps.Remove(app);
+                _owners.Remove(owner);
 
-                        if (_ownerApps.Count == 0)
-                        {
-                            _ownerApps = null;
-                        }
-                    }
+                if (_owners.Count == 0)
+                {
+                    _owners = null;
                 }
             }
 
@@ -660,29 +615,13 @@ namespace System.Windows
         }
 
         // Check if the given is an owner to this dictionary
-        internal bool ContainsOwner(object owner)
-        {
-            if (owner is IInternalFrameworkElement fe)
-            {
-                return _ownerFEs != null && _ownerFEs.Contains(fe);
-            }
-            else
-            {
-                if (owner is Application app)
-                {
-                    return _ownerApps != null && _ownerApps.Contains(app);
-                }
-            }
-
-            return false;
-        }
+        internal bool ContainsOwner(IResourceDictionaryOwner owner) => _owners is not null && _owners.Contains(owner);
 
         // Helper method that tries to set IsInitialized to true if BeginInit hasn't been called before this.
         // This method is called on AddOwner
         private void TryInitialize()
         {
-            if (!IsInitializePending &&
-                !IsInitialized)
+            if (!IsInitializePending && !IsInitialized)
             {
                 IsInitialized = true;
             }
@@ -701,48 +640,14 @@ namespace System.Windows
 
             if (shouldInvalidate || hasImplicitStyles)
             {
-                // Invalidate all FE owners
-                if (_ownerFEs != null)
+                // Invalidate all owners
+                if (_owners != null)
                 {
-                    foreach (IInternalFrameworkElement fe in _ownerFEs)
+                    foreach (IResourceDictionaryOwner owner in _owners)
                     {
-                        if (fe != null)
-                        {
-                            // Set the HasImplicitStyles flag on the owner
-                            if (hasImplicitStyles)
-                            {
-                                fe.ShouldLookupImplicitStyles = true;
-                            }
-
-                            // If this dictionary has been initialized fire an invalidation
-                            // to let the tree know of this change.
-                            if (shouldInvalidate)
-                            {
-                                TreeWalkHelper.InvalidateOnResourcesChange(fe, info);
-                            }
-                        }
+                        owner.OnResourcesChange(info, shouldInvalidate, hasImplicitStyles);
                     }
-                }
 
-                // Invalidate all App owners
-                if (_ownerApps != null)
-                {
-                    foreach (Application app in _ownerApps)
-                    {
-                        if (app != null)
-                        {
-                            // Set the HasImplicitStyles flag on the owner
-                            if (hasImplicitStyles)
-                            {
-                                app.HasImplicitStylesInResources = true;
-                            }
-                            
-                            if (shouldInvalidate)
-                            {
-                                app.InvalidateResources(info);
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -817,7 +722,7 @@ namespace System.Windows
         /// Adds the given owner to all merged dictionaries of this ResourceDictionary
         /// </summary>
         /// <param name="owner"></param>
-        private void AddOwnerToAllMergedDictionaries(object owner)
+        private void AddOwnerToAllMergedDictionaries(IResourceDictionaryOwner owner)
         {
             if (_mergedDictionaries != null)
             {
@@ -833,7 +738,7 @@ namespace System.Windows
         /// Removes the given owner to all merged dictionaries of this ResourceDictionary
         /// </summary>
         /// <param name="owner"></param>
-        private void RemoveOwnerFromAllMergedDictionaries(object owner)
+        private void RemoveOwnerFromAllMergedDictionaries(IResourceDictionaryOwner owner)
         {
             if (_mergedDictionaries != null)
             {
@@ -858,33 +763,15 @@ namespace System.Windows
         /// <param name="mergedDictionary"></param>
         private void PropagateParentOwners(ResourceDictionary mergedDictionary)
         {
-            if (_ownerFEs != null)
+            if (_owners != null)
             {
-                Debug.Assert(_ownerFEs.Count > 0);
+                Debug.Assert(_owners.Count > 0);
 
-                mergedDictionary._ownerFEs ??= new WeakReferenceList<IInternalFrameworkElement>(_ownerFEs.Count);
+                mergedDictionary._owners ??= new WeakReferenceList<IResourceDictionaryOwner>(_owners.Count);
 
-                foreach (IInternalFrameworkElement fe in _ownerFEs)
+                foreach (IResourceDictionaryOwner owner in _owners)
                 {
-                    if (fe != null)
-                    {
-                        mergedDictionary.AddOwner(fe);
-                    }
-                }
-            }
-
-            if (_ownerApps != null)
-            {
-                Debug.Assert(_ownerApps.Count > 0);
-
-                mergedDictionary._ownerApps ??= new WeakReferenceList<Application>(_ownerApps.Count);
-
-                foreach (Application app in _ownerApps)
-                {
-                    if (app != null)
-                    {
-                        mergedDictionary.AddOwner(app);
-                    }
+                    mergedDictionary.AddOwner(owner);
                 }
             }
         }
@@ -897,33 +784,25 @@ namespace System.Windows
         /// <param name="mergedDictionary"></param>
         internal void RemoveParentOwners(ResourceDictionary mergedDictionary)
         {
-            if (_ownerFEs != null)
+            if (_owners != null)
             {
-                foreach (IInternalFrameworkElement fe in _ownerFEs)
+                foreach (IResourceDictionaryOwner owner in _owners)
                 {
-                    mergedDictionary.RemoveOwner(fe);
-                }
-            }
-
-            if (_ownerApps != null)
-            {
-                Debug.Assert(_ownerApps.Count > 0);
-
-                foreach (Application app in _ownerApps)
-                {
-                    mergedDictionary.RemoveOwner(app);
+                    mergedDictionary.RemoveOwner(owner);
                 }
             }
         }
 
         private bool ContainsCycle(ResourceDictionary origin)
         {
-            for (int i = 0; i < MergedDictionaries.InternalCount; i++)
+            if (_mergedDictionaries != null)
             {
-                ResourceDictionary mergedDictionary = MergedDictionaries[i];
-                if (mergedDictionary == origin || mergedDictionary.ContainsCycle(origin))
+                foreach (ResourceDictionary mergedDictionary in _mergedDictionaries.InternalItems)
                 {
-                    return true;
+                    if (mergedDictionary == origin || mergedDictionary.ContainsCycle(origin))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -1027,6 +906,8 @@ namespace System.Windows
         }
 
         #endregion Inheritance Context
+
+        internal bool IsEmpty => Count == 0 && (_mergedDictionaries is null || _mergedDictionaries.InternalCount == 0);
 
         internal bool TryGetResource(object key, out object value) => (value = GetItem(key)) != null;
 

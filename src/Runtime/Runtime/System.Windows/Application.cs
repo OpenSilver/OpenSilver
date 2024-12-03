@@ -33,7 +33,7 @@ namespace System.Windows
     /// <summary>
     /// Encapsulates the app and its available services.
     /// </summary>
-    public partial class Application
+    public partial class Application : IResourceDictionaryOwner
     {
         private static readonly Dictionary<string, string> _resourcesCache = new(StringComparer.OrdinalIgnoreCase);
 
@@ -45,9 +45,6 @@ namespace System.Windows
         private Dictionary<object, object> _implicitResourcesCache;
         private Host _host;
         private Theme _theme;
-
-        // Says if App.Resources has any implicit styles
-        internal bool HasImplicitStylesInResources { get; set; }
 
         /// <summary>
         /// Gets the Application object for the current application.
@@ -117,7 +114,16 @@ namespace System.Windows
             get { return _theme; }
             set
             {
-                value?.Seal();
+                if (_theme == value) return;
+
+                _theme?.RemoveOwner(this);
+
+                if (value is not null)
+                {
+                    value.Seal();
+                    value.AddOwner(this);
+                }
+
                 _theme = value;
             }
         }
@@ -194,7 +200,7 @@ namespace System.Windows
         {
             get
             {
-                if (_resources == null)
+                if (_resources is null)
                 {
                     _resources = new ResourceDictionary();
                     _resources.AddOwner(this);
@@ -203,6 +209,8 @@ namespace System.Windows
             }
             set
             {
+                if (_resources == value) return;
+
                 ResourceDictionary oldValue = _resources;
                 _resources = value;
 
@@ -218,27 +226,42 @@ namespace System.Windows
                     }
                 }
 
-                if (oldValue != value)
-                {
-                    // this notify all window in the app that Application resources changed
-                    InvalidateResources(new ResourcesChangeInfo(oldValue, value));
-                }
+                // this notify all window in the app that Application resources changed
+                InvalidateResources(new ResourcesChangeInfo(oldValue, value));
             }
         }
 
-        internal bool HasResources
+        internal bool HasResources => _resources is not null && !_resources.IsEmpty;
+
+        // Says if App.Resources has any implicit styles
+        internal bool HasImplicitStylesInResources { get; set; }
+
+        void IResourceDictionaryOwner.SetResources(ResourceDictionary resourceDictionary)
         {
-            get
+            // Propagate the HasImplicitStyles flag to the new owner
+            if (resourceDictionary.HasImplicitStyles)
             {
-                ResourceDictionary resources = _resources;
-                return resources != null &&
-                       (resources.Count > 0 || resources.MergedDictionaries.InternalCount > 0);
+                HasImplicitStylesInResources = true;
             }
         }
 
-        internal object FindImplicitResourceInternal(object resourceKey)
+        void IResourceDictionaryOwner.OnResourcesChange(ResourcesChangeInfo info, bool shouldInvalidate, bool hasImplicitStyles)
         {
-            if (_implicitResourcesCache?.TryGetValue(resourceKey, out object resource) ?? false)
+            // Set the HasImplicitStyles flag on the owner
+            if (hasImplicitStyles)
+            {
+                HasImplicitStylesInResources = true;
+            }
+
+            if (shouldInvalidate)
+            {
+                InvalidateResources(info);
+            }
+        }
+
+        internal object FindImplicitResource(object resourceKey)
+        {
+            if (_implicitResourcesCache is not null && _implicitResourcesCache.TryGetValue(resourceKey, out object resource))
             {
                 return resource;
             }
@@ -246,13 +269,13 @@ namespace System.Windows
             return null;
         }
 
-        internal void InvalidateResources(ResourcesChangeInfo info)
+        private void InvalidateResources(ResourcesChangeInfo info)
         {
-            InvalidateStyleCache(info);
+            InvalidateImplicitResourcesCache(info);
             InvalidateResourceReferences(info);
         }
 
-        private void InvalidateStyleCache(ResourcesChangeInfo info)
+        private void InvalidateImplicitResourcesCache(ResourcesChangeInfo info)
         {
             if (info.Key is not null)
             {
@@ -283,7 +306,7 @@ namespace System.Windows
             }
         }
 
-        private void InvalidateResourceReferences(ResourcesChangeInfo info)
+        internal void InvalidateResourceReferences(ResourcesChangeInfo info)
         {
             foreach (Window window in Windows)
             {

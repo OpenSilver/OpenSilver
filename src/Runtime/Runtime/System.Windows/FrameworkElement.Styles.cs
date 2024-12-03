@@ -257,7 +257,7 @@ namespace System.Windows
                     Application app = Application.Current;
                     if (app != null)
                     {
-                        implicitStyle = app.FindImplicitResourceInternal(resourceKey);
+                        implicitStyle = app.FindImplicitResource(resourceKey);
                         if (implicitStyle != null)
                         {
                             return implicitStyle;
@@ -298,7 +298,7 @@ namespace System.Windows
         internal bool ShouldLookupImplicitStyles
         {
             get { return ReadInternalFlag(InternalFlags.ShouldLookupImplicitStyles); }
-            set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
+            private set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
         }
 
         // Indicates if this instance has a style set by a generator

@@ -11,10 +11,12 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Xaml;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
+using OpenSilver.Theming;
 
 namespace System.Windows.Markup;
 
@@ -22,6 +24,8 @@ namespace System.Windows.Markup;
 /// Implements a markup extension that supports static (XAML load time) resource references made from XAML, 
 /// with additional system logic that retrieves different resources depending on the currently active theme.
 /// </summary>
+[OpenSilver.NotImplemented]
+[EditorBrowsable(EditorBrowsableState.Never)]
 [ContentProperty(nameof(ResourceKey))]
 public class ThemeResourceExtension : MarkupExtension
 {
@@ -157,14 +161,20 @@ public class ThemeResourceExtension : MarkupExtension
 
     private object FindResourceInAppOrSystem()
     {
-        if (Application.Current is Application app &&
-            app.HasResources &&
-            app.Resources.TryGetResource(ResourceKey, out object resource))
+        if (Application.Current is Application app)
         {
-            return resource;
+            if (app.HasResources && app.Resources.TryGetResource(ResourceKey, out object resource))
+            {
+                return resource;
+            }
+
+            if (app.Theme is Theme theme && theme.TryGetResource(ResourceKey, out resource))
+            {
+                return resource;
+            }
         }
 
         // Look in the built-in resources (eg. "SystemAccentColor")
-        return XamlResources.FindResource(ResourceKey);
+        return XamlResources.FindBuiltInResource(ResourceKey);
     }
 }

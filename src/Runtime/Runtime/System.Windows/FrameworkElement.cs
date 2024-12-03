@@ -31,7 +31,7 @@ namespace System.Windows
     /// object tree, and object lifetime feature areas.
     /// </summary>
     [RuntimeNameProperty(nameof(Name))]
-    public abstract partial class FrameworkElement : UIElement
+    public abstract partial class FrameworkElement : UIElement, IResourceDictionaryOwner
     {
         #region Inheritance Context
 
@@ -432,21 +432,6 @@ namespace System.Windows
 #region Resources
 
         /// <summary>
-        ///     Check if resource is not empty.
-        ///     Call HasResources before accessing resources every time you need
-        ///     to query for a resource.
-        /// </summary>
-        internal bool HasResources
-        {
-            get
-            {
-                ResourceDictionary resources = _resources;
-                return resources != null &&
-                       (resources.Count > 0 || resources.MergedDictionaries.InternalCount > 0);
-            }
-        }
-
-        /// <summary>
         /// Gets the locally defined resource dictionary. In XAML, you can establish
         /// resource items as child object elements of a frameworkElement.Resources property
         /// element, through XAML implicit collection syntax.
@@ -456,16 +441,17 @@ namespace System.Windows
         {
             get
             {
-                if (_resources == null)
+                if (_resources is null)
                 {
-                    ResourceDictionary resource = new ResourceDictionary();
-                    resource.AddOwner(this);
-                    _resources = resource;
+                    _resources = new ResourceDictionary();
+                    _resources.AddOwner(this);
                 }
                 return _resources;
             }
             set
             {
+                if (_resources == value) return;
+
                 ResourceDictionary oldValue = _resources;
                 _resources = value;
 
@@ -482,15 +468,43 @@ namespace System.Windows
                 }
 
                 // Invalidate ResourceReference properties for this subtree
-                // 
-                if (oldValue != value)
-                {
-                    TreeWalkHelper.InvalidateOnResourcesChange(this, new ResourcesChangeInfo(oldValue, value));
-                }
+                TreeWalkHelper.InvalidateOnResourcesChange(this, new ResourcesChangeInfo(oldValue, value));
             }
         }
-        
-#endregion
+
+        /// <summary>
+        ///     Check if resource is not empty.
+        ///     Call HasResources before accessing resources every time you need
+        ///     to query for a resource.
+        /// </summary>
+        internal bool HasResources => _resources is not null && !_resources.IsEmpty;
+
+        void IResourceDictionaryOwner.SetResources(ResourceDictionary resourceDictionary)
+        {
+            // Propagate the HasImplicitStyles flag to the new owner
+            if (resourceDictionary.HasImplicitStyles)
+            {
+                ShouldLookupImplicitStyles = true;
+            }
+        }
+
+        void IResourceDictionaryOwner.OnResourcesChange(ResourcesChangeInfo info, bool shouldInvalidate, bool hasImplicitStyles)
+        {
+            // Set the HasImplicitStyles flag on the owner
+            if (hasImplicitStyles)
+            {
+                ShouldLookupImplicitStyles = true;
+            }
+
+            // If this dictionary has been initialized fire an invalidation
+            // to let the tree know of this change.
+            if (shouldInvalidate)
+            {
+                TreeWalkHelper.InvalidateOnResourcesChange(this, info);
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets a value that indicates whether this element is in the Visual Tree, that is, if it has been loaded for presentation.

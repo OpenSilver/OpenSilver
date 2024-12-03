@@ -15,9 +15,11 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using OpenSilver.Internal;
 
-namespace System.Windows
+namespace System.Windows;
+
+public partial class ResourceDictionary
 {
-    internal sealed class ResourceDictionaryCollection : PresentationFrameworkCollection<ResourceDictionary>
+    private sealed class ResourceDictionaryCollection : PresentationFrameworkCollection<ResourceDictionary>
     {
         private readonly ResourceDictionary _owner;
         private readonly CollectionChangedHelper _collectionChanged;
