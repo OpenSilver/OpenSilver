@@ -41,9 +41,7 @@ public partial class ResourceDictionary
         {
             _collectionChanged.CheckReentrancy();
 
-            CheckValue(value);
             AddInternal(value);
-            value._parentDictionary = _owner;
 
             _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, InternalCount - 1);
         }
@@ -54,7 +52,6 @@ public partial class ResourceDictionary
 
             foreach (ResourceDictionary dictionary in InternalItems)
             {
-                dictionary._parentDictionary = null;
                 _owner.RemoveParentOwners(dictionary);
             }
 
@@ -67,9 +64,7 @@ public partial class ResourceDictionary
         {
             _collectionChanged.CheckReentrancy();
 
-            CheckValue(value);
             InsertInternal(index, value);
-            value._parentDictionary = _owner;
 
             _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Add, value, index);
         }
@@ -80,7 +75,6 @@ public partial class ResourceDictionary
 
             ResourceDictionary removedItem = GetItemInternal(index);
             RemoveAtInternal(index);
-            removedItem._parentDictionary = null;
 
             _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Remove, removedItem, index);
         }
@@ -91,21 +85,10 @@ public partial class ResourceDictionary
         {
             _collectionChanged.CheckReentrancy();
 
-            CheckValue(value);
             ResourceDictionary originalItem = GetItemInternal(index);
             SetItemInternal(index, value);
-            originalItem._parentDictionary = null;
-            value._parentDictionary = _owner;
 
             _collectionChanged.OnCollectionChanged(NotifyCollectionChangedAction.Replace, originalItem, value, index);
-        }
-
-        private static void CheckValue(ResourceDictionary value)
-        {
-            if (value._parentDictionary is not null)
-            {
-                throw new InvalidOperationException("Element is already the child of another element.");
-            }
         }
     }
 }

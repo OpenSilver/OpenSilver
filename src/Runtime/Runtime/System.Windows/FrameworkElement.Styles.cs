@@ -232,7 +232,7 @@ namespace System.Windows
                         break;
                     }
 
-                    if (f.HasResources && f.Resources.HasImplicitStyles)
+                    if (f.HasResources)
                     {
                         implicitStyle = f.Resources[resourceKey];
                         if (implicitStyle != null)

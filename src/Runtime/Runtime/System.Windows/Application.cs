@@ -297,10 +297,10 @@ namespace System.Windows
                 }
             }
             else if (info.IsCatastrophicDictionaryChange ||
-                (info.NewDictionary != null && (info.NewDictionary.HasImplicitStyles || info.NewDictionary.HasImplicitDataTemplates)) ||
-                (info.OldDictionary != null && (info.OldDictionary.HasImplicitStyles || info.OldDictionary.HasImplicitDataTemplates)))
+                (info.NewDictionary != null && ResourceDictionary.Helpers.HasImplicitResources(info.NewDictionary)) ||
+                (info.OldDictionary != null && ResourceDictionary.Helpers.HasImplicitResources(info.OldDictionary)))
             {
-                _implicitResourcesCache = HasResources && (Resources.HasImplicitStyles || Resources.HasImplicitDataTemplates) ?
+                _implicitResourcesCache = HasResources && ResourceDictionary.Helpers.HasImplicitResources(Resources) ?
                     ResourceDictionary.Helpers.BuildImplicitResourcesCache(Resources) :
                     null;
             }

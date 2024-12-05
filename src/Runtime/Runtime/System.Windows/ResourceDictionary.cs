@@ -47,13 +47,6 @@ namespace System.Windows
         //
         private Dictionary<object, ResourceDictionary> _themeDictionaries;
 
-        //
-        // Note: In Silverlight, a ResourceDictionary can only be in
-        // one merged dictionary at a time, so we need to store a reference
-        // to its parent dictionary in that case.
-        //
-        private ResourceDictionary _parentDictionary;
-
         private WeakReferenceList<IResourceDictionaryOwner> _owners;
 
         // We store a weak reference so that the dictionary does not leak the owner.
@@ -61,7 +54,8 @@ namespace System.Windows
 
         // a dummy DO, used as the InheritanceContext when the dictionary's owner is
         // not itself a DO
-        private static readonly DependencyObject DummyInheritanceContext = new DependencyObject();
+        private static readonly DependencyObject _dummyInheritanceContext = new();
+        private static readonly WeakReference<DependencyObject> DummyInheritanceContext = new(_dummyInheritanceContext);
 
         #endregion Data
 
@@ -552,7 +546,7 @@ namespace System.Windows
                 else
                 {
                     // if the first owner is ineligible, use a dummy
-                    _inheritanceContext = new WeakReference<DependencyObject>(DummyInheritanceContext);
+                    _inheritanceContext = DummyInheritanceContext;
 
                     // set InheritanceContext for the existing values
                     AddInheritanceContextToValues();
@@ -647,15 +641,12 @@ namespace System.Windows
                     {
                         owner.OnResourcesChange(info, shouldInvalidate, hasImplicitStyles);
                     }
-
                 }
             }
         }
 
         private void OnMergedDictionariesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            ResourceDictionary oldDictionary = null;
-            ResourceDictionary newDictionary = null;
             ResourcesChangeInfo info;
 
             if (e.Action != NotifyCollectionChangedAction.Reset)
@@ -664,6 +655,9 @@ namespace System.Windows
                     (e.NewItems != null && e.NewItems.Count == 1) ||
                     (e.OldItems != null && e.OldItems.Count == 1),
                     "The NotifyCollectionChanged event fired when no dictionaries were added or removed");
+
+                ResourceDictionary oldDictionary = null;
+                ResourceDictionary newDictionary = null;
 
                 // If one or more resource dictionaries were removed we
                 // need to remove the owners they were given by their
@@ -1053,7 +1047,7 @@ namespace System.Windows
             // Update the HasImplicitStyles flag
             if (!HasImplicitStyles)
             {
-                HasImplicitStyles = (key as Type) != null;
+                HasImplicitStyles = key is Type;
             }
         }
 
@@ -1063,7 +1057,7 @@ namespace System.Windows
             // Update the HasImplicitDataTemplates flag
             if (!HasImplicitDataTemplates)
             {
-                HasImplicitDataTemplates = (key is DataTemplateKey);
+                HasImplicitDataTemplates = key is DataTemplateKey;
             }
         }
 
@@ -1106,27 +1100,13 @@ namespace System.Windows
         internal bool HasImplicitStyles
         {
             get => ReadPrivateFlag(PrivateFlags.HasImplicitStyles);
-            set
-            { 
-                WritePrivateFlag(PrivateFlags.HasImplicitStyles, value);
-                if (value && _parentDictionary != null && !_parentDictionary.HasImplicitStyles)
-                {
-                    _parentDictionary.HasImplicitStyles = true;
-                }
-            }
+            set => WritePrivateFlag(PrivateFlags.HasImplicitStyles, value);
         }
 
         internal bool HasImplicitDataTemplates
         {
             get => ReadPrivateFlag(PrivateFlags.HasImplicitDataTemplates);
-            set
-            {
-                WritePrivateFlag(PrivateFlags.HasImplicitDataTemplates, value);
-                if (value && _parentDictionary != null && !_parentDictionary.HasImplicitDataTemplates)
-                {
-                    _parentDictionary.HasImplicitDataTemplates = true;
-                }
-            }
+            set => WritePrivateFlag(PrivateFlags.HasImplicitDataTemplates, value);
         }
 
         /// <summary>
@@ -1223,16 +1203,21 @@ namespace System.Windows
 
         internal static class Helpers
         {
-            internal static Dictionary<object, object> BuildImplicitResourcesCache(ResourceDictionary rd)
+            public static Dictionary<object, object> BuildImplicitResourcesCache(ResourceDictionary rd)
             {
+                Debug.Assert(rd is not null);
+
+                var cache = new Dictionary<object, object>();
+                AddResourcesToCache(rd, cache);
+                return cache;
+
                 static void AddResourcesToCache(ResourceDictionary rd, Dictionary<object, object> cache)
                 {
-                    if (rd._mergedDictionaries != null)
+                    if (rd._mergedDictionaries is not null)
                     {
-                        List<ResourceDictionary> mergedDictionaries = rd._mergedDictionaries.InternalItems;
-                        for (int i = 0; i < mergedDictionaries.Count; i++)
+                        foreach (ResourceDictionary mergedDictionary in rd._mergedDictionaries.InternalItems)
                         {
-                            AddResourcesToCache(mergedDictionaries[i], cache);
+                            AddResourcesToCache(mergedDictionary, cache);
                         }
                     }
 
@@ -1252,10 +1237,29 @@ namespace System.Windows
                         }
                     }
                 }
+            }
 
-                var cache = new Dictionary<object, object>();
-                AddResourcesToCache(rd, cache);
-                return cache;
+            public static bool HasImplicitResources(ResourceDictionary rd)
+            {
+                Debug.Assert(rd is not null);
+
+                if (rd.HasImplicitStyles || rd.HasImplicitDataTemplates)
+                {
+                    return true;
+                }
+
+                if (rd._mergedDictionaries is not null)
+                {
+                    foreach (ResourceDictionary mergedDictionary in rd._mergedDictionaries.InternalItems)
+                    {
+                        if (HasImplicitResources(mergedDictionary))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
             }
         }
     }
