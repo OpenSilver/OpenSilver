@@ -872,14 +872,7 @@ namespace GlobalResource
                     bool isAttachedProperty = IsPropertyAttached(element);
 
                     // Check if the property is a collection, in which case we must use ".Add(...)", otherwise a simple "=" is enough:
-                    if (IsPropertyOrFieldACollection(element, isAttachedProperty)
-                        && (element.Elements().Count() != 1
-                        || (!IsTypeAssignableFrom(element.Elements().First().Name, element.Name, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
-                        && !GeneratingCode.IsBinding(element.Elements().First(), _settings)
-                        && element.Elements().First().Name.LocalName != "StaticResourceExtension"
-                        && element.Elements().First().Name.LocalName != "StaticResource"
-                        && element.Elements().First().Name.LocalName != "TemplateBinding"
-                        && element.Elements().First().Name.LocalName != "TemplateBindingExtension"))
+                    if (IsPropertyACollection(element, isAttachedProperty))
                     {
                         //------------------------
                         // PROPERTY TYPE IS A COLLECTION
@@ -2109,6 +2102,30 @@ if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThi
                     GetClrNamespaceAndLocalName(parentElement.Name, out string parentNamespaceName, out string parentLocalName, out string parentAssemblyNameIfAny);
                     return _reflectionOnSeparateAppDomain.IsPropertyOrFieldACollection(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
                 }
+            }
+
+            private bool IsPropertyACollection(XElement element, bool isAttachedProperty)
+            {
+                if (!IsPropertyOrFieldACollection(element, isAttachedProperty))
+                {
+                    return false;
+                }
+
+                if (element.Elements().Count() != 1)
+                {
+                    return true;
+                }
+
+                XElement child = element.Elements().First();
+
+                return !IsTypeAssignableFrom(child.Name, element.Name, isAttachedProperty) &&
+                    !GeneratingCode.IsBinding(child, _settings) &&
+                    child.Name.LocalName != "StaticResource" &&
+                    child.Name.LocalName != "StaticResourceExtension" &&
+                    child.Name.LocalName != "TemplateBinding" &&
+                    child.Name.LocalName != "TemplateBindingExtension" &&
+                    child.Name.LocalName != "DynamicResource" &&
+                    child.Name.LocalName != "DynamicResourceExtension";
             }
 
             private bool IsPropertyOrFieldADictionary(
