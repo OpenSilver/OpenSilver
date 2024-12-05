@@ -1022,6 +1022,7 @@ namespace OpenSilver.Compiler
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
                                         _assemblyNameWithoutExtension);
 
+                                string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
                                 string propertyTypeName;
                                 if (!isAttachedProperty)
@@ -1029,7 +1030,7 @@ namespace OpenSilver.Compiler
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
-                                        out _,
+                                        out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
                                         assemblyNameIfAny,
@@ -1040,7 +1041,7 @@ namespace OpenSilver.Compiler
                                     _reflectionOnSeparateAppDomain.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
-                                        out _,
+                                        out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
                                         assemblyNameIfAny);
@@ -1072,11 +1073,23 @@ namespace OpenSilver.Compiler
                                         $"global::{propertyTypeName}" :
                                         $"global::{propertyTypeNamespace}.{propertyTypeName}";
 
-                                    parameters.StringBuilder.AppendLine($@"object {markupValue};
-if (!{RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, out {markupValue}))
-{{
-    {parentElementUniqueNameOrThisKeyword}.{propertyName} = ({propertyTypeFullName}){markupValue};
-}}");
+                                    parameters.StringBuilder
+                                        .AppendLine($"object {markupValue};")
+                                        .AppendLine($"if (!{RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, out {markupValue}))")
+                                        .AppendLine("{");
+
+                                    if (!isAttachedProperty)
+                                    {
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {parentElementUniqueNameOrThisKeyword}.{propertyName} = ({propertyTypeFullName}){markupValue};");
+                                    }
+                                    else
+                                    {
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {propertyDeclaringTypeName}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, ({propertyTypeFullName}){markupValue});");
+                                    }
+
+                                    parameters.StringBuilder.AppendLine("}");
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")

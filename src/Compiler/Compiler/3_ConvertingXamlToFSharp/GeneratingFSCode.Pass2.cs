@@ -1095,6 +1095,7 @@ namespace GlobalResource
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
                                         _assemblyNameWithoutExtension);
 
+                                string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
                                 string propertyTypeName;
                                 if (!isAttachedProperty)
@@ -1102,7 +1103,7 @@ namespace GlobalResource
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
-                                        out _,
+                                        out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
                                         assemblyNameIfAny,
@@ -1113,7 +1114,7 @@ namespace GlobalResource
                                     _reflectionOnSeparateAppDomain.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
-                                        out _,
+                                        out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
                                         assemblyNameIfAny);
@@ -1145,9 +1146,20 @@ namespace GlobalResource
                                         $"global.{propertyTypeName}" :
                                         $"global.{propertyTypeNamespace}.{propertyTypeName}";
 
-                                    parameters.StringBuilder.AppendLine($@"let mutable {markupValue}: obj = null
-if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, ref {markupValue})) then
-    {parentElementUniqueNameOrThisKeyword}.{propertyName} <- unbox<{propertyTypeFullName}> {markupValue}");
+                                    parameters.StringBuilder
+                                        .AppendLine($"let mutable {markupValue}: obj = null")
+                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, ref {markupValue})) then");
+
+                                    if (!isAttachedProperty)
+                                    {
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {parentElementUniqueNameOrThisKeyword}.{propertyName} <- ({markupValue} :?> {propertyTypeFullName})");
+                                    }
+                                    else
+                                    {
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {propertyDeclaringTypeName}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, ({markupValue} :?> {propertyTypeFullName}))");
+                                    }
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")

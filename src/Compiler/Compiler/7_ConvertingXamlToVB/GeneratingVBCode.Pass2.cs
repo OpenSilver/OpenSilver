@@ -1028,6 +1028,7 @@ End Sub
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
                                         _assemblyNameWithoutExtension);
 
+                                string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
                                 string propertyTypeName;
                                 if (!isAttachedProperty)
@@ -1035,7 +1036,7 @@ End Sub
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
-                                        out _,
+                                        out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
                                         assemblyNameIfAny,
@@ -1046,7 +1047,7 @@ End Sub
                                     _reflectionOnSeparateAppDomain.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
-                                        out _,
+                                        out propertyDeclaringTypeName,
                                         out propertyTypeNamespace,
                                         out propertyTypeName,
                                         assemblyNameIfAny);
@@ -1078,10 +1079,22 @@ End Sub
                                         $"Global.{propertyTypeName}" :
                                         $"Global.{propertyTypeNamespace}.{propertyTypeName}";
 
-                                    parameters.StringBuilder.AppendLine($@"Dim {markupValue} As Object = Nothing
-If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, {markupValue})
-    {parentElementUniqueNameOrThisKeyword}.{propertyName} = CType({markupValue}, {propertyTypeFullName})
-End If");
+                                    parameters.StringBuilder
+                                        .AppendLine($"Dim {markupValue} As Object = Nothing")
+                                        .AppendLine($"If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, {markupValue})");
+
+                                    if (!isAttachedProperty)
+                                    {
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {parentElementUniqueNameOrThisKeyword}.{propertyName} = CType({markupValue}, {propertyTypeFullName})");
+                                    }
+                                    else
+                                    {
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {propertyDeclaringTypeName}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, CType({markupValue}, {propertyTypeFullName}))");
+                                    }
+
+                                    parameters.StringBuilder.AppendLine("End If");
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
