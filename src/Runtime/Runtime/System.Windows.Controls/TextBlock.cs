@@ -45,6 +45,7 @@ namespace System.Windows.Controls
         static TextBlock()
         {
             IsHitTestableProperty.OverrideMetadata(typeof(TextBlock), new PropertyMetadata(BooleanBoxes.TrueBox));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBlock), new PropertyMetadata(typeof(TextBlock)));
         }
 
         public TextBlock()
