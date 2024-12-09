@@ -5,7 +5,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyName>OpenSilver.Controls.Data.Input</AssemblyName>
     <RootNamespace>System.Windows.Controls</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

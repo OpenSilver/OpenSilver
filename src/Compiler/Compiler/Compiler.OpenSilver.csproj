@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyName Condition="'$(OpenSilverBuildUUID)' == ''">OpenSilver.Compiler</AssemblyName>
     <AssemblyName Condition="'$(OpenSilverBuildUUID)' != ''">OpenSilver.Compiler.$(OpenSilverBuildUUID)</AssemblyName>
     <RootNamespace>OpenSilver.Compiler</RootNamespace>

@@ -4,7 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>OpenSilver.Interactivity</AssemblyName>
     <RootNamespace>System.Windows.Interactivity</RootNamespace>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DefineTrace>true</DefineTrace>
     <NoWarn>$(NoWarn);CS1591</NoWarn>

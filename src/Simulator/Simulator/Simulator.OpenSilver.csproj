@@ -7,7 +7,6 @@
     <RootNamespace>OpenSilver.Simulator</RootNamespace>
     <PackageId>OpenSilver.Simulator</PackageId>
     <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
     <AssemblyName>OpenSilver.Simulator</AssemblyName>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
