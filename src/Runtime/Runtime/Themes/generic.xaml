@@ -104,6 +104,9 @@
     <!-- TextBlock -->
     <Style TargetType="controls:TextBlock" />
 
+    <!-- RichTextBlock -->
+    <Style TargetType="controls:RichTextBlock" />
+
     <!--  ContentControl  -->
     <Style TargetType="controls:ContentControl">
         <Setter Property="Foreground"
