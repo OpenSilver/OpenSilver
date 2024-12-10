@@ -277,7 +277,7 @@ public sealed class Hyperlink : Span
 
         if (string.IsNullOrEmpty(target))
         {
-            target = "_self";
+            target = "_blank";
         }
 
         NavigateNative(navigateUri, target);
