@@ -140,7 +140,7 @@ namespace TestApplication
             dragDropTargets.Add(new Test("TreeViewDragDropTarget", "DragDropTarget/TreeViewDragDropTarget"));
             Tests.Add(dragDropTargets);
 
-            Tests.Add(new Test("OpenFileDialog", "OpenFileDialog"));
+            Tests.Add(new Test("FileDialog", "FileDialog"));
             Tests.Add(new Test("PopupWindow", "PopupWindow"));
 
             Tests.Add(new Test("RightToLeft", "RightToLeft"));

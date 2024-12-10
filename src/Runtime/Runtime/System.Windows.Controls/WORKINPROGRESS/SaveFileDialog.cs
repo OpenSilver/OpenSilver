@@ -3,24 +3,22 @@ using System.Security;
 
 namespace System.Windows.Controls
 {
+    [Obsolete("Use OpenSilver.Controls.OpenFileDialog instead.")]
     [OpenSilver.NotImplemented]
     public sealed partial class SaveFileDialog
     {
-        [OpenSilver.NotImplemented]
         public string Filter
         {
             get;
             set;
         }
 
-        [OpenSilver.NotImplemented]
         public int FilterIndex
         {
             get;
             set;
         }
 
-        [OpenSilver.NotImplemented]
         public string SafeFileName
         {
             get;
@@ -34,7 +32,6 @@ namespace System.Windows.Controls
         // Returns:
         //     The default file name extension applied to files that are saved with the System.Windows.Controls.SaveFileDialog,
         //     which can optionally include the dot character (.).
-        [OpenSilver.NotImplemented]
         public string DefaultExt { get; set; }
 
         //
@@ -49,7 +46,6 @@ namespace System.Windows.Controls
         //     Occurs if the specified file name is null or contains invalid characters such
         //     as quotes ("), less than (<), greater than (>), pipe (|), backspace (\b), null
         //     (\0), tab (\t), colon (:), asterisk(*), question mark (?), and slashes (\\, /).
-        [OpenSilver.NotImplemented]
         public string DefaultFileName { get; set; }
 
         //
@@ -65,7 +61,6 @@ namespace System.Windows.Controls
         //   T:System.InvalidOperationException:
         //     No file was selected in the dialog box.
         [SecuritySafeCritical]
-        [OpenSilver.NotImplemented]
         public Stream OpenFile()
         {
             return null;
@@ -89,7 +84,6 @@ namespace System.Windows.Controls
         //     Active Scripting in Internet Explorer is disabled.-or-The call to the System.Windows.Controls.OpenFileDialog.ShowDialog
         //     method was not made from user-initiated code or too much time passed between
         //     user-initiation and the display of the dialog.
-        [OpenSilver.NotImplemented]
         public bool? ShowDialog()
         {
             return null;
