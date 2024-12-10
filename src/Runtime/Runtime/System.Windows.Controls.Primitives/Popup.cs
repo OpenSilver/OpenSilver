@@ -84,6 +84,16 @@ namespace System.Windows.Controls.Primitives
         private static void OnPlacementTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
+
+            if (popup.IsOpen)
+            {
+                popup.UpdatePlacementTargetRegistration((UIElement)e.OldValue, (UIElement)e.NewValue);
+            }
+            else if (e.OldValue is not null)
+            {
+                UnregisterPopupFromPlacementTarget(popup, (UIElement)e.OldValue);
+            }
+
             popup.UpdatePositionTracker();
             popup.Reposition();
         }
@@ -635,6 +645,10 @@ namespace System.Windows.Controls.Primitives
             UpdatePopupParent();
 
             _popupRoot.Child = Child;
+
+            // When opening, set the placement target registration
+            UpdatePlacementTargetRegistration(null, PlacementTarget);
+
             _popupRoot.Show();
 
             UpdatePosition();
@@ -645,7 +659,108 @@ namespace System.Windows.Controls.Primitives
             OpenSilver.Interop.JavaScriptRuntime.Flush();
         }
 
-        private void HidePopupRootIfVisible() => _popupRoot?.Close();
+        private void HidePopupRootIfVisible()
+        {
+            _popupRoot?.Close();
+
+            // When closing, clear the placement target registration
+            UpdatePlacementTargetRegistration(PlacementTarget, null);
+        }
+
+        /// <summary>
+        /// Updates the popup's placement target registration.
+        /// This method is only called when IsOpen changes or when PlacementTarget changes,
+        /// When IsOpen changes, your before/after is either PlacementTarget or null. When 
+        /// PlacementTarget changes, the before/after are stored in the event args.
+        /// </summary>
+        private void UpdatePlacementTargetRegistration(UIElement oldValue, UIElement newValue)
+        {
+            // A popup will be registered with its placement target to enable the descendent walker
+            // to traverse into the popup. This is required for style sheet invalidations, etc.
+            //
+            // To avoid life-time issues, the popup will only be registered with the placement target
+            // if the popup is in the Open state. Otherwise the strong-ref from the placement target
+            // back to the popup could potentially keep the popup alive even though it has long
+            // been closed.
+
+            if (oldValue is not null)
+            {
+                UnregisterPopupFromPlacementTarget(this, oldValue);
+
+                if (newValue is null && VisualTreeHelper.GetParent(this) is null)
+                {
+                    TreeWalkHelper.InvalidateOnTreeChange(this, oldValue, false);
+                }
+            }
+
+            if (newValue is not null)
+            {
+                // Only register with PlacementTarget if we aren't in a tree
+                if (VisualTreeHelper.GetParent(this) is null)
+                {
+                    RegisterPopupWithPlacementTarget(this, newValue);
+
+                    // Invalidate relevant properties for this subtree
+                    TreeWalkHelper.InvalidateOnTreeChange(this, newValue, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Registers this popup with the specified placement target. The descendant walker requires this so that
+        /// it can traverse into the popup's element tree.
+        /// </summary>
+        private static void RegisterPopupWithPlacementTarget(Popup popup, UIElement placementTarget)
+        {
+            Debug.Assert(popup is not null, "Popup must be non-null");
+            Debug.Assert(placementTarget is not null, "Placement target must be non-null.");
+
+            //
+            // The registered popups are stored in an array list on the specified element (which is
+            // typically the placement target).
+            // The array list for storing the registered popups on the placement target is lazily created.
+            //
+
+            if (placementTarget.GetValue(RegisteredPopupsField) is not List<Popup> registeredPopups)
+            {
+                registeredPopups = new(1);
+                placementTarget.SetValue(RegisteredPopupsField, registeredPopups);
+            }
+
+            if (!registeredPopups.Contains(popup))
+            {
+                registeredPopups.Add(popup);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters the popup from the spefied placement target. For more details see comments on
+        /// RegisterPopupWithPlacementTarget.
+        /// </summary>
+        private static void UnregisterPopupFromPlacementTarget(Popup popup, UIElement placementTarget)
+        {
+            Debug.Assert(popup is not null, "Popup must be non-null");
+            Debug.Assert(placementTarget is not null, "Placement target must be non-null.");
+
+            if (placementTarget.GetValue(RegisteredPopupsField) is List<Popup> registeredPopups)
+            {
+                registeredPopups.Remove(popup);
+
+                // If after removing this popup from the placement targets popup registration list, no more
+                // popups are left, we can also get rid of the array list.
+                if (registeredPopups.Count == 0)
+                {
+                    placementTarget.ClearValue(RegisteredPopupsField);
+                }
+            }
+        }
+
+        internal static readonly DependencyProperty RegisteredPopupsField =
+            DependencyProperty.RegisterAttached(
+                "_RegisteredPopupsField",
+                typeof(List<Popup>),
+                typeof(Popup),
+                null);
 
         public event EventHandler ClosedDueToOutsideClick;
 

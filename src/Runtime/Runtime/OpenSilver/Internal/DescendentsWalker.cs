@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace OpenSilver.Internal;
@@ -168,6 +169,18 @@ internal struct DescendentsWalker<T>
     {
         WalkVisualChildren(feParent);
 
+        //
+        // If a popup is attached to the framework element visit each popup node.
+        //
+        if (feParent.GetValue(Popup.RegisteredPopupsField) is List<Popup> registeredPopups)
+        {
+            foreach (Popup p in registeredPopups)
+            {
+                bool visitedViaVisualTree = false;
+                VisitNode((IInternalUIElement)p, visitedViaVisualTree);
+            }
+        }
+
         feParent.IsLogicalChildrenIterationInProgress = true;
 
         try
@@ -243,6 +256,18 @@ internal struct DescendentsWalker<T>
         finally
         {
             feParent.IsVisualChildrenIterationInProgress = false;
+        }
+
+        //
+        // If a popup is attached to the framework element visit each popup node.
+        //
+        if (feParent.GetValue(Popup.RegisteredPopupsField) is List<Popup> registeredPopups)
+        {
+            foreach (Popup p in registeredPopups)
+            {
+                bool visitedViaVisualTree = false;
+                VisitNode((IInternalUIElement)p, visitedViaVisualTree);
+            }
         }
     }
 

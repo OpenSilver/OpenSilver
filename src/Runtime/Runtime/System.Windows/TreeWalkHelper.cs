@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using System.Windows.Controls.Primitives;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -238,8 +239,10 @@ namespace System.Windows
         internal static bool HasChildren(IInternalUIElement uie)
         {
             // See if we have logical or visual children, in which case this is a real tree invalidation.
-            return uie != null && (uie.HasVisualChildren ||
-                (uie is IInternalFrameworkElement fe && fe.HasLogicalChildren));
+            return uie is not null &&
+                (uie.HasVisualChildren ||
+                 uie.GetValue(Popup.RegisteredPopupsField) is not null ||
+                 (uie is IInternalFrameworkElement fe && fe.HasLogicalChildren));
         }
 
         private static readonly VisitedCallback<TreeChangeInfo> TreeChangeDelegate
