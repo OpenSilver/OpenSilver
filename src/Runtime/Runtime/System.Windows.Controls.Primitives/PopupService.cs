@@ -13,33 +13,31 @@
 
 using System.Windows.Input;
 
-namespace System.Windows.Controls.Primitives
+namespace System.Windows.Controls.Primitives;
+
+internal static class PopupService
 {
-    internal static class PopupService
+    internal static FrameworkElement RootVisual { get; private set; }
+
+    /// <summary>
+    /// Place the Popup relative to this point 
+    /// </summary>
+    internal static Point MousePosition { get; private set; }
+
+    internal static void SetRootVisual()
     {
-        internal static FrameworkElement RootVisual { get; private set; }
-
-        /// <summary>
-        /// Place the ToolTip relative to this point 
-        /// </summary>
-        internal static Point MousePosition { get; set; }
-
-        internal static void SetRootVisual()
+        if (RootVisual == null && Application.Current != null)
         {
-            if (RootVisual == null && Application.Current != null)
+            RootVisual = Application.Current.RootVisual as FrameworkElement;
+            if (RootVisual != null)
             {
-                RootVisual = Application.Current.RootVisual as FrameworkElement;
-                if (RootVisual != null)
-                {
-                    // keep caching mouse position because we can't query it from Silverlight 
-                    RootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
-                }
+                // keep caching mouse position because we can't query it from Silverlight 
+                RootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
             }
         }
-
-        private static void OnRootMouseMove(object sender, MouseEventArgs e)
-        {
-            MousePosition = e.GetPosition(null);
-        }
     }
+
+    internal static void OnMouseEvent(MouseEventArgs e) => MousePosition = e.GetPosition(null);
+
+    private static void OnRootMouseMove(object sender, MouseEventArgs e) => OnMouseEvent(e);
 }

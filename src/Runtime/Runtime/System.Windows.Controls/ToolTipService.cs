@@ -293,7 +293,7 @@ namespace System.Windows.Controls
 
         private static void OnOwnerMouseEnter(object sender, MouseEventArgs e)
         {
-            PopupService.MousePosition = e.GetPosition(null);
+            PopupService.OnMouseEvent(e);
 
             OnOwnerMouseEnterInternal(sender, e.OriginalSource);
         }

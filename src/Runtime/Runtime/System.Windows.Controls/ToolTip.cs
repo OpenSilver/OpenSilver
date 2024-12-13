@@ -153,11 +153,7 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="PlacementTarget"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PlacementTargetProperty =
-            DependencyProperty.Register(
-                nameof(PlacementTarget),
-                typeof(UIElement),
-                typeof(ToolTip),
-                null);
+            ToolTipService.PlacementTargetProperty.AddOwner(typeof(ToolTip));
 
         /// <summary>
         /// Gets or sets the visual element or control that the tool tip should be 
@@ -191,11 +187,7 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="Placement"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PlacementProperty =
-            DependencyProperty.Register(
-                nameof(Placement),
-                typeof(PlacementMode),
-                typeof(ToolTip),
-                new PropertyMetadata(PlacementMode.Mouse));
+            ToolTipService.PlacementProperty.AddOwner(typeof(ToolTip));
 
         /// <summary>
         /// Gets or sets how the <see cref="ToolTip" /> should be positioned
