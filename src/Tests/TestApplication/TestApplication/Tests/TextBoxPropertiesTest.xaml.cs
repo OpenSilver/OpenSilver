@@ -36,5 +36,12 @@ namespace TestApplication.Tests
             if (TextBoxForWrapping != null)
                 TextBoxForWrapping.TextWrapping = TextWrapping.NoWrap;
         }
+
+        private void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            SelectionTextBlock.Text = SelectionTextBox.SelectedText;
+            SelectionStartTextBlock.Text = SelectionTextBox.SelectionStart.ToString();
+            SelectionLengthTextBlock.Text = SelectionTextBox.SelectionLength.ToString();
+        }
     }
 }
