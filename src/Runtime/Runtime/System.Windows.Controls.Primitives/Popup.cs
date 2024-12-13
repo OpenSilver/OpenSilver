@@ -129,8 +129,9 @@ namespace System.Windows.Controls.Primitives
         {
             PlacementMode value = (PlacementMode)o;
             return value == PlacementMode.Bottom
-                || value == PlacementMode.Mouse
                 || value == PlacementMode.Right
+                || value == PlacementMode.Mouse
+                || value == PlacementMode.MousePoint
                 || value == PlacementMode.Left
                 || value == PlacementMode.Top;
         }
@@ -457,18 +458,27 @@ namespace System.Windows.Controls.Primitives
             {
                 offset = PerformPlacement(target);
             }
-            else if (Placement == PlacementMode.Mouse)
-            {
-                offset = PopupService.MousePosition;
-                offset.Y += _cursorOffsetY;
-            }
-            else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                offset = GetRelativeTransform(null).Transform(new Point(0, 0));
-            }
             else
             {
-                offset = new Point(0, 0);
+                PlacementMode placement = Placement;
+
+                if (placement == PlacementMode.Mouse)
+                {
+                    offset = PopupService.MousePosition;
+                    offset.Y += _cursorOffsetY;
+                }
+                else if (placement == PlacementMode.MousePoint)
+                {
+                    offset = PopupService.MousePosition;
+                }
+                else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                {
+                    offset = GetRelativeTransform(null).Transform(new Point(0, 0));
+                }
+                else
+                {
+                    offset = new Point(0, 0);
+                }
             }
 
             _popupRoot.SetPosition(offset.X + HorizontalOffset, offset.Y + VerticalOffset);
@@ -491,6 +501,9 @@ namespace System.Windows.Controls.Primitives
                     case PlacementMode.Mouse:
                         point.X = PopupService.MousePosition.X;
                         point.Y = PopupService.MousePosition.Y + _cursorOffsetY;
+                        break;
+                    case PlacementMode.MousePoint:
+                        point = PopupService.MousePosition;
                         break;
                     case PlacementMode.Top:
                         point.X = targetInterestPoints.TopLeft.X + childInterestPoints.TopLeft.X - childInterestPoints.BottomLeft.X;
