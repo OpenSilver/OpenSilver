@@ -35,7 +35,7 @@ public sealed class Updates : Task
         return true;
     }
 
-    private async void Update(string productId)
+    private void Update(string productId)
     {
         try
         {
@@ -45,12 +45,17 @@ public sealed class Updates : Task
             string os = Uri.EscapeDataString(Environment.OSVersion.ToString());
             string ide = Uri.EscapeDataString(IDE ?? "");
 
-            using var client = new HttpClient();
-            await client.GetAsync(
-                new UriBuilder("https://opensilver-service.azurewebsites.net/api/Updates")
-                {
-                    Query = $"id={identifier}&productId={productId}&version={productVersion}&date={date}&os={os}&ide={ide}"
-                }.ToString());
+            using var client = new HttpClient()
+            {
+                // If the request takes more than a few seconds, it is not worth waiting for,
+                // as this would unnecessarily delay the build process.
+                Timeout = TimeSpan.FromSeconds(5)
+            };
+            var query = new UriBuilder("https://opensilver-service.azurewebsites.net/api/Updates")
+            {
+                Query = $"id={identifier}&productId={productId}&version={productVersion}&date={date}&os={os}&ide={ide}"
+            }.ToString();
+            client.GetAsync(query).GetAwaiter().GetResult();
         }
         catch { }
     }
