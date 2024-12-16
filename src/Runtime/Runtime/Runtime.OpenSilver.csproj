@@ -79,7 +79,6 @@
     <Compile Include="OpenSilver\Internal\CollectionChangedHelper.cs" />
     <Compile Include="OpenSilver\Internal\Data\BindingCollection.cs" />
     <Compile Include="OpenSilver\Internal\MatrixUtil.cs" />
-    <Compile Include="OpenSilver\IO\MemoryFileStream.cs" />
     <Compile Include="OpenSilver\Theming\Theme.cs" />
     <Compile Include="Properties\Strings.Designer.cs">
       <DesignTime>True</DesignTime>

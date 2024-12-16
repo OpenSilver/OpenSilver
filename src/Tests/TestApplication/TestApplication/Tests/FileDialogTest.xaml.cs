@@ -71,14 +71,14 @@ namespace TestApplication.OpenSilver.Tests
                 Filter = "*.txt|*.txt"
             };
 #if OPENSILVER
-            bool? result = await saveFileDialog.ShowDialog();
+            bool? result = await saveFileDialog.ShowDialogAsync();
 #else
             bool? result = saveFileDialog.ShowDialog();
 #endif
             if (result == true)
             {
 #if OPENSILVER
-                using (Stream saveFileStream = await saveFileDialog.OpenFile())
+                using (Stream saveFileStream = await saveFileDialog.OpenFileAsync())
 #else
                 using (Stream saveFileStream = saveFileDialog.OpenFile())
 #endif
