@@ -635,17 +635,42 @@ namespace System.Windows.Data
                 return;
             }
 
-            object convertedValue = GetRawProposedValue();
-
+            object rawValue = GetRawProposedValue();
+            Type expectedType = _propertyPathWalker.FinalNode.Type;
             ValidationError vError = null;
 
             try
             {
-                convertedValue = ConvertProposedValue(convertedValue);
+                object convertedValue = rawValue;
 
-                if (convertedValue == DependencyProperty.UnsetValue)
+                if (expectedType != null && ParentBinding.Converter != null)
                 {
-                    return;
+                    convertedValue = ParentBinding.Converter.ConvertBack(convertedValue,
+                        expectedType,
+                        ParentBinding.ConverterParameter,
+                        ParentBinding.ConverterCulture);
+
+                    if (convertedValue == DependencyProperty.UnsetValue)
+                    {
+                        return;
+                    }
+                }
+
+                if (!DependencyProperty.IsValidType(convertedValue, expectedType))
+                {
+                    convertedValue = DynamicConverter.Convert(convertedValue,
+                        expectedType,
+                        null,
+                        ParentBinding.ConverterCulture);
+
+                    if (convertedValue == DependencyProperty.UnsetValue)
+                    {
+                        UpdateValidationError(new ValidationError(this)
+                        {
+                            ErrorContent = string.Format(Strings.Validation_ConversionFailed, rawValue),
+                        });
+                        return;
+                    }
                 }
 
                 UpdateSource(convertedValue);
@@ -673,30 +698,6 @@ namespace System.Windows.Data
         }
 
         private object GetRawProposedValue() => Target.GetValue(TargetProperty);
-
-        private object ConvertProposedValue(object value)
-        {
-            object convertedValue = value;
-            Type expectedType = _propertyPathWalker.FinalNode.Type;
-
-            if (expectedType != null && ParentBinding.Converter != null)
-            {
-                convertedValue = ParentBinding.Converter.ConvertBack(convertedValue,
-                    expectedType,
-                    ParentBinding.ConverterParameter,
-                    ParentBinding.ConverterCulture);
-            }
-
-            if (convertedValue != DependencyProperty.UnsetValue && !DependencyProperty.IsValidType(convertedValue, expectedType))
-            {
-                convertedValue = DynamicConverter.Convert(convertedValue,
-                    expectedType,
-                    null,
-                    ParentBinding.ConverterCulture);
-            }
-
-            return convertedValue;
-        }
 
         internal void UpdateSource(object convertedValue)
         {

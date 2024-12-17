@@ -1654,6 +1654,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value &apos;{0}&apos; could not be converted..
+        /// </summary>
+        internal static string Validation_ConversionFailed {
+            get {
+                return ResourceManager.GetString("Validation_ConversionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; language tag must be empty or must conform to grammar defined in IETF RFC 3066..
         /// </summary>
         internal static string XmlLangMalformed {
