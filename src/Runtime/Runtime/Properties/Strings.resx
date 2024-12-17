@@ -654,6 +654,9 @@
   <data name="UnexpectedParameterType" xml:space="preserve">
     <value>Parameter is unexpected type '{0}'. Expected type is '{1}'.</value>
   </data>
+  <data name="Validation_ConversionFailed" xml:space="preserve">
+    <value>Value '{0}' could not be converted.</value>
+  </data>
   <data name="XmlLangMalformed" xml:space="preserve">
     <value>'{0}' language tag must be empty or must conform to grammar defined in IETF RFC 3066.</value>
   </data>
