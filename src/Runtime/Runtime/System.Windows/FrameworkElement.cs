@@ -842,7 +842,7 @@ namespace System.Windows
                         if (Features.DOM.AssignName && d is FrameworkElement fe)
                         {
                             INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                                fe.OuterDiv, "dataId", (string)newValue ?? string.Empty);
+                                fe.OuterDiv, "dataId", (string)newValue ?? string.Empty, true);
                         }
                     },
                 });
