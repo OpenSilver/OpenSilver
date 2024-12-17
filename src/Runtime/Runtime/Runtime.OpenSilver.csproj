@@ -23,6 +23,7 @@
     <Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
     <Compile Include="Core\Events\DOMEventManager.cs" />
     <Compile Include="Core\Main\CopyOnWriteList.cs" />
+    <Compile Include="OpenSilver\Controls\SaveFileDialog.cs" />
     <Compile Include="OpenSilver\Features.cs" />
     <Compile Include="OpenSilver\Internal\Controls\IGeneratorHost.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ImageManager.cs" />
@@ -84,6 +85,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
+    <Compile Include="System.Web\MimeMapping.cs" />
     <Compile Include="System.Windows.Automation.Peers\ChildWindowAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\TreeViewAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\TreeViewItemAutomationPeer.cs" />

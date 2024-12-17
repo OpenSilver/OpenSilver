@@ -60,6 +60,7 @@
     <file src="../../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/any/js_css" />
     <file src="../../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/any/js_css" />
     <file src="../../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/any/js_css" />
+    <file src="../../src/Runtime/Scripts/FileSaver.min.js" target="contentFiles/any/any/js_css" />
 
     <!-- OpenSilver icon -->
     <file src="OpenSilver_icon.png" target="images\OpenSilver_icon.png" />

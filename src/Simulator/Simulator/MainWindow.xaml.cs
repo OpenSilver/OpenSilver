@@ -571,6 +571,7 @@ Click OK to continue.";
                     File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.css"), Path.Combine(destinationPath, "cshtml5.css"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "cshtml5.js"), Path.Combine(destinationPath, "cshtml5.js"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "ResizeObserver.js"), Path.Combine(destinationPath, "ResizeObserver.js"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "FileSaver.min.js"), Path.Combine(destinationPath, "FileSaver.min.js"), true);
 
                     // Create "interopcalls.js" which contains all the JS executed by the Simulator so far:
                     string fullLog = _javaScriptExecutionHandler.FullLogOfExecutedJavaScriptCode;
