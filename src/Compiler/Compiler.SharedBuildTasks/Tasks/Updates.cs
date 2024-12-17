@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using Microsoft.Build.Framework;
@@ -22,7 +23,8 @@ namespace OpenSilver.Compiler;
 
 public sealed class Updates : Task
 {
-    private const string Key = "Identifier";
+    private const string IdentifierKey = "Identifier";
+    private const string LastUpdateDateKey = "LastUpdateDate";
 
     [Required]
     public string PackagePath { get; set; }
@@ -37,6 +39,13 @@ public sealed class Updates : Task
 
     private void Update(string productId)
     {
+        if (IgnoreUpdate())
+        {
+            return;
+        }
+
+        SetLastUpdateDate(DateTime.UtcNow);
+
         try
         {
             string identifier = GetIdentifier();
@@ -58,23 +67,44 @@ public sealed class Updates : Task
             client.GetAsync(query).GetAwaiter().GetResult();
         }
         catch { }
+
+        SaveSettings();
     }
+
+    private bool IgnoreUpdate() => (DateTime.UtcNow - GetLastUpdateDate()) < TimeSpan.FromDays(1);
 
     private static string GetIdentifier()
     {
-        string id = OpenSilverSettings.Instance.GetValue(Key);
+        string id = OpenSilverSettings.Instance.GetValue(IdentifierKey);
         if (string.IsNullOrWhiteSpace(id))
         {
             id = Guid.NewGuid().ToString();
-            OpenSilverSettings.Instance.SetValue(Key, id);
-            OpenSilverSettings.Instance.SaveSettings();
+            OpenSilverSettings.Instance.SetValue(IdentifierKey, id);
         }
         return id;
     }
 
-    private string GetProductVersion()
+    private string GetProductVersion() => PackagePath.Substring(Path.GetDirectoryName(PackagePath).Length + 1);
+
+    private DateTime GetLastUpdateDate()
     {
-        string pkgDirectory = Path.GetDirectoryName(PackagePath);
-        return PackagePath.Substring(pkgDirectory.Length + 1);
+        string value = OpenSilverSettings.Instance.GetValue(LastUpdateDateKey);
+        if (long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out long ticks))
+        {
+            return new DateTime(ticks);
+        }
+        return DateTime.MinValue;
+    }
+
+    private void SetLastUpdateDate(DateTime utcDate) =>
+        OpenSilverSettings.Instance.SetValue(LastUpdateDateKey, utcDate.Ticks.ToString(CultureInfo.InvariantCulture));
+
+    private void SaveSettings()
+    {
+        try
+        {
+            OpenSilverSettings.Instance.SaveSettings();
+        }
+        catch { }
     }
 }
