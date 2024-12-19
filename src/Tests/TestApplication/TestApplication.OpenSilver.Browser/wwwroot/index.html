@@ -10,11 +10,11 @@
             const style = document.createElement('link');
             style.setAttribute('rel', 'stylesheet');
             style.setAttribute('type', 'text/css');
-            style.setAttribute('href', 'loading-indicator.css?date=' + new Date().toISOString());
+            style.setAttribute('href', '$ext_loadingindicatorcss$?date=' + new Date().toISOString());
             document.head.appendChild(style);
             const script = document.createElement('script');
             script.setAttribute('type', 'application/javascript');
-            script.setAttribute('src', 'libs/opensilver.js?date=' + new Date().toISOString());
+            script.setAttribute('src', 'modern/loading-animation.js?date=' + new Date().toISOString());
             document.head.appendChild(script);
         })();
     </script>
@@ -45,6 +45,19 @@
     </div>
     <div id="opensilver-root" style="position: relative; width: 100%; height: 100%; overflow-x: hidden; overflow-y: hidden"></div>
 
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        (function () {
+            const script = document.createElement('script');
+            script.setAttribute('type', 'application/javascript');
+            script.setAttribute('src', 'libs/opensilver.js?date=' + new Date().toISOString());
+            script.addEventListener('load', function () {
+                const scriptWebAssembly = document.createElement('script');
+                scriptWebAssembly.setAttribute('type', 'application/javascript');
+                scriptWebAssembly.setAttribute('src', '_framework/blazor.webassembly.js?date=' + new Date().toISOString());
+                document.body.appendChild(scriptWebAssembly);
+            });
+            document.body.appendChild(script);
+        })();
+    </script>
 </body>
 </html>
