@@ -504,7 +504,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     private int ComputeFirstItemInViewportIndex(bool isHorizontal, int itemCount)
     {
         int index = isHorizontal ? (int)_scrollData._offset.X : (int)_scrollData._offset.Y;
-        return Math.Max(0, Math.Min(index, itemCount));
+        return Math.Max(0, Math.Min(index, itemCount - 1));
     }
 
     private Size MeasureNonItemsHost(Size constraint)
