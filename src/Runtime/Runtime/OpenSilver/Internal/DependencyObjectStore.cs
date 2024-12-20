@@ -173,6 +173,11 @@ internal static class DependencyObjectStore
         PropertyMetadata metadata)
     {
         var oldEntry = storage.Entry;
+        if (!oldEntry.IsAnimated)
+        {
+            return;
+        }
+
         var newEntry = new EffectiveValueEntry(oldEntry.BaseValueSourceInternal);
 
         if (oldEntry.IsExpression)

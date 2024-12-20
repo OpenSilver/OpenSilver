@@ -44,7 +44,11 @@ internal sealed class AnimationClock<TValue> : AnimationClock
         _target.AttachAnimationClock(_dp, this);
     }
 
-    public override object GetCurrentValue() => _animator.GetCurrentValue(_initialValue, _dp, this);
+    public override object GetCurrentValue()
+    {
+        Debug.Assert(CurrentState != ClockState.Stopped);
+        return _animator.GetCurrentValue(_initialValue, _dp, this);
+    }
 
     protected override void OnFrameCore() => _target.RefreshAnimation(_dp, this);
 
