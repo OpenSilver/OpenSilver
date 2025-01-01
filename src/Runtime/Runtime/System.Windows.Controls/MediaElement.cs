@@ -29,7 +29,7 @@ namespace System.Windows.Controls
         // todo: not sure if ogg is actually only for audio or not.
         // If not, find a way to know which one it currently is.
         private static readonly HashSet<string> SupportedAudioTypes = new() { "mp3", "ogg" };
-        
+
         private INTERNAL_HtmlDomElementReference _mediaElement;
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace System.Windows.Controls
             const string Muted = "muted";
             SetBoolAttribute(Muted, value);
         }
-        
+
         /// <summary>
         /// Gets or sets a media source on the MediaElement.
         /// </summary>
@@ -333,11 +333,12 @@ namespace System.Windows.Controls
                     {
                         if (_mediaElement != null)
                         {
+                            UnregisterEvent(_mediaElement);
                             INTERNAL_HtmlDomManager.RemoveFromDom(_mediaElement);
                         }
 
                         _mediaElement = INTERNAL_HtmlDomManager.AppendDomElement(tagName, parentRef, this);
-                        
+                        RegisterEvent(_mediaElement);
                         if (!IsAudioOnly)
                         {
                             _mediaElement.Style.width = "100%";
@@ -354,6 +355,37 @@ namespace System.Windows.Controls
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(_mediaElement, "src", absoluteURI, true);
             }
         }
+
+        private void RegisterEvent(INTERNAL_HtmlDomElementReference mediaElement)
+        {
+            string sElement = OpenSilver.Interop.GetVariableStringForJS(mediaElement);
+            _mediaOpenedCallback = JavaScriptCallback.Create(OnMediaOpened);
+            string smediaOpenedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaOpenedCallback);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.addEventListener('canplay',function(e){{ {smediaOpenedCallback}();}});");
+
+            _mediaEndedCallback = JavaScriptCallback.Create(OnMediaEnded);
+            string smediaEndedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaEndedCallback);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.addEventListener('ended',function(e){{ {smediaEndedCallback}();}});");
+        }
+
+        private void UnregisterEvent(INTERNAL_HtmlDomElementReference mediaElement)
+        {
+            _mediaOpenedCallback?.Dispose();
+            _mediaOpenedCallback = null;
+            _mediaEndedCallback?.Dispose();
+            _mediaEndedCallback = null;
+        }
+
+        private JavaScriptCallback _mediaOpenedCallback;
+        void OnMediaOpened()
+        {
+            this.MediaOpened?.Invoke(this, new RoutedEventArgs());
+        }
+        private JavaScriptCallback _mediaEndedCallback;
+        void OnMediaEnded()
+        {
+            this.MediaEnded?.Invoke(this, new RoutedEventArgs());
+        }      
 
         private static string GetExtension(string uriString)
         {
@@ -408,7 +440,6 @@ namespace System.Windows.Controls
         protected override AutomationPeer OnCreateAutomationPeer()
             => new MediaElementAutomationPeer(this);
 
-        [OpenSilver.NotImplemented]
         public event RoutedEventHandler MediaOpened;
 
         [OpenSilver.NotImplemented]

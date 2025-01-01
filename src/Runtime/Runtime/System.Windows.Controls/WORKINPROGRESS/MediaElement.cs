@@ -192,7 +192,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Occurs when the <see cref="MediaElement"/> is no longer playing audio or video.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        
         public event RoutedEventHandler MediaEnded;
 
         /// <summary>
