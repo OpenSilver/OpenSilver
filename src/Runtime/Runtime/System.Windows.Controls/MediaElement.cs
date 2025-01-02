@@ -31,6 +31,30 @@ namespace System.Windows.Controls
         private static readonly HashSet<string> SupportedAudioTypes = new() { "mp3", "ogg" };
 
         private INTERNAL_HtmlDomElementReference _mediaElement;
+        private JavaScriptCallback _mediaOpenedCallback;
+        private JavaScriptCallback _mediaEndedCallback;
+        private JavaScriptCallback _mediaFailedCallback;
+
+        /// <summary>
+        /// Occurs when the media stream has been validated and opened, and the file headers have been read.
+        /// </summary>
+        public event RoutedEventHandler MediaOpened;
+
+        private void OnMediaOpened() => MediaOpened?.Invoke(this, new RoutedEventArgs());
+
+        /// <summary>
+        /// Occurs when the <see cref="MediaElement"/> is no longer playing audio or video.
+        /// </summary>
+        public event RoutedEventHandler MediaEnded;
+
+        private void OnMediaEnded() => MediaEnded?.Invoke(this, new RoutedEventArgs());
+
+        /// <summary>
+        /// Occurs when there is an error associated with the media <see cref="Source"/>.
+        /// </summary>
+        public event EventHandler<ExceptionRoutedEventArgs> MediaFailed;
+
+        private void OnMediaFailed() => MediaFailed?.Invoke(this, new ExceptionRoutedEventArgs());
 
         /// <summary>
         /// Gets or sets a value that indicates whether media will begin playback automatically
@@ -193,7 +217,17 @@ namespace System.Windows.Controls
             }
         }
 
-        private void SetMediaSource(Uri source) => CreateMediaElement(OuterDiv, source);
+        private void SetMediaSource(Uri source)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _mediaElement != null)
+            {
+                string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
+                INTERNAL_HtmlDomManager.RemoveAttribute(_mediaElement, "src");
+                OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.load();");
+            }
+
+            CreateMediaElement(OuterDiv, source);
+        }
 
         /// <summary>
         /// Gets or sets the media's volume.
@@ -224,6 +258,31 @@ namespace System.Windows.Controls
             {
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(_mediaElement, Volume, volume);
             }
+        }
+
+        public bool ShowControls
+        {
+            get { return (bool)GetValue(ShowControlsProperty); }
+            set { SetValueInternal(ShowControlsProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ShowControls"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ShowControlsProperty =
+            DependencyProperty.Register(
+                nameof(ShowControls),
+                typeof(bool),
+                typeof(MediaElement),
+                new PropertyMetadata(false)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((MediaElement)d).SetControlsAttribute((bool)newValue),
+                });
+
+        private void SetControlsAttribute(bool value)
+        {
+            const string Controls = "controls";
+            SetBoolAttribute(Controls, value);
         }
 
         /// <summary>
@@ -286,6 +345,29 @@ namespace System.Windows.Controls
             }
         }
 
+        /// <summary>
+        /// Stops and resets media to be played from the beginning.
+        /// </summary>
+        public void Stop()
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                if (_mediaElement != null)
+                {
+                    string sElement = OpenSilver.Interop.GetVariableStringForJS(_mediaElement);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.pause(); {sElement}.currentTime = 0;");
+                }
+            }
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            base.INTERNAL_OnDetachedFromVisualTree();
+
+            UnregisterEvent();
+            _mediaElement = null;
+        }
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             domElementWhereToPlaceChildren = null;
@@ -333,12 +415,13 @@ namespace System.Windows.Controls
                     {
                         if (_mediaElement != null)
                         {
-                            UnregisterEvent(_mediaElement);
+                            UnregisterEvent();
                             INTERNAL_HtmlDomManager.RemoveFromDom(_mediaElement);
+                            _mediaElement = null;
                         }
 
-                        _mediaElement = INTERNAL_HtmlDomManager.AppendDomElement(tagName, parentRef, this);
-                        RegisterEvent(_mediaElement);
+                        _mediaElement = CreateHTMLMediaElement(tagName, parentRef);
+
                         if (!IsAudioOnly)
                         {
                             _mediaElement.Style.width = "100%";
@@ -350,42 +433,42 @@ namespace System.Windows.Controls
                 }
             }
 
-            if (_mediaElement != null)
+            if (_mediaElement != null && !string.IsNullOrEmpty(absoluteURI))
             {
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(_mediaElement, "src", absoluteURI, true);
             }
         }
 
-        private void RegisterEvent(INTERNAL_HtmlDomElementReference mediaElement)
+        private INTERNAL_HtmlDomElementReference CreateHTMLMediaElement(string tagName, INTERNAL_HtmlDomElementReference parent)
         {
+            var mediaElement = INTERNAL_HtmlDomManager.AppendDomElement(tagName, parent, this);
+
             string sElement = OpenSilver.Interop.GetVariableStringForJS(mediaElement);
+
             _mediaOpenedCallback = JavaScriptCallback.Create(OnMediaOpened);
-            string smediaOpenedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaOpenedCallback);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.addEventListener('canplay',function(e){{ {smediaOpenedCallback}();}});");
+            string mediaOpenedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaOpenedCallback);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.addEventListener('loadedmetadata', function(e) {{ {mediaOpenedCallback}(); }});");
 
             _mediaEndedCallback = JavaScriptCallback.Create(OnMediaEnded);
-            string smediaEndedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaEndedCallback);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.addEventListener('ended',function(e){{ {smediaEndedCallback}();}});");
+            string mediaEndedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaEndedCallback);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.addEventListener('ended', function(e) {{ {mediaEndedCallback}(); }});");
+
+            _mediaFailedCallback = JavaScriptCallback.Create(OnMediaFailed);
+            string mediaFailedCallback = OpenSilver.Interop.GetVariableStringForJS(_mediaFailedCallback);
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sElement}.addEventListener('error', function(e) {{ {mediaFailedCallback}(); }});");
+
+            return mediaElement;
         }
 
-        private void UnregisterEvent(INTERNAL_HtmlDomElementReference mediaElement)
+        private void UnregisterEvent()
         {
             _mediaOpenedCallback?.Dispose();
             _mediaOpenedCallback = null;
             _mediaEndedCallback?.Dispose();
             _mediaEndedCallback = null;
+            _mediaFailedCallback?.Dispose();
+            _mediaFailedCallback = null;
         }
-
-        private JavaScriptCallback _mediaOpenedCallback;
-        void OnMediaOpened()
-        {
-            this.MediaOpened?.Invoke(this, new RoutedEventArgs());
-        }
-        private JavaScriptCallback _mediaEndedCallback;
-        void OnMediaEnded()
-        {
-            this.MediaEnded?.Invoke(this, new RoutedEventArgs());
-        }      
 
         private static string GetExtension(string uriString)
         {
@@ -398,31 +481,6 @@ namespace System.Windows.Controls
                 }
             }
             return string.Empty;
-        }
-
-        public bool ShowControls
-        {
-            get { return (bool)GetValue(ShowControlsProperty); }
-            set { SetValueInternal(ShowControlsProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="ShowControls"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ShowControlsProperty =
-            DependencyProperty.Register(
-                nameof(ShowControls),
-                typeof(bool),
-                typeof(MediaElement),
-                new PropertyMetadata(false)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((MediaElement)d).SetControlsAttribute((bool)newValue),
-                });
-
-        private void SetControlsAttribute(bool value)
-        {
-            const string Controls = "controls";
-            SetBoolAttribute(Controls, value);
         }
 
         private void Refresh()
@@ -439,10 +497,5 @@ namespace System.Windows.Controls
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new MediaElementAutomationPeer(this);
-
-        public event RoutedEventHandler MediaOpened;
-
-        [OpenSilver.NotImplemented]
-        public event EventHandler<ExceptionRoutedEventArgs> MediaFailed;
     }
 }

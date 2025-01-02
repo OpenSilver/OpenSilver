@@ -22,15 +22,6 @@ namespace System.Windows.Controls
     public partial class MediaElement
     {
         /// <summary>
-        /// Stops and resets media to be played from the beginning.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public void Stop()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         ///  The collection of timeline markers (represented as <see cref="TimelineMarker"/> objects) associated
         ///  with the currently loaded media file.
         /// </summary>
@@ -188,12 +179,6 @@ namespace System.Windows.Controls
         /// </param>
         [OpenSilver.NotImplemented]
         public void SetSource(Stream stream) { }
-
-        /// <summary>
-        /// Occurs when the <see cref="MediaElement"/> is no longer playing audio or video.
-        /// </summary>
-        
-        public event RoutedEventHandler MediaEnded;
 
         /// <summary>
         /// Occurs when the value of the <see cref="CurrentState"/> property changes.
