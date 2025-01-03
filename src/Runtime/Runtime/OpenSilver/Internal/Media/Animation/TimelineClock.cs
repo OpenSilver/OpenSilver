@@ -205,6 +205,16 @@ internal abstract class TimelineClock
 
     public void OnFrame(TimeSpan frameTime)
     {
+        if (_parent is not null && _parent.CurrentState == ClockState.Stopped)
+        {
+            if (CurrentState != ClockState.Stopped)
+            {
+                ResetCachedStateToStopped();
+                OnFrameCore();
+            }
+            return;
+        }
+
         if (frameTime < BeginTime)
         {
             ResetCachedStateToStopped();
