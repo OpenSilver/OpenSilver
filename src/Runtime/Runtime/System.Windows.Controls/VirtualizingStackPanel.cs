@@ -30,7 +30,8 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     // When VSP is in pixel mode _scrollData is in units of pixels.  Otherwise the units are logical.
     private ScrollData _scrollData;
     private bool _isVirtualizing;
-    private int _firstItemInViewportOffset;
+    private int _firstItemInViewportIndex;
+    private double _firstItemInViewportPixelOffset;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VirtualizingStackPanel"/> class.
@@ -91,6 +92,66 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
         element.SetValueInternal(VirtualizationModeProperty, value);
     }
+
+    /// <summary>
+    /// Identifies the VirtualizingStackPanel.ScrollAmount attached dependency property.
+    /// </summary>
+    public static readonly DependencyProperty ScrollAmountProperty =
+        DependencyProperty.RegisterAttached(
+            "ScrollAmount",
+            typeof(double),
+            typeof(VirtualizingStackPanel),
+            new PropertyMetadata(1.0),
+            IsScrollAmountValid);
+
+    /// <summary>
+    /// Returns the scroll amount for the specified object.
+    /// </summary>
+    /// <param name="element">
+    /// The object from which the scroll amount is read.
+    /// </param>
+    /// <returns>
+    /// A <see cref="double"/> representing the scroll amount. The default value is 1.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// element is null.
+    /// </exception>
+    public static double GetScrollAmount(DependencyObject element)
+    {
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+
+        return (double)element.GetValue(ScrollAmountProperty);
+    }
+
+    /// <summary>
+    /// Sets the scroll amount on the specified object.
+    /// </summary>
+    /// <param name="element">
+    /// The element on which to set the scroll amount.
+    /// </param>
+    /// <param name="value">
+    /// A <see cref="double"/> that indicates the scrolling amount. 
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// element is null.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// value is not greater than 0.
+    /// </exception>
+    public static void SetScrollAmount(DependencyObject element, double value)
+    {
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+
+        element.SetValueInternal(ScrollAmountProperty, value);
+    }
+
+    private static bool IsScrollAmountValid(object value) => (double)value > 0.0;
 
     private static readonly DependencyPropertyKey IsVirtualizingPropertyKey =
         DependencyProperty.RegisterAttachedReadOnly(
@@ -322,34 +383,38 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         bool isHorizontal = Orientation == Orientation.Horizontal;
         ItemsControl owner = ItemsControl.GetItemsOwner(this);
         int itemCount = owner.Items.Count;
-        var stackDesiredSize = new Size(0, 0);
-        int nvisible = 0;
-        _firstItemInViewportOffset = 0;
+        Size stackDesiredSize = new();
+        double numberOfItemsInViewport = 0.0;
+        _firstItemInViewportIndex = 0;
+        _firstItemInViewportPixelOffset = 0.0;
 
         SetVirtualizationState(owner);
 
         IItemContainerGenerator generator = ItemContainerGenerator;
         if (itemCount > 0)
         {
-            Size childAvailable = constraint;
+            Size childConstraint = constraint;
             if (CanHorizontallyScroll || isHorizontal)
             {
-                childAvailable.Width = double.PositiveInfinity;
+                childConstraint.Width = double.PositiveInfinity;
             }
             if (CanVerticallyScroll || !isHorizontal)
             {
-                childAvailable.Height = double.PositiveInfinity;
+                childConstraint.Height = double.PositiveInfinity;
             }
 
             // Next, prepare and measure the extents of our viewable items...
-            int firstItemInViewportIndex = ComputeFirstItemInViewportIndex(isHorizontal, itemCount);
+            int nvisible = 0;
+            (int firstItemInViewportIndex, double firstItemInViewportLogicalOffset) = ComputeFirstItemInViewportIndex(isHorizontal, itemCount);
             GeneratorPosition start = generator.GeneratorPositionFromIndex(firstItemInViewportIndex);
-            int insertAt = start.Offset == 0 ? start.Index : start.Index + 1;
-            int beyond = 0;
 
             using (generator.StartAt(start, GeneratorDirection.Forward, true))
             {
+                double viewportSize = 0;
+                int insertAt = start.Offset == 0 ? start.Index : start.Index + 1;
+                int beyond = 0;
                 List<UIElement> children = InternalChildren;
+
                 for (int i = firstItemInViewportIndex; i < itemCount && beyond < 2; i++, insertAt++)
                 {
                     // Generate the child container
@@ -369,28 +434,86 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
                         generator.PrepareItemContainer(child);
                     }
 
-                    child.Measure(childAvailable);
+                    child.Measure(childConstraint);
                     Size size = child.DesiredSize;
                     nvisible++;
 
+                    // Include the offset of the first item in the viewport, if any.
+                    if (i == firstItemInViewportIndex)
+                    {
+                        // If we display only one item, we need to adjust the scroll offset because we don't want to scroll
+                        // past the end of the last element. Currently, there is only one item if the first display item is
+                        // the last item of the itemscontrol. This is guaranteed because we always 2 items after the last
+                        // fully visible item, if possible. If this behavior changes in the future, the following condition
+                        // will not be valid anymore.
+                        if (i == itemCount - 1)
+                        {
+                            if (isHorizontal)
+                            {
+                                double overflow = size.Width - constraint.Width;
+                                firstItemInViewportLogicalOffset = overflow switch
+                                {
+                                    > 0 => Math.Min(firstItemInViewportLogicalOffset, overflow / size.Width),
+                                    _ => 0,
+                                };
+                            }
+                            else
+                            {
+                                double overflow = size.Height - constraint.Height;
+                                firstItemInViewportLogicalOffset = overflow switch
+                                {
+                                    > 0 => Math.Min(firstItemInViewportLogicalOffset, overflow / size.Height),
+                                    _ => 0,
+                                };
+                            }
+                        }
+
+                        numberOfItemsInViewport -= firstItemInViewportLogicalOffset;
+                        _firstItemInViewportPixelOffset = firstItemInViewportLogicalOffset * (isHorizontal ? size.Width : size.Height);
+                        viewportSize -= _firstItemInViewportPixelOffset;
+                    }
+
+                    // Accumulate child size.
                     if (isHorizontal)
                     {
                         stackDesiredSize.Height = Math.Max(stackDesiredSize.Height, size.Height);
                         stackDesiredSize.Width += size.Width;
+                        viewportSize += size.Width;
 
-                        if (stackDesiredSize.Width > constraint.Width)
+                        if (viewportSize > constraint.Width)
                         {
+                            if (beyond == 0)
+                            {
+                                double overflow = viewportSize - constraint.Width;
+                                numberOfItemsInViewport += 1 - (overflow / size.Width);
+                            }
+
                             beyond++;
+                        }
+                        else
+                        {
+                            numberOfItemsInViewport += 1.0;
                         }
                     }
                     else
                     {
                         stackDesiredSize.Width = Math.Max(stackDesiredSize.Width, size.Width);
                         stackDesiredSize.Height += size.Height;
+                        viewportSize += size.Height;
 
-                        if (stackDesiredSize.Height > constraint.Height)
+                        if (viewportSize > constraint.Height)
                         {
+                            if (beyond == 0)
+                            {
+                                double overflow = viewportSize - constraint.Height;
+                                numberOfItemsInViewport += 1 - (overflow / size.Height);
+                            }
+
                             beyond++;
+                        }
+                        else
+                        {
+                            numberOfItemsInViewport += 1.0;
                         }
                     }
                 }
@@ -400,17 +523,15 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             {
                 CleanupContainers(owner, firstItemInViewportIndex, nvisible);
             }
-
-            nvisible -= beyond;
         }
 
         // Update our Extent and Viewport values
 
         if (IsScrolling)
         {
-            var viewport = isHorizontal ? new Size(nvisible, constraint.Height) : new Size(constraint.Width, nvisible);
-            var extent = isHorizontal ? new Size(itemCount, stackDesiredSize.Height) : new Size(stackDesiredSize.Width, itemCount);
-            var offset = new Vector(
+            Size viewport = isHorizontal ? new(numberOfItemsInViewport, constraint.Height) : new(constraint.Width, numberOfItemsInViewport);
+            Size extent = isHorizontal ? new(itemCount, stackDesiredSize.Height) : new(stackDesiredSize.Width, itemCount);
+            Vector offset = new(
                 ScrollContentPresenter.CoerceOffset(_scrollData._offset.X, extent.Width, viewport.Width),
                 ScrollContentPresenter.CoerceOffset(_scrollData._offset.Y, extent.Height, viewport.Height));
 
@@ -455,7 +576,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         List<UIElement> children = InternalChildren;
         IRecyclingItemContainerGenerator generator = ItemContainerGenerator as IRecyclingItemContainerGenerator;
         int last = firstItemInViewportIndex + count - 1;
-        int offset = 0;
+        int index = 0;
 
         var pos = new GeneratorPosition(children.Count - 1, 0);
         while (pos.Index >= 0)
@@ -480,13 +601,13 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             }
             else if (item < firstItemInViewportIndex)
             {
-                offset++;
+                index++;
             }
 
             pos.Index--;
         }
 
-        _firstItemInViewportOffset = offset;
+        _firstItemInViewportIndex = index;
     }
 
     private bool NotifyCleanupItem(UIElement child, ItemsControl itemsControl)
@@ -501,15 +622,29 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
         return !e.Cancel;
     }
 
-    private int ComputeFirstItemInViewportIndex(bool isHorizontal, int itemCount)
+    private (int Index, double Offset) ComputeFirstItemInViewportIndex(bool isHorizontal, int itemCount)
     {
-        int index = isHorizontal ? (int)_scrollData._offset.X : (int)_scrollData._offset.Y;
-        return Math.Max(0, Math.Min(index, itemCount - 1));
+        double rawOffset = isHorizontal ? _scrollData._offset.X : _scrollData._offset.Y;
+
+        if (rawOffset < 0)
+        {
+            return (0, 0);
+        }
+        else if (rawOffset >= itemCount)
+        {
+            return (itemCount - 1, 1);
+        }
+        else
+        {
+            int index = (int)rawOffset;
+            double offset = rawOffset - index;
+            return (index, offset);
+        }
     }
 
     private Size MeasureNonItemsHost(Size constraint)
     {
-        Size stackDesiredSize = new Size();
+        Size stackDesiredSize = new();
         List<UIElement> children = InternalChildren;
         Size layoutSlotSize = constraint;
         bool fHorizontal = Orientation == Orientation.Horizontal;
@@ -734,13 +869,13 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
         if (isHorizontal)
         {
-            rcChild.X = ComputeFirstItemInViewportOffset(true);
+            rcChild.X = -ComputeFirstItemInViewportOffset(true);
             rcChild.Y = -_scrollData._computedOffset.Y;
         }
         else
         {
             rcChild.X = -_scrollData._computedOffset.X;
-            rcChild.Y = ComputeFirstItemInViewportOffset(false);
+            rcChild.Y = -ComputeFirstItemInViewportOffset(false);
         }
 
         for (int i = 0; i < children.Count; i++)
@@ -772,13 +907,13 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 
     private double ComputeFirstItemInViewportOffset(bool isHorizontal)
     {
-        double offset = 0.0;
+        double offset = _firstItemInViewportPixelOffset;
 
         List<UIElement> children = InternalChildren;
-        for (int i = 0; i < _firstItemInViewportOffset && i < children.Count; i++)
+        for (int i = 0; i < _firstItemInViewportIndex && i < children.Count; i++)
         {
             UIElement child = children[i];
-            offset -= isHorizontal ? child.DesiredSize.Width : child.DesiredSize.Height;
+            offset += isHorizontal ? child.DesiredSize.Width : child.DesiredSize.Height;
         }
 
         return offset;
@@ -860,7 +995,8 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     protected override void OnClearChildren()
     {
         base.OnClearChildren();
-        _firstItemInViewportOffset = 0;
+        _firstItemInViewportIndex = 0;
+        _firstItemInViewportPixelOffset = 0;
     }
 
     /// <summary>
@@ -967,7 +1103,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </summary>
     public virtual void LineUp()
     {
-        double offset = Orientation == Orientation.Horizontal ? ScrollViewer.LineDelta : 1.0;
+        double offset = Orientation == Orientation.Horizontal ? ScrollViewer.LineDelta : ScrollAmount;
         SetVerticalOffset(VerticalOffset - offset);
     }
 
@@ -976,7 +1112,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </summary>
     public virtual void LineDown()
     {
-        double offset = Orientation == Orientation.Horizontal ? ScrollViewer.LineDelta : 1.0;
+        double offset = Orientation == Orientation.Horizontal ? ScrollViewer.LineDelta : ScrollAmount;
         SetVerticalOffset(VerticalOffset + offset);
     }
 
@@ -985,7 +1121,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </summary>
     public virtual void LineLeft()
     {
-        double offset = Orientation == Orientation.Vertical ? ScrollViewer.LineDelta : 1.0;
+        double offset = Orientation == Orientation.Vertical ? ScrollViewer.LineDelta : ScrollAmount;
         SetHorizontalOffset(HorizontalOffset - offset);
     }
 
@@ -994,7 +1130,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     /// </summary>
     public virtual void LineRight()
     {
-        double offset = Orientation == Orientation.Vertical ? ScrollViewer.LineDelta : 1.0;
+        double offset = Orientation == Orientation.Vertical ? ScrollViewer.LineDelta : ScrollAmount;
         SetHorizontalOffset(HorizontalOffset + offset);
     }
 
@@ -1005,7 +1141,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         double offset = Orientation == Orientation.Horizontal ?
             SystemParameters.WheelScrollLines * ScrollViewer.LineDelta :
-            SystemParameters.WheelScrollLines;
+            SystemParameters.WheelScrollLines * ScrollAmount;
 
         SetVerticalOffset(VerticalOffset - offset);
     }
@@ -1017,7 +1153,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         double offset = Orientation == Orientation.Horizontal ?
             SystemParameters.WheelScrollLines * ScrollViewer.LineDelta :
-            SystemParameters.WheelScrollLines;
+            SystemParameters.WheelScrollLines * ScrollAmount;
 
         SetVerticalOffset(VerticalOffset + offset);
     }
@@ -1029,7 +1165,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         double offset = Orientation == Orientation.Vertical ?
             SystemParameters.WheelScrollLines * ScrollViewer.LineDelta :
-            SystemParameters.WheelScrollLines;
+            SystemParameters.WheelScrollLines * ScrollAmount;
 
         SetHorizontalOffset(HorizontalOffset - offset);
     }
@@ -1041,7 +1177,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         double offset = Orientation == Orientation.Vertical ?
             SystemParameters.WheelScrollLines * ScrollViewer.LineDelta :
-            SystemParameters.WheelScrollLines;
+            SystemParameters.WheelScrollLines * ScrollAmount;
 
         SetHorizontalOffset(HorizontalOffset + offset);
     }
@@ -1166,6 +1302,19 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
             bool isVirtualizing = IsItemsHost && value;
 
             _isVirtualizing = isVirtualizing;
+        }
+    }
+
+    private double ScrollAmount
+    {
+        get
+        {
+            if (ItemsControl.GetItemsOwner(this) is ItemsControl owner)
+            {
+                return GetScrollAmount(owner);
+            }
+
+            return 1.0;
         }
     }
 
