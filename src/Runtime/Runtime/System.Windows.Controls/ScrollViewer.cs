@@ -25,7 +25,7 @@ namespace System.Windows.Controls
     [TemplatePart(Name = ElementScrollContentPresenterName, Type = typeof(ScrollContentPresenter))]
     [TemplatePart(Name = ElementHorizontalScrollBarName, Type = typeof(ScrollBar))]
     [TemplatePart(Name = ElementVerticalScrollBarName, Type = typeof(ScrollBar))]
-    public sealed class ScrollViewer : ContentControl
+    public class ScrollViewer : ContentControl
     {
         internal const double LineDelta = 16.0; // Default physical amount to scroll with one Up/Down/Left/Right key
         internal const double WheelDelta = 48.0; // Default physical amount to scroll with one MouseWheel.
@@ -46,9 +46,13 @@ namespace System.Windows.Controls
         private double _xSize;
         private double _ySize;
 
-        private bool _invalidatedMeasureFromArrange;
+        // Event/infrastructure
+        private EventHandler _layoutUpdatedHandler;
         private IScrollInfo _scrollInfo;
 
+        private CommandQueue _queue;
+
+        private bool _invalidatedMeasureFromArrange;
         private TouchInfo _touchInfo;
 
         /// <summary>
@@ -206,7 +210,14 @@ namespace System.Windows.Controls
         /// <param name="offset">
         /// The position that the content scrolls to.
         /// </param>
-        public void ScrollToHorizontalOffset(double offset) => SetScrollOffset(Orientation.Horizontal, offset);
+        public void ScrollToHorizontalOffset(double offset)
+        {
+            double validatedOffset = ScrollContentPresenter.ValidateInputOffset(offset, nameof(offset));
+
+            // Queue up the scroll command, which tells the content to scroll.
+            // Will lead to an update of all offsets (both live and deferred).
+            EnqueueCommand(Commands.SetHorizontalOffset, validatedOffset);
+        }
 
         /// <summary>
         /// Scrolls the content that is within the <see cref="ScrollViewer"/> to the 
@@ -215,7 +226,14 @@ namespace System.Windows.Controls
         /// <param name="offset">
         /// The position that the content scrolls to.
         /// </param>
-        public void ScrollToVerticalOffset(double offset) => SetScrollOffset(Orientation.Vertical, offset);
+        public void ScrollToVerticalOffset(double offset)
+        {
+            double validatedOffset = ScrollContentPresenter.ValidateInputOffset(offset, nameof(offset));
+
+            // Queue up the scroll command, which tells the content to scroll.
+            // Will lead to an update of all offsets (both live and deferred).
+            EnqueueCommand(Commands.SetVerticalOffset, validatedOffset);
+        }
 
         /// <summary>
         /// Gets the value of the <see cref="HorizontalScrollBarVisibility"/> dependency property 
@@ -327,22 +345,6 @@ namespace System.Windows.Controls
             }
         }
 
-        private void SetScrollOffset(Orientation orientation, double value)
-        {
-            if (ScrollInfo is not null)
-            {
-                double scrollable = (orientation == Orientation.Horizontal) ? ScrollableWidth : ScrollableHeight;
-                double clamped = Math.Max(value, 0);
-
-                clamped = Math.Min(scrollable, clamped);
-
-                // Update ScrollContentPresenter 
-                if (orientation == Orientation.Horizontal)
-                    ScrollInfo.SetHorizontalOffset(clamped);
-                else
-                    ScrollInfo.SetVerticalOffset(clamped);
-            }
-        }
         /// <summary> 
         /// Handles the ScrollBar.Scroll event and updates the UI.
         /// </summary>
@@ -359,37 +361,46 @@ namespace System.Windows.Controls
                 {
                     case ScrollEventType.ThumbPosition:
                     case ScrollEventType.ThumbTrack:
-                        SetScrollOffset(orientation, e.NewValue);
+                        if (horizontal)
+                            ScrollToHorizontalOffset(e.NewValue);
+                        else
+                            ScrollToVerticalOffset(e.NewValue);
                         break;
                     case ScrollEventType.LargeDecrement:
                         if (horizontal)
-                            ScrollInfo.PageLeft();
+                            PageLeft();
                         else
-                            ScrollInfo.PageUp();
+                            PageUp();
                         break;
                     case ScrollEventType.LargeIncrement:
                         if (horizontal)
-                            ScrollInfo.PageRight();
+                            PageRight();
                         else
-                            ScrollInfo.PageDown();
+                            PageDown();
                         break;
                     case ScrollEventType.SmallDecrement:
                         if (horizontal)
-                            ScrollInfo.LineLeft();
+                            LineLeft();
                         else
-                            ScrollInfo.LineUp();
+                            LineUp();
                         break;
                     case ScrollEventType.SmallIncrement:
                         if (horizontal)
-                            ScrollInfo.LineRight();
+                            LineRight();
                         else
-                            ScrollInfo.LineDown();
+                            LineDown();
                         break;
                     case ScrollEventType.First:
-                        SetScrollOffset(orientation, double.MinValue);
+                        if (horizontal)
+                            ScrollToLeftEnd();
+                        else
+                            ScrollToTop();
                         break;
                     case ScrollEventType.Last:
-                        SetScrollOffset(orientation, double.MaxValue);
+                        if (horizontal)
+                            ScrollToRightEnd();
+                        else
+                            ScrollToBottom();
                         break;
                 }
             }
@@ -407,16 +418,16 @@ namespace System.Windows.Controls
                 switch (key)
                 {
                     case Key.Up:
-                        ScrollInfo.LineUp();
+                        LineUp();
                         break;
                     case Key.Down:
-                        ScrollInfo.LineDown();
+                        LineDown();
                         break;
                     case Key.Left:
-                        ScrollInfo.LineLeft();
+                        LineLeft();
                         break;
                     case Key.Right:
-                        ScrollInfo.LineRight();
+                        LineRight();
                         break;
                 }
             }
@@ -593,10 +604,8 @@ namespace System.Windows.Controls
         /// </summary>
         public void InvalidateScrollInfo()
         {
-            IScrollInfo isi = ScrollInfo;
-
             // anybody can call this method even if we don't have ISI...
-            if (isi == null)
+            if (ScrollInfo is not IScrollInfo isi)
             {
                 return;
             }
@@ -655,92 +664,7 @@ namespace System.Windows.Controls
                 !DoubleUtil.AreClose(ExtentWidth, isi.ExtentWidth) ||
                 !DoubleUtil.AreClose(ExtentHeight, isi.ExtentHeight))
             {
-                double oldActualHorizontalOffset = HorizontalOffset;
-                double oldActualVerticalOffset = VerticalOffset;
-
-                double oldViewportWidth = ViewportWidth;
-                double oldViewportHeight = ViewportHeight;
-
-                double oldExtentWidth = ExtentWidth;
-                double oldExtentHeight = ExtentHeight;
-
-                double oldScrollableWidth = ScrollableWidth;
-                double oldScrollableHeight = ScrollableHeight;
-
-                bool changed = false;
-
-                //
-                // Go through scrolling properties updating values.
-                //
-                if (!DoubleUtil.AreClose(oldActualHorizontalOffset, isi.HorizontalOffset))
-                {
-                    _xPositionISI = isi.HorizontalOffset;
-                    HorizontalOffset = _xPositionISI;
-                    changed = true;
-                }
-
-                if (!DoubleUtil.AreClose(oldActualVerticalOffset, isi.VerticalOffset))
-                {
-                    _yPositionISI = isi.VerticalOffset;
-                    VerticalOffset = _yPositionISI;
-                    changed = true;
-                }
-
-                if (!DoubleUtil.AreClose(oldViewportWidth, isi.ViewportWidth))
-                {
-                    _xSize = isi.ViewportWidth;
-                    SetValueInternal(ViewportWidthPropertyKey, _xSize);
-                    changed = true;
-                }
-
-                if (!DoubleUtil.AreClose(oldViewportHeight, isi.ViewportHeight))
-                {
-                    _ySize = isi.ViewportHeight;
-                    SetValueInternal(ViewportHeightPropertyKey, _ySize);
-                    changed = true;
-                }
-
-                if (!DoubleUtil.AreClose(oldExtentWidth, isi.ExtentWidth))
-                {
-                    _xExtent = isi.ExtentWidth;
-                    SetValueInternal(ExtentWidthPropertyKey, _xExtent);
-                    changed = true;
-                }
-
-                if (!DoubleUtil.AreClose(oldExtentHeight, isi.ExtentHeight))
-                {
-                    _yExtent = isi.ExtentHeight;
-                    SetValueInternal(ExtentHeightPropertyKey, _yExtent);
-                    changed = true;
-                }
-
-                // ScrollableWidth/Height are dependant on Viewport and Extent set above.  This check must be done after those.
-                double scrollableWidth = ScrollableWidth;
-                if (!DoubleUtil.AreClose(oldScrollableWidth, ScrollableWidth))
-                {
-                    SetValueInternal(ScrollableWidthPropertyKey, scrollableWidth);
-                    changed = true;
-                }
-
-                double scrollableHeight = ScrollableHeight;
-                if (!DoubleUtil.AreClose(oldScrollableHeight, ScrollableHeight))
-                {
-                    SetValueInternal(ScrollableHeightPropertyKey, scrollableHeight);
-                    changed = true;
-                }
-
-                if (changed)
-                {
-                    if (ElementHorizontalScrollBar != null && !DoubleUtil.AreClose(oldActualHorizontalOffset, HorizontalOffset))
-                    {
-                        ElementHorizontalScrollBar.Value = HorizontalOffset;
-                    }
-
-                    if (ElementVerticalScrollBar != null && !DoubleUtil.AreClose(oldActualVerticalOffset, VerticalOffset))
-                    {
-                        ElementVerticalScrollBar.Value = VerticalOffset;
-                    }
-                }
+                EnsureLayoutUpdatedHandler();
             }
         }
 
@@ -848,34 +772,34 @@ namespace System.Windows.Controls
                 switch (e.Key)
                 {
                     case Key.Up:
-                        ScrollInfo.LineUp();
+                        LineUp();
                         break;
                     case Key.Down:
-                        ScrollInfo.LineDown();
+                        LineDown();
                         break;
                     case Key.Left:
-                        ScrollInfo.LineLeft();
+                        LineLeft();
                         break;
                     case Key.Right:
-                        ScrollInfo.LineRight();
+                        LineRight();
                         break;
                     case Key.PageUp:
-                        ScrollInfo.PageUp();
+                        PageUp();
                         break;
                     case Key.PageDown:
-                        ScrollInfo.PageDown();
+                        PageDown();
                         break;
                     case Key.Home:
                         if (!control)
-                            SetScrollOffset(Orientation.Horizontal, double.MinValue);
+                            ScrollToLeftEnd();
                         else
-                            SetScrollOffset(Orientation.Vertical, double.MinValue);
+                            ScrollToTop();
                         break;
                     case Key.End:
                         if (!control)
-                            SetScrollOffset(Orientation.Horizontal, double.MaxValue);
+                            ScrollToRightEnd();
                         else
-                            SetScrollOffset(Orientation.Vertical, double.MaxValue);
+                            ScrollToBottom();
                         break;
                     default:
                         handled = false;
@@ -890,6 +814,15 @@ namespace System.Windows.Controls
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ScrollViewerAutomationPeer(this);
 
+        /// <summary>
+        /// Measures the content of a <see cref="ScrollViewer"/> element.
+        /// </summary>
+        /// <param name="constraint">
+        /// The upper limit <see cref="Size"/> that should not be exceeded.
+        /// </param>
+        /// <returns>
+        /// The computed desired limit <see cref="Size"/> of the <see cref="ScrollViewer"/> element.
+        /// </returns>
         protected override Size MeasureOverride(Size constraint)
         {
             IScrollInfo isi = ScrollInfo;
@@ -1013,6 +946,12 @@ namespace System.Windows.Controls
             return desiredSize;
         }
 
+        /// <summary>
+        /// Arranges the content of the <see cref="ScrollViewer"/>.
+        /// </summary>
+        /// <param name="arrangeSize">
+        /// The final area within the parent that this element should use to arrange itself and its children.
+        /// </param>
         protected override Size ArrangeOverride(Size arrangeSize)
         {
             bool previouslyInvalidatedMeasureFromArrange = _invalidatedMeasureFromArrange;
@@ -1034,21 +973,356 @@ namespace System.Windows.Controls
             return size;
         }
 
-        internal void LineUp() => ScrollInfo?.LineUp();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content upward by one line.
+        /// </summary>
+        public void LineUp() => EnqueueCommand(Commands.LineUp, 0);
 
-        internal void LineDown() => ScrollInfo?.LineDown();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content downward by one line.
+        /// </summary>
+        public void LineDown() => EnqueueCommand(Commands.LineDown, 0);
 
-        internal void LineLeft() => ScrollInfo?.LineLeft();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content to the left by a predetermined amount.
+        /// </summary>
+        public void LineLeft() => EnqueueCommand(Commands.LineLeft, 0);
 
-        internal void LineRight() => ScrollInfo?.LineRight();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content to the right by a predetermined amount.
+        /// </summary>
+        public void LineRight() => EnqueueCommand(Commands.LineRight, 0);
 
-        internal void PageUp() => ScrollInfo?.PageUp();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content upward by one page.
+        /// </summary>
+        public void PageUp() => EnqueueCommand(Commands.PageUp, 0);
 
-        internal void PageDown() => ScrollInfo?.PageDown();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content downward by one page.
+        /// </summary>
+        public void PageDown() => EnqueueCommand(Commands.PageDown, 0);
 
-        internal void PageLeft() => ScrollInfo?.PageLeft();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content to the left by one page.
+        /// </summary>
+        public void PageLeft() => EnqueueCommand(Commands.PageLeft, 0);
 
-        internal void PageRight() => ScrollInfo?.PageRight();
+        /// <summary>
+        /// Scrolls the <see cref="ScrollViewer"/> content to the right by one page.
+        /// </summary>
+        public void PageRight() => EnqueueCommand(Commands.PageRight, 0);
+
+        /// <summary>
+        /// Scrolls horizontally to the beginning of the <see cref="ScrollViewer"/> content.
+        /// </summary>
+        public void ScrollToLeftEnd() => EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity);
+
+        /// <summary>
+        /// Scrolls horizontally to the end of the <see cref="ScrollViewer"/> content.
+        /// </summary>
+        public void ScrollToRightEnd() => EnqueueCommand(Commands.SetHorizontalOffset, double.PositiveInfinity);
+
+        /// <summary>
+        /// Scrolls to the beginning of the <see cref="ScrollViewer"/> content.
+        /// </summary>
+        public void ScrollToHome()
+        {
+            EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity);
+            EnqueueCommand(Commands.SetVerticalOffset, double.NegativeInfinity);
+        }
+
+        /// <summary>
+        /// Scrolls to the end of the <see cref="ScrollViewer"/> content.
+        /// </summary>
+        public void ScrollToEnd()
+        {
+            EnqueueCommand(Commands.SetHorizontalOffset, double.NegativeInfinity);
+            EnqueueCommand(Commands.SetVerticalOffset, double.PositiveInfinity);
+        }
+
+        /// <summary>
+        /// Scrolls vertically to the beginning of the <see cref="ScrollViewer"/> content.
+        /// </summary>
+        public void ScrollToTop() => EnqueueCommand(Commands.SetVerticalOffset, double.NegativeInfinity);
+
+        /// <summary>
+        /// Scrolls vertically to the end of the <see cref="ScrollViewer"/> content.
+        /// </summary>
+        public void ScrollToBottom() => EnqueueCommand(Commands.SetVerticalOffset, double.PositiveInfinity);
+
+        //returns true if there was a command sent to ISI
+        private bool ExecuteNextCommand()
+        {
+            IScrollInfo isi = ScrollInfo;
+            if (isi is null) return false;
+
+            Command cmd = _queue.Fetch();
+            switch (cmd.Code)
+            {
+                case Commands.LineUp: isi.LineUp(); break;
+                case Commands.LineDown: isi.LineDown(); break;
+                case Commands.LineLeft: isi.LineLeft(); break;
+                case Commands.LineRight: isi.LineRight(); break;
+
+                case Commands.PageUp: isi.PageUp(); break;
+                case Commands.PageDown: isi.PageDown(); break;
+                case Commands.PageLeft: isi.PageLeft(); break;
+                case Commands.PageRight: isi.PageRight(); break;
+
+                case Commands.SetHorizontalOffset: isi.SetHorizontalOffset(cmd.Param); break;
+                case Commands.SetVerticalOffset: isi.SetVerticalOffset(cmd.Param); break;
+
+                case Commands.Invalid: return false;
+            }
+            return true;
+        }
+
+        private void EnqueueCommand(Commands code, double param)
+        {
+            _queue.Enqueue(new Command(code, param));
+            EnsureQueueProcessing();
+        }
+
+        private void EnsureQueueProcessing()
+        {
+            if (!_queue.IsEmpty())
+            {
+                EnsureLayoutUpdatedHandler();
+            }
+        }
+
+        // LayoutUpdated event handler.
+        // 1. executes next queued command, if any
+        // 2. If no commands to execute, updates properties and fires events
+        private void OnLayoutUpdated(object sender, EventArgs e)
+        {
+            // if there was a command, execute it and leave the handler for the next pass
+            if (ExecuteNextCommand())
+            {
+                InvalidateArrange();
+                return;
+            }
+
+            if (ScrollInfo is IScrollInfo isi)
+            {
+                double oldActualHorizontalOffset = HorizontalOffset;
+                double oldActualVerticalOffset = VerticalOffset;
+
+                double oldViewportWidth = ViewportWidth;
+                double oldViewportHeight = ViewportHeight;
+
+                double oldExtentWidth = ExtentWidth;
+                double oldExtentHeight = ExtentHeight;
+
+                double oldScrollableWidth = ScrollableWidth;
+                double oldScrollableHeight = ScrollableHeight;
+
+                bool changed = false;
+
+                //
+                // Go through scrolling properties updating values.
+                //
+                if (!DoubleUtil.AreClose(oldActualHorizontalOffset, isi.HorizontalOffset))
+                {
+                    _xPositionISI = isi.HorizontalOffset;
+                    HorizontalOffset = _xPositionISI;
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldActualVerticalOffset, isi.VerticalOffset))
+                {
+                    _yPositionISI = isi.VerticalOffset;
+                    VerticalOffset = _yPositionISI;
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldViewportWidth, isi.ViewportWidth))
+                {
+                    _xSize = isi.ViewportWidth;
+                    SetValueInternal(ViewportWidthPropertyKey, _xSize);
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldViewportHeight, isi.ViewportHeight))
+                {
+                    _ySize = isi.ViewportHeight;
+                    SetValueInternal(ViewportHeightPropertyKey, _ySize);
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldExtentWidth, isi.ExtentWidth))
+                {
+                    _xExtent = isi.ExtentWidth;
+                    SetValueInternal(ExtentWidthPropertyKey, _xExtent);
+                    changed = true;
+                }
+
+                if (!DoubleUtil.AreClose(oldExtentHeight, isi.ExtentHeight))
+                {
+                    _yExtent = isi.ExtentHeight;
+                    SetValueInternal(ExtentHeightPropertyKey, _yExtent);
+                    changed = true;
+                }
+
+                // ScrollableWidth/Height are dependant on Viewport and Extent set above.  This check must be done after those.
+                double scrollableWidth = ScrollableWidth;
+                if (!DoubleUtil.AreClose(oldScrollableWidth, ScrollableWidth))
+                {
+                    SetValueInternal(ScrollableWidthPropertyKey, scrollableWidth);
+                    changed = true;
+                }
+
+                double scrollableHeight = ScrollableHeight;
+                if (!DoubleUtil.AreClose(oldScrollableHeight, ScrollableHeight))
+                {
+                    SetValueInternal(ScrollableHeightPropertyKey, scrollableHeight);
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    if (ElementHorizontalScrollBar != null && !DoubleUtil.AreClose(oldActualHorizontalOffset, HorizontalOffset))
+                    {
+                        ElementHorizontalScrollBar.Value = HorizontalOffset;
+                    }
+
+                    if (ElementVerticalScrollBar != null && !DoubleUtil.AreClose(oldActualVerticalOffset, VerticalOffset))
+                    {
+                        ElementVerticalScrollBar.Value = VerticalOffset;
+                    }
+
+                    //
+                    // Disconnect the layout listener.
+                    //
+                    ClearLayoutUpdatedHandler();
+                    return;
+                }
+            }
+
+            ClearLayoutUpdatedHandler();
+        }
+
+        private void EnsureLayoutUpdatedHandler()
+        {
+            if (_layoutUpdatedHandler is null)
+            {
+                _layoutUpdatedHandler = new EventHandler(OnLayoutUpdated);
+                LayoutUpdated += _layoutUpdatedHandler;
+            }
+            InvalidateArrange(); //can be that there is no outstanding need to do layout - make sure it is.
+        }
+
+        private void ClearLayoutUpdatedHandler()
+        {
+            // If queue is not empty - then we still need that handler to make sure queue is being processed.
+            if (_layoutUpdatedHandler is not null && _queue.IsEmpty())
+            {
+                LayoutUpdated -= _layoutUpdatedHandler;
+                _layoutUpdatedHandler = null;
+            }
+        }
+
+        private enum Commands
+        {
+            Invalid,
+            LineUp,
+            LineDown,
+            LineLeft,
+            LineRight,
+            PageUp,
+            PageDown,
+            PageLeft,
+            PageRight,
+            SetHorizontalOffset,
+            SetVerticalOffset,
+        }
+
+        private struct Command
+        {
+            internal Command(Commands code, double param)
+            {
+                Code = code;
+                Param = param;
+            }
+
+            internal Commands Code;
+            internal double Param;
+        }
+
+        // implements ring buffer of commands
+        private struct CommandQueue
+        {
+            private const int _capacity = 32;
+
+            //returns false if capacity is used up and entry ignored
+            internal void Enqueue(Command command)
+            {
+                if (_lastWritePosition == _lastReadPosition) //buffer is empty
+                {
+                    _array = new Command[_capacity];
+                    _lastWritePosition = _lastReadPosition = 0;
+                }
+
+                if (!OptimizeCommand(command)) //regular insertion, if optimization didn't happen
+                {
+                    _lastWritePosition = (_lastWritePosition + 1) % _capacity;
+
+                    if (_lastWritePosition == _lastReadPosition) //buffer is full
+                    {
+                        // throw away the oldest entry and continue to accumulate fresh input
+                        _lastReadPosition = (_lastReadPosition + 1) % _capacity;
+                    }
+
+                    _array[_lastWritePosition] = command;
+                }
+            }
+
+            // this tries to "merge" the incoming command with the accumulated queue
+            // for example, if we get SetHorizontalOffset incoming, all "horizontal"
+            // commands in the queue get removed and replaced with incoming one,
+            // since horizontal position is going to end up at the specified offset anyways.
+            private bool OptimizeCommand(Command command)
+            {
+                if (_lastWritePosition != _lastReadPosition) //buffer has something
+                {
+                    if ((command.Code == Commands.SetHorizontalOffset && _array[_lastWritePosition].Code == Commands.SetHorizontalOffset) ||
+                        (command.Code == Commands.SetVerticalOffset && _array[_lastWritePosition].Code == Commands.SetVerticalOffset))
+                    {
+                        //if the last command was "set offset" or "make visible", simply replace it and
+                        //don't insert new command
+                        _array[_lastWritePosition].Param = command.Param;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // returns Invalid command if there is no more commands
+            internal Command Fetch()
+            {
+                if (_lastWritePosition == _lastReadPosition) //buffer is empty
+                {
+                    return new Command(Commands.Invalid, 0);
+                }
+                _lastReadPosition = (_lastReadPosition + 1) % _capacity;
+
+                //array exists always if writePos != readPos
+                Command command = _array[_lastReadPosition];
+
+                if (_lastWritePosition == _lastReadPosition) //it was the last command
+                {
+                    _array = null; // make GC work. Hopefully the whole queue is processed in Gen0
+                }
+                return command;
+            }
+
+            internal bool IsEmpty() => _lastWritePosition == _lastReadPosition;
+
+            private int _lastWritePosition;
+            private int _lastReadPosition;
+            private Command[] _array;
+        }
 
         private sealed class TouchInfo
         {

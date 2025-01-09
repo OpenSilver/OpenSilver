@@ -221,4 +221,21 @@ internal partial class TextViewBase : IScrollInfo
             _scrollData.ScrollOwner?.InvalidateScrollInfo();
         }
     }
+
+    private sealed class ScrollData
+    {
+        internal ScrollViewer ScrollOwner;
+        internal Size Viewport;
+        internal Size Extent;
+        internal Point Offset;
+        internal bool CanHorizontallyScroll;
+        internal bool CanVerticallyScroll;
+
+        internal double HorizontalOffset => Offset.X;
+        internal double VerticalOffset => Offset.Y;
+        internal double ViewportWidth => Viewport.Width;
+        internal double ViewportHeight => Viewport.Height;
+        internal double ExtentWidth => Extent.Width;
+        internal double ExtentHeight => Extent.Height;
+    }
 }

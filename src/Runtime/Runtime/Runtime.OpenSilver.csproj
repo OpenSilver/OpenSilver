@@ -49,7 +49,6 @@
 		<Compile Include="OpenSilver\Internal\Documents\TextContainersHelper.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerSpan.cs" />
 		<Compile Include="OpenSilver\Internal\Documents\TextContainerTextBlock.cs" />
-    <Compile Include="OpenSilver\Internal\Controls\ScrollData.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewBase.IScrollInfo.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\TextViewHosts.cs" />
@@ -381,7 +380,7 @@
 		<Compile Include="System.Windows.Automation\MultipleViewPatternIdentifiers.cs" />
 		<Compile Include="System.Windows.Automation\TableItemPatternIdentifiers.cs" />
 		<Compile Include="System.Windows.Automation\TablePatternIdentifiers.cs" />
-		<Compile Include="System.Windows.Controls\IGeneratorHost.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\IGeneratorHost.cs" />
 		<Compile Include="System.Windows.Controls\RangeObservableCollection.cs" />
 		<Compile Include="System.Windows.Controls\ContentChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\ContentChangedEventHandler.cs" />
@@ -446,7 +445,7 @@
 		<Compile Include="System.Windows\NullableBoolConverter.cs" />
 		<Compile Include="System.Windows\StyleTypedPropertyAttribute.cs" />
 		<Compile Include="System.Windows\SystemColors.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\SystemParameters.cs" />
+		<Compile Include="System.Windows\SystemParameters.cs" />
 		<Compile Include="System.Windows.Automation\AutomationElementIdentifiers.cs" />
 		<Compile Include="System.Windows.Automation\AutomationProperties.cs" />
 		<Compile Include="System.Windows.Automation\AutomationProperty.cs" />
