@@ -50,11 +50,11 @@ namespace System.Windows.Controls
         private ContentControl _headerContentControl;
         private bool _initialized;
         private FrameworkElement _registeredParent;
-        private Dictionary<string, ValidationSummaryItem> _validationSummaryItemDictionary;
+        private Dictionary<ValidationError, ValidationSummaryItem> _validationSummaryItemDictionary;
 
-#endregion Member Fields
+        #endregion Member Fields
 
-#region Events
+        #region Events
 
         /// <summary>
         /// Event triggered when an Error is clicked on.
@@ -77,7 +77,7 @@ namespace System.Windows.Controls
         {
             this.DefaultStyleKey = typeof(ValidationSummary);
             this._errors = new ValidationItemCollection();
-            this._validationSummaryItemDictionary = new Dictionary<string, ValidationSummaryItem>();
+            this._validationSummaryItemDictionary = new Dictionary<ValidationError, ValidationSummaryItem>();
             this._displayedErrors = new ValidationItemCollection();
             this._errors.CollectionChanged += new NotifyCollectionChangedEventHandler(this.Errors_CollectionChanged);
             this.Loaded += new RoutedEventHandler(this.ValidationSummary_Loaded);
@@ -872,14 +872,11 @@ namespace System.Windows.Controls
             FrameworkElement inputControl = e.OriginalSource as FrameworkElement;
             if (e != null && e.Error != null && e.Error.ErrorContent != null && inputControl != null)
             {
-                string message = e.Error.ErrorContent.ToString();
-                string key = String.IsNullOrEmpty(inputControl.Name) ? inputControl.GetHashCode().ToString(CultureInfo.InvariantCulture) : inputControl.Name;
-                key += message;
-                if (this._validationSummaryItemDictionary.ContainsKey(key))
+                if (this._validationSummaryItemDictionary.ContainsKey(e.Error))
                 {
-                    ValidationSummaryItem existingError = this._validationSummaryItemDictionary[key];
+                    ValidationSummaryItem existingError = this._validationSummaryItemDictionary[e.Error];
                     this._errors.Remove(existingError);
-                    this._validationSummaryItemDictionary.Remove(key);
+                    this._validationSummaryItemDictionary.Remove(e.Error);
                 }
                 if (e.Action == ValidationErrorEventAction.Added)
                 {
@@ -894,9 +891,10 @@ namespace System.Windows.Controls
                         {
                             propertyName = vmd.Caption;
                         }
+                        string message = e.Error.ErrorContent.ToString();
                         ValidationSummaryItem vsi = new ValidationSummaryItem(message, propertyName, ValidationSummaryItemType.PropertyError, new ValidationSummaryItemSource(propertyName, inputControl as Control), null);
                         this._errors.Add(vsi);
-                        this._validationSummaryItemDictionary[key] = vsi;
+                        this._validationSummaryItemDictionary[e.Error] = vsi;
                     }
                 }
             }
