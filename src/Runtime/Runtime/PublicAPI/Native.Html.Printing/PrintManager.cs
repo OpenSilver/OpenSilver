@@ -14,10 +14,6 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,14 +34,7 @@ namespace CSHTML5.Native.Html.Printing
         /// </summary>
         public static void Print()
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoid("window.print()");
-            }
-            else
-            {
-                MessageBox.Show("The application requested to show the print dialog. This feature is not implemented in the Simulator. Please run the application in the browser instead.");
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoid("window.print()");
         }
 
         /// <summary>
@@ -58,25 +47,20 @@ namespace CSHTML5.Native.Html.Printing
             {
                 if (element._isLoaded)
                 {
-                    if (!OpenSilver.Interop.IsRunningInTheSimulator)
-                    {
-                        // Remove the class "section-to-print" from the previous print area:
-                        if (CurrentPrintArea != null && CurrentPrintArea._isLoaded)
-                            OpenSilver.Interop.ExecuteJavaScriptVoid(
-                                $"{OpenSilver.Interop.GetVariableStringForJS(CurrentPrintArea.OuterDiv)}.classList.remove(\"section-to-print\")");
-
-                        // Add the class "section-to-print" to the new print area: (credits: https://stackoverflow.com/questions/468881/print-div-id-printarea-div-only )
+                    // Remove the class "section-to-print" from the previous print area:
+                    if (CurrentPrintArea != null && CurrentPrintArea._isLoaded)
                         OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{OpenSilver.Interop.GetVariableStringForJS(element.OuterDiv)}.classList.add(\"section-to-print\")");
+                            $"{OpenSilver.Interop.GetVariableStringForJS(CurrentPrintArea.OuterDiv)}.classList.remove(\"section-to-print\")");
 
-                        // Remember the new print area:
-                        CurrentPrintArea = element;
+                    // Add the class "section-to-print" to the new print area: (credits: https://stackoverflow.com/questions/468881/print-div-id-printarea-div-only )
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(
+                        $"{OpenSilver.Interop.GetVariableStringForJS(element.OuterDiv)}.classList.add(\"section-to-print\")");
 
-                        // Remember that the print is no longer the default one:
-                        IsDefaultPrintArea = false;
-                    }
-                    else
-                        MessageBox.Show("The application requested to set the print area. This feature is not implemented in the Simulator. Please run the application in the browser instead.");
+                    // Remember the new print area:
+                    CurrentPrintArea = element;
+
+                    // Remember that the print is no longer the default one:
+                    IsDefaultPrintArea = false;
                 }
                 else
                     throw new InvalidOperationException("You can only set the print area to an element that is visible on screen or that has been loaded in the Visual Tree.");
@@ -90,30 +74,25 @@ namespace CSHTML5.Native.Html.Printing
         /// </summary>
         public static void ResetPrintArea()
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            // Set the print area to be the whole window (this is the default value, also called from the "setter" of "Window.Current.Content"):
+            var root = Window.Current.Content;
+            if (root != null)
             {
-                // Set the print area to be the whole window (this is the default value, also called from the "setter" of "Window.Current.Content"):
-                var root = Window.Current.Content;
-                if (root != null)
-                {
-                    SetPrintArea(root);
-                }
-                else
-                {
-                    //-----------------------------------------------------------------------
-                    // If "root" is null, it is likely because we have arrived here due to a
-                    // call to the Print(element) method during the constructor of MainPage.
-                    // In that case, the "Window.Current.Content" has not yet been set.
-                    // It's not a problem, because it will be set later, so we will likely
-                    // arrive again here after the user code of the constructor.
-                    //-----------------------------------------------------------------------
-                }
-
-                // Remember that the print area is now back to the default one:
-                IsDefaultPrintArea = true;
+                SetPrintArea(root);
             }
             else
-                MessageBox.Show("The application requested to reset the print area. This feature is not implemented in the Simulator. Please run the application in the browser instead.");
+            {
+                //-----------------------------------------------------------------------
+                // If "root" is null, it is likely because we have arrived here due to a
+                // call to the Print(element) method during the constructor of MainPage.
+                // In that case, the "Window.Current.Content" has not yet been set.
+                // It's not a problem, because it will be set later, so we will likely
+                // arrive again here after the user code of the constructor.
+                //-----------------------------------------------------------------------
+            }
+
+            // Remember that the print area is now back to the default one:
+            IsDefaultPrintArea = true;
         }
 
         /// <summary>
@@ -122,68 +101,63 @@ namespace CSHTML5.Native.Html.Printing
         /// <param name="element">The element to print.</param>
         public static void Print(UIElement element)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            // Remember the previous print area, if any:
+            var previousPrintArea = CurrentPrintArea;
+
+            // Check whether the element is already in the Visual Tree:
+            if (element._isLoaded)
             {
-                // Remember the previous print area, if any:
-                var previousPrintArea = CurrentPrintArea;
+                //---------------------------------------------------
+                // The element is already in the Visual Tree.
+                // (in this case, the "Print" method is synchronous)
+                //---------------------------------------------------
 
-                // Check whether the element is aready in the Visual Tree:
-                if (element._isLoaded)
-                {
-                    //---------------------------------------------------
-                    // The element is already in the Visual Tree.
-                    // (in this case, the "Print" method is synchronous)
-                    //---------------------------------------------------
+                // Temporarily set the print area to the element that the user wants to print:
+                SetPrintArea(element);
 
-                    // Temporarily set the print area to the element that the user wants to print:
-                    SetPrintArea(element);
+                // Print:
+                Print();
 
-                    // Print:
-                    Print();
-
-                    // Revert to the previous print area:
-                    RestorePreviousPrintArea(previousPrintArea);
-                }
-                else
-                {
-                    //---------------------------------------------------
-                    // The element is not in the Visual Tree.
-                    // (in this case, the "Print" method is asynchronous)
-                    //---------------------------------------------------
-
-                    // Create and show a popup that will be used to temporarily put the element into the visual tree. This is required in order to be able to print it. We show the popup off-screen so that it is not visible:
-                    var temporaryPopup = new Popup() { VerticalOffset = 10000 };
-                    temporaryPopup.IsOpen = true;
-
-                    // Create a container for the element
-                    var container = new Border()
-                    {
-                        Child = element
-                    };
-
-                    // Listen to the "Loaded" event of the container, so that we are notified when the element becomes visible:
-                    container.Loaded += (s2, e2) =>
-                    {
-                        Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                        {
-                            // Print the element:
-                            PrintManager.Print(element);
-
-                            // Revert to the previous print area:
-                            RestorePreviousPrintArea(previousPrintArea);
-
-                            // Close the temporary popup:
-                            temporaryPopup.IsOpen = false;
-                        });
-                    };
-
-                    // Put the container into the popup, and open the popup:
-                    temporaryPopup.Child = container;
-                    temporaryPopup.IsOpen = true;
-                }
+                // Revert to the previous print area:
+                RestorePreviousPrintArea(previousPrintArea);
             }
             else
-                MessageBox.Show("The application requested to print. This feature is not implemented in the Simulator. Please run the application in the browser instead.");
+            {
+                //---------------------------------------------------
+                // The element is not in the Visual Tree.
+                // (in this case, the "Print" method is asynchronous)
+                //---------------------------------------------------
+
+                // Create and show a popup that will be used to temporarily put the element into the visual tree. This is required in order to be able to print it. We show the popup off-screen so that it is not visible:
+                var temporaryPopup = new Popup() { VerticalOffset = 10000 };
+                temporaryPopup.IsOpen = true;
+
+                // Create a container for the element
+                var container = new Border()
+                {
+                    Child = element
+                };
+
+                // Listen to the "Loaded" event of the container, so that we are notified when the element becomes visible:
+                container.Loaded += (s2, e2) =>
+                {
+                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                    {
+                        // Print the element:
+                        PrintManager.Print(element);
+
+                        // Revert to the previous print area:
+                        RestorePreviousPrintArea(previousPrintArea);
+
+                        // Close the temporary popup:
+                        temporaryPopup.IsOpen = false;
+                    });
+                };
+
+                // Put the container into the popup, and open the popup:
+                temporaryPopup.Child = container;
+                temporaryPopup.IsOpen = true;
+            }
         }
 
         private static void RestorePreviousPrintArea(UIElement previousPrintArea)
