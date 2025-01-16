@@ -14,7 +14,6 @@
 
 
 using System;
-using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -129,30 +128,31 @@ namespace CSHTML5.Native.Html.Printing
                 //---------------------------------------------------
 
                 // Create and show a popup that will be used to temporarily put the element into the visual tree. This is required in order to be able to print it. We show the popup off-screen so that it is not visible:
-                var temporaryPopup = new Popup() { VerticalOffset = 10000 };
-                temporaryPopup.IsOpen = true;
+                var temporaryPopup = new Popup();
 
                 // Create a container for the element
                 var container = new Border()
                 {
-                    Child = element
+                    Child = element,
+                    Margin = new Thickness(0, 10000, 0, 0)
                 };
 
-                // Listen to the "Loaded" event of the container, so that we are notified when the element becomes visible:
-                container.Loaded += (s2, e2) =>
+                // Listen to the "LayoutUpdated" event of the container, so that we are notified when the element becomes visible:
+                container.LayoutUpdated += handler;
+
+                void handler(object s, EventArgs e)
                 {
-                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                    {
-                        // Print the element:
-                        PrintManager.Print(element);
+                    container.LayoutUpdated -= handler;
 
-                        // Revert to the previous print area:
-                        RestorePreviousPrintArea(previousPrintArea);
+                    // Print the element:
+                    Print(element);
 
-                        // Close the temporary popup:
-                        temporaryPopup.IsOpen = false;
-                    });
-                };
+                    // Revert to the previous print area:
+                    RestorePreviousPrintArea(previousPrintArea);
+
+                    // Close the temporary popup:
+                    temporaryPopup.IsOpen = false;
+                }
 
                 // Put the container into the popup, and open the popup:
                 temporaryPopup.Child = container;
