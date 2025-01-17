@@ -130,6 +130,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSilver.WebAssembly", "W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compiler.SharedBuildTasks.OpenSilver", "Compiler\Compiler.SharedBuildTasks\Compiler.SharedBuildTasks.OpenSilver.csproj", "{839A56F5-C47E-4569-9A3A-9443EA8A262E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Maui", "Maui", "{67E1D2D9-7BEC-4877-8063-856599E14B1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.MauiHybrid", "Maui\Hybrid\OpenSilver.MauiHybrid.csproj", "{20251DFC-AF96-47D7-9E2E-907AE2257B1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -302,6 +306,10 @@ Global
 		{839A56F5-C47E-4569-9A3A-9443EA8A262E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{839A56F5-C47E-4569-9A3A-9443EA8A262E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{839A56F5-C47E-4569-9A3A-9443EA8A262E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20251DFC-AF96-47D7-9E2E-907AE2257B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20251DFC-AF96-47D7-9E2E-907AE2257B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20251DFC-AF96-47D7-9E2E-907AE2257B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20251DFC-AF96-47D7-9E2E-907AE2257B1B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -356,6 +364,7 @@ Global
 		{5BE991C3-6E28-46D7-953D-94D5D4AC131D} = {5CABE705-CE13-456F-B02E-977B59D964FA}
 		{C57535EA-4837-4C68-B389-3E3E7F16DEF0} = {14B7A75E-0BDD-45A3-A645-9FEABE7811E1}
 		{839A56F5-C47E-4569-9A3A-9443EA8A262E} = {8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}
+		{20251DFC-AF96-47D7-9E2E-907AE2257B1B} = {67E1D2D9-7BEC-4877-8063-856599E14B1D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}
