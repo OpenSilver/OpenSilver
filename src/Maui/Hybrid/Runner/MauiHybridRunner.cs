@@ -23,13 +23,31 @@ namespace OpenSilver.MauiHybrid.Runner
 {
     public class MauiHybridRunner(IJSRuntime jsRuntime) : IMauiHybridRunner
     {
-        private const string InvokeJsMethod = "jsMauiHybrid";
+        private const string InvokeJsMethod = "_hybridRuntime.invokeJS";
+        private const string StartAsyncJsMethod = "_hybridRuntime.startAsync";
+        private static bool _isRunApplicationCalled;
+
+        private static readonly Lazy<OnCallbackSimulator> _onCallbackSimulator =
+            new Lazy<OnCallbackSimulator>(() => new OnCallbackSimulator());
+        private static OnCallbackSimulator OnCallbackSimulator => _onCallbackSimulator.Value;
 
         #region Interface implementation
         public async Task<T> RunApplicationAsync<T>(Func<Task<T>> createAppDelegate) where T : System.Windows.Application
         {
             ArgumentNullException.ThrowIfNull(createAppDelegate);
 
+            if (!MainThread.IsMainThread)
+            {
+                throw new InvalidOperationException("RunApplicationAsync must be called on the main thread.");
+            }
+
+            if (_isRunApplicationCalled)
+            {
+                throw new InvalidOperationException("RunApplicationAsync can only be called once.");
+            }
+            _isRunApplicationCalled = true;
+
+            await StartJsAsync();
             var context = InitializeOpenSilver();
             var tcs = new TaskCompletionSource<T>();
 
@@ -85,6 +103,15 @@ namespace OpenSilver.MauiHybrid.Runner
             }
         }
 
+        private async Task StartJsAsync()
+        {
+            var res = await jsRuntime.InvokeAsync<bool>(StartAsyncJsMethod);
+            if (!res)
+            {
+                throw new InvalidOperationException("An unexpected error occurred. Please check the browser console for more details.");
+            }
+        }
+
         private BackgroundThreadSynchronizationContext InitializeOpenSilver()
         {
             var dispatcher = Dispatcher.GetForCurrentThread() ??
@@ -133,8 +160,7 @@ namespace OpenSilver.MauiHybrid.Runner
         public static void InkoveFromJs(int callbackId, string idWhereCallbackArgsAreStored,
             JsonElement[] callbackArgsObject)
         {
-            var callback = new OnCallbackSimulator();
-            callback.OnCallbackFromJavaScript(
+            OnCallbackSimulator.OnCallbackFromJavaScript(
                 callbackId,
                 idWhereCallbackArgsAreStored,
                 callbackArgsObject.Select(GetValueFromJsonElement).ToArray(),
@@ -145,8 +171,7 @@ namespace OpenSilver.MauiHybrid.Runner
         [JSInvokable]
         public static void ErrorFromJs(string idWhereCallbackArgsAreStored)
         {
-            var callback = new OnCallbackSimulator();
-            callback.OnCallbackFromJavaScriptError(
+            OnCallbackSimulator.OnCallbackFromJavaScriptError(
                 idWhereCallbackArgsAreStored
             );
         }

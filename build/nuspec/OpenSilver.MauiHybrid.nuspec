@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>OpenSilver.MauiHybrid</id>
+    <version>$PackageVersion$</version>
+    <authors>Userware</authors>
+    <projectUrl>https://www.opensilver.net</projectUrl>
+    <repository type="git" url="$RepositoryUrl$" />
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <description>OpenSilver.MauiHybrid enables OpenSilver applications to run seamlessly on Windows, macOS, Android, and iOS.</description>
+    <copyright>Copyright (c) 2025, Userware. All rights reserved.</copyright>
+    <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono windows android macos ios maui hybrid</tags>
+    <icon>images/OpenSilver_icon.png</icon>
+    <dependencies>
+      <group targetFramework=".NET8.0">
+	    <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
+      <group targetFramework=".NET9.0">
+	    <dependency id="OpenSilver" version="$PackageVersion$" include="compile" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- Runtime -->
+    <file src="../../src/Maui/Hybrid/bin/$Configuration$/net8.0/OpenSilver.MauiHybrid.dll" target="lib/net8.0/OpenSilver.MauiHybrid.dll" />
+    <file src="../../src/Maui/Hybrid/bin/$Configuration$/net9.0/OpenSilver.MauiHybrid.dll" target="lib/net9.0/OpenSilver.MauiHybrid.dll" />
+
+    <!-- Targets -->
+    <file src="../../src/Targets/OpenSilver.WebAssembly.targets" target="build/OpenSilver.MauiHybrid.targets" />
+    <file src="../../src/Compiler/Compiler.SharedBuildTasks/bin/$Configuration$/netstandard2.0/OpenSilver.SharedBuildTasks.Config.targets" target="build/OpenSilver.SharedBuildTasks.Config.targets" />
+
+    <!-- Tools -->
+    <file src="../../src/Compiler/Compiler/bin/$Configuration$/netstandard2.0/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
+    <file src="../../src/Compiler/Compiler/bin/$Configuration$/netstandard2.0/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
+    <file src="../../src/Compiler/Compiler.SharedBuildTasks/bin/$Configuration$/netstandard2.0/OpenSilver.Compiler.SharedBuildTasks.$OpenSilverBuildUUID$.dll" target="tools/OpenSilver.Compiler.SharedBuildTasks.$OpenSilverBuildUUID$.dll" />
+
+    <!-- Content Files -->
+    <file src="../../src/Runtime/Scripts/cshtml5.js" target="content/js/cshtml5.js" />
+    <file src="../../src/Runtime/Scripts/cshtml5.css" target="content/css/cshtml5.css" />
+    <file src="../../src/Runtime/Scripts/ResizeObserver.js" target="content/js/ResizeObserver.js" />
+    <file src="../../src/Runtime/Scripts/html2canvas.js" target="content/js/html2canvas.js" />
+    <file src="../../src/Runtime/Scripts/quill.min.js" target="content/js/quill.min.js" />
+    <file src="../../src/Runtime/Scripts/quill.core.css" target="content/css/quill.core.css" />
+    <file src="../../src/Runtime/Scripts/FileSaver.min.js" target="content/js/FileSaver.min.js" />
+    <file src="../../src/Maui/Hybrid/wwwroot/libs/mauihybrid.js" target="content/js/mauihybrid.js" />
+
+    <!-- Package icon -->
+    <file src="OpenSilver_icon.png" target="images/OpenSilver_icon.png" />
+  </files>
+</package>

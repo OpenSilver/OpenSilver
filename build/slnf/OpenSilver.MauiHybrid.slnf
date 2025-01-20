@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "..\\..\\src\\OpenSilver.sln",
+    "projects": [
+      "Compiler\\Compiler.SharedBuildTasks\\Compiler.SharedBuildTasks.OpenSilver.csproj",
+      "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
+      "Maui\\Hybrid\\OpenSilver.MauiHybrid.csproj"
+    ]
+  }
+}
