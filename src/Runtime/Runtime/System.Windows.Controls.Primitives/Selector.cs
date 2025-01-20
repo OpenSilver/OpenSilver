@@ -40,6 +40,7 @@ namespace System.Windows.Controls.Primitives
             SkipCoerceSelectedItemCheck = 0x00000008,
             SelectedValueDrivesSelection = 0x00000010,
             SelectedValueWaitsForItems = 0x00000020,
+            NewContainersArePending = 0x00000040,
         }
 
         // Condense boolean bits.  Constructor takes the default value, and will resize to access up to 32 bits.
@@ -466,6 +467,12 @@ namespace System.Windows.Controls.Primitives
             set { SetBit(CacheBits.SelectedValueWaitsForItems, value); }
         }
 
+        private bool NewContainersArePending
+        {
+            get { return GetBit(CacheBits.NewContainersArePending); }
+            set { SetBit(CacheBits.NewContainersArePending, value); }
+        }
+
         private void SetBit(CacheBits bit, bool value)
         {
             if (value)
@@ -557,8 +564,9 @@ namespace System.Windows.Controls.Primitives
             if (element is SelectorItem container)
             {
                 container.ParentSelector = this;
-                container.IsSelected = _selectedItems.Contains(NewItemInfo(item, element));
             }
+
+            OnNewContainer();
         }
 
         /// <summary>
@@ -1078,6 +1086,19 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
+        // when new containers arrive, schedule work for LayoutUpdated time.
+        // (we might actually do it sooner - see OnGeneratorStatusChanged).
+        private void OnNewContainer()
+        {
+            if (!NewContainersArePending)
+            {
+                NewContainersArePending = true;
+                LayoutUpdated += OnLayoutUpdated;
+            }
+        }
+
+        private void OnLayoutUpdated(object sender, EventArgs e) => AdjustNewContainers();
+
         private void OnGeneratorStatusChanged(object sender, EventArgs e)
         {
             if (ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
@@ -1088,6 +1109,13 @@ namespace System.Windows.Controls.Primitives
 
         private void AdjustNewContainers()
         {
+            // remove the LayoutUpdate handler, if we'd set one earlier
+            if (NewContainersArePending)
+            {
+                LayoutUpdated -= OnLayoutUpdated;
+                NewContainersArePending = false;
+            }
+
             AdjustItemInfosAfterGeneratorChangeOverride();
 
             if (base.HasItems)
