@@ -38,6 +38,8 @@ jobs:
         run: ./build/build-nuget-package-OpenSilver.Simulator.bat ${{ steps.format-version.outputs.version }}
       - name: Build OpenSilver.WebAssembly NuGet package
         run: ./build/build-nuget-package-OpenSilver.Wasm.bat ${{ steps.format-version.outputs.version }}
+      - name: Build OpenSilver.MauiHybrid NuGet package
+        run: ./build/build-nuget-package-OpenSilver.MauiHybrid.bat ${{ steps.format-version.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: OpenSilver
