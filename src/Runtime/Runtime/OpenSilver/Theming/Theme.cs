@@ -99,7 +99,17 @@ public abstract class Theme : IResourceDictionaryOwner
                 throw new ArgumentException(string.Format(Strings.CannotBeBasedOnSelf, nameof(Theme)));
             }
 
+            if (_basedOn is not null)
+            {
+                RemoveAllOwnersFromTheme(_basedOn);
+            }
+
             _basedOn = value;
+
+            if (_basedOn is not null)
+            {
+                AddAllOwnersToTheme(_basedOn);
+            }
         }
     }
 
@@ -166,6 +176,8 @@ public abstract class Theme : IResourceDictionaryOwner
 
         _apps ??= new(1);
         _apps.Add(application);
+
+        _basedOn?.AddOwner(application);
     }
 
     internal void RemoveOwner(Application application)
@@ -176,6 +188,30 @@ public abstract class Theme : IResourceDictionaryOwner
         if (_apps.Count == 0)
         {
             _apps = null;
+        }
+
+        _basedOn?.RemoveOwner(application);
+    }
+
+    private void AddAllOwnersToTheme(Theme theme)
+    {
+        if (_apps is not null)
+        {
+            foreach (Application app in _apps)
+            {
+                theme.AddOwner(app);
+            }
+        }
+    }
+
+    private void RemoveAllOwnersFromTheme(Theme theme)
+    {
+        if (_apps is not null)
+        {
+            foreach (Application app in _apps)
+            {
+                theme.RemoveOwner(app);
+            }
         }
     }
 
@@ -238,7 +274,7 @@ public abstract class Theme : IResourceDictionaryOwner
             return resources;
         }
 
-        if (BasedOn is Theme basedOn)
+        if (_basedOn is Theme basedOn)
         {
             return basedOn.GetOrCreateResourceDictionary(assembly);
         }
