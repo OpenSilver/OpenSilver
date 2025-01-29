@@ -402,7 +402,7 @@ document.setFocus = function (element) {
     });
 };
 
-document.createInputManager = function (callback) {
+document.createInputManager = function (callback, pointerCallback) {
     if (document.inputManager) return;
 
     // This must remain synchronyzed with the EVENTS enum defined in InputManager.cs.
@@ -498,6 +498,10 @@ document.createInputManager = function (callback) {
         return '';
     };
 
+    function isTouch(e) {
+        return e.pointerType === 'touch';
+    }
+
     function initDom() {
         document.addEventListener('pointerdown', function (e) {
             if (!e.isHandled) {
@@ -517,7 +521,7 @@ document.createInputManager = function (callback) {
                 const target = _pointerCapture;
                 switch (e.button) {
                     case 0:
-                        callback(getClosestElementId(target), EVENTS.POINTER_LEFT_UP, e);
+                        pointerCallback(getClosestElementId(target), EVENTS.POINTER_LEFT_UP, e, isTouch(e), e.pageX, e.pageY, _modifiers);
                         break;
                     case 2:
                         callback(getClosestElementId(target), EVENTS.POINTER_RIGHT_UP, e);
@@ -531,7 +535,7 @@ document.createInputManager = function (callback) {
                 setModifiers(e);
                 const target = _pointerCapture;
                 if (target !== null) {
-                    callback(getClosestElementId(target), EVENTS.POINTER_MOVE, e);
+                    pointerCallback(getClosestElementId(target), EVENTS.POINTER_MOVE, e, isTouch(e), e.pageX, e.pageY, _modifiers);
                 }
             }
         });
@@ -546,7 +550,7 @@ document.createInputManager = function (callback) {
 
         document.addEventListener('keydown', function (e) { setModifiers(e); });
 
-        document.addEventListener('keyup', function (e) { setModifiers(e); });        
+        document.addEventListener('keyup', function (e) { setModifiers(e); });
 
         window.addEventListener('focus', function (e) { callback('', EVENTS.WINDOW_FOCUS, e); });
 
@@ -596,7 +600,7 @@ document.createInputManager = function (callback) {
                 e.isHandled = true;
                 setModifiers(e);
                 const target = _pointerCapture || e.target;
-                callback(getClosestElementId(target), EVENTS.POINTER_MOVE, e);
+                pointerCallback(getClosestElementId(target), EVENTS.POINTER_MOVE, e, isTouch(e), e.pageX, e.pageY, _modifiers);
             });
 
             root.addEventListener('wheel', function (e) {
@@ -616,7 +620,7 @@ document.createInputManager = function (callback) {
                 const id = (_pointerCapture === null || e.target === _pointerCapture) ? getClosestElementId(e.target) : '';
                 switch (e.button) {
                     case 0:
-                        callback(id, EVENTS.POINTER_LEFT_DOWN, e);
+                        pointerCallback(id, EVENTS.POINTER_LEFT_DOWN, e, isTouch(e), e.pageX, e.pageY, _modifiers);
                         break;
                     case 2:
                         callback(id, EVENTS.POINTER_RIGHT_DOWN, e);
@@ -629,7 +633,7 @@ document.createInputManager = function (callback) {
                 const target = _pointerCapture || e.target;
                 switch (e.button) {
                     case 0:
-                        callback(getClosestElementId(target), EVENTS.POINTER_LEFT_UP, e);
+                        pointerCallback(getClosestElementId(target), EVENTS.POINTER_LEFT_UP, e, isTouch(e), e.pageX, e.pageY, _modifiers);
                         break;
                     case 2:
                         callback(getClosestElementId(target), EVENTS.POINTER_RIGHT_UP, e);
@@ -643,14 +647,14 @@ document.createInputManager = function (callback) {
             view.addEventListener('pointerenter', function (e) {
                 if (_pointerCapture === null || this === _pointerCapture) {
                     setModifiers(e);
-                    callback(getClosestElementId(this), EVENTS.POINTER_ENTER, e);
+                    pointerCallback(getClosestElementId(this), EVENTS.POINTER_ENTER, e, isTouch(e), e.pageX, e.pageY, _modifiers);
                 }
             });
 
             view.addEventListener('pointerleave', function (e) {
                 if (_pointerCapture === null || this === _pointerCapture) {
                     setModifiers(e);
-                    callback(getClosestElementId(this), EVENTS.POINTER_LEAVE, e);
+                    pointerCallback(getClosestElementId(this), EVENTS.POINTER_LEAVE, e, isTouch(e), e.pageX, e.pageY, _modifiers);
                 }
             });
 

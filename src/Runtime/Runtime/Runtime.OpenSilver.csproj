@@ -86,6 +86,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
+    <Compile Include="PublicAPI\Interop\PointerCallbackArgs.cs" />
     <Compile Include="System.Web\MimeMapping.cs" />
     <Compile Include="System.Windows.Automation.Peers\ChildWindowAutomationPeer.cs" />
     <Compile Include="System.Windows.Automation.Peers\TreeViewAutomationPeer.cs" />

@@ -130,6 +130,7 @@ internal sealed class InputManager
     private enum FocusRequestType { GotFocus, LostFocus }
 
     private readonly JavaScriptCallback _handler;
+    private readonly JavaScriptCallback _pointerHandler;
     private readonly FocusQueue _focusQueue = new();
 
     private const int _doubleClickDeltaTime = 400;
@@ -145,11 +146,13 @@ internal sealed class InputManager
     private InputManager()
     {
         _handler = JavaScriptCallback.Create(ProcessInput);
+        _pointerHandler = JavaScriptCallback.Create(ProcessPointerInput);
 
         if (Current == null)
         {
             string sHandler = OpenSilver.Interop.GetVariableStringForJS(_handler);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sHandler})");
+            string sPointerHandler = OpenSilver.Interop.GetVariableStringForJS(_pointerHandler);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sHandler}, {sPointerHandler})");
         }
     }
 
@@ -319,6 +322,29 @@ internal sealed class InputManager
         }
     }
 
+    private void ProcessPointerInput(string id, int eventId, object jsEventArg, bool isTouchEvent, double pageX, double pageY, int keyModifiers)
+    {
+        UIElement uie = INTERNAL_HtmlDomManager.GetElementById(id);
+        if (uie is null)
+        {
+            ProcessEvent((EVENTS)eventId, jsEventArg);
+        }
+        else
+        {
+            DispatchEvent(
+                uie,
+                (EVENTS)eventId,
+                new PointerCallbackArgs
+                {
+                    IsTouchEvent = isTouchEvent,
+                    PageX = pageX,
+                    PageY = pageY,
+                    KeyModifiers = (ModifierKeys)keyModifiers,
+                    UIEventArg = jsEventArg
+                });
+        }
+    }
+
     private void ProcessEvent(EVENTS eventType, object jsEventArg)
     {
         switch (eventType)
@@ -422,34 +448,12 @@ internal sealed class InputManager
     {
         switch (eventType)
         {
-            case EVENTS.POINTER_MOVE:
-                ProcessOnMouseMove(uie, jsEventArg);
-                break;
-
-            case EVENTS.POINTER_LEFT_DOWN:
-                _mouseLeftDown = true;
-                ProcessOnMouseLeftButtonDown(uie, jsEventArg);
-                break;
-
-            case EVENTS.POINTER_LEFT_UP:
-                _mouseLeftDown = false;
-                ProcessOnMouseLeftButtonUp(uie, jsEventArg);
-                break;
-
             case EVENTS.POINTER_RIGHT_DOWN:
                 ProcessOnMouseRightButtonDown(uie, jsEventArg);
                 break;
 
             case EVENTS.POINTER_RIGHT_UP:
                 ProcessOnMouseRightButtonUp(uie, jsEventArg);
-                break;
-
-            case EVENTS.POINTER_ENTER:
-                ProcessOnMouseEnter(uie, jsEventArg);
-                break;
-
-            case EVENTS.POINTER_LEAVE:
-                ProcessOnMouseLeave(uie, jsEventArg);
                 break;
 
             case EVENTS.WHEEL:
@@ -474,7 +478,35 @@ internal sealed class InputManager
         }
     }
 
-    private void ProcessOnMouseMove(UIElement uie, object jsEventArg)
+    private void DispatchEvent(UIElement uie, EVENTS eventType, PointerCallbackArgs jsEventArg)
+    {
+        switch (eventType)
+        {
+            case EVENTS.POINTER_MOVE:
+                ProcessOnMouseMove(uie, jsEventArg);
+                break;
+
+            case EVENTS.POINTER_LEFT_DOWN:
+                _mouseLeftDown = true;
+                ProcessOnMouseLeftButtonDown(uie, jsEventArg);
+                break;
+
+            case EVENTS.POINTER_LEFT_UP:
+                _mouseLeftDown = false;
+                ProcessOnMouseLeftButtonUp(uie, jsEventArg);
+                break;
+
+            case EVENTS.POINTER_ENTER:
+                ProcessOnMouseEnter(uie, jsEventArg);
+                break;
+
+            case EVENTS.POINTER_LEAVE:
+                ProcessOnMouseLeave(uie, jsEventArg);
+                break;
+        }
+    }
+
+    private void ProcessOnMouseMove(UIElement uie, PointerCallbackArgs jsEventArg)
     {
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
@@ -483,7 +515,7 @@ internal sealed class InputManager
         }
     }
 
-    private void ProcessOnMouseLeftButtonDown(UIElement uie, object jsEventArg)
+    private void ProcessOnMouseLeftButtonDown(UIElement uie, PointerCallbackArgs jsEventArg)
     {
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
@@ -499,7 +531,7 @@ internal sealed class InputManager
         }
     }
 
-    private void ProcessOnMouseLeftButtonUp(UIElement uie, object jsEventArg)
+    private void ProcessOnMouseLeftButtonUp(UIElement uie, PointerCallbackArgs jsEventArg)
     {
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
@@ -582,7 +614,7 @@ internal sealed class InputManager
         }
     }
 
-    private void ProcessOnMouseEnter(UIElement uie, object jsEventArg)
+    private void ProcessOnMouseEnter(UIElement uie, PointerCallbackArgs jsEventArg)
     {
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
@@ -593,7 +625,7 @@ internal sealed class InputManager
         }
     }
 
-    private void ProcessOnMouseLeave(UIElement uie, object jsEventArg)
+    private void ProcessOnMouseLeave(UIElement uie, PointerCallbackArgs jsEventArg)
     {
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
@@ -759,13 +791,13 @@ internal sealed class InputManager
         }
     }
 
-    private void ProcessPointerEvent(UIElement uie, object jsEventArg, RoutedEvent routedEvent)
+    private void ProcessPointerEvent(UIElement uie, PointerCallbackArgs jsEventArg, RoutedEvent routedEvent)
     {
         var e = new MouseEventArgs()
         {
             RoutedEvent = routedEvent,
             OriginalSource = uie,
-            UIEventArg = jsEventArg,
+            UIEventArg = jsEventArg.UIEventArg,
         };
 
         e.FillEventArgs(uie, jsEventArg);
@@ -805,13 +837,46 @@ internal sealed class InputManager
         return e.Handled;
     }
 
-    private void ProcessOnTapped(UIElement uie, object jsEventArg)
+    private bool ProcessMouseButtonEvent(
+        UIElement uie,
+        PointerCallbackArgs jsEventArg,
+        RoutedEvent routedEvent,
+        MouseButton button,
+        int timeStamp,
+        bool refreshClickCount,
+        bool closeToolTips)
+    {
+        var e = new MouseButtonEventArgs()
+        {
+            RoutedEvent = routedEvent,
+            OriginalSource = uie,
+            UIEventArg = jsEventArg.UIEventArg,
+        };
+
+        e.FillEventArgs(uie, jsEventArg);
+
+        if (refreshClickCount)
+        {
+            e.ClickCount = RefreshClickCount(uie, button, timeStamp, e.GetPosition(null));
+        }
+
+        if (closeToolTips)
+        {
+            ToolTipService.OnMouseButtonDown(e);
+        }
+
+        RaiseUserInitiatedEvent(uie, e);
+
+        return e.Handled;
+    }
+
+    private void ProcessOnTapped(UIElement uie, PointerCallbackArgs jsEventArg)
     {
         var e = new TappedRoutedEventArgs
         {
             RoutedEvent = UIElement.TappedEvent,
             OriginalSource = uie,
-            UIEventArg = jsEventArg,
+            UIEventArg = jsEventArg.UIEventArg,
         };
 
         e.FillEventArgs(uie, jsEventArg);

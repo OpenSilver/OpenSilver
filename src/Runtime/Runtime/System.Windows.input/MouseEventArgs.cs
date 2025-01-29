@@ -75,6 +75,27 @@ public class MouseEventArgs : RoutedEventArgs
         SetPointerAbsolutePosition(jsEventArg, element.ParentWindow);
     }
 
+    internal void FillEventArgs(UIElement element, PointerCallbackArgs args)
+    {
+        KeyModifiers = args.KeyModifiers;
+        IsTouchEvent = args.IsTouchEvent;
+        _pointerAbsoluteX = args.PageX;
+        _pointerAbsoluteY = args.PageY;
+
+        //---------------------------------------
+        // Adjust the absolute coordinates to take into account the fact that the XAML Window is not necessary un the top-left corner of the HTML page:
+        //---------------------------------------
+        //if (window != null)
+        //{
+        //    // Get the XAML Window root position relative to the page and subtracts it
+        //    string sElement = OpenSilver.Interop.GetVariableStringForJS(window.OuterDiv);
+        //    _pointerAbsoluteX -= OpenSilver.Interop.ExecuteJavaScriptDouble(
+        //        $"{sElement}.getBoundingClientRect().left - document.body.getBoundingClientRect().left", false);
+        //    _pointerAbsoluteY -= OpenSilver.Interop.ExecuteJavaScriptDouble(
+        //        $"{sElement}.getBoundingClientRect().top - document.body.getBoundingClientRect().top", false);
+        //}
+    }
+
     protected internal void SetPointerAbsolutePosition(object jsEventArg, Window window)
     {
         string sEvent = OpenSilver.Interop.GetVariableStringForJS(jsEventArg);
