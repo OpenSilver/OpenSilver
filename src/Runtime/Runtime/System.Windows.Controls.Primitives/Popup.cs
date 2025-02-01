@@ -446,7 +446,7 @@ namespace System.Windows.Controls.Primitives
                 transform = Matrix.Identity;
             }
 
-            _popupRoot.SetTransform(transform);
+            _popupRoot.Transform = transform;
         }
 
         private void UpdatePosition()
@@ -533,7 +533,7 @@ namespace System.Windows.Controls.Primitives
             {
                 var root = Application.Current.Host.Content;
                 var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
-                InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.InternalGetVisualChild(0));
+                InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.Transform);
 
                 offset = PutInScreenBounds(offset, windowBounds, childInterestPoints);
             }
@@ -552,8 +552,9 @@ namespace System.Windows.Controls.Primitives
 
             var root = Application.Current.Host.Content;
             var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
-            InterestPoints targetInterestPoints = GetInterestPoints(placementTarget, Window.GetWindow(placementTarget));
-            InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.InternalGetVisualChild(0));
+            InterestPoints targetInterestPoints = GetInterestPoints(
+                placementTarget, placementTarget.GetRelativeTransform(Window.GetWindow(placementTarget)));
+            InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.Transform);
             double hOffset = HorizontalOffset;
             double vOffset = VerticalOffset;
 
@@ -692,10 +693,8 @@ namespace System.Windows.Controls.Primitives
             public Point BottomRight;
         }
 
-        private static InterestPoints GetInterestPoints(UIElement element, UIElement relativeTo)
+        private static InterestPoints GetInterestPoints(UIElement element, Matrix transform)
         {
-            var transform = element.GetRelativeTransform(relativeTo);
-
             return new InterestPoints
             {
                 TopLeft = transform.Transform(new Point(0, 0)),

@@ -26,7 +26,6 @@ internal sealed class PopupRoot : FrameworkElement
     private static readonly HashSet<PopupRoot> _popupRoots = new();
 
     private readonly Popup _popup;
-    private readonly PositionLayer _positionLayer;
     private readonly TransformLayer _transformLayer;
 
     static PopupRoot()
@@ -41,9 +40,7 @@ internal sealed class PopupRoot : FrameworkElement
         ParentWindow = GetParentWindowOfPopup(popup);
         _popup = popup;
 
-        _positionLayer = new PositionLayer();
         _transformLayer = new TransformLayer();
-        _positionLayer.Child = _transformLayer;
 
         SetLayoutBindings();
     }
@@ -60,7 +57,7 @@ internal sealed class PopupRoot : FrameworkElement
 
     internal Popup Popup => _popup;
 
-    internal PopupLayer HiddenVisualParent => _transformLayer;
+    internal FrameworkElement HiddenVisualParent => _transformLayer;
 
     internal void Show()
     {
@@ -75,9 +72,9 @@ internal sealed class PopupRoot : FrameworkElement
         IsConnectedToLiveTree = true;
         UpdateIsVisible();
 
-        PropagateResumeLayout(this, _positionLayer);
-        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_positionLayer, this);
-        _positionLayer.UpdateIsVisible();
+        PropagateResumeLayout(this, _transformLayer);
+        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_transformLayer, this);
+        _transformLayer.UpdateIsVisible();
 
         SetLayoutSize();
     }
@@ -91,18 +88,22 @@ internal sealed class PopupRoot : FrameworkElement
 
         IsOpen = false;
 
-        PropagateSuspendLayout(_positionLayer);
-        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_positionLayer, this);
-        _positionLayer.UpdateIsVisible();
+        PropagateSuspendLayout(_transformLayer);
+        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_transformLayer, this);
+        _transformLayer.UpdateIsVisible();
 
         INTERNAL_HtmlDomManager.RemoveNodeNative(OuterDiv);
         OuterDiv = null;
         IsConnectedToLiveTree = false;
     }
 
-    internal void SetPosition(double x, double y) => _positionLayer.SetTransform(Matrix.CreateTranslation(x, y));
+    internal void SetPosition(double x, double y) => _transformLayer.SetPosition(x, y);
 
-    internal void SetTransform(Matrix m) => _transformLayer.SetTransform(m);
+    internal Matrix Transform
+    {
+        get => _transformLayer.Transform;
+        set => _transformLayer.Transform = value;
+    }
 
     internal void PutPopupInFront()
     {
@@ -122,7 +123,7 @@ internal sealed class PopupRoot : FrameworkElement
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        return _positionLayer;
+        return _transformLayer;
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -133,8 +134,8 @@ internal sealed class PopupRoot : FrameworkElement
         // In other words, the parents of a popup that has StayOpen=True will always stay open
         // regardless of the value of their "StayOpen" property.
 
-        HashSet<Popup> listOfPopupThatMustBeClosed = new HashSet<Popup>();
-        List<PopupRoot> popupRootList = new List<PopupRoot>();
+        var listOfPopupThatMustBeClosed = new HashSet<Popup>();
+        var popupRootList = new List<PopupRoot>();
 
         foreach (PopupRoot root in GetActivePopupRoots())
         {
@@ -200,10 +201,10 @@ internal sealed class PopupRoot : FrameworkElement
 
     private void SetLayoutSize()
     {
-        _positionLayer.InvalidateMeasure();
-        _positionLayer.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        _positionLayer.Arrange(new Rect(new Point(), _positionLayer.DesiredSize));
-        _positionLayer.UpdateLayout();
+        _transformLayer.InvalidateMeasure();
+        _transformLayer.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        _transformLayer.Arrange(new Rect(new Point(), _transformLayer.DesiredSize));
+        _transformLayer.UpdateLayout();
     }
 
     // If the popup has a placement target, and the latter is in the visual tree,
@@ -212,126 +213,128 @@ internal sealed class PopupRoot : FrameworkElement
     // window (MainWindow) to display the popup.
     private static Window GetParentWindowOfPopup(Popup popup)
         => popup.PlacementTarget?.ParentWindow ?? popup.ParentWindow ?? Application.Current.MainWindow;
-}
 
-internal abstract class PopupLayer : FrameworkElement
-{
-    private readonly MatrixTransform _transform;
-
-    protected PopupLayer()
+    internal sealed class TransformLayer : FrameworkElement
     {
-        _transform = new MatrixTransform();
-        RenderTransform = _transform;
-    }
-
-    public abstract UIElement Child { get; set; }
-
-    public void SetTransform(Matrix m) => _transform.Matrix = m;
-
-    protected override int VisualChildrenCount => Child is null ? 0 : 1;
-
-    protected override UIElement GetVisualChild(int index)
-    {
-        if (Child is not UIElement child || index != 0)
+        static TransformLayer()
         {
-            throw new ArgumentOutOfRangeException(nameof(index));
+            RenderTransformProperty.OverrideMetadata(
+                typeof(TransformLayer),
+                new PropertyMetadata(null, null, CoerceRenderTransform));
+
+            RenderTransformOriginProperty.OverrideMetadata(
+                typeof(TransformLayer),
+                new PropertyMetadata(new Point(0, 0), null, CoerceRenderTransformOrigin));
         }
 
-        return child;
-    }
+        private readonly TransformGroup _renderTransform;
+        private readonly MatrixTransform _translateTransform;
+        private readonly MatrixTransform _transform;
+        private UIElement _child;
 
-    protected internal override void INTERNAL_OnAttachedToVisualTree()
-    {
-        base.INTERNAL_OnAttachedToVisualTree();
-        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
-    }
-
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        if (Child is UIElement child)
+        public TransformLayer()
         {
-            child.Measure(availableSize);
-            return child.DesiredSize;
+            _renderTransform = new TransformGroup();
+            _renderTransform.CanBeInheritanceContext = false;
+            _renderTransform.Children.CanBeInheritanceContext = false;
+
+            _translateTransform = new MatrixTransform();
+            _transform = new MatrixTransform();
+
+            _renderTransform.Children.Add(_transform);
+            _renderTransform.Children.Add(_translateTransform);
+
+            CoerceValue(RenderTransformProperty);
         }
-        return new Size();
-    }
 
-    protected override Size ArrangeOverride(Size finalSize)
-    {
-        Child?.Arrange(new Rect(finalSize));
-        return finalSize;
-    }
-}
-
-internal sealed class PositionLayer : PopupLayer
-{
-    private UIElement _child;
-
-    public override UIElement Child
-    {
-        get => _child;
-        set
+        public UIElement Child
         {
-            if (_child == value) return;
+            get => _child;
+            set
+            {
+                if (_child == value) return;
 
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-            RemoveVisualChild(_child);
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+                RemoveVisualChild(_child);
 
-            _child = value;
+                _child = value;
 
-            AddVisualChild(_child);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
+                AddVisualChild(_child);
+
+                InvalidateMeasure();
+            }
+        }
+
+        protected override int VisualChildrenCount => _child is null ? 0 : 1;
+
+        protected override UIElement GetVisualChild(int index)
+        {
+            if (_child is not UIElement child || index != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return child;
+        }
+
+        protected internal override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-
-            InvalidateMeasure();
         }
-    }
-}
 
-internal sealed class TransformLayer : PopupLayer
-{
-    private UIElement _child;
-
-    public override UIElement Child
-    {
-        get => _child;
-        set
+        protected override Size MeasureOverride(Size availableSize)
         {
-            if (_child == value) return;
-
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-            RemoveVisualChild(_child);
-
-            _child = value;
-
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
-            AddVisualChild(_child);
-
-            InvalidateMeasure();
+            if (_child is UIElement child)
+            {
+                child.Measure(availableSize);
+                return child.DesiredSize;
+            }
+            return new Size();
         }
-    }
 
-    private new void AddVisualChild(UIElement child)
-    {
-        if (child is null) return;
-
-        if (child.InternalVisualParent is not null)
+        protected override Size ArrangeOverride(Size finalSize)
         {
-            throw new ArgumentException(Strings.UIElement_HasParent);
+            _child?.Arrange(new Rect(finalSize));
+            return finalSize;
         }
 
-        HasVisualChildren = true;
+        internal Matrix Transform
+        {
+            get => _transform.Matrix;
+            set => _transform.Matrix = value;
+        }
 
-        PropagateResumeLayout(this, child);
-        SynchronizeForceInheritProperties(child, this);
-    }
+        internal void SetPosition(double x, double y) => _translateTransform.Matrix = Matrix.CreateTranslation(x, y);
 
-    private new void RemoveVisualChild(UIElement child)
-    {
-        if (child is null) return;
+        private new void AddVisualChild(UIElement child)
+        {
+            if (child is null) return;
 
-        HasVisualChildren = false;
+            if (child.InternalVisualParent is not null)
+            {
+                throw new ArgumentException(Strings.UIElement_HasParent);
+            }
 
-        PropagateSuspendLayout(child);
-        SynchronizeForceInheritProperties(child, this);
+            HasVisualChildren = true;
+
+            PropagateResumeLayout(this, child);
+            SynchronizeForceInheritProperties(child, this);
+        }
+
+        private new void RemoveVisualChild(UIElement child)
+        {
+            if (child is null) return;
+
+            HasVisualChildren = false;
+
+            PropagateSuspendLayout(child);
+            SynchronizeForceInheritProperties(child, this);
+        }
+
+        private static object CoerceRenderTransform(DependencyObject d, object value) => ((TransformLayer)d)._renderTransform;
+
+        private static object CoerceRenderTransformOrigin(DependencyObject d, object value) => new Point(0, 0);
     }
 }
