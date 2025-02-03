@@ -145,7 +145,8 @@ namespace System.Windows.Controls.Primitives
                 CaptureMouse();
                 IsDragging = true;
 
-                _origin = _previousPosition = e.GetPosition(null);
+                _transformToOriginal = GetTransformToOriginal();
+                _origin = _previousPosition = _transformToOriginal.Transform(e.GetPosition(null));
 
                 // Raise the DragStarted event 
                 bool success = false;
@@ -163,6 +164,24 @@ namespace System.Windows.Controls.Primitives
                     }
                 }
             }
+        }
+
+        private Matrix GetTransformToOriginal()
+        {
+            Matrix transform = Parent switch
+            {
+                Popup => GetRelativeTransform(null),
+                UIElement parent => parent.GetRelativeTransform(null),
+                _ => Matrix.Identity,
+            };
+
+            if (transform.HasInverse)
+            {
+                transform.Invert();
+                return transform;
+            }
+
+            return Matrix.Identity;
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -215,7 +234,7 @@ namespace System.Windows.Controls.Primitives
 
             if (IsDragging)
             {
-                Point position = e.GetPosition(null);
+                Point position = _transformToOriginal.Transform(e.GetPosition(null));
 
                 if (position != _previousPosition)
                 {
@@ -341,5 +360,7 @@ namespace System.Windows.Controls.Primitives
         /// Last position of the thumb while during a drag operation.
         /// </summary> 
         private Point _previousPosition;
+
+        private Matrix _transformToOriginal;
     }
 }
