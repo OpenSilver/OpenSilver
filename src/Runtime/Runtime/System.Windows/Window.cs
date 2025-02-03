@@ -131,7 +131,7 @@ namespace System.Windows
             RootDomElement.Style.overflow = "clip";
 
             // Create the DIV that will correspond to the root of the window visual tree:
-            OuterDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", RootDomElement, this);
+            OuterDiv = INTERNAL_HtmlDomManager.CreateWindow("div", RootDomElement, this);
 
             OuterDiv.Style.width = "100%";
             OuterDiv.Style.height = "100%";

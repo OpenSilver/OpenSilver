@@ -800,7 +800,7 @@ internal sealed class InputManager
             UIEventArg = jsEventArg.UIEventArg,
         };
 
-        e.FillEventArgs(uie, jsEventArg);
+        e.FillEventArgs(jsEventArg);
         RaiseUserInitiatedEvent(uie, e);
     }
 
@@ -853,7 +853,7 @@ internal sealed class InputManager
             UIEventArg = jsEventArg.UIEventArg,
         };
 
-        e.FillEventArgs(uie, jsEventArg);
+        e.FillEventArgs(jsEventArg);
 
         if (refreshClickCount)
         {
@@ -879,7 +879,7 @@ internal sealed class InputManager
             UIEventArg = jsEventArg.UIEventArg,
         };
 
-        e.FillEventArgs(uie, jsEventArg);
+        e.FillEventArgs(jsEventArg);
         RaiseUserInitiatedEvent(uie, e);
     }
 

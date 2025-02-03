@@ -215,6 +215,21 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
+        internal static INTERNAL_HtmlDomElementReference CreateWindow(
+            string tagName, 
+            INTERNAL_HtmlDomElementReference parent, 
+            UIElement uie)
+        {
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createWindowSafe('{tagName}', '{uid}', '{parent.UniqueIdentifier}')");
+
+            AddToGlobalStore(uid, uie);
+
+            return new(uid);
+        }
+
         internal static INTERNAL_HtmlDomElementReference CreateDomLayoutElementAndAppendIt(
             string tagName, object parentRef, UIElement uie, bool isKeyboardFocusable)
         {

@@ -63,7 +63,7 @@ document.createElementSafe = function (tagName, id, parent, index) {
     if (typeof parent === 'string') parent = document.getElementById(parent);
     if (parent == null) return null;
 
-    const element = document._createElement(tagName, id);
+    const element = document._createElement(tagName, id, parent.windowId);
 
     if (index < 0 || index >= parent.children.length) {
         parent.appendChild(element);
@@ -74,11 +74,25 @@ document.createElementSafe = function (tagName, id, parent, index) {
     return element;
 };
 
-document._createElement = function (tagName, id) {
+document.createWindowSafe = function (tagName, id, parent) {
+    if (typeof parent === 'string') parent = document.getElementById(parent);
+    if (parent == null) return null;
+
+    const element = document._createElement(tagName, id, id);
+    parent.appendChild(element);
+
+    return element;
+};
+
+document._createElement = function (tagName, id, windowId) {
     const element = document.createElement(tagName);
     element.setAttribute('id', id);
     Object.defineProperty(element, 'xamlid', {
         value: id,
+        writable: false,
+    });
+    Object.defineProperty(element, 'windowId', {
+        value: windowId,
         writable: false,
     });
     Object.defineProperty(element, 'dump', {
@@ -91,12 +105,12 @@ document.createLayout = function (tagName, id, parentId, isKeyboardFocusable) {
     const parent = document.getElementById(parentId);
     if (!parent) return;
 
-    const element = document._createLayout(tagName, id, isKeyboardFocusable);
+    const element = document._createLayout(tagName, id, parent.windowId, isKeyboardFocusable);
     parent.appendChild(element);
 };
 
-document._createLayout = function (tagName, id, isKeyboardFocusable) {
-    const element = document._createElement(tagName, id);
+document._createLayout = function (tagName, id, windowId, isKeyboardFocusable) {
+    const element = document._createElement(tagName, id, windowId);
     element.classList.add('opensilver-uielement', 'uielement-unarranged');
     document.inputManager.addListeners(element, isKeyboardFocusable);
     return element;
@@ -113,7 +127,7 @@ document.createTextBlock = function (id, parentId) {
     const parent = document.getElementById(parentId);
     if (!parent) return;
 
-    const element = document._createLayout('div', id, false);
+    const element = document._createLayout('div', id, parent.windowId, false);
     element.classList.add('opensilver-textblock');
 
     parent.appendChild(element);
@@ -123,7 +137,7 @@ document.createBorder = function (id, parentId) {
     const parent = document.getElementById(parentId);
     if (!parent) return;
 
-    const element = document._createLayout('div', id, false);
+    const element = document._createLayout('div', id, parent.windowId, false);
     element.classList.add('opensilver-border');
 
     parent.appendChild(element);
@@ -133,7 +147,7 @@ document.createInkPresenter = function (id, canvasId, parentId) {
     const parent = document.getElementById(parentId);
     if (!parent) return;
 
-    const element = document._createLayout('div', id, false);
+    const element = document._createLayout('div', id, parent.windowId, false);
     const canvas = document._createElement('canvas', canvasId);
     canvas.classList.add('opensilver-inkpresenter');
 
@@ -485,21 +499,37 @@ document.createInputManager = function (callback, pointerCallback) {
             _modifiers |= MODIFIERKEYS.WINDOWS;
     };
 
-    function getClosestElementId(element) {
+    function getClosestXamlElement(element) {
         while (element) {
-            const xamlid = element.xamlid;
-            if (xamlid) {
-                return xamlid;
+            if (element.xamlid) {
+                return element;
             }
 
             element = element.parentElement;
         }
 
-        return '';
+        return null;
     };
 
-    function isTouch(e) {
-        return e.pointerType === 'touch';
+    function getClosestElementId(element) {
+        element = getClosestXamlElement(element);
+
+        return element?.xamlid ?? '';
+    };
+
+    function processPointerCallback(element, eventId, e) {
+        let { pageX, pageY } = e;
+
+        if (element?.windowId) {
+            const parentWindow = document.getElementById(element.windowId);
+            if (parentWindow) {
+                const windowRect = parentWindow.getBoundingClientRect();
+                const bodyRect = document.body.getBoundingClientRect();
+                pageX -= (windowRect.left - bodyRect.left);
+                pageY -= (windowRect.top - bodyRect.top);
+            }
+        }
+        pointerCallback(element?.xamlid ?? '', eventId, e, e.pointerType === 'touch', pageX, pageY, _modifiers);
     }
 
     function initDom() {
@@ -521,7 +551,7 @@ document.createInputManager = function (callback, pointerCallback) {
                 const target = _pointerCapture;
                 switch (e.button) {
                     case 0:
-                        pointerCallback(getClosestElementId(target), EVENTS.POINTER_LEFT_UP, e, isTouch(e), e.pageX, e.pageY, _modifiers);
+                        processPointerCallback(getClosestXamlElement(target), EVENTS.POINTER_LEFT_UP, e);
                         break;
                     case 2:
                         callback(getClosestElementId(target), EVENTS.POINTER_RIGHT_UP, e);
@@ -535,7 +565,7 @@ document.createInputManager = function (callback, pointerCallback) {
                 setModifiers(e);
                 const target = _pointerCapture;
                 if (target !== null) {
-                    pointerCallback(getClosestElementId(target), EVENTS.POINTER_MOVE, e, isTouch(e), e.pageX, e.pageY, _modifiers);
+                    processPointerCallback(getClosestXamlElement(target), EVENTS.POINTER_MOVE, e);
                 }
             }
         });
@@ -600,7 +630,7 @@ document.createInputManager = function (callback, pointerCallback) {
                 e.isHandled = true;
                 setModifiers(e);
                 const target = _pointerCapture || e.target;
-                pointerCallback(getClosestElementId(target), EVENTS.POINTER_MOVE, e, isTouch(e), e.pageX, e.pageY, _modifiers);
+                processPointerCallback(getClosestXamlElement(target), EVENTS.POINTER_MOVE, e);
             });
 
             root.addEventListener('wheel', function (e) {
@@ -617,13 +647,13 @@ document.createInputManager = function (callback, pointerCallback) {
             root.addEventListener('pointerdown', function (e) {
                 e.isHandled = true;
                 setModifiers(e);
-                const id = (_pointerCapture === null || e.target === _pointerCapture) ? getClosestElementId(e.target) : '';
+                const element = (_pointerCapture === null || e.target === _pointerCapture) ? getClosestXamlElement(e.target) : null;
                 switch (e.button) {
                     case 0:
-                        pointerCallback(id, EVENTS.POINTER_LEFT_DOWN, e, isTouch(e), e.pageX, e.pageY, _modifiers);
+                        processPointerCallback(element, EVENTS.POINTER_LEFT_DOWN, e);
                         break;
                     case 2:
-                        callback(id, EVENTS.POINTER_RIGHT_DOWN, e);
+                        callback(element?.xamlid ?? '', EVENTS.POINTER_RIGHT_DOWN, e);
                         break;
                 }
             });
@@ -633,7 +663,7 @@ document.createInputManager = function (callback, pointerCallback) {
                 const target = _pointerCapture || e.target;
                 switch (e.button) {
                     case 0:
-                        pointerCallback(getClosestElementId(target), EVENTS.POINTER_LEFT_UP, e, isTouch(e), e.pageX, e.pageY, _modifiers);
+                        processPointerCallback(getClosestXamlElement(target), EVENTS.POINTER_LEFT_UP, e);
                         break;
                     case 2:
                         callback(getClosestElementId(target), EVENTS.POINTER_RIGHT_UP, e);
@@ -647,14 +677,14 @@ document.createInputManager = function (callback, pointerCallback) {
             view.addEventListener('pointerenter', function (e) {
                 if (_pointerCapture === null || this === _pointerCapture) {
                     setModifiers(e);
-                    pointerCallback(getClosestElementId(this), EVENTS.POINTER_ENTER, e, isTouch(e), e.pageX, e.pageY, _modifiers);
+                    processPointerCallback(getClosestXamlElement(this), EVENTS.POINTER_ENTER, e);
                 }
             });
 
             view.addEventListener('pointerleave', function (e) {
                 if (_pointerCapture === null || this === _pointerCapture) {
                     setModifiers(e);
-                    pointerCallback(getClosestElementId(this), EVENTS.POINTER_LEAVE, e, isTouch(e), e.pageX, e.pageY, _modifiers);
+                    processPointerCallback(getClosestXamlElement(this), EVENTS.POINTER_LEAVE, e);
                 }
             });
 
@@ -1057,7 +1087,7 @@ document.createTextviewManager = function (inputCallback, scrollCallback) {
             const parent = document.getElementById(parentId);
             if (!parent) return;
 
-            const view = document._createLayout('textarea', id, true);
+            const view = document._createLayout('textarea', id, parent.windowId, true);
             view.classList.add('opensilver-textboxview');
 
             view.setAttribute('tabindex', -1);
@@ -1087,7 +1117,7 @@ document.createTextviewManager = function (inputCallback, scrollCallback) {
             const parent = document.getElementById(parentId);
             if (!parent) return;
 
-            const view = document._createLayout('input', id, true);
+            const view = document._createLayout('input', id, parent.windowId, true);
             view.classList.add('opensilver-passwordboxview');
 
             view.setAttribute('type', 'password');
@@ -1530,7 +1560,7 @@ document.createRichTextViewManager = function (selectionChangedCallback, content
             const parent = document.getElementById(parentId);
             if (!parent) return;
 
-            const view = document._createLayout('div', id, true);
+            const view = document._createLayout('div', id, parent.windowId, true);
             instances.set(id, view);
 
             view.addEventListener('scroll', function (e) { scrollCallback(this.id); });
@@ -1738,7 +1768,7 @@ document.htmlPresenterHelpers = (function () {
             const parent = document.getElementById(parentId);
             if (!parent) return;
 
-            const view = document._createLayout('div', id, false);
+            const view = document._createLayout('div', id, parent.windowId, false);
             const content = document.createElement('div');
             content.setAttribute('id', contentId);
             if (useShadowDom) {
