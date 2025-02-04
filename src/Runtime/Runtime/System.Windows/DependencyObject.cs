@@ -223,7 +223,7 @@ namespace System.Windows
                 }
             }
 
-            if (GetStorage(dependencyProperty, metadata, false) is Storage storage)
+            if (GetStorage(dependencyProperty) is Storage storage)
             {
                 return DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
             }
@@ -263,7 +263,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             DependencyObjectStore.SetCurrentValueCommon(storage,
                 this,
@@ -285,7 +285,7 @@ namespace System.Windows
         /// </returns>
         public object ReadLocalValue(DependencyProperty dp)
         {
-            if (GetStorage(dp, null, false) is Storage storage)
+            if (GetStorage(dp) is Storage storage)
             {
                 // In silverlight ReadLocalValue returns a BindingExpression if the value
                 // is a BindingExpression set from a style's setter and the "real" local
@@ -319,7 +319,7 @@ namespace System.Windows
         // ReadLocalValue() will only return the local value
         internal object ReadLocalValueInternal(DependencyProperty dp)
         {
-            if (GetStorage(dp, null, false) is Storage storage)
+            if (GetStorage(dp) is Storage storage)
             {
                 return storage.LocalValue;
             }
@@ -329,7 +329,7 @@ namespace System.Windows
 
         internal bool HasDefaultValue(DependencyProperty dp)
         {
-            return GetStorage(dp, null, false) is not Storage storage ||
+            return GetStorage(dp) is not Storage storage ||
                 storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default;
         }
 
@@ -338,10 +338,10 @@ namespace System.Windows
             Debug.Assert(dp is not null);
             Debug.Assert(clock is not null);
 
-            PropertyMetadata metadata = SetupPropertyChange(dp);
-
-            if (GetStorage(dp, metadata, false) is Storage storage && storage.Clock == clock)
+            if (GetStorage(dp) is Storage storage && storage.Clock == clock)
             {
+                PropertyMetadata metadata = SetupPropertyChange(dp);
+
                 if (clock.CurrentState == ClockState.Stopped)
                 {
                     DependencyObjectStore.ClearAnimatedValue(storage, this, dp, metadata);
@@ -360,7 +360,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
             storage.Clock = clock;
         }
 
@@ -369,13 +369,13 @@ namespace System.Windows
             Debug.Assert(dp is not null);
             Debug.Assert(clock is not null);
 
-            PropertyMetadata metadata = SetupPropertyChange(dp);
-
-            if (GetStorage(dp, metadata, false) is Storage storage)
+            if (GetStorage(dp) is Storage storage)
             {
                 if (storage.Clock == clock)
                 {
                     storage.Clock = null;
+
+                    PropertyMetadata metadata = SetupPropertyChange(dp);
                     DependencyObjectStore.ClearAnimatedValue(storage, this, dp, metadata);
                 }
             }
@@ -405,7 +405,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             DependencyObjectStore.SetValueCommon(storage,
                 this,
@@ -426,7 +426,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             DependencyObjectStore.SetValueCommon(storage,
                 this,
@@ -462,7 +462,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             DependencyObjectStore.SetValueCommon(storage,
                 this,
@@ -483,7 +483,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             DependencyObjectStore.SetValueCommon(storage,
                 this,
@@ -524,8 +524,19 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            if (GetStorage(dp, metadata, value != DependencyProperty.UnsetValue) is Storage storage)
+            if (value == DependencyProperty.UnsetValue)
             {
+                if (GetStorage(dp) is Storage storage)
+                {
+                    DependencyObjectStore.ClearLocalStyleValue(storage,
+                        this,
+                        dp,
+                        metadata);
+                }
+            }
+            else
+            {
+                Storage storage = GetOrCreateStorage(dp, metadata);
                 DependencyObjectStore.SetLocalStyleValue(storage,
                     this,
                     dp,
@@ -540,8 +551,19 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            if (GetStorage(dp, metadata, value != DependencyProperty.UnsetValue) is Storage storage)
+            if (value == DependencyProperty.UnsetValue)
             {
+                if (GetStorage(dp) is Storage storage)
+                {
+                    DependencyObjectStore.ClearThemeStyleValue(storage,
+                        this,
+                        dp,
+                        metadata);
+                }
+            }
+            else
+            {
+                Storage storage = GetOrCreateStorage(dp, metadata);
                 DependencyObjectStore.SetThemeStyleValue(storage,
                     this,
                     dp,
@@ -563,7 +585,7 @@ namespace System.Windows
             Debug.Assert(dp is not null);
             Debug.Assert(metadata is not null);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             return DependencyObjectStore.SetInheritedValue(storage,
                 this,
@@ -593,7 +615,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             DependencyObjectStore.CoerceValueCommon(storage,
                 this,
@@ -608,11 +630,10 @@ namespace System.Windows
                 foreach (Storage storage in CopyInheritedStorages(d))
                 {
                     DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
-                    DependencyObjectStore.SetInheritedValue(storage,
+                    DependencyObjectStore.ClearInheritedValue(storage,
                         d,
                         dp,
                         dp.GetMetadata(d.DependencyObjectType),
-                        DependencyProperty.UnsetValue,
                         false); // recursively
                 }
             }
@@ -673,7 +694,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
 
-            Storage storage = GetStorage(dp, metadata, true);
+            Storage storage = GetOrCreateStorage(dp, metadata);
 
             DependencyObjectStore.RefreshExpressionCommon(storage,
                 this,
@@ -710,10 +731,9 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
-
-            if (GetStorage(dp, metadata, false) is Storage storage)
+            if (GetStorage(dp) is Storage storage)
             {
+                PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
                 DependencyObjectStore.ClearValueCommon(storage, this, dp, metadata);
             }
         }
@@ -737,7 +757,7 @@ namespace System.Windows
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
 
-            if (GetStorage(dp, metadata, false) is Storage storage)
+            if (GetStorage(dp) is Storage storage)
             {
                 DependencyObjectStore.ClearValueCommon(storage, this, dp, metadata);
             }
@@ -784,12 +804,12 @@ namespace System.Windows
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
-
-            if (GetStorage(dp, metadata, false) is Storage storage)
+            if (GetStorage(dp) is Storage storage)
             {
                 return DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.AnimationBaseValue);
             }
+
+            PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
 
             return metadata.GetDefaultValue(this, dp);
         }
@@ -876,24 +896,30 @@ namespace System.Windows
             return dp.GetMetadata(DependencyObjectType);
         }
 
-        internal Storage GetStorage(DependencyProperty dp, PropertyMetadata metadata, bool createIfNotFound)
+        internal Storage GetStorage(DependencyProperty dp)
         {
-            Storage storage = null;
-            int propertyIndex = dp.GlobalIndex;
-            if (_effectiveValues is not null && _effectiveValues.TryGetValue(propertyIndex, out storage))
+            if (_effectiveValues is not null && _effectiveValues.TryGetValue(dp.GlobalIndex, out Storage storage))
             {
                 return storage;
             }
 
-            if (createIfNotFound)
+            return null;
+        }
+
+        private Storage GetOrCreateStorage(DependencyProperty dp, PropertyMetadata metadata)
+        {
+            int propertyIndex = dp.GlobalIndex;
+
+            if (_effectiveValues is not null && _effectiveValues.TryGetValue(propertyIndex, out Storage storage))
             {
-                metadata ??= dp.GetMetadata(DependencyObjectType);
-                storage = Storage.CreateDefaultValueEntry(dp, metadata.Inherits, metadata.GetDefaultValue(this, dp));
-                EffectiveValues.Add(propertyIndex, storage);
-                if (metadata.Inherits)
-                {
-                    _inheritableEffectiveValuesCount++;
-                }
+                return storage;
+            }
+
+            storage = Storage.CreateDefaultValueEntry(dp, metadata.Inherits, metadata.GetDefaultValue(this, dp));
+            EffectiveValues.Add(propertyIndex, storage);
+            if (metadata.Inherits)
+            {
+                _inheritableEffectiveValuesCount++;
             }
 
             return storage;

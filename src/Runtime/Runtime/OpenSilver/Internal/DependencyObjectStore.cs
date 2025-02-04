@@ -208,11 +208,7 @@ internal static class DependencyObjectStore
         PropertyMetadata metadata,
         object newValue)
     {
-        if (newValue == DependencyProperty.UnsetValue)
-        {
-            ClearLocalStyleValue(storage, d, dp, metadata);
-            return;
-        }
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
 
         storage.LocalStyleValue = newValue;
 
@@ -251,7 +247,7 @@ internal static class DependencyObjectStore
             OperationType.Unknown);
     }
 
-    private static void ClearLocalStyleValue(
+    internal static void ClearLocalStyleValue(
         Storage storage,
         DependencyObject d,
         DependencyProperty dp,
@@ -301,11 +297,7 @@ internal static class DependencyObjectStore
         PropertyMetadata metadata,
         object newValue)
     {
-        if (newValue == DependencyProperty.UnsetValue)
-        {
-            ClearThemeStyleValue(storage, d, dp, metadata);
-            return;
-        }
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
 
         EffectiveValueEntry oldEntry = storage.Entry;
 
@@ -347,7 +339,7 @@ internal static class DependencyObjectStore
             OperationType.Unknown);
     }
 
-    private static void ClearThemeStyleValue(
+    internal static void ClearThemeStyleValue(
         Storage storage,
         DependencyObject d,
         DependencyProperty dp,
@@ -398,10 +390,7 @@ internal static class DependencyObjectStore
         object newValue,
         bool propagateChanges)
     {
-        if (newValue == DependencyProperty.UnsetValue)
-        {
-            return ClearInheritedValue(storage, d, dp, metadata, propagateChanges);
-        }
+        Debug.Assert(newValue != DependencyProperty.UnsetValue);
 
         storage.InheritedValue = newValue;
 
@@ -427,7 +416,7 @@ internal static class DependencyObjectStore
             propagateChanges ? OperationType.Unknown : OperationType.Inherit);
     }
 
-    private static bool ClearInheritedValue(
+    internal static bool ClearInheritedValue(
         Storage storage,
         DependencyObject d,
         DependencyProperty dp,

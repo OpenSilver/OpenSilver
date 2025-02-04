@@ -186,8 +186,10 @@ namespace System.Windows
 
             if (inheritanceNode)
             {
-                Storage storage = d.GetStorage(dp, metadata, false);
-                BaseValueSourceInternal oldValueSource = storage?.Entry.BaseValueSourceInternal ?? BaseValueSourceInternal.Default;
+                Storage storage = d.GetStorage(dp);
+                BaseValueSourceInternal oldValueSource = storage is not null ?
+                    storage.Entry.BaseValueSourceInternal :
+                    BaseValueSourceInternal.Default;
 
                 // If the oldValueSource is of lower precedence than Inheritance
                 // only then do we need to Invalidate the property
