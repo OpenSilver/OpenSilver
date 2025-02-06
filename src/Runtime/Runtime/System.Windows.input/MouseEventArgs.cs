@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using CSHTML5.Internal;
 
 namespace System.Windows.Input;
@@ -131,7 +132,7 @@ public class MouseEventArgs : RoutedEventArgs
             relativeTo = popup.IsOpen ? popup.Child : null;
         }
 
-        if (relativeTo == null)
+        if (relativeTo is null)
         {
             //-----------------------------------
             // Return the absolute pointer coordinates:
@@ -144,11 +145,12 @@ public class MouseEventArgs : RoutedEventArgs
             // Returns the pointer coordinates relative to the "relativeTo" element:
             //-----------------------------------
 
-            UIElement rootVisual = Window.GetWindow(relativeTo);
-            if (rootVisual != null)
+            Matrix m = relativeTo.InternalTransformToAncestor(null);
+            if (m.HasInverse)
             {
-                return rootVisual.GetRelativeTransform(relativeTo).Transform(origin);
+                m.Invert();
             }
+            return m.Transform(origin);
         }
 
         return new Point(0.0, 0.0);

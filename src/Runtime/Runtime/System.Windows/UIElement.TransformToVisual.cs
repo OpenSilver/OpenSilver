@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -24,37 +23,30 @@ namespace System.Windows;
 public partial class UIElement
 {
     /// <summary>
-    /// Returns a transform object that can be used to transform coordinates from
-    /// the UIElement to the specified object.
+    /// Returns a transform that can be used to transform coordinates from the <see cref="UIElement"/> to the 
+    /// specified visual object.
     /// </summary>
     /// <param name="visual">
-    /// The object to compare to the current object for purposes of obtaining the
-    /// transform.
+    /// The <see cref="UIElement"/> to which the coordinates are transformed.
     /// </param>
     /// <returns>
-    /// The transform information as an object. Call methods on this object to get
-    /// a practical transform.
+    /// A value of type <see cref="GeneralTransform"/>.
     /// </returns>
-    public GeneralTransform TransformToVisual(UIElement visual) => new MatrixTransform(GetRelativeTransform(visual));
+    /// <exception cref="InvalidOperationException">
+    /// The visual objects are not related.
+    /// </exception>
+    public GeneralTransform TransformToVisual(UIElement visual) => new MatrixTransform(InternalTransformToVisual(visual));
 
-    internal Matrix GetRelativeTransform(UIElement visual)
+    internal Matrix InternalTransformToVisual(UIElement visual)
     {
-        if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this) ||
-            (visual is not null && !INTERNAL_VisualTreeManager.IsElementInVisualTree(visual)))
-        {
-            return Matrix.Identity;
-        }
-
-        visual ??= Window.GetWindow(this);
-
         if (visual is null)
         {
-            return Matrix.Identity;
+            return InternalTransformToAncestor(null);
         }
 
         if (FindCommonVisualAncestor(visual) is not UIElement ancestor)
         {
-            return GetRelativeTransformNative(visual);
+            return TransformToVisualNative(visual);
         }
 
         TrySimpleTransformToAncestor(ancestor, false, out Matrix m0);
@@ -69,6 +61,60 @@ public partial class UIElement
         }
 
         return m0;
+    }
+
+    /// <summary>
+    /// Returns a transform that can be used to transform coordinates from the <see cref="UIElement"/> to the 
+    /// specified ancestor of the visual object.
+    /// </summary>
+    /// <param name="ancestor">
+    /// The <see cref="UIElement"/> to which the coordinates are transformed.
+    /// </param>
+    /// <returns>
+    /// A value of type <see cref="GeneralTransform"/>.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// The visual objects are not related.
+    /// </exception>
+    public GeneralTransform TransformToAncestor(UIElement ancestor) => new MatrixTransform(InternalTransformToAncestor(ancestor));
+
+    internal Matrix InternalTransformToAncestor(UIElement ancestor)
+    {
+        TrySimpleTransformToAncestor(ancestor, false, out Matrix m);
+        return m;
+    }
+
+    /// <summary>
+    /// Returns a transform that can be used to transform coordinates from the <see cref="UIElement"/> to the 
+    /// specified visual object descendant.
+    /// </summary>
+    /// <param name="descendant">
+    /// The <see cref="UIElement"/> to which the coordinates are transformed.
+    /// </param>
+    /// <returns>
+    /// A value of type <see cref="GeneralTransform"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="descendant"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// The visual objects are not related.
+    /// </exception>
+    public GeneralTransform TransformToDescendant(UIElement descendant)
+    {
+        if (descendant is null)
+        {
+            throw new ArgumentNullException(nameof(descendant));
+        }
+
+        return new MatrixTransform(InternalTransformToDescendant(descendant));
+    }
+
+    internal Matrix InternalTransformToDescendant(UIElement descendant)
+    {
+        Debug.Assert(descendant is not null);
+        descendant.TrySimpleTransformToAncestor(this, true, out Matrix m);
+        return m;
     }
 
     private bool TrySimpleTransformToAncestor(UIElement ancestor, bool inverse, out Matrix simpleTransform)
@@ -112,17 +158,13 @@ public partial class UIElement
 
             m.Translate(g.VisualOffset.X, g.VisualOffset.Y);
 
-            if (GetAncestor(g) is not UIElement parent)
-            {
-                break;
-            }
-
-            g = parent;
+            g = GetVisualAncestor(g);
         }
 
-        Debug.Assert(g == ancestor, inverse ?
-            "The specified Visual is not a descendant of this Visual." :
-            "The specified Visual is not an ancestor of this Visual.");
+        if (g != ancestor)
+        {
+            throw new InvalidOperationException(inverse ? Strings.UIElement_NotADescendant : Strings.UIElement_NotAnAncestor);
+        }
 
         if (inverse)
         {
@@ -137,37 +179,6 @@ public partial class UIElement
 
         simpleTransform = m;
         return true; // simple transform succeeded
-
-        static UIElement GetAncestor(UIElement uie)
-        {
-            Debug.Assert(uie is not null);
-
-            // We try to get the ancestor in 3 differents ways. We cannot only rely on
-            // the visual tree because popups create a disconnection in the visual tree.
-            // This method helps "reconnect" the visual tree.
-            //
-            // (1) Get the regular visual parent
-            // (2) Get the an informal visual parent when the element is the root of a popup
-            // (3) Get the containing window (if different from the element itself)
-
-            if (uie.VisualParent is UIElement parent)
-            {
-                return parent;
-            }
-
-            if (uie is FrameworkElement fe && fe.Parent is Popup popup)
-            {
-                return popup.PopupRoot?.HiddenVisualParent;
-            }
-
-            Window window = Window.GetWindow(uie);
-            if (window != uie)
-            {
-                return window;
-            }
-
-            return null;
-        }
     }
 
     private bool TryGetBorderOffsets(UIElement uie, out Point offsets)
@@ -183,11 +194,15 @@ public partial class UIElement
         return false;
     }
 
-    private Matrix GetRelativeTransformNative(UIElement otherVisual)
+    private Matrix TransformToVisualNative(UIElement otherVisual)
     {
         Debug.Assert(otherVisual is not null);
-        Debug.Assert(INTERNAL_VisualTreeManager.IsElementInVisualTree(this));
-        Debug.Assert(INTERNAL_VisualTreeManager.IsElementInVisualTree(otherVisual));
+
+        if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this) ||
+            !INTERNAL_VisualTreeManager.IsElementInVisualTree(otherVisual))
+        {
+            return Matrix.Identity;
+        }
 
         string sOuterDivOfControl = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
         string sOuterDivOfReferenceVisual = OpenSilver.Interop.GetVariableStringForJS(otherVisual.OuterDiv);
@@ -198,5 +213,88 @@ public partial class UIElement
             $"{sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top");
 
         return new Matrix(1, 0, 0, 1, offsetLeft, offsetTop);
+    }
+
+    private void SetVisualFlagsToRoot(VisualFlags flag, bool value)
+    {
+        UIElement current = this;
+
+        do
+        {
+            current.WriteVisualFlag(flag, value);
+            current = GetVisualAncestor(current);
+        }
+        while (current is not null);
+    }
+
+    private UIElement FindFirstAncestorWithFlagsAnd(VisualFlags flag)
+    {
+        UIElement current = this;
+
+        do
+        {
+            if (current.ReadVisualFlag(flag))
+            {
+                // The other UIElement crossed through this UIElement's parent chain. Hence this is our
+                // common ancestor.
+                return current;
+            }
+
+            current = GetVisualAncestor(current);
+        }
+        while (current is not null);
+
+        return null;
+    }
+
+    private UIElement FindCommonVisualAncestor(UIElement otherVisual)
+    {
+        if (otherVisual is null)
+        {
+            throw new ArgumentNullException(nameof(otherVisual));
+        }
+
+        // Since we can't rely on code running in the CLR, we need to first make sure
+        // that the FindCommonAncestor flag is not set. It is enought to ensure this
+        // on one path to the root Visual.
+
+        SetVisualFlagsToRoot(VisualFlags.FindCommonAncestor, false);
+
+        // Walk up the other visual's parent chain and set the FindCommonAncestor flag.
+        otherVisual.SetVisualFlagsToRoot(VisualFlags.FindCommonAncestor, true);
+
+        // Now see if the other Visual's parent chain crosses our parent chain.
+        return FindFirstAncestorWithFlagsAnd(VisualFlags.FindCommonAncestor);
+    }
+
+    private static UIElement GetVisualAncestor(UIElement uie)
+    {
+        Debug.Assert(uie is not null);
+
+        // We try to get the ancestor in 3 differents ways. We cannot only rely on
+        // the visual tree because popups create a disconnection in the visual tree.
+        // This method helps "reconnect" the visual tree.
+        //
+        // (1) Get the regular visual parent
+        // (2) Get the an informal visual parent when the element is the root of a popup
+        // (3) Get the containing window (if different from the element itself)
+
+        if (uie.VisualParent is UIElement parent)
+        {
+            return parent;
+        }
+
+        if (uie is FrameworkElement fe && fe.Parent is Popup popup)
+        {
+            return popup.PopupRoot?.HiddenVisualParent;
+        }
+
+        Window window = Window.GetWindow(uie);
+        if (window != uie)
+        {
+            return window;
+        }
+
+        return null;
     }
 }

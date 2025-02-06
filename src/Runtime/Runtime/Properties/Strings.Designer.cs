@@ -1699,6 +1699,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified UIElement is not a descendant of this UIElement..
+        /// </summary>
+        internal static string UIElement_NotADescendant {
+            get {
+                return ResourceManager.GetString("UIElement_NotADescendant", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified UIElement is not an ancestor of this UIElement..
+        /// </summary>
+        internal static string UIElement_NotAnAncestor {
+            get {
+                return ResourceManager.GetString("UIElement_NotAnAncestor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not an UIElement..
         /// </summary>
         internal static string UIElement_NotAnUIElement {

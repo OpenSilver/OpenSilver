@@ -1254,56 +1254,6 @@ namespace System.Windows
             return current == ancestor;
         }
 
-        private UIElement FindFirstAncestorWithFlagsAnd(VisualFlags flag)
-        {
-            UIElement current = this;
-
-            do
-            {
-                if (current.ReadVisualFlag(flag))
-                {
-                    // The other UIElement crossed through this UIElement's parent chain. Hence this is our
-                    // common ancestor.
-                    return current;
-                }
-
-                current = current.VisualParent as UIElement;
-            }
-            while (current is not null);
-
-            return null;
-        }
-
-        private UIElement FindCommonVisualAncestor(UIElement otherVisual)
-        {
-            if (otherVisual is null)
-            {
-                throw new ArgumentNullException(nameof(otherVisual));
-            }
-
-            // Since we can't rely on code running in the CLR, we need to first make sure
-            // that the FindCommonAncestor flag is not set. It is enought to ensure this
-            // on one path to the root Visual.
-
-            SetVisualFlagsToRoot(VisualFlags.FindCommonAncestor, false);
-
-            // Walk up the other visual's parent chain and set the FindCommonAncestor flag.
-            otherVisual.SetVisualFlagsToRoot(VisualFlags.FindCommonAncestor, true);
-
-            // Now see if the other Visual's parent chain crosses our parent chain.
-            if (FindFirstAncestorWithFlagsAnd(VisualFlags.FindCommonAncestor) is UIElement ancestor)
-            {
-                return ancestor;
-            }
-
-            if (Window.GetWindow(this) is Window window && window == Window.GetWindow(otherVisual))
-            {
-                return window;
-            }
-
-            return null;
-        }
-
         #region ForceInherit property support
 
         internal static void SynchronizeForceInheritProperties(UIElement uie, DependencyObject parent)
@@ -1370,18 +1320,6 @@ namespace System.Windows
             {
                 _visualFlags &= (~field);
             }
-        }
-
-        private void SetVisualFlagsToRoot(VisualFlags flag, bool value)
-        {
-            UIElement current = this;
-
-            do
-            {
-                current.WriteVisualFlag(flag, value);
-                current = current.VisualParent as UIElement;
-            }
-            while (current is not null);
         }
 
         private CoreFlags _flags;

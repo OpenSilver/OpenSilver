@@ -434,7 +434,7 @@ namespace System.Windows.Controls.Primitives
             Matrix transform;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                transform = GetRelativeTransform(Window.GetWindow(this));
+                transform = InternalTransformToAncestor(null);
                 transform.OffsetX = transform.OffsetY = 0;
             }
             else if (GetValue(RenderTransformProperty) is Transform popupTransform)
@@ -470,7 +470,7 @@ namespace System.Windows.Controls.Primitives
             {
                 // In Silverlight, when a popup is in the visual tree, it always position the Child relative
                 // to the popup's top left corner.
-                offset = GetRelativeTransform(null).Transform(new Point(0, 0));
+                offset = InternalTransformToAncestor(null).Transform(new Point(0, 0));
                 offset.Offset(HorizontalOffset, VerticalOffset);
             }
             else
@@ -552,8 +552,7 @@ namespace System.Windows.Controls.Primitives
 
             var root = Application.Current.Host.Content;
             var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
-            InterestPoints targetInterestPoints = GetInterestPoints(
-                placementTarget, placementTarget.GetRelativeTransform(Window.GetWindow(placementTarget)));
+            InterestPoints targetInterestPoints = GetInterestPoints(placementTarget, placementTarget.InternalTransformToAncestor(null));
             InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.Transform);
             double hOffset = HorizontalOffset;
             double vOffset = VerticalOffset;

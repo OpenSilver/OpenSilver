@@ -669,6 +669,12 @@
   <data name="UIElement_Layout_PositiveInfinityReturned" xml:space="preserve">
     <value>Layout measurement override of element '{0}' should not return PositiveInfinity as its DesiredSize, even if Infinity is passed in as available size.</value>
   </data>
+  <data name="UIElement_NotADescendant" xml:space="preserve">
+    <value>The specified UIElement is not a descendant of this UIElement.</value>
+  </data>
+  <data name="UIElement_NotAnAncestor" xml:space="preserve">
+    <value>The specified UIElement is not an ancestor of this UIElement.</value>
+  </data>
   <data name="UIElement_NotAnUIElement" xml:space="preserve">
     <value>'{0}' is not an UIElement.</value>
   </data>

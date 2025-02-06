@@ -170,8 +170,8 @@ namespace System.Windows.Controls.Primitives
         {
             Matrix transform = Parent switch
             {
-                Popup => GetRelativeTransform(null),
-                UIElement parent => parent.GetRelativeTransform(null),
+                Popup => InternalTransformToAncestor(null),
+                UIElement parent => parent.InternalTransformToAncestor(null),
                 _ => Matrix.Identity,
             };
 
