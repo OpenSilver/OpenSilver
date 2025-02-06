@@ -64,7 +64,7 @@ window._hybridRuntime = (function () {
 
     (function () {
         const styleheets = ['libs/cshtml5.css', 'libs/quill.core.css'];
-        const scripts = ['libs/cshtml5.js', 'libs/ResizeObserver.js', 'libs/quill.min.js', 'libs/html2canvas.js', 'libs/FileSaver.min.js'];
+        const scripts = ['libs/cshtml5.js', 'libs/quill.min.js', 'libs/html2canvas.js', 'libs/FileSaver.min.js'];
         const timestamp = '?date=' + new Date().toISOString();
 
         styleheets.forEach((name) => {

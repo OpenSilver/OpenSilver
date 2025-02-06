@@ -159,6 +159,7 @@
     <Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />
     <Compile Include="System.Windows\LogicalTreeHelper.cs" />
     <Compile Include="System.Windows\RoutingStrategy.cs" />
+    <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
     <Compile Include="System.Windows\TreeChangeInfo.cs" />
     <Compile Include="System.Windows\UIElement.TransformToVisual.cs" />
     <Compile Include="System.Windows\ValidateValueCallback.cs" />
@@ -176,7 +177,6 @@
     <Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
     <Compile Include="OpenSilver\Internal\PFCDefaultValueFactory.cs" />
     <Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
-    <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
     <Compile Include="OpenSilver\Internal\StringBuilderFactory.cs" />
     <Compile Include="OpenSilver\Internal\VisualStateGroupCollection.cs" />
     <Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />

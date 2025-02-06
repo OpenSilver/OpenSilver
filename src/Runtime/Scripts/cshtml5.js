@@ -1822,6 +1822,38 @@ document.createUIDispatcher = function (callback) {
     };
 };
 
+document.createResizeManager = (function (onresizeCallback) {
+    const _observer = new ResizeObserver(onResize);
+    const _observedElements = new Map();
+
+    function onResize(entries) {
+        for (const entry of entries) {
+            const id = entry.target.id;
+
+            if (_observedElements.get(id) !== entry.target) {
+                continue;
+            }
+
+            onresizeCallback(id, entry.contentRect.width, entry.contentRect.height);
+        }
+    }
+
+    document.resizeManager = {
+        observe: function (element) {
+            if (element && element.id) {
+                _observedElements.set(element.id, element);
+                _observer.observe(element);
+            }
+        },
+        unobserve: function (id) {
+            const element = _observedElements.get(id);
+            if (_observedElements.delete(id)) {
+                _observer.unobserve(element);
+            }
+        },
+    }
+});
+
 document.openFileDialog = (function () {
     const _dialogs = new Map();
 

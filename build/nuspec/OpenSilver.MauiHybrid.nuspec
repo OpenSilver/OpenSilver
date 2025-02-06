@@ -38,7 +38,6 @@
     <!-- Content Files -->
     <file src="../../src/Runtime/Scripts/cshtml5.js" target="content/js/cshtml5.js" />
     <file src="../../src/Runtime/Scripts/cshtml5.css" target="content/css/cshtml5.css" />
-    <file src="../../src/Runtime/Scripts/ResizeObserver.js" target="content/js/ResizeObserver.js" />
     <file src="../../src/Runtime/Scripts/html2canvas.js" target="content/js/html2canvas.js" />
     <file src="../../src/Runtime/Scripts/quill.min.js" target="content/js/quill.min.js" />
     <file src="../../src/Runtime/Scripts/quill.core.css" target="content/css/quill.core.css" />

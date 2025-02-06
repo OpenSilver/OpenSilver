@@ -25,12 +25,14 @@ namespace System.Windows
     /// Represents an application window.
     /// </summary>
     [ContentProperty(nameof(Content))]
-    public class Window : FrameworkElement
+    public class Window : FrameworkElement, IResizeObserverListener
     {
         static Window()
         {
             KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
         }
+
+        private IDisposable _resizeObserver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
@@ -55,16 +57,12 @@ namespace System.Windows
                     "beforeunload", 
                     ProcessOnClosing)
                 .AttachToDomEvents();
-
-                new DOMEventManager(
-                    INTERNAL_HtmlDomManager.GetHtmlWindow, 
-                    "resize", 
-                    OnWindowSizeChanged)
-                .AttachToDomEvents();
             }
 
             GotFocus += new RoutedEventHandler(OnGotFocus);
         }
+
+        ~Window() => _resizeObserver?.Dispose();
 
         internal TextMeasurementService TextMeasurementService { get; private set; }
 
@@ -133,6 +131,8 @@ namespace System.Windows
             // Create the DIV that will correspond to the root of the window visual tree:
             OuterDiv = INTERNAL_HtmlDomManager.CreateWindowDomElementAndAppendIt(this);
 
+            _resizeObserver = ResizeObserver.Observe(RootDomElement, this);
+
             InputManager.Current.RegisterRoot(RootDomElement);
 
             // Set the window as "loaded":
@@ -151,14 +151,6 @@ namespace System.Windows
 
             // Raise the "Loaded" event:
             RaiseLoadedEvent();
-            
-            SizeChanged += WindowSizeChangedEventHandler;
-        }
-
-        private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)
-        {
-            InvalidateMeasure();
-            InvalidateArrange();
         }
 
         private void OnGotFocus(object sender, RoutedEventArgs e) => Current = this;
@@ -170,19 +162,10 @@ namespace System.Windows
         /// </summary>
         public new event WindowSizeChangedEventHandler SizeChanged;
 
-        private void OnWindowSizeChanged(object jsEventArg)
+        private void OnWindowSizeChanged(Size size)
         {
-            if (SizeChanged is WindowSizeChangedEventHandler handler)
-            {
-                string sElement = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
-                double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sElement}.offsetWidth");
-                double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sElement}.offsetHeight");
-
-                handler(this, new WindowSizeChangedEventArgs
-                {
-                    Size = new Size(width, height),
-                });
-            }
+            InvalidateMeasure();
+            SizeChanged?.Invoke(this, new WindowSizeChangedEventArgs(size));
         }
 
         /// <summary>
@@ -194,7 +177,7 @@ namespace System.Windows
             {
                 if (OuterDiv is not null)
                 {
-                    string sDiv = OpenSilver.Interop.GetVariableStringForJS(OuterDiv);
+                    string sDiv = OpenSilver.Interop.GetVariableStringForJS(RootDomElement);
                     double width = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDiv}.offsetWidth");
                     double height = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDiv}.offsetHeight");
                     return new Rect(0, 0, width, height);
@@ -379,5 +362,7 @@ namespace System.Windows
             Content?.Arrange(new Rect(new Point(), finalSize));
             return finalSize;
         }
+
+        void IResizeObserverListener.OnSizeChanged(Size size) => OnWindowSizeChanged(size);
     }
 }

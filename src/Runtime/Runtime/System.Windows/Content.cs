@@ -11,127 +11,127 @@
 *  
 \*====================================================================================*/
 
-using System;
-using CSHTML5;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
-namespace System.Windows.Interop
+namespace System.Windows.Interop;
+
+public class Content : IResizeObserverListener
 {
-    public class Content
+    private readonly JavaScriptCallback _fullscreenchangeCallback;
+    private readonly IDisposable _resizeObserver;
+
+    public Content() : this(null)
     {
-        private readonly JavaScriptCallback _fullscreenchangeCallback;
-        private readonly ResizeObserverAdapter _resizeObserver;
+    }
 
-        public Content() : this(null)
+    internal Content(Application app)
+    {
+        if (app is not null)
         {
+            _fullscreenchangeCallback = JavaScriptCallback.Create(FullScreenChangedCallback);
+
+            // Hooks the FullScreenChanged event
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                $"document.addEventListener('fullscreenchange', {OpenSilver.Interop.GetVariableStringForJS(_fullscreenchangeCallback)})");
+
+            _resizeObserver = ResizeObserver.Observe(app.GetRootDiv(), this);
+
+            // WORKINPROGRESS
+            // Add Zoomed event
         }
+    }
 
-        internal Content(Application app)
+    ~Content() => _resizeObserver?.Dispose();
+
+    /// <summary>
+    /// Gets the browser-determined height of the content area.
+    /// </summary>
+    public double ActualHeight => Application.Current.MainWindow.ActualHeight;
+
+    /// <summary>
+    /// Gets the browser-determined width of the Silverlight content area.
+    /// </summary>
+    public double ActualWidth => Application.Current.MainWindow.ActualWidth;
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the page is displaying in full-screen mode.
+    /// </summary>
+    public bool IsFullScreen
+    {
+        get => OpenSilver.Interop.ExecuteJavaScriptBoolean("window.innerHeight == screen.height");
+        set
         {
-            if (app is not null)
+            if (value)
             {
-                _fullscreenchangeCallback = JavaScriptCallback.Create(FullScreenChangedCallback);
-
-                // Hooks the FullScreenChanged event
-                OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"document.addEventListener('fullscreenchange', {OpenSilver.Interop.GetVariableStringForJS(_fullscreenchangeCallback)})");
-
-                _resizeObserver = new ResizeObserverAdapter();
-                _resizeObserver.Observe(app.GetRootDiv(), OnContentSizeChanged);
-
-                // WORKINPROGRESS
-                // Add Zoomed event
-            }
-        }
-
-        /// <summary>
-        /// Gets the browser-determined height of the content area.
-        /// </summary>
-        public double ActualHeight => Application.Current.MainWindow.ActualHeight;
-
-        /// <summary>
-        /// Gets the browser-determined width of the Silverlight content area.
-        /// </summary>
-        public double ActualWidth => Application.Current.MainWindow.ActualWidth;
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether the page is displaying in full-screen mode.
-        /// </summary>
-        public bool IsFullScreen
-        {
-            get => OpenSilver.Interop.ExecuteJavaScriptBoolean("window.innerHeight == screen.height");
-            set
-            {
-                if (value)
+                if (!OpenSilver.Interop.IsRunningInTheSimulator)
                 {
-                    if (!OpenSilver.Interop.IsRunningInTheSimulator)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScriptVoid(@"
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(@"
 var element = document.body;
 var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
 if (requestMethod) {
     requestMethod.call(element);
 }");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Full-screen mode is not supported when running inside the Simulator. Please launch the application in the browser instead.");
-                    }
                 }
                 else
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid(@"
+                    MessageBox.Show("Full-screen mode is not supported when running inside the Simulator. Please launch the application in the browser instead.");
+                }
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"
 var requestMethod = document.exitFullScreen || document.webkitExitFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msExitFullScreen || document.msCancelFullScreen;
 if (requestMethod) {
     requestMethod.call(document);
 }");
-                }
             }
         }
-
-        /// <summary>
-        /// Gets the factor by which the current browser window resizes its contents.
-        /// </summary>
-        /// <returns> 
-        /// The zoom setting for the current browser window.
-        /// </returns>
-        public double ZoomFactor => OpenSilver.Interop.ExecuteJavaScriptDouble("window.devicePixelRatio", false);
-
-        /// <summary>
-        /// Occurs when the browser enters or exits full-screen mode.
-        /// </summary>
-        public event EventHandler FullScreenChanged;
-
-        /// <summary>
-        /// Occurs when the <see cref="Window"/> gets resized.
-        /// </summary>
-        public event EventHandler Resized;
-
-        /// <summary>
-        /// Called when the full screen mode changes.
-        /// Fires the <see cref="FullScreenChanged"/> event.
-        /// </summary>
-        private void FullScreenChangedCallback() =>
-            FullScreenChanged?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
-
-        /// <summary>
-        /// Called when the window gets resized.
-        /// Fires the <see cref="Resized"/> event.
-        /// </summary>
-        private void OnContentSizeChanged(Size size) =>
-            Resized?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
-
-        /// <summary>
-        /// Gets or sets a value that indicates the behavior of full-screen mode.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public FullScreenOptions FullScreenOptions { get; set; }
-
-        /// <summary>
-        /// Occurs when the zoom setting in the host browser window changes or is initialized.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public event EventHandler Zoomed;
     }
+
+    /// <summary>
+    /// Gets the factor by which the current browser window resizes its contents.
+    /// </summary>
+    /// <returns> 
+    /// The zoom setting for the current browser window.
+    /// </returns>
+    public double ZoomFactor => OpenSilver.Interop.ExecuteJavaScriptDouble("window.devicePixelRatio", false);
+
+    /// <summary>
+    /// Occurs when the browser enters or exits full-screen mode.
+    /// </summary>
+    public event EventHandler FullScreenChanged;
+
+    /// <summary>
+    /// Occurs when the <see cref="Window"/> gets resized.
+    /// </summary>
+    public event EventHandler Resized;
+
+    /// <summary>
+    /// Called when the full screen mode changes.
+    /// Fires the <see cref="FullScreenChanged"/> event.
+    /// </summary>
+    private void FullScreenChangedCallback() =>
+        FullScreenChanged?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
+
+    /// <summary>
+    /// Called when the window gets resized.
+    /// Fires the <see cref="Resized"/> event.
+    /// </summary>
+    private void OnContentSizeChanged(Size size) =>
+        Resized?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
+
+    /// <summary>
+    /// Gets or sets a value that indicates the behavior of full-screen mode.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public FullScreenOptions FullScreenOptions { get; set; }
+
+    /// <summary>
+    /// Occurs when the zoom setting in the host browser window changes or is initialized.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public event EventHandler Zoomed;
+
+    void IResizeObserverListener.OnSizeChanged(Size size) => OnContentSizeChanged(size);
 }

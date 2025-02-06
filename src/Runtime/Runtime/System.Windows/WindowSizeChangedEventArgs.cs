@@ -11,20 +11,30 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Contains the argument returned by a window size change event.
+/// </summary>
+public sealed class WindowSizeChangedEventArgs
 {
     /// <summary>
-    /// Contains the argument returned by a window size change event.
+    /// Initializes a new instance of the <see cref="WindowSizeChangedEventArgs"/> class.
     /// </summary>
-    public sealed partial class WindowSizeChangedEventArgs
+    public WindowSizeChangedEventArgs() { }
+
+    internal WindowSizeChangedEventArgs(Size size)
     {
-        /// <summary>
-        /// Gets or sets whether the window size event was handled.
-        /// </summary>
-        public bool Handled { get; set; }
-        /// <summary>
-        /// Gets the new size of the window.
-        /// </summary>
-        public Size Size { get; internal set; }
+        Size = size;
     }
+
+    /// <summary>
+    /// Gets the new size of the window.
+    /// </summary>
+    public Size Size { get; }
+
+    /// <summary>
+    /// Gets or sets whether the window size event was handled.
+    /// </summary>
+    public bool Handled { get; set; }
 }

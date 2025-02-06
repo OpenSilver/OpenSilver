@@ -24,10 +24,10 @@ using OpenSilver.Internal;
 namespace CSHTML5.Native.Html.Controls
 {
     [ContentProperty(nameof(Html))]
-    public class HtmlPresenter : FrameworkElement
+    public class HtmlPresenter : FrameworkElement, IResizeObserverListener
     {
         private INTERNAL_HtmlDomElementReference _jsDiv;
-        private ResizeObserverAdapter _resizeObserver;
+        private IDisposable _resizeObserver;
 
         static HtmlPresenter()
         {
@@ -195,8 +195,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            _resizeObserver = new ResizeObserverAdapter();
-            _resizeObserver.Observe(_jsDiv, OnHtmlContentResized);
+            _resizeObserver = ResizeObserver.Observe(_jsDiv, this);
 
             SetScrollMode(this, ScrollMode);
         }
@@ -205,11 +204,8 @@ namespace CSHTML5.Native.Html.Controls
         {
             base.INTERNAL_OnDetachedFromVisualTree();
 
-            if (_resizeObserver is not null)
-            {
-                _resizeObserver.Unobserve(_jsDiv);
-                _resizeObserver = null;
-            }
+            _resizeObserver?.Dispose();
+            _resizeObserver = null;
 
             _jsDiv = null;
             IsUsingShadowDOM = false;
@@ -272,6 +268,6 @@ namespace CSHTML5.Native.Html.Controls
         internal sealed override bool ShouldApplyMirrorTransform() =>
             GetFlowDirectionFromVisual(VisualTreeHelper.GetParent(this)) == FlowDirection.RightToLeft;
 
-        private void OnHtmlContentResized(Size size) => InvalidateMeasure();
+        void IResizeObserverListener.OnSizeChanged(Size size) => InvalidateMeasure();
     }
 }

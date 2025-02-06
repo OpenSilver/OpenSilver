@@ -12,101 +12,134 @@
 \*====================================================================================*/
 
 using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using CSHTML5.Internal;
 
 namespace OpenSilver.Internal;
 
-/// <summary>
-/// ResizeObserver implementation
-/// </summary>
-internal sealed class ResizeObserverAdapter
+internal interface IResizeObserverListener
 {
-    // Holds the reference to the observer js object.
-    private static object _observerJsReference;
+    void OnSizeChanged(Size size);
+}
 
-    private bool _isObserved;
-    private JavaScriptCallback _sizeChangedCallback;
+internal static class ResizeObserver
+{
+    private static readonly Dictionary<string, WeakListenerList> _listeners = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ResizeObserverAdapter"/>.
-    /// </summary>
-    public ResizeObserverAdapter()
+    static ResizeObserver()
     {
+        var jsCallback = Interop.GetVariableStringForJS(JavaScriptCallback.Create(OnSizeChangedCallback));
+        Interop.ExecuteJavaScriptVoidAsync($"document.createResizeManager({jsCallback})");
     }
 
-    public bool IsObserved => _isObserved;
-
-    /// <summary>
-    /// Monitors the specified <paramref name="elementReference"/> for resize, and calls the specified action.
-    /// </summary>
-    /// <param name="elementReference">
-    /// The element to observe.
-    /// </param>
-    /// <param name="callback">
-    /// The action to call when resizing occurs.
-    /// </param>
-    public void Observe(INTERNAL_HtmlDomElementReference elementReference, Action<Size> callback)
+    private static void OnSizeChangedCallback(string id, double width, double height)
     {
-        EnsureResizeObserverInitialized();
-
-        if (!_isObserved)
+        if (!_listeners.TryGetValue(id, out WeakListenerList listeners))
         {
-            _isObserved = true;
-            _sizeChangedCallback = JavaScriptCallback.Create((string arg) => callback(ParseSize(arg)));
+            return;
+        }
 
-            string sReference = Interop.GetVariableStringForJS(_observerJsReference);
-            string sElement = Interop.GetVariableStringForJS(elementReference);
-            string sAction = Interop.GetVariableStringForJS(_sizeChangedCallback);
+        LinkedListNode<WeakListener> weakListener = listeners.First;
 
-            Interop.ExecuteJavaScriptVoid($"{sReference}.observe({sElement}, {sAction})");
+        while (weakListener is not null)
+        {
+            if (weakListener.Value.TryGetListener(out IResizeObserverListener listener))
+            {
+                listener.OnSizeChanged(new Size(width, height));
+            }
+
+            weakListener = weakListener.Next;
         }
     }
 
-    /// <summary>
-    /// Remove the specified element from the list of observed elements.
-    /// </summary>
-    /// <param name="elementReference">
-    /// The html element reference to unobserve.
-    /// </param>
-    public void Unobserve(object elementReference)
+    public static IDisposable Observe(INTERNAL_HtmlDomElementReference element, IResizeObserverListener listener)
     {
-        EnsureResizeObserverInitialized();
+        Debug.Assert(element is not null && !string.IsNullOrEmpty(element.UniqueIdentifier));
 
-        if (_isObserved)
+        lock (_listeners)
         {
-            _isObserved = false;
-            _sizeChangedCallback.Dispose();
-            _sizeChangedCallback = null;
+            string id = element.UniqueIdentifier;
 
-            string sReference = Interop.GetVariableStringForJS(_observerJsReference);
-            string sElement = Interop.GetVariableStringForJS(elementReference);
-            Interop.ExecuteJavaScriptVoid($"{sReference}.unobserve({sElement})");
+            if (!_listeners.TryGetValue(id, out WeakListenerList listeners))
+            {
+                listeners = new(id);
+                _listeners[id] = listeners;
+                Interop.ExecuteJavaScriptVoidAsync($"document.resizeManager.observe({Interop.GetVariableStringForJS(element)})");
+            }
+
+            LinkedListNode<WeakListener> weakListener = listeners.AddLast(new WeakListener(listener));
+            return new Disposable(weakListener);
         }
     }
 
-    private static void EnsureResizeObserverInitialized()
-        => _observerJsReference ??= Interop.ExecuteJavaScript("new ResizeObserverAdapter()");
-
-    /// <summary>
-    /// Helper method used to parse size string "Height|Width".
-    /// </summary>
-    /// <param name="argSize">The size string to parse.</param>
-    /// <returns>The parsed <see cref="Size"/>, or <see cref="Size.Empty"/> if the parse fails.</returns>
-    private static Size ParseSize(string argSize)
+    private sealed class WeakListenerList : LinkedList<WeakListener>
     {
-        int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
-
-        if (sepIndex == -1)
+        public WeakListenerList(string id)
         {
-            return Size.Empty;
+            Id = id;
         }
 
-        string actualWidthAsString = argSize.Substring(0, sepIndex);
-        string actualHeightAsString = argSize.Substring(sepIndex + 1);
-        double actualWidth = Math.Floor(double.Parse(actualWidthAsString, CultureInfo.InvariantCulture));
-        double actualHeight = Math.Floor(double.Parse(actualHeightAsString, CultureInfo.InvariantCulture));
-        return new Size(actualWidth, actualHeight);
+        public string Id { get; }
+    }
+
+    private sealed class WeakListener
+    {
+        private readonly WeakReference<IResizeObserverListener> _listener;
+
+        public WeakListener(IResizeObserverListener listener)
+        {
+            _listener = new(listener);
+        }
+
+        public bool TryGetListener(out IResizeObserverListener listener) => _listener.TryGetTarget(out listener);
+    }
+
+    private static void Unobserve(LinkedListNode<WeakListener> listener)
+    {
+        var list = (WeakListenerList)listener.List;
+
+        lock (_listeners)
+        {
+            list.Remove(listener);
+            if (list.Count == 0)
+            {
+                _listeners.Remove(list.Id);
+                Interop.ExecuteJavaScriptVoidAsync($"document.resizeManager.unobserve('{list.Id}')");
+            }
+        }
+    }
+
+    private sealed class Disposable : IDisposable
+    {
+        private readonly LinkedListNode<WeakListener> _weakListener;
+        private bool _disposed;
+
+        public Disposable(LinkedListNode<WeakListener> weakListener)
+        {
+            _weakListener = weakListener;
+        }
+
+        ~Disposable() => Dispose(false);
+
+        public void Dispose() => Dispose(true);
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+
+            if (disposing)
+            {
+                GC.SuppressFinalize(this);
+            }
+
+            Unobserve(_weakListener);
+        }
     }
 }
