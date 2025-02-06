@@ -630,15 +630,7 @@ namespace System.Windows
                 nameof(RenderTransform),
                 typeof(Transform),
                 typeof(UIElement),
-                new PropertyMetadata(null, OnRenderTransformChanged)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var uie = (UIElement)d;
-                        uie.SetTransform((Transform)newValue);
-                        uie.SetTransformOrigin(uie.RenderTransformOrigin);
-                    }
-                });
+                new PropertyMetadata(null, OnRenderTransformChanged));
 
         /// <summary>
         /// Gets or sets transform information that affects the rendering position of a <see cref="UIElement"/>.
@@ -652,37 +644,6 @@ namespace System.Windows
             set => SetValueInternal(RenderTransformProperty, value);
         }
 
-        private static void OnRenderTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            UIElement uie = (UIElement)d;
-
-            if (uie._renderTransformChangedListener != null)
-            {
-                uie._renderTransformChangedListener.Detach();
-                uie._renderTransformChangedListener = null;
-            }
-
-            if (e.NewValue is Transform newTransform)
-            {
-                uie._renderTransformChangedListener = new(uie, newTransform)
-                {
-                    OnEventAction = static (instance, sender, args) => instance.OnRenderTransformChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
-                };
-                newTransform.Changed += uie._renderTransformChangedListener.OnEvent;
-            }
-        }
-
-        private void OnRenderTransformChanged(object sender, EventArgs e)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                this.SetTransform((Transform)sender);
-            }
-        }
-
-        private WeakEventListener<UIElement, Transform, EventArgs> _renderTransformChangedListener;
-
         /// <summary>
         /// Identifies the <see cref="RenderTransformOrigin"/> dependency property.
         /// </summary>
@@ -691,10 +652,7 @@ namespace System.Windows
                 nameof(RenderTransformOrigin),
                 typeof(Point),
                 typeof(UIElement),
-                new PropertyMetadata(new Point(0, 0))
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetTransformOrigin((Point)newValue),
-                });
+                new PropertyMetadata(new Point(0, 0), OnRenderTransformChanged));
 
         /// <summary>
         /// Gets or sets the origin point of any possible render transform declared by
@@ -709,12 +667,64 @@ namespace System.Windows
             set => SetValueInternal(RenderTransformOriginProperty, value);
         }
 
-        private Point GetRenderTransformOrigin()
+        private static void OnRenderTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Point relativeOrigin = RenderTransformOrigin;
-            Size renderSize = RenderSize;
-            return new Point(renderSize.Width * relativeOrigin.X, renderSize.Height * relativeOrigin.Y);
+            UIElement uie = (UIElement)d;
+
+            //if never measured, then nothing to do, it should be measured at some point
+            if (!uie.NeverMeasured && !uie.NeverArranged)
+            {
+                uie.InvalidateArrange();
+                uie.AreTransformsClean = false;
+            }
         }
+
+        private static readonly DependencyProperty VisualTransformProperty =
+            DependencyProperty.Register(
+                nameof(VisualTransform),
+                typeof(Transform),
+                typeof(UIElement),
+                new PropertyMetadata(null, OnVisualTransformChanged)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetTransform((Transform)newValue),
+                });
+
+        internal Transform VisualTransform
+        {
+            get => (Transform)GetValue(VisualTransformProperty);
+            set => SetValue(VisualTransformProperty, value);
+        }
+
+        private static void OnVisualTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var uie = (UIElement)d;
+
+            if (uie._visualTransformChangedListener != null)
+            {
+                uie._visualTransformChangedListener.Detach();
+                uie._visualTransformChangedListener = null;
+            }
+
+            if (e.NewValue is Transform newTransform)
+            {
+                uie._visualTransformChangedListener = new(uie, newTransform)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnVisualTransformChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newTransform.Changed += uie._visualTransformChangedListener.OnEvent;
+            }
+        }
+
+        private void OnVisualTransformChanged(object sender, EventArgs e)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                this.SetTransform((Transform)sender);
+            }
+        }
+
+        private WeakEventListener<UIElement, Transform, EventArgs> _visualTransformChangedListener;
 
         #endregion
 
@@ -1360,7 +1370,7 @@ namespace System.Windows
         HasAutomationPeer = 0x00100000,
         RenderingInvalidated = 0x00200000,
         IsVisibleCache = 0x00400000,
-        //AreTransformsClean = 0x00800000,
+        AreTransformsClean = 0x00800000,
         BypassLayoutPolicies = 0x01000000, //IsOpacitySuppressed = 0x01000000,
         //ExistsEventHandlersStore = 0x02000000,
         //TouchesOverCache = 0x04000000,

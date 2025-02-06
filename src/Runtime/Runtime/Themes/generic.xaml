@@ -106,6 +106,12 @@
 
     <!-- RichTextBlock -->
     <Style TargetType="controls:RichTextBlock" />
+    
+    <!-- Image -->
+    <Style TargetType="controls:Image">
+        <Setter Property="FlowDirection"
+                Value="LeftToRight" />
+    </Style>
 
     <!--  ContentControl  -->
     <Style TargetType="controls:ContentControl">

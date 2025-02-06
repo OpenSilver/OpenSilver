@@ -46,6 +46,14 @@ namespace System.Windows.Controls
         {
             IsHitTestableProperty.OverrideMetadata(typeof(TextBlock), new PropertyMetadata(BooleanBoxes.TrueBox));
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBlock), new PropertyMetadata(typeof(TextBlock)));
+            FlowDirectionProperty.OverrideMetadata(
+                typeof(TextBlock),
+                new FrameworkPropertyMetadata(
+                    FlowDirection.LeftToRight,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsParentArrange)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextBlock)d).SetDirection((FlowDirection)newValue),
+                });
         }
 
         public TextBlock()
@@ -1122,8 +1130,6 @@ namespace System.Windows.Controls
             return Inlines.InternalItems[index];
         }
 
-        internal override string GetPlainText() => Text;
-
         /// <inheritdoc />
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
@@ -1138,6 +1144,11 @@ namespace System.Windows.Controls
                 }
             }
         }
+
+        internal override string GetPlainText() => Text;
+
+        internal sealed override bool ShouldApplyMirrorTransform() =>
+            GetFlowDirectionFromVisual(VisualTreeHelper.GetParent(this)) == FlowDirection.RightToLeft;
 
         internal void InvalidateCacheAndMeasure()
         {

@@ -470,8 +470,7 @@ namespace System.Windows.Controls.Primitives
             {
                 // In Silverlight, when a popup is in the visual tree, it always position the Child relative
                 // to the popup's top left corner.
-                offset = InternalTransformToAncestor(null).Transform(new Point(0, 0));
-                offset.Offset(HorizontalOffset, VerticalOffset);
+                offset = InternalTransformToAncestor(null).Transform(new Point(HorizontalOffset, VerticalOffset));
             }
             else
             {
@@ -532,10 +531,9 @@ namespace System.Windows.Controls.Primitives
             if (StaysWithinScreenBounds)
             {
                 var root = Application.Current.Host.Content;
-                var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
-                InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.Transform);
-
-                offset = PutInScreenBounds(offset, windowBounds, childInterestPoints);
+                offset = PutInScreenBounds(offset,
+                    new Size(root.ActualWidth, root.ActualHeight),
+                    InterestPointsFromRect(new Rect(child.RenderSize), _popupRoot.Transform));
             }
 
             return offset;
@@ -551,13 +549,13 @@ namespace System.Windows.Controls.Primitives
             }
 
             var root = Application.Current.Host.Content;
-            var windowBounds = new Size(root.ActualWidth, root.ActualHeight);
-            InterestPoints targetInterestPoints = GetInterestPoints(placementTarget, placementTarget.InternalTransformToAncestor(null));
-            InterestPoints childInterestPoints = GetInterestPoints(child, _popupRoot.Transform);
-            double hOffset = HorizontalOffset;
-            double vOffset = VerticalOffset;
+            Size windowBounds = new(root.ActualWidth, root.ActualHeight);
+            InterestPoints targetInterestPoints = InterestPointsFromRect(
+                new Rect(HorizontalOffset, VerticalOffset, placementTarget.RenderSize.Width, placementTarget.RenderSize.Height),
+                placementTarget.InternalTransformToAncestor(null));
+            InterestPoints childInterestPoints = InterestPointsFromRect(new Rect(child.RenderSize), _popupRoot.Transform);
 
-            Point offset = GetCandidateOffset(placement, targetInterestPoints, childInterestPoints, hOffset, vOffset);
+            Point offset = GetCandidateOffset(placement, targetInterestPoints, childInterestPoints);
             Rect childBounds = GetBounds(childInterestPoints);
             childBounds.Offset(childInterestPoints.TopLeft.X + offset.X, childInterestPoints.TopLeft.Y + offset.Y);
 
@@ -565,7 +563,7 @@ namespace System.Windows.Controls.Primitives
             {
                 if (placement == PlacementMode.Bottom)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Top, targetInterestPoints, childInterestPoints, hOffset, vOffset);
+                    offset = GetCandidateOffset(PlacementMode.Top, targetInterestPoints, childInterestPoints);
                 }
                 else
                 {
@@ -576,7 +574,7 @@ namespace System.Windows.Controls.Primitives
             {
                 if (placement == PlacementMode.Top)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Bottom, targetInterestPoints, childInterestPoints, hOffset, vOffset);
+                    offset = GetCandidateOffset(PlacementMode.Bottom, targetInterestPoints, childInterestPoints);
                 }
                 else
                 {
@@ -591,7 +589,7 @@ namespace System.Windows.Controls.Primitives
             {
                 if (placement == PlacementMode.Right)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Left, targetInterestPoints, childInterestPoints, hOffset, vOffset);
+                    offset = GetCandidateOffset(PlacementMode.Left, targetInterestPoints, childInterestPoints);
                 }
                 else
                 {
@@ -602,7 +600,7 @@ namespace System.Windows.Controls.Primitives
             {
                 if (placement == PlacementMode.Left)
                 {
-                    offset = GetCandidateOffset(PlacementMode.Right, targetInterestPoints, childInterestPoints, hOffset, vOffset);
+                    offset = GetCandidateOffset(PlacementMode.Right, targetInterestPoints, childInterestPoints);
                 }
                 else
                 {
@@ -617,11 +615,7 @@ namespace System.Windows.Controls.Primitives
 
             return offset;
 
-            static Point GetCandidateOffset(PlacementMode placement,
-                InterestPoints targetInterestPoints,
-                InterestPoints childInterestPoints,
-                double hOffset,
-                double vOffset)
+            static Point GetCandidateOffset(PlacementMode placement, InterestPoints targetInterestPoints, InterestPoints childInterestPoints)
             {
                 Point offset;
 
@@ -651,8 +645,6 @@ namespace System.Windows.Controls.Primitives
                         offset = new Point(0, 0);
                         break;
                 }
-
-                offset.Offset(hOffset, vOffset);
 
                 return offset;
             }
@@ -692,14 +684,14 @@ namespace System.Windows.Controls.Primitives
             public Point BottomRight;
         }
 
-        private static InterestPoints GetInterestPoints(UIElement element, Matrix transform)
+        private static InterestPoints InterestPointsFromRect(Rect rect, Matrix transform)
         {
             return new InterestPoints
             {
-                TopLeft = transform.Transform(new Point(0, 0)),
-                TopRight = transform.Transform(new Point(element.RenderSize.Width, 0)),
-                BottomLeft = transform.Transform(new Point(0, element.RenderSize.Height)),
-                BottomRight = transform.Transform(new Point(element.RenderSize.Width, element.RenderSize.Height)),
+                TopLeft = transform.Transform(rect.TopLeft),
+                TopRight = transform.Transform(rect.TopRight),
+                BottomLeft = transform.Transform(rect.BottomLeft),
+                BottomRight = transform.Transform(rect.BottomRight),
             };
         }
 
@@ -734,11 +726,11 @@ namespace System.Windows.Controls.Primitives
 
             _popupRoot.Show();
 
-            UpdatePosition();
-
             // Force layout update to prevent the popup content from briefly appearing in
             // the top left corner of the screen.
             UpdateLayout();
+            UpdatePosition();
+
             OpenSilver.Interop.JavaScriptRuntime.Flush();
         }
 

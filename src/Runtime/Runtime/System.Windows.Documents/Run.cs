@@ -138,8 +138,13 @@ public sealed class Run : Inline
     /// <summary>
     /// Identifies the <see cref="FlowDirection"/> dependency property.
     /// </summary>
-    public static readonly DependencyProperty FlowDirectionProperty =
-        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(TextElement));
+    public new static readonly DependencyProperty FlowDirectionProperty =
+        TextElement.FlowDirectionProperty.AddOwner(
+            typeof(Run),
+            new FrameworkPropertyMetadata(FlowDirection.LeftToRight, FrameworkPropertyMetadataOptions.Inherits)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((Run)d).SetDirection((FlowDirection)newValue),
+            });
 
     /// <summary>
     /// Gets or sets the direction that text and other user interface elements flow within

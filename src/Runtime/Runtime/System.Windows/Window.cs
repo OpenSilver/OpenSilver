@@ -131,13 +131,8 @@ namespace System.Windows
             RootDomElement.Style.overflow = "clip";
 
             // Create the DIV that will correspond to the root of the window visual tree:
-            OuterDiv = INTERNAL_HtmlDomManager.AppendDomElement("div", RootDomElement, this);
+            OuterDiv = INTERNAL_HtmlDomManager.CreateWindowDomElementAndAppendIt(this);
 
-            OuterDiv.Style.width = "100%";
-            OuterDiv.Style.height = "100%";
-            OuterDiv.Style.overflowX = "hidden";
-            OuterDiv.Style.overflowY = "hidden";
-            
             InputManager.Current.RegisterRoot(RootDomElement);
 
             // Set the window as "loaded":
@@ -370,10 +365,10 @@ namespace System.Windows
         protected override Size MeasureOverride(Size availableSize)
         {
             availableSize = Bounds.Size;
-            if (Content is not null)
+            if (Content is FrameworkElement content)
             {
-                Content.Measure(availableSize);
-                return Content.DesiredSize;
+                content.Measure(availableSize);
+                return content.DesiredSize;
             }
             return availableSize;
         }
@@ -381,10 +376,7 @@ namespace System.Windows
         protected override Size ArrangeOverride(Size finalSize)
         {
             finalSize = Bounds.Size;
-            if (Content is not null)
-            {
-                Content.Arrange(new Rect(new Point(), finalSize));
-            }
+            Content?.Arrange(new Rect(new Point(), finalSize));
             return finalSize;
         }
     }

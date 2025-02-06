@@ -31,6 +31,14 @@ namespace System.Windows.Controls
         {
             IsHitTestableProperty.OverrideMetadata(typeof(RichTextBlock), new PropertyMetadata(BooleanBoxes.TrueBox));
             DefaultStyleKeyProperty.OverrideMetadata(typeof(RichTextBlock), new PropertyMetadata(typeof(RichTextBlock)));
+            FlowDirectionProperty.OverrideMetadata(
+                typeof(RichTextBlock),
+                new FrameworkPropertyMetadata(
+                    FlowDirection.LeftToRight,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsParentArrange)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((RichTextBlock)d).SetDirection((FlowDirection)newValue),
+                });
         }
 
         private BlockCollection _blocks;
@@ -491,5 +499,8 @@ namespace System.Windows.Controls
 
             return Blocks.InternalItems[index];
         }
+
+        internal sealed override bool ShouldApplyMirrorTransform() =>
+            GetFlowDirectionFromVisual(VisualTreeHelper.GetParent(this)) == FlowDirection.RightToLeft;
     }
 }

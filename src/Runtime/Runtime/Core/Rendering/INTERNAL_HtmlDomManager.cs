@@ -237,6 +237,20 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return new(uid);
         }
 
+        internal static INTERNAL_HtmlDomElementReference CreateWindowDomElementAndAppendIt(Window window)
+        {
+            Debug.Assert(window is not null);
+
+            string uid = NewId();
+
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.createWindow('{uid}', '{window.RootDomElement.UniqueIdentifier}')");
+
+            AddToGlobalStore(uid, window);
+
+            return new(uid);
+        }
+
         internal static INTERNAL_HtmlDomElementReference CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
         {
             Debug.Assert(popupRoot != null);
@@ -616,7 +630,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return OpenSilver.Interop.IsNull(jsObject) || OpenSilver.Interop.IsUndefined(jsObject);
         }
 
-        internal static void ArrangeNative(INTERNAL_HtmlDomStyleReference style, Point offset, Size size, Rect? clip)
+        internal static void ArrangeNative(INTERNAL_HtmlDomStyleReference style, Vector offset, Size size, Rect? clip)
         {
             string left = Math.Round(offset.X, 2).ToInvariantString();
             string top = Math.Round(offset.Y, 2).ToInvariantString();

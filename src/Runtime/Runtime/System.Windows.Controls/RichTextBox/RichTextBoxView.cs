@@ -100,7 +100,7 @@ internal sealed class RichTextBoxView : TextViewBase
 
         Host.Synchronize();
 
-        Interop.ExecuteJavaScriptAsync($"document.richTextViewManager.deleteView('{OuterDiv.UniqueIdentifier}')");
+        Interop.ExecuteJavaScriptVoidAsync($"document.richTextViewManager.deleteView('{OuterDiv.UniqueIdentifier}')");
     }
 
     private void SetProperties()

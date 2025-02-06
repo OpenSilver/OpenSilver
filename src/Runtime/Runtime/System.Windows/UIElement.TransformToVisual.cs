@@ -138,22 +138,10 @@ public partial class UIElement
                 m.Translate(offsets.X, offsets.Y);
             }
 
-            if (g.GetValue(RenderTransformProperty) is Transform transform)
+            if (g.VisualTransform is Transform transform)
             {
-                Point origin = g.GetRenderTransformOrigin();
-                bool hasOrigin = origin.X != 0d || origin.Y != 0d;
-                if (hasOrigin)
-                {
-                    m.Translate(-origin.X, -origin.Y);
-                }
-
                 Matrix cm = transform.Matrix;
                 MatrixUtil.MultiplyMatrix(ref m, ref cm);
-
-                if (hasOrigin)
-                {
-                    m.Translate(origin.X, origin.Y);
-                }
             }
 
             m.Translate(g.VisualOffset.X, g.VisualOffset.Y);

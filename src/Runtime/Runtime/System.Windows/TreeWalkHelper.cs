@@ -169,6 +169,8 @@ namespace System.Windows
             }
         }
 
+        private static bool IsForceInheritedProperty(DependencyProperty dp) => dp == FrameworkElement.FlowDirectionProperty;
+
         /// <summary>
         /// Callback on visiting each node in the descendency
         /// during an inheritable property change
@@ -183,8 +185,9 @@ namespace System.Windows
             DependencyProperty dp = info.Property;
             PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
             bool inheritanceNode = IsInheritanceNode(metadata);
+            bool isForceInheritedProperty = IsForceInheritedProperty(dp);
 
-            if (inheritanceNode)
+            if (inheritanceNode || isForceInheritedProperty)
             {
                 Storage storage = d.GetStorage(dp);
                 BaseValueSourceInternal oldValueSource = storage is not null ?
@@ -214,11 +217,21 @@ namespace System.Windows
                 {
                     Debug.Assert(storage is not null);
 
-                    // set the inherited value so that it is known if at some point,
-                    // the value of higher precedence that is currently used is removed.
-                    // we know that the value of the property is not changing, so we can
-                    // skip the call to UpdateEffectiveValue(...)
                     storage.InheritedValue = info.NewValue;
+
+                    if (isForceInheritedProperty)
+                    {
+                        return DependencyObjectStore.UpdateEffectiveValue(
+                            storage,
+                            d,
+                            dp,
+                            metadata,
+                            storage.Entry,
+                            storage.Entry,
+                            false,
+                            OperationType.Inherit);
+                    }
+
                     return false;
                 }
             }

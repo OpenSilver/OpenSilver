@@ -442,6 +442,8 @@ namespace System.Windows.Controls
         {
             if (ScrollInfo is not null)
             {
+                bool fInvertForRTL = FlowDirection == FlowDirection.RightToLeft;
+
                 switch (key)
                 {
                     case Key.Up:
@@ -451,10 +453,24 @@ namespace System.Windows.Controls
                         LineDown();
                         break;
                     case Key.Left:
-                        LineLeft();
+                        if (fInvertForRTL)
+                        {
+                            LineRight();
+                        }
+                        else
+                        {
+                            LineLeft();
+                        }
                         break;
                     case Key.Right:
-                        LineRight();
+                        if (fInvertForRTL)
+                        {
+                            LineLeft();
+                        }
+                        else
+                        {
+                            LineRight();
+                        }
                         break;
                 }
             }

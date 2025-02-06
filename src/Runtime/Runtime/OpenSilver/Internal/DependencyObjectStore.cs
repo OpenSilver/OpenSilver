@@ -662,7 +662,7 @@ internal static class DependencyObjectStore
         }
     }
 
-    private static bool UpdateEffectiveValue(
+    internal static bool UpdateEffectiveValue(
         Storage storage,
         DependencyObject d,
         DependencyProperty dp,

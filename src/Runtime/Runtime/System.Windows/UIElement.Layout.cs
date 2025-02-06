@@ -370,7 +370,7 @@ namespace System.Windows
                     LayoutManager layoutManager = LayoutManager.Current;
 
                     Size oldSize = RenderSize;
-                    Point oldOffset = VisualOffset;
+                    Vector oldOffset = VisualOffset;
                     Rect? oldLayoutClip = LayoutClip;
                     bool sizeChanged = false;
                     bool gotException = true;
@@ -636,7 +636,7 @@ namespace System.Windows
             e.NeverArranged = true;
             e.PreviousArrangeRect = new Rect();
             e.PreviousAvailableSize = new Size();
-            e.VisualOffset = new Point();
+            e.VisualOffset = new Vector();
             e.LayoutClip = null;
             e._desiredSize = new Size();
             e.RenderSize = new Size();
@@ -721,7 +721,7 @@ namespace System.Windows
             }
         }
 
-        internal Point VisualOffset { get; set; }
+        internal Vector VisualOffset { get; set; }
 
         internal Rect? LayoutClip { get; private set; }
 
@@ -790,6 +790,12 @@ namespace System.Windows
         {
             get { return ReadFlag(CoreFlags.MeasureDuringArrange); }
             set { WriteFlag(CoreFlags.MeasureDuringArrange, value); }
+        }
+
+        internal bool AreTransformsClean
+        {
+            get { return ReadFlag(CoreFlags.AreTransformsClean); }
+            set { WriteFlag(CoreFlags.AreTransformsClean, value); }
         }
 
         internal bool BypassLayoutPolicies

@@ -17,6 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
+using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -31,6 +32,14 @@ namespace CSHTML5.Native.Html.Controls
         static HtmlPresenter()
         {
             IsHitTestableProperty.OverrideMetadata(typeof(HtmlPresenter), new PropertyMetadata(BooleanBoxes.TrueBox));
+            FlowDirectionProperty.OverrideMetadata(
+                typeof(HtmlPresenter),
+                new FrameworkPropertyMetadata(
+                    FlowDirection.LeftToRight,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsParentArrange)
+                {
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((HtmlPresenter)d).SetDirection((FlowDirection)newValue),
+                });
         }
 
         /// <summary>
@@ -259,6 +268,9 @@ namespace CSHTML5.Native.Html.Controls
         protected override Size ArrangeOverride(Size finalSize) => finalSize;
 
         internal sealed override bool EnablePointerEventsCore => true;
+
+        internal sealed override bool ShouldApplyMirrorTransform() =>
+            GetFlowDirectionFromVisual(VisualTreeHelper.GetParent(this)) == FlowDirection.RightToLeft;
 
         private void OnHtmlContentResized(Size size) => InvalidateMeasure();
     }

@@ -71,6 +71,15 @@ internal abstract partial class TextViewBase : FrameworkElement
             });
 
         IsHitTestableProperty.OverrideMetadata(typeof(TextViewBase), new PropertyMetadata(BooleanBoxes.TrueBox));
+
+        FlowDirectionProperty.OverrideMetadata(
+            typeof(TextViewBase),
+            new FrameworkPropertyMetadata(
+                FlowDirection.LeftToRight,
+                FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsParentArrange)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextViewBase)d).SetDirection((FlowDirection)newValue),
+            });
     }
 
     private Size _contentSize;
@@ -123,6 +132,11 @@ internal abstract partial class TextViewBase : FrameworkElement
         ArrangeScrollData(finalSize);
 
         return finalSize;
+    }
+
+    internal sealed override bool ShouldApplyMirrorTransform()
+    {
+        return GetFlowDirectionFromVisual(VisualTreeHelper.GetParent(this)) == FlowDirection.RightToLeft;
     }
 
     private static void OnFontFamilyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

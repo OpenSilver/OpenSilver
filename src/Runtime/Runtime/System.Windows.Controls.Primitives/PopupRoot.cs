@@ -21,7 +21,7 @@ using OpenSilver.Internal;
 
 namespace System.Windows.Controls.Primitives;
 
-internal sealed class PopupRoot : FrameworkElement
+internal sealed class PopupRoot : UIElement
 {
     private static readonly HashSet<PopupRoot> _popupRoots = new();
 
@@ -185,18 +185,23 @@ internal sealed class PopupRoot : FrameworkElement
         }
     }
 
+    public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren) =>
+        throw new InvalidOperationException("'CreateDomElement' should not be called for the PopupRoot object.");
+
     private void SetLayoutBindings()
     {
-        _transformLayer.SetBinding(WidthProperty,
-            new Binding { Path = new PropertyPath(WidthProperty), Source = _popup });
-        _transformLayer.SetBinding(HeightProperty,
-            new Binding { Path = new PropertyPath(HeightProperty), Source = _popup });
-        _transformLayer.SetBinding(MaxHeightProperty,
-            new Binding { Path = new PropertyPath(MaxHeightProperty), Source = _popup });
-        _transformLayer.SetBinding(HorizontalAlignmentProperty,
+        _transformLayer.SetBinding(FrameworkElement.WidthProperty,
+            new Binding { Path = new PropertyPath(FrameworkElement.WidthProperty), Source = _popup });
+        _transformLayer.SetBinding(FrameworkElement.HeightProperty,
+            new Binding { Path = new PropertyPath(FrameworkElement.HeightProperty), Source = _popup });
+        _transformLayer.SetBinding(FrameworkElement.MaxHeightProperty,
+            new Binding { Path = new PropertyPath(FrameworkElement.MaxHeightProperty), Source = _popup });
+        _transformLayer.SetBinding(FrameworkElement.HorizontalAlignmentProperty,
             new Binding { Path = new PropertyPath(Popup.HorizontalContentAlignmentProperty), Source = _popup });
-        _transformLayer.SetBinding(VerticalAlignmentProperty,
+        _transformLayer.SetBinding(FrameworkElement.VerticalAlignmentProperty,
             new Binding { Path = new PropertyPath(Popup.VerticalContentAlignmentProperty), Source = _popup });
+        _transformLayer.SetBinding(FrameworkElement.FlowDirectionProperty,
+            new Binding { Path = new PropertyPath(FrameworkElement.FlowDirectionProperty), Source = _popup });
     }
 
     private void SetLayoutSize()
@@ -213,128 +218,128 @@ internal sealed class PopupRoot : FrameworkElement
     // window (MainWindow) to display the popup.
     private static Window GetParentWindowOfPopup(Popup popup)
         => popup.PlacementTarget?.ParentWindow ?? popup.ParentWindow ?? Application.Current.MainWindow;
+}
 
-    internal sealed class TransformLayer : FrameworkElement
+internal sealed class TransformLayer : FrameworkElement
+{
+    static TransformLayer()
     {
-        static TransformLayer()
-        {
-            RenderTransformProperty.OverrideMetadata(
-                typeof(TransformLayer),
-                new PropertyMetadata(null, null, CoerceRenderTransform));
+        RenderTransformProperty.OverrideMetadata(
+            typeof(TransformLayer),
+            new PropertyMetadata(null, null, CoerceRenderTransform));
 
-            RenderTransformOriginProperty.OverrideMetadata(
-                typeof(TransformLayer),
-                new PropertyMetadata(new Point(0, 0), null, CoerceRenderTransformOrigin));
-        }
-
-        private readonly TransformGroup _renderTransform;
-        private readonly MatrixTransform _translateTransform;
-        private readonly MatrixTransform _transform;
-        private UIElement _child;
-
-        public TransformLayer()
-        {
-            _renderTransform = new TransformGroup();
-            _renderTransform.CanBeInheritanceContext = false;
-            _renderTransform.Children.CanBeInheritanceContext = false;
-
-            _translateTransform = new MatrixTransform();
-            _transform = new MatrixTransform();
-
-            _renderTransform.Children.Add(_transform);
-            _renderTransform.Children.Add(_translateTransform);
-
-            CoerceValue(RenderTransformProperty);
-        }
-
-        public UIElement Child
-        {
-            get => _child;
-            set
-            {
-                if (_child == value) return;
-
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-                RemoveVisualChild(_child);
-
-                _child = value;
-
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
-                AddVisualChild(_child);
-
-                InvalidateMeasure();
-            }
-        }
-
-        protected override int VisualChildrenCount => _child is null ? 0 : 1;
-
-        protected override UIElement GetVisualChild(int index)
-        {
-            if (_child is not UIElement child || index != 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
-            return child;
-        }
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            if (_child is UIElement child)
-            {
-                child.Measure(availableSize);
-                return child.DesiredSize;
-            }
-            return new Size();
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            _child?.Arrange(new Rect(finalSize));
-            return finalSize;
-        }
-
-        internal Matrix Transform
-        {
-            get => _transform.Matrix;
-            set => _transform.Matrix = value;
-        }
-
-        internal void SetPosition(double x, double y) => _translateTransform.Matrix = Matrix.CreateTranslation(x, y);
-
-        private new void AddVisualChild(UIElement child)
-        {
-            if (child is null) return;
-
-            if (child.InternalVisualParent is not null)
-            {
-                throw new ArgumentException(Strings.UIElement_HasParent);
-            }
-
-            HasVisualChildren = true;
-
-            PropagateResumeLayout(this, child);
-            SynchronizeForceInheritProperties(child, this);
-        }
-
-        private new void RemoveVisualChild(UIElement child)
-        {
-            if (child is null) return;
-
-            HasVisualChildren = false;
-
-            PropagateSuspendLayout(child);
-            SynchronizeForceInheritProperties(child, this);
-        }
-
-        private static object CoerceRenderTransform(DependencyObject d, object value) => ((TransformLayer)d)._renderTransform;
-
-        private static object CoerceRenderTransformOrigin(DependencyObject d, object value) => new Point(0, 0);
+        RenderTransformOriginProperty.OverrideMetadata(
+            typeof(TransformLayer),
+            new PropertyMetadata(new Point(0, 0), null, CoerceRenderTransformOrigin));
     }
+
+    private readonly TransformGroup _renderTransform;
+    private readonly MatrixTransform _translateTransform;
+    private readonly MatrixTransform _transform;
+    private UIElement _child;
+
+    public TransformLayer()
+    {
+        _renderTransform = new TransformGroup();
+        _renderTransform.CanBeInheritanceContext = false;
+        _renderTransform.Children.CanBeInheritanceContext = false;
+
+        _translateTransform = new MatrixTransform();
+        _transform = new MatrixTransform();
+
+        _renderTransform.Children.Add(_transform);
+        _renderTransform.Children.Add(_translateTransform);
+
+        CoerceValue(RenderTransformProperty);
+    }
+
+    public UIElement Child
+    {
+        get => _child;
+        set
+        {
+            if (_child == value) return;
+
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+            RemoveVisualChild(_child);
+
+            _child = value;
+
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
+            AddVisualChild(_child);
+
+            InvalidateMeasure();
+        }
+    }
+
+    protected override int VisualChildrenCount => _child is null ? 0 : 1;
+
+    protected override UIElement GetVisualChild(int index)
+    {
+        if (_child is not UIElement child || index != 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        return child;
+    }
+
+    protected internal override void INTERNAL_OnAttachedToVisualTree()
+    {
+        base.INTERNAL_OnAttachedToVisualTree();
+        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (_child is UIElement child)
+        {
+            child.Measure(availableSize);
+            return child.DesiredSize;
+        }
+        return new Size();
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        _child?.Arrange(new Rect(finalSize));
+        return finalSize;
+    }
+
+    internal Matrix Transform
+    {
+        get => _transform.Matrix;
+        set => _transform.Matrix = value;
+    }
+
+    internal void SetPosition(double x, double y) => _translateTransform.Matrix = Matrix.CreateTranslation(x, y);
+
+    private new void AddVisualChild(UIElement child)
+    {
+        if (child is null) return;
+
+        if (child.InternalVisualParent is not null)
+        {
+            throw new ArgumentException(Strings.UIElement_HasParent);
+        }
+
+        HasVisualChildren = true;
+
+        PropagateResumeLayout(this, child);
+        SynchronizeForceInheritProperties(child, this);
+    }
+
+    private new void RemoveVisualChild(UIElement child)
+    {
+        if (child is null) return;
+
+        HasVisualChildren = false;
+
+        PropagateSuspendLayout(child);
+        SynchronizeForceInheritProperties(child, this);
+    }
+
+    private static object CoerceRenderTransform(DependencyObject d, object value) => ((TransformLayer)d)._renderTransform;
+
+    private static object CoerceRenderTransformOrigin(DependencyObject d, object value) => new Point(0, 0);
 }

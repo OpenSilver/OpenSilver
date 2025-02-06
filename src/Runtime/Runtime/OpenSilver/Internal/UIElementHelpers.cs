@@ -189,6 +189,13 @@ internal static class UIElementHelpers
             INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text));
     }
 
+    internal static void SetDirection(this UIElement uie, FlowDirection flowDirection)
+    {
+        INTERNAL_HtmlDomManager.SetDomElementAttribute(uie.OuterDiv,
+            "dir",
+            flowDirection == FlowDirection.LeftToRight ? "ltr" : "rtl");
+    }
+
     internal static void SetOpacity(this UIElement uie, double opacity)
     {
         uie.OuterDiv.Style.opacity = Math.Round(opacity, 2).ToInvariantString();
@@ -247,11 +254,6 @@ internal static class UIElementHelpers
             Transform when !transform.IsIdentity => MatrixTransform.MatrixToHtmlString(transform.Matrix),
             _ => string.Empty,
         };
-    }
-
-    internal static void SetTransformOrigin(this UIElement uie, Point origin)
-    {
-        uie.OuterDiv.Style.transformOrigin = $"{Math.Round(origin.X * 100, 4).ToInvariantString()}% {Math.Round(origin.Y * 100, 4).ToInvariantString()}%";
     }
 
     internal static void SetZIndex(this UIElement uie, int value)

@@ -141,6 +141,16 @@ document.createInkPresenter = function (id, canvasId, parentId) {
     parent.appendChild(element);
 };
 
+document.createWindow = function (id, rootElementId) {
+    const rootElement = document.getElementById(rootElementId);
+    if (!rootElement) return;
+
+    const w = document._createElement('div', id);
+    w.classList.add('opensilver-window');
+
+    rootElement.appendChild(w);
+};
+
 document.createPopupRoot = function (id, rootElementId, pointerEvents) {
     const rootElement = document.getElementById(rootElementId);
     if (!rootElement) return;

@@ -365,9 +365,19 @@ namespace System.Windows
         /// </summary>
         internal virtual FrameworkElement StateGroupsRoot => TemplateChild;
 
+        static FrameworkElement()
+        {
+            FlowDirectionProperty.OverrideMetadata(
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(
+                    FlowDirection.LeftToRight,
+                    FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsParentArrange,
+                    OnFlowDirectionChanged,
+                    CoerceFlowDirection));
+        }
+
         /// <summary>
-        /// Provides base class initialization behavior for FrameworkElement-derived
-        /// classes.
+        /// Provides base class initialization behavior for FrameworkElement-derived classes.
         /// </summary>
         public FrameworkElement()
         {
@@ -817,34 +827,8 @@ namespace System.Windows
                 nameof(FlowDirection),
                 typeof(FlowDirection),
                 typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(
-                    FlowDirection.LeftToRight,
-                    FrameworkPropertyMetadataOptions.Inherits,
-                    OnFlowDirectionChanged,
-                    CoerceFlowDirection)
-                {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        const string DIR = "dir";
-                        const string RTL = "rtl";
-                        const string LTR = "ltr";
-
-                        var uie = (UIElement)d;
-                        var direction = (FlowDirection)newValue;
-
-                        if (VisualTreeHelper.GetParent(uie) is UIElement parent
-                            && (FlowDirection)parent.GetValue(FlowDirectionProperty) == direction)
-                        {
-                            INTERNAL_HtmlDomManager.RemoveAttribute(uie.OuterDiv, DIR);
-                            return;
-                        }
-
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                            uie.OuterDiv,
-                            DIR,
-                            direction == FlowDirection.LeftToRight ? LTR : RTL);
-                    },
-                });
+                new PropertyMetadata(FlowDirection.LeftToRight) { Inherits = true, },
+                IsValidFlowDirection);
 
         /// <summary>
         /// Gets or sets the direction that text and other user interface 
@@ -861,21 +845,26 @@ namespace System.Windows
             set => SetValueInternal(FlowDirectionProperty, value);
         }
 
+        private static bool IsValidFlowDirection(object o)
+        {
+            FlowDirection value = (FlowDirection)o;
+            return value == FlowDirection.LeftToRight || value == FlowDirection.RightToLeft;
+        }
+
         private static void OnFlowDirectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // Check that d is a FrameworkElement since the property inherits and this can be called
-            // on non-FEs.
-            if (d is FrameworkElement fe)
-            {
-                // Cache the new value as a bit to optimize accessing the FlowDirection property's CLR accessor
-                fe.IsRightToLeft = ((FlowDirection)e.NewValue) == FlowDirection.RightToLeft;
-            }
+            // Cache the new value as a bit to optimize accessing the FlowDirection property's CLR accessor
+            var fe = (FrameworkElement)d;
+            fe.IsRightToLeft = ((FlowDirection)e.NewValue) == FlowDirection.RightToLeft;
+            fe.AreTransformsClean = false;
         }
 
         private static object CoerceFlowDirection(DependencyObject d, object baseValue)
         {
-            FlowDirection direction = (FlowDirection)baseValue;
-            return (direction != FlowDirection.RightToLeft) ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
+            var fe = (FrameworkElement)d;
+            fe.InvalidateVisual();
+            fe.AreTransformsClean = false;
+            return baseValue;
         }
 
         internal bool IsRightToLeft

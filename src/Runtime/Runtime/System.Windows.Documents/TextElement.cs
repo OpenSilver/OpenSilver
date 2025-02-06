@@ -536,6 +536,9 @@ public abstract class TextElement : UIElement
         set => SetValueInternal(LanguageProperty, value);
     }
 
+    internal static readonly DependencyProperty FlowDirectionProperty =
+        FrameworkElement.FlowDirectionProperty.AddOwner(typeof(TextElement));
+
     /// <summary>
     /// Gets or sets a unique identification for the object.
     /// </summary>

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -323,95 +324,100 @@ public partial class FrameworkElement
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(TemplateChild, this, 0);
         }
 
-        bool isLayoutRoot = BypassLayoutPolicies;
-
-        Thickness margin = Margin;
-        double marginWidth = isLayoutRoot ? 0 : margin.Left + margin.Right;
-        double marginHeight = isLayoutRoot ? 0 : margin.Top + margin.Bottom;
-
-        //  parent size is what parent want us to be
-        Size frameworkAvailableSize = new Size(
-            Math.Max(availableSize.Width - marginWidth, 0),
-            Math.Max(availableSize.Height - marginHeight, 0));
-
-        MinMax mm = new MinMax(this);
-
-        frameworkAvailableSize.Width = Math.Max(mm.minWidth, Math.Min(frameworkAvailableSize.Width, mm.maxWidth));
-        frameworkAvailableSize.Height = Math.Max(mm.minHeight, Math.Min(frameworkAvailableSize.Height, mm.maxHeight));
-
-        //  call to specific layout to measure
-        Size desiredSize = MeasureOverride(frameworkAvailableSize);
-
-        //  maximize desiredSize with user provided min size
-        desiredSize = new Size(
-            Math.Max(desiredSize.Width, mm.minWidth),
-            Math.Max(desiredSize.Height, mm.minHeight));
-
-        //here is the "true minimum" desired size - the one that is
-        //for sure enough for the control to render its content.
-        Size unclippedDesiredSize = desiredSize;
-
-        bool clipped = false;
-
-        // User-specified max size starts to "clip" the control here.
-        //Starting from this point desiredSize could be smaller then actually
-        //needed to render the whole control
-        if (desiredSize.Width > mm.maxWidth)
+        if (BypassLayoutPolicies)
         {
-            desiredSize.Width = mm.maxWidth;
-            clipped = true;
-        }
-
-        if (desiredSize.Height > mm.maxHeight)
-        {
-            desiredSize.Height = mm.maxHeight;
-            clipped = true;
-        }
-
-        //  because of negative margins, clipped desired size may be negative.
-        //  need to keep it as doubles for that reason and maximize with 0 at the
-        //  very last point - before returning desired size to the parent.
-        double clippedDesiredWidth = desiredSize.Width + marginWidth;
-        double clippedDesiredHeight = desiredSize.Height + marginHeight;
-
-        // In overconstrained scenario, parent wins and measured size of the child,
-        // including any sizes set or computed, can not be larger then
-        // available size. We will clip the guy later.
-        if (clippedDesiredWidth > availableSize.Width)
-        {
-            clippedDesiredWidth = availableSize.Width;
-            clipped = true;
-        }
-
-        if (clippedDesiredHeight > availableSize.Height)
-        {
-            clippedDesiredHeight = availableSize.Height;
-            clipped = true;
-        }
-
-        //  Note: unclippedDesiredSize is needed in ArrangeCore,
-        //  because due to the layout protocol, arrange should be called
-        //  with constraints greater or equal to child's desired size
-        //  returned from MeasureOverride. But in most circumstances
-        //  it is possible to reconstruct original unclipped desired size.
-        //  In such cases we want to optimize space and save 16 bytes by
-        //  not storing it on each FrameworkElement.
-        //
-        //  The if statement conditions below lists the cases when
-        //  it is NOT possible to recalculate unclipped desired size later
-        //  in ArrangeCore, thus we save it...
-        if (clipped
-            || clippedDesiredWidth < 0
-            || clippedDesiredHeight < 0)
-        {
-            _unclippedDesiredSize = unclippedDesiredSize;
+            return MeasureOverride(availableSize);
         }
         else
         {
-            _unclippedDesiredSize = Size.Empty;
-        }
+            Thickness margin = Margin;
+            double marginWidth = margin.Left + margin.Right;
+            double marginHeight = margin.Top + margin.Bottom;
 
-        return new Size(Math.Max(0, clippedDesiredWidth), Math.Max(0, clippedDesiredHeight));
+            //  parent size is what parent want us to be
+            Size frameworkAvailableSize = new Size(
+                Math.Max(availableSize.Width - marginWidth, 0),
+                Math.Max(availableSize.Height - marginHeight, 0));
+
+            MinMax mm = new MinMax(this);
+
+            frameworkAvailableSize.Width = Math.Max(mm.minWidth, Math.Min(frameworkAvailableSize.Width, mm.maxWidth));
+            frameworkAvailableSize.Height = Math.Max(mm.minHeight, Math.Min(frameworkAvailableSize.Height, mm.maxHeight));
+
+            //  call to specific layout to measure
+            Size desiredSize = MeasureOverride(frameworkAvailableSize);
+
+            //  maximize desiredSize with user provided min size
+            desiredSize = new Size(
+                Math.Max(desiredSize.Width, mm.minWidth),
+                Math.Max(desiredSize.Height, mm.minHeight));
+
+            //here is the "true minimum" desired size - the one that is
+            //for sure enough for the control to render its content.
+            Size unclippedDesiredSize = desiredSize;
+
+            bool clipped = false;
+
+            // User-specified max size starts to "clip" the control here.
+            //Starting from this point desiredSize could be smaller then actually
+            //needed to render the whole control
+            if (desiredSize.Width > mm.maxWidth)
+            {
+                desiredSize.Width = mm.maxWidth;
+                clipped = true;
+            }
+
+            if (desiredSize.Height > mm.maxHeight)
+            {
+                desiredSize.Height = mm.maxHeight;
+                clipped = true;
+            }
+
+            //  because of negative margins, clipped desired size may be negative.
+            //  need to keep it as doubles for that reason and maximize with 0 at the
+            //  very last point - before returning desired size to the parent.
+            double clippedDesiredWidth = desiredSize.Width + marginWidth;
+            double clippedDesiredHeight = desiredSize.Height + marginHeight;
+
+            // In overconstrained scenario, parent wins and measured size of the child,
+            // including any sizes set or computed, can not be larger then
+            // available size. We will clip the guy later.
+            if (clippedDesiredWidth > availableSize.Width)
+            {
+                clippedDesiredWidth = availableSize.Width;
+                clipped = true;
+            }
+
+            if (clippedDesiredHeight > availableSize.Height)
+            {
+                clippedDesiredHeight = availableSize.Height;
+                clipped = true;
+            }
+
+            //  Note: unclippedDesiredSize is needed in ArrangeCore,
+            //  because due to the layout protocol, arrange should be called
+            //  with constraints greater or equal to child's desired size
+            //  returned from MeasureOverride. But in most circumstances
+            //  it is possible to reconstruct original unclipped desired size.
+            //  In such cases we want to optimize space and save 16 bytes by
+            //  not storing it on each FrameworkElement.
+            //
+            //  The if statement conditions below lists the cases when
+            //  it is NOT possible to recalculate unclipped desired size later
+            //  in ArrangeCore, thus we save it...
+            if (clipped
+                || clippedDesiredWidth < 0
+                || clippedDesiredHeight < 0)
+            {
+                _unclippedDesiredSize = unclippedDesiredSize;
+            }
+            else
+            {
+                _unclippedDesiredSize = Size.Empty;
+            }
+
+            return new Size(Math.Max(0, clippedDesiredWidth), Math.Max(0, clippedDesiredHeight));
+        }
     }
 
     /// <summary>
@@ -432,134 +438,142 @@ public partial class FrameworkElement
 
     internal sealed override void ArrangeCore(Rect finalRect)
     {
-        // If LayoutConstrained==true (parent wins in layout),
-        // we might get finalRect.Size smaller then UnclippedDesiredSize.
-        // Stricltly speaking, this may be the case even if LayoutConstrained==false (child wins),
-        // since who knows what a particualr parent panel will try to do in error.
-        // In this case we will not actually arrange a child at a smaller size,
-        // since the logic of the child does not expect to receive smaller size
-        // (if it coudl deal with smaller size, it probably would accept it in MeasureOverride)
-        // so lets replace the smaller arreange size with UnclippedDesiredSize
-        // and then clip the guy later.
-        // We will use at least UnclippedDesiredSize to compute arrangeSize of the child, and
-        // we will use layoutSlotSize to compute alignments - so the bigger child can be aligned within
-        // smaller slot.
-
-        // This is computed on every ArrangeCore. Depending on LayoutConstrained, actual clip may apply or not
-        NeedsClipBounds = false;
-
-        // Start to compute arrange size for the child.
-        // It starts from layout slot or deisred size if layout slot is smaller then desired,
-        // and then we reduce it by margins, apply Width/Height etc, to arrive at the size
-        // that child will get in its ArrangeOverride.
-        Size arrangeSize = finalRect.Size;
-
-        bool isLayoutRoot = BypassLayoutPolicies;
-
-        Thickness margin = Margin;
-        double marginWidth = isLayoutRoot ? 0 : margin.Left + margin.Right;
-        double marginHeight = isLayoutRoot ? 0 : margin.Top + margin.Bottom;
-        arrangeSize.Width = Math.Max(0, arrangeSize.Width - marginWidth);
-        arrangeSize.Height = Math.Max(0, arrangeSize.Height - marginHeight);
-
-        // Next, compare against unclipped, transformed size.
-        Size sb = _unclippedDesiredSize;
-        Size unclippedDesiredSize;
-        if (sb.IsEmpty)
+        if (BypassLayoutPolicies)
         {
-            unclippedDesiredSize = new Size(Math.Max(0, DesiredSize.Width - marginWidth),
-                                            Math.Max(0, DesiredSize.Height - marginHeight));
+            Size oldRenderSize = RenderSize;
+            Size inkSize = ArrangeOverride(finalRect.Size);
+            RenderSize = inkSize;
+            SetLayoutOffset(new Vector(finalRect.X, finalRect.Y), oldRenderSize);
         }
         else
         {
-            unclippedDesiredSize = new Size(sb.Width, sb.Height);
+            // If LayoutConstrained==true (parent wins in layout),
+            // we might get finalRect.Size smaller then UnclippedDesiredSize.
+            // Stricltly speaking, this may be the case even if LayoutConstrained==false (child wins),
+            // since who knows what a particualr parent panel will try to do in error.
+            // In this case we will not actually arrange a child at a smaller size,
+            // since the logic of the child does not expect to receive smaller size
+            // (if it coudl deal with smaller size, it probably would accept it in MeasureOverride)
+            // so lets replace the smaller arreange size with UnclippedDesiredSize
+            // and then clip the guy later.
+            // We will use at least UnclippedDesiredSize to compute arrangeSize of the child, and
+            // we will use layoutSlotSize to compute alignments - so the bigger child can be aligned within
+            // smaller slot.
+
+            // This is computed on every ArrangeCore. Depending on LayoutConstrained, actual clip may apply or not
+            NeedsClipBounds = false;
+
+            // Start to compute arrange size for the child.
+            // It starts from layout slot or deisred size if layout slot is smaller then desired,
+            // and then we reduce it by margins, apply Width/Height etc, to arrive at the size
+            // that child will get in its ArrangeOverride.
+            Size arrangeSize = finalRect.Size;
+
+            Thickness margin = Margin;
+            double marginWidth = margin.Left + margin.Right;
+            double marginHeight = margin.Top + margin.Bottom;
+            arrangeSize.Width = Math.Max(0, arrangeSize.Width - marginWidth);
+            arrangeSize.Height = Math.Max(0, arrangeSize.Height - marginHeight);
+
+            // Next, compare against unclipped, transformed size.
+            Size sb = _unclippedDesiredSize;
+            Size unclippedDesiredSize;
+            if (sb.IsEmpty)
+            {
+                unclippedDesiredSize = new Size(Math.Max(0, DesiredSize.Width - marginWidth),
+                                                Math.Max(0, DesiredSize.Height - marginHeight));
+            }
+            else
+            {
+                unclippedDesiredSize = new Size(sb.Width, sb.Height);
+            }
+
+            if (DoubleUtil.LessThan(arrangeSize.Width, unclippedDesiredSize.Width))
+            {
+                NeedsClipBounds = true;
+                arrangeSize.Width = unclippedDesiredSize.Width;
+            }
+
+            if (DoubleUtil.LessThan(arrangeSize.Height, unclippedDesiredSize.Height))
+            {
+                NeedsClipBounds = true;
+                arrangeSize.Height = unclippedDesiredSize.Height;
+            }
+
+            // Alignment==Stretch --> arrange at the slot size minus margins
+            // Alignment!=Stretch --> arrange at the unclippedDesiredSize
+            if (HorizontalAlignment != HorizontalAlignment.Stretch)
+            {
+                arrangeSize.Width = unclippedDesiredSize.Width;
+            }
+
+            if (VerticalAlignment != VerticalAlignment.Stretch)
+            {
+                arrangeSize.Height = unclippedDesiredSize.Height;
+            }
+
+            MinMax mm = new MinMax(this);
+
+            //we have to choose max between UnclippedDesiredSize and Max here, because
+            //otherwise setting of max property could cause arrange at less then unclippedDS.
+            //Clipping by Max is needed to limit stretch here
+            double effectiveMaxWidth = Math.Max(unclippedDesiredSize.Width, mm.maxWidth);
+            if (DoubleUtil.LessThan(effectiveMaxWidth, arrangeSize.Width))
+            {
+                NeedsClipBounds = true;
+                arrangeSize.Width = effectiveMaxWidth;
+            }
+
+            double effectiveMaxHeight = Math.Max(unclippedDesiredSize.Height, mm.maxHeight);
+            if (DoubleUtil.LessThan(effectiveMaxHeight, arrangeSize.Height))
+            {
+                NeedsClipBounds = true;
+                arrangeSize.Height = effectiveMaxHeight;
+            }
+
+            Size oldRenderSize = RenderSize;
+            Size innerInkSize = ArrangeOverride(arrangeSize);
+
+            //Here we use un-clipped InkSize because element does not know that it is
+            //clipped by layout system and it shoudl have as much space to render as
+            //it returned from its own ArrangeOverride
+            RenderSize = innerInkSize;
+
+            //clippedInkSize differs from InkSize only what MaxWidth/Height explicitly clip the
+            //otherwise good arrangement. For ex, DS<clientSize but DS>MaxWidth - in this
+            //case we should initiate clip at MaxWidth and only show Top-Left portion
+            //of the element limited by Max properties. It is Top-left because in case when we
+            //are clipped by container we also degrade to Top-Left, so we are consistent.
+            Size clippedInkSize = new Size(Math.Min(innerInkSize.Width, mm.maxWidth),
+                                           Math.Min(innerInkSize.Height, mm.maxHeight));
+
+            //remember we have to clip if Max properties limit the inkSize
+            NeedsClipBounds |=
+                    DoubleUtil.LessThan(clippedInkSize.Width, innerInkSize.Width)
+                || DoubleUtil.LessThan(clippedInkSize.Height, innerInkSize.Height);
+
+            //Note that inkSize now can be bigger then layoutSlotSize-margin (because of layout
+            //squeeze by the parent or LayoutConstrained=true, which clips desired size in Measure).
+
+            // The client size is the size of layout slot decreased by margins.
+            // This is the "window" through which we see the content of the child.
+            // Alignments position ink of the child in this "window".
+            // Max with 0 is neccessary because layout slot may be smaller then unclipped desired size.
+            Size clientSize = new Size(Math.Max(0, finalRect.Width - marginWidth),
+                                       Math.Max(0, finalRect.Height - marginHeight));
+
+            //remember we have to clip if clientSize limits the inkSize
+            NeedsClipBounds |=
+                    DoubleUtil.LessThan(clientSize.Width, clippedInkSize.Width)
+                || DoubleUtil.LessThan(clientSize.Height, clippedInkSize.Height);
+
+            Vector offset = ComputeAlignmentOffset(clientSize, clippedInkSize);
+
+            offset.X += finalRect.X + margin.Left;
+            offset.Y += finalRect.Y + margin.Top;
+
+            SetLayoutOffset(offset, oldRenderSize);
         }
-
-        if (DoubleUtil.LessThan(arrangeSize.Width, unclippedDesiredSize.Width))
-        {
-            NeedsClipBounds = true;
-            arrangeSize.Width = unclippedDesiredSize.Width;
-        }
-
-        if (DoubleUtil.LessThan(arrangeSize.Height, unclippedDesiredSize.Height))
-        {
-            NeedsClipBounds = true;
-            arrangeSize.Height = unclippedDesiredSize.Height;
-        }
-
-        // Alignment==Stretch --> arrange at the slot size minus margins
-        // Alignment!=Stretch --> arrange at the unclippedDesiredSize
-        if (HorizontalAlignment != HorizontalAlignment.Stretch)
-        {
-            arrangeSize.Width = unclippedDesiredSize.Width;
-        }
-
-        if (VerticalAlignment != VerticalAlignment.Stretch)
-        {
-            arrangeSize.Height = unclippedDesiredSize.Height;
-        }
-
-        MinMax mm = new MinMax(this);
-
-        //we have to choose max between UnclippedDesiredSize and Max here, because
-        //otherwise setting of max property could cause arrange at less then unclippedDS.
-        //Clipping by Max is needed to limit stretch here
-        double effectiveMaxWidth = Math.Max(unclippedDesiredSize.Width, mm.maxWidth);
-        if (DoubleUtil.LessThan(effectiveMaxWidth, arrangeSize.Width))
-        {
-            NeedsClipBounds = true;
-            arrangeSize.Width = effectiveMaxWidth;
-        }
-
-        double effectiveMaxHeight = Math.Max(unclippedDesiredSize.Height, mm.maxHeight);
-        if (DoubleUtil.LessThan(effectiveMaxHeight, arrangeSize.Height))
-        {
-            NeedsClipBounds = true;
-            arrangeSize.Height = effectiveMaxHeight;
-        }
-
-        Size oldRenderSize = RenderSize;
-        Size innerInkSize = ArrangeOverride(arrangeSize);
-
-        //Here we use un-clipped InkSize because element does not know that it is
-        //clipped by layout system and it shoudl have as much space to render as
-        //it returned from its own ArrangeOverride
-        RenderSize = innerInkSize;
-
-        //clippedInkSize differs from InkSize only what MaxWidth/Height explicitly clip the
-        //otherwise good arrangement. For ex, DS<clientSize but DS>MaxWidth - in this
-        //case we should initiate clip at MaxWidth and only show Top-Left portion
-        //of the element limited by Max properties. It is Top-left because in case when we
-        //are clipped by container we also degrade to Top-Left, so we are consistent.
-        Size clippedInkSize = new Size(Math.Min(innerInkSize.Width, mm.maxWidth),
-                                       Math.Min(innerInkSize.Height, mm.maxHeight));
-
-        //remember we have to clip if Max properties limit the inkSize
-        NeedsClipBounds |=
-                DoubleUtil.LessThan(clippedInkSize.Width, innerInkSize.Width)
-            || DoubleUtil.LessThan(clippedInkSize.Height, innerInkSize.Height);
-
-        //Note that inkSize now can be bigger then layoutSlotSize-margin (because of layout
-        //squeeze by the parent or LayoutConstrained=true, which clips desired size in Measure).
-
-        // The client size is the size of layout slot decreased by margins.
-        // This is the "window" through which we see the content of the child.
-        // Alignments position ink of the child in this "window".
-        // Max with 0 is neccessary because layout slot may be smaller then unclipped desired size.
-        Size clientSize = new Size(Math.Max(0, finalRect.Width - marginWidth),
-                                   Math.Max(0, finalRect.Height - marginHeight));
-
-        //remember we have to clip if clientSize limits the inkSize
-        NeedsClipBounds |=
-                DoubleUtil.LessThan(clientSize.Width, clippedInkSize.Width)
-            || DoubleUtil.LessThan(clientSize.Height, clippedInkSize.Height);
-
-        Point offset = isLayoutRoot ? new Point() : ComputeAlignmentOffset(clientSize, clippedInkSize);
-
-        offset.X += finalRect.X + margin.Left;
-        offset.Y += finalRect.Y + margin.Top;
-
-        SetLayoutOffset(offset, oldRenderSize);
     }
 
     internal override Rect? GetLayoutClip(Size layoutSlotSize)
@@ -600,7 +614,7 @@ public partial class FrameworkElement
 
             if (needToClipSlot)
             {
-                Point offset = ComputeAlignmentOffset(clippingSize, inkSize);
+                Vector offset = ComputeAlignmentOffset(clippingSize, inkSize);
 
                 double left, top, width, height;
                 if (offset.X < 0)
@@ -708,9 +722,9 @@ public partial class FrameworkElement
         SizeChanged?.Invoke(this, new SizeChangedEventArgs(info));
     }
 
-    private Point ComputeAlignmentOffset(Size clientSize, Size inkSize)
+    private Vector ComputeAlignmentOffset(Size clientSize, Size inkSize)
     {
-        Point offset = new Point();
+        var offset = new Vector();
 
         HorizontalAlignment ha = HorizontalAlignment;
         VerticalAlignment va = VerticalAlignment;
@@ -766,9 +780,103 @@ public partial class FrameworkElement
     /// relative to parent's visual as a result of layout. Typically, this is called
     /// by the parent inside of its ArrangeOverride implementation after calling Arrange on a child.
     /// </summary>
-    private void SetLayoutOffset(Point offset, Size oldRenderSize)
+    private void SetLayoutOffset(Vector offset, Size oldRenderSize)
     {
+        if (!AreTransformsClean || !DoubleUtil.AreClose(RenderSize, oldRenderSize))
+        {
+            Transform additionalTransform = GetFlowDirectionTransform(); // rtl
+            Transform renderTransform = (Transform)GetValue(RenderTransformProperty);
+
+            TransformGroup t = null;
+
+            // arbitrary transform, create a collection
+            if (additionalTransform is not null || renderTransform is not null)
+            {
+                // Create a TransformGroup and make sure it does not participate
+                // in the InheritanceContext treeness because it is internal operation only.
+                t = new TransformGroup();
+                t.CanBeInheritanceContext = false;
+                t.Children.CanBeInheritanceContext = false;
+
+                if (additionalTransform is not null)
+                {
+                    t.Children.Add(additionalTransform);
+                }
+
+                if (renderTransform is not null)
+                {
+                    Point origin = GetRenderTransformOrigin();
+                    bool hasOrigin = origin.X != 0d || origin.Y != 0d;
+                    if (hasOrigin)
+                    {
+                        var backOrigin = new TranslateTransform
+                        {
+                            X = -origin.X,
+                            Y = -origin.Y,
+                        };
+                        t.Children.Add(backOrigin);
+                    }
+
+                    //can not freeze render transform - it can be animated
+                    t.Children.Add(renderTransform);
+
+                    if (hasOrigin)
+                    {
+                        var forwardOrigin = new TranslateTransform
+                        {
+                            X = origin.X,
+                            Y = origin.Y,
+                        };
+                        t.Children.Add(forwardOrigin);
+                    }
+                }
+            }
+
+            VisualTransform = t;
+            AreTransformsClean = true;
+        }
+
         VisualOffset = offset;
+    }
+
+    private Point GetRenderTransformOrigin()
+    {
+        Point relativeOrigin = RenderTransformOrigin;
+        Size renderSize = RenderSize;
+        return new Point(renderSize.Width * relativeOrigin.X, renderSize.Height * relativeOrigin.Y);
+    }
+
+    private Transform GetFlowDirectionTransform()
+    {
+        if (ShouldApplyMirrorTransform()) //Window applies its own mirror
+        {
+            return new MatrixTransform(new Matrix(-1.0, 0.0, 0.0, 1.0, RenderSize.Width, 0.0));
+        }
+
+        return null;
+    }
+
+    internal virtual bool ShouldApplyMirrorTransform()
+    {
+        FlowDirection thisFlowDirection = FlowDirection;
+
+        // If the element is connected to visual tree, get FlowDirection
+        // from its visual parent.
+        FlowDirection parentFlowDirection = GetFlowDirectionFromVisual(VisualTreeHelper.GetParent(this));
+
+        //  if direction changes, instantiate a mirroring transform
+        return ApplyMirrorTransform(parentFlowDirection, thisFlowDirection);
+    }
+
+    internal static FlowDirection GetFlowDirectionFromVisual(DependencyObject visual)
+    {
+        return visual is FrameworkElement fe ? fe.FlowDirection : FlowDirection.LeftToRight;
+    }
+
+    private static bool ApplyMirrorTransform(FlowDirection parentFD, FlowDirection thisFD)
+    {
+        return (parentFD == FlowDirection.LeftToRight && thisFD == FlowDirection.RightToLeft) ||
+               (parentFD == FlowDirection.RightToLeft && thisFD == FlowDirection.LeftToRight);
     }
 
     private bool NeedsClipBounds

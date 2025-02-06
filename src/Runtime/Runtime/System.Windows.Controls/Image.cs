@@ -43,6 +43,7 @@ namespace System.Windows.Controls
 
         static Image()
         {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Image), new PropertyMetadata(typeof(Image)));
             IsHitTestableProperty.OverrideMetadata(typeof(Image), new PropertyMetadata(BooleanBoxes.TrueBox));
         }
 
