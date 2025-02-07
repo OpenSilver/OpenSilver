@@ -202,9 +202,17 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             catch { }
         }
 
+        private static string GetFullPathForFile(string fileName)
+        {
+            string assemblyPath = Assembly.GetExecutingAssembly().Location;
+            string directoryPath = Path.GetDirectoryName(assemblyPath);
+
+            return Path.Combine(directoryPath, fileName);
+        }
+
         private string PrepareIndexFile()
         {
-            string simulatorRootHtml = File.ReadAllText("simulator_root.html");
+            string simulatorRootHtml = File.ReadAllText(GetFullPathForFile("simulator_root.html"));
 
             string outputPathAbsolute = GetOutputPathAbsoluteAndReadAssemblyAttributes();
 
@@ -349,6 +357,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 {
                     localPath = Path.Combine(OutputRootPath, localPath);
                 }
+
+                localPath = GetFullPathForFile(localPath);
 
                 if (File.Exists(localPath))
                 {
