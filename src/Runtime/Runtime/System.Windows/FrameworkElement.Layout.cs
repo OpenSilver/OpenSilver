@@ -581,7 +581,7 @@ public partial class FrameworkElement
         if (NeedsClipBounds || ClipToBounds)
         {
             // see if  MaxWidth/MaxHeight limit the element
-            MinMax mm = new MinMax(this);
+            var mm = new MinMax(this);
 
             //this is in element's local rendering coord system
             Size inkSize = RenderSize;
@@ -604,8 +604,8 @@ public partial class FrameworkElement
             double marginWidth = margin.Left + margin.Right;
             double marginHeight = margin.Top + margin.Bottom;
 
-            Size clippingSize = new Size(Math.Max(0, layoutSlotSize.Width - marginWidth),
-                                         Math.Max(0, layoutSlotSize.Height - marginHeight));
+            var clippingSize = new Size(Math.Max(0, layoutSlotSize.Width - marginWidth),
+                                        Math.Max(0, layoutSlotSize.Height - marginHeight));
 
             bool needToClipSlot =
                 ClipToBounds //forces clip at layout slot bounds even if reported sizes are ok
@@ -638,11 +638,16 @@ public partial class FrameworkElement
                     height = clippingSize.Height;
                 }
 
-                Rect slotRect = new Rect(left, top, width, height);
+                var slotRect = new Rect(left, top, width, height);
 
                 if (needToClipLocally) //intersect 2 rects
                 {
                     slotRect.Intersect(new Rect(0, 0, maxWidthClip, maxHeightClip));
+                }
+
+                if (GetFlowDirectionMatrix() is Matrix rtlMirror)
+                {
+                    slotRect.Transform(rtlMirror);
                 }
 
                 return slotRect;
@@ -650,7 +655,14 @@ public partial class FrameworkElement
 
             if (needToClipLocally)
             {
-                return new Rect(0, 0, maxWidthClip, maxHeightClip);
+                var clipRect = new Rect(0, 0, maxWidthClip, maxHeightClip);
+
+                if (GetFlowDirectionMatrix() is Matrix rtlMirror)
+                {
+                    clipRect.Transform(rtlMirror);
+                }
+
+                return clipRect;
             }
 
             return null;
@@ -846,13 +858,22 @@ public partial class FrameworkElement
         return new Point(renderSize.Width * relativeOrigin.X, renderSize.Height * relativeOrigin.Y);
     }
 
-    private Transform GetFlowDirectionTransform()
+    private Matrix? GetFlowDirectionMatrix()
     {
-        if (ShouldApplyMirrorTransform()) //Window applies its own mirror
+        if (ShouldApplyMirrorTransform())
         {
-            return new MatrixTransform(new Matrix(-1.0, 0.0, 0.0, 1.0, RenderSize.Width, 0.0));
+            return new Matrix(-1.0, 0.0, 0.0, 1.0, RenderSize.Width, 0.0);
         }
 
+        return null;
+    }
+
+    private Transform GetFlowDirectionTransform()
+    {
+        if (GetFlowDirectionMatrix() is Matrix matrix)
+        {
+            return new MatrixTransform(matrix);
+        }
         return null;
     }
 
