@@ -11,9 +11,11 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows.Input;
 
@@ -59,7 +61,7 @@ public class MouseEventArgs : RoutedEventArgs
     /// Gets a value that indicates which key modifiers were active at the time that
     /// the pointer event was initiated.
     /// </summary>
-    public ModifierKeys KeyModifiers { get; internal set; }
+    public ModifierKeys KeyModifiers { get; }
 
     /// <summary>
     /// Gets an object that reports stylus device information, such as the collection
@@ -69,33 +71,6 @@ public class MouseEventArgs : RoutedEventArgs
     /// The stylus device information object.
     /// </returns>
     public StylusDevice StylusDevice => new StylusDevice(this);
-
-    internal void FillEventArgs(UIElement element, object jsEventArg)
-    {
-        KeyModifiers = Keyboard.Modifiers;
-        SetPointerAbsolutePosition(jsEventArg, element.ParentWindow);
-    }
-
-    protected internal void SetPointerAbsolutePosition(object jsEventArg, Window window)
-    {
-        string sEvent = OpenSilver.Interop.GetVariableStringForJS(jsEventArg);
-        IsTouchEvent = OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.pointerType === 'touch'", false);
-        _pointerAbsoluteX = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sEvent}.pageX", false);
-        _pointerAbsoluteY = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sEvent}.pageY", false);
-
-        //---------------------------------------
-        // Adjust the absolute coordinates to take into account the fact that the XAML Window is not necessary un the top-left corner of the HTML page:
-        //---------------------------------------
-        if (window != null)
-        {
-            // Get the XAML Window root position relative to the page and substracts it
-            string sElement = OpenSilver.Interop.GetVariableStringForJS(window.OuterDiv);
-            _pointerAbsoluteX -= OpenSilver.Interop.ExecuteJavaScriptDouble(
-                $"{sElement}.getBoundingClientRect().left - document.body.getBoundingClientRect().left", false);
-            _pointerAbsoluteY -= OpenSilver.Interop.ExecuteJavaScriptDouble(
-                $"{sElement}.getBoundingClientRect().top - document.body.getBoundingClientRect().top", false);
-        }
-    }
 
     /// <summary>
     /// Gets a reference to a pointer token.
@@ -154,5 +129,28 @@ public class MouseEventArgs : RoutedEventArgs
         }
 
         return new Point(0.0, 0.0);
+    }
+
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected internal void SetPointerAbsolutePosition(object jsEventArg, Window window)
+    {
+        string sEvent = OpenSilver.Interop.GetVariableStringForJS(jsEventArg);
+        IsTouchEvent = OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.pointerType === 'touch'", false);
+        _pointerAbsoluteX = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sEvent}.pageX", false);
+        _pointerAbsoluteY = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sEvent}.pageY", false);
+
+        //---------------------------------------
+        // Adjust the absolute coordinates to take into account the fact that the XAML Window is not necessary un the top-left corner of the HTML page:
+        //---------------------------------------
+        if (window != null)
+        {
+            // Get the XAML Window root position relative to the page and substracts it
+            string sElement = OpenSilver.Interop.GetVariableStringForJS(window.OuterDiv);
+            _pointerAbsoluteX -= OpenSilver.Interop.ExecuteJavaScriptDouble(
+                $"{sElement}.getBoundingClientRect().left - document.body.getBoundingClientRect().left", false);
+            _pointerAbsoluteY -= OpenSilver.Interop.ExecuteJavaScriptDouble(
+                $"{sElement}.getBoundingClientRect().top - document.body.getBoundingClientRect().top", false);
+        }
     }
 }

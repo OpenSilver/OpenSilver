@@ -18,6 +18,16 @@ namespace System.Windows.Input;
 /// </summary>
 public sealed class TappedRoutedEventArgs : MouseEventArgs
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TappedRoutedEventArgs"/> class.
+    /// </summary>
+    public TappedRoutedEventArgs() { }
+
+    internal TappedRoutedEventArgs(bool isTouchDevice, ModifierKeys keyModifiers, double x, double y)
+        : base(isTouchDevice, keyModifiers, x, y)
+    {
+    }
+
     /// <inheritdoc />
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
         ((TappedEventHandler)genericHandler)(genericTarget, this);

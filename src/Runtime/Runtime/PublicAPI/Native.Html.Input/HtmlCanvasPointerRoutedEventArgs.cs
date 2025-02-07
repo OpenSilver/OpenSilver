@@ -31,25 +31,20 @@ namespace CSHTML5.Native.Html.Input
 
         // Note: there are multiple constructor overloads.
         public HtmlCanvasPointerRoutedEventArgs(MouseEventArgs e, HtmlCanvas htmlCanvas)
+            : base(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
             this.OriginalSource = e.OriginalSource;
             this.Handled = e.Handled;
-            this.KeyModifiers = e.KeyModifiers;
             this.Pointer = e.Pointer;
-            this._pointerAbsoluteX = e._pointerAbsoluteX;
-            this._pointerAbsoluteY = e._pointerAbsoluteY;
-
             this.HtmlCanvas = htmlCanvas;
         }
 
         // Note: there are multiple constructor overloads.
         public HtmlCanvasPointerRoutedEventArgs(RightTappedRoutedEventArgs e, HtmlCanvas htmlCanvas)
+            : base(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
             this.OriginalSource = e.OriginalSource;
             this.Handled = e.Handled;
-            this._pointerAbsoluteX = e._pointerAbsoluteX;
-            this._pointerAbsoluteY = e._pointerAbsoluteY;
-
             this.HtmlCanvas = htmlCanvas;
         }
 

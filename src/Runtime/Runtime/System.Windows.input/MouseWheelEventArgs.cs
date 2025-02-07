@@ -18,6 +18,17 @@ namespace System.Windows.Input;
 /// </summary>
 public class MouseWheelEventArgs : MouseEventArgs
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MouseWheelEventArgs"/> class.
+    /// </summary>
+    public MouseWheelEventArgs() { }
+
+    internal MouseWheelEventArgs(bool isTouchDevice, ModifierKeys keyModifiers, double x, double y, int delta)
+        : base(isTouchDevice, keyModifiers, x, y)
+    {
+        Delta = delta;
+    }
+
     /// <inheritdoc />
     protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
         ((MouseWheelEventHandler)genericHandler)(genericTarget, this);
@@ -30,15 +41,5 @@ public class MouseWheelEventArgs : MouseEventArgs
     /// An integer value that provides a factor of how much the mouse wheel rotated. This value can 
     /// be a negative integer.
     /// </returns>
-    public int Delta { get; private set; }
-
-    internal new void FillEventArgs(UIElement element, object jsEventArg)
-    {
-        base.FillEventArgs(element, jsEventArg);
-
-        double deltaY = OpenSilver.Interop.ExecuteJavaScriptDouble(
-            $"{OpenSilver.Interop.GetVariableStringForJS(jsEventArg)}.deltaY", false);
-
-        Delta = deltaY > 0 ? -120 : 120;
-    }
+    public int Delta { get; }
 }
