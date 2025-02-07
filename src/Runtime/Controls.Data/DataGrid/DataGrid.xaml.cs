@@ -4850,6 +4850,7 @@ namespace System.Windows.Controls
             }
         }
 
+#if !OPENSILVER
         private void EditingElement_Loaded(object sender, RoutedEventArgs e)
         {
             FrameworkElement element = sender as FrameworkElement;
@@ -4859,6 +4860,7 @@ namespace System.Windows.Controls
             }
             PreparingCellForEditPrivate(element);
         }
+#endif
 
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         private bool EndCellEdit(DataGridEditAction editAction, bool exitEditingMode, bool keepFocus, bool raiseEvents)
@@ -5447,7 +5449,17 @@ namespace System.Windows.Controls
                     }
 
                     // Subscribe to the new element's events
+#if OPENSILVER
+                    void EditingElement_LayoutUpdated(object sender, EventArgs e)
+                    {
+                        element.LayoutUpdated -= EditingElement_LayoutUpdated;
+                        PreparingCellForEditPrivate(element);
+                    }
+
+                    element.LayoutUpdated += EditingElement_LayoutUpdated;
+#else
                     element.Loaded += new RoutedEventHandler(EditingElement_Loaded);
+#endif
                 }
             }
             else
@@ -7326,6 +7338,6 @@ namespace System.Windows.Controls
             ProcessVerticalScroll(e.ScrollEventType);
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }
