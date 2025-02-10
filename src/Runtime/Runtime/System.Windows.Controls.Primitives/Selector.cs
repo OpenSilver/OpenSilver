@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 namespace System.Windows.Controls.Primitives
 {
@@ -564,6 +565,10 @@ namespace System.Windows.Controls.Primitives
             if (element is SelectorItem container)
             {
                 container.ParentSelector = this;
+                if (container.IsSelected)
+                {
+                    NotifyIsSelectedChanged(container, true);
+                }
             }
 
             OnNewContainer();
@@ -587,6 +592,12 @@ namespace System.Windows.Controls.Primitives
             {
                 container.ParentSelector = null;
                 container.ClearContentControl(item);
+            }
+
+            //This check ensures that selection is cleared only for generated containers.
+            if (!((IGeneratorHost)this).IsItemItsOwnContainer(item))
+            {
+                element.ClearValue(SelectorItem.IsSelectedProperty);
             }
         }
 
