@@ -551,7 +551,7 @@ document.createInputManager = function (callback, pointerCallback) {
             pageY -= (windowRect.top - bodyRect.top);
         }
 
-        pointerCallback(getClosestElementId(element), type, e, e.type === 'touch', pageX, pageY, _modifiers);
+        pointerCallback(getClosestElementId(element), type, e, e.pointerType === 'touch', pageX, pageY, _modifiers);
     }
 
     function initDom() {
