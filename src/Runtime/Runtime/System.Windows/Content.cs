@@ -11,14 +11,12 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 namespace System.Windows.Interop;
 
 public class Content : IResizeObserverListener
 {
-    private readonly JavaScriptCallback _fullscreenchangeCallback;
     private readonly IDisposable _resizeObserver;
 
     public Content() : this(null)
@@ -29,13 +27,10 @@ public class Content : IResizeObserverListener
     {
         if (app is not null)
         {
-            _fullscreenchangeCallback = JavaScriptCallback.Create(FullScreenChangedCallback);
+            _resizeObserver = ResizeObserver.Observe(app.GetRootDiv(), this);
 
             // Hooks the FullScreenChanged event
-            OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"document.addEventListener('fullscreenchange', {OpenSilver.Interop.GetVariableStringForJS(_fullscreenchangeCallback)})");
-
-            _resizeObserver = ResizeObserver.Observe(app.GetRootDiv(), this);
+            DOMEvents.Document.AddEventListener("fullscreenchange", FullScreenChangedCallback);
 
             // WORKINPROGRESS
             // Add Zoomed event

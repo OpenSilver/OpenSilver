@@ -78,7 +78,7 @@ namespace System.Windows
             AppDomain.CurrentDomain.UnhandledException +=
                 (s, e) => OnUnhandledException(e.ExceptionObject as Exception, false);
 
-            new DOMEventManager(GetWindow, "beforeunload", ProcessOnExit).AttachToDomEvents();
+            DOMEvents.Window.AddEventListener("beforeunload", OnExitNative);
 
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
             OpenSilver.Interop.ResetLoadedFilesDictionaries();
@@ -89,7 +89,7 @@ namespace System.Windows
             // Keep a reference to the startup assembly:
             StartupAssemblyInfo.StartupAssembly = this.GetType().Assembly;
 
-            Window.Current = _mainWindow = new Window(true);
+            Window.Current = _mainWindow = new Window();
             _mainWindow.AttachToDomElement(_rootDiv);
 
             // We call the "Startup" event and the "OnLaunched" method using the Dispatcher, because usually the user registers the "Startup" event in the constructor of the "App.cs" class, which is derived from "Application.cs", and therefore when we arrive here the event is not yet registered. Executing the code in the Dispatcher ensures that the constructor of the "App.cs" class has finished before running the code.
@@ -354,9 +354,6 @@ namespace System.Windows
             set => _mainWindow.Content = value as FrameworkElement;
         }
 
-        //returns the html window element
-        internal object GetWindow() => INTERNAL_HtmlDomManager.GetHtmlWindow();
-
         internal INTERNAL_HtmlDomElementReference GetRootDiv() => _rootDiv;
 
         /// <summary>
@@ -596,13 +593,21 @@ namespace System.Windows
         /// </param>
         protected virtual void OnExit(ExitEventArgs e) => Exit?.Invoke(this, e);
 
-        private void ProcessOnExit(object jsEventArg)
+        private void OnExitNative(object jsEventArg)
         {
             var e = new ExitEventArgs(0);
 
             try
             {
                 OnExit(e);
+
+                foreach (Window window in Windows)
+                {
+                    if (window.InvokeOnClosing(true))
+                    {
+                        e.Handled = true;
+                    }
+                }
             }
             finally
             {

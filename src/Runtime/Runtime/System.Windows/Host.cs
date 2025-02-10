@@ -14,14 +14,13 @@
 using System.Collections.Generic;
 using System.Windows.Interop;
 using System.Web;
-using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
     public class Host
     {
         private readonly Application _app;
-        private readonly JavaScriptCallback _hashChangeCallback;
         private Content _content;
         private Settings _settings;
         private string _navigationState;
@@ -33,9 +32,7 @@ namespace System.Windows
         {
             _app = app;
             _navigationState = GetBrowserNavigationState();
-            _hashChangeCallback = JavaScriptCallback.Create(OnNavigationChanged);
-            OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"window.addEventListener('hashchange', {OpenSilver.Interop.GetVariableStringForJS(_hashChangeCallback)}, false)");
+            DOMEvents.Window.AddEventListener("hashchange", OnNavigationChanged);
         }
 
         /// <summary>

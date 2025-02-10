@@ -21,7 +21,6 @@
   <ItemGroup>
     <Compile Include="..\OpenSilver.Xaml\**\*.cs" LinkBase="XamlReader" />
     <Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
-    <Compile Include="Core\Events\DOMEventManager.cs" />
     <Compile Include="Core\Main\CopyOnWriteList.cs" />
     <Compile Include="OpenSilver\Controls\SaveFileDialog.cs" />
     <Compile Include="OpenSilver\Features.cs" />
@@ -34,6 +33,7 @@
     <Compile Include="OpenSilver\Internal\Data\TypeHelper.cs" />
     <Compile Include="OpenSilver\Internal\DescendentsWalker.cs" />
     <Compile Include="OpenSilver\Internal\Documents\TextContainerInlineImageContainer.cs" />
+    <Compile Include="OpenSilver\Internal\DOMEvents.cs" />
     <Compile Include="OpenSilver\Internal\EffectiveValueEntry.cs" />
     <Compile Include="OpenSilver\Internal\IResourceDictionaryOwner.cs" />
     <Compile Include="OpenSilver\Internal\ISealable.cs" />

@@ -399,29 +399,6 @@ document.detachView = function (id) {
     }
 };
 
-document.removeEventListenerSafe = function (element, method, func) {
-    if (typeof element == 'string') {
-        element = document.getElementById(element);
-    }
-    if (element) {
-        element.removeEventListener(method, func);
-    }
-};
-
-document.addEventListenerSafe = function (element, method, func) {
-    if (typeof element == 'string') {
-        element = document.getElementById(element);
-    }
-    if (element) {
-        if (method == "touchstart" || method == "wheel" || method == "touchmove") {
-            element.addEventListener(method, func, { passive: true });
-        }
-        else {
-            element.addEventListener(method, func);
-        }
-    }
-};
-
 document.setFocus = function (element) {
     if (!element) return;
 

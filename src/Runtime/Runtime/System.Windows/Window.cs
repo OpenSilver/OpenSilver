@@ -37,9 +37,7 @@ namespace System.Windows
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
         /// </summary>
-        public Window() : this(false) { }
-
-        internal Window(bool hookUpEvents)
+        public Window()
         {
             BypassLayoutPolicies = true;
 
@@ -49,15 +47,6 @@ namespace System.Windows
             }
 
             PopupService.TrackMousePosition(this);
-
-            if (hookUpEvents)
-            {
-                new DOMEventManager(
-                    INTERNAL_HtmlDomManager.GetHtmlWindow, 
-                    "beforeunload", 
-                    ProcessOnClosing)
-                .AttachToDomEvents();
-            }
 
             GotFocus += new RoutedEventHandler(OnGotFocus);
         }
@@ -263,18 +252,18 @@ namespace System.Windows
         /// <summary>
         /// Raises the Closing event
         /// </summary>
-        void ProcessOnClosing(object jsEventArg)
-        {
-            OnClosing(new ClosingEventArgs(true));
-        }
+        /// <param name="e">The arguments for the event.</param>
+        protected void OnClosing(ClosingEventArgs e) => Closing?.Invoke(this, e);
 
-        /// <summary>
-        /// Raises the Closing event
-        /// </summary>
-        /// <param name="eventArgs">The arguments for the event.</param>
-        protected void OnClosing(ClosingEventArgs eventArgs)
+        internal bool InvokeOnClosing(bool cancellable)
         {
-            Closing?.Invoke(this, eventArgs);
+            if (Closing is not null)
+            {
+                var e = new ClosingEventArgs(cancellable);
+                OnClosing(e);
+                return e.IsCancelable && e.Cancel;
+            }
+            return false;
         }
 
         #endregion
