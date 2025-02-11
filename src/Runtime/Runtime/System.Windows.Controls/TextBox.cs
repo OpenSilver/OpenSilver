@@ -687,6 +687,11 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Clears all the content from the text box.
+        /// </summary>
+        public void Clear() => SetCurrentValue(TextProperty, string.Empty);
+
+        /// <summary>
         /// Builds the visual tree for the
         /// <see cref="TextBox" /> control when a new
         /// template is applied.
