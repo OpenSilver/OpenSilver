@@ -87,7 +87,7 @@ namespace System.Windows
             ClientSideResourceRegister.Startup();
 
             // Keep a reference to the startup assembly:
-            StartupAssemblyInfo.StartupAssembly = this.GetType().Assembly;
+            StartupAssemblyInfo.StartupAssembly = GetType().Assembly;
 
             Window.Current = _mainWindow = new Window();
             _mainWindow.AttachToDomElement(_rootDiv);
@@ -97,12 +97,9 @@ namespace System.Windows
             {
                 StartAppServices();
 
-                // Raise the "Startup" event:
-                if (this.Startup != null)
-                    Startup(this, new StartupEventArgs());
+                OnStartup(new StartupEventArgs());
 
-                // Call the "OnLaunched" method:
-                this.OnLaunched(new LaunchActivatedEventArgs());
+                OnLaunched(new LaunchActivatedEventArgs());
             });
         }
 
@@ -343,6 +340,19 @@ namespace System.Windows
         /// Occurs when an application is started.
         /// </summary>
         public event StartupEventHandler Startup;
+
+        /// <summary>
+        /// Raises the <see cref="Startup"/> event.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="StartupEventArgs"/> that contains the event data.
+        /// </param>
+        /// <remarks>
+        /// <see cref="OnStartup"/> raises the <see cref="Startup"/> event.
+        /// A type that derives from <see cref="Application"/> may override <see cref="OnStartup"/>. The overridden method 
+        /// must call <see cref="OnStartup"/> in the base class if the <see cref="Startup"/> event needs to be raised.
+        /// </remarks>
+        protected virtual void OnStartup(StartupEventArgs e) => Startup?.Invoke(this, e);
 
         /// <summary>
         /// Gets or sets the main application UI. This is an alias for the 
