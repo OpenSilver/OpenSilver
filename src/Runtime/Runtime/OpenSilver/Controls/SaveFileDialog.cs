@@ -165,7 +165,7 @@ public sealed class SaveFileDialog
         if (!string.IsNullOrEmpty(DefaultFileName))
         {
             var messageBoxResult = MessageBox.Show(
-                $"Do you want to save '{DefaultFileName}' ?",
+                $"Do you want to save {DefaultFileName}?",
                 "File Download - Security Warning",
                 MessageBoxButton.OKCancel);
 
@@ -240,7 +240,7 @@ public sealed class SaveFileDialog
 
     private string GetFilename()
     {
-        if (_filterEntries.Count < FilterIndex)
+        if (_filterEntries?.Count < FilterIndex)
         {
             throw new InvalidOperationException("FilterIndex is out of bounds of Filter");
         }
