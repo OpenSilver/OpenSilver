@@ -167,6 +167,11 @@ namespace System.Windows.Controls
             }
         }
 
+        /// <summary>
+        /// Clears all the selection in a <see cref="ListBox"/>.
+        /// </summary>
+        public void UnselectAll() => UnselectAllImpl();
+
         public override void OnApplyTemplate()
         {
             // _scrollHost must be set before calling base

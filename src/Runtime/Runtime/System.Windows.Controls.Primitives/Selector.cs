@@ -977,6 +977,28 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
+        /// Unselect all items in the collection.
+        /// </summary>
+        internal virtual void UnselectAllImpl()
+        {
+            SelectionChange.Begin();
+            SelectionChange.CleanupDeferSelection();
+            try
+            {
+                object selectedItem = InternalSelectedItem;
+
+                foreach (ItemInfo info in _selectedItems)
+                {
+                    SelectionChange.Unselect(info);
+                }
+            }
+            finally
+            {
+                SelectionChange.End();
+            }
+        }
+
+        /// <summary>
         /// Raise the SelectionChanged event.
         /// </summary>
         private void InvokeSelectionChanged(List<ItemInfo> unselectedInfos, List<ItemInfo> selectedInfos)
