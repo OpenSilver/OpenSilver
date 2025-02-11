@@ -38,9 +38,18 @@ public sealed class Hyperlink : Span
     }
 
     /// <summary>
+    /// Identifies the <see cref="Click"/> routed event.
+    /// </summary>
+    public static readonly RoutedEvent ClickEvent = ButtonBase.ClickEvent.AddOwner(typeof(Hyperlink));
+
+    /// <summary>
     /// Occurs when the left mouse button is clicked on a <see cref="Hyperlink"/>.
     /// </summary>
-    public event RoutedEventHandler Click;
+    public event RoutedEventHandler Click
+    {
+        add => AddHandler(ClickEvent, value);
+        remove => RemoveHandler(ClickEvent, value);
+    }
 
     /// <summary>
     /// Identifies the <see cref="Command"/> dependency property.
@@ -236,7 +245,7 @@ public sealed class Hyperlink : Span
 
     private void OnClick()
     {
-        Click?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
+        RaiseEvent(new RoutedEventArgs(ClickEvent) { OriginalSource = this });
 
         ExecuteCommand();
 

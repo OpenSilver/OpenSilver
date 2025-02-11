@@ -47,9 +47,23 @@ namespace System.Windows.Controls.Primitives
         }
 
         /// <summary>
+        /// Identifies the <see cref="Click"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent ClickEvent =
+            EventManager.RegisterRoutedEvent(
+                nameof(Click),
+                RoutingStrategy.Bubble,
+                typeof(RoutedEventHandler),
+                typeof(ButtonBase));
+
+        /// <summary>
         /// Occurs when a <see cref="Button"/> is clicked.
         /// </summary>
-        public event RoutedEventHandler Click;
+        public event RoutedEventHandler Click
+        {
+            add => AddHandler(ClickEvent, value);
+            remove => RemoveHandler(ClickEvent, value);
+        }
 
         /// <summary>
         /// Identifies the <see cref="ClickMode"/> dependency property.
@@ -223,9 +237,9 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         protected virtual void OnClick()
         {
-            Click?.Invoke(this, new RoutedEventArgs
+            RaiseEvent(new RoutedEventArgs(ClickEvent)
             {
-                OriginalSource = this
+                OriginalSource = this,
             });
 
             ExecuteCommand();
