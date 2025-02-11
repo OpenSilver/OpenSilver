@@ -60,9 +60,34 @@ namespace System.Windows.Threading
         }
 
         /// <summary>
-        /// Gets a value that indicates whether the timer is running.
+        /// Gets or sets a value that indicates whether the timer is running.
         /// </summary>
-        public bool IsEnabled => _timer is not null;
+        /// <returns>
+        /// true if the timer is enabled; otherwise, false. The default is false.
+        /// </returns>
+        public bool IsEnabled
+        {
+            get => _timer is not null;
+            set
+            {
+                if (_timer is not null && !value)
+                {
+                    Stop();
+                }
+                else if (_timer is null && value)
+                {
+                    Start();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a user-defined data object.
+        /// </summary>
+        /// <returns>
+        /// The user-defined data. The default is null.
+        /// </returns>
+        public object Tag { get; set; }
 
         /// <summary>
         /// Occurs when the timer interval has elapsed.
