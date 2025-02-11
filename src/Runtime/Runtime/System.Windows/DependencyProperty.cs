@@ -20,6 +20,29 @@ namespace System.Windows
     public class DependencyProperty
     {
         /// <summary>
+        /// Registers a dependency property with the specified property name, property type, and owner type.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the dependency property to register. The name must be unique within the registration 
+        /// namespace of the owner type.
+        /// </param>
+        /// <param name="propertyType">
+        /// The type of the property.
+        /// </param>
+        /// <param name="ownerType">
+        /// The owner type that is registering the dependency property.
+        /// </param>
+        /// <returns>
+        /// A dependency property identifier that should be used to set the value of a public static readonly 
+        /// field in your class. That identifier is then used to reference the dependency property later, for 
+        /// operations such as setting its value programmatically or obtaining metadata.
+        /// </returns>
+        public static DependencyProperty Register(string name, Type propertyType, Type ownerType)
+        {
+            return Register(name, propertyType, ownerType, null);
+        }
+
+        /// <summary>
         /// Registers a dependency property with the specified property name, property type,
         /// owner type, and property metadata for the property.
         /// </summary>
@@ -62,14 +85,30 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Register a Dependency Property
+        /// Registers a dependency property with the specified property name, property type, owner type, 
+        /// property metadata, and a value validation callback for the property.
         /// </summary>
-        /// <param name="name">Name of property</param>
-        /// <param name="propertyType">Type of the property</param>
-        /// <param name="ownerType">Type that is registering the property</param>
-        /// <param name="typeMetadata">Metadata to use if current type doesn't specify type-specific metadata</param>
-        /// <param name="validateValueCallback">Provides additional value validation outside automatic type validation</param>
-        /// <returns>Dependency Property</returns>
+        /// <param name="name">
+        /// The name of the dependency property to register.
+        /// </param>
+        /// <param name="propertyType">
+        /// The type of the property.
+        /// </param>
+        /// <param name="ownerType">
+        /// The owner type that is registering the dependency property.
+        /// </param>
+        /// <param name="typeMetadata">
+        /// Property metadata for the dependency property.
+        /// </param>
+        /// <param name="validateValueCallback">
+        /// A reference to a callback that should perform any custom validation of the dependency property 
+        /// value beyond typical type validation.
+        /// </param>
+        /// <returns>
+        /// A dependency property identifier that should be used to set the value of a public static readonly 
+        /// field in your class. That identifier is then used to reference the dependency property later, for 
+        /// operations such as setting its value programmatically or obtaining metadata.
+        /// </returns>
         public static DependencyProperty Register(
             string name,
             Type propertyType,
@@ -127,10 +166,29 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Simple registration, metadata, validation, and a read-only property
-        /// key.  Calling this version restricts the property such that it can
-        /// only be set via the corresponding overload of DependencyObject.SetValue.
+        /// Registers a read-only dependency property, with the specified property type, owner type, 
+        /// property metadata, and a validation callback.
         /// </summary>
+        /// <param name="name">
+        /// The name of the dependency property to register.
+        /// </param>
+        /// <param name="propertyType">
+        /// The type of the property.
+        /// </param>
+        /// <param name="ownerType">
+        /// The owner type that is registering the dependency property.
+        /// </param>
+        /// <param name="typeMetadata">
+        /// Property metadata for the dependency property.
+        /// </param>
+        /// <param name="validateValueCallback">
+        /// A reference to a user-created callback that should perform any custom validation of the 
+        /// dependency property value beyond typical type validation.
+        /// </param>
+        /// <returns>
+        /// A dependency property key that should be used to set the value of a static read-only field 
+        /// in your class, which is then used to reference the dependency property later.
+        /// </returns>
         public static DependencyPropertyKey RegisterReadOnly(
             string name,
             Type propertyType,
@@ -268,6 +326,28 @@ namespace System.Windows
             authorizedKey.SetDependencyProperty(property);
 
             return authorizedKey;
+        }
+
+        /// <summary>
+        /// Registers an attached property with the specified property name, property type, and owner type.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the dependency property to register.
+        /// </param>
+        /// <param name="propertyType">
+        /// The type of the property.
+        /// </param>
+        /// <param name="ownerType">
+        /// The owner type that is registering the dependency property.
+        /// </param>
+        /// <returns>
+        /// A dependency property identifier that should be used to set the value of a public static readonly 
+        /// field in your class. That identifier is then used to reference the dependency property later, for 
+        /// operations such as setting its value programmatically or obtaining metadata.
+        /// </returns>
+        public static DependencyProperty RegisterAttached(string name, Type propertyType, Type ownerType)
+        {
+            return RegisterAttached(name, propertyType, ownerType, null);
         }
 
         /// <summary>
@@ -1113,6 +1193,21 @@ namespace System.Windows
         public override string ToString()
         {
             return Name;
+        }
+
+        /// <summary>
+        /// Returns a hash code for this <see cref="DependencyProperty"/>.
+        /// </summary>
+        /// <returns>
+        /// The hash code for this <see cref="DependencyProperty"/>.
+        /// </returns>
+        /// <remarks>
+        /// The property system uses its own unique identifier <see cref="GlobalIndex"/>, and the value of 
+        /// that property is returned by <see cref="GetHashCode"/>.
+        /// </remarks>
+        public override int GetHashCode()
+        {
+            return GlobalIndex;
         }
 
         internal static bool IsValidType(object value, Type propertyType)
