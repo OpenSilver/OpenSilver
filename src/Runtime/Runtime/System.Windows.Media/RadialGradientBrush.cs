@@ -230,7 +230,7 @@ namespace System.Windows.Media
 
             public string GetBrush(Shape shape) => $"url(#{_gradientRef.UniqueIdentifier})";
 
-            public void RenderBrush() => DrawRadialGradient();
+            public void RenderBrush(Shape shape) => DrawRadialGradient();
 
             public void DestroyBrush(Shape shape)
             {

@@ -32,7 +32,7 @@ namespace System.Windows.Media
 				nameof(AlignmentX),
 				typeof(AlignmentX),
 				typeof(TileBrush),
-				new PropertyMetadata(AlignmentX.Center));
+				new PropertyMetadata(AlignmentX.Center, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the horizontal alignment of content in the <see cref="TileBrush"/>
@@ -56,7 +56,7 @@ namespace System.Windows.Media
 				nameof(AlignmentY),
 				typeof(AlignmentY),
 				typeof(TileBrush),
-				new PropertyMetadata(AlignmentY.Center));
+				new PropertyMetadata(AlignmentY.Center, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets the vertical alignment of content in the <see cref="TileBrush"/>
@@ -80,7 +80,7 @@ namespace System.Windows.Media
 				nameof(Stretch),
 				typeof(Stretch),
 				typeof(TileBrush),
-				new PropertyMetadata(Stretch.Fill));
+				new PropertyMetadata(Stretch.Fill, OnPropertyChanged));
 
         /// <summary>
         /// Gets or sets a value that specifies how the content of this <see cref="TileBrush"/>

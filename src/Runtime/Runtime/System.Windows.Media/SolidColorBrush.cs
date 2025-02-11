@@ -110,7 +110,7 @@ namespace System.Windows.Media
 
             public void DestroyBrush(Shape shape) { }
 
-            public void RenderBrush() { }
+            public void RenderBrush(Shape shape) { }
         }
 
         SolidColorBrush ICloneOnAnimation<SolidColorBrush>.Clone() => new SolidColorBrush(this);

@@ -164,7 +164,7 @@ namespace System.Windows.Media
 
             public string GetBrush(Shape shape) => "none";
 
-            public void RenderBrush() { }
+            public void RenderBrush(Shape shape) { }
         }
     }
 }

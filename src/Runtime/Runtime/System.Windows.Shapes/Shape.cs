@@ -101,7 +101,7 @@ namespace System.Windows.Shapes
             {
                 if (_fillBrush is ISvgBrush svgBrush)
                 {
-                    svgBrush.RenderBrush();
+                    svgBrush.RenderBrush(this);
                     SetSvgAttribute("fill", svgBrush.GetBrush(this));
                 }
             }
@@ -203,7 +203,7 @@ namespace System.Windows.Shapes
             {
                 if (_strokeBrush is ISvgBrush svgBrush)
                 {
-                    svgBrush.RenderBrush();
+                    svgBrush.RenderBrush(this);
                     SetSvgAttribute("stroke", svgBrush.GetBrush(this));
                 }
             }
@@ -588,7 +588,7 @@ namespace System.Windows.Shapes
         /// <summary>
         /// Get the bonds of the geometry that defines this shape
         /// </summary>
-        internal virtual Rect GetDefiningGeometryBounds() => GetBBox();
+        internal virtual Rect GetDefiningGeometryBounds() => GetBBox(SvgElement);
 
         internal Size GetStretchedRenderSize(Stretch mode, double strokeThickness, Size availableSize, Rect geometryBounds)
         {
@@ -768,11 +768,11 @@ namespace System.Windows.Shapes
             SetSvgAttribute("fill-rule", value);
         }
 
-        internal Rect GetBBox()
+        internal static Rect GetBBox(INTERNAL_HtmlDomElementReference svgElement)
         {
-            if (SvgElement is not null)
+            if (svgElement is not null)
             {
-                string sDiv = OpenSilver.Interop.GetVariableStringForJS(SvgElement);
+                string sDiv = OpenSilver.Interop.GetVariableStringForJS(svgElement);
 
                 SVGRect bbox = JsonSerializer.Deserialize<SVGRect>(
                     OpenSilver.Interop.ExecuteJavaScriptString($"document.getBBox({sDiv})"));

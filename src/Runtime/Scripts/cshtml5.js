@@ -329,6 +329,67 @@ document.drawSvgRadialGradient = function (id, cx, cy, r, units, spreadMethod, t
     }
 };
 
+document.setSvgPatternNaturalSize = function (patternId, imageId, renderTargetId, alignX, alignY) {
+    const pattern = document.getElementById(patternId);
+    const image = document.getElementById(imageId);
+    const renderTarget = document.getElementById(renderTargetId);
+
+    if (!pattern || !image || !renderTarget) return;
+
+    const img = document.createElement('img');
+    img.src = image.getAttribute('href');
+    img.onload = function () {
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+
+        image.setAttribute('width', naturalWidth);
+        image.setAttribute('height', naturalHeight);
+
+        const bounds = renderTarget.getBoundingClientRect();
+        const width = bounds.width;
+        const height = bounds.height;
+
+        switch (alignX) {
+            case 0: // AlignmentX.Left
+                viewBoxAlignX = 0;
+                break;
+
+            case 1: // AlignmentX.Center
+                viewBoxAlignX = (naturalWidth - width) / 2;
+                break;
+
+            case 2: // AlignmentX.Right
+                viewBoxAlignX = naturalWidth - width;
+                break;
+
+            default:
+                viewBoxAlignX = 0;
+                break;
+        }
+
+        let viewBoxAlignY;
+        switch (alignY) {
+            case 0: // AlignmentY.Top
+                viewBoxAlignY = 0;
+                break;
+
+            case 1: // AlignmentY.Center
+                viewBoxAlignY = (naturalHeight - height) / 2;
+                break;
+
+            case 2: // AlignmentY.Bottom
+                viewBoxAlignY = naturalHeight - height;
+                break;
+
+            default:
+                viewBoxAlignY = 0;
+                break;
+        }
+
+        pattern.setAttribute('viewBox', `${viewBoxAlignX} ${viewBoxAlignY} ${width} ${height}`);
+    };
+};
+
 document.arrangeRectangle = function (id, x, y, width, height) {
     const rect = document.getElementById(id);
     if (rect) {
