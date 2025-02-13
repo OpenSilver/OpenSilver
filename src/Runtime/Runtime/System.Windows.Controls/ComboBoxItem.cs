@@ -22,14 +22,20 @@ namespace System.Windows.Controls
     {
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            e.Handled = true;
+            if (!e.IsTouchEvent) // touch event should bubble to the parent ScrollViewer
+            {
+                e.Handled = true;
+            }
 
             base.OnMouseLeftButtonDown(e);
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            e.Handled = true;
+            if (!e.IsTouchEvent) // touch event should bubble to the parent ScrollViewer
+            {
+                e.Handled = true;
+            }
 
             ComboBox parent = ParentComboBox;
 
