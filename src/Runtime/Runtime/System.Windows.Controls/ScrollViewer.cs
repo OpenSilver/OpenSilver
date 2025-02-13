@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -54,6 +55,7 @@ namespace System.Windows.Controls
 
         private bool _invalidatedMeasureFromArrange;
         private TouchInfo _touchInfo;
+        private DispatcherTimer _inertiaTimer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollViewer"/> class.
@@ -730,6 +732,12 @@ namespace System.Windows.Controls
                     HorizontalOffset = ScrollInfo.HorizontalOffset,
                     VerticalOffset = ScrollInfo.VerticalOffset,
                 };
+
+                if (_inertiaTimer != null)
+                {
+                    _inertiaTimer.Stop();
+                    _inertiaTimer = null;
+                }
             }
         }
 
@@ -737,7 +745,14 @@ namespace System.Windows.Controls
         {
             base.OnMouseLeftButtonUp(e);
 
-            _touchInfo = null;
+            if (_touchInfo != null)
+            {
+                if (ComputedVerticalScrollBarVisibility == Visibility.Visible || ComputedHorizontalScrollBarVisibility == Visibility.Visible)
+                {
+                    StartScrollingInertia(_touchInfo.VelocityX, _touchInfo.VelocityY, _touchInfo.HorizontalOffset, _touchInfo.VerticalOffset);
+                }
+                _touchInfo = null;
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -754,6 +769,7 @@ namespace System.Windows.Controls
             if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
             {
                 double deltaX = _touchInfo.X - position.X;
+                _touchInfo.VelocityX = deltaX;
                 _touchInfo.HorizontalOffset += deltaX;
                 ScrollToHorizontalOffset(_touchInfo.HorizontalOffset);
             }
@@ -762,11 +778,48 @@ namespace System.Windows.Controls
             {
                 double deltaY = _touchInfo.Y - position.Y;
                 _touchInfo.VerticalOffset += deltaY;
+                _touchInfo.VelocityY = deltaY;
                 ScrollToVerticalOffset(_touchInfo.VerticalOffset);
             }
 
             _touchInfo.X = position.X;
             _touchInfo.Y = position.Y;
+        }
+
+        private void StartScrollingInertia(double velocityX, double velocityY, double horizontalOffset, double verticalOffset)
+        {
+            const double Deceleration = 0.95;
+            const double Threshold = 0.1;
+
+            _inertiaTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) }; // Approximately 60 FPS
+
+            _inertiaTimer.Tick += (s, e) =>
+            {
+                var scrolledHorizontally = Math.Abs(velocityX) < Threshold || ComputedHorizontalScrollBarVisibility == Visibility.Collapsed;
+                var scrolledVertically = Math.Abs(velocityY) < Threshold || ComputedVerticalScrollBarVisibility == Visibility.Collapsed;
+
+                if (scrolledHorizontally && scrolledVertically)
+                {
+                    _inertiaTimer.Stop();
+                    return;
+                }
+
+                if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
+                {
+                    horizontalOffset += velocityX;
+                    ScrollToHorizontalOffset(horizontalOffset);
+                    velocityX *= Deceleration;
+                }
+
+                if (ComputedVerticalScrollBarVisibility == Visibility.Visible)
+                {
+                    verticalOffset += velocityY;
+                    ScrollToVerticalOffset(verticalOffset);
+                    velocityY *= Deceleration;
+                }
+            };
+
+            _inertiaTimer.Start();
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
@@ -1394,6 +1447,8 @@ namespace System.Windows.Controls
             public double Y;
             public double HorizontalOffset;
             public double VerticalOffset;
+            public double VelocityX;
+            public double VelocityY;
         }
     }
 }
