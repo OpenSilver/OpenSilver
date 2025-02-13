@@ -1,12 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Net;
+﻿using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Resources;
 #if OPENSILVER
 using OpenFileDialog = OpenSilver.Controls.OpenFileDialog;
 using SaveFileDialog = OpenSilver.Controls.SaveFileDialog;
@@ -60,16 +56,32 @@ namespace TestApplication.OpenSilver.Tests
             }
         }
 
-#if OPENSILVER
-        private async void SaveTextButton_Click(object sender, RoutedEventArgs e)
-#else
         private void SaveTextButton_Click(object sender, RoutedEventArgs e)
+        {
+            Save("Text files|*.txt", null, null);
+        }
+
+#if OPENSILVER
+        private async void Save(string filter, string defaultFilename, string defaultExt)
+#else
+        private void Save(string filter, string defaultFilename, string defaultExt)
 #endif
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            if (!string.IsNullOrEmpty(filter))
             {
-                Filter = "*.txt|*.txt"
-            };
+                saveFileDialog.Filter = filter;
+            }
+            if (!string.IsNullOrEmpty(defaultFilename))
+            {
+                saveFileDialog.DefaultFileName = defaultFilename;
+            }
+            if (!string.IsNullOrEmpty(defaultExt))
+            {
+                saveFileDialog.DefaultExt = defaultExt;
+            }
+
 #if OPENSILVER
             bool? result = await saveFileDialog.ShowDialogAsync();
 #else
@@ -97,6 +109,21 @@ namespace TestApplication.OpenSilver.Tests
             {
                 MessageBox.Show("Result from file dialog was false.");
             }
+        }
+
+        private void SaveTextWithoutFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            Save(null, null, null);
+        }
+
+        private void SaveTextWithDefaultFilenameButton_Click(object sender, RoutedEventArgs e)
+        {
+            Save(null, "default-filename.txt", null);
+        }
+
+        private void SaveTextWithDefaultExtButton_Click(object sender, RoutedEventArgs e)
+        {
+            Save("All files|*.*", "default-filename-without-extension", ".defExt");
         }
     }
 }
