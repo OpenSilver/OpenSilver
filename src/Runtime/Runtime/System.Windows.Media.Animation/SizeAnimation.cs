@@ -197,11 +197,8 @@ public sealed class SizeAnimation : AnimationTimeline, IFromByToAnimation<Size>
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Size>(
-            this,
-            isRoot,
-            new FromToByAnimator<Size>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<Size>(this, new FromToByAnimator<Size>(this));
 
     Size IFromByToAnimation<Size>.InterpolateValue(Size from, Size to, double progress) =>
         AnimatedTypeHelpers.InterpolateSize(from, to, progress);

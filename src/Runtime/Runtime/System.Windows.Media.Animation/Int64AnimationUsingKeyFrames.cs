@@ -53,8 +53,8 @@ public sealed class Int64AnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<long>(this, isRoot, new KeyFramesAnimator<long>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<long>(this, new KeyFramesAnimator<long>(this));
 
     private void SetKeyFrames(Int64KeyFrameCollection keyFrames)
     {

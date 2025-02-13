@@ -22,8 +22,8 @@ namespace OpenSilver.Internal.Media.Animation;
 
 internal abstract class AnimationClock : TimelineClock
 {
-    protected AnimationClock(AnimationTimeline owner, bool isRoot)
-        : base(owner, isRoot)
+    protected AnimationClock(AnimationTimeline owner)
+        : base(owner)
     {
     }
 

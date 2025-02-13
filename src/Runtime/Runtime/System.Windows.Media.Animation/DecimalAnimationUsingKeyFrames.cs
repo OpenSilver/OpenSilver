@@ -53,8 +53,8 @@ public sealed class DecimalAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<decimal>(this, isRoot, new KeyFramesAnimator<decimal>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<decimal>(this, new KeyFramesAnimator<decimal>(this));
 
     private void SetKeyFrames(DecimalKeyFrameCollection keyFrames)
     {

@@ -53,8 +53,8 @@ public sealed class MatrixAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<Matrix>(this, isRoot, new KeyFramesAnimator<Matrix>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<Matrix>(this, new KeyFramesAnimator<Matrix>(this));
 
     private void SetKeyFrames(MatrixKeyFrameCollection keyFrames)
     {

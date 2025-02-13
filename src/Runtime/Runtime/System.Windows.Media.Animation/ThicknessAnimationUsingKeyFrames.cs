@@ -53,8 +53,8 @@ public sealed class ThicknessAnimationUsingKeyFrames : AnimationTimeline, IKeyFr
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<Thickness>(this, isRoot, new KeyFramesAnimator<Thickness>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<Thickness>(this, new KeyFramesAnimator<Thickness>(this));
 
     private void SetKeyFrames(ThicknessKeyFrameCollection keyFrames)
     {

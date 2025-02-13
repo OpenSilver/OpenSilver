@@ -117,11 +117,8 @@ public sealed class ColorAnimation : AnimationTimeline, IFromByToAnimation<Color
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Color>(
-            this,
-            isRoot,
-            new FromToByAnimator<Color>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<Color>(this, new FromToByAnimator<Color>(this));
 
     Color IFromByToAnimation<Color>.InterpolateValue(Color from, Color to, double progress) =>
         AnimatedTypeHelpers.InterpolateColor(from, to, progress);

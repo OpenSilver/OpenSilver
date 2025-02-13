@@ -197,11 +197,8 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Vector>(
-            this,
-            isRoot,
-            new FromToByAnimator<Vector>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<Vector>(this, new FromToByAnimator<Vector>(this));
 
     Vector IFromByToAnimation<Vector>.InterpolateValue(Vector from, Vector to, double progress) =>
         AnimatedTypeHelpers.InterpolateVector(from, to, progress);

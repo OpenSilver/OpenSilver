@@ -196,11 +196,8 @@ public sealed class SingleAnimation : AnimationTimeline, IFromByToAnimation<floa
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<float>(
-            this,
-            isRoot,
-            new FromToByAnimator<float>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<float>(this, new FromToByAnimator<float>(this));
 
     float IFromByToAnimation<float>.InterpolateValue(float from, float to, double progress) =>
         AnimatedTypeHelpers.InterpolateSingle(from, to, progress);

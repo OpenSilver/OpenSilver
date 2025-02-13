@@ -197,11 +197,8 @@ public sealed class DecimalAnimation : AnimationTimeline, IFromByToAnimation<dec
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<decimal>(
-            this,
-            isRoot,
-            new FromToByAnimator<decimal>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<decimal>(this, new FromToByAnimator<decimal>(this));
 
     decimal IFromByToAnimation<decimal>.InterpolateValue(decimal from, decimal to, double progress) =>
         AnimatedTypeHelpers.InterpolateDecimal(from, to, progress);

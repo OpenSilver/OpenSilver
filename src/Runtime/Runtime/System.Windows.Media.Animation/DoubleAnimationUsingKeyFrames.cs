@@ -54,8 +54,8 @@ public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<double>(this, isRoot, new KeyFramesAnimator<double>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<double>(this, new KeyFramesAnimator<double>(this));
 
     private void SetKeyFrames(DoubleKeyFrameCollection keyFrames)
     {

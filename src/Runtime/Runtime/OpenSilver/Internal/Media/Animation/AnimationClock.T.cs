@@ -29,8 +29,8 @@ internal sealed class AnimationClock<TValue> : AnimationClock
     private DependencyProperty _dp;
     private TValue _initialValue;
 
-    public AnimationClock(AnimationTimeline owner, bool isRoot, IValueAnimator<TValue> animator)
-        : base(owner, isRoot)
+    public AnimationClock(AnimationTimeline owner, IValueAnimator<TValue> animator)
+        : base(owner)
     {
         Debug.Assert(animator is not null);
         _animator = animator;

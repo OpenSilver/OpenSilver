@@ -197,11 +197,8 @@ public sealed class ByteAnimation : AnimationTimeline, IFromByToAnimation<byte>
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<byte>(
-            this,
-            isRoot,
-            new FromToByAnimator<byte>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<byte>(this, new FromToByAnimator<byte>(this));
 
     byte IFromByToAnimation<byte>.InterpolateValue(byte from, byte to, double progress) =>
         AnimatedTypeHelpers.InterpolateByte(from, to, progress);

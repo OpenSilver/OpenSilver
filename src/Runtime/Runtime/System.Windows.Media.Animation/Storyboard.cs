@@ -27,7 +27,6 @@ namespace System.Windows.Media.Animation;
 public sealed class Storyboard : Timeline
 {
     private TimelineCollection _children;
-    private TimelineClock _activeClock;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Storyboard"/> class.
@@ -152,101 +151,505 @@ public sealed class Storyboard : Timeline
     public static void SetTarget(Timeline element, DependencyObject target) => element.SetValueInternal(TargetProperty, target);
 
     /// <summary>
-    /// Initiates the set of animations associated with the storyboard.
+    /// Applies the animations associated with this <see cref="Storyboard"/> to their targets and initiates them.
     /// </summary>
-    public void Begin() => BeginCommon(this, false);
+    public void Begin() => BeginCommon(this, true, false);
 
-    internal void Begin(DependencyObject containingObject, bool alignedToLastTick) =>
-        BeginCommon(containingObject, alignedToLastTick);
+    /// <summary>
+    /// Applies the animations associated with this <see cref="Storyboard"/> to their targets and initiates them.
+    /// </summary>
+    /// <param name="containingObject">
+    /// An object contained within the same name scope as the targets of this storyboard's animations. Animations without a
+    /// Storyboard.TargetName are applied to containingObject.
+    /// </param>
+    public void Begin(FrameworkElement containingObject) => BeginCommon(containingObject, true, false);
 
-    private void BeginCommon(DependencyObject containingObject, bool alignedToLastTick)
+    /// <summary>
+    /// Applies the animations associated with this <see cref="Storyboard"/> to their targets and initiates them.
+    /// </summary>
+    /// <param name="containingObject">
+    /// An object contained within the same name scope as the targets of this storyboard's animations. Animations 
+    /// without a Storyboard.TargetName are applied to containingObject.
+    /// </param>
+    /// <param name="isControllable">
+    /// true if the storyboard should be interactively controllable; otherwise, false.
+    /// </param>
+    public void Begin(FrameworkElement containingObject, bool isControllable) => BeginCommon(containingObject, isControllable, false);
+
+    // This method should only be used by VisualStateManager for Silverlight compatibility. In WPF, Begin is asynchronous. In 
+    // Silverlight the VSM fires a frame immediately, but other storyboards don't.
+    internal void BeginVSM(FrameworkElement containingObject) => BeginCommon(containingObject, true, true);
+
+    private void BeginCommon(DependencyObject containingObject, bool isControllable, bool alignedToLastTick)
     {
-        _activeClock?.Pause();
+        if (GetStoryboardClock(containingObject, false) is TimelineClock currentClock)
+        {
+            currentClock.Controller.Pause();
+        }
 
-        _activeClock = CreateClock(true);
-        ClockTreeWalkRecursive(_activeClock,
+        TimelineClock storyboardClockTree = CreateClock();
+        storyboardClockTree.IsRoot = true;
+        storyboardClockTree.HasControllableRoot = isControllable;
+
+        ClockTreeWalkRecursive(storyboardClockTree,
             containingObject,
             null,
             null,
             null,
             null);
 
-        _activeClock.Begin(alignedToLastTick);
+        if (isControllable)
+        {
+            SetStoryboardClock(containingObject, storyboardClockTree);
+        }
+
+        storyboardClockTree.InternalBegin(alignedToLastTick);
     }
 
     /// <summary>
-    /// Gets the clock state of the storyboard.
+    /// Retrieves the current iteration of the clock that was created for this <see cref="Storyboard"/>.
     /// </summary>
     /// <returns>
-    /// One of the enumeration values: <see cref="ClockState.Active"/>,
+    /// This clock's current iteration within its current active period, or null if this clock is stopped.
+    /// </returns>
+    public int GetCurrentIteration() => GetCurrentIterationImpl(this) ?? 0;
+
+    /// <summary>
+    /// Retrieves the current iteration of the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <returns>
+    /// This clock's current iteration within its current active period, or null if this clock is stopped.
+    /// </returns>
+    public int? GetCurrentIteration(FrameworkElement containingObject) => GetCurrentIterationImpl(containingObject);
+
+    private int? GetCurrentIterationImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, true) is TimelineClock clock)
+        {
+            return clock.CurrentIteration;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Retrieves the current progress of the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <returns>
+    /// null if this clock is <see cref="ClockState.Stopped"/>, or 0.0 if this clock is active and its timeline
+    /// has a <see cref="Timeline.Duration"/> of <see cref="Duration.Forever"/>; otherwise, a value between 0.0 
+    /// and 1.0 that indicates the current progress of this clock within its current iteration. A value of 0.0 
+    /// indicates no progress, and a value of 1.0 indicates that the clock is at the end of its current iteration.
+    /// </returns>
+    public double GetCurrentProgress() => GetCurrentProgressImpl(this) ?? 0;
+
+    /// <summary>
+    /// Retrieves the current progress of the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <returns>
+    /// null if this clock is <see cref="ClockState.Stopped"/>, or 0.0 if this clock is active and its timeline
+    /// has a <see cref="Timeline.Duration"/> of <see cref="Duration.Forever"/>; otherwise, a value between 0.0 
+    /// and 1.0 that indicates the current progress of this clock within its current iteration. A value of 0.0 
+    /// indicates no progress, and a value of 1.0 indicates that the clock is at the end of its current iteration.
+    /// </returns>
+    public double? GetCurrentProgress(FrameworkElement containingObject) => GetCurrentProgressImpl(containingObject);
+
+    private double? GetCurrentProgressImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, true) is TimelineClock clock)
+        {
+            return clock.CurrentProgress;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Retrieves the current state of the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <returns>
+    /// The current state of the clock created for this storyboard: <see cref="ClockState.Active"/>,
     /// <see cref="ClockState.Filling"/>, or <see cref="ClockState.Stopped"/>.
     /// </returns>
-    public ClockState GetCurrentState() => _activeClock?.CurrentState ?? ClockState.Stopped;
+    public ClockState GetCurrentState() => GetCurrentStateImpl(this);
 
     /// <summary>
-    /// Gets the current time of the storyboard.
+    /// Retrieves the current state of the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement)"/> method was called. This 
+    /// object contains the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <returns>
+    /// The current state of the clock created for this storyboard: <see cref="ClockState.Active"/>,
+    /// <see cref="ClockState.Filling"/>, or <see cref="ClockState.Stopped"/>.
+    /// </returns>
+    public ClockState GetCurrentState(FrameworkElement containingObject) => GetCurrentStateImpl(containingObject);
+
+    private ClockState GetCurrentStateImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, true) is TimelineClock clock)
+        {
+            return clock.CurrentState;
+        }
+        return ClockState.Stopped;
+    }
+
+    /// <summary>
+    /// Retrieves the current time of the clock that was created for this <see cref="Storyboard"/>.
     /// </summary>
     /// <returns>
-    /// The current time of the storyboard, or null if the storyboard's clock is <see cref="ClockState.Stopped"/>.
+    /// <see cref="TimeSpan.Zero"/> if this storyboard's clock is <see cref="ClockState.Stopped"/>; otherwise, the 
+    /// current time of the storyboard's clock.
     /// </returns>
-    public TimeSpan GetCurrentTime() => _activeClock?.CurrentTime ?? TimeSpan.Zero;
+    public TimeSpan GetCurrentTime() => GetCurrentTimeImpl(this) ?? TimeSpan.Zero;
 
     /// <summary>
-    /// Pauses the animation clock associated with the storyboard.
+    /// Retrieves the current time of the clock that was created for this <see cref="Storyboard"/>.
     /// </summary>
-    public void Pause() => _activeClock?.Pause();
-
-    /// <summary>
-    /// Resumes the animation clock, or run-time state, associated with the storyboard.
-    /// </summary>
-    public void Resume() => _activeClock?.Resume();
-
-    /// <summary>
-    /// Moves the storyboard to the specified animation position. The storyboard performs
-    /// the requested seek when the next clock tick occurs.
-    /// </summary>
-    /// <param name="offset">
-    /// A positive or negative time value that describes the amount by which the timeline
-    /// should move forward or backward from the beginning of the animation. By using
-    /// the <see cref="TimeSpan"/> Parse behavior, a <see cref="TimeSpan"/> can be specified 
-    /// as a string in the following format (in this syntax, the [] characters denote optional 
-    /// components of the string, but the quotes, colons, and periods are all a literal part of
-    /// the syntax):"[days.]hours:minutes:seconds[.fractionalSeconds]"- or -"days"
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
     /// </param>
-    public void Seek(TimeSpan offset) => _activeClock?.Seek(offset);
+    /// <returns>
+    /// null if this storyboard's clock is <see cref="ClockState.Stopped"/>; otherwise, the current time of the 
+    /// storyboard's clock.
+    /// </returns>
+    public TimeSpan? GetCurrentTime(FrameworkElement containingObject) => GetCurrentTimeImpl(containingObject);
 
-    /// <summary>
-    /// Moves the storyboard to the specified animation position immediately(synchronously).
-    /// </summary>
-    /// <param name="offset">
-    /// A positive or negative time value that describes the amount by which the timeline should move
-    /// forward or backward from the beginning of the animation. By using the TimeSpan Parse behavior,
-    /// a TimeSpan can be specified as a string in the following format (in this syntax, the [] characters
-    /// denote optional components of the string, but the quotes, colons, and periods are all a literal part of the syntax):
-    ///"[days.]hours:minutes:seconds[.fractionalSeconds]"
-    ///- or -
-    ///"days"
-    /// </param>
-    public void SeekAlignedToLastTick(TimeSpan offset) => _activeClock?.SeekAlignedToLastTick(offset);
-
-    /// <summary>
-    /// Advances the current time of the storyboard's clock to the end of its active period.
-    /// </summary>
-    public void SkipToFill() => _activeClock?.SkipToFill();
-
-    /// <summary>
-    /// Stops the storyboard.
-    /// </summary>
-    public void Stop()
+    private TimeSpan? GetCurrentTimeImpl(DependencyObject containingObject)
     {
-        if (_activeClock is not null)
+        if (GetStoryboardClock(containingObject, true) is TimelineClock clock)
         {
-            _activeClock.Stop();
-            _activeClock = null;
+            return clock.CurrentTime;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Retrieves a value that indicates whether the clock that was created for this <see cref="Storyboard"/> is paused.
+    /// </summary>
+    /// <returns>
+    /// true if the clock created for this <see cref="Storyboard"/> is paused; otherwise, false.
+    /// </returns>
+    public bool GetIsPaused() => GetIsPausedImpl(this);
+
+    /// <summary>
+    /// Retrieves a value that indicates whether the clock that was created for this <see cref="Storyboard"/> is paused.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <returns>
+    /// true if the clock created for this <see cref="Storyboard"/> is paused; otherwise, false.
+    /// </returns>
+    public bool GetIsPaused(FrameworkElement containingObject) => GetIsPausedImpl(containingObject);
+
+    private bool GetIsPausedImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, true) is TimelineClock clock)
+        {
+            return clock.IsPaused;
+        }
+
+        // A clock that has been disposed is not in a paused state.
+        return false;
+    }
+
+    /// <summary>
+    /// Pauses the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    public void Pause() => PauseImpl(this);
+
+    /// <summary>
+    /// Pauses the clock of the specified <see cref="FrameworkElement"/> associated with this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    public void Pause(FrameworkElement containingObject) => PauseImpl(containingObject);
+
+    private void PauseImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, false) is TimelineClock clock)
+        {
+            clock.Controller.Pause();
         }
     }
 
-    internal override TimelineClock CreateClock(bool isRoot) => new StoryboardClock(this, isRoot);
+    /// <summary>
+    /// Resumes the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    public void Resume() => ResumeImpl(this);
+
+    /// <summary>
+    /// Resumes the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    public void Resume(FrameworkElement containingObject) => ResumeImpl(containingObject);
+
+    private void ResumeImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, false) is TimelineClock clock)
+        {
+            clock.Controller.Resume();
+        }
+    }
+
+    /// <summary>
+    /// Seeks this <see cref="Storyboard"/> to the specified position. The <see cref="Storyboard"/> performs the 
+    /// requested seek when the next clock tick occurs.
+    /// </summary>
+    /// <param name="offset">
+    /// A positive or negative value that describes the amount by which the timeline should move forward or backward.
+    /// </param>
+    public void Seek(TimeSpan offset) => SeekImpl(this, offset, TimeSeekOrigin.BeginTime);
+
+    /// <summary>
+    /// Seeks this <see cref="Storyboard"/> to the specified position. The <see cref="Storyboard"/> performs the requested 
+    /// seek when the next clock tick occurs.
+    /// </summary>
+    /// <param name="offset">
+    /// A positive or negative value that describes the amount by which the timeline should move forward or backward from 
+    /// the specified origin.
+    /// </param>
+    /// <param name="origin">
+    /// The position from which offset is applied.
+    /// </param>
+    public void Seek(TimeSpan offset, TimeSeekOrigin origin) => SeekImpl(this, offset, origin);
+
+    /// <summary>
+    /// Seeks this <see cref="Storyboard"/> to the specified position. The <see cref="Storyboard"/> performs the 
+    /// requested seek when the next clock tick occurs.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <param name="offset">
+    /// A positive or negative value that describes the amount by which the timeline should move forward or backward 
+    /// from the specified origin.
+    /// </param>
+    public void Seek(FrameworkElement containingObject, TimeSpan offset) => SeekImpl(containingObject, offset, TimeSeekOrigin.BeginTime);
+
+    /// <summary>
+    /// Seeks this <see cref="Storyboard"/> to the specified position. The <see cref="Storyboard"/> performs the requested 
+    /// seek when the next clock tick occurs.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <param name="offset">
+    /// A positive or negative value that describes the amount by which the timeline should move forward or backward from 
+    /// the specified origin.
+    /// </param>
+    /// <param name="origin">
+    /// The position from which offset is applied.
+    /// </param>
+    public void Seek(FrameworkElement containingObject, TimeSpan offset, TimeSeekOrigin origin) => SeekImpl(containingObject, offset, origin);
+
+    private void SeekImpl(DependencyObject containingObject, TimeSpan offset, TimeSeekOrigin origin)
+    {
+        if (GetStoryboardClock(containingObject, false) is TimelineClock clock)
+        {
+            clock.Controller.Seek(offset, origin);
+        }
+    }
+
+    /// <summary>
+    /// Seeks this <see cref="Storyboard"/> to a new position immediately (synchronously).
+    /// </summary>
+    /// <param name="offset">
+    /// A positive or negative value that describes the amount by which the timeline should move forward or backward.
+    /// </param>
+    public void SeekAlignedToLastTick(TimeSpan offset) => SeekAlignedToLastTickImpl(this, offset, TimeSeekOrigin.BeginTime);
+
+    /// <summary>
+    /// Seeks this <see cref="Storyboard"/> to a new position immediately (synchronously).
+    /// </summary>
+    /// <param name="offset">
+    /// A positive or negative value that describes the amount by which the timeline should move forward or backward 
+    /// from the specified origin.
+    /// </param>
+    /// <param name="origin">
+    /// The position from which offset is applied.
+    /// </param>
+    public void SeekAlignedToLastTick(TimeSpan offset, TimeSeekOrigin origin) => SeekAlignedToLastTickImpl(this, offset, origin);
+
+    /// <summary>
+    /// Seeks this <see cref="Storyboard"/> to a new position immediately (synchronously).
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <param name="offset">
+    /// A positive or negative value that describes the amount by which the timeline should move forward or backward from 
+    /// the specified origin.
+    /// </param>
+    /// <param name="origin">
+    /// The position from which offset is applied.
+    /// </param>
+    public void SeekAlignedToLastTick(FrameworkElement containingObject, TimeSpan offset, TimeSeekOrigin origin) =>
+        SeekAlignedToLastTickImpl(containingObject, offset, origin);
+
+    private void SeekAlignedToLastTickImpl(DependencyObject containingObject, TimeSpan offset, TimeSeekOrigin origin)
+    {
+        if (GetStoryboardClock(containingObject, false) is TimelineClock clock)
+        {
+            clock.Controller.SeekAlignedToLastTick(offset, origin);
+        }
+    }
+
+    /// <summary>
+    /// Advances the current time of this storyboard's clock to the end of its active period.
+    /// </summary>
+    public void SkipToFill() => SkipToFillImpl(this);
+
+    /// <summary>
+    /// Advances the current time of this storyboard's clock to the end of its active period.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    public void SkipToFill(FrameworkElement containingObject) => SkipToFillImpl(containingObject);
+
+    private void SkipToFillImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, false) is TimelineClock clock)
+        {
+            clock.Controller.SkipToFill();
+        }
+    }
+
+    /// <summary>
+    /// Stops the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    public void Stop() => StopImpl(this);
+
+    /// <summary>
+    /// Stops the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    public void Stop(FrameworkElement containingObject) => StopImpl(containingObject);
+
+    private void StopImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, false) is TimelineClock clock)
+        {
+            clock.Controller.Stop();
+        }
+    }
+
+    /// <summary>
+    /// Removes the clock objects that were created for this <see cref="Storyboard"/>. Animations that belong 
+    /// to this <see cref="Storyboard"/> no longer affect the properties they once animated, regardless of their 
+    /// <see cref="Timeline.FillBehavior"/> setting.
+    /// </summary>
+    public void Remove() => RemoveImpl(this, true);
+
+    /// <summary>
+    /// Removes the clock objects that were created for this <see cref="Storyboard"/>. Animations that belong 
+    /// to this <see cref="Storyboard"/> no longer affect the properties they once animated, regardless of their 
+    /// <see cref="Timeline.FillBehavior"/> setting.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    public void Remove(FrameworkElement containingObject) => RemoveImpl(containingObject, true);
+
+    // This method should only be used by VisualStateManager for Silverlight compatibility. In WPF, Remove fires the Completed
+    // event if it was not already fired, but the event is not fired in Silverlight when the storyboard is removed by the VSM.
+    internal void RemoveVSM(FrameworkElement containingObject) => RemoveImpl(containingObject, false);
+
+    private void RemoveImpl(DependencyObject containingObject, bool raiseCompletedEvent)
+    {
+        var clocks = (Dictionary<Storyboard, WeakReference<TimelineClock>>)containingObject.GetValue(StoryboardClockTreesField);
+
+        if (clocks is not null && clocks.TryGetValue(this, out WeakReference<TimelineClock> clockReference))
+        {
+            if (clockReference.TryGetTarget(out TimelineClock clock))
+            {
+                if (raiseCompletedEvent)
+                {
+                    clock.Controller.Remove();
+                }
+                else
+                {
+                    clock.Controller.Stop();
+                }
+            }
+
+            clocks.Remove(this);
+        }
+    }
+
+    internal override TimelineClock CreateClock() => new StoryboardClock(this);
+
+    private static readonly DependencyProperty StoryboardClockTreesField =
+        DependencyProperty.RegisterAttached(
+            nameof(StoryboardClockTreesField),
+            typeof(Dictionary<Storyboard, WeakReference<TimelineClock>>),
+            typeof(Storyboard),
+            null);
+
+    private TimelineClock GetStoryboardClock(DependencyObject o, bool throwIfNull)
+    {
+        Debug.Assert(o is not null);
+
+        WeakReference<TimelineClock> weakClock = null;
+
+        var clocks = (Dictionary<Storyboard, WeakReference<TimelineClock>>)o.GetValue(StoryboardClockTreesField);
+
+        if (clocks is null || !clocks.TryGetValue(this, out weakClock))
+        {
+            if (throwIfNull)
+            {
+                throw new InvalidOperationException(Strings.Storyboard_NeverApplied);
+            }
+        }
+
+        if (weakClock is not null && weakClock.TryGetTarget(out TimelineClock clock))
+        {
+            return clock;
+        }
+
+        return null;
+    }
+
+    private void SetStoryboardClock(DependencyObject o, TimelineClock clock)
+    {
+        Debug.Assert(o is not null);
+
+        var clocks = (Dictionary<Storyboard, WeakReference<TimelineClock>>)o.GetValue(StoryboardClockTreesField);
+
+        if (clocks is null)
+        {
+            clocks = new();
+            o.SetValue(StoryboardClockTreesField, clocks);
+        }
+
+        clocks[this] = clock.WeakReference;
+    }
 
     /// <summary>
     /// Recursively walks the timeline tree and determine the target object
@@ -278,33 +681,30 @@ public sealed class Storyboard : Timeline
 
         // If we have target object/property information, use it instead of the
         //  parent's information.
-        string nameString = (string)currentTimeline.GetValue(TargetNameProperty);
-        if (nameString != null)
+        if (currentTimeline.GetValue(TargetNameProperty) is string nameString)
         {
             currentObjectName = nameString;
         }
 
         // The TargetProperty trumps the TargetName property.
-        DependencyObject localTargetObject = (DependencyObject)currentTimeline.GetValue(TargetProperty);
-        if (localTargetObject != null)
+        if (currentTimeline.GetValue(TargetProperty) is DependencyObject localTargetObject)
         {
             targetObject = localTargetObject;
             currentObjectName = null;
         }
 
-        PropertyPath propertyPath = (PropertyPath)currentTimeline.GetValue(TargetPropertyProperty);
-        if (propertyPath != null)
+        if (currentTimeline.GetValue(TargetPropertyProperty) is PropertyPath propertyPath)
         {
             currentPropertyPath = propertyPath;
         }
 
         if (currentTimeline is not Storyboard storyboard)
         {
-            if (targetObject == null)
+            if (targetObject is null)
             {
                 // Resolve the target object name.  If no name specified, use the
                 //  containing object.
-                if (currentObjectName != null)
+                if (currentObjectName is not null)
                 {
                     targetObject = ResolveTargetName(
                         currentObjectName,
@@ -325,7 +725,7 @@ public sealed class Storyboard : Timeline
             }
 
             // See if we have a property name to use.
-            if (currentPropertyPath == null)
+            if (currentPropertyPath is null)
             {
                 throw new InvalidOperationException(string.Format(Strings.Storyboard_TargetPropertyRequired, currentTimeline.GetType()));
             }
@@ -342,8 +742,7 @@ public sealed class Storyboard : Timeline
 
             for (int i = 0; i < childrenTimelines.Count; i++)
             {
-                TimelineClock childClock = childrenTimelines[i].CreateClock(false);
-                if (childClock == null)
+                if (childrenTimelines[i].CreateClock() is not TimelineClock childClock)
                 {
                     continue;
                 }
@@ -366,11 +765,11 @@ public sealed class Storyboard : Timeline
         object namedObject;
         DependencyObject targetObject;
 
-        if (nameResolver != null)
+        if (nameResolver is not null)
         {
             namedObject = nameResolver.Resolve(targetName);
         }
-        else if (fe != null)
+        else if (fe is not null)
         {
             namedObject = fe.FindName(targetName);
         }
@@ -379,13 +778,13 @@ public sealed class Storyboard : Timeline
             throw new InvalidOperationException(string.Format(Strings.Storyboard_NoNameScope, targetName));
         }
 
-        if (namedObject == null)
+        if (namedObject is null)
         {
             throw new InvalidOperationException(string.Format(Strings.Storyboard_NameNotFound, targetName, fe.GetType()));
         }
 
         targetObject = namedObject as DependencyObject;
-        if (targetObject == null)
+        if (targetObject is null)
         {
             throw new InvalidOperationException(string.Format(Strings.Storyboard_TargetNameNotDependencyObject, targetName));
         }
@@ -397,8 +796,8 @@ public sealed class Storyboard : Timeline
     {
         private readonly List<TimelineClock> _children = new();
 
-        public StoryboardClock(Storyboard owner, bool isRoot)
-            : base(owner, isRoot)
+        public StoryboardClock(Storyboard owner)
+            : base(owner)
         {
         }
 

@@ -545,6 +545,9 @@
   <data name="Storyboard_NameNotFound" xml:space="preserve">
     <value>'{0}' name cannot be found in the name scope of '{1}'.</value>
   </data>
+  <data name="Storyboard_NeverApplied" xml:space="preserve">
+    <value>Cannot perform action because the specified Storyboard was not applied to this object for interactive control.</value>
+  </data>
   <data name="Storyboard_NoNameScope" xml:space="preserve">
     <value>No applicable name scope exists to resolve the name '{0}'.</value>
   </data>
@@ -592,6 +595,12 @@
   </data>
   <data name="Timing_RepeatBehaviorNotRepeatDuration" xml:space="preserve">
     <value>'{0}' RepeatBehavior does not represent a repeat duration and does not have a RepeatDuration value.</value>
+  </data>
+  <data name="Timing_SeekDestinationIndefinite" xml:space="preserve">
+    <value>The ClockController.Seek method was called using TimeSeekOrigin.Duration as the seekOrigin parameter for a Clock that has a duration of Forever. Clocks that have duration of Forever must use TimeSeekOrigin.BeginTime.</value>
+  </data>
+  <data name="Timing_SeekDestinationNegative" xml:space="preserve">
+    <value>The ClockController.Seek method was called with arguments that describe a seek destination with a negative value. The seek destination must be a time greater than or equal to zero.</value>
   </data>
   <data name="Timing_SkipToFillDestinationIndefinite" xml:space="preserve">
     <value>Cannot call the Storyboard.SkipToFill method for a Storyboard that has a Duration or RepeatDuration of Forever, because this Storyboard will never reach its fill period.</value>

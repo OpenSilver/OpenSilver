@@ -197,11 +197,8 @@ public sealed class ThicknessAnimation : AnimationTimeline, IFromByToAnimation<T
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Thickness>(
-            this,
-            isRoot,
-            new FromToByAnimator<Thickness>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<Thickness>(this, new FromToByAnimator<Thickness>(this));
 
     Thickness IFromByToAnimation<Thickness>.InterpolateValue(Thickness from, Thickness to, double progress) =>
         AnimatedTypeHelpers.InterpolateThickness(from, to, progress);

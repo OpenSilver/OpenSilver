@@ -198,5 +198,5 @@ public abstract partial class Timeline : DependencyObject
 
     internal INameResolver NameResolver { get; set; }
 
-    internal virtual TimelineClock CreateClock(bool isRoot) => null;
+    internal virtual TimelineClock CreateClock() => null;
 }

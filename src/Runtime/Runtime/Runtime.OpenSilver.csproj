@@ -39,6 +39,7 @@
     <Compile Include="OpenSilver\Internal\ISealable.cs" />
     <Compile Include="OpenSilver\Internal\ITemplateContent.cs" />
     <Compile Include="OpenSilver\Internal\Media\Animation\AnimationClock.T.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\ClockController.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.Geometry.cs" />
     <Compile Include="OpenSilver\Internal\Storage.cs" />
     <Compile Include="OpenSilver\Internal\DependencyObjectStore.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="System.Windows.Media.Animation\ThicknessAnimation.cs" />
     <Compile Include="System.Windows.Media.Animation\ThicknessAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\ThicknessKeyFrame.cs" />
+    <Compile Include="System.Windows.Media.Animation\TimeSeekOrigin.cs" />
     <Compile Include="System.Windows.Media.Animation\VectorAnimation.cs" />
     <Compile Include="System.Windows.Media.Animation\VectorAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\VectorKeyFrame.cs" />

@@ -59,8 +59,8 @@ public sealed class ObjectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<object>(this, isRoot, new ObjectKeyFramesAnimator(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<object>(this, new ObjectKeyFramesAnimator(this));
 
     private void SetKeyFrames(ObjectKeyFrameCollection keyFrames)
     {

@@ -54,8 +54,8 @@ public sealed class BooleanAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<bool>(this, isRoot, new KeyFramesAnimator<bool>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<bool>(this, new KeyFramesAnimator<bool>(this));
 
     private void SetKeyFrames(BooleanKeyFrameCollection keyFrames)
     {

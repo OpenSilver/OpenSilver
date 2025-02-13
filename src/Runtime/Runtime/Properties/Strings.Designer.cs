@@ -1339,6 +1339,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot perform action because the specified Storyboard was not applied to this object for interactive control..
+        /// </summary>
+        internal static string Storyboard_NeverApplied {
+            get {
+                return ResourceManager.GetString("Storyboard_NeverApplied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No applicable name scope exists to resolve the name &apos;{0}&apos;..
         /// </summary>
         internal static string Storyboard_NoNameScope {
@@ -1479,6 +1488,24 @@ namespace OpenSilver.Internal {
         internal static string Timing_RepeatBehaviorNotRepeatDuration {
             get {
                 return ResourceManager.GetString("Timing_RepeatBehaviorNotRepeatDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ClockController.Seek method was called using TimeSeekOrigin.Duration as the seekOrigin parameter for a Clock that has a duration of Forever. Clocks that have duration of Forever must use TimeSeekOrigin.BeginTime..
+        /// </summary>
+        internal static string Timing_SeekDestinationIndefinite {
+            get {
+                return ResourceManager.GetString("Timing_SeekDestinationIndefinite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ClockController.Seek method was called with arguments that describe a seek destination with a negative value. The seek destination must be a time greater than or equal to zero..
+        /// </summary>
+        internal static string Timing_SeekDestinationNegative {
+            get {
+                return ResourceManager.GetString("Timing_SeekDestinationNegative", resourceCulture);
             }
         }
         

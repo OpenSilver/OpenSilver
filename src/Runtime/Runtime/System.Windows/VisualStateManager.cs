@@ -17,7 +17,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media.Animation;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -322,8 +321,8 @@ namespace System.Windows
                     return true;
                 }
 
-                state.Storyboard?.Begin(stateGroupsRoot, true);
-                lastState?.Storyboard?.Stop();
+                state.Storyboard?.BeginVSM(stateGroupsRoot);
+                lastState?.Storyboard?.RemoveVSM(stateGroupsRoot);
 
                 // remember the current state
                 group.CurrentState = state;

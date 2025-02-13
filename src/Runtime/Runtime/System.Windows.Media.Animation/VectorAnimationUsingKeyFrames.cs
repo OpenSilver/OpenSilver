@@ -53,8 +53,8 @@ public sealed class VectorAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<Vector>(this, isRoot, new KeyFramesAnimator<Vector>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<Vector>(this, new KeyFramesAnimator<Vector>(this));
 
     private void SetKeyFrames(VectorKeyFrameCollection keyFrames)
     {

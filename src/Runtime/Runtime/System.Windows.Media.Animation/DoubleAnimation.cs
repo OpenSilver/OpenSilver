@@ -117,11 +117,8 @@ public class DoubleAnimation : AnimationTimeline, IFromByToAnimation<double>
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<double>(
-            this,
-            isRoot,
-            new FromToByAnimator<double>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<double>(this, new FromToByAnimator<double>(this));
 
     double IFromByToAnimation<double>.InterpolateValue(double from, double to, double progress) =>
         AnimatedTypeHelpers.InterpolateDouble(from, to, progress);

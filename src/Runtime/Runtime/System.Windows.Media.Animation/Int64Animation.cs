@@ -202,11 +202,8 @@ public sealed class Int64Animation : AnimationTimeline, IFromByToAnimation<long>
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<long>(
-            this,
-            isRoot,
-            new FromToByAnimator<long>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<long>(this, new FromToByAnimator<long>(this));
 
     long IFromByToAnimation<long>.InterpolateValue(long from, long to, double progress) =>
         AnimatedTypeHelpers.InterpolateInt64(from, to, progress);

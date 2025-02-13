@@ -55,8 +55,8 @@ public sealed class PointAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Point>(this, isRoot, new KeyFramesAnimator<Point>(this));
+    internal override TimelineClock CreateClock() =>
+        new AnimationClock<Point>(this, new KeyFramesAnimator<Point>(this));
 
     private void SetKeyFrames(PointKeyFrameCollection keyFrames)
     {

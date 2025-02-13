@@ -53,8 +53,8 @@ public sealed class RectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<Rect>(this, isRoot, new KeyFramesAnimator<Rect>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<Rect>(this, new KeyFramesAnimator<Rect>(this));
 
     private void SetKeyFrames(RectKeyFrameCollection keyFrames)
     {

@@ -202,11 +202,8 @@ public sealed class Int32Animation : AnimationTimeline, IFromByToAnimation<int>
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<int>(
-            this,
-            isRoot,
-            new FromToByAnimator<int>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<int>(this, new FromToByAnimator<int>(this));
 
     int IFromByToAnimation<int>.InterpolateValue(int from, int to, double progress) =>
         AnimatedTypeHelpers.InterpolateInt32(from, to, progress);

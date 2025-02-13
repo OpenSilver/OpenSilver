@@ -53,8 +53,8 @@ public sealed class ByteAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-       new AnimationClock<byte>(this, isRoot, new KeyFramesAnimator<byte>(this));
+    internal sealed override TimelineClock CreateClock() =>
+       new AnimationClock<byte>(this, new KeyFramesAnimator<byte>(this));
 
     private void SetKeyFrames(ByteKeyFrameCollection keyFrames)
     {

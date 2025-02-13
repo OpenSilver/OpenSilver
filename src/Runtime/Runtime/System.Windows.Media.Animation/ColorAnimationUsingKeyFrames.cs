@@ -56,8 +56,8 @@ public class ColorAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAnimatio
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 
-    internal override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Color>(this, isRoot, new KeyFramesAnimator<Color>(this));
+    internal override TimelineClock CreateClock() =>
+        new AnimationClock<Color>(this, new KeyFramesAnimator<Color>(this));
 
     private void SetKeyFrames(ColorKeyFrameCollection keyFrames)
     {

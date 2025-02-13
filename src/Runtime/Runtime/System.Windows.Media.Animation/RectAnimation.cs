@@ -196,11 +196,8 @@ public sealed class RectAnimation : AnimationTimeline, IFromByToAnimation<Rect>
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Rect>(
-            this,
-            isRoot,
-            new FromToByAnimator<Rect>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<Rect>(this, new FromToByAnimator<Rect>(this));
 
     Rect IFromByToAnimation<Rect>.InterpolateValue(Rect from, Rect to, double progress) =>
         AnimatedTypeHelpers.InterpolateRect(from, to, progress);

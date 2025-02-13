@@ -115,11 +115,8 @@ public sealed class PointAnimation : AnimationTimeline, IFromByToAnimation<Point
         set => SetValueInternal(ToProperty, value);
     }
 
-    internal sealed override TimelineClock CreateClock(bool isRoot) =>
-        new AnimationClock<Point>(
-            this,
-            isRoot,
-            new FromToByAnimator<Point>(this));
+    internal sealed override TimelineClock CreateClock() =>
+        new AnimationClock<Point>(this, new FromToByAnimator<Point>(this));
 
     Point IFromByToAnimation<Point>.InterpolateValue(Point from, Point to, double progress) =>
         AnimatedTypeHelpers.InterpolatePoint(from, to, progress);
