@@ -65,30 +65,34 @@ internal class TouchScrollHelper
             e.Handled = true;
         }
 
-        if (!e.IsTouchEvent)
+        if (!e.IsTouchEvent || Pointer.Captured != null)
         {
             return;
         }
-
-        _pointerPosition = e.GetPosition(null);
-        _horizontalOffset = _scrollViewer.ScrollInfo.HorizontalOffset;
-        _verticalOffset = _scrollViewer.ScrollInfo.VerticalOffset;
-        _velocityX = 0;
-        _velocityY = 0;
 
         if (_inertiaTimer != null)
         {
             _inertiaTimer.Stop();
             _inertiaTimer = null;
         }
+
+        _scrollViewer.CaptureMouse();
+
+        _pointerPosition = e.GetPosition(null);
+        _horizontalOffset = _scrollViewer.ScrollInfo.HorizontalOffset;
+        _verticalOffset = _scrollViewer.ScrollInfo.VerticalOffset;
+        _velocityX = 0;
+        _velocityY = 0;
     }
 
     private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (!e.IsTouchEvent)
+        if (!e.IsTouchEvent || Pointer.Captured != _scrollViewer)
         {
             return;
         }
+
+        _scrollViewer.ReleaseMouseCapture();
 
         if (VerticalScrollBarVisibility == Visibility.Visible || HorizontalScrollBarVisibility == Visibility.Visible)
         {
@@ -98,7 +102,7 @@ internal class TouchScrollHelper
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
-        if (!e.IsTouchEvent || Pointer.Captured is not null)
+        if (!e.IsTouchEvent || Pointer.Captured != _scrollViewer)
         {
             return;
         }
@@ -131,7 +135,7 @@ internal class TouchScrollHelper
 
         _inertiaTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) }; // Approximately 60 FPS
 
-        _inertiaTimer.Tick += (s, e) =>
+        _inertiaTimer.Tick += (_, _) =>
         {
             var scrolledHorizontally = Math.Abs(_velocityX) < Threshold || HorizontalScrollBarVisibility == Visibility.Collapsed;
             var scrolledVertically = Math.Abs(_velocityY) < Threshold || VerticalScrollBarVisibility == Visibility.Collapsed;
