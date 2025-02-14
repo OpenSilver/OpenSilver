@@ -81,11 +81,7 @@ namespace System.Windows.Controls
         {
             if (!e.Handled)
             {
-                if (!e.IsTouchEvent) // touch event should bubble to the parent ScrollViewer
-                {
-                    e.Handled = true;
-                }
-
+                e.Handled = true;
                 Focus();
                 ListBox parent = ParentListBox;
                 if (parent != null)

@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
-using System.Windows.Threading;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -34,6 +33,8 @@ namespace System.Windows.Controls
         private const string ElementScrollContentPresenterName = "ScrollContentPresenter";
         private const string ElementHorizontalScrollBarName = "HorizontalScrollBar";
         private const string ElementVerticalScrollBarName = "VerticalScrollBar";
+
+        private readonly TouchScrollHelper _touchScrollHelper;
 
         // Property caching
         private Visibility _scrollVisibilityX;
@@ -54,8 +55,6 @@ namespace System.Windows.Controls
         private CommandQueue _queue;
 
         private bool _invalidatedMeasureFromArrange;
-        private TouchInfo _touchInfo;
-        private DispatcherTimer _inertiaTimer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollViewer"/> class.
@@ -63,6 +62,7 @@ namespace System.Windows.Controls
         public ScrollViewer()
         {
             DefaultStyleKey = typeof(ScrollViewer);
+            _touchScrollHelper = new TouchScrollHelper(this);
         }
 
         /// <summary> 
@@ -372,6 +372,20 @@ namespace System.Windows.Controls
             {
                 ElementVerticalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Vertical, e); };
             }
+        }
+
+        public override void INTERNAL_AttachToDomEvents()
+        {
+            base.INTERNAL_AttachToDomEvents();
+
+            _touchScrollHelper.SubscribeToEvents();
+        }
+
+        public override void INTERNAL_DetachFromDomEvents()
+        {
+            base.INTERNAL_DetachFromDomEvents();
+
+            _touchScrollHelper.UnsubscribeFromEvents();
         }
 
         /// <summary> 
@@ -711,115 +725,6 @@ namespace System.Windows.Controls
             {
                 EnsureLayoutUpdatedHandler();
             }
-        }
-
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
-            base.OnMouseLeftButtonDown(e);
-
-            if (!e.Handled && Focus())
-            {
-                e.Handled = true;
-            }
-
-            if (e.IsTouchEvent)
-            {
-                Point position = e.GetPosition(null);
-                _touchInfo = new TouchInfo
-                {
-                    X = position.X,
-                    Y = position.Y,
-                    HorizontalOffset = ScrollInfo.HorizontalOffset,
-                    VerticalOffset = ScrollInfo.VerticalOffset,
-                };
-
-                if (_inertiaTimer != null)
-                {
-                    _inertiaTimer.Stop();
-                    _inertiaTimer = null;
-                }
-            }
-        }
-
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-        {
-            base.OnMouseLeftButtonUp(e);
-
-            if (_touchInfo != null)
-            {
-                if (ComputedVerticalScrollBarVisibility == Visibility.Visible || ComputedHorizontalScrollBarVisibility == Visibility.Visible)
-                {
-                    StartScrollingInertia(_touchInfo.VelocityX, _touchInfo.VelocityY, _touchInfo.HorizontalOffset, _touchInfo.VerticalOffset);
-                }
-                _touchInfo = null;
-            }
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-
-            if (!e.IsTouchEvent || Pointer.Captured is not null || ScrollInfo is null || _touchInfo is null)
-            {
-                return;
-            }
-
-            Point position = e.GetPosition(null);
-
-            if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
-            {
-                double deltaX = _touchInfo.X - position.X;
-                _touchInfo.VelocityX = deltaX;
-                _touchInfo.HorizontalOffset += deltaX;
-                ScrollToHorizontalOffset(_touchInfo.HorizontalOffset);
-            }
-
-            if (ComputedVerticalScrollBarVisibility == Visibility.Visible)
-            {
-                double deltaY = _touchInfo.Y - position.Y;
-                _touchInfo.VerticalOffset += deltaY;
-                _touchInfo.VelocityY = deltaY;
-                ScrollToVerticalOffset(_touchInfo.VerticalOffset);
-            }
-
-            _touchInfo.X = position.X;
-            _touchInfo.Y = position.Y;
-        }
-
-        private void StartScrollingInertia(double velocityX, double velocityY, double horizontalOffset, double verticalOffset)
-        {
-            const double Deceleration = 0.97;
-            const double Threshold = 0.1;
-
-            _inertiaTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) }; // Approximately 60 FPS
-
-            _inertiaTimer.Tick += (s, e) =>
-            {
-                var scrolledHorizontally = Math.Abs(velocityX) < Threshold || ComputedHorizontalScrollBarVisibility == Visibility.Collapsed;
-                var scrolledVertically = Math.Abs(velocityY) < Threshold || ComputedVerticalScrollBarVisibility == Visibility.Collapsed;
-
-                if (scrolledHorizontally && scrolledVertically)
-                {
-                    _inertiaTimer.Stop();
-                    return;
-                }
-
-                if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
-                {
-                    horizontalOffset += velocityX;
-                    ScrollToHorizontalOffset(horizontalOffset);
-                    velocityX *= Deceleration;
-                }
-
-                if (ComputedVerticalScrollBarVisibility == Visibility.Visible)
-                {
-                    verticalOffset += velocityY;
-                    ScrollToVerticalOffset(verticalOffset);
-                    velocityY *= Deceleration;
-                }
-            };
-
-            _inertiaTimer.Start();
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
@@ -1439,16 +1344,6 @@ namespace System.Windows.Controls
             private int _lastWritePosition;
             private int _lastReadPosition;
             private Command[] _array;
-        }
-
-        private sealed class TouchInfo
-        {
-            public double X;
-            public double Y;
-            public double HorizontalOffset;
-            public double VerticalOffset;
-            public double VelocityX;
-            public double VelocityY;
         }
     }
 }
