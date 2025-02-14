@@ -192,6 +192,7 @@ public sealed class Storyboard : Timeline
         storyboardClockTree.HasControllableRoot = isControllable;
 
         ClockTreeWalkRecursive(storyboardClockTree,
+            isControllable,
             containingObject,
             null,
             null,
@@ -667,6 +668,7 @@ public sealed class Storyboard : Timeline
     /// </remarks>
     private static void ClockTreeWalkRecursive(
         TimelineClock currentClock,
+        bool hasControllableRoot,
         DependencyObject containingObject,
         TimelineClock parentClock,
         DependencyObject parentObject,
@@ -698,7 +700,7 @@ public sealed class Storyboard : Timeline
             currentPropertyPath = propertyPath;
         }
 
-        if (currentTimeline is not Storyboard storyboard)
+        if (currentClock is AnimationClock animationClock)
         {
             if (targetObject is null)
             {
@@ -730,14 +732,23 @@ public sealed class Storyboard : Timeline
                 throw new InvalidOperationException(string.Format(Strings.Storyboard_TargetPropertyRequired, currentTimeline.GetType()));
             }
 
-            currentClock.SetParent(parentClock);
-            currentClock.SetContext(targetObject, currentPropertyPath);
+            animationClock.SetParent(parentClock);
+
+            (DependencyObject animatedTarget, DependencyProperty animatedProperty) =
+                StoryboardPathResolver.Resolve(targetObject, currentPropertyPath);
+
+            animationClock.SetContext(animatedTarget, animatedProperty);
         }
         else
         {
-            var storyboardClock = (StoryboardClock)currentClock;
+            if (currentClock is not StoryboardClock storyboardClock)
+            {
+                return;
+            }
+
             storyboardClock.SetParent(parentClock);
 
+            var storyboard = (Storyboard)currentTimeline;
             List<Timeline> childrenTimelines = storyboard.Children.InternalItems;
 
             for (int i = 0; i < childrenTimelines.Count; i++)
@@ -747,12 +758,14 @@ public sealed class Storyboard : Timeline
                     continue;
                 }
 
+                childClock.HasControllableRoot = hasControllableRoot;
                 storyboardClock.AddClock(childClock);
 
                 ClockTreeWalkRecursive(
                     childClock,
+                    hasControllableRoot,
                     containingObject,
-                    currentClock,
+                    storyboardClock,
                     targetObject,
                     currentObjectName,
                     currentPropertyPath);
@@ -763,7 +776,6 @@ public sealed class Storyboard : Timeline
     private static DependencyObject ResolveTargetName(string targetName, IInternalFrameworkElement fe, INameResolver nameResolver)
     {
         object namedObject;
-        DependencyObject targetObject;
 
         if (nameResolver is not null)
         {
@@ -783,8 +795,7 @@ public sealed class Storyboard : Timeline
             throw new InvalidOperationException(string.Format(Strings.Storyboard_NameNotFound, targetName, fe.GetType()));
         }
 
-        targetObject = namedObject as DependencyObject;
-        if (targetObject is null)
+        if (namedObject is not DependencyObject targetObject)
         {
             throw new InvalidOperationException(string.Format(Strings.Storyboard_TargetNameNotDependencyObject, targetName));
         }
@@ -810,9 +821,6 @@ public sealed class Storyboard : Timeline
 
             _children.Add(clock);
         }
-
-        public override void SetContext(DependencyObject target, PropertyPath targetProperty) =>
-            throw new NotImplementedException();
 
         protected override void OnFrameCore()
         {

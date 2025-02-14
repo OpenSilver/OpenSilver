@@ -68,8 +68,8 @@ internal sealed class PropertyPathWalker
         {
             PropertyPathNode node = type switch
             {
-                PropertyNodeType.AttachedProperty or PropertyNodeType.Property => new StandardPropertyPathNode(bindExpr, typeName, propertyName),
-                PropertyNodeType.Indexed => new IndexedPropertyPathNode(bindExpr, index),
+                PropertyNodeType.Property => new StandardPropertyPathNode(bindExpr, typeName, propertyName),
+                PropertyNodeType.Indexer => new IndexedPropertyPathNode(bindExpr, index),
                 _ => throw new InvalidOperationException(),
             };
 

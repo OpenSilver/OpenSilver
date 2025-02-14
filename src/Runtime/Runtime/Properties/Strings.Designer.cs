@@ -79,6 +79,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property is not animatable on &apos;{1}&apos; class because the IsAnimationProhibited flag has been set on the UIPropertyMetadata used to associate the property with the class..
+        /// </summary>
+        internal static string Animation_DependencyPropertyIsNotAnimatable {
+            get {
+                return ResourceManager.GetString("Animation_DependencyPropertyIsNotAnimatable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Element declared as Application Service does not implement IApplicationService interface..
         /// </summary>
         internal static string Application_ServiceMustImplementInterface {
@@ -1096,6 +1105,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Path indexer parameter has value that cannot be resolved: &apos;{0}&apos;.
+        /// </summary>
+        internal static string PropertyPathIndexWrongType {
+            get {
+                return ResourceManager.GetString("PropertyPathIndexWrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Range actions are not supported..
         /// </summary>
         internal static string RangeActionsNotSupported {
@@ -1362,6 +1380,42 @@ namespace OpenSilver.Internal {
         internal static string Storyboard_NoTarget {
             get {
                 return ResourceManager.GetString("Storyboard_NoTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property value is not a DependencyObject in property path &apos;{1}&apos;..
+        /// </summary>
+        internal static string Storyboard_PropertyPathDependencyObjectNotFound {
+            get {
+                return ResourceManager.GetString("Storyboard_PropertyPathDependencyObjectNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; Storyboard.TargetProperty path contains non animatable property &apos;{1}&apos;..
+        /// </summary>
+        internal static string Storyboard_PropertyPathIncludesNonAnimatableProperty {
+            get {
+                return ResourceManager.GetString("Storyboard_PropertyPathIncludesNonAnimatableProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; Storyboard.TargetProperty path does not point to a DependencyProperty..
+        /// </summary>
+        internal static string Storyboard_PropertyPathMustPointToDependencyProperty {
+            get {
+                return ResourceManager.GetString("Storyboard_PropertyPathMustPointToDependencyProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot resolve all property references in the property path &apos;{0}&apos;. Verify that applicable objects support the properties..
+        /// </summary>
+        internal static string Storyboard_PropertyPathPropertyNotFound {
+            get {
+                return ResourceManager.GetString("Storyboard_PropertyPathPropertyNotFound", resourceCulture);
             }
         }
         

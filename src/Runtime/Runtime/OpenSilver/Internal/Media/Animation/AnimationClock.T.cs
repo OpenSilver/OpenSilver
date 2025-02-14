@@ -11,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media.Animation;
-using OpenSilver.Internal.Data;
 
 namespace OpenSilver.Internal.Media.Animation;
 
@@ -38,10 +34,16 @@ internal sealed class AnimationClock<TValue> : AnimationClock
 
     public new AnimationTimeline Timeline => (AnimationTimeline)base.Timeline;
 
-    public override void SetContext(DependencyObject rootTarget, PropertyPath targetProperty)
+    public override void SetContext(DependencyObject target, DependencyProperty targetProperty)
     {
-        Initialize(rootTarget, targetProperty);
-        _target.AttachAnimationClock(_dp, this);
+        Debug.Assert(target is not null);
+        Debug.Assert(targetProperty is not null);
+
+        _target = target;
+        _dp = targetProperty;
+        _initialValue = (TValue)target.GetValue(targetProperty);
+
+        target.AttachAnimationClock(targetProperty, this);
     }
 
     public override object GetCurrentValue()
@@ -67,69 +69,4 @@ internal sealed class AnimationClock<TValue> : AnimationClock
             return duration;
         }
     }
-
-    private void Initialize(DependencyObject rootTarget, PropertyPath targetProperty)
-    {
-        if (targetProperty.DependencyProperty is not null)
-        {
-            _target = rootTarget;
-            _dp = targetProperty.DependencyProperty;
-            return;
-        }
-
-        IReadOnlyList<SourceValueInfo> parts = targetProperty.SVI;
-        if (parts.Count > 0)
-        {
-            DependencyObject target = rootTarget;
-            for (int i = 0; i < parts.Count - 1; i++)
-            {
-                SourceValueInfo svi = parts[i];
-                switch (svi.type)
-                {
-                    case PropertyNodeType.Property:
-                        DependencyProperty dp = DPFromName(svi.propertyName, svi.typeName, target.GetType());
-                        var value = AsDependencyObject(target.GetValue(dp));
-                        if (i == 0 && value is ICloneOnAnimation<DependencyObject> cloneable && !cloneable.IsClone)
-                        {
-                            value = cloneable.Clone();
-                            target.SetValueInternal(dp, value);
-                        }
-                        target = value;
-                        break;
-
-                    case PropertyNodeType.Indexed:
-                        if (target is not IList list)
-                        {
-                            throw new InvalidOperationException($"'{target}' must implement IList.");
-                        }
-                        if (!int.TryParse(svi.param, out int index))
-                        {
-                            throw new InvalidOperationException($"'{svi.param}' can't be converted to an integer value.");
-                        }
-
-                        target = AsDependencyObject(list[index]);
-                        break;
-
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
-
-            _target = target;
-            _dp = DPFromName(parts[parts.Count - 1].propertyName, parts[parts.Count - 1].typeName, target.GetType());
-            _initialValue = (TValue)_target.GetValue(_dp);
-            return;
-        }
-
-        throw new InvalidOperationException();
-    }
-
-    private static DependencyObject AsDependencyObject(object o) =>
-        o as DependencyObject ??
-        throw new InvalidOperationException($"'{o}' must be a DependencyObject.");
-
-    private static DependencyProperty DPFromName(string propertyName, string typeName, Type ownerType) =>
-        GetKnownProperty(propertyName, typeName) ??
-        DependencyProperty.FromName(propertyName, ownerType) ??
-        throw new InvalidOperationException($"No DependencyProperty named '{propertyName}' could be found in '{ownerType}'.");
 }

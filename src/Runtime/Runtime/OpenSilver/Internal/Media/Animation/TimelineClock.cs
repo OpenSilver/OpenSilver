@@ -226,8 +226,6 @@ internal abstract class TimelineClock
         OnStopCore();
     }
 
-    public abstract void SetContext(DependencyObject target, PropertyPath targetProperty);
-
     protected abstract void OnFrameCore();
 
     protected abstract void OnStopCore();

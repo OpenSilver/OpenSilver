@@ -18,9 +18,8 @@ namespace OpenSilver.Internal.Data
     internal enum PropertyNodeType
     {
         None = 0,
-        AttachedProperty = 1,
-        Indexed = 2,
-        Property = 3,
+        Property = 1,
+        Indexer = 2,
     }
 
     internal ref struct PropertyPathParser
@@ -52,7 +51,7 @@ namespace OpenSilver.Internal.Data
             PropertyNodeType type;
             if (path[0] == '(')
             {
-                type = PropertyNodeType.AttachedProperty;
+                type = PropertyNodeType.Property;
                 int end = path.IndexOf(')');
                 if (end == -1)
                 {
@@ -89,7 +88,7 @@ namespace OpenSilver.Internal.Data
             }
             else if (path[0] == '[')
             {
-                type = PropertyNodeType.Indexed;
+                type = PropertyNodeType.Indexer;
                 int end = path.IndexOf(']');
 
                 typeName = null;

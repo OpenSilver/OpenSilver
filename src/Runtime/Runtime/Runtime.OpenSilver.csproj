@@ -110,6 +110,7 @@
     <Compile Include="System.Windows.Data\MultiBinding.cs" />
     <Compile Include="System.Windows.Data\MultiBindingExpression.cs" />
     <Compile Include="System.Windows.Documents\InlineImageContainer.cs" />
+    <Compile Include="OpenSilver\Internal\Media\Animation\StoryboardPathResolver.cs" />
     <Compile Include="System.Windows.Media.Animation\BooleanAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\BooleanKeyFrame.cs" />
     <Compile Include="System.Windows.Media.Animation\ByteAnimation.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="System.Windows\RoutingStrategy.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
     <Compile Include="System.Windows\TreeChangeInfo.cs" />
+    <Compile Include="System.Windows\UIElement.Animations.cs" />
     <Compile Include="System.Windows\UIElement.TransformToVisual.cs" />
     <Compile Include="System.Windows\ValidateValueCallback.cs" />
     <Compile Include="OpenSilver\Internal\WeakReferenceList.cs" />

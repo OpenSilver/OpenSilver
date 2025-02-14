@@ -381,6 +381,20 @@ namespace System.Windows
             }
         }
 
+        internal void DetachAnimationClock(DependencyProperty dp, bool clearAnimatedValue)
+        {
+            if (GetStorage(dp) is Storage storage)
+            {
+                storage.Clock = null;
+
+                if (clearAnimatedValue)
+                {
+                    PropertyMetadata metadata = SetupPropertyChange(dp);
+                    DependencyObjectStore.ClearAnimatedValue(storage, this, dp, metadata);
+                }
+            }
+        }
+
         /// <summary>
         /// Sets the local value of a dependency property on a <see cref="DependencyObject"/>.
         /// </summary>

@@ -123,6 +123,9 @@
   <data name="AddedItemNotInCollection" xml:space="preserve">
     <value>A collection Add event refers to item that does not belong to collection.</value>
   </data>
+  <data name="Animation_DependencyPropertyIsNotAnimatable" xml:space="preserve">
+    <value>'{0}' property is not animatable on '{1}' class because the IsAnimationProhibited flag has been set on the UIPropertyMetadata used to associate the property with the class.</value>
+  </data>
   <data name="Application_ServiceMustImplementInterface" xml:space="preserve">
     <value>Element declared as Application Service does not implement IApplicationService interface.</value>
   </data>
@@ -464,6 +467,9 @@
   <data name="PropertyNotReadOnly" xml:space="preserve">
     <value>This method overrides metadata only on read-only properties. This property is not read-only.</value>
   </data>
+  <data name="PropertyPathIndexWrongType" xml:space="preserve">
+    <value>Path indexer parameter has value that cannot be resolved: '{0}'</value>
+  </data>
   <data name="RangeActionsNotSupported" xml:space="preserve">
     <value>Range actions are not supported.</value>
   </data>
@@ -553,6 +559,18 @@
   </data>
   <data name="Storyboard_NoTarget" xml:space="preserve">
     <value>No target was specified for '{0}'.</value>
+  </data>
+  <data name="Storyboard_PropertyPathDependencyObjectNotFound" xml:space="preserve">
+    <value>'{0}' property value is not a DependencyObject in property path '{1}'.</value>
+  </data>
+  <data name="Storyboard_PropertyPathIncludesNonAnimatableProperty" xml:space="preserve">
+    <value>'{0}' Storyboard.TargetProperty path contains non animatable property '{1}'.</value>
+  </data>
+  <data name="Storyboard_PropertyPathMustPointToDependencyProperty" xml:space="preserve">
+    <value>'{0}' Storyboard.TargetProperty path does not point to a DependencyProperty.</value>
+  </data>
+  <data name="Storyboard_PropertyPathPropertyNotFound" xml:space="preserve">
+    <value>Cannot resolve all property references in the property path '{0}'. Verify that applicable objects support the properties.</value>
   </data>
   <data name="Storyboard_TargetNameNotDependencyObject" xml:space="preserve">
     <value>'{0}' target object Name found but the object is not a valid target type.</value>
