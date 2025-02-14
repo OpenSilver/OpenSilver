@@ -788,7 +788,7 @@ namespace System.Windows.Controls
 
         private void StartScrollingInertia(double velocityX, double velocityY, double horizontalOffset, double verticalOffset)
         {
-            const double Deceleration = 0.95;
+            const double Deceleration = 0.97;
             const double Threshold = 0.1;
 
             _inertiaTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) }; // Approximately 60 FPS
