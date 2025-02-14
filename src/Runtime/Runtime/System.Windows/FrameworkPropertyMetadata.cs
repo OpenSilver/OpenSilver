@@ -63,7 +63,7 @@ namespace System.Windows
     /// Reports or applies metadata for a dependency property, specifically adding framework-specific
     /// property system characteristics.
     /// </summary>
-    public class FrameworkPropertyMetadata : PropertyMetadata
+    public class FrameworkPropertyMetadata : UIPropertyMetadata
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FrameworkPropertyMetadata"/> class.
@@ -257,6 +257,46 @@ namespace System.Windows
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="FrameworkPropertyMetadata"/> class with the provided default 
+        /// value and framework metadata options, specified callbacks, and a Boolean that can be used to prevent 
+        /// animation of the property.
+        /// </summary>
+        /// <param name="defaultValue">
+        /// The default value of the dependency property, usually provided as a specific type.
+        /// </param>
+        /// <param name="flags">
+        /// The metadata option flags (a combination of <see cref="FrameworkPropertyMetadataOptions"/> values). These 
+        /// options specify characteristics of the dependency property that interact with systems such as layout or 
+        /// data binding.
+        /// </param>
+        /// <param name="propertyChangedCallback">
+        /// A reference to a handler implementation that the property system will call whenever the effective value of 
+        /// the property changes.
+        /// </param>
+        /// <param name="coerceValueCallback">
+        /// A reference to a handler implementation that will be called whenever the property system calls 
+        /// <see cref="DependencyObject.CoerceValue(DependencyProperty)"/> on this dependency property.
+        /// </param>
+        /// <param name="isAnimationProhibited">
+        /// true to prevent the property system from animating the property that this metadata is applied to. Such 
+        /// properties will raise a run-time exception originating from the property system if animations of them are 
+        /// attempted. false to permit animating the property. The default is false.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// defaultValue is set to <see cref="DependencyProperty.UnsetValue"/>.
+        /// </exception>
+        public FrameworkPropertyMetadata(
+            object defaultValue,
+            FrameworkPropertyMetadataOptions flags,
+            PropertyChangedCallback propertyChangedCallback,
+            CoerceValueCallback coerceValueCallback,
+            bool isAnimationProhibited)
+            : base(defaultValue, propertyChangedCallback, coerceValueCallback, isAnimationProhibited)
+        {
+            TranslateFlags(flags);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FrameworkPropertyMetadata"/> class with the provided 
         /// default value and framework metadata options, specified callbacks, and a data-binding update trigger
         /// default.
@@ -290,7 +330,51 @@ namespace System.Windows
             PropertyChangedCallback propertyChangedCallback,
             CoerceValueCallback coerceValueCallback,
             UpdateSourceTrigger defaultUpdateSourceTrigger)
-            : base(defaultValue, propertyChangedCallback, coerceValueCallback)
+            : this(defaultValue, flags, propertyChangedCallback, coerceValueCallback, false, defaultUpdateSourceTrigger)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FrameworkPropertyMetadata"/> class with the provided 
+        /// default value and framework metadata options, specified callbacks, a Boolean that can be used to 
+        /// prevent animation of the property, and a data-binding update trigger default.
+        /// </summary>
+        /// <param name="defaultValue">
+        /// The default value of the dependency property, usually provided as a specific type.
+        /// </param>
+        /// <param name="flags">
+        /// The metadata option flags (a combination of <see cref="FrameworkPropertyMetadataOptions"/> values). 
+        /// These options specify characteristics of the dependency property that interact with systems such as 
+        /// layout or data binding.
+        /// </param>
+        /// <param name="propertyChangedCallback">
+        /// A reference to a handler implementation that the property system will call whenever the effective 
+        /// value of the property changes.
+        /// </param>
+        /// <param name="coerceValueCallback">
+        /// A reference to a handler implementation that will be called whenever the property system calls 
+        /// <see cref="DependencyObject.CoerceValue(DependencyProperty)"/> against this property.
+        /// </param>
+        /// <param name="isAnimationProhibited">
+        /// true to prevent the property system from animating the property that this metadata is applied to. 
+        /// Such properties will raise a run-time exception originating from the property system if animations 
+        /// of them are attempted. The default is false.
+        /// </param>
+        /// <param name="defaultUpdateSourceTrigger">
+        /// The <see cref="UpdateSourceTrigger"/> to use when bindings for this property are applied that have
+        /// their <see cref="UpdateSourceTrigger"/> set to <see cref="UpdateSourceTrigger.Default"/>.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// defaultValue is set to <see cref="DependencyProperty.UnsetValue"/>.
+        /// </exception>
+        public FrameworkPropertyMetadata(
+            object defaultValue,
+            FrameworkPropertyMetadataOptions flags,
+            PropertyChangedCallback propertyChangedCallback,
+            CoerceValueCallback coerceValueCallback,
+            bool isAnimationProhibited,
+            UpdateSourceTrigger defaultUpdateSourceTrigger)
+            : base(defaultValue, propertyChangedCallback, coerceValueCallback, isAnimationProhibited)
         {
             if (!IsValidUpdateSourceTrigger(defaultUpdateSourceTrigger))
             {

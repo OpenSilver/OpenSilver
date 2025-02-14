@@ -457,7 +457,9 @@ namespace System.Windows
             // Unused                                    = 0x00000004,
             // Unused                                    = 0x00000008,
             Inherited = 0x00000010,
-            // Unused                                    = 0x00000020,
+
+            UI_IsAnimationProhibitedID = 0x00000020,
+
             FW_AffectsMeasureID = 0x00000040,
             FW_AffectsArrangeID = 0x00000080,
             FW_AffectsParentMeasureID = 0x00000100,

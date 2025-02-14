@@ -74,6 +74,16 @@ public partial class UIElement
 
     internal static bool IsPropertyAnimatable(DependencyObject d, DependencyProperty dp)
     {
-        return !dp.ReadOnly;
+        if (dp.ReadOnly)
+        {
+            return false;
+        }
+
+        if (dp.GetMetadata(d.DependencyObjectType) is UIPropertyMetadata uiMetadata && uiMetadata.IsAnimationProhibited)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

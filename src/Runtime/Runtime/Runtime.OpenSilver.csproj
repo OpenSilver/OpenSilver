@@ -166,6 +166,7 @@
     <Compile Include="System.Windows\TreeChangeInfo.cs" />
     <Compile Include="System.Windows\UIElement.Animations.cs" />
     <Compile Include="System.Windows\UIElement.TransformToVisual.cs" />
+    <Compile Include="System.Windows\UIPropertyMetadata.cs" />
     <Compile Include="System.Windows\ValidateValueCallback.cs" />
     <Compile Include="OpenSilver\Internal\WeakReferenceList.cs" />
     <Compile Include="Diagnostics\DebugInfo.cs" />
