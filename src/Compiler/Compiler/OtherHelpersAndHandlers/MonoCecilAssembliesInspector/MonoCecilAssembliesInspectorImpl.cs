@@ -603,9 +603,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             var markupExtensionGeneric = FindType(SystemXamlNamespace, GenericMarkupExtension);
 
-            var isAssignableFrom = markupExtensionGeneric.IsAssignableFrom(elementType);
-            var typeIsAMarkupExtension = isAssignableFrom && !elementType.IsString();
-            return typeIsAMarkupExtension;
+            return markupExtensionGeneric.IsAssignableFrom(elementType);
         }
 
         public bool IsTypeAssignableFrom(string nameSpaceOfTypeToAssignFrom, string nameOfTypeToAssignFrom,
@@ -786,26 +784,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             if (field != null &&
                 (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
                 return $"{type.GetTypeNameIncludingGenericArguments(true, _compilerType)}.{field.Name}";
-
-            return null;
-        }
-
-        public string GetKeyNameOfProperty(string namespaceName, string localTypeName, string assemblyNameIfAny,
-            string propertyName)
-        {
-            var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-
-            var property = FindPropertyDeep(type, propertyName, out _);
-            if (property == null) return null;
-
-            // Look for the static dependency property field in the type and its ancestors:
-            var fieldName = propertyName + PropertySuffix;
-            var field = FindFieldDeep(type, fieldName, out _, true, true, true);
-            if (field != null)
-            {
-                string prefix = GetGlobalPrefixFromCompilerType();
-                return prefix + type + "." + fieldName;
-            }
 
             return null;
         }
