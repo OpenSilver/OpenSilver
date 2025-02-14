@@ -1221,111 +1221,89 @@ End Sub
                                 // Other (custom MarkupExtensions)
                                 //------------------------------
 
-                                string propertyKey = GetKeyNameOfProperty(
-                                    parent, element.Name.LocalName.Split('.')[1], _reflectionOnSeparateAppDomain
-                                );
-                                string propertyKeyString = propertyKey ?? "Nothing";
-
+                                string propertyOwnerTypeNS, propertyOwnerTypeName;
                                 if (isAttachedProperty)
                                 {
-                                    string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                                        elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny
-                                    );
-
-                                    string[] splittedLocalName = element.Name.LocalName.Split('.');
-
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
-                                        propertyName,
-                                        element.Name.NamespaceName,
-                                        splittedLocalName[0],
-                                        out string propertyNamespaceName,
-                                        out string propertyLocalTypeName,
-                                        out _,
-                                        out _,
-                                        assemblyNameIfAny,
-                                        true
-                                    );
-
-                                    string propertyType = string.Format(
-                                        "Global.{0}{1}{2}",
-                                        propertyNamespaceName,
-                                        string.IsNullOrEmpty(propertyNamespaceName) ? string.Empty : ".",
-                                        propertyLocalTypeName
-                                    );
-
-                                    string markupExtension = string.Format(
-                                        "CType({1},{0}).ProvideValue(New Global.System.ServiceProvider({2}, {3}))",
-                                        IMarkupExtensionClass, childUniqueName, GeneratingCode.GetUniqueName(parent), propertyKeyString
-                                    );
-
-                                    parameters.StringBuilder.AppendLine(
-                                        string.Format("{0}.Set{1}({2}, CType({4},{3})",
-                                                      elementTypeInCSharp,
-                                                      propertyName,
-                                                      parentElementUniqueNameOrThisKeyword,
-                                                      propertyType,
-                                                      markupExtension
-                                        )
-                                    );
+                                    propertyOwnerTypeNS = element.Name.NamespaceName;
+                                    propertyOwnerTypeName = element.Name.LocalName.Split('.')[0];
                                 }
                                 else
                                 {
-                                    // Todo: remove what is irrelevant below:
-                                    // Note: the code was copy-pasted from the Binding section from here.
-                                    // It is because we need to call SetBinding if a Custom marckup
-                                    // expression returns a Binding.
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(
-                                        propertyName,
-                                        parent.Name.Namespace.NamespaceName,
-                                        parent.Name.LocalName,
-                                        out string propertyDeclaringTypeName,
-                                        out _,
-                                        out _,
-                                        assemblyNameIfAny,
-                                        false
-                                    );
+                                    propertyOwnerTypeNS = parent.Name.Namespace.NamespaceName;
+                                    propertyOwnerTypeName = parent.Name.LocalName;
+                                }
 
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
-                                        propertyName,
-                                        parent.Name.Namespace.NamespaceName,
-                                        parent.Name.LocalName,
-                                        out string propertyNamespaceName,
-                                        out string propertyLocalTypeName,
-                                        out _,
-                                        out _,
-                                        assemblyNameIfAny
-                                    );
+                                _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                    propertyName,
+                                    propertyOwnerTypeNS,
+                                    propertyOwnerTypeName,
+                                    out string propertyTypeNS,
+                                    out string propertyTypeName,
+                                    out _,
+                                    out _,
+                                    assemblyNameIfAny,
+                                    isAttachedProperty);
 
-                                    string dpName = _reflectionOnSeparateAppDomain.GetField(
-                                        propertyName + "Property",
-                                        isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
-                                        isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _assemblyNameWithoutExtension);
+                                string dpName = _reflectionOnSeparateAppDomain.GetField(
+                                    propertyName + "Property",
+                                    propertyOwnerTypeNS,
+                                    propertyOwnerTypeName,
+                                    _assemblyNameWithoutExtension);
 
-                                    if (dpName != null)
+                                if (dpName != null)
+                                {
+                                    string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
+                                    string propertyTypeFullName = GetFullTypeName(propertyTypeNS, propertyTypeName);
+
+                                    parameters.StringBuilder
+                                        .AppendLine($"Dim {markupValue} As Object = Nothing")
+                                        .AppendLine($"If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dpName}, {childUniqueName}, {markupValue})");
+
+                                    if (isAttachedProperty)
                                     {
-                                        string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
-                                        string propertyTypeFullName = string.IsNullOrEmpty(propertyNamespaceName) ?
-                                            $"Global.{propertyLocalTypeName}" :
-                                            $"Global.{propertyNamespaceName}.{propertyLocalTypeName}";
+                                        string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                            propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
 
-                                        parameters.StringBuilder.AppendLine($@"Dim {markupValue} As Object = Nothing
-If Not {RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dpName}, {childUniqueName}, {markupValue})
-    {parentElementUniqueNameOrThisKeyword}.{propertyName} = CType({markupValue}, {propertyTypeFullName})
-End If");
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {elementTypeInCSharp}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, CType({markupValue}, {propertyTypeFullName}))");
+                                    }
+                                    else
+                                    {
+                                        parameters.StringBuilder
+                                            .AppendLine($"    {parentElementUniqueNameOrThisKeyword}.{propertyName} = CType({markupValue}, {propertyTypeFullName})");
+                                    }
+
+                                    parameters.StringBuilder.AppendLine("End If");
+                                }
+                                else
+                                {
+                                    if (isAttachedProperty)
+                                    {
+                                        string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                            propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
+
+                                        string markupExtension = string.Format(
+                                            "CType({1},{0}).ProvideValue(New Global.System.ServiceProvider({2}, Nothing))",
+                                            IMarkupExtensionClass, childUniqueName, GeneratingCode.GetUniqueName(parent));
+
+                                        parameters.StringBuilder.AppendLine(
+                                            string.Format("{0}.Set{1}({2}, CType({4},{3})",
+                                                          elementTypeInCSharp,
+                                                          propertyName,
+                                                          parentElementUniqueNameOrThisKeyword,
+                                                          GetFullTypeName(propertyTypeNS, propertyTypeName),
+                                                          markupExtension));
                                     }
                                     else
                                     {
                                         parameters.StringBuilder.AppendLine(
                                             string.Format(
-                                                "{0}.{1} = CType((CType({4},{3}).ProvideValue(New Global.System.ServiceProvider({0}, {5})),{2})",
+                                                "{0}.{1} = CType((CType({4},{3}).ProvideValue(New Global.System.ServiceProvider({0}, Nothing)),{2})",
                                                 GeneratingCode.GetUniqueName(parent),
                                                 propertyName,
-                                                "Global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
+                                                GetFullTypeName(propertyTypeNS, propertyTypeName),
                                                 IMarkupExtensionClass,
-                                                childUniqueName,
-                                                propertyKeyString));
-
+                                                childUniqueName));
                                     }
                                 }
                             }
@@ -2135,12 +2113,6 @@ End If");
                 XName name = xNamespace + typeAsStringInsideAXamlAttribute;
 
                 GetClrNamespaceAndLocalName(name, out namespaceName, out localName, out assemblyNameIfAny);
-            }
-
-            private string GetKeyNameOfProperty(XElement element, string propertyName, AssembliesInspector reflectionOnSeparateAppDomain)
-            {
-                GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
-                return reflectionOnSeparateAppDomain.GetKeyNameOfProperty(elementNameSpace, elementLocalName, assemblyNameIfAny, propertyName);
             }
 
             private void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
