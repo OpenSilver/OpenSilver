@@ -374,6 +374,10 @@ namespace System.Windows
                     FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsParentArrange,
                     OnFlowDirectionChanged,
                     CoerceFlowDirection));
+
+            EventManager.RegisterClassHandler<FrameworkElement>(
+                Validation.ErrorEvent,
+                new EventHandler<ValidationErrorEventArgs>(OnValidationError));
         }
 
         /// <summary>
@@ -1043,9 +1047,10 @@ namespace System.Windows
         /// </summary>
         public event EventHandler<ValidationErrorEventArgs> BindingValidationError;
 
-        internal void OnBindingValidationError(ValidationErrorEventArgs e)
+        private static void OnValidationError(object sender, ValidationErrorEventArgs e)
         {
-            BindingValidationError?.Invoke(this, e);
+            var fe = (FrameworkElement)sender;
+            fe.BindingValidationError?.Invoke(fe, e);
         }
 
         #endregion

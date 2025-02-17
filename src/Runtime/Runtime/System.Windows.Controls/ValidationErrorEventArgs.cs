@@ -11,49 +11,59 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Controls
+namespace System.Windows.Controls;
+
+/// <summary>
+/// Provides data for the <see cref="FrameworkElement.BindingValidationError"/> event.
+/// </summary>
+public class ValidationErrorEventArgs : RoutedEventArgs
 {
     /// <summary>
-    /// Provides data for the <see cref="FrameworkElement.BindingValidationError"/> event.
+    /// Initializes a new instance of the <see cref="ValidationErrorEventArgs"/> class.
     /// </summary>
-    public class ValidationErrorEventArgs : RoutedEventArgs
+    public ValidationErrorEventArgs()
+        : base(Validation.ErrorEvent)
     {
-        public ValidationErrorEventArgs() { }
-
-        internal ValidationErrorEventArgs(ValidationError error, ValidationErrorEventAction action)
-        {
-            Error = error;
-            Action = action;
-        }
-
-        /// <summary>
-        /// Gets the state of the validation error.
-        /// </summary>
-        /// <returns>
-        /// One of the enumeration values that indicates the state of the validation error.
-        /// </returns>
-        public ValidationErrorEventAction Action { get; }
-
-
-        /// <summary>
-        /// Gets the validation error that caused the <see cref="FrameworkElement.BindingValidationError"/>
-        /// event.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="ValidationError"/> object that contains the exception that caused the validation error.
-        /// </returns>
-        public ValidationError Error { get; }
-
-        /// <summary>
-        /// Gets or sets the value that marks the routed event as handled.
-        /// </summary>
-        /// <returns>
-        /// true if the event is handled; otherwise, false.
-        /// </returns>
-        public new bool Handled
-        {
-            get => base.Handled;
-            set => base.Handled = value;
-        }
     }
+
+    internal ValidationErrorEventArgs(ValidationError error, ValidationErrorEventAction action)
+        : base(Validation.ErrorEvent)
+    {
+        Error = error;
+        Action = action;
+    }
+
+    /// <summary>
+    /// Gets the state of the validation error.
+    /// </summary>
+    /// <returns>
+    /// One of the enumeration values that indicates the state of the validation error.
+    /// </returns>
+    public ValidationErrorEventAction Action { get; }
+
+
+    /// <summary>
+    /// Gets the validation error that caused the <see cref="FrameworkElement.BindingValidationError"/>
+    /// event.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="ValidationError"/> object that contains the exception that caused the validation error.
+    /// </returns>
+    public ValidationError Error { get; }
+
+    /// <summary>
+    /// Gets or sets the value that marks the routed event as handled.
+    /// </summary>
+    /// <returns>
+    /// true if the event is handled; otherwise, false.
+    /// </returns>
+    public new bool Handled
+    {
+        get => base.Handled;
+        set => base.Handled = value;
+    }
+
+    /// <inheritdoc />
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
+        ((EventHandler<ValidationErrorEventArgs>)genericHandler)(genericTarget, this);
 }

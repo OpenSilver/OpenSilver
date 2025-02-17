@@ -11,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Media;
 using System.Windows.Data;
 
 namespace System.Windows.Controls
@@ -24,6 +22,54 @@ namespace System.Windows.Controls
     /// </summary>
     public static class Validation
     {
+        /// <summary>
+        /// Identifies the Validation.Error attached event.
+        /// </summary>
+        public static readonly RoutedEvent ErrorEvent =
+            EventManager.RegisterRoutedEvent(
+                "ValidationError",
+                RoutingStrategy.Bubble,
+                typeof(EventHandler<ValidationErrorEventArgs>),
+                typeof(Validation));
+
+        /// <summary>
+        /// Adds an event handler for the Validation.Error attached event to the specified object.
+        /// </summary>
+        /// <param name="element">
+        /// The <see cref="UIElement"/> object to add <paramref name="handler"/> to.
+        /// </param>
+        /// <param name="handler">
+        /// The handler to add.
+        /// </param>
+        public static void AddErrorHandler(UIElement element, EventHandler<ValidationErrorEventArgs> handler)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.AddHandler(ErrorEvent, handler);
+        }
+
+        /// <summary>
+        /// Adds an event handler for the Validation.Error attached event from the specified object.
+        /// </summary>
+        /// <param name="element">
+        /// The <see cref="UIElement"/> object to remove <paramref name="handler"/> from.
+        /// </param>
+        /// <param name="handler">
+        /// The handler to remove.
+        /// </param>
+        public static void RemoveErrorHandler(UIElement element, EventHandler<ValidationErrorEventArgs> handler)
+        {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            element.RemoveHandler(ErrorEvent, handler);
+        }
+
         /// <summary>
         /// Identifies the <see cref="Validation"/> Errors attached property.
         /// </summary>
@@ -248,33 +294,9 @@ namespace System.Windows.Controls
 
         private static void OnValidationError(DependencyObject source, ValidationError validationError, ValidationErrorEventAction action)
         {
-            List<FrameworkElement> route = new List<FrameworkElement>(); 
-            for (UIElement e = source as UIElement; e != null; e = VisualTreeHelper.GetParent(e) as UIElement)
+            if (source is UIElement uie)
             {
-                if (e is FrameworkElement fe)
-                {
-                    route.Add(fe);
-                }
-            }
-
-            if (route.Count == 0)
-            {
-                return;
-            }
-
-            ValidationErrorEventArgs args = new ValidationErrorEventArgs(validationError, action)
-            {
-                OriginalSource = source,
-            };
-
-            foreach (FrameworkElement fe in route)
-            {
-                fe.OnBindingValidationError(args);
-
-                if (args.Handled)
-                {
-                    break;
-                }
+                uie.RaiseEvent(new ValidationErrorEventArgs(validationError, action));
             }
         }
 
