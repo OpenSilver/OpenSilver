@@ -141,4 +141,8 @@ public class ScrollChangedEventArgs : RoutedEventArgs
     /// A <see cref="double"/> that represents the change in extent height.
     /// </returns>
     public double ExtentHeightChange => _extentChange.Y;
+
+    /// <inheritdoc />
+    protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget) =>
+        ((ScrollChangedEventHandler)genericHandler)(genericTarget, this);
 }
