@@ -551,6 +551,9 @@
   <data name="Size_WidthCannotBeNegative" xml:space="preserve">
     <value>Width must be non-negative.</value>
   </data>
+  <data name="SourceNotSet" xml:space="preserve">
+    <value>Must set Source in RoutedEventArgs before building event route or invoking handlers.</value>
+  </data>
   <data name="Storyboard_NameNotFound" xml:space="preserve">
     <value>'{0}' name cannot be found in the name scope of '{1}'.</value>
   </data>

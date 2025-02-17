@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Collections.Generic;
+using OpenSilver.Internal;
 
 namespace System.Windows;
 
@@ -104,6 +105,16 @@ internal sealed class EventRoute
         if (args is null)
         {
             throw new ArgumentNullException(nameof(args));
+        }
+
+        if (args.Source is null)
+        {
+            throw new ArgumentException(Strings.SourceNotSet);
+        }
+
+        if (args.RoutedEvent != RoutedEvent)
+        {
+            throw new ArgumentException(Strings.Mismatched_RoutedEvent);
         }
 
         if (args.RoutedEvent.RoutingStrategy == RoutingStrategy.Direct || args.RoutedEvent.RoutingStrategy == RoutingStrategy.Bubble)

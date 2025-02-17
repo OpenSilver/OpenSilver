@@ -1357,6 +1357,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Must set Source in RoutedEventArgs before building event route or invoking handlers..
+        /// </summary>
+        internal static string SourceNotSet {
+            get {
+                return ResourceManager.GetString("SourceNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; name cannot be found in the name scope of &apos;{1}&apos;..
         /// </summary>
         internal static string Storyboard_NameNotFound {

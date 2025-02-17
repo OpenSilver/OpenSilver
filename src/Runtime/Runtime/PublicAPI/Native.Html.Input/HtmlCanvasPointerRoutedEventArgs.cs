@@ -33,7 +33,7 @@ namespace CSHTML5.Native.Html.Input
         public HtmlCanvasPointerRoutedEventArgs(MouseEventArgs e, HtmlCanvas htmlCanvas)
             : base(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
-            this.OriginalSource = e.OriginalSource;
+            this.Source = e.OriginalSource;
             this.Handled = e.Handled;
             this.Pointer = e.Pointer;
             this.HtmlCanvas = htmlCanvas;
@@ -43,7 +43,7 @@ namespace CSHTML5.Native.Html.Input
         public HtmlCanvasPointerRoutedEventArgs(RightTappedRoutedEventArgs e, HtmlCanvas htmlCanvas)
             : base(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
         {
-            this.OriginalSource = e.OriginalSource;
+            this.Source = e.OriginalSource;
             this.Handled = e.Handled;
             this.HtmlCanvas = htmlCanvas;
         }

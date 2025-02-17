@@ -201,13 +201,22 @@ namespace System.Windows
 
             e.ClearUserInitiated();
 
-            e.OriginalSource ??= this;
+            RaiseEventImpl(this, e);
+        }
 
-            EventRoute route = EventRouteFactory.FetchObject(e.RoutedEvent);
+        private static void RaiseEventImpl(UIElement sender, RoutedEventArgs args)
+        {
+            EventRoute route = EventRouteFactory.FetchObject(args.RoutedEvent);
 
-            BuildRouteHelper(this, route, e);
+            // Set Source
+            args.Source = sender;
 
-            route.InvokeHandlers(e);
+            BuildRouteHelper(sender, route, args);
+
+            route.InvokeHandlers(args);
+
+            // Reset Source to OriginalSource
+            args.Source = args.OriginalSource;
 
             EventRouteFactory.RecycleObject(route);
         }
@@ -216,6 +225,11 @@ namespace System.Windows
         {
             Debug.Assert(route is not null);
             Debug.Assert(args is not null);
+
+            if (args.Source is null)
+            {
+                throw new ArgumentException(Strings.SourceNotSet);
+            }
 
             if (args.RoutedEvent != route.RoutedEvent)
             {

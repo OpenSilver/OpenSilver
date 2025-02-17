@@ -1003,11 +1003,10 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         private void InvokeSelectionChanged(List<ItemInfo> unselectedInfos, List<ItemInfo> selectedInfos)
         {
-            SelectionChangedEventArgs selectionChanged = new SelectionChangedEventArgs(unselectedInfos, selectedInfos);
-
-            selectionChanged.OriginalSource = this;
-
-            OnSelectionChanged(selectionChanged);
+            OnSelectionChanged(new SelectionChangedEventArgs(unselectedInfos, selectedInfos)
+            {
+                Source = this,
+            });
         }
 
         private static bool ItemGetIsSelectable(object item)

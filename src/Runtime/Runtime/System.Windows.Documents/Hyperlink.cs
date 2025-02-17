@@ -245,7 +245,7 @@ public sealed class Hyperlink : Span
 
     private void OnClick()
     {
-        RaiseEvent(new RoutedEventArgs(ClickEvent) { OriginalSource = this });
+        RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
         ExecuteCommand();
 

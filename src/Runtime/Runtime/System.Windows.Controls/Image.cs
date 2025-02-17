@@ -268,7 +268,7 @@ namespace System.Windows.Controls
                 bmi.OnImageOpened((int)_naturalSize.Width, (int)_naturalSize.Height);
             }
 
-            ImageOpened?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
+            ImageOpened?.Invoke(this, new RoutedEventArgs { Source = this });
         }
 
         internal void OnErrorNative()
@@ -282,7 +282,7 @@ namespace System.Windows.Controls
                 bmi.OnImageFailed();
             }
 
-            ImageFailed?.Invoke(this, new ExceptionRoutedEventArgs { OriginalSource = this });
+            ImageFailed?.Invoke(this, new ExceptionRoutedEventArgs { Source = this });
         }
     }
 }

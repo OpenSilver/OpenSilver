@@ -1245,7 +1245,7 @@ namespace System.Windows.Controls
                         new Vector(ViewportWidth - oldViewportWidth, ViewportHeight - oldViewportHeight))
                     {
                         RoutedEvent = ScrollChangedEvent,
-                        OriginalSource = this
+                        Source = this,
                     };
 
                     try

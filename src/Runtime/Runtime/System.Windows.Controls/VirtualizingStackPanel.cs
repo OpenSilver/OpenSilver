@@ -614,7 +614,7 @@ public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         var e = new CleanUpVirtualizedItemEventArgs(itemsControl.ItemContainerGenerator.ItemFromContainer(child), child)
         {
-            OriginalSource = this
+            Source = this
         };
 
         OnCleanUpVirtualizedItem(e);

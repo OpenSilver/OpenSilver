@@ -237,10 +237,7 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         protected virtual void OnClick()
         {
-            RaiseEvent(new RoutedEventArgs(ClickEvent)
-            {
-                OriginalSource = this,
-            });
+            RaiseEvent(new RoutedEventArgs(ClickEvent, this));
 
             ExecuteCommand();
         }

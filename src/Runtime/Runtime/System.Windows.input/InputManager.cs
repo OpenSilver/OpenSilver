@@ -114,10 +114,7 @@ internal sealed class InputManager
                 if (routedEvent is null) continue;
 
                 UIElement target = r.Target;
-                RaiseUserInitiatedEvent(target, new RoutedEventArgs(routedEvent)
-                {
-                    OriginalSource = target,
-                });
+                RaiseUserInitiatedEvent(target, new RoutedEventArgs(routedEvent, target));
             }
         }
     }
@@ -205,7 +202,7 @@ internal sealed class InputManager
             RaiseUserInitiatedEvent(uie, new MouseEventArgs
             {
                 RoutedEvent = UIElement.LostMouseCaptureEvent,
-                OriginalSource = uie,
+                Source = uie,
             });
         }
     }
@@ -277,7 +274,7 @@ internal sealed class InputManager
                 RaiseUserInitiatedEvent(uie, new MouseEventArgs
                 {
                     RoutedEvent = UIElement.MouseLeaveEvent,
-                    OriginalSource = uie,
+                    Source = uie,
                 });
             }
         }
@@ -489,10 +486,8 @@ internal sealed class InputManager
         // The window received focus, re-focus element with logical focus if any.
         if (FocusManager.GetFocusedElement() is UIElement focusedElement)
         {
-            RaiseUserInitiatedEvent(focusedElement, new RoutedEventArgs
+            RaiseUserInitiatedEvent(focusedElement, new RoutedEventArgs(UIElement.GotFocusEvent, focusedElement)
             {
-                RoutedEvent = UIElement.GotFocusEvent,
-                OriginalSource = focusedElement,
                 UIEventArg = jsEventArg,
             });
         }
@@ -502,10 +497,8 @@ internal sealed class InputManager
     {
         if (FocusManager.GetFocusedElement() is UIElement focusedElement)
         {
-            RaiseUserInitiatedEvent(focusedElement, new RoutedEventArgs
+            RaiseUserInitiatedEvent(focusedElement, new RoutedEventArgs(UIElement.LostFocusEvent, focusedElement)
             {
-                RoutedEvent = UIElement.LostFocusEvent,
-                OriginalSource = focusedElement,
                 UIEventArg = jsEventArg,
             });
         }
@@ -580,7 +573,7 @@ internal sealed class InputManager
             var e = new MouseButtonEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
             {
                 RoutedEvent = UIElement.MouseRightButtonUpEvent,
-                OriginalSource = mouseTarget,
+                Source = mouseTarget,
                 UIEventArg = parameters.UIEventArg,
             };
 
@@ -600,7 +593,7 @@ internal sealed class InputManager
             var e = new MouseWheelEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY, delta)
             {
                 RoutedEvent = UIElement.MouseWheelEvent,
-                OriginalSource = mouseTarget,
+                Source = mouseTarget,
                 UIEventArg = parameters.UIEventArg,
             };
 
@@ -653,7 +646,7 @@ internal sealed class InputManager
         var e = new KeyEventArgs()
         {
             RoutedEvent = UIElement.KeyDownEvent,
-            OriginalSource = keyboardTarget,
+            Source = keyboardTarget,
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
             Key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
@@ -692,7 +685,7 @@ internal sealed class InputManager
         var e = new KeyEventArgs()
         {
             RoutedEvent = UIElement.KeyUpEvent,
-            OriginalSource = keyboardTarget,
+            Source = keyboardTarget,
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
             Key = VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
@@ -763,7 +756,7 @@ internal sealed class InputManager
         var textInputStartArgs = new TextCompositionEventArgs
         {
             RoutedEvent = UIElement.TextInputStartEvent,
-            OriginalSource = keyboardTarget,
+            Source = keyboardTarget,
             Text = text,
             TextComposition = TextComposition.Empty,
             UIEventArg = jsEventArg,
@@ -774,7 +767,7 @@ internal sealed class InputManager
         var textInputArgs = new TextCompositionEventArgs
         {
             RoutedEvent = UIElement.TextInputEvent,
-            OriginalSource = keyboardTarget,
+            Source = keyboardTarget,
             Text = text,
             TextComposition = TextComposition.Empty,
             UIEventArg = jsEventArg,
@@ -793,7 +786,7 @@ internal sealed class InputManager
         var e = new MouseEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
         {
             RoutedEvent = routedEvent,
-            OriginalSource = uie,
+            Source = uie,
             UIEventArg = parameters.UIEventArg,
         };
 
@@ -812,7 +805,7 @@ internal sealed class InputManager
         var e = new MouseButtonEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
         {
             RoutedEvent = routedEvent,
-            OriginalSource = uie,
+            Source = uie,
             UIEventArg = parameters.UIEventArg,
         };
 
@@ -836,7 +829,7 @@ internal sealed class InputManager
         var e = new TappedRoutedEventArgs(parameters.IsTouchEvent, parameters.KeyModifiers, parameters.PageX, parameters.PageY)
         {
             RoutedEvent = UIElement.TappedEvent,
-            OriginalSource = uie,
+            Source = uie,
             UIEventArg = parameters.UIEventArg,
         };
 

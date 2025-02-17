@@ -72,20 +72,19 @@ namespace System.Windows.Controls.Primitives
         private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ToggleButton button = (ToggleButton)d;
-            bool? oldValue = (bool?)e.OldValue;
             bool? newValue = (bool?)e.NewValue;
 
             if (newValue == true)
             {
-                button.OnChecked(new RoutedEventArgs { OriginalSource = button });
+                button.OnChecked(new RoutedEventArgs { Source = button });
             }
             else if (newValue == false)
             {
-                button.OnUnchecked(new RoutedEventArgs { OriginalSource = button });
+                button.OnUnchecked(new RoutedEventArgs { Source = button });
             }
             else
             {
-                button.OnIndeterminate(new RoutedEventArgs { OriginalSource = button });
+                button.OnIndeterminate(new RoutedEventArgs { Source = button });
             }
 
             button.UpdateVisualStates();

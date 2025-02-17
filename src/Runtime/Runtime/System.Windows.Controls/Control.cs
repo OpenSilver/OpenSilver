@@ -84,8 +84,9 @@ namespace System.Windows.Controls
                 var doubleClick = new MouseButtonEventArgs(e.IsTouchEvent, e.KeyModifiers, e._pointerAbsoluteX, e._pointerAbsoluteY)
                 {
                     RoutedEvent = MouseDoubleClickEvent,
-                    OriginalSource = e.OriginalSource,
+                    Source = e.OriginalSource, // Set OriginalSource because initially is null
                 };
+                doubleClick.OverrideSource(e.Source);
 
                 ctrl.OnMouseDoubleClick(doubleClick);
 

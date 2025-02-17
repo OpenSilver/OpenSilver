@@ -248,7 +248,7 @@ namespace System.Windows.Controls
                 pwb._textViewHost?.View.SetPasswordNative((string)e.NewValue);
             }
 
-            pwb.OnPasswordChanged(new RoutedEventArgs { OriginalSource = pwb });
+            pwb.OnPasswordChanged(new RoutedEventArgs { Source = pwb });
         }
 
         private static object CoercePassword(DependencyObject d, object baseValue) => baseValue ?? string.Empty;

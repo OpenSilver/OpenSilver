@@ -97,7 +97,7 @@ namespace System.Windows.Controls
 
                 VisualStateManager.GoToState(this, VisualStates.StateToolTipOpen, true);
 
-                Opened?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
+                Opened?.Invoke(this, new RoutedEventArgs { Source = this });
             }
             else
             {
@@ -106,7 +106,7 @@ namespace System.Windows.Controls
                     VisualStateManager.GoToState(this, VisualStates.StateToolTipClosed, true);
                     _parentPopup.IsOpen = false;
 
-                    Closed?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
+                    Closed?.Invoke(this, new RoutedEventArgs { Source = this });
                 }
             }
         }

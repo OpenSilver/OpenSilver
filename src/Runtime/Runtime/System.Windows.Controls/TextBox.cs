@@ -169,7 +169,7 @@ namespace System.Windows.Controls
                 tb._textViewHost?.View.SetTextNative((string)e.NewValue);
             }
 
-            tb.OnTextChanged(new TextChangedEventArgs() { OriginalSource = tb });
+            tb.OnTextChanged(new TextChangedEventArgs() { Source = tb });
         }
 
         private static object CoerceText(DependencyObject d, object value)
