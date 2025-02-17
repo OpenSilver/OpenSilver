@@ -33,8 +33,8 @@ internal class TouchScrollHelper
     private double _velocityY;
     private DispatcherTimer _inertiaTimer;
 
-    private Visibility HorizontalScrollBarVisibility => _scrollViewer.ComputedHorizontalScrollBarVisibility;
-    private Visibility VerticalScrollBarVisibility => _scrollViewer.ComputedVerticalScrollBarVisibility;
+    private bool IsHorizontalScrollBarVisible => _scrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
+    private bool IsVerticalScrollBarVisible => _scrollViewer.ComputedVerticalScrollBarVisibility == Visibility.Visible;
 
     public TouchScrollHelper(ScrollViewer scrollViewer)
     {
@@ -65,7 +65,9 @@ internal class TouchScrollHelper
             e.Handled = true;
         }
 
-        if (!e.IsTouchEvent || Pointer.Captured != null)
+        if (!e.IsTouchEvent ||
+            Pointer.Captured != null ||
+            !IsHorizontalScrollBarVisible && !IsVerticalScrollBarVisible)
         {
             return;
         }
@@ -94,7 +96,7 @@ internal class TouchScrollHelper
 
         _scrollViewer.ReleaseMouseCapture();
 
-        if (VerticalScrollBarVisibility == Visibility.Visible || HorizontalScrollBarVisibility == Visibility.Visible)
+        if (IsVerticalScrollBarVisible || IsHorizontalScrollBarVisible)
         {
             StartScrollingInertia();
         }
@@ -109,7 +111,7 @@ internal class TouchScrollHelper
 
         var position = e.GetPosition(null);
 
-        if (HorizontalScrollBarVisibility == Visibility.Visible)
+        if (IsHorizontalScrollBarVisible)
         {
             double deltaX = _pointerPosition.X - position.X;
             _velocityX = deltaX;
@@ -117,7 +119,7 @@ internal class TouchScrollHelper
             _scrollViewer.ScrollToHorizontalOffset(_horizontalOffset);
         }
 
-        if (VerticalScrollBarVisibility == Visibility.Visible)
+        if (IsVerticalScrollBarVisible)
         {
             double deltaY = _pointerPosition.Y - position.Y;
             _verticalOffset += deltaY;
@@ -137,8 +139,8 @@ internal class TouchScrollHelper
 
         _inertiaTimer.Tick += (_, _) =>
         {
-            var scrolledHorizontally = Math.Abs(_velocityX) < Threshold || HorizontalScrollBarVisibility == Visibility.Collapsed;
-            var scrolledVertically = Math.Abs(_velocityY) < Threshold || VerticalScrollBarVisibility == Visibility.Collapsed;
+            var scrolledHorizontally = Math.Abs(_velocityX) < Threshold || !IsHorizontalScrollBarVisible;
+            var scrolledVertically = Math.Abs(_velocityY) < Threshold || !IsVerticalScrollBarVisible;
 
             if (scrolledHorizontally && scrolledVertically)
             {
@@ -146,14 +148,14 @@ internal class TouchScrollHelper
                 return;
             }
 
-            if (HorizontalScrollBarVisibility == Visibility.Visible)
+            if (IsHorizontalScrollBarVisible)
             {
                 _horizontalOffset += _velocityX;
                 _scrollViewer.ScrollToHorizontalOffset(_horizontalOffset);
                 _velocityX *= Deceleration;
             }
 
-            if (VerticalScrollBarVisibility == Visibility.Visible)
+            if (IsVerticalScrollBarVisible)
             {
                 _verticalOffset += _velocityY;
                 _scrollViewer.ScrollToVerticalOffset(_verticalOffset);
