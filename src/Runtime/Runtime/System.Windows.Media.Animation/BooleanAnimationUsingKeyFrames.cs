@@ -51,6 +51,9 @@ public sealed class BooleanAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
 
     IKeyFrameCollection<bool> IKeyFrameAnimation<bool>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(bool);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

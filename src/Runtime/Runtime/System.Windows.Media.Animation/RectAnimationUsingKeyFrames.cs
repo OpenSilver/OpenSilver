@@ -50,6 +50,9 @@ public sealed class RectAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
 
     IKeyFrameCollection<Rect> IKeyFrameAnimation<Rect>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Rect);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

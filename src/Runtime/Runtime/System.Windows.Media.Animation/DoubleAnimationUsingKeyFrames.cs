@@ -51,6 +51,9 @@ public sealed class DoubleAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     IKeyFrameCollection<double> IKeyFrameAnimation<double>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(double);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

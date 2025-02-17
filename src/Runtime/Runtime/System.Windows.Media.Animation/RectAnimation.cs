@@ -196,6 +196,9 @@ public sealed class RectAnimation : AnimationTimeline, IFromByToAnimation<Rect>
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Rect);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<Rect>(this, new FromToByAnimator<Rect>(this));
 

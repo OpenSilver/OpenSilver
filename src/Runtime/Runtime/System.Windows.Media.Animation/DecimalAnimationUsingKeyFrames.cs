@@ -50,6 +50,9 @@ public sealed class DecimalAnimationUsingKeyFrames : AnimationTimeline, IKeyFram
 
     IKeyFrameCollection<decimal> IKeyFrameAnimation<decimal>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(decimal);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

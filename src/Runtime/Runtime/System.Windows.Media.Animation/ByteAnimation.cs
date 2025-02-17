@@ -197,6 +197,9 @@ public sealed class ByteAnimation : AnimationTimeline, IFromByToAnimation<byte>
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(byte);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<byte>(this, new FromToByAnimator<byte>(this));
 

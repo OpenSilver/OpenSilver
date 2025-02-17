@@ -79,6 +79,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AnimationTimeline of type &apos;{0}&apos; cannot be used to animate the &apos;{1}&apos; property of type &apos;{2}&apos;..
+        /// </summary>
+        internal static string Animation_AnimationTimelineTypeMismatch {
+            get {
+                return ResourceManager.GetString("Animation_AnimationTimelineTypeMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; property is not animatable on &apos;{1}&apos; class because the IsAnimationProhibited flag has been set on the UIPropertyMetadata used to associate the property with the class..
         /// </summary>
         internal static string Animation_DependencyPropertyIsNotAnimatable {

@@ -50,6 +50,9 @@ public sealed class ByteAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
 
     IKeyFrameCollection<byte> IKeyFrameAnimation<byte>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(byte);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

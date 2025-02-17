@@ -53,6 +53,9 @@ public class ColorAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAnimatio
 
     IKeyFrameCollection<Color> IKeyFrameAnimation<Color>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Color);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

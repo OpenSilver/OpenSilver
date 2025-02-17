@@ -50,6 +50,9 @@ public sealed class ThicknessAnimationUsingKeyFrames : AnimationTimeline, IKeyFr
 
     IKeyFrameCollection<Thickness> IKeyFrameAnimation<Thickness>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Thickness);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

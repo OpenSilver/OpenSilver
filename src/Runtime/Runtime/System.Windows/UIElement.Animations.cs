@@ -51,6 +51,17 @@ public partial class UIElement
                 nameof(dp));
         }
 
+        if (animation is not null && !IsAnimationValid(dp, animation))
+        {
+            throw new ArgumentException(
+                string.Format(
+                    Strings.Animation_AnimationTimelineTypeMismatch,
+                    animation.GetType(),
+                    dp.Name,
+                    dp.PropertyType),
+                nameof(animation));
+        }
+
         if (animation is null)
         {
             DetachAnimationClock(dp, true);
@@ -85,5 +96,11 @@ public partial class UIElement
         }
 
         return true;
+    }
+
+    internal static bool IsAnimationValid(DependencyProperty dp, AnimationTimeline animation)
+    {
+        Type targetPropertyType = animation.TargetPropertyType;
+        return dp.PropertyType.IsAssignableFrom(targetPropertyType) || targetPropertyType == typeof(object);
     }
 }

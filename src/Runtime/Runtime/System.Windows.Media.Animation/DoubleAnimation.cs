@@ -117,6 +117,9 @@ public class DoubleAnimation : AnimationTimeline, IFromByToAnimation<double>
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(double);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<double>(this, new FromToByAnimator<double>(this));
 

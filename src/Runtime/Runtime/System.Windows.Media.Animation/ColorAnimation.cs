@@ -117,6 +117,9 @@ public sealed class ColorAnimation : AnimationTimeline, IFromByToAnimation<Color
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Color);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<Color>(this, new FromToByAnimator<Color>(this));
 

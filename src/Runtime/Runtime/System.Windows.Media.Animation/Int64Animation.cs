@@ -202,6 +202,9 @@ public sealed class Int64Animation : AnimationTimeline, IFromByToAnimation<long>
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(long);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<long>(this, new FromToByAnimator<long>(this));
 

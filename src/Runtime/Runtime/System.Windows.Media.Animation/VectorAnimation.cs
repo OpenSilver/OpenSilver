@@ -197,6 +197,9 @@ public sealed class VectorAnimation : AnimationTimeline, IFromByToAnimation<Vect
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Vector);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<Vector>(this, new FromToByAnimator<Vector>(this));
 

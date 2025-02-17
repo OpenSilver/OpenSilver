@@ -50,6 +50,9 @@ public sealed class SizeAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameAn
 
     IKeyFrameCollection<Size> IKeyFrameAnimation<Size>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Size);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

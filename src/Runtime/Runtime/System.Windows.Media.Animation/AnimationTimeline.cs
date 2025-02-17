@@ -13,9 +13,20 @@
 
 namespace System.Windows.Media.Animation;
 
+/// <summary>
+/// Defines a segment of time over which output values are produced. These values are used to animate a target property.
+/// </summary>
 public abstract class AnimationTimeline : Timeline
 {
     internal static readonly TimeSpan DefaultDuration = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// When overridden in a derived class, gets the <see cref="Type"/> of property that can be animated.
+    /// </summary>
+    /// <returns>
+    /// The type of property that can be animated by this animation.
+    /// </returns>
+    public abstract Type TargetPropertyType { get; }
 
     protected override Duration GetNaturalDurationCore() => DefaultDuration;
 

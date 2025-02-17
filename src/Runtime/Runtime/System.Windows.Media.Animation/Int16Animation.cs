@@ -202,6 +202,9 @@ public sealed class Int16Animation : AnimationTimeline, IFromByToAnimation<short
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(short);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<short>(this, new FromToByAnimator<short>(this));
 

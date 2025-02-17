@@ -197,6 +197,9 @@ public sealed class ThicknessAnimation : AnimationTimeline, IFromByToAnimation<T
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Thickness);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<Thickness>(this, new FromToByAnimator<Thickness>(this));
 

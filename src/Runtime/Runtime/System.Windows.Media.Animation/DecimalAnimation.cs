@@ -197,6 +197,9 @@ public sealed class DecimalAnimation : AnimationTimeline, IFromByToAnimation<dec
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(decimal);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<decimal>(this, new FromToByAnimator<decimal>(this));
 

@@ -115,6 +115,9 @@ public sealed class PointAnimation : AnimationTimeline, IFromByToAnimation<Point
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Point);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<Point>(this, new FromToByAnimator<Point>(this));
 

@@ -51,6 +51,9 @@ public sealed class StringAnimationUsingKeyFrames : AnimationTimeline, IKeyFrame
 
     IKeyFrameCollection<string> IKeyFrameAnimation<string>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(string);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

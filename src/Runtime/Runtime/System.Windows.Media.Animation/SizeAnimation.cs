@@ -197,6 +197,9 @@ public sealed class SizeAnimation : AnimationTimeline, IFromByToAnimation<Size>
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Size);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<Size>(this, new FromToByAnimator<Size>(this));
 

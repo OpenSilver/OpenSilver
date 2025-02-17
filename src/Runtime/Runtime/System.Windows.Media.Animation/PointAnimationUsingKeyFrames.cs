@@ -52,6 +52,9 @@ public sealed class PointAnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
 
     IKeyFrameCollection<Point> IKeyFrameAnimation<Point>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(Point);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

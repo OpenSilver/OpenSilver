@@ -123,6 +123,9 @@
   <data name="AddedItemNotInCollection" xml:space="preserve">
     <value>A collection Add event refers to item that does not belong to collection.</value>
   </data>
+  <data name="Animation_AnimationTimelineTypeMismatch" xml:space="preserve">
+    <value>AnimationTimeline of type '{0}' cannot be used to animate the '{1}' property of type '{2}'.</value>
+  </data>
   <data name="Animation_DependencyPropertyIsNotAnimatable" xml:space="preserve">
     <value>'{0}' property is not animatable on '{1}' class because the IsAnimationProhibited flag has been set on the UIPropertyMetadata used to associate the property with the class.</value>
   </data>

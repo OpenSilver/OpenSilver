@@ -50,6 +50,9 @@ public sealed class Int64AnimationUsingKeyFrames : AnimationTimeline, IKeyFrameA
 
     IKeyFrameCollection<long> IKeyFrameAnimation<long>.KeyFrames => _frames;
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(long);
+
     protected sealed override Duration GetNaturalDurationCore() =>
         KeyFrameAnimationHelpers.GetLargestTimeSpanKeyTime(this);
 

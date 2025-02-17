@@ -196,6 +196,9 @@ public sealed class SingleAnimation : AnimationTimeline, IFromByToAnimation<floa
         set => SetValueInternal(ToProperty, value);
     }
 
+    /// <inheritdoc />
+    public sealed override Type TargetPropertyType => typeof(float);
+
     internal sealed override TimelineClock CreateClock() =>
         new AnimationClock<float>(this, new FromToByAnimator<float>(this));
 
