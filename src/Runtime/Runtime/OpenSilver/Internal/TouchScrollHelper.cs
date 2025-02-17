@@ -21,11 +21,20 @@ namespace OpenSilver.Internal;
 
 internal class TouchScrollHelper
 {
+    private static bool _isScrollingStarted;
+
+    public static bool IsScrolling { get; private set; }
+
+    private const int MinScrollDelta = 5;
+    private const double Deceleration = 0.97;
+    private const double Threshold = 0.1;
+
     private readonly ScrollViewer _scrollViewer;
     private readonly MouseButtonEventHandler _mouseLeftButtonDownHandler;
     private readonly MouseButtonEventHandler _mouseLeftButtonUpHandler;
     private readonly MouseEventHandler _mouseMoveHandler;
 
+    private Point _startPosition;
     private Point _pointerPosition;
     private double _horizontalOffset;
     private double _verticalOffset;
@@ -47,15 +56,11 @@ internal class TouchScrollHelper
     public void SubscribeToEvents()
     {
         _scrollViewer.AddHandler(UIElement.MouseLeftButtonDownEvent, _mouseLeftButtonDownHandler, handledEventsToo: true);
-        _scrollViewer.AddHandler(UIElement.MouseLeftButtonUpEvent, _mouseLeftButtonUpHandler, handledEventsToo: true);
-        _scrollViewer.AddHandler(UIElement.MouseMoveEvent, _mouseMoveHandler, handledEventsToo: true);
     }
 
     public void UnsubscribeFromEvents()
     {
         _scrollViewer.RemoveHandler(UIElement.MouseLeftButtonDownEvent, _mouseLeftButtonDownHandler);
-        _scrollViewer.RemoveHandler(UIElement.MouseLeftButtonUpEvent, _mouseLeftButtonUpHandler);
-        _scrollViewer.RemoveHandler(UIElement.MouseMoveEvent, _mouseMoveHandler);
     }
 
     private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -65,20 +70,27 @@ internal class TouchScrollHelper
             e.Handled = true;
         }
 
-        if (!e.IsTouchEvent ||
-            Pointer.Captured != null ||
-            !IsHorizontalScrollBarVisible && !IsVerticalScrollBarVisible)
+        if (e.IsTouchEvent &&
+            !_isScrollingStarted && // prevents scrolling multiple nested ScrollViewers
+            Pointer.Captured == null &&
+            (IsVerticalScrollBarVisible || IsHorizontalScrollBarVisible))
         {
-            return;
+            StartScrolling(e);
         }
+    }
+
+    private void StartScrolling(MouseButtonEventArgs e)
+    {
+        _isScrollingStarted = true;
+
+        _scrollViewer.AddHandler(UIElement.MouseLeftButtonUpEvent, _mouseLeftButtonUpHandler, handledEventsToo: true);
+        _scrollViewer.AddHandler(UIElement.MouseMoveEvent, _mouseMoveHandler, handledEventsToo: true);
 
         if (_inertiaTimer != null)
         {
             _inertiaTimer.Stop();
             _inertiaTimer = null;
         }
-
-        _scrollViewer.CaptureMouse();
 
         _pointerPosition = e.GetPosition(null);
         _horizontalOffset = _scrollViewer.ScrollInfo.HorizontalOffset;
@@ -89,14 +101,13 @@ internal class TouchScrollHelper
 
     private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (!e.IsTouchEvent || Pointer.Captured != _scrollViewer)
-        {
-            return;
-        }
+        _isScrollingStarted = false;
+        IsScrolling = false;
 
-        _scrollViewer.ReleaseMouseCapture();
+        _scrollViewer.RemoveHandler(UIElement.MouseLeftButtonUpEvent, _mouseLeftButtonUpHandler);
+        _scrollViewer.RemoveHandler(UIElement.MouseMoveEvent, _mouseMoveHandler);
 
-        if (IsVerticalScrollBarVisible || IsHorizontalScrollBarVisible)
+        if (!ScrollingIsCompleted())
         {
             StartScrollingInertia();
         }
@@ -104,13 +115,22 @@ internal class TouchScrollHelper
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
-        if (!e.IsTouchEvent || Pointer.Captured != _scrollViewer)
-        {
-            return;
-        }
-
         var position = e.GetPosition(null);
 
+        if (!IsScrolling)
+        {
+            IsScrolling = Math.Abs(position.X - _startPosition.X) > MinScrollDelta ||
+                          Math.Abs(position.Y - _startPosition.Y) > MinScrollDelta;
+        }
+
+        if (IsScrolling)
+        {
+            Scroll(position);
+        }
+    }
+
+    private void Scroll(Point position)
+    {
         if (IsHorizontalScrollBarVisible)
         {
             double deltaX = _pointerPosition.X - position.X;
@@ -132,22 +152,10 @@ internal class TouchScrollHelper
 
     private void StartScrollingInertia()
     {
-        const double Deceleration = 0.97;
-        const double Threshold = 0.1;
-
         _inertiaTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) }; // Approximately 60 FPS
 
         _inertiaTimer.Tick += (_, _) =>
         {
-            var scrolledHorizontally = Math.Abs(_velocityX) < Threshold || !IsHorizontalScrollBarVisible;
-            var scrolledVertically = Math.Abs(_velocityY) < Threshold || !IsVerticalScrollBarVisible;
-
-            if (scrolledHorizontally && scrolledVertically)
-            {
-                _inertiaTimer.Stop();
-                return;
-            }
-
             if (IsHorizontalScrollBarVisible)
             {
                 _horizontalOffset += _velocityX;
@@ -161,8 +169,21 @@ internal class TouchScrollHelper
                 _scrollViewer.ScrollToVerticalOffset(_verticalOffset);
                 _velocityY *= Deceleration;
             }
+
+            if (ScrollingIsCompleted())
+            {
+                _inertiaTimer.Stop();
+            }
         };
 
         _inertiaTimer.Start();
+    }
+
+    private bool ScrollingIsCompleted()
+    {
+        var scrolledHorizontally = Math.Abs(_velocityX) < Threshold || !IsHorizontalScrollBarVisible;
+        var scrolledVertically = Math.Abs(_velocityY) < Threshold || !IsVerticalScrollBarVisible;
+
+        return scrolledHorizontally && scrolledVertically;
     }
 }

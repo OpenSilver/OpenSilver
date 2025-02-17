@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System.Windows.Input;
 
 namespace System.Windows.Controls
@@ -33,7 +34,7 @@ namespace System.Windows.Controls
 
             ComboBox parent = ParentComboBox;
 
-            if (parent != null)
+            if (parent != null && !TouchScrollHelper.IsScrolling)
             {
                 parent.NotifyComboBoxItemMouseUp(this);
             }
