@@ -26,6 +26,7 @@ internal class TouchScrollHelper
     public static bool IsScrolling { get; private set; }
 
     private const int MinScrollDelta = 5;
+    private const int MaxWaitMsForInertia = 50;
     private const double Deceleration = 0.97;
     private const double Threshold = 0.1;
 
@@ -40,6 +41,7 @@ internal class TouchScrollHelper
     private double _verticalOffset;
     private double _velocityX;
     private double _velocityY;
+    private DateTime _lastMoveTime;
     private DispatcherTimer _inertiaTimer;
 
     private bool IsHorizontalScrollBarVisible => _scrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
@@ -97,6 +99,7 @@ internal class TouchScrollHelper
         _verticalOffset = _scrollViewer.ScrollInfo.VerticalOffset;
         _velocityX = 0;
         _velocityY = 0;
+        _lastMoveTime = DateTime.Now;
     }
 
     private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -107,7 +110,7 @@ internal class TouchScrollHelper
         _scrollViewer.RemoveHandler(UIElement.MouseLeftButtonUpEvent, _mouseLeftButtonUpHandler);
         _scrollViewer.RemoveHandler(UIElement.MouseMoveEvent, _mouseMoveHandler);
 
-        if (!ScrollingIsCompleted())
+        if ((DateTime.Now - _lastMoveTime).TotalMilliseconds < MaxWaitMsForInertia && !ScrollingIsCompleted())
         {
             StartScrollingInertia();
         }
@@ -115,6 +118,7 @@ internal class TouchScrollHelper
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
+        _lastMoveTime = DateTime.Now;
         var position = e.GetPosition(null);
 
         if (!IsScrolling)
