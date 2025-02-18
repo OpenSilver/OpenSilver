@@ -504,8 +504,8 @@ End Sub
                     {
                         // Verify that the attribute is not an attached property:
                         //todo: This test does not work 100% of the time. For example if we have <Grid Column="1" ..../> the compiler thinks that Column is a normal property whereas it actually is an attached property.
-                        bool isAttachedProperty = attributeLocalName.Contains(".");
-                        if (!isAttachedProperty)
+                        bool isAttachedMember = attributeLocalName.Contains(".");
+                        if (!isAttachedMember)
                         {
                             bool isXNameAttr = GeneratingCode.IsXNameAttribute(attribute);
                             if (isXNameAttr || GeneratingCode.IsNameAttribute(attribute))
@@ -657,7 +657,7 @@ End Sub
                                                     GenerateCodeForInstantiatingAttributeValue(
                                                         typeName,
                                                         propertyName,
-                                                        isAttachedProperty,
+                                                        isAttachedMember,
                                                         attributeValue,
                                                         element
                                                     );
@@ -691,7 +691,7 @@ End Sub
                                                     GenerateCodeForInstantiatingAttributeValue(
                                                         typeName,
                                                         propertyName,
-                                                        isAttachedProperty,
+                                                        isAttachedMember,
                                                         attributeValue,
                                                         element
                                                     );
@@ -718,26 +718,60 @@ End Sub
                         else
                         {
                             //-------------
-                            // ATTACHED PROPERTY
+                            // ATTACHED PROPERTY OR EVENT
                             //-------------
 
-                            // Split the attribute name:
-                            string[] splitted = attribute.Name.LocalName.Split('.');
-                            string classLocalNameForAttachedProperty = splitted[0];
-                            XName elementNameForAttachedProperty = attribute.Name.Namespace + classLocalNameForAttachedProperty;
-                            string classFullNameForAttachedProperty = GetCSharpEquivalentOfXamlTypeAsString(elementNameForAttachedProperty);
-                            string propertyName = splitted[1];
+                            string[] split = attribute.Name.LocalName.Split('.');
 
-                                // Generate the code for instantiating the attribute value:
-                            string codeForInstantiatingTheAttributeValue = GenerateCodeForInstantiatingAttributeValue(
-                                elementNameForAttachedProperty,
-                                propertyName,
-                                isAttachedProperty,
-                                attributeValue,
-                                element);
+                            XName ownerTypeXName = attribute.Name.Namespace + split[0];
+                            string memberName = split[1];
 
-                            // Append the statement:
-                            parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2},{3})", classFullNameForAttachedProperty, propertyName, elementUniqueNameOrThisKeyword, codeForInstantiatingTheAttributeValue));
+                            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                                ownerTypeXName,
+                                _settings.EnableImplicitAssemblyRedirection,
+                                out string ownerTypeNamespace,
+                                out string ownerTypeName,
+                                out string ownerTypeAssemblyName);
+
+                            (MemberTypes memberType, MethodDefinition method, TypeReference declaringType) =
+                                _reflectionOnSeparateAppDomain.GetAttachedMemberType(
+                                    memberName, ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName);
+
+                            switch (memberType)
+                            {
+                                case MemberTypes.Property:
+                                    {
+                                        string ownerType = $"Global.{declaringType.ConvertToString(SupportedLanguage.VBNet)}";
+                                        string value = GenerateCodeForInstantiatingAttributeValue(
+                                            ownerTypeXName,
+                                            memberName,
+                                            isAttachedMember,
+                                            attributeValue,
+                                            element);
+
+                                        parameters.StringBuilder.AppendLine(
+                                            $"{ownerType}.Set{memberName}({elementUniqueNameOrThisKeyword}, {value})");
+                                    }
+                                    break;
+
+                                case MemberTypes.Event:
+                                    {
+                                        string ownerType = $"Global.{declaringType.ConvertToString(SupportedLanguage.VBNet)}";
+
+                                        parameters.StringBuilder.AppendLine(
+                                            string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3})",
+                                                RuntimeHelperClass,
+                                                parameters.CurrentXamlContext,
+                                                parameters.ComponentConnector.Connect(elementTypeInCSharp, ownerType, memberName, attributeValue),
+                                                elementUniqueNameOrThisKeyword));
+                                    }
+                                    break;
+
+                                default:
+                                    throw new XamlParseException(
+                                        $"The property '{attribute.Name.LocalName}' does not exist in XML namespace '{attribute.Name.NamespaceName}'.",
+                                        attribute);
+                            }
                         }
                     }
                 }

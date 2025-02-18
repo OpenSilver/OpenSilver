@@ -37,7 +37,21 @@ namespace OpenSilver.Compiler
                 {
                     componentType = componentType,
                     eventName = eventName,
-                    handlerName = handlerName
+                    handlerName = handlerName,
+                });
+
+                return componentId;
+            }
+
+            public int Connect(string componentType, string ownerType, string eventName, string handlerName)
+            {
+                int componentId = _entries.Count;
+                _entries.Add(new ComponentConnectorEntry
+                {
+                    componentType = componentType,
+                    ownerType = ownerType,
+                    eventName = eventName,
+                    handlerName = handlerName,
                 });
 
                 return componentId;
@@ -60,7 +74,14 @@ namespace OpenSilver.Compiler
                     {
                         ComponentConnectorEntry eventEntry = _entries[componentId];
                         builder.Append(' ', 4 * 4).AppendLine($"| {componentId} ->");
-                        builder.Append(' ', 4 * 5).AppendLine($"{RuntimeHelperClass}.RegisterEventHandler(\"{eventEntry.handlerName}\", \"{eventEntry.eventName}\", {targetParam}, this)");
+                        if (string.IsNullOrEmpty(eventEntry.ownerType))
+                        {
+                            builder.Append(' ', 4 * 5).AppendLine($"{RuntimeHelperClass}.RegisterEventHandler(\"{eventEntry.handlerName}\", \"{eventEntry.eventName}\", {targetParam}, this)");
+                        }
+                        else
+                        {
+                            builder.Append(' ', 4 * 5).AppendLine($"{RuntimeHelperClass}.RegisterAttachedEventHandler(\"{eventEntry.handlerName}\", typeof<{eventEntry.ownerType}>, \"{eventEntry.eventName}\", {targetParam}, this)");
+                        }
                     }
 
                     builder.Append(' ', 4 * 4).AppendLine("| _ -> ()");
@@ -76,6 +97,7 @@ namespace OpenSilver.Compiler
             private struct ComponentConnectorEntry
             {
                 public string componentType;
+                public string ownerType;
                 public string eventName;
                 public string handlerName;
             }

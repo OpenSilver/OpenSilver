@@ -75,6 +75,9 @@ namespace OpenSilver.Compiler
         public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny = null)
             => _monoCecilVersion.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
 
+        public (MemberTypes Type, MethodDefinition Method, TypeReference DeclaringType) GetAttachedMemberType(string memberName, string ownerTypeNamespace, string ownerTypeName, string ownerTypeAssemblyName)
+            => _monoCecilVersion.GetAttachedMemberType(memberName, ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName);
+
         public bool IsTypeAnEnum(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
             => _monoCecilVersion.IsTypeAnEnum(namespaceName, localTypeName, assemblyNameIfAny);
 

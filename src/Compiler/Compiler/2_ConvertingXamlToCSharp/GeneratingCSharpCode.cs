@@ -37,7 +37,21 @@ namespace OpenSilver.Compiler
                 {
                     componentType = componentType,
                     eventName = eventName,
-                    handlerName = handlerName
+                    handlerName = handlerName,
+                });
+
+                return componentId;
+            }
+
+            public int Connect(string componentType, string ownerType, string eventName, string handlerName)
+            {
+                int componentId = _entries.Count;
+                _entries.Add(new ComponentConnectorEntry
+                {
+                    componentType = componentType,
+                    ownerType = ownerType,
+                    eventName = eventName,
+                    handlerName = handlerName,
                 });
 
                 return componentId;
@@ -61,7 +75,14 @@ namespace OpenSilver.Compiler
                     {
                         ComponentConnectorEntry eventEntry = _entries[componentId];
                         builder.Append(' ', 4 * 4).AppendLine($"case {componentId}:");
-                        builder.Append(' ', 4 * 5).AppendLine($"(({eventEntry.componentType})({targetParam})).{eventEntry.eventName} += this.{eventEntry.handlerName};");
+                        if (string.IsNullOrEmpty(eventEntry.ownerType))
+                        {
+                            builder.Append(' ', 4 * 5).AppendLine($"(({eventEntry.componentType})({targetParam})).{eventEntry.eventName} += this.{eventEntry.handlerName};");
+                        }
+                        else
+                        {
+                            builder.Append(' ', 4 * 5).AppendLine($"{eventEntry.ownerType}.Add{eventEntry.eventName}Handler(({eventEntry.componentType})({targetParam}), this.{eventEntry.handlerName});");
+                        }
                         builder.Append(' ', 4 * 5).AppendLine("return;");
                     }
 
@@ -76,6 +97,7 @@ namespace OpenSilver.Compiler
             private struct ComponentConnectorEntry
             {
                 public string componentType;
+                public string ownerType;
                 public string eventName;
                 public string handlerName;
             }

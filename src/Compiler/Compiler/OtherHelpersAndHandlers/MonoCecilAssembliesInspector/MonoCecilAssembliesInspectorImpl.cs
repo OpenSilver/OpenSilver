@@ -367,13 +367,17 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return null;
         }
 
-        private static MethodDefinition FindMethodDeep(TypeDefinition elementType, string methodName, out TypeReference ownerElementType)
+        private static MethodDefinition FindMethodDeep(TypeDefinition elementType,
+            string methodName,
+            bool onlyPublic,
+            bool onlyStatic,
+            out TypeReference ownerElementType)
         {
             ownerElementType = elementType;
             while (ownerElementType != null)
             {
                 var resolved = ownerElementType.ResolveOrThrow();
-                var methodInfo = FindMethod(resolved, methodName);
+                var methodInfo = FindMethod(resolved, methodName, onlyPublic, onlyStatic);
                 if (methodInfo != null)
                 {
                     return methodInfo;
@@ -415,7 +419,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string assemblyNameIfAny = null)
         {
             var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-            var methodInfo = FindMethodDeep(elementType, methodName, out var ownerElementType);
+            var methodInfo = FindMethodDeep(elementType, methodName, false, false, out var ownerElementType);
 
             if (methodInfo == null)
             {
@@ -570,6 +574,28 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 default:
                     return MemberTypes.Custom;
             }
+        }
+
+        public (MemberTypes Type, MethodDefinition Method, TypeReference DeclaringType) GetAttachedMemberType(
+            string memberName, string ownerTypeNamespace, string ownerTypeName, string ownerTypeAssemblyName)
+        {
+            TypeDefinition ownerType = FindType(ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName);
+
+            TypeReference declaringType;
+
+            // First try attached property
+            if (FindMethodDeep(ownerType, $"Set{memberName}", true, true, out declaringType) is MethodDefinition setMethod)
+            {
+                return (MemberTypes.Property, setMethod, declaringType);
+            }
+
+            // Then attached event
+            if (FindMethodDeep(ownerType, $"Add{memberName}Handler", true, true, out declaringType) is MethodDefinition addMethod)
+            {
+                return (MemberTypes.Event, addMethod, declaringType);
+            }
+
+            return (MemberTypes.Custom, null, null);
         }
 
         public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName,

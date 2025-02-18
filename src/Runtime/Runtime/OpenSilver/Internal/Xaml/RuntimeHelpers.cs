@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Xaml;
 using System.Windows;
 using System.Windows.Data;
@@ -156,14 +157,36 @@ namespace OpenSilver.Internal.Xaml
         {
             try
             {
-                var methodInfo = firstArgument.GetType().GetMethod(handlerName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var methodInfo = firstArgument.GetType().GetMethod(handlerName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 var eventInfo = target.GetType().GetEvent(eventName);
                 Delegate handler = Delegate.CreateDelegate(eventInfo.EventHandlerType,
                                              firstArgument,
                                              methodInfo);
                 eventInfo.AddEventHandler(target, handler);
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"{handlerName}: {ex.Message}");
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void RegisterAttachedEventHandler(string handlerName, Type ownerType, string eventName, object target, object firstArgument)
+        {
+            try
+            {
+                var methodInfo = firstArgument.GetType().GetMethod(handlerName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                var addHandlerMethod = ownerType.GetMethod($"Add{eventName}Handler", BindingFlags.Public | BindingFlags.Static);
+                var parameters = addHandlerMethod.GetParameters();
+                if (parameters.Length == 2)
+                {
+                    Delegate handler = Delegate.CreateDelegate(parameters[1].ParameterType,
+                        firstArgument,
+                        methodInfo);
+                    addHandlerMethod.Invoke(null, new object[2] { target, handler });
+                }
+            }
+            catch (Exception ex)
             {
                 throw new InvalidOperationException($"{handlerName}: {ex.Message}");
             }
