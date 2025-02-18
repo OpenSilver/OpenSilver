@@ -29,7 +29,6 @@ namespace System.Windows.Controls
     {
         static RichTextBlock()
         {
-            IsHitTestableProperty.OverrideMetadata(typeof(RichTextBlock), new PropertyMetadata(BooleanBoxes.TrueBox));
             DefaultStyleKeyProperty.OverrideMetadata(typeof(RichTextBlock), new PropertyMetadata(typeof(RichTextBlock)));
             FlowDirectionProperty.OverrideMetadata(
                 typeof(RichTextBlock),

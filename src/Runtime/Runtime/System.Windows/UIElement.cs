@@ -770,6 +770,10 @@ namespace System.Windows
                 {
                     return Visibility.Visible;
                 }
+                else if (ReadVisualFlag(VisualFlags.VisibilityCache_TakesSpace))
+                {
+                    return Visibility.Hidden;
+                }
                 else
                 {
                     return Visibility.Collapsed;
@@ -777,16 +781,23 @@ namespace System.Windows
             }
             set
             {
-                Debug.Assert(value == Visibility.Visible || value == Visibility.Collapsed);
+                Debug.Assert(value == Visibility.Visible || value == Visibility.Hidden || value == Visibility.Collapsed);
 
                 switch (value)
                 {
                     case Visibility.Visible:
                         WriteVisualFlag(VisualFlags.VisibilityCache_Visible, true);
+                        WriteVisualFlag(VisualFlags.VisibilityCache_TakesSpace, false);
+                        break;
+
+                    case Visibility.Hidden:
+                        WriteVisualFlag(VisualFlags.VisibilityCache_Visible, false);
+                        WriteVisualFlag(VisualFlags.VisibilityCache_TakesSpace, true);
                         break;
 
                     case Visibility.Collapsed:
                         WriteVisualFlag(VisualFlags.VisibilityCache_Visible, false);
+                        WriteVisualFlag(VisualFlags.VisibilityCache_TakesSpace, false);
                         break;
                 }
             }
@@ -798,8 +809,8 @@ namespace System.Windows
         /// </summary>
         public Visibility Visibility
         {
-            get { return VisibilityCache; }
-            set { SetValueInternal(VisibilityProperty, value); }
+            get => VisibilityCache;
+            set => SetValueInternal(VisibilityProperty, VisibilityBoxes.Box(value));
         }
 
         /// <summary>
@@ -810,11 +821,12 @@ namespace System.Windows
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(UIElement),
-                new PropertyMetadata(VisibilityBoxes.VisibleBox, OnVisibilityChanged, CoerceVisibility)
+                new PropertyMetadata(VisibilityBoxes.VisibleBox, OnVisibilityChanged)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                        INTERNAL_HtmlDomManager.SetVisible(((UIElement)d).OuterDiv, (Visibility)newValue == Visibility.Visible),
-                });
+                        INTERNAL_HtmlDomManager.SetVisibility(((UIElement)d).OuterDiv, (Visibility)newValue),
+                },
+                ValidateVisibility);
 
         private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -822,51 +834,102 @@ namespace System.Windows
             Visibility newVisibility = (Visibility)e.NewValue;
 
             uie.VisibilityCache = newVisibility;
+            uie.SwitchVisibilityIfNeeded(newVisibility);
 
             // The IsVisible property depends on this property.
             uie.UpdateIsVisible();
+
+            uie.UpdateInVisibilityCollapsedTreeCache();
         }
 
-        private static object CoerceVisibility(DependencyObject d, object baseValue)
+        internal bool InVisibilityCollapsedTree
         {
-            Visibility visibility = (Visibility)baseValue;
-            return VisibilityBoxes.Box(visibility);
+            get => ReadFlag(CoreFlags.InVisibilityCollapsedTree);
+            private set => WriteFlag(CoreFlags.InVisibilityCollapsedTree, value);
         }
 
-        private void SwitchVisibilityIfNeeded(bool isVisible)
+        private void UpdateInVisibilityCollapsedTreeCache()
         {
-            if (isVisible)
+            bool inVisibilityCollapsedTree =
+                VisualTreeHelper.GetParent(this) is UIElement parent &&
+                parent.InVisibilityCollapsedTree;
+
+            UpdateIsInCollapsedTreeCacheRec(this, inVisibilityCollapsedTree);
+
+            static void UpdateIsInCollapsedTreeCacheRec(UIElement uie, bool inVisibilityCollapsedTree)
             {
-                EnsureVisible();
+                if (!inVisibilityCollapsedTree)
+                {
+                    inVisibilityCollapsedTree = uie.Visibility == Visibility.Collapsed;
+                }
+
+                if (uie.InVisibilityCollapsedTree != inVisibilityCollapsedTree)
+                {
+                    uie.InVisibilityCollapsedTree = inVisibilityCollapsedTree;
+
+                    if (!inVisibilityCollapsedTree && INTERNAL_VisualTreeManager.IsElementInVisualTree(uie))
+                    {
+                        if (uie.RenderingIsDeferred)
+                        {
+                            uie.RenderingIsDeferred = false;
+                            INTERNAL_VisualTreeManager.RenderElementsAndRaiseChangedEventOnAllDependencyProperties(uie);
+                        }
+                    }
+
+                    int count = uie.VisualChildrenCount;
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (uie.GetVisualChild(i) is UIElement child)
+                        {
+                            UpdateIsInCollapsedTreeCacheRec(child, inVisibilityCollapsedTree);
+                        }
+                    }
+                }
             }
-            else
-            {
-                EnsureInvisible();
-            }
         }
 
-        private void EnsureVisible()
+        private static bool ValidateVisibility(object o)
         {
-            if (ReadFlag(CoreFlags.IsCollapsed))
-            {
-                WriteFlag(CoreFlags.IsCollapsed, false);
-
-                //invalidate parent if needed
-                InvalidateParentMeasure();
-
-                //make sure element has been rendered
-                InvalidateVisual();
-            }
+            var value = (Visibility)o;
+            return value == Visibility.Visible || value == Visibility.Hidden || value == Visibility.Collapsed;
         }
 
-        private void EnsureInvisible()
+        private void SwitchVisibilityIfNeeded(Visibility visibility)
         {
-            if (!ReadFlag(CoreFlags.IsCollapsed))
+            switch (visibility)
             {
-                WriteFlag(CoreFlags.IsCollapsed, true);
+                case Visibility.Visible:
+                    if (ReadFlag(CoreFlags.IsCollapsed))
+                    {
+                        WriteFlag(CoreFlags.IsCollapsed, false);
 
-                //invalidate parent
-                InvalidateParentMeasure();
+                        // invalidate parent if needed
+                        InvalidateParentMeasure();
+
+                        // make sure element has been rendered
+                        InvalidateVisual();
+                    }
+                    break;
+
+                case Visibility.Hidden:
+                    if (ReadFlag(CoreFlags.IsCollapsed))
+                    {
+                        WriteFlag(CoreFlags.IsCollapsed, false);
+
+                        // invalidate parent
+                        InvalidateParentMeasure();
+                    }
+                    break;
+
+                case Visibility.Collapsed:
+                    if (!ReadFlag(CoreFlags.IsCollapsed))
+                    {
+                        WriteFlag(CoreFlags.IsCollapsed, true);
+
+                        // invalidate parent
+                        InvalidateParentMeasure();
+                    }
+                    break;
             }
         }
 
@@ -909,22 +972,14 @@ namespace System.Windows
 
             uie.WriteFlag(CoreFlags.IsVisibleCache, isVisible);
 
-            if (isVisible)
-            {
-                if (uie.RenderingIsDeferred)
-                {
-                    uie.RenderingIsDeferred = false;
-                    INTERNAL_VisualTreeManager.RenderElementsAndRaiseChangedEventOnAllDependencyProperties(uie);
-                }
-            }
-
-            uie.SwitchVisibilityIfNeeded(isVisible);
+            // Raise the public changed event.
+            uie.IsVisibleChanged?.Invoke(uie, e);
 
             // Invalidate the children so that they will inherit the new value.
             uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
-            // Raise the public changed event.
-            uie.IsVisibleChanged?.Invoke(uie, e);
+            // Update pointer events
+            uie.CoerceIsHitTestable();
         }
 
         private static object CoerceIsVisible(DependencyObject d, object baseValue)
@@ -1123,16 +1178,14 @@ namespace System.Windows
 #region pointer-events
 
         /// <summary>
-        /// Fetches the value that pointer-events (css) should be coerced to.
+        /// Gets the value that pointer-events (css) should be coerced to.
         /// </summary>
         internal virtual bool EnablePointerEventsCore => false;
 
         internal virtual void SetPointerEvents(bool hitTestable) =>
             OuterDiv.Style.pointerEvents = hitTestable ? "auto" : "none";
 
-        // IsHitTestable should be updated exclusively with Coercion, that is why we create a read-only
-        // property and just drop the key.
-        internal static readonly DependencyProperty IsHitTestableProperty =
+        private static readonly DependencyProperty IsHitTestableProperty =
             DependencyProperty.Register(
                 nameof(IsHitTestable),
                 typeof(bool),
@@ -1147,7 +1200,7 @@ namespace System.Windows
         private static object CoerceIsHitTestable(DependencyObject d, object value)
         {
             UIElement uie = (UIElement)d;
-            return BooleanBoxes.Box(uie.EnablePointerEventsCore && uie.IsEnabled && uie.IsHitTestVisible);
+            return BooleanBoxes.Box(uie.EnablePointerEventsCore && uie.IsEnabled && uie.IsHitTestVisible && uie.IsVisible);
         }
 
         internal void CoerceIsHitTestable() => CoerceValue(IsHitTestableProperty);
@@ -1282,6 +1335,11 @@ namespace System.Windows
             {
                 uie.UpdateIsVisible();
             }
+
+            if (parent is UIElement parentAsUIE && parentAsUIE.InVisibilityCollapsedTree)
+            {
+                uie.UpdateInVisibilityCollapsedTreeCache();
+            }
         }
 
         internal void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
@@ -1372,7 +1430,7 @@ namespace System.Windows
         IsVisibleCache = 0x00400000,
         AreTransformsClean = 0x00800000,
         BypassLayoutPolicies = 0x01000000, //IsOpacitySuppressed = 0x01000000,
-        //ExistsEventHandlersStore = 0x02000000,
+        InVisibilityCollapsedTree = 0x02000000, //ExistsEventHandlersStore = 0x02000000,
         //TouchesOverCache = 0x04000000,
         //TouchesOverChanged = 0x08000000,
         //TouchesCapturedWithinCache = 0x10000000,
@@ -1392,24 +1450,39 @@ namespace System.Windows
         /// </summary>
         None = 0x0,
 
+        // TreeLevel counter - occupies 11 bits. 
+        // NOTE: The location of these bits in this ulong should be synchronized with 
+        // UIElement.TreeLevel property getter/setter.
+        TreeLevelBit0 = 0x00000001,
+        TreeLevelBit1 = 0x00000002,
+        TreeLevelBit2 = 0x00000004,
+        TreeLevelBit3 = 0x00000008,
+        TreeLevelBit4 = 0x00000010,
+        TreeLevelBit5 = 0x00000020,
+        TreeLevelBit6 = 0x00000040,
+        TreeLevelBit7 = 0x00000080,
+        TreeLevelBit8 = 0x00000100,
+        TreeLevelBit9 = 0x00000200,
+        TreeLevelBit10 = 0x00000400,
+
         //// IsSubtreeDirtyForPrecompute indicates that at least one Visual in the sub-graph of this Visual needs
         //// a bounding box update.
-        //IsSubtreeDirtyForPrecompute = 0x00000001,
+        //IsSubtreeDirtyForPrecompute = 0x00000800,
 
         //// Should post render indicates that this is a root visual and therefore we need to indicate that this
         //// visual tree needs to be re-rendered. Today we are doing this by posting a render queue item.
-        //ShouldPostRender = 0x00000002,
+        //ShouldPostRender = 0x00001000,
 
         // Needs documentation
-        IsUIElement = 0x00000004,
+        IsUIElement = 0x00002000,
 
         // For UIElement -- It's in VisualFlags so that it can be propagated through the
         // Visual subtree without casting.
-        IsLayoutSuspended = 0x00000008,
+        IsLayoutSuspended = 0x00004000,
 
         // Are we in the process of iterating the visual children. 
         // This flag is set during a descendents walk, for property invalidation.
-        IsVisualChildrenIterationInProgress = 0x00000010,
+        IsVisualChildrenIterationInProgress = 0x00008000,
 
         //// Used on ModelVisual3D to signify that its content bounds
         //// cache is valid.
@@ -1420,66 +1493,51 @@ namespace System.Windows
         //// bounds.  A better solution that would be both a 2D and 3D win would be to
         //// stop invalidating _bboxSubgraph when a visual’s transform changes.
         //// 
-        //Are3DContentBoundsValid = 0x00000020,
+        //Are3DContentBoundsValid = 0x00010000,
 
         // FindCommonAncestor is used to find the common ancestor of a Visual.
-        FindCommonAncestor = 0x00000040,
+        FindCommonAncestor = 0x00020000,
 
         //// IsLayoutIslandRoot indicates that this Visual is a root of Element Layout Island.
-        //IsLayoutIslandRoot = 0x00000080,
+        //IsLayoutIslandRoot = 0x00040000,
 
         //// UseLayoutRounding indicates that layout rounding should be applied during Measure/Arrange for this UIElement.
-        //UseLayoutRounding = 0x00000100,
+        //UseLayoutRounding = 0x00080000,
 
         // These bits together make up UIElement.VisibilityCache
-        VisibilityCache_Visible = 0x00000200,
-        //VisibilityCache_TakesSpace = 0x00000400,
+        VisibilityCache_Visible = 0x00100000,
+        VisibilityCache_TakesSpace = 0x00200000,
 
         //// Indicates that a given node is registered for AncestorChanged.
-        //RegisteredForAncestorChanged = 0x00000800,
+        //RegisteredForAncestorChanged = 0x00400000,
 
         //// Indicates that a node below this node is registered for AncestorChanged.
-        //SubTreeHoldsAncestorChanged = 0x00001000,
+        //SubTreeHoldsAncestorChanged = 0x00800000,
 
         //// Indicates that this node is used by a cyclic brush
-        //NodeIsCyclicBrushRoot = 0x00002000,
+        //NodeIsCyclicBrushRoot = 0x01000000,
 
         //// Indicates that this node has an Effect
-        //NodeHasEffect = 0x00004000,
+        //NodeHasEffect = 0x02000000,
 
         //// Indicates that this node is of Viewport3DVisual class.
-        //IsViewport3DVisual = 0x00008000,
+        //IsViewport3DVisual = 0x04000000,
 
         //// Used to discover cycles in VisualBrush scenarios.
-        //ReentrancyFlag = 0x00010000,
+        //ReentrancyFlag = 0x08000000,
 
         // Indicates if the visual has any children. Avoids calls to visualchildrencount while checking for presence of children.
-        HasChildren = 0x00020000,
+        HasChildren = 0x10000000,
 
         //// Controls if the bitmap effect emulation layer is enabled. 
-        //BitmapEffectEmulationDisabled = 0x00040000,
+        //BitmapEffectEmulationDisabled = 0x20000000,
 
         //// These two DPI flags are used to determine the DPI value of a Visual.
         //// Combination of these two flags point to 4 possible choices (DpiScaleFlag1 being the LSB) : Choice 0-2 directly 
         //// represent the index in the static array (in UIElement) on which DPI is stored. Choice 3 indicates that the index is stored 
         //// in an uncommon field on the Visual.
-        //DpiScaleFlag1 = 0x00080000,
+        //DpiScaleFlag1 = 0x40000000,
 
-        //DpiScaleFlag2 = 0x00100000,
-
-        ////TreeLevel counter - occupies 11 bits. 
-        ////NOTE: The location of these bits in this ulong should be synchronized with 
-        ////Visual.TreeLevel property getter/setter.
-        //TreeLevelBit0 = 0x00200000,
-        //TreeLevelBit1 = 0x00400000,
-        //TreeLevelBit2 = 0x00800000,
-        //TreeLevelBit3 = 0x01000000,
-        //TreeLevelBit4 = 0x02000000,
-        //TreeLevelBit5 = 0x04000000,
-        //TreeLevelBit6 = 0x08000000,
-        //TreeLevelBit7 = 0x10000000,
-        //TreeLevelBit8 = 0x20000000,
-        //TreeLevelBit9 = 0x40000000,
-        //TreeLevelBit10 = 0x80000000,
+        //DpiScaleFlag2 = 0x80000000,
     }
 }

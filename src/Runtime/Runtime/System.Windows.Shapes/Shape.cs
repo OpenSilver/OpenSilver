@@ -27,11 +27,6 @@ namespace System.Windows.Shapes
     /// </summary>
     public abstract class Shape : FrameworkElement
     {
-        static Shape()
-        {
-            IsHitTestableProperty.OverrideMetadata(typeof(Shape), new PropertyMetadata(BooleanBoxes.TrueBox));
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Shape"/> class.
         /// </summary>
