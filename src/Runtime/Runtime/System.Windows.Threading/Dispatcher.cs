@@ -121,6 +121,21 @@ public sealed class Dispatcher
     public bool CheckAccess() => _dispatcherImpl.CheckAccess();
 
     /// <summary>
+    /// Determines whether the calling thread has access to this <see cref="Dispatcher"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// The calling thread does not have access to this <see cref="Dispatcher"/>.
+    /// </exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public void VerifyAccess()
+    {
+        if (!CheckAccess())
+        {
+            throw new InvalidOperationException(Strings.VerifyAccess);
+        }
+    }
+
+    /// <summary>
     /// Executes the specified <see cref="Action"/> asynchronously at the specified priority on the thread 
     /// the <see cref="Dispatcher"/> is associated with.
     /// </summary>

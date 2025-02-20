@@ -723,6 +723,9 @@
   <data name="Validation_ConversionFailed" xml:space="preserve">
     <value>Value '{0}' could not be converted.</value>
   </data>
+  <data name="VerifyAccess" xml:space="preserve">
+    <value>The calling thread cannot access this object because a different thread owns it.</value>
+  </data>
   <data name="XmlLangGetCultureFailure" xml:space="preserve">
     <value>There is no registered CultureInfo with the IetfLanguageTag '{0}'.</value>
   </data>

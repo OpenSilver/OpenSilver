@@ -1861,6 +1861,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The calling thread cannot access this object because a different thread owns it..
+        /// </summary>
+        internal static string VerifyAccess {
+            get {
+                return ResourceManager.GetString("VerifyAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There is no registered CultureInfo with the IetfLanguageTag &apos;{0}&apos;..
         /// </summary>
         internal static string XmlLangGetCultureFailure {
