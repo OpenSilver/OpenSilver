@@ -14,27 +14,27 @@
 namespace System.Windows.Threading;
 
 /// <summary>
-/// An enunmeration describing the status of a DispatcherOperation.
+/// Describes the possible values for the status of a <see cref="DispatcherOperation"/>.
 /// </summary>
 public enum DispatcherOperationStatus
 {
     /// <summary>
-    /// The operation is still pending.
+    /// The operation is pending and is still in the <see cref="Dispatcher"/> queue.
     /// </summary>
     Pending,
 
     /// <summary>
-    /// The operation has been aborted.
+    /// The operation has aborted.
     /// </summary>
     Aborted,
 
     /// <summary>
-    /// The operation has been completed.
+    /// The operation is completed.
     /// </summary>
     Completed,
 
     /// <summary>
-    /// The operation has started executing, but has not completed yet.
+    /// The operation started executing, but has not completed.
     /// </summary>
-    Executing
+    Executing,
 }

@@ -84,15 +84,7 @@ public sealed class Dispatcher
     /// <exception cref="ArgumentNullException">
     /// <paramref name="a"/> is null.
     /// </exception>
-    public DispatcherOperation BeginInvoke(Action a)
-    {
-        if (a == null)
-        {
-            throw new ArgumentNullException(nameof(a));
-        }
-
-        return InvokeAsync(a, DispatcherPriority.Normal);
-    }
+    public DispatcherOperation BeginInvoke(Action a) => InvokeAsync(a);
 
     /// <summary>
     /// Executes the specified delegate asynchronously with the specified array of arguments
@@ -110,7 +102,126 @@ public sealed class Dispatcher
     /// is called, that represents the operation that has been posted to the <see cref="Dispatcher"/>
     /// queue.
     /// </returns>
-    public DispatcherOperation BeginInvoke(Delegate d, params object[] args) => BeginInvoke(() => d.DynamicInvoke(args));
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="d"/> is null.
+    /// </exception>
+    public DispatcherOperation BeginInvoke(Delegate d, params object[] args) =>
+        BeginInvokeImpl(DispatcherPriority.Normal, d, args, -1);
+
+    /// <summary>
+    /// Executes the specified delegate asynchronously with the specified arguments, at the specified priority, 
+    /// on the thread that the <see cref="Dispatcher"/> was created on.
+    /// </summary>
+    /// <param name="d">
+    /// The delegate to a method that takes parameters specified in args, which is pushed onto the <see cref="Dispatcher"/> 
+    /// event queue.
+    /// </param>
+    /// <param name="priority">
+    /// The priority, relative to the other pending operations in the <see cref="Dispatcher"/> event queue, with 
+    /// which the specified method is invoked.
+    /// </param>
+    /// <param name="args">
+    /// An array of objects to pass as arguments to the given method. Can be null.
+    /// </param>
+    /// <returns>
+    /// An object, which is returned immediately after <see cref="BeginInvoke(Delegate, DispatcherPriority, object[])"/> 
+    /// is called, that can be used to interact with the delegate as it is pending execution in the event queue.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="d"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidEnumArgumentException">
+    /// <paramref name="priority"/> is not a valid <see cref="DispatcherPriority"/>.
+    /// </exception>
+    public DispatcherOperation BeginInvoke(Delegate d, DispatcherPriority priority, params object[] args) =>
+        BeginInvokeImpl(priority, d, args, -1);
+
+    /// <summary>
+    /// Executes the specified delegate asynchronously at the specified priority on the thread the <see cref="Dispatcher"/> 
+    /// is associated with.
+    /// </summary>
+    /// <param name="priority">
+    /// The priority, relative to the other pending operations in the <see cref="Dispatcher"/> event queue, with 
+    /// which the specified method is invoked.
+    /// </param>
+    /// <param name="method">
+    /// The delegate to a method that takes no arguments, which is pushed onto the <see cref="Dispatcher"/> event queue.
+    /// </param>
+    /// <returns>
+    /// An object, which is returned immediately after <see cref="BeginInvoke(DispatcherPriority, Delegate)"/> 
+    /// is called, that can be used to interact with the delegate as it is pending execution in the event queue.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="method"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidEnumArgumentException">
+    /// <paramref name="priority"/> is not a valid <see cref="DispatcherPriority"/>.
+    /// </exception>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public DispatcherOperation BeginInvoke(DispatcherPriority priority, Delegate method) =>
+        BeginInvokeImpl(priority, method, null, 0);
+
+    /// <summary>
+    /// Executes the specified delegate asynchronously at the specified priority and with the specified argument on 
+    /// the thread the <see cref="Dispatcher"/> is associated with.
+    /// </summary>
+    /// <param name="priority">
+    /// The priority, relative to the other pending operations in the <see cref="Dispatcher"/> event queue, with which 
+    /// the specified method is invoked.
+    /// </param>
+    /// <param name="method">
+    /// A delegate to a method that takes one argument, which is pushed onto the <see cref="Dispatcher"/> event queue.
+    /// </param>
+    /// <param name="arg">
+    /// The object to pass as an argument to the specified method.
+    /// </param>
+    /// <returns>
+    /// An object, which is returned immediately after <see cref="BeginInvoke(DispatcherPriority, Delegate, object)"/> 
+    /// is called, that can be used to interact with the delegate as it is pending execution in the event queue.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="method"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidEnumArgumentException">
+    /// <paramref name="priority"/> is not a valid <see cref="DispatcherPriority"/>.
+    /// </exception>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public DispatcherOperation BeginInvoke(DispatcherPriority priority, Delegate method, object arg) =>
+        BeginInvokeImpl(priority, method, arg, 1);
+
+    /// <summary>
+    /// Executes the specified delegate asynchronously at the specified priority and with the specified array of arguments on the 
+    /// thread the <see cref="Dispatcher"/> is associated with.
+    /// </summary>
+    /// <param name="priority">
+    /// The priority, relative to the other pending operations in the <see cref="Dispatcher"/> event queue, with which the 
+    /// specified method is invoked.
+    /// </param>
+    /// <param name="method">
+    /// A delegate to a method that takes multiple arguments, which is pushed onto the <see cref="Dispatcher"/> event queue.
+    /// </param>
+    /// <param name="arg">
+    /// The object to pass as an argument to the specified method.
+    /// </param>
+    /// <param name="args">
+    /// An array of objects to pass as arguments to the specified method.
+    /// </param>
+    /// <returns>
+    /// An object, which is returned immediately after <see cref="BeginInvoke(DispatcherPriority, Delegate, object, object[])"/>
+    /// is called, that can be used to interact with the delegate as it is pending execution in the <see cref="Dispatcher"/> queue.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="method"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidEnumArgumentException">
+    /// <paramref name="priority"/> is not a valid <see cref="DispatcherPriority"/>.
+    /// </exception>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public DispatcherOperation BeginInvoke(DispatcherPriority priority, Delegate method, object arg, params object[] args) =>
+        BeginInvokeImpl(priority, method, CombineParameters(arg, args), -1);
 
     /// <summary>
     /// Determines whether the calling thread is the thread associated with this <see cref="Dispatcher"/>.
@@ -135,23 +246,54 @@ public sealed class Dispatcher
     /// An object, which is returned immediately after <see cref="InvokeAsync(Action, DispatcherPriority)"/>
     /// is called, that can be used to interact with the delegate as it is pending execution in the event queue.
     /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="a"/> is null.
+    /// </exception>
+    /// <exception cref="InvalidEnumArgumentException">
+    /// <paramref name="priority"/> is not a valid <see cref="DispatcherPriority"/>.
+    /// </exception>
     public DispatcherOperation InvokeAsync(Action a, DispatcherPriority priority = DispatcherPriority.Normal)
     {
+        if (a is null)
+        {
+            throw new ArgumentNullException(nameof(a));
+        }
+
         ValidatePriority(priority);
 
         var operation = new DispatcherOperation(a, priority);
+        InvokeAsyncImpl(operation);
 
-        lock (_sync)
+        return operation;
+    }
+
+    /// <summary>
+    /// Executes the specified <see cref="Func{TResult}"/> asynchronously at the specified priority on the thread the 
+    /// <see cref="Dispatcher"/> is associated with.
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="callback">
+    /// A delegate to invoke through the dispatcher.
+    /// </param>
+    /// <param name="priority">
+    /// The priority that determines the order in which the specified callback is invoked relative to the other pending 
+    /// operations in the <see cref="Dispatcher"/>.
+    /// </param>
+    /// <returns>
+    /// An object, which is returned immediately after <see cref="InvokeAsync{TResult}(Func{TResult}, DispatcherPriority)"/>
+    /// is called, that can be used to interact with the delegate as it is pending execution in the event queue.
+    /// </returns>
+    public DispatcherOperation<TResult> InvokeAsync<TResult>(Func<TResult> callback, DispatcherPriority priority = DispatcherPriority.Normal)
+    {
+        if (callback is null)
         {
-            if (_isProcessingQueue)
-            {
-                _pendingOperations.Enqueue(operation);
-            }
-            else
-            {
-                EnqueueOperation(operation);
-            }
+            throw new ArgumentNullException(nameof(callback));
         }
+
+        ValidatePriority(priority);
+
+        var operation = new DispatcherOperation<TResult>(priority, callback);
+        InvokeAsyncImpl(operation);
 
         return operation;
     }
@@ -168,7 +310,71 @@ public sealed class Dispatcher
         return new(this);
     }
 
+    /// <summary>
+    /// Determines whether the specified <see cref="DispatcherPriority"/> is a valid priority.
+    /// </summary>
+    /// <param name="priority">
+    /// The priority to check.
+    /// </param>
+    /// <param name="paramName">
+    /// A string that will be returned by the exception that occurs if the priority is invalid.
+    /// </param>
+    /// <exception cref="InvalidEnumArgumentException">
+    /// priority is not a valid <see cref="DispatcherPriority"/>.
+    /// </exception>
+    public static void ValidatePriority(DispatcherPriority priority, [CallerArgumentExpression(nameof(priority))] string paramName = null)
+    {
+        if (priority < DispatcherPriority.Inactive || priority > DispatcherPriority.Send)
+        {
+            throw new InvalidEnumArgumentException(paramName, (int)priority, typeof(DispatcherPriority));
+        }
+    }
+
     internal void EnableProcessing() => Interlocked.Decrement(ref _disableProcessingRequests);
+
+    private DispatcherOperation BeginInvokeImpl(DispatcherPriority priority, Delegate method, object args, int numArgs)
+    {
+        if (method is null)
+        {
+            throw new ArgumentNullException(nameof(method));
+        }
+
+        ValidatePriority(priority);
+
+        var operation = new DispatcherOperation(method, priority, args, numArgs);
+        InvokeAsyncImpl(operation);
+
+        return operation;
+    }
+
+    private void InvokeAsyncImpl(DispatcherOperation operation)
+    {
+        lock (_sync)
+        {
+            if (_isProcessingQueue)
+            {
+                _pendingOperations.Enqueue(operation);
+            }
+            else
+            {
+                EnqueueOperation(operation);
+            }
+        }
+    }
+
+    private static object[] CombineParameters(object arg, object[] args)
+    {
+        if (args is null)
+        {
+            return [arg, null];
+        }
+
+        object[] parameters = new object[1 + args.Length];
+        parameters[0] = arg;
+        args.CopyTo(parameters, 1);
+
+        return parameters;
+    }
 
     private void SetTickRate(int tickRate) => _dispatcherImpl.SetTickRate(tickRate);
 
@@ -204,11 +410,16 @@ public sealed class Dispatcher
 
     private void ProcessPendingOperations()
     {
-        while (_pendingOperations.Count > 0)
+        if (_pendingOperations.Count == 0)
         {
-            DispatcherOperation operation = _pendingOperations.Dequeue();
-            lock (_sync)
+            return;
+        }
+
+        lock (_sync)
+        {
+            while (_pendingOperations.Count > 0)
             {
+                DispatcherOperation operation = _pendingOperations.Dequeue();
                 EnqueueOperation(operation);
             }
         }
@@ -218,9 +429,9 @@ public sealed class Dispatcher
 
     private bool TryDequeueOperation(out DispatcherOperation operation)
     {
-        while (_disableProcessingRequests == 0)
+        lock (_sync)
         {
-            lock (_sync)
+            while (_disableProcessingRequests == 0)
             {
                 if (_queue.MaxPriority == (int)DispatcherPriority.Inactive)
                 {
@@ -228,23 +439,15 @@ public sealed class Dispatcher
                 }
 
                 operation = _queue.Dequeue();
+
+                if (operation.Status != DispatcherOperationStatus.Pending) continue;
+
+                return true;
             }
-
-            if (operation.Status != DispatcherOperationStatus.Pending) continue;
-
-            return true;
         }
 
         operation = null;
         return false;
-    }
-
-    private static void ValidatePriority(DispatcherPriority priority, [CallerArgumentExpression(nameof(priority))] string paramName = null)
-    {
-        if (priority < DispatcherPriority.Inactive || priority > DispatcherPriority.Send)
-        {
-            throw new InvalidEnumArgumentException(paramName, (int)priority, typeof(DispatcherPriority));
-        }
     }
 
     private interface IDispatcherImpl
@@ -283,7 +486,7 @@ public sealed class Dispatcher
             _dispatcher = dispatcher;
 
             var interval = GetInterval(dispatcher._tickRate);
-            _timer = new Timer(Timer_Tick, null, interval, interval);
+            _timer = new Timer(OnTimerTick, null, interval, interval);
         }
 
         private static int GetInterval(int tickRate) =>
@@ -294,7 +497,7 @@ public sealed class Dispatcher
                 _ => 1
             };
 
-        private void Timer_Tick(object state) =>
+        private void OnTimerTick(object state) =>
             INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(() =>
             {
                 try
