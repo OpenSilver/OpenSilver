@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 using OpenSilver.Internal;
 
 namespace System.Windows.Controls
@@ -30,9 +31,13 @@ namespace System.Windows.Controls
         internal const double LineDelta = 16.0; // Default physical amount to scroll with one Up/Down/Left/Right key
         internal const double WheelDelta = 48.0; // Default physical amount to scroll with one MouseWheel.
 
+        internal static bool IsPanning => PanHelper.IsPanning;
+
         private const string ElementScrollContentPresenterName = "ScrollContentPresenter";
         private const string ElementHorizontalScrollBarName = "HorizontalScrollBar";
         private const string ElementVerticalScrollBarName = "VerticalScrollBar";
+
+        private readonly PanHelper _panHelper;
 
         // Property caching
         private Visibility _scrollVisibilityX;
@@ -53,7 +58,13 @@ namespace System.Windows.Controls
         private CommandQueue _queue;
 
         private bool _invalidatedMeasureFromArrange;
-        private TouchInfo _touchInfo;
+
+        static ScrollViewer()
+        {
+            EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnTouchStartThunk), true);
+            EventManager.RegisterClassHandler<ScrollViewer>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnTouchEndThunk), true);
+            EventManager.RegisterClassHandler<ScrollViewer>(MouseMoveEvent, new MouseEventHandler(OnTouchMoveThunk), true);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollViewer"/> class.
@@ -61,6 +72,7 @@ namespace System.Windows.Controls
         public ScrollViewer()
         {
             DefaultStyleKey = typeof(ScrollViewer);
+            _panHelper = new PanHelper(this);
         }
 
         /// <summary> 
@@ -719,54 +731,16 @@ namespace System.Windows.Controls
             {
                 e.Handled = true;
             }
-
-            if (e.IsTouchEvent)
-            {
-                Point position = e.GetPosition(null);
-                _touchInfo = new TouchInfo
-                {
-                    X = position.X,
-                    Y = position.Y,
-                    HorizontalOffset = ScrollInfo.HorizontalOffset,
-                    VerticalOffset = ScrollInfo.VerticalOffset,
-                };
-            }
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonUp(e);
-
-            _touchInfo = null;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-
-            if (!e.IsTouchEvent || Pointer.Captured is not null || ScrollInfo is null || _touchInfo is null)
-            {
-                return;
-            }
-
-            Point position = e.GetPosition(null);
-
-            if (ComputedHorizontalScrollBarVisibility == Visibility.Visible)
-            {
-                double deltaX = _touchInfo.X - position.X;
-                _touchInfo.HorizontalOffset += deltaX;
-                ScrollToHorizontalOffset(_touchInfo.HorizontalOffset);
-            }
-
-            if (ComputedVerticalScrollBarVisibility == Visibility.Visible)
-            {
-                double deltaY = _touchInfo.Y - position.Y;
-                _touchInfo.VerticalOffset += deltaY;
-                ScrollToVerticalOffset(_touchInfo.VerticalOffset);
-            }
-
-            _touchInfo.X = position.X;
-            _touchInfo.Y = position.Y;
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
@@ -793,6 +767,18 @@ namespace System.Windows.Controls
 
             e.Handled = true;
         }
+
+        private static void OnTouchStartThunk(object sender, MouseButtonEventArgs e) => ((ScrollViewer)sender).OnTouchStart(e);
+
+        private void OnTouchStart(MouseButtonEventArgs e) => _panHelper.HandleMouseLeftButtonDown(e);
+
+        private static void OnTouchEndThunk(object sender, MouseButtonEventArgs e) => ((ScrollViewer)sender).OnTouchEnd(e);
+
+        private void OnTouchEnd(MouseButtonEventArgs e) => _panHelper.HandleMouseLeftButtonUp(e);
+
+        private static void OnTouchMoveThunk(object sender, MouseEventArgs e) => ((ScrollViewer)sender).OnTouchMove(e);
+
+        private void OnTouchMove(MouseEventArgs e) => _panHelper.HandleMouseMove(e);
 
         private bool TemplatedParentHandlesScrolling => TemplatedParent is Control c && c.HandlesScrolling;
 
@@ -1388,12 +1374,231 @@ namespace System.Windows.Controls
             private Command[] _array;
         }
 
-        private sealed class TouchInfo
+        private sealed class PanHelper
         {
-            public double X;
-            public double Y;
-            public double HorizontalOffset;
-            public double VerticalOffset;
+            private static PanHelper _current;
+            private static readonly DispatcherTimer _recoveryTimer;
+
+            private const double MaxInactivityPeriodMS = 3 * 1000;
+            private const double RecoveryTimerIntervalMS = 2.0 / 3.0 * MaxInactivityPeriodMS;
+            private const double MaxWaitForInertiaMS = 50;
+            private const double MinScrollDelta = 5;
+            private const double DecelerationRatio = 0.97;
+            private const double VelocityThreshold = 0.5;
+            private const double InertiaTimerIntervalMS = 1000.0 / 60;
+
+            static PanHelper()
+            {
+                _recoveryTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(RecoveryTimerIntervalMS),
+                };
+
+                _recoveryTimer.Tick += new EventHandler(OnRecoverTimerTick);
+            }
+
+            public static bool IsPanning => _current?._isPanning ?? false;
+
+            private static void OnRecoverTimerTick(object sender, EventArgs e)
+            {
+                if (_current is not PanHelper current)
+                {
+                    return;
+                }
+
+                if ((GetTime() - current._lastMoveTime).TotalMilliseconds > MaxInactivityPeriodMS)
+                {
+                    current.Cancel();
+                }
+            }
+
+            private static void SetCurrent(PanHelper panHelper)
+            {
+                _current = panHelper;
+                _recoveryTimer.IsEnabled = panHelper is not null;
+            }
+
+            private static DateTime GetTime() => DateTime.UtcNow;
+
+            private readonly ScrollViewer _scrollViewer;
+            private bool _isPanning;
+
+            private Point _originPosition;
+            private Point _previousPosition;
+            private double _horizontalOffset;
+            private double _verticalOffset;
+            private double _velocityX;
+            private double _velocityY;
+            private DateTime _lastMoveTime;
+            private DispatcherTimer _inertiaTimer;
+
+            private bool IsHorizontalScrollBarVisible => _scrollViewer.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
+            private bool IsVerticalScrollBarVisible => _scrollViewer.ComputedVerticalScrollBarVisibility == Visibility.Visible;
+            private bool IsEnabled => this == _current;
+
+            public PanHelper(ScrollViewer scrollViewer)
+            {
+                Debug.Assert(scrollViewer is not null);
+                _scrollViewer = scrollViewer;
+                _scrollViewer.AddHandler(UnloadedEvent, new RoutedEventHandler(OnUnloaded), true);
+            }
+
+            public void HandleMouseLeftButtonDown(MouseButtonEventArgs e)
+            {
+                Cancel();
+
+                if (e.IsTouchEvent &&
+                    Pointer.Captured is null &&
+                    (IsVerticalScrollBarVisible || IsHorizontalScrollBarVisible) &&
+                    _scrollViewer.ScrollInfo is IScrollInfo isi &&
+                    _current is null) // prevents scrolling multiple nested ScrollViewers
+                {
+                    SetCurrent(this);
+
+                    _originPosition = _previousPosition = e.GetPosition(_scrollViewer);
+                    _horizontalOffset = isi.HorizontalOffset;
+                    _verticalOffset = isi.VerticalOffset;
+                    _velocityX = 0;
+                    _velocityY = 0;
+                    _lastMoveTime = GetTime();
+                }
+            }
+
+            public void HandleMouseMove(MouseEventArgs e)
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                _lastMoveTime = GetTime();
+
+                Point position = e.GetPosition(_scrollViewer);
+
+                if (!_isPanning)
+                {
+                    _isPanning = Math.Abs(position.X - _originPosition.X) > MinScrollDelta ||
+                                 Math.Abs(position.Y - _originPosition.Y) > MinScrollDelta;
+                }
+
+                if (_isPanning)
+                {
+                    Scroll(position);
+                }
+            }
+
+            public void HandleMouseLeftButtonUp(MouseButtonEventArgs e)
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                Cancel();
+
+                if ((GetTime() - _lastMoveTime).TotalMilliseconds < MaxWaitForInertiaMS && CanScroll(_velocityX, _velocityY))
+                {
+                    StartScrollingInertia();
+                }
+            }
+
+            private void Scroll(Point position)
+            {
+                if (IsHorizontalScrollBarVisible)
+                {
+                    double deltaX = _previousPosition.X - position.X;
+                    _velocityX = deltaX;
+                    _horizontalOffset += deltaX;
+                    _scrollViewer.ScrollToHorizontalOffset(_horizontalOffset);
+                }
+
+                if (IsVerticalScrollBarVisible)
+                {
+                    double deltaY = _previousPosition.Y - position.Y;
+                    _velocityY = deltaY;
+                    _verticalOffset += deltaY;
+                    _scrollViewer.ScrollToVerticalOffset(_verticalOffset);
+                }
+
+                _previousPosition = position;
+            }
+
+            private void StartScrollingInertia()
+            {
+                if (_inertiaTimer is null)
+                {
+                    _inertiaTimer = new DispatcherTimer
+                    {
+                        Interval = TimeSpan.FromMilliseconds(InertiaTimerIntervalMS),
+                    };
+
+                    _inertiaTimer.Tick += new EventHandler(OnInertiaTimerTick);
+                }
+
+                _inertiaTimer.Tag = new ScrollData
+                {
+                    HorizontalOffset = _horizontalOffset,
+                    VerticalOffset = _verticalOffset,
+                    VelocityX = _velocityX,
+                    VelocityY = _velocityY,
+                };
+
+                _inertiaTimer.Start();
+            }
+
+            private void OnInertiaTimerTick(object sender, EventArgs e)
+            {
+                var timer = (DispatcherTimer)sender;
+                var scrollData = (ScrollData)timer.Tag;
+
+                if (IsHorizontalScrollBarVisible)
+                {
+                    scrollData.HorizontalOffset += scrollData.VelocityX;
+                    _scrollViewer.ScrollToHorizontalOffset(scrollData.HorizontalOffset);
+                    scrollData.VelocityX *= DecelerationRatio;
+                }
+
+                if (IsVerticalScrollBarVisible)
+                {
+                    scrollData.VerticalOffset += scrollData.VelocityY;
+                    _scrollViewer.ScrollToVerticalOffset(scrollData.VerticalOffset);
+                    scrollData.VelocityY *= DecelerationRatio;
+                }
+
+                if (!CanScroll(scrollData.VelocityX, scrollData.VelocityY))
+                {
+                    timer.Stop();
+                }
+            }
+
+            private void OnUnloaded(object sender, RoutedEventArgs e) => Cancel();
+
+            private void Cancel()
+            {
+                if (IsEnabled)
+                {
+                    SetCurrent(null);
+                }
+
+                _isPanning = false;
+                _inertiaTimer?.Stop();
+            }
+
+            private bool CanScroll(double velocityX, double velocityY)
+            {
+                bool canScrollH = Math.Abs(velocityX) >= VelocityThreshold && IsHorizontalScrollBarVisible;
+                bool canScrollV = Math.Abs(velocityY) >= VelocityThreshold && IsVerticalScrollBarVisible;
+
+                return canScrollH || canScrollV;
+            }
+
+            private sealed class ScrollData
+            {
+                public double HorizontalOffset;
+                public double VerticalOffset;
+                public double VelocityX;
+                public double VelocityY;
+            }
         }
     }
 }
