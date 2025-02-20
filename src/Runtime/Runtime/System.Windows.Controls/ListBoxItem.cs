@@ -120,7 +120,7 @@ namespace System.Windows.Controls
 
             this.IsFocused = true;
             this.UpdateVisualStates();
-
+            
             ParentSelector?.NotifyListItemGotFocus(this);
         }
 
