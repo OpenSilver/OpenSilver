@@ -1466,6 +1466,11 @@ namespace System.Windows.Controls
 
             public void HandleMouseMove(MouseEventArgs e)
             {
+                if (Pointer.Captured is not null)
+                {
+                    Cancel();
+                }
+
                 if (!IsEnabled)
                 {
                     return;
