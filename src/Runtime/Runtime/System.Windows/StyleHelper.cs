@@ -60,7 +60,7 @@ namespace System.Windows
 
             implicitStyleCache = newStyle;
 
-            fe.HasLocalStyle = fe.ReadLocalValueInternal(FrameworkElement.StyleProperty) != DependencyProperty.UnsetValue;
+            fe.HasLocalStyle = fe.ReadLocalValue(FrameworkElement.StyleProperty) != DependencyProperty.UnsetValue;
 
             // Local style takes priority over an implicit style.
             if (!fe.HasLocalStyle)

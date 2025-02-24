@@ -13,7 +13,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -285,46 +284,31 @@ namespace System.Windows
         /// </returns>
         public object ReadLocalValue(DependencyProperty dp)
         {
+            if (dp is null)
+            {
+                throw new ArgumentNullException(nameof(dp));
+            }
+
             if (GetStorage(dp) is Storage storage)
             {
-                // In silverlight ReadLocalValue returns a BindingExpression if the value
-                // is a BindingExpression set from a style's setter and the "real" local
-                // value in unset. (This is not the case in WPF)
-                if (storage.LocalValue != DependencyProperty.UnsetValue)
-                {
-                    return storage.LocalValue;
-                }
-                else if (storage.LocalStyleValue != DependencyProperty.UnsetValue)
-                {
-                    if (storage.LocalStyleValue is BindingExpression be)
-                    {
-                        return be;
-                    }
-                }
-                else
-                {
-                    if (storage.ThemeStyleValue is BindingExpression be)
-                    {
-                        return be;
-                    }
-                }
-                return storage.LocalValue;
+                return ReadLocalValueEntry(storage);
             }
 
             return DependencyProperty.UnsetValue;
         }
 
-        // This method is here to workaround the fact that in Silverlight, ReadLocalValue()
-        // can return a value set from a style if it is a BindingExpression, while in WPF
-        // ReadLocalValue() will only return the local value
-        internal object ReadLocalValueInternal(DependencyProperty dp)
+        /// <summary>
+        /// Retrieve the local value of a property (if set).
+        /// </summary>
+        /// <returns>
+        /// The local value. <see cref="DependencyProperty.UnsetValue"/> if no local value was set via 
+        /// <see cref="SetValue(DependencyProperty, object)"/>.
+        /// </returns>
+        private object ReadLocalValueEntry(Storage storage)
         {
-            if (GetStorage(dp) is Storage storage)
-            {
-                return storage.LocalValue;
-            }
-
-            return DependencyProperty.UnsetValue;
+            EffectiveValueEntry entry = storage.Entry;
+            object value = entry.IsCoercedWithCurrentValue ? entry.ModifiedValue.CoercedValue : entry.LocalValue;
+            return value;
         }
 
         internal bool HasDefaultValue(DependencyProperty dp)

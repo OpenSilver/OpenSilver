@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
 using System.Windows;
 
 namespace OpenSilver.Internal;
@@ -56,6 +57,30 @@ internal sealed class EffectiveValueEntry
     internal object Value { get; set; }
 
     internal ModifiedValue ModifiedValue => Value as ModifiedValue;
+
+    internal object LocalValue
+    {
+        get
+        {
+            if (BaseValueSourceInternal == BaseValueSourceInternal.Local)
+            {
+                if (!HasModifiers)
+                {
+                    Debug.Assert(Value != DependencyProperty.UnsetValue);
+                    return Value;
+                }
+                else
+                {
+                    Debug.Assert(ModifiedValue != null && ModifiedValue.BaseValue != DependencyProperty.UnsetValue);
+                    return ModifiedValue.BaseValue;
+                }
+            }
+            else
+            {
+                return DependencyProperty.UnsetValue;
+            }
+        }
+    }
 
     internal FullValueSource FullValueSource { get; private set; }
 

@@ -86,7 +86,7 @@ namespace System.Windows
             Style oldStyle = fe.HasLocalStyle ? (Style)e.OldValue : fe.ImplicitStyle;
             Style newStyle = (Style)e.NewValue;
 
-            fe.HasLocalStyle = fe.ReadLocalValueInternal(StyleProperty) != DependencyProperty.UnsetValue;
+            fe.HasLocalStyle = fe.ReadLocalValue(StyleProperty) != DependencyProperty.UnsetValue;
 
             StyleHelper.UpdateStyleCache(fe, oldStyle, newStyle, ref fe._styleCache);
         }
