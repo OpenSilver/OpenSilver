@@ -272,6 +272,42 @@ namespace System.Windows
         }
 
         /// <summary>
+        /// Creates a specialized enumerator for determining which dependency properties have locally set values 
+        /// on this <see cref="DependencyObject"/>.
+        /// </summary>
+        /// <returns>
+        /// A specialized local value enumerator.
+        /// </returns>
+        public LocalValueEnumerator GetLocalValueEnumerator()
+        {
+            int effectiveValuesCount = EffectiveValuesCount;
+            if (effectiveValuesCount == 0)
+            {
+                return LocalValueEnumerator.Empty;
+            }
+
+            var snapshot = new LocalValueEntry[effectiveValuesCount];
+            int count = 0;
+
+            // Iterate through the effectiveValues
+            foreach (KeyValuePair<int, Storage> pair in _effectiveValues)
+            {
+                if (DependencyProperty.RegisteredPropertyList[pair.Key] is not DependencyProperty dp)
+                {
+                    continue;
+                }
+
+                object localValue = ReadLocalValueEntry(pair.Value);
+                if (localValue != DependencyProperty.UnsetValue)
+                {
+                    snapshot[count++] = new LocalValueEntry(dp, localValue);
+                }
+            }
+
+            return new LocalValueEnumerator(snapshot, count);
+        }
+
+        /// <summary>
         /// Returns the local value of a dependency property, if a local value is set.
         /// </summary>
         /// <param name="dp">

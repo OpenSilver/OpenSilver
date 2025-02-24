@@ -159,6 +159,7 @@
     <Compile Include="System.Windows\GlobalEventManager.cs" />
     <Compile Include="System.Windows\HierarchicalDataTemplate.cs" />
     <Compile Include="System.Windows\LengthConverter.cs" />
+    <Compile Include="System.Windows\LocalValueEnumerator.cs" />
     <Compile Include="System.Windows\ResourceReferenceExpression.cs" />
     <Compile Include="System.Windows\ResourceReferenceKeyNotFoundException.cs" />
     <Compile Include="System.Windows\ResourcesChangedEventArgs.cs" />

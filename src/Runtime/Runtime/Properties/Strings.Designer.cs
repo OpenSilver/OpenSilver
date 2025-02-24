@@ -754,6 +754,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Local value enumeration position is out of range..
+        /// </summary>
+        internal static string LocalValueEnumerationOutOfBounds {
+            get {
+                return ResourceManager.GetString("LocalValueEnumerationOutOfBounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local value enumeration position is before the start, need to call MoveNext first..
+        /// </summary>
+        internal static string LocalValueEnumerationReset {
+            get {
+                return ResourceManager.GetString("LocalValueEnumerationReset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree..
         /// </summary>
         internal static string LogicalTreeLoop {

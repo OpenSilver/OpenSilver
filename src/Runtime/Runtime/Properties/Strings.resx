@@ -350,6 +350,12 @@
   <data name="ListBoxSelectAllSelectionMode" xml:space="preserve">
     <value>Can only call SelectAll when SelectionMode is Multiple or Extended.</value>
   </data>
+  <data name="LocalValueEnumerationOutOfBounds" xml:space="preserve">
+    <value>Local value enumeration position is out of range.</value>
+  </data>
+  <data name="LocalValueEnumerationReset" xml:space="preserve">
+    <value>Local value enumeration position is before the start, need to call MoveNext first.</value>
+  </data>
   <data name="LogicalTreeLoop" xml:space="preserve">
     <value>Logical tree depth exceeded while traversing the tree. This could indicate a cycle in the tree.</value>
   </data>
