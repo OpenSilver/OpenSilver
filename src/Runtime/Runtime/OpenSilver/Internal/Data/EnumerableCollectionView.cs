@@ -1,36 +1,27 @@
-﻿// Copyright (C) Microsoft Corporation.  All rights reserved.
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+//
+// Description: Collection view over an IEnumerable.
+//
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
-using System.Threading;
-using System.Windows;
-using System.Windows.Data;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace OpenSilver.Internal.Data
 {
     ///<summary>
     /// Collection view over an IEnumerable.
     ///</summary>
-    internal sealed class EnumerableCollectionView : CollectionView
-#if WPF
-        , IItemProperties
-#endif // WPF
+    internal sealed class EnumerableCollectionView : CollectionView, IItemProperties
     {
-#region Constructors
-
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
-
         // Set up a ListCollectionView over the
         // snapshot.  We will delegate all CollectionView functionality
         // to this view.
@@ -41,7 +32,7 @@ namespace OpenSilver.Internal.Data
 
             // if the source doesn't raise collection change events, try to
             // detect changes by polling the enumerator
-            _pollForChanges = !(source is INotifyCollectionChanged);
+            _pollForChanges = source is not INotifyCollectionChanged;
 
             LoadSnapshotCore(source);
 
@@ -56,25 +47,15 @@ namespace OpenSilver.Internal.Data
 
             _view = new ListCollectionView(_snapshot);
 
-            INotifyCollectionChanged incc = _view as INotifyCollectionChanged;
-            incc.CollectionChanged += new NotifyCollectionChangedEventHandler(_OnViewChanged);
+            INotifyCollectionChanged incc = _view;
+            incc.CollectionChanged += new NotifyCollectionChangedEventHandler(OnViewChanged);
 
-            INotifyPropertyChanged ipc = _view as INotifyPropertyChanged;
-            ipc.PropertyChanged += new PropertyChangedEventHandler(_OnPropertyChanged);
+            INotifyPropertyChanged ipc = _view;
+            ipc.PropertyChanged += new PropertyChangedEventHandler(OnPropertyChanged);
 
-            _view.CurrentChanging += new CurrentChangingEventHandler(_OnCurrentChanging);
-            _view.CurrentChanged += new EventHandler(_OnCurrentChanged);
+            _view.CurrentChanging += new CurrentChangingEventHandler(OnCurrentChanging);
+            _view.CurrentChanged += new EventHandler(OnCurrentChanged);
         }
-
-#endregion Constructors
-
-        //------------------------------------------------------
-        //
-        //  Interfaces
-        //
-        //------------------------------------------------------
-
-#region ICollectionView
 
         /// <summary>
         /// Culture to use during sorting.
@@ -254,12 +235,6 @@ namespace OpenSilver.Internal.Data
             return _view.MoveCurrentToPosition(position);
         }
 
-#endregion ICollectionView
-
-#if WPF
-
-#region IItemProperties
-
         /// <summary>
         /// Returns information about the properties available on items in the
         /// underlying collection.  This information may come from a schema, from
@@ -270,18 +245,6 @@ namespace OpenSilver.Internal.Data
         {
             get { return ((IItemProperties)_view).ItemProperties; }
         }
-
-#endregion IItemProperties
-
-#endif // WPF
-
-        //------------------------------------------------------
-        //
-        //  Public Properties
-        //
-        //------------------------------------------------------
-
-#region Public Properties
 
         /// <summary>
         /// Return the number of records (or -1, meaning "don't know").
@@ -314,18 +277,6 @@ namespace OpenSilver.Internal.Data
         {
             get { return _view.NeedsRefresh; }
         }
-
-#endregion Public Properties
-
-
-
-        //------------------------------------------------------
-        //
-        //  Public Methods
-        //
-        //------------------------------------------------------
-
-#region Public Methods
 
         /// <summary> Return the index where the given item appears, or -1 if doesn't appear.
         /// </summary>
@@ -362,17 +313,6 @@ namespace OpenSilver.Internal.Data
             EnsureSnapshot();
             return _view.GetItemAt(index);
         }
-
-#endregion Public Methods
-
-
-        //------------------------------------------------------
-        //
-        //  Protected Methods
-        //
-        //------------------------------------------------------
-
-#region Protected Methods
 
         /// <summary> Implementation of IEnumerable.GetEnumerator().
         /// This provides a way to enumerate the members of the collection
@@ -487,17 +427,6 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-#endregion Protected Methods
-
-
-        //------------------------------------------------------
-        //
-        //  Private Methods
-        //
-        //------------------------------------------------------
-
-#region Private Methods
-
         // Load a snapshot of the contents of the IEnumerable into the
         // ObservableCollection.
         void LoadSnapshot(IEnumerable source)
@@ -557,10 +486,7 @@ namespace OpenSilver.Internal.Data
 
             // we're done with an enumerator - dispose it
             IDisposable id = ie as IDisposable;
-            if (id != null)
-            {
-                id.Dispose();
-            }
+            id?.Dispose();
         }
 
         // if the IEnumerable has changed, bring the snapshot up to date.
@@ -599,7 +525,7 @@ namespace OpenSilver.Internal.Data
 
         // forward events from the internal view to our own listeners
 
-        void _OnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             if (_ignoreEventsLevel != 0)
                 return;
@@ -607,7 +533,7 @@ namespace OpenSilver.Internal.Data
             OnPropertyChanged(args);
         }
 
-        void _OnViewChanged(object sender, NotifyCollectionChangedEventArgs args)
+        void OnViewChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             if (_ignoreEventsLevel != 0)
                 return;
@@ -615,7 +541,7 @@ namespace OpenSilver.Internal.Data
             OnCollectionChanged(args);
         }
 
-        void _OnCurrentChanging(object sender, CurrentChangingEventArgs args)
+        void OnCurrentChanging(object sender, CurrentChangingEventArgs args)
         {
             if (_ignoreEventsLevel != 0)
                 return;
@@ -623,7 +549,7 @@ namespace OpenSilver.Internal.Data
             OnCurrentChanging();
         }
 
-        void _OnCurrentChanged(object sender, EventArgs args)
+        void OnCurrentChanged(object sender, EventArgs args)
         {
             if (_ignoreEventsLevel != 0)
                 return;
@@ -631,23 +557,13 @@ namespace OpenSilver.Internal.Data
             OnCurrentChanged();
         }
 
-#endregion Private Methods
+        private readonly ListCollectionView _view;
+        private readonly ObservableCollection<object> _snapshot;
+        private IEnumerator _trackingEnumerator;
+        private int _ignoreEventsLevel;
+        private readonly bool _pollForChanges;
 
-#region Private Data
-
-        //------------------------------------------------------
-        //
-        //  Private Fields
-        //
-        //------------------------------------------------------
-
-        ListCollectionView _view;
-        ObservableCollection<object> _snapshot;
-        IEnumerator _trackingEnumerator;
-        int _ignoreEventsLevel;
-        bool _pollForChanges;
-
-        class IgnoreViewEventsHelper : IDisposable
+        private sealed class IgnoreViewEventsHelper : IDisposable
         {
             public IgnoreViewEventsHelper(EnumerableCollectionView parent)
             {
@@ -666,8 +582,7 @@ namespace OpenSilver.Internal.Data
                 GC.SuppressFinalize(this);
             }
 
-            EnumerableCollectionView _parent;
+            private EnumerableCollectionView _parent;
         }
-#endregion Private Data
     }
 }

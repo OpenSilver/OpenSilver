@@ -1,37 +1,39 @@
-﻿// Copyright (C) 2003 by Microsoft Corporation.  All rights reserved.
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+//
+// Description: Base implementation of ICollectionView that enforces
+// affinity to the UI thread dispatcher.
+//
 
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data
 {
-    internal class CollectionView : ICollectionView, INotifyCollectionChanged, INotifyPropertyChanged
+    /// <summary>
+    /// Represents a view for grouping, sorting, filtering, and navigating a data collection.
+    /// </summary>
+    public class CollectionView : DispatcherObject, ICollectionView, INotifyPropertyChanged
     {
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
-
-#region Constructors
-
         /// <summary>
-        /// Create a view to given collection.
+        /// Initializes a new instance of the <see cref="CollectionView"/> class that represents a view of the specified collection.
         /// </summary>
-        /// <remarks>
-        /// Note that this instance of CollectionView is bound to the
-        /// UI thread dispatcher of the caller of this constructor.
-        /// </remarks>
-        /// <param name="collection">underlying collection</param>
+        /// <param name="collection">
+        /// The underlying collection.
+        /// </param>
         public CollectionView(IEnumerable collection)
             : this(collection, 0)
         {
@@ -42,7 +44,21 @@ namespace System.Windows.Data
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            SetFlag(CollectionViewFlags.AllowsCrossThreadChanges, false);
+            _engine = DataBindEngine.CurrentDataBindEngine;
+
+            if (!_engine.IsShutDown)
+            {
+                SynchronizationInfo syncInfo = _engine.ViewManager.GetSynchronizationInfo(collection);
+                SetFlag(CollectionViewFlags.AllowsCrossThreadChanges, syncInfo.IsSynchronized);
+            }
+            else
+            {
+                // WPF doesn't really support doing anything on a thread whose dispatcher
+                // has been shut down.  But for app-compat we should limp along
+                // as well as we did in 4.0.  This means avoiding anything that
+                // touches the ViewManager.
+                moveToFirst = -1;
+            }
 
             _sourceCollection = collection;
 
@@ -50,7 +66,14 @@ namespace System.Windows.Data
             INotifyCollectionChanged incc = collection as INotifyCollectionChanged;
             if (incc != null)
             {
-                incc.CollectionChanged += new NotifyCollectionChangedEventHandler(OnCollectionChanged);
+                // BindingListCollectionView already listens to IBindingList.ListChanged;
+                // Don't double-subscribe (bug 452474, 607512)
+                IBindingList ibl;
+                if (this is not BindingListCollectionView ||
+                    ((ibl = collection as IBindingList) != null && !ibl.SupportsChangeNotification))
+                {
+                    incc.CollectionChanged += new NotifyCollectionChangedEventHandler(OnCollectionChanged);
+                }
                 SetFlag(CollectionViewFlags.IsDynamic, true);
             }
 
@@ -59,18 +82,20 @@ namespace System.Windows.Data
             int currentPosition = -1;
             if (moveToFirst >= 0)
             {
-                IEnumerator e = collection.GetEnumerator();
-                if (e.MoveNext())
-                {
-                    currentItem = e.Current;
-                    currentPosition = 0;
-                }
+                BindingOperations.AccessCollection(collection,
+                    () =>
+                    {
+                        IEnumerator e = collection.GetEnumerator();
+                        if (e.MoveNext())
+                        {
+                            currentItem = e.Current;
+                            currentPosition = 0;
+                        }
 
-                IDisposable d = e as IDisposable;
-                if (d != null)
-                {
-                    d.Dispose();
-                }
+                        IDisposable d = e as IDisposable;
+                        d?.Dispose();
+                    },
+                    false);
             }
 
             _currentItem = currentItem;
@@ -86,15 +111,12 @@ namespace System.Windows.Data
             SetFlag(CollectionViewFlags.ShouldProcessCollectionChanged, shouldProcessCollectionChanged);
         }
 
-#endregion Constructors
-
-#region Public Interfaces
-
-#region ICollectionView
-
         /// <summary>
-        /// Culture to use during sorting.
+        /// Gets or sets the culture information to use during sorting.
         /// </summary>
+        /// <returns>
+        /// The culture information to use during sorting.
+        /// </returns>
         public virtual CultureInfo Culture
         {
             get { return _culture; }
@@ -112,22 +134,24 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Returns the underlying collection.
+        /// Returns the underlying unfiltered collection.
         /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerable"/> object that is the underlying collection.
+        /// </returns>
         public virtual IEnumerable SourceCollection
         {
             get { return _sourceCollection; }
         }
 
         /// <summary>
-        /// Filter is a callback set by the consumer of the ICollectionView
-        /// and used by the implementation of the ICollectionView to determine if an
-        /// item is suitable for inclusion in the view.
+        /// Gets or sets a method used to determine if an item is suitable for inclusion in the view.
         /// </summary>
+        /// <returns>
+        /// A delegate that represents the method used to determine if an item is suitable for inclusion in the view.
+        /// </returns>
         /// <exception cref="NotSupportedException">
-        /// Simpler implementations do not support filtering and will throw a NotSupportedException.
-        /// Use <seealso cref="CanFilter"/> property to test if filtering is supported before
-        /// assigning a non-null value.
+        /// The current implementation does not support filtering.
         /// </exception>
         public virtual Predicate<object> Filter
         {
@@ -147,9 +171,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Indicates whether or not this ICollectionView can do any filtering.
-        /// When false, set <seealso cref="Filter"/> will throw an exception.
+        /// Gets a value that indicates whether the view supports filtering.
         /// </summary>
+        /// <returns>
+        /// true if the view supports filtering; otherwise, false. The default is true.
+        /// </returns>
         public virtual bool CanFilter
         {
             get
@@ -159,69 +185,68 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Collection of Sort criteria to sort items in this view over the SourceCollection.
+        /// Gets a collection of <see cref="SortDescription"/> structures that describes how the items in the collection 
+        /// are sorted in the view.
         /// </summary>
-        /// <remarks>
-        /// <p>
-        /// Simpler implementations do not support sorting and will return an empty
-        /// and immutable / read-only SortDescription collection.
-        /// Attempting to modify such a collection will cause NotSupportedException.
-        /// Use <seealso cref="CanSort"/> property on CollectionView to test if sorting is supported
-        /// before modifying the returned collection.
-        /// </p>
-        /// <p>
-        /// One or more sort criteria in form of <seealso cref="SortDescription"/>
-        /// can be added, each specifying a property and direction to sort by.
-        /// </p>
-        /// </remarks>
+        /// <returns>
+        /// An empty <see cref="SortDescriptionCollection"/> in all cases.
+        /// </returns>
         public virtual SortDescriptionCollection SortDescriptions
         {
             get { return SortDescriptionCollection.Empty; }
         }
 
         /// <summary>
-        /// Test if this ICollectionView supports sorting before adding
-        /// to <seealso cref="SortDescriptions"/>.
+        /// Gets a value that indicates whether the view supports sorting.
         /// </summary>
+        /// <returns>
+        /// false in all cases.
+        /// </returns>
         public virtual bool CanSort
         {
             get { return false; }
         }
 
         /// <summary>
-        /// Returns true if this view really supports grouping.
-        /// When this returns false, the rest of the interface is ignored.
+        /// Gets a value that indicates whether the view supports grouping.
         /// </summary>
+        /// <returns>
+        /// false in all cases.
+        /// </returns>
         public virtual bool CanGroup
         {
             get { return false; }
         }
 
         /// <summary>
-        /// The description of grouping, indexed by level.
+        /// Gets a collection of <see cref="GroupDescription"/> objects that describes how the items in the collection are 
+        /// grouped in the view.
         /// </summary>
+        /// <returns>
+        /// null in all cases.
+        /// </returns>
         public virtual ObservableCollection<GroupDescription> GroupDescriptions
         {
             get { return null; }
         }
 
         /// <summary>
-        /// The top-level groups, constructed according to the descriptions
-        /// given in GroupDescriptions.
+        /// Gets a collection of the top-level groups that is constructed based on the <see cref="GroupDescriptions"/> property.
         /// </summary>
+        /// <returns>
+        /// null in all cases.
+        /// </returns>
         public virtual ReadOnlyObservableCollection<object> Groups
         {
             get { return null; }
         }
 
         /// <summary>
-        /// Return the "current item" for this view
+        /// Gets the current item in the view.
         /// </summary>
-        /// <remarks>
-        /// Only wrapper classes (those that pass currency handling calls to another internal
-        /// CollectionView) should override CurrentItem; all other derived classes
-        /// should use SetCurrent() to update the current values stored in the base class.
-        /// </remarks>
+        /// <returns>
+        /// The current item of the view. By default, the first item of the collection starts as the current item.
+        /// </returns>
         public virtual object CurrentItem
         {
             get
@@ -233,19 +258,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// The ordinal position of the <seealso cref="CurrentItem"/> within the (optionally
-        /// sorted and filtered) view.
+        /// Gets the ordinal position of the <see cref="CurrentItem"/> within the (optionally sorted and filtered) view.
         /// </summary>
         /// <returns>
-        /// -1 if the CurrentPosition is unknown, because the collection does not have an
-        /// effective notion of indices, or because CurrentPosition is being forcibly changed
-        /// due to a CollectionChange.
+        /// The ordinal position of the <see cref="CurrentItem"/> within the (optionally sorted and filtered) view.
         /// </returns>
-        /// <remarks>
-        /// Only wrapper classes (those that pass currency handling calls to another internal
-        /// CollectionView) should override CurrenPosition; all other derived classes
-        /// should use SetCurrent() to update the current values stored in the base class.
-        /// </remarks>
         public virtual int CurrentPosition
         {
             get
@@ -257,8 +274,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Return true if <seealso cref="CurrentItem"/> is beyond the end (End-Of-File).
+        /// Gets a value that indicates whether the <see cref="CurrentItem"/> of the view is beyond the end of the collection.
         /// </summary>
+        /// <returns>
+        /// true if the <see cref="CurrentItem"/> of the view is beyond the end of the collection; otherwise, false.
+        /// </returns>
         public virtual bool IsCurrentAfterLast
         {
             get
@@ -270,8 +290,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Return true if <seealso cref="CurrentItem"/> is before the beginning (Beginning-Of-File).
+        /// Gets a value that indicates whether the <see cref="CurrentItem"/> of the view is before the beginning of the collection.
         /// </summary>
+        /// <returns>
+        /// true if the <see cref="CurrentItem"/> of the view is before the beginning of the collection; otherwise, false.
+        /// </returns>
         public virtual bool IsCurrentBeforeFirst
         {
             get
@@ -282,26 +305,25 @@ namespace System.Windows.Data
             }
         }
 
-        ///<summary>
-        /// Raise this event before changing currency.
-        ///</summary>
+        /// <summary>
+        /// Occurs when the <see cref="CurrentItem"/> is changing.
+        /// </summary>
         public virtual event CurrentChangingEventHandler CurrentChanging;
 
-        ///<summary>
-        ///Raise this event after changing currency.
-        ///</summary>
+        /// <summary>
+        /// Occurs after the <see cref="CurrentItem"/> has changed.
+        /// </summary>
         public virtual event EventHandler CurrentChanged;
 
         /// <summary>
-        /// Return true if the item belongs to this view.  No assumptions are
-        /// made about the item. This method will behave similarly to IList.Contains().
+        /// Returns a value that indicates whether the specified item belongs to the view.
         /// </summary>
-        /// <remarks>
-        /// <p>If the caller knows that the item belongs to the
-        /// underlying collection, it is more efficient to call PassesFilter.
-        /// If the underlying collection is only of type IEnumerable, this method
-        /// is a O(N) operation</p>
-        /// </remarks>
+        /// <param name="item">
+        /// The object to check.
+        /// </param>
+        /// <returns>
+        /// true if the item belongs to the view; otherwise, false.
+        /// </returns>
         public virtual bool Contains(object item)
         {
             VerifyRefreshNotDeferred();
@@ -310,11 +332,16 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Enter a Defer Cycle.
-        /// Defer cycles are used to coalesce changes to the ICollectionView.
+        /// Enters a defer cycle that you can use to merge changes to the view and delay automatic refresh.
         /// </summary>
+        /// <returns>
+        /// An <see cref="IDisposable"/> object that you can use to dispose of the calling object.
+        /// </returns>
         public virtual IDisposable DeferRefresh()
         {
+            if (AllowsCrossThreadChanges)
+                VerifyAccess();
+
             IEditableCollectionView ecv = this as IEditableCollectionView;
             if (ecv != null && (ecv.IsAddingNew || ecv.IsEditingItem))
                 throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(DeferRefresh)));
@@ -324,11 +351,14 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Move <seealso cref="CurrentItem"/> to the given item.
-        /// If the item is not found, move to BeforeFirst.
+        /// Sets the specified item to be the <see cref="CurrentItem"/> in the view.
         /// </summary>
-        /// <param name="item">Move CurrentItem to this item.</param>
-        /// <returns>true if <seealso cref="CurrentItem"/> points to an item within the view.</returns>
+        /// <param name="item">
+        /// The item to set as the <see cref="CurrentItem"/>.
+        /// </param>
+        /// <returns>
+        /// true if the resulting <see cref="CurrentItem"/> is within the view; otherwise, false.
+        /// </returns>
         public virtual bool MoveCurrentTo(object item)
         {
             VerifyRefreshNotDeferred();
@@ -344,7 +374,7 @@ namespace System.Windows.Data
             int index = -1;
             IEditableCollectionView ecv = this as IEditableCollectionView;
             bool isNewItem = (ecv != null && ecv.IsAddingNew && ItemsControl.EqualsEx(item, ecv.CurrentAddItem));
-            
+
             // Note: Silverlight adds a null check here (probably to avoid
             // NullReferenceException in the PassesFilter method) while WPF
             // doesn't.
@@ -359,9 +389,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Move <seealso cref="CurrentItem"/> to the first item.
+        /// Sets the first item in the view as the <see cref="CurrentItem"/>.
         /// </summary>
-        /// <returns>true if <seealso cref="CurrentItem"/> points to an item within the view.</returns>
+        /// <returns>
+        /// true if the resulting <see cref="CurrentItem"/> is an item within the view; otherwise, false.
+        /// </returns>
         public virtual bool MoveCurrentToFirst()
         {
             VerifyRefreshNotDeferred();
@@ -377,9 +409,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Move <seealso cref="CurrentItem"/> to the last item.
+        /// Sets the last item in the view as the <see cref="CurrentItem"/>.
         /// </summary>
-        /// <returns>true if <seealso cref="CurrentItem"/> points to an item within the view.</returns>
+        /// <returns>
+        /// true if the resulting <see cref="CurrentItem"/> is an item within the view; otherwise, false.
+        /// </returns>
         public virtual bool MoveCurrentToLast()
         {
             VerifyRefreshNotDeferred();
@@ -395,9 +429,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Move <seealso cref="CurrentItem"/> to the next item.
+        /// Sets the item after the <see cref="CurrentItem"/> in the view as the <see cref="CurrentItem"/>.
         /// </summary>
-        /// <returns>true if <seealso cref="CurrentItem"/> points to an item within the view.</returns>
+        /// <returns>
+        /// true if the resulting <see cref="CurrentItem"/> is an item within the view; otherwise, false.
+        /// </returns>
         public virtual bool MoveCurrentToNext()
         {
             VerifyRefreshNotDeferred();
@@ -426,10 +462,14 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Move <seealso cref="CurrentItem"/> to the item at the given index.
+        /// Sets the item at the specified index to be the <see cref="CurrentItem"/> in the view.
         /// </summary>
-        /// <param name="position">Move CurrentItem to this index</param>
-        /// <returns>true if <seealso cref="CurrentItem"/> points to an item within the view.</returns>
+        /// <param name="position">
+        /// The index to set the <see cref="CurrentItem"/> to.
+        /// </param>
+        /// <returns>
+        /// true if the resulting <see cref="CurrentItem"/> is an item within the view; otherwise, false.
+        /// </returns>
         public virtual bool MoveCurrentToPosition(int position)
         {
             VerifyRefreshNotDeferred();
@@ -469,9 +509,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Move <seealso cref="CurrentItem"/> to the previous item.
+        /// Sets the item before the <see cref="CurrentItem"/> in the view as the <see cref="CurrentItem"/>.
         /// </summary>
-        /// <returns>true if <seealso cref="CurrentItem"/> points to an item within the view.</returns>
+        /// <returns>
+        /// true if the resulting <see cref="CurrentItem"/> is an item within the view; otherwise, false.
+        /// </returns>
         public virtual bool MoveCurrentToPrevious()
         {
             VerifyRefreshNotDeferred();
@@ -500,7 +542,7 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Re-create the view, using any <seealso cref="SortDescriptions"/> and/or <seealso cref="Filter"/>.
+        /// Re-creates the view.
         /// </summary>
         public virtual void Refresh()
         {
@@ -513,14 +555,13 @@ namespace System.Windows.Data
 
         internal void RefreshInternal()
         {
+            if (AllowsCrossThreadChanges)
+                VerifyAccess();
+
             RefreshOverride();
 
             SetFlag(CollectionViewFlags.NeedsRefresh, false);
         }
-
-#endregion ICollectionView
-
-#region IEnumerable
 
         /// <summary>
         /// Returns an object that enumerates the items in this view.
@@ -530,19 +571,15 @@ namespace System.Windows.Data
             return GetEnumerator();
         }
 
-#endregion IEnumerable
-
-#endregion Public Interfaces
-
-#region Public Methods
-
         /// <summary>
-        /// Return true if the item belongs to this view.  The item is assumed to belong to the
-        /// underlying DataCollection;  this method merely takes filters into account.
-        /// It is commonly used during collection-changed notifications to determine if the added/removed
-        /// item requires processing.
-        /// Returns true if no filter is set on collection view.
+        /// Returns a value that indicates whether the specified item in the underlying collection belongs to the view.
         /// </summary>
+        /// <param name="item">
+        /// The item to check.
+        /// </param>
+        /// <returns>
+        /// true if the specified item belongs to the view or if there is not filter set on the collection view; otherwise, false.
+        /// </returns>
         public virtual bool PassesFilter(object item)
         {
             if (CanFilter && Filter != null)
@@ -551,17 +588,15 @@ namespace System.Windows.Data
             return true;
         }
 
-        /// <summary> Return the index where the given item belongs, or -1 if this index is unknown.
+        /// <summary>
+        /// Returns the index at which the specified item is located.
         /// </summary>
-        /// <remarks>
-        /// If this method returns an index other than -1, it must always be true that
-        /// view[index-1] &lt; item &lt;= view[index], where the comparisons are done via
-        /// the view's IComparer.Compare method (if any).
-        /// (This method is used by a listener's (e.g. System.Windows.Controls.ItemsControl)
-        /// CollectionChanged event handler to speed up its reaction to insertion and deletion of items.
-        /// If IndexOf is  not implemented, a listener does a binary search using IComparer.Compare.)
-        /// </remarks>
-        /// <param name="item">data item</param>
+        /// <param name="item">
+        /// The item to locate.
+        /// </param>
+        /// <returns>
+        /// The index at which the specified item is located, or -1 if the item is unknown.
+        /// </returns>
         public virtual int IndexOf(object item)
         {
             VerifyRefreshNotDeferred();
@@ -570,17 +605,16 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Retrieve item at the given zero-based index in this CollectionView.
+        /// Retrieves the item at the specified zero-based index in the view.
         /// </summary>
-        /// <remarks>
-        /// <p>The index is evaluated with any SortDescriptions or Filter being set on this CollectionView.
-        /// If the underlying collection is only of type IEnumerable, this method
-        /// is a O(N) operation.</p>
-        /// <p>When deriving from CollectionView, override this method to provide
-        /// a more efficient implementation.</p>
-        /// </remarks>
+        /// <param name="index">
+        /// The zero-based index of the item to retrieve.
+        /// </param>
+        /// <returns>
+        /// The item at the specified zero-based index in the view.
+        /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if index is out of range
+        /// index is less than 0.
         /// </exception>
         public virtual object GetItemAt(int index)
         {
@@ -591,21 +625,31 @@ namespace System.Windows.Data
             return EnumerableWrapper[index];
         }
 
-#endregion Public Methods
+        /// <summary>
+        /// Removes the reference to the underlying collection from the <see cref="CollectionView"/>.
+        /// </summary>
+        public virtual void DetachFromSourceCollection()
+        {
+            INotifyCollectionChanged incc = _sourceCollection as INotifyCollectionChanged;
+            if (incc != null)
+            {
+                IBindingList ibl;
+                if (this is not BindingListCollectionView ||
+                    ((ibl = _sourceCollection as IBindingList) != null && !ibl.SupportsChangeNotification))
+                {
+                    incc.CollectionChanged -= new NotifyCollectionChangedEventHandler(OnCollectionChanged);
+                }
+            }
 
-#region Public Properties
+            _sourceCollection = null;
+        }
 
         /// <summary>
-        /// Return the number of items (or -1, meaning "don't know");
-        /// if a Filter is set, this counts only items that pass the filter.
+        /// Gets the number of records in the view.
         /// </summary>
-        /// <remarks>
-        /// <p>If the underlying collection is only of type IEnumerable, this count
-        /// is a O(N) operation; this Count value will be cached until the
-        /// collection changes again.</p>
-        /// <p>When deriving from CollectionView, override this property to provide
-        /// a more efficient implementation.</p>
-        /// </remarks>
+        /// <returns>
+        /// The number of records in the view, or -1 if the number of records is unknown.
+        /// </returns>
         public virtual int Count
         {
             get
@@ -617,48 +661,66 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Returns true if the resulting (filtered) view is emtpy.
+        /// Gets a value that indicates whether the resulting (filtered) view is empty.
         /// </summary>
+        /// <returns>
+        /// true if the resulting view is empty; otherwise, false.
+        /// </returns>
         public virtual bool IsEmpty
         {
             get { return EnumerableWrapper.IsEmpty; }
         }
 
         /// <summary>
-        ///     Returns true if this view needs to be refreshed.
+        /// Returns an object that you can use to compare items in the view.
         /// </summary>
+        /// <returns>
+        /// An <see cref="IComparer"/> object that you can use to compare items in the view.
+        /// </returns>
+        public virtual IComparer Comparer
+        {
+            get { return this as IComparer; }
+        }
+
+        /// <summary>
+        /// Gets a value that indicates whether the view needs to be refreshed.
+        /// </summary>
+        /// <returns>
+        /// true if the view needs to be refreshed; otherwise, false.
+        /// </returns>
         public virtual bool NeedsRefresh
         {
             get { return CheckFlag(CollectionViewFlags.NeedsRefresh); }
         }
 
         /// <summary>
-        ///     Returns true if this view is in use (i.e. if anyone
-        ///     is listening to its events).
+        /// Gets a value that indicates whether any object is subscribing to the events of this <see cref="CollectionView"/>.
         /// </summary>
+        /// <returns>
+        /// true if any object is subscribing to the events of this <see cref="CollectionView"/>; otherwise, false.
+        /// </returns>
         public virtual bool IsInUse
         {
             get
             {
                 return CollectionChanged != null || PropertyChanged != null ||
-                       CurrentChanged != null || CurrentChanging != null;
+                        CurrentChanged != null || CurrentChanging != null;
             }
         }
 
         /// <summary>
-        ///     Gets the object that is in the collection to represent a new item.
+        /// Gets the object that is in the collection to represent a new item.
         /// </summary>
+        /// <returns>
+        /// The object that is in the collection to represent a new item.
+        /// </returns>
         public static object NewItemPlaceholder
         {
             get { return _newItemPlaceholder; }
         }
 
-#endregion Public Properties
-
-#region Public Events
-
         /// <summary>
-        /// Raise this event when the (filtered) view changes
+        /// Occurs when the view has changed.
         /// </summary>
         protected virtual event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -677,8 +739,6 @@ namespace System.Windows.Data
             }
         }
 
-#region IPropertyChange implementation
-
         /// <summary>
         /// PropertyChanged event (per <see cref="INotifyPropertyChanged"/>).
         /// </summary>
@@ -695,29 +755,23 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Raises a PropertyChanged event (per <see cref="INotifyPropertyChanged"/>).
+        /// Raises the <see cref="INotifyPropertyChanged.PropertyChanged"/> event using the specified arguments.
         /// </summary>
+        /// <param name="e">
+        /// Arguments of the event being raised.
+        /// </param>
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, e);
-            }
+            PropertyChanged?.Invoke(this, e);
         }
 
         /// <summary>
-        /// PropertyChanged event (per <see cref="INotifyPropertyChanged"/>).
+        /// Occurs when a property value has changed.
         /// </summary>
         protected virtual event PropertyChangedEventHandler PropertyChanged;
 
-#endregion IPropertyChange implementation
-
-#endregion Public Events
-
-#region Protected Methods
-
         /// <summary>
-        /// Re-create the view, using any <seealso cref="SortDescriptions"/> and/or <seealso cref="Filter"/>.
+        /// Re-creates the view.
         /// </summary>
         protected virtual void RefreshOverride()
         {
@@ -770,8 +824,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Returns an object that enumerates the items in this view.
+        /// Returns an object that you can use to enumerate the items in the view.
         /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerator"/> object that you can use to enumerate the items in the view.
+        /// </returns>
         protected virtual IEnumerator GetEnumerator()
         {
             VerifyRefreshNotDeferred();
@@ -783,25 +840,19 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        ///     Notify listeners that this View has changed
+        /// Raises the <see cref="CollectionChanged"/> event.
         /// </summary>
-        /// <remarks>
-        ///     CollectionViews (and sub-classes) should take their filter/sort/grouping
-        ///     into account before calling this method to forward CollectionChanged events.
-        /// </remarks>
         /// <param name="args">
-        ///     The NotifyCollectionChangedEventArgs to be passed to the EventHandler
+        /// The <see cref="NotifyCollectionChangedEventArgs"/> object to pass to the event handler.
         /// </param>
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            unchecked
-            { ++_timestamp; }    // invalidate enumerators because of a change
+            unchecked { ++_timestamp; }    // invalidate enumerators because of a change
 
-            if (CollectionChanged != null)
-                CollectionChanged(this, args);
+            CollectionChanged?.Invoke(this, args);
 
             // Collection changes change the count unless an item is being
             // replaced or moved within the collection.
@@ -820,12 +871,14 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// set CurrentItem and CurrentPosition, no questions asked!
+        /// Sets the specified item and index as the values of the <see cref="CurrentItem"/> and <see cref="CurrentPosition"/> properties.
         /// </summary>
-        /// <remarks>
-        /// CollectionViews (and sub-classes) should use this method to update
-        /// the Current__ values.
-        /// </remarks>
+        /// <param name="newItem">
+        /// The item to set as the <see cref="CurrentItem"/>.
+        /// </param>
+        /// <param name="newPosition">
+        /// The value to set as the <see cref="CurrentPosition"/> property value.
+        /// </param>
         protected void SetCurrent(object newItem, int newPosition)
         {
             int count = (newItem != null) ? 0 : IsEmpty ? 0 : Count;
@@ -833,16 +886,18 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// set CurrentItem and CurrentPosition, no questions asked!
+        /// Sets the specified item and index as the values of the <see cref="CurrentItem"/> and <see cref="CurrentPosition"/> 
+        /// properties. This method can be called from a constructor of a derived class.
         /// </summary>
-        /// <remarks>
-        /// This method can be called from a constructor - it does not call
-        /// any virtuals.  The 'count' parameter is substitute for the real Count,
-        /// used only when newItem is null.
-        /// In that case, this method sets IsCurrentAfterLast to true if and only
-        /// if newPosition >= count.  This distinguishes between a null belonging
-        /// to the view and the dummy null when CurrentPosition is past the end.
-        /// </remarks>
+        /// <param name="newItem">
+        /// The item to set as the <see cref="CurrentItem"/>.
+        /// </param>
+        /// <param name="newPosition">
+        /// The value to set as the <see cref="CurrentPosition"/> property value.
+        /// </param>
+        /// <param name="count">
+        /// The number of items in the <see cref="CollectionView"/>.
+        /// </param>
         protected void SetCurrent(object newItem, int newPosition, int count)
         {
             if (newItem != null)
@@ -871,9 +926,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// ask listeners (via <seealso cref="ICollectionView.CurrentChanging"/> event) if it's OK to change currency
+        /// Returns a value that indicates whether the view can change which item is the <see cref="CurrentItem"/>.
         /// </summary>
-        /// <returns>false if a listener cancels the change, true otherwise</returns>
+        /// <returns>
+        /// false if a listener cancels the change; otherwise, true.
+        /// </returns>
         protected bool OKToChangeCurrent()
         {
             CurrentChangingEventArgs args = new CurrentChangingEventArgs();
@@ -882,13 +939,8 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Raise a CurrentChanging event that is not cancelable.
-        /// Internally, CurrentPosition is set to -1.
-        /// This is called by CollectionChanges (Remove and Refresh) that affect the CurrentItem.
+        /// Raises a <see cref="CurrentChanging"/> event that is not cancelable.
         /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// This CurrentChanging event cannot be canceled.
-        /// </exception>
         protected void OnCurrentChanging()
         {
             _currentPosition = -1;
@@ -896,16 +948,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Raises the CurrentChanging event
+        /// Raises the <see cref="CurrentChanging"/> event with the specified arguments.
         /// </summary>
         /// <param name="args">
-        ///     CancelEventArgs used by the consumer of the event.  args.Cancel will
-        ///     be true after this call if the CurrentItem should not be changed for
-        ///     any reason.
+        /// Information about the event.
         /// </param>
-        /// <exception cref="InvalidOperationException">
-        ///     This CurrentChanging event cannot be canceled.
-        /// </exception>
         protected virtual void OnCurrentChanging(CurrentChangingEventArgs args)
         {
             if (args == null)
@@ -918,32 +965,29 @@ namespace System.Windows.Data
                 return;
             }
 
-            if (CurrentChanging != null)
-            {
-                CurrentChanging(this, args);
-            }
+            CurrentChanging?.Invoke(this, args);
         }
 
         /// <summary>
-        /// Raises the CurrentChanged event
+        /// Raises the <see cref="CurrentChanged"/> event.
         /// </summary>
         protected virtual void OnCurrentChanged()
         {
-            if (CurrentChanged != null && _currentChangedMonitor.Enter())
+            EventHandler currentChanged = CurrentChanged;
+            if (currentChanged != null && _currentChangedMonitor.Enter())
             {
                 using (_currentChangedMonitor)
                 {
-                    CurrentChanged(this, EventArgs.Empty);
+                    currentChanged(this, EventArgs.Empty);
                 }
             }
         }
 
         /// <summary>
-        ///     Must be implemented by the derived classes to process a single change on the
-        ///     UI thread.  The UI thread will have already been entered by now.
+        /// When overridden in a derived class, processes a single change on the UI thread.
         /// </summary>
         /// <param name="args">
-        ///     The NotifyCollectionChangedEventArgs to be processed.
+        /// The <see cref="NotifyCollectionChangedEventArgs"/> object to process.
         /// </param>
         protected virtual void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
@@ -1032,18 +1076,14 @@ namespace System.Windows.Data
                 OnPropertyChanged(CurrentItemPropertyName);
         }
 
-        ///<summary>
-        ///     Handle CollectionChanged events.
-        ///
-        ///     Calls ProcessCollectionChanged() or
-        ///     posts the change to the Dispatcher to process on the correct thread.
-        ///</summary>
-        /// <remarks>
-        ///     User should override <see cref="ProcessCollectionChanged"/>
-        /// </remarks>
+        /// <summary>
+        /// Raises the <see cref="CollectionChanged"/> event.
+        /// </summary>
         /// <param name="sender">
+        /// The sender of the event.
         /// </param>
         /// <param name="args">
+        /// The <see cref="NotifyCollectionChangedEventArgs"/> object to pass to the event handler.
         /// </param>
         protected void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
@@ -1051,13 +1091,71 @@ namespace System.Windows.Data
             {
                 if (!AllowsCrossThreadChanges)
                 {
+                    if (!CheckAccess())
+                        throw new NotSupportedException(Strings.MultiThreadedCollectionChangeNotSupported);
                     ProcessCollectionChanged(args);
+                }
+                else
+                {
+                    PostChange(args);
                 }
             }
         }
 
         /// <summary>
-        ///     Refresh, or mark that refresh is needed when defer cycle completes.
+        /// Occurs when the <see cref="AllowsCrossThreadChanges"/> property changes.
+        /// </summary>
+        protected virtual void OnAllowsCrossThreadChangesChanged()
+        {
+        }
+
+        /// <summary>
+        /// Clears unprocessed changed to the collection.
+        /// </summary>
+        protected void ClearPendingChanges()
+        {
+            lock (_changeLogLock)
+            {
+                _changeLog.Clear();
+                _tempChangeLog.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Ensures that all pending changes to the collection have been committed.
+        /// </summary>
+        protected void ProcessPendingChanges()
+        {
+            lock (_changeLogLock)
+            {
+                ProcessChangeLog(_changeLog, true);
+                _changeLog.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Called by the base class to notify the derived class that an <see cref="INotifyCollectionChanged.CollectionChanged"/> 
+        /// event has been posted to the message queue.
+        /// </summary>
+        /// <param name="args">
+        /// The <see cref="NotifyCollectionChangedEventArgs"/> object that is added to the change log.
+        /// </param>
+        [Obsolete("Replaced by OnAllowsCrossThreadChangesChanged")]
+        protected virtual void OnBeginChangeLogging(NotifyCollectionChangedEventArgs args)
+        {
+        }
+
+        /// <summary>
+        /// Clears any pending changes from the change log.
+        /// </summary>
+        [Obsolete("Replaced by ClearPendingChanges")]
+        protected void ClearChangeLog()
+        {
+            ClearPendingChanges();
+        }
+
+        /// <summary>
+        /// Refreshes the view or specifies that the view needs to be refreshed when the defer cycle completes.
         /// </summary>
         protected void RefreshOrDefer()
         {
@@ -1071,33 +1169,64 @@ namespace System.Windows.Data
             }
         }
 
-#endregion Protected Methods
-
-#region Protected Properties
+        /// <summary>
+        /// Gets a value that indicates whether the underlying collection provides change notifications.
+        /// </summary>
+        /// <returns>
+        /// true if the underlying collection provides change notifications; otherwise, false.
+        /// </returns>
+        protected bool IsDynamic
+        {
+            get
+            {
+                return CheckFlag(CollectionViewFlags.IsDynamic);
+            }
+        }
 
         /// <summary>
-        ///     Returns true if this view supports CollectionChanged events raised
-        ///     by the source collection on a foreign thread (a thread different
-        ///     from the Dispatcher's thread).
+        /// Gets a value that indicates whether a thread other than the one that created the <see cref="CollectionView"/> 
+        /// can change the <see cref="SourceCollection"/>.
         /// </summary>
-        /// <notes>
-        ///     The value of this property depends on the synchronization information
-        ///     registered for the source collection via
-        ///     BindingOperations.EnableCollectionSynchronization.
-        ///     The value is set when the view is created.
-        /// </notes>
+        /// <returns>
+        /// true if a thread other than the one that created the <see cref="CollectionView"/> can change the 
+        /// <see cref="SourceCollection"/>; otherwise, false.
+        /// </returns>
         protected bool AllowsCrossThreadChanges
         {
             get { return CheckFlag(CollectionViewFlags.AllowsCrossThreadChanges); }
         }
 
+        internal void SetAllowsCrossThreadChanges(bool value)
+        {
+            bool oldValue = CheckFlag(CollectionViewFlags.AllowsCrossThreadChanges);
+            if (oldValue == value)
+                return;
+
+            SetFlag(CollectionViewFlags.AllowsCrossThreadChanges, value);
+            OnAllowsCrossThreadChangesChanged();
+        }
+
         /// <summary>
-        /// IsRefreshDeferred returns true if there
-        /// is still an outstanding DeferRefresh in
-        /// use.  If at all possible, derived classes
-        /// should not call Refresh if IsRefreshDeferred
-        /// is true.
+        /// Gets a value that indicates whether it has been necessary to update the change log because a 
+        /// <see cref="CollectionChanged"/> notification has been received on a different thread without 
+        /// first entering the user interface (UI) thread dispatcher.
         /// </summary>
+        /// <returns>
+        /// true if it has been necessary to update the change log because a <see cref="CollectionChanged"/>
+        /// notification has been received on a different thread without first entering the user interface 
+        /// (UI) thread dispatcher; otherwise, false.
+        /// </returns>
+        protected bool UpdatedOutsideDispatcher
+        {
+            get { return AllowsCrossThreadChanges; }
+        }
+
+        /// <summary>
+        /// Gets a value that indicates whether there is an outstanding <see cref="DeferRefresh"/> in use.
+        /// </summary>
+        /// <returns>
+        /// true if there is an outstanding <see cref="DeferRefresh"/> in use; otherwise, false.
+        /// </returns>
         protected bool IsRefreshDeferred
         {
             get
@@ -1107,9 +1236,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// IsCurrentInSync returns true if CurrentItem and CurrentPosition are
-        /// up-to-date with the state and content of the collection.
+        /// Gets a value that indicates whether the <see cref="CurrentItem"/> is at the <see cref="CurrentPosition"/>.
         /// </summary>
+        /// <returns>
+        /// true if the <see cref="CurrentItem"/> is in the view and at the <see cref="CurrentPosition"/>; otherwise, false.
+        /// </returns>
         protected bool IsCurrentInSync
         {
             get
@@ -1121,14 +1252,48 @@ namespace System.Windows.Data
             }
         }
 
-#endregion Protected Properties
+        /// <summary>
+        /// This method is for use by an agent that manages a set of
+        /// one or more views.  Normal applications should not use it directly.
+        /// </summary>
+        /// <remarks>
+        /// It is used to control the lifetime of the view, so that it gets
+        /// garbage-collected at the right time.
+        /// </remarks>
+        internal void SetViewManagerData(object value)
+        {
+            object[] array;
 
-#region Internal Methods
+            if (_vmData == null)
+            {
+                // 90% case - store a single value directly
+                _vmData = value;
+            }
+            else if ((array = _vmData as object[]) == null)
+            {
+                // BindingListCollectionView appears in the table for both
+                // DataTable and DataView - keep both references (bug 1745899)
+                _vmData = new object[] { _vmData, value };
+            }
+            else
+            {
+                // in case a view is held by more than two tables, keep all
+                // references.  This doesn't happen in current code, but there's
+                // nothing preventing it, either.
+                object[] newArray = new object[array.Length + 1];
+                array.CopyTo(newArray, 0);
+                newArray[array.Length] = value;
+                _vmData = newArray;
+            }
+        }
 
         // helper to validate that we are not in the middle of a DeferRefresh
         // and throw if that is the case.
         internal void VerifyRefreshNotDeferred()
         {
+            if (AllowsCrossThreadChanges)
+                VerifyAccess();
+
             // If the Refresh is being deferred to change filtering or sorting of the
             // data by this CollectionView, then CollectionView will not reflect the correct
             // state of the underlying data.
@@ -1140,13 +1305,9 @@ namespace System.Windows.Data
         internal void InvalidateEnumerableWrapper()
         {
             IndexedEnumerable wrapper = (IndexedEnumerable)Interlocked.Exchange(ref _enumerableWrapper, null);
-            if (wrapper != null)
-            {
-                wrapper.Invalidate();
-            }
+            wrapper?.Invalidate();
         }
 
-#if WPF
         internal ReadOnlyCollection<ItemPropertyInfo> GetItemProperties()
         {
             IEnumerable collection = SourceCollection;
@@ -1211,7 +1372,6 @@ namespace System.Windows.Data
             // return the result as a read-only collection
             return new ReadOnlyCollection<ItemPropertyInfo>(list);
         }
-#endif // WPF
 
         internal Type GetItemType(bool useRepresentativeItem)
         {
@@ -1242,7 +1402,7 @@ namespace System.Windows.Data
                             break;
                         }
 
-                        if (type == typeof(Object))
+                        if (type == typeof(object))
                         {
                             // IEnumerable<Object> is useless;  we need a representative
                             // item.   But keep going - perhaps IEnumerable<T> shows up later.
@@ -1295,17 +1455,19 @@ namespace System.Windows.Data
             }
 
             IDisposable d = ie as IDisposable;
-            if (d != null)
-            {
-                d.Dispose();
-            }
+            d?.Dispose();
 
             return result;
         }
 
-#endregion Internal Methods
-
-#region Internal Properties
+        internal virtual void GetCollectionChangedSources(int level, Action<int, object, bool?, List<string>> format, List<string> sources)
+        {
+            format(level, this, null, sources);
+            if (_sourceCollection != null)
+            {
+                format(level + 1, _sourceCollection, null, sources);
+            }
+        }
 
         internal object SyncRoot
         {
@@ -1320,19 +1482,9 @@ namespace System.Windows.Data
             get { return _timestamp; }
         }
 
-#endregion Internal Properties
-
-        //------------------------------------------------------
-        //
-        //  Internal Types
-        //
-        //------------------------------------------------------
-
-#region Internal Types
-
         internal sealed class PlaceholderAwareEnumerator : IEnumerator
         {
-            enum Position { BeforePlaceholder, OnPlaceholder, OnNewItem, AfterPlaceholder }
+            private enum Position { BeforePlaceholder, OnPlaceholder, OnNewItem, AfterPlaceholder }
 
             public PlaceholderAwareEnumerator(CollectionView collectionView, IEnumerator baseEnumerator, NewItemPlaceholderPosition placeholderPosition, object newItem)
             {
@@ -1419,17 +1571,13 @@ namespace System.Windows.Data
                 _baseEnumerator.Reset();
             }
 
-            CollectionView _collectionView;
-            IEnumerator _baseEnumerator;
-            NewItemPlaceholderPosition _placeholderPosition;
-            Position _position;
-            object _newItem;
-            int _timestamp;
+            private readonly CollectionView _collectionView;
+            private readonly IEnumerator _baseEnumerator;
+            private readonly NewItemPlaceholderPosition _placeholderPosition;
+            private Position _position;
+            private readonly object _newItem;
+            private readonly int _timestamp;
         }
-
-#endregion Internal Types
-
-#region Private Properties
 
         private bool IsCurrentInView
         {
@@ -1453,10 +1601,6 @@ namespace System.Windows.Data
                 return _enumerableWrapper;
             }
         }
-
-#endregion Private Properties
-
-#region Private Methods
 
         // Just move it.  No argument check, no events, just move current to position.
         private void _MoveCurrentToPosition(int position)
@@ -1500,6 +1644,71 @@ namespace System.Windows.Data
             }
         }
 
+        /// <summary>
+        ///     DeferProcessing is to be called from OnCollectionChanged by derived classes  that
+        ///     wish to process the remainder of a changeLog after allowing other events to be
+        ///     processed.
+        /// </summary>
+        /// <param name="changeLog">
+        ///     List of NotifyCollectionChangedEventArgs that could not be precessed.
+        /// </param>
+        private void DeferProcessing(List<NotifyCollectionChangedEventArgs> changeLog)
+        {
+            Debug.Assert(changeLog != null && changeLog.Count > 0, "don't defer when there's no work");
+
+            lock (SyncRoot)
+            {
+                lock (_changeLogLock)
+                {
+                    _changeLog.InsertRange(0, changeLog);
+
+                    if (_databindOperation != null)
+                    {
+                        _engine.ChangeCost(_databindOperation, changeLog.Count);
+                    }
+                    else
+                    {
+                        _databindOperation = _engine.Marshal(new DispatcherOperationCallback(ProcessInvoke), null, changeLog.Count);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Must be implemented by the derived classes to process changes on the
+        ///     UI thread.  Called by ProcessInvoke wich is called by the Dispatcher, so
+        ///     the UI thread will have allready been entered by now.
+        /// </summary>
+        /// <param name="changeLog">
+        ///     List of NotifyCollectionChangedEventArgs that is to be processed.
+        /// </param>
+        /// <param name="processAll"></param>
+        private List<NotifyCollectionChangedEventArgs> ProcessChangeLog(List<NotifyCollectionChangedEventArgs> changeLog, bool processAll = false)
+        {
+            int currentIndex = 0;
+            bool mustDeferProcessing = false;
+            long beginTime = DateTime.Now.Ticks;
+
+            for (; currentIndex < changeLog.Count && !mustDeferProcessing; currentIndex++)
+            {
+                ProcessCollectionChanged(changeLog[currentIndex]);
+
+                if (!processAll)
+                {
+                    mustDeferProcessing = DateTime.Now.Ticks - beginTime > DataBindEngine.CrossThreadThreshold;
+                }
+            }
+
+            if (mustDeferProcessing && currentIndex < changeLog.Count)
+            {
+                // create an unprocessed subset of changeLog
+                changeLog.RemoveRange(0, currentIndex);
+                return changeLog;
+            }
+
+            return null;
+        }
+
         // returns true if ANY flag in flags is set.
         private bool CheckFlag(CollectionViewFlags flags)
         {
@@ -1518,9 +1727,76 @@ namespace System.Windows.Data
             }
         }
 
+        // Post a change on the UI thread Dispatcher and updated the _changeLog.
+        private void PostChange(NotifyCollectionChangedEventArgs args)
+        {
+            lock (SyncRoot)
+            {
+                lock (_changeLogLock)
+                {
+                    // we can ignore everything before a Reset
+                    if (args.Action == NotifyCollectionChangedAction.Reset)
+                    {
+                        _changeLog.Clear();
+                    }
+
+                    if (_changeLog.Count == 0 && CheckAccess())
+                    {
+                        // when a change arrives on the UI thread and there are
+                        // no pending cross-thread changes, process the event
+                        // synchronously.   This is important for editing operations
+                        // (AddNew, Remove), which expect to get notified about
+                        // the changes they make directly.
+                        ProcessCollectionChanged(args);
+                    }
+                    else
+                    {
+                        // the change (or another pending change) arrived on the
+                        // wrong thread.  Marshal it to the UI thread.
+                        _changeLog.Add(args);
+
+                        if (_databindOperation == null)
+                        {
+                            _databindOperation = _engine.Marshal(
+                                new DispatcherOperationCallback(ProcessInvoke),
+                                null, _changeLog.Count);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Callback that is passed to Dispatcher.BeginInvoke in PostChange
+        private object ProcessInvoke(object arg)
+        {
+            // work on a private copy of the change log, so that other threads
+            // can add to the main change log
+            lock (SyncRoot)
+            {
+                lock (_changeLogLock)
+                {
+                    _databindOperation = null;
+                    _tempChangeLog = _changeLog;
+                    _changeLog = new List<NotifyCollectionChangedEventArgs>();
+                }
+            }
+
+            // process the changes
+            List<NotifyCollectionChangedEventArgs> unprocessedChanges = ProcessChangeLog(_tempChangeLog);
+
+            // if changes remain (because we ran out of time), reschedule them
+            if (unprocessedChanges != null && unprocessedChanges.Count > 0)
+            {
+                DeferProcessing(unprocessedChanges);
+            }
+
+            _tempChangeLog = s_emptyList;
+
+            return null;
+        }
+
         private void ValidateCollectionChangedEventArgs(NotifyCollectionChangedEventArgs e)
         {
-
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -1599,7 +1875,6 @@ namespace System.Windows.Data
                 AdjustCurrencyForRemove(oldIndex);
             else if (newIndex <= CurrentPosition)
                 AdjustCurrencyForAdd(newIndex);
-
         }
 
 
@@ -1621,11 +1896,7 @@ namespace System.Windows.Data
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
 
-#endregion Private Methods
-
-#region Private Types
-
-        private class DeferHelper : IDisposable
+        private sealed class DeferHelper : IDisposable
         {
             public DeferHelper(CollectionView collectionView)
             {
@@ -1648,7 +1919,7 @@ namespace System.Windows.Data
 
 
         // this class helps prevent reentrant calls
-        private class SimpleMonitor : IDisposable
+        private sealed class SimpleMonitor : IDisposable
         {
             public bool Enter()
             {
@@ -1667,7 +1938,7 @@ namespace System.Windows.Data
 
             public bool Busy { get { return _entered; } }
 
-            bool _entered;
+            private bool _entered;
         }
 
         [Flags]
@@ -1684,30 +1955,35 @@ namespace System.Windows.Data
             CachedIsEmpty = 0x200,
         }
 
-#endregion Private Types
+        private readonly object _changeLogLock = new();
 
-#region Private Fields
+        private List<NotifyCollectionChangedEventArgs> _changeLog = new();
+        private List<NotifyCollectionChangedEventArgs> _tempChangeLog = s_emptyList;
 
-        IEnumerable _sourceCollection;  // the underlying collection
-        CultureInfo _culture;           // culture to use when sorting
-        SimpleMonitor _currentChangedMonitor = new SimpleMonitor();
-        int _deferLevel;
-        IndexedEnumerable _enumerableWrapper;
-        Predicate<object> _filter;
-        object _currentItem;
-        int _currentPosition;
-        CollectionViewFlags _flags = CollectionViewFlags.ShouldProcessCollectionChanged |
-                                     CollectionViewFlags.NeedsRefresh;
-        bool _currentElementWasRemovedOrReplaced;
-        static object _newItemPlaceholder = new NamedObject("NewItemPlaceholder");
-        object _syncObject = new object();
-        int _timestamp;
-        static readonly string IEnumerableT = typeof(IEnumerable<>).Name;
+        private DataBindOperation _databindOperation;
+        private object _vmData;            // view manager's private data
+        private IEnumerable _sourceCollection;  // the underlying collection
+        private CultureInfo _culture;           // culture to use when sorting
+        private readonly SimpleMonitor _currentChangedMonitor = new SimpleMonitor();
+        private int _deferLevel;
+        private IndexedEnumerable _enumerableWrapper;
+        private Predicate<object> _filter;
+        private object _currentItem;
+        private int _currentPosition;
+        private CollectionViewFlags _flags = CollectionViewFlags.ShouldProcessCollectionChanged | CollectionViewFlags.NeedsRefresh;
+        private bool _currentElementWasRemovedOrReplaced;
+        private static readonly object _newItemPlaceholder = new NamedObject("NewItemPlaceholder");
+        private readonly object _syncObject = new();
+        private readonly DataBindEngine _engine;
+        private int _timestamp;
+
+        private static readonly List<NotifyCollectionChangedEventArgs> s_emptyList = new();
+        private static readonly string IEnumerableT = typeof(IEnumerable<>).Name;
         internal static readonly object NoNewItem = new NamedObject("NoNewItem");
 
         // since there's nothing in the uncancelable event args that is mutable,
         // just create one instance to be used universally.
-        static readonly CurrentChangingEventArgs uncancelableCurrentChangingEventArgs = new CurrentChangingEventArgs(false);
+        private static readonly CurrentChangingEventArgs uncancelableCurrentChangingEventArgs = new(false);
 
         internal const string CountPropertyName = "Count";
         internal const string IsEmptyPropertyName = "IsEmpty";
@@ -1716,7 +1992,5 @@ namespace System.Windows.Data
         internal const string CurrentItemPropertyName = "CurrentItem";
         internal const string IsCurrentBeforeFirstPropertyName = "IsCurrentBeforeFirst";
         internal const string IsCurrentAfterLastPropertyName = "IsCurrentAfterLast";
-
-#endregion Private Fields
     }
 }

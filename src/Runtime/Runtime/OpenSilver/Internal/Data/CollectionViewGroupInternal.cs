@@ -1,169 +1,128 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="CollectionViewGroupInternal.cs" company="Microsoft">
-//      (c) Copyright Microsoft Corporation.
-//      This source is subject to the Microsoft Public License (Ms-PL).
-//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
-//      All other rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace OpenSilver.Internal.Data
 {
-    /// <summary>
-    /// A CollectionViewGroupInternal, as created by a CollectionView according to a GroupDescription.
-    /// </summary>
     internal class CollectionViewGroupInternal : CollectionViewGroup
     {
-#region Private Fields
-
-        //------------------------------------------------------
-        //
-        //  Private Fields
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// GroupDescription used to define how to group the items
-        /// </summary>
-        private GroupDescription _groupBy;
-
-        /// <summary>
-        /// Parent group of this CollectionViewGroupInternal
-        /// </summary>
-        private CollectionViewGroupInternal _parentGroup;
-
-        /// <summary>
-        /// Used for detecting stale enumerators
-        /// </summary>
-        private int _version;
-
-#endregion Private Fields
-
-#region Constructors
-
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// Initializes a new instance of the CollectionViewGroupInternal class.
-        /// </summary>
-        /// <param name="name">Name of the CollectionViewGroupInternal</param>
-        /// <param name="parent">Parent node of the CollectionViewGroup</param>
-        internal CollectionViewGroupInternal(object name, CollectionViewGroupInternal parent)
-            : base(name)
+        internal CollectionViewGroupInternal(object name, CollectionViewGroupInternal parent, bool isExplicit = false) : base(name)
         {
-            this._parentGroup = parent;
+            _parentGroup = parent;
+            _isExplicit = isExplicit;
         }
 
-#endregion Constructors
-
-#region Public Properties
-
-        //------------------------------------------------------
-        //
-        //  Public Properties
-        //
-        //------------------------------------------------------
-
         /// <summary>
-        /// Gets a value indicating whether this group 
-        /// is at the bottom level (not further sub-grouped).
+        /// Is this group at the bottom level (not further subgrouped).
         /// </summary>
         public override bool IsBottomLevel
         {
-            get { return this._groupBy == null; }
+            get { return (_groupBy == null); }
         }
 
-#endregion  Public Properties
-
-#region Internal Properties
-
-        //------------------------------------------------------
-        //
-        //  Internal Properties
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// Gets or sets the number of items and groups in the subtree under this group
-        /// </summary>
-        [DefaultValue(1)]
-        internal int FullCount { get; set; }
-
-        /// <summary>
-        /// Gets or sets how this group divides into subgroups
-        /// </summary>
+        // how this group divides into subgroups
         internal GroupDescription GroupBy
         {
-            get
-            {
-                return this._groupBy;
-            }
-
+            get { return _groupBy; }
             set
             {
-                bool oldIsBottomLevel = this.IsBottomLevel;
+                bool oldIsBottomLevel = IsBottomLevel;
 
-                if (this._groupBy != null)
+                if (_groupBy != null)
                 {
-                    ((INotifyPropertyChanged)this._groupBy).PropertyChanged -= new PropertyChangedEventHandler(this.OnGroupByChanged);
+                    if (_propertyChangedListener != null)
+                    {
+                        _propertyChangedListener.Detach();
+                        _propertyChangedListener = null;
+                    }
                 }
 
-                this._groupBy = value;
+                _groupBy = value;
 
-                if (this._groupBy != null)
+                if (_groupBy != null)
                 {
-                    ((INotifyPropertyChanged)this._groupBy).PropertyChanged += new PropertyChangedEventHandler(this.OnGroupByChanged);
+                    _propertyChangedListener = new WeakEventListener<CollectionViewGroupInternal, INotifyPropertyChanged, PropertyChangedEventArgs>(this, _groupBy)
+                    {
+                        OnEventAction = static (instance, source, args) => instance.OnGroupByChanged(source, args),
+                        OnDetachAction = static (listener, source) => source.PropertyChanged -= listener.OnEvent,
+                    };
+                    ((INotifyPropertyChanged)_groupBy).PropertyChanged += _propertyChangedListener.OnEvent;
                 }
 
-                if (oldIsBottomLevel != this.IsBottomLevel)
+                // choose a comparer based on info in the GroupDescription and the owning collection view
+                _groupComparer = (_groupBy == null) ? null :
+                    ListCollectionView.PrepareComparer(
+                        _groupBy.CustomSort,
+                        _groupBy.SortDescriptionsInternal,
+                        static state =>
+                        {
+                            for (CollectionViewGroupInternal group = (CollectionViewGroupInternal)state;
+                                 group != null;
+                                 group = group.Parent)
+                            {
+                                CollectionViewGroupRoot root = group as CollectionViewGroupRoot;
+                                if (root != null)
+                                {
+                                    return root.View;
+                                }
+                            }
+                            return null;    // this should never happen - root should always be present
+                        }, this);
+
+                if (oldIsBottomLevel != IsBottomLevel)
                 {
-                    this.OnPropertyChanged(new PropertyChangedEventArgs("IsBottomLevel"));
+                    OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsBottomLevel)));
                 }
             }
         }
 
-        /// <summary>
-        /// Gets or sets the most recent index where activity took place
-        /// </summary>
-        internal int LastIndex { get; set; }
+        // the number of items and groups in the subtree under this group
+        internal int FullCount
+        {
+            get { return _fullCount; }
+            set { _fullCount = value; }
+        }
 
-        /// <summary>
-        /// Gets the first item (leaf) added to this group.  If this can't be determined,
-        /// DependencyProperty.UnsetValue.
-        /// </summary>
+        // the most recent index where actvity took place
+        internal int LastIndex
+        {
+            get { return _lastIndex; }
+            set { _lastIndex = value; }
+        }
+
+        // the first item (leaf) added to this group.  If this can't be determined,
+        // DependencyProperty.UnsetValue.
         internal object SeedItem
         {
             get
             {
-                if (this.ItemCount > 0 && (this.GroupBy == null || this.GroupBy.GroupNames.Count == 0))
+                if (ItemCount > 0 && (GroupBy == null || GroupBy.GroupNames.Count == 0))
                 {
                     // look for first item, child by child
                     for (int k = 0, n = Items.Count; k < n; ++k)
                     {
-                        CollectionViewGroupInternal subgroup = this.Items[k] as CollectionViewGroupInternal;
+                        CollectionViewGroupInternal subgroup = Items[k] as CollectionViewGroupInternal;
                         if (subgroup == null)
                         {
                             // child is an item - return it
-                            return this.Items[k];
+                            return Items[k];
                         }
                         else if (subgroup.ItemCount > 0)
                         {
                             // child is a nonempty subgroup - ask it
                             return subgroup.SeedItem;
                         }
-                        //// otherwise child is an empty subgroup - go to next child
+                        // otherwise child is an empty subgroup - go to next child
                     }
 
                     // we shouldn't get here, but just in case...
@@ -179,95 +138,260 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        #endregion Internal Properties
-
-        #region Private Properties
-
-        //------------------------------------------------------
-        //
-        //  Private Properties
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// Gets the parent node for this CollectionViewGroupInternal
-        /// </summary>
-        private CollectionViewGroupInternal Parent
-        {
-            get { return this._parentGroup; }
-        }
-
-#endregion Private Properties
-
-#region Internal Methods
-
-        //------------------------------------------------------
-        //
-        //  Internal Methods
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// Adds the specified item to the collection
-        /// </summary>
-        /// <param name="item">Item to add</param>
         internal void Add(object item)
         {
-            this.ChangeCounts(item, +1);
-            this.ProtectedItems.Add(item);
+            if (_groupComparer == null)
+            {
+                ChangeCounts(item, +1);
+                ProtectedItems.Add(item);
+            }
+            else
+            {
+                Insert(item, null, null);
+            }
         }
 
-        /// <summary>
-        /// Clears the collection of items
-        /// </summary>
+        internal int Remove(object item, bool returnLeafIndex)
+        {
+            int index = -1;
+            int localIndex = ProtectedItems.IndexOf(item);
+
+            if (localIndex >= 0)
+            {
+                if (returnLeafIndex)
+                {
+                    index = LeafIndexFromItem(null, localIndex);
+                }
+
+                CollectionViewGroupInternal subGroup = item as CollectionViewGroupInternal;
+                if (subGroup != null)
+                {
+                    subGroup.Clear();
+
+                    // Remove from the name to group map.
+                    RemoveSubgroupFromMap(subGroup);
+                }
+
+                ChangeCounts(item, -1);
+
+                // ChangeCounts may clear this group, if it is now empty.
+                // In that case, don't use localIndex - it's now out of range.
+                if (ProtectedItems.Count > 0)
+                {
+                    ProtectedItems.RemoveAt(localIndex);
+                }
+            }
+
+            return index;
+        }
+
         internal void Clear()
         {
-            this.ProtectedItems.Clear();
-            this.FullCount = 1;
-            this.ProtectedItemCount = 0;
+            // reset the counts before delving into subgroups.   The subgroup
+            // changes can incur re-entrant calls to LeafAt(index) which will
+            // get out-of-range exceptions, unless we fend them
+            // off by ensuring that count<=index.
+            FullCount = 1;
+            ProtectedItemCount = 0;
+
+            if (_groupBy != null)
+            {
+                // This group has subgroups.  Disconnect from GroupDescription events
+                if (_propertyChangedListener != null)
+                {
+                    _propertyChangedListener.Detach();
+                    _propertyChangedListener = null;
+                }
+
+                _groupBy = null;
+
+                // recursively clear subgroups
+                for (int i = 0, n = ProtectedItems.Count; i < n; ++i)
+                {
+                    CollectionViewGroupInternal subGroup = ProtectedItems[i] as CollectionViewGroupInternal;
+                    subGroup?.Clear();
+                }
+            }
+
+            ProtectedItems.Clear();
+            _nameToGroupMap?.Clear();
         }
 
-        /// <summary>
-        /// Finds the index of the specified item
-        /// </summary>
-        /// <param name="item">Item we are looking for</param>
-        /// <param name="seed">Seed of the item we are looking for</param>
-        /// <param name="comparer">Comparer used to find the item</param>
-        /// <param name="low">Low range of item index</param>
-        /// <param name="high">High range of item index</param>
-        /// <returns>Index of the specified item</returns>
+        // return the index of the given item within the list of leaves governed
+        // by this group
+        internal int LeafIndexOf(object item)
+        {
+            int leaves = 0;         // number of leaves we've passed over so far
+            for (int k = 0, n = Items.Count; k < n; ++k)
+            {
+                CollectionViewGroupInternal subgroup = Items[k] as CollectionViewGroupInternal;
+                if (subgroup != null)
+                {
+                    int subgroupIndex = subgroup.LeafIndexOf(item);
+                    if (subgroupIndex < 0)
+                    {
+                        leaves += subgroup.ItemCount;       // item not in this subgroup
+                    }
+                    else
+                    {
+                        return (leaves + subgroupIndex);    // item is in this subgroup
+                    }
+                }
+                else
+                {
+                    // current item is a leaf - compare it directly
+                    if (ItemsControl.EqualsEx(item, Items[k]))
+                    {
+                        return leaves;
+                    }
+                    else
+                    {
+                        leaves += 1;
+                    }
+                }
+            }
+
+            // item not found
+            return -1;
+        }
+
+        // return the index of the given item within the list of leaves governed
+        // by the full group structure.  The item must be a (direct) child of this
+        // group.  The caller provides the index of the item within this group,
+        // if known, or -1 if not.
+        internal int LeafIndexFromItem(object item, int index)
+        {
+            int result = 0;
+
+            // accumulate the number of predecessors at each level
+            for (CollectionViewGroupInternal group = this;
+                    group != null;
+                    item = group, group = group.Parent, index = -1)
+            {
+                // accumulate the number of predecessors at the level of item
+                for (int k = 0, n = group.Items.Count; k < n; ++k)
+                {
+                    // if we've reached the item, move up to the next level
+                    if ((index < 0 && ItemsControl.EqualsEx(item, group.Items[k])) ||
+                        index == k)
+                    {
+                        break;
+                    }
+
+                    // accumulate leaf count
+                    CollectionViewGroupInternal subgroup = group.Items[k] as CollectionViewGroupInternal;
+                    result += (subgroup == null) ? 1 : subgroup.ItemCount;
+                }
+            }
+
+            return result;
+        }
+
+
+        // return the item at the given index within the list of leaves governed
+        // by this group
+        internal object LeafAt(int index)
+        {
+            for (int k = 0, n = Items.Count; k < n; ++k)
+            {
+                CollectionViewGroupInternal subgroup = Items[k] as CollectionViewGroupInternal;
+                if (subgroup != null)
+                {
+                    // current item is a group - either drill in, or skip over
+                    if (index < subgroup.ItemCount)
+                    {
+                        return subgroup.LeafAt(index);
+                    }
+                    else
+                    {
+                        index -= subgroup.ItemCount;
+                    }
+                }
+                else
+                {
+                    // current item is a leaf - see if we're done
+                    if (index == 0)
+                    {
+                        return Items[k];
+                    }
+                    else
+                    {
+                        index -= 1;
+                    }
+                }
+            }
+
+            // the loop should have found the index.  We shouldn't get here.
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        // return an enumerator over the leaves governed by this group
+        internal IEnumerator GetLeafEnumerator()
+        {
+            return new LeafEnumerator(this);
+        }
+
+        // insert a new item or subgroup and return its index.  Seed is a
+        // representative from the subgroup (or the item itself) that
+        // is used to position the new item/subgroup w.r.t. the order given
+        // by the comparer.  (If comparer is null, just add at the end).
+        internal int Insert(object item, object seed, IComparer comparer)
+        {
+            // when group sorting is not declared,
+            // never insert the new item/group before the explicit subgroups
+            int low = 0;
+            if (_groupComparer == null && GroupBy != null)
+            {
+                low = GroupBy.GroupNames.Count;
+            }
+
+            int index = FindIndex(item, seed, comparer, low, ProtectedItems.Count);
+
+            // now insert the item
+            ChangeCounts(item, +1);
+            ProtectedItems.Insert(index, item);
+
+            return index;
+        }
+
         protected virtual int FindIndex(object item, object seed, IComparer comparer, int low, int high)
         {
             int index;
 
-            if (comparer != null)
+            if (_groupComparer == null)
             {
-                ListComparer listComparer = comparer as ListComparer;
-                if (listComparer != null)
+                // group sorting is not declared - find the position using the seed
+                if (comparer != null)
                 {
-                    // reset the IListComparer before each search. This cannot be done
+                    IListComparer ilc = comparer as IListComparer;
+                    // reset the IListComparer before each search.  This cannot be done
                     // any less frequently (e.g. in Root.AddToSubgroups), due to the
                     // possibility that the item may appear in more than one subgroup.
-                    listComparer.Reset();
-                }
+                    ilc?.Reset();
 
-                for (index = low; index < high; ++index)
+                    for (index = low; index < high; ++index)
+                    {
+                        CollectionViewGroupInternal subgroup = ProtectedItems[index] as CollectionViewGroupInternal;
+                        object seed1 = (subgroup != null) ? subgroup.SeedItem : ProtectedItems[index];
+                        if (seed1 == DependencyProperty.UnsetValue)
+                            continue;
+                        if (comparer.Compare(seed, seed1) < 0)
+                            break;
+                    }
+                }
+                else
                 {
-                    CollectionViewGroupInternal subgroup = this.ProtectedItems[index] as CollectionViewGroupInternal;
-                    object seed1 = (subgroup != null) ? subgroup.SeedItem : this.ProtectedItems[index];
-                    if (seed1 == DependencyProperty.UnsetValue)
-                    {
-                        continue;
-                    }
-                    if (comparer.Compare(seed, seed1) < 0)
-                    {
-                        break;
-                    }
+                    index = high;
                 }
             }
             else
             {
-                index = high;
+                // group sorting is declared - find the position using the local comparer
+                for (index = low; index < high; ++index)
+                {
+                    if (_groupComparer.Compare(item, ProtectedItems[index]) < 0)
+                        break;
+                }
             }
 
             return index;
@@ -349,72 +473,70 @@ namespace OpenSilver.Internal.Data
             return true;
         }
 
-        /// <summary>
-        /// Returns an enumerator over the leaves governed by this group
-        /// </summary>
-        /// <returns>Enumerator of leaves</returns>
-        internal IEnumerator GetLeafEnumerator()
+        // the group's description has changed - notify parent
+        protected virtual void OnGroupByChanged()
         {
-            return new LeafEnumerator(this);
+            Parent?.OnGroupByChanged();
         }
 
         /// <summary>
-        /// Insert a new item or subgroup and return its index.  Seed is a
-        /// representative from the subgroup (or the item itself) that
-        /// is used to position the new item/subgroup w.r.t. the order given
-        /// by the comparer. (If comparer is null, just add at the end).
+        ///     Maps the given name with the given subgroup
         /// </summary>
-        /// <param name="item">Item we are looking for</param>
-        /// <param name="seed">Seed of the item we are looking for</param>
-        /// <param name="comparer">Comparer used to find the item</param>
-        /// <returns>The index where the item was inserted</returns>
-        internal int Insert(object item, object seed, IComparer comparer)
+        internal void AddSubgroupToMap(object nameKey, CollectionViewGroupInternal subgroup)
         {
-            // never insert the new item/group before the explicit subgroups
-            int low = (this.GroupBy == null) ? 0 : this.GroupBy.GroupNames.Count;
-            int index = this.FindIndex(item, seed, comparer, low, ProtectedItems.Count);
+            Debug.Assert(subgroup != null);
 
-            // now insert the item
-            this.ChangeCounts(item, +1);
-            ProtectedItems.Insert(index, item);
+            // Use null name place holder.
+            nameKey ??= s_nullGroupNameKey;
 
-            return index;
+            // The dictionary is not initialized until first addition 
+            _nameToGroupMap ??= new Dictionary<object, WeakReference>();
+
+            // Add to the map. Use WeakReference to avoid memory leaks
+            // in case some one calls ProtectedItems.Remove instead of
+            // CollectionViewGroupInternal.Remove
+            _nameToGroupMap[nameKey] = new WeakReference(subgroup);
+
+            ScheduleMapCleanup();
         }
 
         /// <summary>
-        /// Return the item at the given index within the list of leaves governed
-        /// by this group
+        ///     Removes the given subgroup from the name to group map.
         /// </summary>
-        /// <param name="index">Index of the leaf</param>
-        /// <returns>Item at given index</returns>
-        internal object LeafAt(int index)
+        private void RemoveSubgroupFromMap(CollectionViewGroupInternal subgroup)
         {
-            for (int k = 0, n = this.Items.Count; k < n; ++k)
+            Debug.Assert(subgroup != null);
+
+            if (_nameToGroupMap == null)
+                return;
+
+            // Search for the subgroup in the map.
+            foreach (KeyValuePair<object, WeakReference> item in _nameToGroupMap)
             {
-                CollectionViewGroupInternal subgroup = this.Items[k] as CollectionViewGroupInternal;
-                if (subgroup != null)
+                if (item.Value.Target == subgroup)
                 {
-                    // current item is a group - either drill in, or skip over
-                    if (index < subgroup.ItemCount)
-                    {
-                        return subgroup.LeafAt(index);
-                    }
-                    else
-                    {
-                        index -= subgroup.ItemCount;
-                    }
+                    _nameToGroupMap.Remove(item.Key);
+                    break;
                 }
-                else
+            }
+
+            ScheduleMapCleanup();
+        }
+
+        /// <summary>
+        ///     Tries to find the subgroup for the name from the map.
+        /// </summary>
+        internal CollectionViewGroupInternal GetSubgroupFromMap(object nameKey)
+        {
+            if (_nameToGroupMap != null)
+            {
+                // Use null name place holder.
+                nameKey ??= s_nullGroupNameKey;
+
+                // Find and return the subgroup
+                if (_nameToGroupMap.TryGetValue(nameKey, out WeakReference weakRef))
                 {
-                    // current item is a leaf - see if we're done
-                    if (index == 0)
-                    {
-                        return this.Items[k];
-                    }
-                    else
-                    {
-                        index -= 1;
-                    }
+                    return weakRef.Target as CollectionViewGroupInternal;
                 }
             }
 
@@ -422,186 +544,68 @@ namespace OpenSilver.Internal.Data
         }
 
         /// <summary>
-        /// Returns the index of the given item within the list of leaves governed
-        /// by the full group structure.  The item must be a (direct) child of this
-        /// group.  The caller provides the index of the item within this group,
-        /// if known, or -1 if not.
+        ///     Schedules a dispatcher operation to clean up the map
+        ///     of garbage collected weak references.
         /// </summary>
-        /// <param name="item">Item we are looking for</param>
-        /// <param name="index">Index of the leaf</param>
-        /// <returns>Number of items under that leaf</returns>
-        internal int LeafIndexFromItem(object item, int index)
+        private void ScheduleMapCleanup()
         {
-            int result = 0;
-
-            // accumulate the number of predecessors at each level
-            for (CollectionViewGroupInternal group = this;
-                    group != null;
-                    item = group, group = group.Parent, index = -1)
+            if (!_mapCleanupScheduled)
             {
-                // accumulate the number of predecessors at the level of item
-                for (int k = 0, n = group.Items.Count; k < n; ++k)
+                _mapCleanupScheduled = true;
+                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                 {
-                    // if we've reached the item, move up to the next level
-                    if ((index < 0 && Object.Equals(item, group.Items[k])) ||
-                        index == k)
+                    _mapCleanupScheduled = false;
+                    if (_nameToGroupMap != null)
                     {
-                        break;
+                        foreach (KeyValuePair<object, WeakReference> item in _nameToGroupMap)
+                        {
+                            if (!item.Value.IsAlive)
+                            {
+                                _nameToGroupMap.Remove(item.Key);
+                            }
+                        }
                     }
-
-                    // accumulate leaf count
-                    CollectionViewGroupInternal subgroup = group.Items[k] as CollectionViewGroupInternal;
-                    result += (subgroup == null) ? 1 : subgroup.ItemCount;
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the index of the given item within the list of leaves governed
-        /// by this group
-        /// </summary>
-        /// <param name="item">Item we are looking for</param>
-        /// <returns>Number of items under that leaf</returns>
-        internal int LeafIndexOf(object item)
-        {
-            int leaves = 0;         // number of leaves we've passed over so far
-            for (int k = 0, n = Items.Count; k < n; ++k)
-            {
-                CollectionViewGroupInternal subgroup = Items[k] as CollectionViewGroupInternal;
-                if (subgroup != null)
-                {
-                    int subgroupIndex = subgroup.LeafIndexOf(item);
-                    if (subgroupIndex < 0)
-                    {
-                        leaves += subgroup.ItemCount;       // item not in this subgroup
-                    }
-                    else
-                    {
-                        return leaves + subgroupIndex;    // item is in this subgroup
-                    }
-                }
-                else
-                {
-                    // current item is a leaf - compare it directly
-                    if (Object.Equals(item, Items[k]))
-                    {
-                        return leaves;
-                    }
-                    else
-                    {
-                        leaves += 1;
-                    }
-                }
-            }
-
-            // item not found
-            return -1;
-        }
-
-        /// <summary>
-        /// The group's description has changed - notify parent 
-        /// </summary>
-        protected virtual void OnGroupByChanged()
-        {
-            if (this.Parent != null)
-            {
-                this.Parent.OnGroupByChanged();
+                }, DispatcherPriority.ContextIdle);
             }
         }
 
-        /// <summary>
-        /// Removes the specified item from the collection
-        /// </summary>
-        /// <param name="item">Item to remove</param>
-        /// <param name="returnLeafIndex">Whether we want to return the leaf index</param>
-        /// <returns>Leaf index where item was removed, if value was specified. Otherwise '-1'</returns>
-        internal int Remove(object item, bool returnLeafIndex)
+        // this comparer is used to insert an item into a group in a position consistent
+        // with a given IList.  It only works when used in the pattern that FindIndex
+        // uses, namely first call Reset(), then call Compare(item, x) any number of
+        // times with the same item (the new item) as the first argument, and a sequence
+        // of x's as the second argument that appear in the IList in the same sequence.
+        // This makes the total search time linear in the size of the IList.  (To give
+        // the correct answer regardless of the sequence of arguments would involve
+        // calling IndexOf and leads to O(N^2) total search time.)
+
+        internal sealed class IListComparer : IComparer
         {
-            int index = -1;
-            int localIndex = this.ProtectedItems.IndexOf(item);
-
-            if (localIndex >= 0)
+            internal IListComparer(IList list)
             {
-                if (returnLeafIndex)
-                {
-                    index = this.LeafIndexFromItem(null, localIndex);
-                }
-
-                this.ChangeCounts(item, -1);
-                this.ProtectedItems.RemoveAt(localIndex);
+                ResetList(list);
             }
 
-            return index;
-        }
-
-#endregion Internal Methods
-
-#region Internal Types
-
-        /// <summary>
-        /// This comparer is used to insert an item into a group in a position consistent
-        /// with a given IList.  It only works when used in the pattern that FindIndex
-        /// uses, namely first call Reset(), then call Compare(item, itemSequence) any number of
-        /// times with the same item (the new item) as the first argument, and a sequence
-        /// of items as the second argument that appear in the IList in the same sequence.
-        /// This makes the total search time linear in the size of the IList.  (To give
-        /// the correct answer regardless of the sequence of arguments would involve
-        /// calling IndexOf and leads to O(N^2) total search time.) 
-        /// </summary>
-        internal class ListComparer : IComparer
-        {
-            /// <summary>
-            /// Constructor for the ListComparer that takes
-            /// in an IList.
-            /// </summary>
-            /// <param name="list">IList used to compare on</param>
-            internal ListComparer(IList list)
-            {
-                this.ResetList(list);
-            }
-
-            /// <summary>
-            /// Sets the index that we start comparing
-            /// from to 0.
-            /// </summary>
             internal void Reset()
             {
-                this._index = 0;
+                _index = 0;
             }
 
-            /// <summary>
-            /// Sets our IList to a new instance
-            /// of a list being passed in and resets
-            /// the index.
-            /// </summary>
-            /// <param name="list">IList used to compare on</param>
             internal void ResetList(IList list)
             {
-                this._list = list;
-                this._index = 0;
+                _list = list;
+                _index = 0;
             }
 
-            /// <summary>
-            /// Compares objects x and y to see which one
-            /// should appear first.
-            /// </summary>
-            /// <param name="x">The first object</param>
-            /// <param name="y">The second object</param>
-            /// <returns>-1 if x is less than y, +1 otherwise</returns>
             public int Compare(object x, object y)
             {
                 if (ItemsControl.EqualsEx(x, y))
-                {
                     return 0;
-                }
 
                 // advance the index until seeing one x or y
-                int n = (this._list != null) ? this._list.Count : 0;
-                for (; this._index < n; ++this._index)
+                int n = (_list != null) ? _list.Count : 0;
+                for (; _index < n; ++_index)
                 {
-                    object z = this._list[this._index];
+                    object z = _list[_index];
                     if (ItemsControl.EqualsEx(x, z))
                     {
                         return -1;  // x occurs first, so x < y
@@ -617,201 +621,182 @@ namespace OpenSilver.Internal.Data
                 return +1;
             }
 
-            private int _index;
-            private IList _list;
+            int _index;
+            IList _list;
         }
 
-#endregion Internal Types
-
-#region Private Methods
-
-        //------------------------------------------------------
-        //
-        //  Private Methods
-        //
-        //------------------------------------------------------
-
-        /// <summary>
-        /// Removes an empty group from the CollectionView grouping
-        /// </summary>
-        /// <param name="group">Empty subgroup to remove</param>
-        private static void RemoveEmptyGroup(CollectionViewGroupInternal group)
+        internal CollectionViewGroupInternal Parent
         {
-            CollectionViewGroupInternal parent = group.Parent;
-
-            if (parent != null)
-            {
-                GroupDescription groupBy = parent.GroupBy;
-                int index = parent.ProtectedItems.IndexOf(group);
-
-                // remove the subgroup unless it is one of the explicit groups
-                if (index >= groupBy.GroupNames.Count)
-                {
-                    parent.Remove(group, false);
-                }
-            }
+            get { return _parentGroup; }
         }
 
-        /// <summary>
-        /// Update the item count of the CollectionViewGroup
-        /// </summary>
-        /// <param name="item">CollectionViewGroup to update</param>
-        /// <param name="delta">Delta to change count by</param>
+        private bool IsExplicit
+        {
+            get { return _isExplicit; }
+        }
+
         protected void ChangeCounts(object item, int delta)
         {
             bool changeLeafCount = !(item is CollectionViewGroup);
 
-            for (CollectionViewGroupInternal group = this;
-                    group != null;
-                    group = group._parentGroup)
+            using (EmptyGroupRemover remover = EmptyGroupRemover.Create(isNeeded: changeLeafCount && delta < 0))
             {
-                group.FullCount += delta;
-                if (changeLeafCount)
+                for (CollectionViewGroupInternal group = this;
+                        group != null;
+                        group = group._parentGroup)
                 {
-                    group.ProtectedItemCount += delta;
-
-                    if (group.ProtectedItemCount == 0)
+                    group.FullCount += delta;
+                    if (changeLeafCount)
                     {
-                        RemoveEmptyGroup(group);
+                        group.ProtectedItemCount += delta;
+
+                        if (group.ProtectedItemCount == 0)
+                        {
+                            remover.RemoveEmptyGroup(group);
+                        }
                     }
                 }
             }
 
-            unchecked
-            {
-                // this invalidates enumerators
-                ++this._version;
-            }
+            unchecked { ++_version; }     // this invalidates enumerators
         }
 
-        /// <summary>
-        /// Handler for the GroupBy PropertyChanged event
-        /// </summary>
-        /// <param name="sender">CollectionViewGroupInternal whose GroupBy property changed</param>
-        /// <param name="e">The args for the PropertyChanged event</param>
-        private void OnGroupByChanged(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
+        void OnGroupByChanged(object sender, PropertyChangedEventArgs e)
         {
-            this.OnGroupByChanged();
+            OnGroupByChanged();
         }
 
-#endregion Private Methods
+        private readonly CollectionViewGroupInternal _parentGroup;
+        private readonly bool _isExplicit;
 
-#region Private Classes
+        private GroupDescription _groupBy;
+        private IComparer _groupComparer;
+        private int _fullCount = 1;
+        private int _lastIndex;
+        private int _version;       // for detecting stale enumerators
 
-        //------------------------------------------------------
-        //
-        //  Private Classes
-        //
-        //------------------------------------------------------
+        private static readonly NamedObject s_nullGroupNameKey = new("NullGroupNameKey");
+        private Dictionary<object, WeakReference> _nameToGroupMap; // To cache the mapping between name and subgroup
+        private bool _mapCleanupScheduled = false;
 
-        /// <summary>
-        /// Enumerator for the leaves in the CollectionViewGroupInternal class.
-        /// </summary>
-        private class LeafEnumerator : IEnumerator
+        private WeakEventListener<CollectionViewGroupInternal, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
+
+        private sealed class LeafEnumerator : IEnumerator
         {
-            private object _current;   // current item
-            private CollectionViewGroupInternal _group; // parent group
-            private int _index;     // current index into Items
-            private IEnumerator _subEnum;   // enumerator over current subgroup
-            private int _version;   // parent group's version at ctor
-
-            /// <summary>
-            /// Initializes a new instance of the LeafEnumerator class.
-            /// </summary>
-            /// <param name="group">CollectionViewGroupInternal that uses the enumerator</param>
             public LeafEnumerator(CollectionViewGroupInternal group)
             {
-                this._group = group;
-                this.DoReset();  // don't call virtual Reset in ctor
+                _group = group;
+                DoReset();  // don't call virtual Reset in ctor
             }
 
-            /// <summary>
-            /// Private helper to reset the enumerator
-            /// </summary>
-            private void DoReset()
-            {
-                Debug.Assert(this._group != null, "_group should have been initialized in constructor");
-                this._version = this._group._version;
-                this._index = -1;
-                this._subEnum = null;
-            }
-
-#region Implement IEnumerator
-
-            /// <summary>
-            /// Reset implementation for IEnumerator
-            /// </summary>
             void IEnumerator.Reset()
             {
-                this.DoReset();
+                DoReset();
             }
 
-            /// <summary>
-            /// MoveNext implementation for IEnumerator
-            /// </summary>
-            /// <returns>Returns whether the MoveNext operation was successful</returns>
+            void DoReset()
+            {
+                _version = _group._version;
+                _index = -1;
+                _subEnum = null;
+            }
+
             bool IEnumerator.MoveNext()
             {
-                Debug.Assert(this._group != null, "_group should have been initialized in constructor");
-
                 // check for invalidated enumerator
-                if (this._group._version != this._version)
-                {
+                if (_group._version != _version)
                     throw new InvalidOperationException();
-                }
 
                 // move forward to the next leaf
-                while (this._subEnum == null || !this._subEnum.MoveNext())
+                while (_subEnum == null || !_subEnum.MoveNext())
                 {
                     // done with the current top-level item.  Move to the next one.
-                    ++this._index;
-                    if (this._index >= this._group.Items.Count)
-                    {
+                    ++_index;
+                    if (_index >= _group.Items.Count)
                         return false;
-                    }
 
-                    CollectionViewGroupInternal subgroup = this._group.Items[this._index] as CollectionViewGroupInternal;
+                    CollectionViewGroupInternal subgroup = _group.Items[_index] as CollectionViewGroupInternal;
                     if (subgroup == null)
                     {
                         // current item is a leaf - it's the new Current
-                        this._current = this._group.Items[this._index];
-                        this._subEnum = null;
+                        _current = _group.Items[_index];
+                        _subEnum = null;
                         return true;
                     }
                     else
                     {
                         // current item is a subgroup - get its enumerator
-                        this._subEnum = subgroup.GetLeafEnumerator();
+                        _subEnum = subgroup.GetLeafEnumerator();
                     }
                 }
 
                 // the loop terminates only when we have a subgroup enumerator
                 // positioned at the new Current item
-                this._current = this._subEnum.Current;
+                _current = _subEnum.Current;
                 return true;
             }
 
-            /// <summary>
-            /// Gets the current implementation for IEnumerator
-            /// </summary>
             object IEnumerator.Current
             {
                 get
                 {
-                    Debug.Assert(this._group != null, "_group should have been initialized in constructor");
-
-                    if (this._index < 0 || this._index >= this._group.Items.Count)
-                    {
+                    if (_index < 0 || _index >= _group.Items.Count)
                         throw new InvalidOperationException();
-                    }
-
-                    return this._current;
+                    return _current;
                 }
             }
 
-#endregion Implement IEnumerator
+            CollectionViewGroupInternal _group; // parent group
+            int _version;   // parent group's version at ctor
+            int _index;     // current index into Items
+            IEnumerator _subEnum;   // enumerator over current subgroup
+            object _current;   // current item
         }
 
-#endregion Private Classes
+        // When removing a leaf item, ChangeCounts removes groups that become empty.
+        // It's important to propagate the changed item count all the way up
+        // to the root before actually removing the empty groups, as the removal
+        // raises an event whose handlers could call back into the group tree -
+        // if the counts are inconsistent, crashes can occur.
+        // This class remembers the empty groups, and removes them after the
+        // counts have all been changed.
+        private sealed class EmptyGroupRemover : IDisposable
+        {
+            public static EmptyGroupRemover Create(bool isNeeded)
+            {
+                return isNeeded ? new EmptyGroupRemover() : null;
+            }
+
+            public void RemoveEmptyGroup(CollectionViewGroupInternal group)
+            {
+                if (_toRemove == null)
+                {
+                    _toRemove = new List<CollectionViewGroupInternal>();
+                }
+                _toRemove.Add(group);
+            }
+
+            public void Dispose()
+            {
+                if (_toRemove != null)
+                {
+                    foreach (CollectionViewGroupInternal group in _toRemove)
+                    {
+                        CollectionViewGroupInternal parent = group.Parent;
+
+                        if (parent != null)
+                        {
+                            // remove the subgroup unless it is one of the explicit groups
+                            if (!group.IsExplicit)
+                            {
+                                parent.Remove(group, false);
+                            }
+                        }
+                    }
+                }
+            }
+
+            private List<CollectionViewGroupInternal> _toRemove;
+        }
     }
 }

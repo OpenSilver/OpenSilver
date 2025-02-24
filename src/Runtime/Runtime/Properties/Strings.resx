@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessCollectionAfterShutDown" xml:space="preserve">
+    <value>AccessCollection for '{0}' collection cannot be called after shutdown.</value>
+  </data>
   <data name="AddedItemNotAtIndex" xml:space="preserve">
     <value>Added item does not appear at given index '{0}'.</value>
   </data>
@@ -142,6 +145,12 @@
   <data name="BindingCollectionContainsNonBinding" xml:space="preserve">
     <value>BindingCollection does not support items of type {0}. Only Binding is allowed.</value>
   </data>
+  <data name="BindingListCannotCustomFilter" xml:space="preserve">
+    <value>Underlying list of this CollectionView does not support filtering.</value>
+  </data>
+  <data name="BindingListCanOnlySortByOneProperty" xml:space="preserve">
+    <value>IBindingList can sort by only one property.</value>
+  </data>
   <data name="CancelEditNotSupported" xml:space="preserve">
     <value>CancelEdit is not supported for the current edit item.</value>
   </data>
@@ -153,6 +162,9 @@
   </data>
   <data name="CannotChangeAfterSealed" xml:space="preserve">
     <value>Cannot modify a '{0}' after it is sealed.</value>
+  </data>
+  <data name="CannotDetermineSortByPropertiesForCollection" xml:space="preserve">
+    <value>Cannot find type information on collection; property names to SortBy cannot be resolved.</value>
   </data>
   <data name="CannotEditPlaceholder" xml:space="preserve">
     <value>Editing the NewItem placeholder is not allowed.</value>
@@ -214,6 +226,21 @@
   </data>
   <data name="CollectionChangeIndexOutOfRange" xml:space="preserve">
     <value>'{0}' index in collection change event is not valid for collection of size '{1}'.</value>
+  </data>
+  <data name="CollectionViewTypeIsInitOnly" xml:space="preserve">
+    <value>CollectionViewType property can only be set during initialization.</value>
+  </data>
+  <data name="CollectionView_MissingSynchronizationCallback" xml:space="preserve">
+    <value>Synchronization callback for '{0}' collection is no longer available.\n This could happen if the callback is an anonymous method.</value>
+  </data>
+  <data name="CollectionView_NameTypeDuplicity" xml:space="preserve">
+    <value>Cannot get CollectionView of type '{0}' for CollectionViewSource that already uses type '{1}'.</value>
+  </data>
+  <data name="CollectionView_ViewTypeInsufficient" xml:space="preserve">
+    <value>'{0}' does not have a constructor that accepts collection type '{1}'.</value>
+  </data>
+  <data name="CollectionView_WrongType" xml:space="preserve">
+    <value>'{0}' type is not a CollectionView type.</value>
   </data>
   <data name="CopyToNotEnoughSpace" xml:space="preserve">
     <value>Number of elements in source Enumerable is greater than available space from index to the end of destination array.</value>
@@ -304,6 +331,9 @@
   </data>
   <data name="ImplementOtherMembersWithSort" xml:space="preserve">
     <value>If SortDescriptions is overridden in derived classes, then must also override '{0}'.</value>
+  </data>
+  <data name="InconsistentBindingList" xml:space="preserve">
+    <value>IBindingList '{0}' has unexpected length after a '{1}' event.\nThis can happen if the IBindingList has been changed without raising a corresponding ListChanged event.</value>
   </data>
   <data name="InsertInDeferSelectionActive" xml:space="preserve">
     <value>Cannot insert in a selection when selection is in progress. Use Add method.</value>
@@ -404,6 +434,9 @@
   <data name="MultiBindingHasNoConverter" xml:space="preserve">
     <value>Cannot set MultiBinding because MultiValueConverter must be specified.</value>
   </data>
+  <data name="MultiThreadedCollectionChangeNotSupported" xml:space="preserve">
+    <value>This type of CollectionView does not support changes to its SourceCollection from a thread different from the Dispatcher thread.</value>
+  </data>
   <data name="MustBaseOnStyleOfABaseType" xml:space="preserve">
     <value>Can only base on a Style with target type that is base type '{0}'.</value>
   </data>
@@ -478,6 +511,9 @@
   </data>
   <data name="PropertyPathIndexWrongType" xml:space="preserve">
     <value>Path indexer parameter has value that cannot be resolved: '{0}'</value>
+  </data>
+  <data name="PropertyToSortByNotFoundOnType" xml:space="preserve">
+    <value>'{0}' type does not have property named '{1}', so cannot sort data collection.</value>
   </data>
   <data name="RangeActionsNotSupported" xml:space="preserve">
     <value>Range actions are not supported.</value>

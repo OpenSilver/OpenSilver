@@ -1,4 +1,6 @@
-﻿// Copyright (C) 2003 by Microsoft Corporation.  All rights reserved.
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Collections.Generic;
@@ -13,28 +15,36 @@ using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data
 {
-    internal class ListCollectionView : CollectionView, IComparer, IEditableCollectionView
-#if WPF
-        , IEditableCollectionViewAddNewItem, IItemProperties
-#endif // WPF
+    /// <summary>
+    /// Represents the collection view for collections that implement <see cref="IList"/>.
+    /// </summary>
+    public class ListCollectionView : CollectionView, IComparer, IEditableCollectionViewAddNewItem, IItemProperties
     {
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
-
-        #region Constructors
-
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="ListCollectionView"/> class, using a supplied collection that 
+        /// implements <see cref="IList"/>.
         /// </summary>
-        /// <param name="list">Underlying IList</param>
+        /// <param name="list">
+        /// The underlying collection, which must implement <see cref="IList"/>.
+        /// </param>
         public ListCollectionView(IList list)
             : base(list)
         {
-
-            _internalList = list;
+            if (AllowsCrossThreadChanges)
+            {
+                BindingOperations.AccessCollection(list,
+                    () =>
+                    {
+                        ClearPendingChanges();
+                        ShadowCollection = [.. (ICollection)SourceCollection];
+                        _internalList = ShadowCollection;
+                    },
+                    false);
+            }
+            else
+            {
+                _internalList = list;
+            }
 
             if (InternalList.Count == 0)    // don't call virtual IsEmpty in ctor
             {
@@ -45,33 +55,31 @@ namespace System.Windows.Data
                 SetCurrent(InternalList[0], 0, 1);
             }
 
-            _group = new CollectionViewGroupRoot(this, false);
+            _group = new CollectionViewGroupRoot(this);
             _group.GroupDescriptionChanged += new EventHandler(OnGroupDescriptionChanged);
             ((INotifyCollectionChanged)_group).CollectionChanged += new NotifyCollectionChangedEventHandler(OnGroupChanged);
             ((INotifyCollectionChanged)_group.GroupDescriptions).CollectionChanged += new NotifyCollectionChangedEventHandler(OnGroupByChanged);
         }
 
-#endregion Constructors
-
-        //------------------------------------------------------
-        //
-        //  Public Methods
-        //
-        //------------------------------------------------------
-
-#region Public Methods
-
-        //------------------------------------------------------
-#region ICollectionView
-
         /// <summary>
-        /// Re-create the view over the associated IList
+        /// Recreates the view.
         /// </summary>
-        /// <remarks>
-        /// Any sorting and filtering will take effect during Refresh.
-        /// </remarks>
         protected override void RefreshOverride()
         {
+            if (AllowsCrossThreadChanges)
+            {
+                BindingOperations.AccessCollection(SourceCollection,
+                    () =>
+                    {
+                        lock (SyncRoot)
+                        {
+                            ClearPendingChanges();
+                            ShadowCollection = [.. (ICollection)SourceCollection];
+                        }
+                    },
+                    false);
+            }
+
             object oldCurrentItem = CurrentItem;
             int oldCurrentPosition = IsEmpty ? -1 : CurrentPosition;
             bool oldIsCurrentAfterLast = IsCurrentAfterLast;
@@ -101,8 +109,7 @@ namespace System.Windows.Data
                 {
                     // oldCurrentItem not found: move to first item
                     object newItem;
-                    newPosition = (NewItemPlaceholderPosition == NewItemPlaceholderPosition.AtBeginning) ?
-                                1 : 0;
+                    newPosition = (NewItemPlaceholderPosition == NewItemPlaceholderPosition.AtBeginning) ? 1 : 0;
                     if (newPosition < InternalCount && (newItem = InternalItemAt(newPosition)) != NewItemPlaceholder)
                     {
                         SetCurrent(newItem, newPosition);
@@ -134,16 +141,17 @@ namespace System.Windows.Data
 
             if (oldCurrentItem != CurrentItem)
                 OnPropertyChanged(CurrentItemPropertyName);
-
         }
 
         /// <summary>
-        /// Return true if the item belongs to this view.  No assumptions are
-        /// made about the item. This method will behave similarly to IList.Contains()
-        /// and will do an exhaustive search through all items in this view.
-        /// If the caller knows that the item belongs to the
-        /// underlying collection, it is more efficient to call PassesFilter.
+        /// Returns a value that indicates whether a given item belongs to the collection view.
         /// </summary>
+        /// <param name="item">
+        /// The object to check.
+        /// </param>
+        /// <returns>
+        /// true if the item belongs to the collection view; otherwise, false.
+        /// </returns>
         public override bool Contains(object item)
         {
             VerifyRefreshNotDeferred();
@@ -152,10 +160,17 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Move <seealso cref="CollectionView.CurrentItem"/> to the item at the given index.
+        /// Sets the item at the specified index to be the <see cref="CollectionView.CurrentItem"/> in the view.
         /// </summary>
-        /// <param name="position">Move CurrentItem to this index</param>
-        /// <returns>true if <seealso cref="CollectionView.CurrentItem"/> points to an item within the view.</returns>
+        /// <param name="position">
+        /// The index to set the <see cref="CollectionView.CurrentItem"/> to.
+        /// </param>
+        /// <returns>
+        /// true if the resulting <see cref="CollectionView.CurrentItem"/> is an item within the view; otherwise, false.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The index is out of range.
+        /// </exception>
         public override bool MoveCurrentToPosition(int position)
         {
             VerifyRefreshNotDeferred();
@@ -197,57 +212,63 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Returns true if this view really supports grouping.
-        /// When this returns false, the rest of the interface is ignored.
+        /// Gets a value that indicates whether the collection view supports grouping.
         /// </summary>
+        /// <returns>
+        /// true if the collection view supports grouping; otherwise, false.
+        /// </returns>
         public override bool CanGroup
         {
             get { return true; }
         }
 
         /// <summary>
-        /// The description of grouping, indexed by level.
+        /// Gets a collection of <see cref="GroupDescription"/> objects that describe how the items in the collection 
+        /// are grouped in the view.
         /// </summary>
+        /// <returns>
+        /// A collection of <see cref="GroupDescription"/> objects that describe how the items in the collection are 
+        /// grouped in the view.
+        /// </returns>
         public override ObservableCollection<GroupDescription> GroupDescriptions
         {
             get { return _group.GroupDescriptions; }
         }
 
         /// <summary>
-        /// The top-level groups, constructed according to the descriptions
-        /// given in GroupDescriptions and/or GroupBySelector.
+        /// Gets the top-level groups.
         /// </summary>
+        /// <returns>
+        /// A read-only collection of the top-level groups, or null if there are no groups.
+        /// </returns>
         public override ReadOnlyObservableCollection<object> Groups
         {
             get { return (IsGrouping) ? _group.Items : null; }
         }
 
-#endregion ICollectionView
-
-
         /// <summary>
-        /// Return true if the item belongs to this view.  The item is assumed to belong to the
-        /// underlying DataCollection;  this method merely takes filters into account.
-        /// It is commonly used during collection-changed notifications to determine if the added/removed
-        /// item requires processing.
-        /// Returns true if no filter is set on collection view.
+        /// Returns a value that indicates whether the specified item in the underlying collection belongs to the view.
         /// </summary>
+        /// <param name="item">
+        /// The item to check.
+        /// </param>
+        /// <returns>
+        /// true if the specified item belongs to the view or if there is not filter set on the collection view; otherwise, false.
+        /// </returns>
         public override bool PassesFilter(object item)
         {
             return ActiveFilter == null || ActiveFilter(item);
         }
 
-        /// <summary> Return the index where the given item belongs, or -1 if this index is unknown.
+        /// <summary>
+        /// Returns the index where the given data item belongs in the collection, or -1 if the index of that item is unknown.
         /// </summary>
-        /// <remarks>
-        /// If this method returns an index other than -1, it must always be true that
-        /// view[index-1] &lt; item &lt;= view[index], where the comparisons are done via
-        /// the view's IComparer.Compare method (if any).
-        /// (This method is used by a listener's (e.g. System.Windows.Controls.ItemsControl)
-        /// CollectionChanged event handler to speed up its reaction to insertion and deletion of items.
-        /// If IndexOf is  not implemented, a listener does a binary search using IComparer.Compare.)
-        /// </remarks>
-        /// <param name="item">data item</param>
+        /// <param name="item">
+        /// The object to check for in the collection.
+        /// </param>
+        /// <returns>
+        /// The index of the item in the collection, or -1 if the item does not exist in the collection.
+        /// </returns>
         public override int IndexOf(object item)
         {
             VerifyRefreshNotDeferred();
@@ -256,13 +277,16 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Retrieve item at the given zero-based index in this CollectionView.
+        /// Retrieves the item at the specified position in the view.
         /// </summary>
-        /// <remarks>
-        /// <p>The index is evaluated with any SortDescriptions or Filter being set on this CollectionView.</p>
-        /// </remarks>
+        /// <param name="index">
+        /// The zero-based index at which the item is located.
+        /// </param>
+        /// <returns>
+        /// The item at the specified position in the view.
+        /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if index is out of range
+        /// If index is out of range.
         /// </exception>
         public override object GetItemAt(int index)
         {
@@ -270,10 +294,6 @@ namespace System.Windows.Data
 
             return InternalItemAt(index);
         }
-
-
-        //------------------------------------------------------
-#region IComparer
 
         /// <summary> Return -, 0, or +, according to whether o1 occurs before, at, or after o2 (respectively)
         /// </summary>
@@ -287,13 +307,18 @@ namespace System.Windows.Data
             return Compare(o1, o2);
         }
 
-        /// <summary> Return -, 0, or +, according to whether o1 occurs before, at, or after o2 (respectively)
+        /// <summary>
+        /// Compares two objects and returns a value that indicates whether one is less than, equal to, or greater than the other.
         /// </summary>
-        /// <param name="o1">first object</param>
-        /// <param name="o2">second object</param>
-        /// <remarks>
-        /// Compares items by their resp. index in the IList.
-        /// </remarks>
+        /// <param name="o1">
+        /// The first object to compare.
+        /// </param>
+        /// <param name="o2">
+        /// The second object to compare.
+        /// </param>
+        /// <returns>
+        /// Less than zero if o1 is less than o2, zero if o1 and o2 are equal, or greater than zero if o1 is greater than o2.
+        /// </returns>
         protected virtual int Compare(object o1, object o2)
         {
             if (!IsGrouping)
@@ -313,13 +338,12 @@ namespace System.Windows.Data
             }
         }
 
-#endregion IComparer
-
         /// <summary>
-        /// Implementation of IEnumerable.GetEnumerator().
-        /// This provides a way to enumerate the members of the collection
-        /// without changing the currency.
+        /// Returns an object that you can use to enumerate the items in the view.
         /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerator"/> object that you can use to enumerate the items in the view.
+        /// </returns>
         protected override IEnumerator GetEnumerator()
         {
             VerifyRefreshNotDeferred();
@@ -327,29 +351,14 @@ namespace System.Windows.Data
             return InternalGetEnumerator();
         }
 
-#endregion Public Methods
-
-
-        //------------------------------------------------------
-        //
-        //  Public Properties
-        //
-        //------------------------------------------------------
-
-#region Public Properties
-
-        //------------------------------------------------------
-#region ICollectionView
-
         /// <summary>
-        /// Collection of Sort criteria to sort items in this view over the SourceCollection.
+        /// Gets a collection of <see cref="SortDescription"/> objects that describes how the items in the collection 
+        /// are sorted in the view.
         /// </summary>
-        /// <remarks>
-        /// <p>
-        /// One or more sort criteria in form of <seealso cref="SortDescription"/>
-        /// can be added, each specifying a property and direction to sort by.
-        /// </p>
-        /// </remarks>
+        /// <returns>
+        /// A collection of <see cref="SortDescription"/> objects that describe how the items in the collection are 
+        /// sorted in the view.
+        /// </returns>
         public override SortDescriptionCollection SortDescriptions
         {
             get
@@ -361,36 +370,33 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Test if this ICollectionView supports sorting before adding
-        /// to <seealso cref="SortDescriptions"/>.
+        /// Gets a value that indicates whether the collection view supports sorting.
         /// </summary>
-        /// <remarks>
-        /// ListCollectionView does implement an IComparer based sorting.
-        /// </remarks>
+        /// <returns>
+        /// For a default instance of <see cref="ListCollectionView"/>, this property always returns true.
+        /// </returns>
         public override bool CanSort
         {
             get { return true; }
         }
 
         /// <summary>
-        /// Test if this ICollectionView supports filtering before assigning
-        /// a filter callback to <seealso cref="Filter"/>.
+        /// Gets a value that indicates whether the view supports callback-based filtering.
         /// </summary>
+        /// <returns>
+        /// For a default instance of <see cref="ListCollectionView"/>, this property always returns true.
+        /// </returns>
         public override bool CanFilter
         {
             get { return true; }
         }
 
         /// <summary>
-        /// Filter is a callback set by the consumer of the ICollectionView
-        /// and used by the implementation of the ICollectionView to determine if an
-        /// item is suitable for inclusion in the view.
+        /// Gets or sets a method that is used to determine whether an item is suitable for inclusion in the view.
         /// </summary>
-        /// <exception cref="NotSupportedException">
-        /// Simpler implementations do not support filtering and will throw a NotSupportedException.
-        /// Use <seealso cref="CanFilter"/> property to test if filtering is supported before
-        /// assigning a non-null value.
-        /// </exception>
+        /// <returns>
+        ///  A delegate that represents the method that is used to determine whether an item is suitable for inclusion in the view.
+        /// </returns>
         public override Predicate<object> Filter
         {
             get
@@ -399,6 +405,8 @@ namespace System.Windows.Data
             }
             set
             {
+                if (AllowsCrossThreadChanges)
+                    VerifyAccess();
                 if (IsAddingNew || IsEditingItem)
                     throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(Filter)));
 
@@ -406,21 +414,19 @@ namespace System.Windows.Data
             }
         }
 
-#endregion ICollectionView
-
         /// <summary>
-        /// Set a custom comparer to sort items using an object that implements IComparer.
+        /// Gets or sets a custom object that implements <see cref="IComparer"/> to sort items in the view.
         /// </summary>
-        /// <remarks>
-        /// Setting the Sort criteria has no immediate effect,
-        /// an explicit <seealso cref="CollectionView.Refresh"/> call by the app is required.
-        /// Note: Setting the custom comparer object will clear previously set <seealso cref="CollectionView.SortDescriptions"/>.
-        /// </remarks>
+        /// <returns>
+        /// The sort criteria as an implementation of <see cref="IComparer"/>.
+        /// </returns>
         public IComparer CustomSort
         {
             get { return _customSort; }
             set
             {
+                if (AllowsCrossThreadChanges)
+                    VerifyAccess();
                 if (IsAddingNew || IsEditingItem)
                     throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringAddOrEdit, nameof(CustomSort)));
                 _customSort = value;
@@ -432,9 +438,12 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// A delegate to select the group description as a function of the
-        /// parent group and its level.
+        /// Gets or sets a delegate to select the <see cref="GroupDescription"/> as a function of the parent group and its level.
         /// </summary>
+        /// <returns>
+        /// A method that provides the logic for the selection of the <see cref="GroupDescription"/> as a function of the parent 
+        /// group and its level. The default value is null.
+        /// </returns>
         [DefaultValue(null)]
         public virtual GroupDescriptionSelectorCallback GroupBySelector
         {
@@ -453,8 +462,19 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Return the estimated number of records (or -1, meaning "don't know").
+        /// Gets the estimated number of records.
         /// </summary>
+        /// <returns>
+        /// One of the following:
+        /// 
+        /// Value – Meaning
+        /// -1 – Could not determine the count of the collection. This might be returned by a "virtualizing" view, 
+        /// where the view deliberately does not account for all items in the underlying collection because the 
+        /// view is trying to increase efficiency and minimize dependence on always having the whole collection 
+        /// available.
+        /// 
+        /// any other integer – The count of the collection.
+        /// </returns>
         public override int Count
         {
             get
@@ -466,35 +486,35 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Returns true if the resulting (filtered) view is emtpy.
+        /// Returns a value that indicates whether the resulting (filtered) view is empty.
         /// </summary>
+        /// <returns>
+        /// true if the resulting view is empty; otherwise, false.
+        /// </returns>
         public override bool IsEmpty
         {
-            get { return (InternalCount == 0); }
+            get { return InternalCount == 0; }
         }
 
         /// <summary>
-        /// Setting this to true informs the view that the list of items
-        /// (after applying the sort and filter, if any) is already in the
-        /// correct order for grouping.  This allows the view to use a more
-        /// efficient algorithm to build the groups.
+        /// Gets or sets a value that indicates whether the list of items (after applying the sort and filters, if any) 
+        /// is already in the correct order for grouping.
         /// </summary>
+        /// <returns>
+        /// true if the list of items is already in the correct order for grouping; otherwise, false.
+        /// </returns>
         public bool IsDataInGroupOrder
         {
             get { return _group.IsDataInGroupOrder; }
             set { _group.IsDataInGroupOrder = value; }
         }
 
-#endregion Public Properties
-
-#region IEditableCollectionView
-
-#region Adding new items
-
         /// <summary>
-        /// Indicates whether to include a placeholder for a new item, and if so,
-        /// where to put it.
+        /// Gets or sets the position of the new item placeholder in the <see cref="ListCollectionView"/>.
         /// </summary>
+        /// <returns>
+        /// One of the enumeration values that specifies the position of the new item placeholder in the <see cref="ListCollectionView"/>.
+        /// </returns>
         public NewItemPlaceholderPosition NewItemPlaceholderPosition
         {
             get { return _newItemPlaceholderPosition; }
@@ -503,7 +523,8 @@ namespace System.Windows.Data
                 VerifyRefreshNotDeferred();
 
                 if (value != _newItemPlaceholderPosition && IsAddingNew)
-                    throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(NewItemPlaceholderPosition), nameof(AddNew)));
+                    throw new InvalidOperationException(
+                        string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(NewItemPlaceholderPosition), nameof(AddNew)));
 
                 if (value != _newItemPlaceholderPosition && _isRemoving)
                 {
@@ -612,22 +633,28 @@ namespace System.Windows.Data
                         }
                     }
 
-                    OnPropertyChanged("NewItemPlaceholderPosition");
+                    OnPropertyChanged(nameof(NewItemPlaceholderPosition));
                 }
             }
         }
 
         /// <summary>
-        /// Return true if the view supports <seealso cref="AddNew"/>.
+        /// Gets a value that indicates whether a new item can be added to the collection.
         /// </summary>
+        /// <returns>
+        /// true if a new item can be added to the collection; otherwise, false.
+        /// </returns>
         public bool CanAddNew
         {
             get { return !IsEditingItem && !SourceList.IsFixedSize && CanConstructItem; }
         }
 
         /// <summary>
-        /// Return true if the view supports <seealso cref="AddNewItem"/>.
+        /// Gets a value that indicates whether a specified object can be added to the collection.
         /// </summary>
+        /// <returns>
+        /// true if a specified object can be added to the collection; otherwise, false.
+        /// </returns>
         public bool CanAddNewItem
         {
             get { return !IsEditingItem && !SourceList.IsFixedSize; }
@@ -660,11 +687,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Add a new item to the underlying collection.  Returns the new item.
-        /// After calling AddNew and changing the new item as desired, either
-        /// <seealso cref="CommitNew"/> or <seealso cref="CancelNew"/> should be
-        /// called to complete the transaction.
+        /// Starts an add transaction and returns the pending new item.
         /// </summary>
+        /// <returns>
+        /// The pending new item.
+        /// </returns>
         public object AddNew()
         {
             VerifyRefreshNotDeferred();
@@ -683,11 +710,17 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Add a new item to the underlying collection.  Returns the new item.
-        /// After calling AddNewItem and changing the new item as desired, either
-        /// <seealso cref="CommitNew"/> or <seealso cref="CancelNew"/> should be
-        /// called to complete the transaction.
+        /// Adds the specified object to the collection.
         /// </summary>
+        /// <param name="newItem">
+        /// The object to add to the collection.
+        /// </param>
+        /// <returns>
+        /// The object that was added to the collection.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// An object cannot be added to the <see cref="ListCollectionView"/> by using the <see cref="AddNewItem(object)"/> method.
+        /// </exception>
         public object AddNewItem(object newItem)
         {
             VerifyRefreshNotDeferred();
@@ -707,36 +740,37 @@ namespace System.Windows.Data
 
         object AddNewCommon(object newItem)
         {
-            _newItemIndex = -2; // this is a signal that the next Add event comes from AddNew
-            int index = SourceList.Add(newItem);
-
-            // if the source doesn't raise collection change events, fake one
-            if (!(SourceList is INotifyCollectionChanged))
-            {
-                // the index returned by IList.Add isn't always reliable
-                if (!ItemsControl.EqualsEx(newItem, SourceList[index]))
+            BindingOperations.AccessCollection(SourceList,
+                () =>
                 {
-                    index = SourceList.IndexOf(newItem);
-                }
+                    ProcessPendingChanges();    // bring the shadow list up to date
 
-                BeginAddNew(newItem, index);
-            }
+                    _newItemIndex = -2; // this is a signal that the next Add event comes from AddNew
+                    int index = SourceList.Add(newItem);
+
+                    // if the source doesn't raise collection change events, fake one
+                    if (!(SourceList is INotifyCollectionChanged))
+                    {
+                        // the index returned by IList.Add isn't always reliable
+                        if (!ItemsControl.EqualsEx(newItem, SourceList[index]))
+                        {
+                            index = SourceList.IndexOf(newItem);
+                        }
+
+                        BeginAddNew(newItem, index);
+                    }
+                },
+                true);
 
             Debug.Assert(_newItemIndex != -2 && ItemsControl.EqualsEx(newItem, _newItem), "AddNew did not raise expected events");
 
             MoveCurrentTo(newItem);
 
             ISupportInitialize isi = newItem as ISupportInitialize;
-            if (isi != null)
-            {
-                isi.BeginInit();
-            }
+            isi?.BeginInit();
 
             IEditableObject ieo = newItem as IEditableObject;
-            if (ieo != null)
-            {
-                ieo.BeginEdit();
-            }
+            ieo?.BeginEdit();
 
             return newItem;
         }
@@ -778,14 +812,13 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Complete the transaction started by <seealso cref="AddNew"/>.  The new
-        /// item remains in the collection, and the view's sort, filter, and grouping
-        /// specifications (if any) are applied to the new item.
+        /// Ends the add transaction and saves the pending new item.
         /// </summary>
         public void CommitNew()
         {
             if (IsEditingItem)
-                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CommitNew), nameof(EditItem)));
+                throw new InvalidOperationException(
+                    string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CommitNew), nameof(EditItem)));
             VerifyRefreshNotDeferred();
 
             if (_newItem == NoNewItem)
@@ -895,13 +928,13 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Complete the transaction started by <seealso cref="AddNew"/>.  The new
-        /// item is removed from the collection.
+        /// Ends the add transaction and discards the pending new item.
         /// </summary>
         public void CancelNew()
         {
             if (IsEditingItem)
-                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CancelNew), nameof(EditItem)));
+                throw new InvalidOperationException(
+                    string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CancelNew), nameof(EditItem)));
             VerifyRefreshNotDeferred();
 
             if (_newItem == NoNewItem)
@@ -910,21 +943,27 @@ namespace System.Windows.Data
             // remove the new item from the underlying collection.  Normally the
             // collection will raise a Remove event, which we'll handle by calling
             // EndNew to leave AddNew mode.
-            SourceList.RemoveAt(_newItemIndex);
+            BindingOperations.AccessCollection(SourceList,
+                () =>
+                {
+                    ProcessPendingChanges();
+                    SourceList.RemoveAt(_newItemIndex);
 
-            // if the collection doesn't raise events, do the work explicitly on its behalf
-            if (_newItem != NoNewItem)
-            {
-                int index = AdjustBefore(NotifyCollectionChangedAction.Remove, _newItem, _newItemIndex);
-                object newItem = EndAddNew(true);
+                    // if the collection doesn't raise events, do the work explicitly on its behalf
+                    if (_newItem != NoNewItem)
+                    {
+                        int index = AdjustBefore(NotifyCollectionChangedAction.Remove, _newItem, _newItemIndex);
+                        object newItem = EndAddNew(true);
 
-                ProcessCollectionChangedWithAdjustedIndex(
-                            new NotifyCollectionChangedEventArgs(
-                                                NotifyCollectionChangedAction.Remove,
-                                                newItem,
-                                                index),
-                            index, -1);
-            }
+                        ProcessCollectionChangedWithAdjustedIndex(
+                                    new NotifyCollectionChangedEventArgs(
+                                                        NotifyCollectionChangedAction.Remove,
+                                                        newItem,
+                                                        index),
+                                    index, -1);
+                    }
+                },
+                true);
         }
 
         // Common functionality used by CommitNew, CancelNew, and when the
@@ -949,26 +988,28 @@ namespace System.Windows.Data
             }
 
             ISupportInitialize isi = newItem as ISupportInitialize;
-            if (isi != null)
-            {
-                isi.EndInit();
-            }
+            isi?.EndInit();
 
             return newItem;
         }
 
         /// <summary>
-        /// Returns true if an <seealso cref="AddNew"/> transaction is in progress.
+        /// Gets a value that indicates whether an add transaction is in progress.
         /// </summary>
+        /// <returns>
+        /// true if an add transaction is in progress; otherwise, false.
+        /// </returns>
         public bool IsAddingNew
         {
             get { return (_newItem != NoNewItem); }
         }
 
         /// <summary>
-        /// When an <seealso cref="AddNew"/> transaction is in progress, this property
-        /// returns the new item.  Otherwise it returns null.
+        /// Gets the item that is being added during the current add transaction.
         /// </summary>
+        /// <returns>
+        /// The item that is being added if <see cref="IsAddingNew"/> is true; otherwise, null.
+        /// </returns>
         public object CurrentAddItem
         {
             get { return IsAddingNew ? _newItem : null; }
@@ -980,30 +1021,32 @@ namespace System.Windows.Data
             {
                 _newItem = item;
 
-                OnPropertyChanged("CurrentAddItem");
-                OnPropertyChanged("IsAddingNew");
-                OnPropertyChanged("CanRemove");
+                OnPropertyChanged(nameof(CurrentAddItem));
+                OnPropertyChanged(nameof(IsAddingNew));
+                OnPropertyChanged(nameof(CanRemove));
             }
         }
 
-#endregion Adding new items
-
-#region Removing items
-
         /// <summary>
-        /// Return true if the view supports <seealso cref="Remove"/> and
-        /// <seealso cref="RemoveAt"/>.
+        /// Gets a value that indicates whether an item can be removed from the collection.
         /// </summary>
+        /// <returns>
+        /// true if an item can be removed from the collection; otherwise, false.
+        /// </returns>
         public bool CanRemove
         {
             get { return !IsEditingItem && !IsAddingNew && !SourceList.IsFixedSize; }
         }
 
         /// <summary>
-        /// Remove the item at the given index from the underlying collection.
-        /// The index is interpreted with respect to the view (not with respect to
-        /// the underlying collection).
+        /// Removes the item at the specified position from the collection.
         /// </summary>
+        /// <param name="index">
+        /// The zero-based index of the item to remove.
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// index is less than 0 or greater than the number of items in the collection view.
+        /// </exception>
         public void RemoveAt(int index)
         {
             if (IsEditingItem || IsAddingNew)
@@ -1014,8 +1057,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Remove the given item from the underlying collection.
+        /// Removes the specified item from the collection.
         /// </summary>
+        /// <returns>
+        /// The item to remove.
+        /// </returns>
         public void Remove(object item)
         {
             if (IsEditingItem || IsAddingNew)
@@ -1031,72 +1077,74 @@ namespace System.Windows.Data
 
         void RemoveImpl(object item, int index)
         {
-            if (item == CollectionView.NewItemPlaceholder)
+            if (item == NewItemPlaceholder)
                 throw new InvalidOperationException(Strings.RemovingPlaceholder);
 
-            // the pending changes may have moved (or even removed) the
-            // item.   Verify the index.
-            if (index >= InternalCount || !ItemsControl.EqualsEx(item, GetItemAt(index)))
-            {
-                index = InternalIndexOf(item);
-                if (index < 0)
-                    return;
-            }
-
-            // convert the index from "view-relative" to "list-relative"
-            int delta = (NewItemPlaceholderPosition == NewItemPlaceholderPosition.AtBeginning) ? 1 : 0;
-
-            int listIndex = index - delta;
-            bool raiseEvent = !(SourceList is INotifyCollectionChanged);
-
-            // remove the item from the list
-            try
-            {
-                _isRemoving = true;
-                if (UsesLocalArray || IsGrouping)
+            BindingOperations.AccessCollection(SourceList,
+                () =>
                 {
-                    if (raiseEvent)
+                    ProcessPendingChanges();
+
+                    // the pending changes may have moved (or even removed) the
+                    // item.   Verify the index.
+                    if (index >= InternalCount || !ItemsControl.EqualsEx(item, GetItemAt(index)))
                     {
-                        listIndex = SourceList.IndexOf(item);
-                        SourceList.RemoveAt(listIndex);
+                        index = InternalIndexOf(item);
+                        if (index < 0)
+                            return;
                     }
-                    else
-                    {
-                        SourceList.Remove(item);
-                    }
-                }
-                else
-                {
-                    SourceList.RemoveAt(listIndex);
-                }
 
-                // if the list doesn't raise CollectionChanged events, fake one
-                if (raiseEvent)
-                {
-                    ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(
-                                                NotifyCollectionChangedAction.Remove,
-                                                item,
-                                                listIndex));
-                }
-            }
-            finally
-            {
-                _isRemoving = false;
-                DoDeferredActions();
-            }
+                    // convert the index from "view-relative" to "list-relative"
+                    int delta = (NewItemPlaceholderPosition == NewItemPlaceholderPosition.AtBeginning) ? 1 : 0;
+
+                    int listIndex = index - delta;
+                    bool raiseEvent = !(SourceList is INotifyCollectionChanged);
+
+                    // remove the item from the list
+                    try
+                    {
+                        _isRemoving = true;
+                        if (UsesLocalArray || IsGrouping)
+                        {
+                            if (raiseEvent)
+                            {
+                                listIndex = SourceList.IndexOf(item);
+                                SourceList.RemoveAt(listIndex);
+                            }
+                            else
+                            {
+                                SourceList.Remove(item);
+                            }
+                        }
+                        else
+                        {
+                            SourceList.RemoveAt(listIndex);
+                        }
+
+                        // if the list doesn't raise CollectionChanged events, fake one
+                        if (raiseEvent)
+                        {
+                            ProcessCollectionChanged(new NotifyCollectionChangedEventArgs(
+                                                        NotifyCollectionChangedAction.Remove,
+                                                        item,
+                                                        listIndex));
+                        }
+                    }
+                    finally
+                    {
+                        _isRemoving = false;
+                        DoDeferredActions();
+                    }
+                },
+                true);
         }
 
-#endregion Removing items
-
-#region Transactional editing of an item
-
         /// <summary>
-        /// Begins an editing transaction on the given item.  The transaction is
-        /// completed by calling either <seealso cref="CommitEdit"/> or
-        /// <seealso cref="CancelEdit"/>.  Any changes made to the item during
-        /// the transaction are considered "pending", provided that the view supports
-        /// the notion of "pending changes" for the given item.
+        /// Begins an edit transaction of the specified item.
         /// </summary>
+        /// <param name="item">
+        /// The item to edit.
+        /// </param>
         public void EditItem(object item)
         {
             VerifyRefreshNotDeferred();
@@ -1117,20 +1165,17 @@ namespace System.Windows.Data
             SetEditItem(item);
 
             IEditableObject ieo = item as IEditableObject;
-            if (ieo != null)
-            {
-                ieo.BeginEdit();
-            }
+            ieo?.BeginEdit();
         }
 
         /// <summary>
-        /// Complete the transaction started by <seealso cref="EditItem"/>.
-        /// The pending changes (if any) to the item are committed.
+        /// Ends the edit transaction and saves the pending changes.
         /// </summary>
         public void CommitEdit()
         {
             if (IsAddingNew)
-                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CommitEdit), nameof(AddNew)));
+                throw new InvalidOperationException(
+                    string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CommitEdit), nameof(AddNew)));
             VerifyRefreshNotDeferred();
 
             if (_editItem == null)
@@ -1140,10 +1185,7 @@ namespace System.Windows.Data
             IEditableObject ieo = _editItem as IEditableObject;
             SetEditItem(null);
 
-            if (ieo != null)
-            {
-                ieo.EndEdit();
-            }
+            ieo?.EndEdit();
 
             // see if the item is entering or leaving the view
             int fromIndex = InternalIndexOf(editItem);
@@ -1233,13 +1275,13 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Complete the transaction started by <seealso cref="EditItem"/>.
-        /// The pending changes (if any) to the item are discarded.
+        /// Ends the edit transaction, and if possible, restores the original value to the item.
         /// </summary>
         public void CancelEdit()
         {
             if (IsAddingNew)
-                throw new InvalidOperationException(string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CancelEdit), nameof(AddNew)));
+                throw new InvalidOperationException(
+                    string.Format(Strings.MemberNotAllowedDuringTransaction, nameof(CancelEdit), nameof(AddNew)));
             VerifyRefreshNotDeferred();
 
             if (_editItem == null)
@@ -1261,37 +1303,39 @@ namespace System.Windows.Data
             IEditableObject ieo = _editItem as IEditableObject;
             SetEditItem(null);
 
-            if (ieo != null)
-            {
-                ieo.CancelEdit();
-            }
+            ieo?.CancelEdit();
         }
 
         /// <summary>
-        /// Returns true if the view supports the notion of "pending changes" on the
-        /// current edit item.  This may vary, depending on the view and the particular
-        /// item.  For example, a view might return true if the current edit item
-        /// implements <seealso cref="IEditableObject"/>, or if the view has special
-        /// knowledge about the item that it can use to support rollback of pending
-        /// changes.
+        /// Gets a value that indicates whether the collection view can discard pending changes and restore the original 
+        /// values of an edited object.
         /// </summary>
+        /// <returns>
+        /// true if the collection view can discard pending changes and restore the original values of an edited object; 
+        /// otherwise, false.
+        /// </returns>
         public bool CanCancelEdit
         {
             get { return (_editItem is IEditableObject); }
         }
 
         /// <summary>
-        /// Returns true if an <seealso cref="EditItem"/> transaction is in progress.
+        /// Gets a value that indicates whether an edit transaction is in progress.
         /// </summary>
+        /// <returns>
+        /// true if an edit transaction is in progress; otherwise, false.
+        /// </returns>
         public bool IsEditingItem
         {
             get { return (_editItem != null); }
         }
 
         /// <summary>
-        /// When an <seealso cref="EditItem"/> transaction is in progress, this property
-        /// returns the affected item.  Otherwise it returns null.
+        /// Gets the item in the collection that is being edited.
         /// </summary>
+        /// <returns>
+        /// The item in the collection that is being edited if <see cref="IsEditingItem"/> is true; otherwise, null.
+        /// </returns>
         public object CurrentEditItem
         {
             get { return _editItem; }
@@ -1303,53 +1347,86 @@ namespace System.Windows.Data
             {
                 _editItem = item;
 
-                OnPropertyChanged("CurrentEditItem");
-                OnPropertyChanged("IsEditingItem");
-                OnPropertyChanged("CanCancelEdit");
-                OnPropertyChanged("CanAddNew");
-                OnPropertyChanged("CanAddNewItem");
-                OnPropertyChanged("CanRemove");
+                OnPropertyChanged(nameof(CurrentEditItem));
+                OnPropertyChanged(nameof(IsEditingItem));
+                OnPropertyChanged(nameof(CanCancelEdit));
+                OnPropertyChanged(nameof(CanAddNew));
+                OnPropertyChanged(nameof(CanAddNewItem));
+                OnPropertyChanged(nameof(CanRemove));
             }
         }
 
-#endregion Transactional editing of an item
-
-#endregion IEditableCollectionView
-
-#if WPF
-
-#region IItemProperties
-
         /// <summary>
-        /// Returns information about the properties available on items in the
-        /// underlying collection.  This information may come from a schema, from
-        /// a type descriptor, from a representative item, or from some other source
-        /// known to the view.
+        /// Gets a collection of objects that describes the properties of the items in the collection.
         /// </summary>
+        /// <returns>
+        /// A collection of objects that describes the properties of the items in the collection.
+        /// </returns>
         public ReadOnlyCollection<ItemPropertyInfo> ItemProperties
         {
             get { return GetItemProperties(); }
         }
 
-#endregion IItemProperties
+        /// <summary>
+        /// Occurs when the <see cref="CollectionView.AllowsCrossThreadChanges"/> property changes.
+        /// </summary>
+        protected override void OnAllowsCrossThreadChangesChanged()
+        {
+            if (AllowsCrossThreadChanges)
+            {
+                BindingOperations.AccessCollection(SourceCollection,
+                    () =>
+                    {
+                        lock (SyncRoot)
+                        {
+                            ClearPendingChanges();
+                            ShadowCollection = [.. (ICollection)SourceCollection];
 
-#endif // WPF
-
-
-        //------------------------------------------------------
-        //
-        //  Protected Methods
-        //
-        //------------------------------------------------------
-#region Protected Methods
+                            if (!UsesLocalArray)
+                            {
+                                _internalList = ShadowCollection;
+                            }
+                        }
+                    },
+                    false);
+            }
+            else
+            {
+                ShadowCollection = null;
+                if (!UsesLocalArray)
+                {
+                    _internalList = SourceList;
+                }
+            }
+        }
 
         /// <summary>
-        /// Handle CollectionChange events
+        /// Called by the base class to notify the derived class that a <see cref="INotifyCollectionChanged.CollectionChanged"/>
+        /// event has been posted to the message queue.
         /// </summary>
+        /// <param name="args">
+        /// The <see cref="NotifyCollectionChangedEventArgs"/> object that is added to the change log.
+        /// </param>
+        [Obsolete("Replaced by OnAllowsCrossThreadChangesChanged")]
+        protected override void OnBeginChangeLogging(NotifyCollectionChangedEventArgs args)
+        {
+        }
+
+        /// <summary>
+        /// Handles <see cref="INotifyCollectionChanged.CollectionChanged"/> events.
+        /// </summary>
+        /// <param name="args">
+        /// The <see cref="NotifyCollectionChangedEventArgs"/> object to process.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="args"/> is null.
+        /// </exception>
         protected override void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (args == null)
+            if (args is null)
+            {
                 throw new ArgumentNullException(nameof(args));
+            }
 
             ValidateCollectionChangedEventArgs(args);
 
@@ -1362,7 +1439,7 @@ namespace System.Windows.Data
                     case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Add:
                     case NotifyCollectionChangedAction.Replace:
-                        OnPropertyChanged("CanAddNew");
+                        OnPropertyChanged(nameof(CanAddNew));
                         break;
                 }
             }
@@ -1379,7 +1456,7 @@ namespace System.Windows.Data
                         || args.Action != NotifyCollectionChangedAction.Add && args.OldStartingIndex < 0)
                     {
                         Debug.Assert(false, "Cannot update collection view from outside UIContext without index in event args");
-                        return;     // 
+                        return;     // support cross-thread changes from all collections
                     }
                     else
                     {
@@ -1735,7 +1812,7 @@ namespace System.Windows.Data
                     }
                     break;
                 default:
-                    Debug.Assert(false, string.Format("Unexpected collection change action '{0}'.", effectiveAction));
+                    Debug.Assert(false, string.Format(Strings.UnexpectedCollectionChangeAction, effectiveAction));
                     break;
             }
 
@@ -1784,7 +1861,6 @@ namespace System.Windows.Data
                     currentItemHasChanged = false;
                     oldCurrentItem = CurrentItem;
                 }
-
             }
 
             // currency has to change after firing the deletion event,
@@ -1815,12 +1891,17 @@ namespace System.Windows.Data
 
             if (currentItemHasChanged)
                 OnPropertyChanged(CurrentItemPropertyName);
-
         }
 
         /// <summary>
-        /// Return index of item in the internal list.
+        /// Returns the index of the specified item in the <see cref="InternalList"/>.
         /// </summary>
+        /// <param name="item">
+        /// The item to return an index for.
+        /// </param>
+        /// <returns>
+        /// The index of the specified item in the <see cref="InternalList"/>.
+        /// </returns>
         protected int InternalIndexOf(object item)
         {
             if (IsGrouping)
@@ -1872,8 +1953,14 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Return item at the given index in the internal list.
+        /// Returns the item at the given index in the <see cref="InternalList"/>.
         /// </summary>
+        /// <param name="index">
+        /// The index at which the item is located.
+        /// </param>
+        /// <returns>
+        /// The item at the specified zero-based index in the view.
+        /// </returns>
         protected object InternalItemAt(int index)
         {
             if (IsGrouping)
@@ -1925,8 +2012,14 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Return true if internal list contains the item.
+        /// Return a value that indicates whether the <see cref="InternalList"/> contains the item.
         /// </summary>
+        /// <param name="item">
+        /// The item to locate.
+        /// </param>
+        /// <returns>
+        /// true if the <see cref="InternalList"/> contains the item; otherwise, false.
+        /// </returns>
         protected bool InternalContains(object item)
         {
             if (item == NewItemPlaceholder)
@@ -1936,8 +2029,11 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Return an enumerator for the internal list.
+        /// Returns an enumerator for the <see cref="InternalList"/>.
         /// </summary>
+        /// <returns>
+        /// An enumerator for the <see cref="InternalList"/>.
+        /// </returns>
         protected IEnumerator InternalGetEnumerator()
         {
             if (!IsGrouping)
@@ -1951,36 +2047,46 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// True if a private copy of the data is needed for sorting and filtering
+        /// Gets a value that indicates whether a private copy of the data is needed for sorting and filtering.
         /// </summary>
+        /// <returns>
+        /// true if a private copy of the data is needed for sorting and filtering; otherwise, false. The default implementation 
+        /// returns true if there is an <see cref="ActiveFilter"/> or <see cref="ActiveComparer"/>, or both.
+        /// </returns>
         protected bool UsesLocalArray
         {
             get { return ActiveComparer != null || ActiveFilter != null; }
         }
 
         /// <summary>
-        /// Protected accessor to private _internalList field.
+        /// Gets the filtered and sorted list of items.
         /// </summary>
+        /// <returns>
+        /// The <see cref="IList"/> on which filtering and sorting have been applied.
+        /// </returns>
         protected IList InternalList
         {
             get { return _internalList; }
         }
 
         /// <summary>
-        /// Protected accessor to private _activeComparer field.
+        /// Gets or sets the current active comparer that is used in sorting.
         /// </summary>
+        /// <returns>
+        /// An <see cref="IComparer"/> object that is the active comparer.
+        /// </returns>
         protected IComparer ActiveComparer
         {
             get { return _activeComparer; }
-            set
-            {
-                _activeComparer = value;
-            }
+            set { _activeComparer = value; }
         }
 
         /// <summary>
-        /// Protected accessor to private _activeFilter field.
+        /// Gets or sets the current active <see cref="Filter"/> callback.
         /// </summary>
+        /// <returns>
+        /// The active <see cref="Filter"/> callback.
+        /// </returns>
         protected Predicate<object> ActiveFilter
         {
             get { return _activeFilter; }
@@ -1988,16 +2094,22 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Protected accessor to _isGrouping field.
+        /// Gets a value that indicates whether there are groups in the view.
         /// </summary>
+        /// <returns>
+        /// true if there are groups in the view; otherwise, false.
+        /// </returns>
         protected bool IsGrouping
         {
             get { return _isGrouping; }
         }
 
         /// <summary>
-        /// Protected accessor to private count.
+        /// Gets the number of records in the <see cref="InternalList"/>.
         /// </summary>
+        /// <returns>
+        /// The number of records in the <see cref="InternalList"/>.
+        /// </returns>
         protected int InternalCount
         {
             get
@@ -2013,16 +2125,6 @@ namespace System.Windows.Data
             }
         }
 
-#endregion Protected Methods
-
-        //------------------------------------------------------
-        //
-        //  Internal Methods
-        //
-        //------------------------------------------------------
-
-#region Internal Methods
-
         /// <summary>
         ///     Contains a snapshot of the ICollectionView.SourceCollection
         ///     at the time that a change notification is posted.
@@ -2034,9 +2136,9 @@ namespace System.Windows.Data
             set { _shadowCollection = value; }
         }
 
-        // 
-
-
+        // why not protected? -> Need to rethink extensibility of ListCollView
+        // Adjust the ShadowCopy so that it accurately reflects the state of the
+        // Data Collection immediately after the CollectionChangeEvent
         internal void AdjustShadowCopy(NotifyCollectionChangedEventArgs e)
         {
             int tempIndex;
@@ -2088,7 +2190,6 @@ namespace System.Windows.Data
 
                 default:
                     throw new NotSupportedException(string.Format(Strings.UnexpectedCollectionChangeAction, e.Action));
-
             }
         }
 
@@ -2101,7 +2202,7 @@ namespace System.Windows.Data
 
         // return an appropriate comparer.   Common logic used by ListCollectionView
         // and by CollectionViewGroupInternal.
-        internal static IComparer PrepareComparer(IComparer customSort, SortDescriptionCollection sort, Func<CollectionView> lazyGetCollectionView)
+        internal static IComparer PrepareComparer(IComparer customSort, SortDescriptionCollection sort, Func<object, CollectionView> lazyGetCollectionView, object state)
         {
             if (customSort != null)
             {
@@ -2110,25 +2211,25 @@ namespace System.Windows.Data
 
             if (sort != null && sort.Count > 0)
             {
-                CollectionView view = lazyGetCollectionView();
+                CollectionView view = lazyGetCollectionView(state);
                 Debug.Assert(view != null, "lazyGetCollectionView should not return null");
 
-                return new SortFieldComparer(view);
+#if WPF
+                if (view.SourceCollection != null)
+                {
+                    IComparer xmlComparer = SystemXmlHelper.PrepareXmlComparer(view.SourceCollection, sort, view.Culture);
+                    if (xmlComparer != null)
+                    {
+                        return xmlComparer;
+                    }
+                }
+#endif
+
+                return new SortFieldComparer(sort, view.Culture);
             }
 
             return null;
         }
-
-#endregion Internal Methods
-
-
-#region Private Properties
-
-        //------------------------------------------------------
-        //
-        //  Private Properties
-        //
-        //------------------------------------------------------
 
         // true if CurrentPosition points to item within view
         private bool IsCurrentInView
@@ -2152,20 +2253,8 @@ namespace System.Windows.Data
             get { return SourceCollection as IList; }
         }
 
-#endregion Private Properties
-
-
-        //------------------------------------------------------
-        //
-        //  Private Methods
-        //
-        //------------------------------------------------------
-
-#region Private Methods
-
         private void ValidateCollectionChangedEventArgs(NotifyCollectionChangedEventArgs e)
         {
-
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -2203,7 +2292,6 @@ namespace System.Windows.Data
         /// Create, filter and sort the local index array.
         /// called from Refresh(), override in derived classes as needed.
         /// </summary>
-        /// <returns>new local array to use for this view</returns>
         private void PrepareLocalArray()
         {
             PrepareShaping();
@@ -2219,7 +2307,7 @@ namespace System.Windows.Data
             {
                 // otherwise use a private copy - either a simple list or a LiveShapingList
                 int size = list.Count;
-                IList localList = new List<object>(size);
+                var localList = new List<object>(size);
 
                 // filter the collection's array into the local array
                 for (int k = 0; k < size; ++k)
@@ -2504,7 +2592,7 @@ namespace System.Windows.Data
         private void PrepareShaping()
         {
             // sort:  prepare the comparer
-            ActiveComparer = ListCollectionView.PrepareComparer(_customSort, _sort, () => { return this; });
+            ActiveComparer = PrepareComparer(_customSort, _sort, static state => (ListCollectionView)state, this);
 
             // filter:  prepare the Predicate<object> filter
             ActiveFilter = Filter;
@@ -2552,8 +2640,6 @@ namespace System.Windows.Data
             RefreshOrDefer();
         }
 
-#region Grouping
-
         // divide the data items into groups
         void PrepareGroups()
         {
@@ -2569,14 +2655,14 @@ namespace System.Windows.Data
             }
             else
             {
-                CollectionViewGroupInternal.ListComparer ilc = _group.ActiveComparer as CollectionViewGroupInternal.ListComparer;
+                CollectionViewGroupInternal.IListComparer ilc = _group.ActiveComparer as CollectionViewGroupInternal.IListComparer;
                 if (ilc != null)
                 {
                     ilc.ResetList(InternalList);
                 }
                 else
                 {
-                    _group.ActiveComparer = new CollectionViewGroupInternal.ListComparer(InternalList);
+                    _group.ActiveComparer = new CollectionViewGroupInternal.IListComparer(InternalList);
                 }
             }
 
@@ -2690,8 +2776,6 @@ namespace System.Windows.Data
             _group.MoveWithinSubgroups(item, InternalList, oldIndex, newIndex);
         }
 
-#endregion Grouping
-
         /// <summary>
         /// Helper to raise a PropertyChanged event  />).
         /// </summary>
@@ -2699,8 +2783,6 @@ namespace System.Windows.Data
         {
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
-
-#region Deferred work
 
         // defer work until the current activity completes
         private void DeferAction(Action action)
@@ -2727,22 +2809,8 @@ namespace System.Windows.Data
             }
         }
 
-#endregion Deferred work
-
-#endregion Private Methods
-
-
-
-        //------------------------------------------------------
-        //
-        //  Private Fields
-        //
-        //------------------------------------------------------
-
-#region Private Fields
-
         private IList _internalList;
-        private CollectionViewGroupRoot _group;
+        private readonly CollectionViewGroupRoot _group;
         private bool _isGrouping;
         private IComparer _activeComparer;
         private Predicate<object> _activeFilter;
@@ -2757,10 +2825,23 @@ namespace System.Windows.Data
         private bool _isItemConstructorValid;
         private ConstructorInfo _itemConstructor;
         private List<Action> _deferredActions;
-        bool _isRemoving;
+        private bool _isRemoving;
 
         private const int _unknownIndex = -1;
-
-#endregion Private Fields
     }
+
+    /// <summary>
+    /// Represents a method that is used to provide custom logic to select the <see cref="GroupDescription"/>
+    /// based on the parent group and its level.
+    /// </summary>
+    /// <param name="group">
+    /// The parent group.
+    /// </param>
+    /// <param name="level">
+    /// The level of group.
+    /// </param>
+    /// <returns>
+    /// The <see cref="GroupDescription"/> chosen based on the parent group and its level.
+    /// </returns>
+    public delegate GroupDescription GroupDescriptionSelectorCallback(CollectionViewGroup group, int level);
 }

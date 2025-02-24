@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
@@ -227,6 +228,32 @@ public sealed class MultiBindingExpression : BindingExpressionBase
         {
             EndSourceUpdate();
         }
+    }
+
+    // Return the object from which the given value was obtained, if possible
+    internal override object GetSourceItem(object newValue)
+    {
+        if (newValue is null)
+        {
+            return null;        // this avoids false positive results
+        }
+
+        // It's impossible to find the source item in the general case - the value
+        // may have been produced by the multi-converter, combining inputs from
+        // several different sources.   But we can do it in the special case where
+        // one of the child bindings actually produced the final value, and the
+        // converter merely selected it (or did other extraneous work).
+        int count = _mutableBindingExpressions.Length;
+        for (int i = 0; i < count; i++)
+        {
+            object value = _mutableBindingExpressions[i].GetValue(null, null);
+            if (ItemsControl.EqualsEx(value, newValue))
+            {
+                return _mutableBindingExpressions[i].GetSourceItem(newValue);
+            }
+        }
+
+        return null;
     }
 
     internal override bool CanSetValue(DependencyObject d, DependencyProperty dp) => IsReflective;

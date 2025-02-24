@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace OpenSilver.Internal.Data;
 
@@ -16,10 +17,21 @@ internal sealed class SortFieldComparer : IComparer
     /// </summary>
     /// <param name="collectionView">CollectionView that contains list of property names and direction to sort by</param>
     public SortFieldComparer(ICollectionView collectionView)
+        : this(collectionView.SortDescriptions, collectionView.Culture)
     {
-        _sortFields = collectionView.SortDescriptions;
+    }
+
+    /// <summary>
+    /// Create a comparer, using the SortDescription and a Type;
+    /// tries to find a reflection PropertyInfo for each property name
+    /// </summary>
+    /// <param name="sortFields">list of property names and direction to sort by</param>
+    /// <param name="culture">culture to use for comparisons</param>
+    internal SortFieldComparer(SortDescriptionCollection sortFields, CultureInfo culture)
+    {
+        _sortFields = sortFields;
         _fields = CreatePropertyInfo(_sortFields);
-        _comparer = CultureSensitiveComparer.GetComparer(collectionView.Culture);
+        _comparer = CultureSensitiveComparer.GetComparer(culture);
     }
 
     /// <summary>

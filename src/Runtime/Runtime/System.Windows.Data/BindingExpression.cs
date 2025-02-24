@@ -680,6 +680,9 @@ namespace System.Windows.Data
             }
         }
 
+        // Return the object from which the given value was obtained, if possible
+        internal override object GetSourceItem(object newValue) => SourceItem;
+
         internal override void Update()
         {
             if (!NeedsUpdate || !IsReflective || IsInTransfer || _propertyPathWalker.IsPathBroken)

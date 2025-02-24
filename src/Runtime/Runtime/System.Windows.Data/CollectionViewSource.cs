@@ -1,39 +1,28 @@
-﻿// Copyright (C) Microsoft Corporation.  All rights reserved.
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+//
+// Description: Defines CollectionViewSource object, the markup-accessible entry
+//              point to CollectionView.
+//
 
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Globalization;
+using System.ComponentModel;
+using System.Windows.Markup;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data
 {
     /// <summary>
-    /// The XAML proxy of a collection view class.
+    /// The Extensible Application Markup Language (XAML) proxy of a <see cref="Data.CollectionView"/> class.
     /// </summary>
     public class CollectionViewSource : DependencyObject, ISupportInitialize
     {
-        #region Constructors
-
-        //
-        //  Constructors
-        //
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CollectionViewSource"/> class.
         /// </summary>
@@ -44,24 +33,14 @@ namespace System.Windows.Data
 
             _groupBy = new ObservableCollection<GroupDescription>();
             ((INotifyCollectionChanged)_groupBy).CollectionChanged += new NotifyCollectionChangedEventHandler(OnForwardedCollectionChanged);
-
-            this.CachedViews = new Dictionary<object, ViewRecord>();
         }
-
-        #endregion Constructors
-
-        #region Public Properties
-
-        //
-        //  Public Properties
-        //
 
         private static readonly DependencyPropertyKey ViewPropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(View),
                 typeof(ICollectionView),
                 typeof(CollectionViewSource),
-                new PropertyMetadata((ICollectionView)null));
+                new FrameworkPropertyMetadata((ICollectionView)null));
 
         /// <summary>
         /// Identifies the <see cref="View"/> dependency property.
@@ -74,27 +53,25 @@ namespace System.Windows.Data
         /// <returns>
         /// The view object that is currently associated with this instance of <see cref="CollectionViewSource"/>.
         /// </returns>
+        [ReadOnly(true)]
         public ICollectionView View
         {
             get
             {
-                //return GetOriginalView(CollectionView);
-                return CollectionView;
+                return GetOriginalView(CollectionView);
             }
         }
 
         /// <summary>
-        /// Identifies <see cref="CollectionViewSource.Source"/> dependency property.
+        /// Identifies the <see cref="Source"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty SourceProperty
-            = DependencyProperty.Register(
-                    "Source",
-                    typeof(object),
-                    typeof(CollectionViewSource),
-                    new PropertyMetadata(
-                            (object)null,
-                            new PropertyChangedCallback(OnSourceChanged)),
-                    new ValidateValueCallback(IsSourceValid));
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register(
+                nameof(Source),
+                typeof(object),
+                typeof(CollectionViewSource),
+                new FrameworkPropertyMetadata(null, OnSourceChanged),
+                IsSourceValid);
 
         /// <summary>
         /// Gets or sets the collection object from which to create this view.
@@ -103,17 +80,15 @@ namespace System.Windows.Data
         /// The collection object from which to create this view. The default is null.
         /// </returns>
         /// <exception cref="ArgumentException">
-        /// The specified value when setting this property is not null or an <see cref="IEnumerable"/>
-        /// implementation.-or-The specified value when setting this property is an <see cref="ICollectionView"/>
-        /// implementation.
+        /// The specified value when setting this property is not null or an <see cref="IEnumerable"/> implementation.
+        /// -or-The specified value when setting this property is an <see cref="ICollectionView"/> implementation.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// The specified value implements <see cref="ICollectionViewFactory"/> but
-        /// its <see cref="ICollectionViewFactory.CreateView"/> method returns an
-        /// <see cref="ICollectionView"/> with one or more of the following inconsistencies:<see cref="ICollectionView.CanFilter"/>
-        /// is false but <see cref="ICollectionView.Filter"/> is not null.<see cref="ICollectionView.CanSort"/>
-        /// is false but <see cref="ICollectionView.SortDescriptions"/> is not empty.<see cref="ICollectionView.CanGroup"/>
-        /// is false but <see cref="ICollectionView.GroupDescriptions"/> is not empty.
+        /// The specified value implements <see cref="ICollectionViewFactory"/> but its <see cref="ICollectionViewFactory.CreateView"/> 
+        /// method returns an <see cref="ICollectionView"/> with one or more of the following inconsistencies:
+        /// <see cref="ICollectionView.CanFilter"/> is false but <see cref="ICollectionView.Filter"/> is not null.
+        /// <see cref="ICollectionView.CanSort"/> is false but <see cref="ICollectionView.SortDescriptions"/> is not empty.
+        /// <see cref="ICollectionView.CanGroup"/> is false but <see cref="ICollectionView.GroupDescriptions"/> is not empty.
         /// </exception>
         public object Source
         {
@@ -122,7 +97,7 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        ///     Called when SourceProperty is invalidated on "d."
+        /// Called when SourceProperty is invalidated on "d."
         /// </summary>
         /// <param name="d">The object on which the property was invalidated.</param>
         /// <param name="e">Argument.</param>
@@ -135,28 +110,91 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Invoked when the <see cref="CollectionViewSource.Source"/> property changes.
+        /// Invoked when the <see cref="Source"/> property changes.
         /// </summary>
         /// <param name="oldSource">
-        /// The old value of the <see cref="CollectionViewSource.Source"/> property.
+        /// The old value of the <see cref="Source"/> property.
         /// </param>
         /// <param name="newSource">
-        /// The new value of the <see cref="CollectionViewSource.Source"/> property.
+        /// The new value of the <see cref="Source"/> property.
         /// </param>
         protected virtual void OnSourceChanged(object oldSource, object newSource)
         {
-
         }
 
         private static bool IsSourceValid(object o)
         {
-            return (o == null || o is IEnumerable) && !(o is ICollectionView);
+            return (o == null || o is IEnumerable || o is IListSource || o is DataSourceProvider) && o is not ICollectionView;
+        }
+
+        private static bool IsValidSourceForView(object o)
+        {
+            return o is IEnumerable || o is IListSource;
         }
 
         /// <summary>
-        /// Gets or sets the cultural information for any operations of the view that might
-        /// differ by culture, such as sorting.
+        /// Identifies the <see cref="CollectionViewType"/> dependency property.
         /// </summary>
+        public static readonly DependencyProperty CollectionViewTypeProperty =
+            DependencyProperty.Register(
+                nameof(CollectionViewType),
+                typeof(Type),
+                typeof(CollectionViewSource),
+                new FrameworkPropertyMetadata(null, OnCollectionViewTypeChanged),
+                IsCollectionViewTypeValid);
+
+        /// <summary>
+        /// Gets or sets the desired view type.
+        /// </summary>
+        /// <remarks>
+        /// The desired view type.
+        /// </remarks>
+        public Type CollectionViewType
+        {
+            get { return (Type)GetValue(CollectionViewTypeProperty); }
+            set { SetValueInternal(CollectionViewTypeProperty, value); }
+        }
+
+        private static void OnCollectionViewTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CollectionViewSource ctrl = (CollectionViewSource)d;
+
+            Type oldCollectionViewType = (Type)e.OldValue;
+            Type newCollectionViewType = (Type)e.NewValue;
+
+            if (!ctrl._isInitializing)
+                throw new InvalidOperationException(Strings.CollectionViewTypeIsInitOnly);
+
+            ctrl.OnCollectionViewTypeChanged(oldCollectionViewType, newCollectionViewType);
+            ctrl.EnsureView();
+        }
+
+        /// <summary>
+        /// Invoked when the <see cref="CollectionViewType"/> property changes.
+        /// </summary>
+        /// <param name="oldCollectionViewType">
+        /// The old value of the <see cref="CollectionViewType"/> property.
+        /// </param>
+        /// <param name="newCollectionViewType">
+        /// The new value of the <see cref="CollectionViewType"/> property.
+        /// </param>
+        protected virtual void OnCollectionViewTypeChanged(Type oldCollectionViewType, Type newCollectionViewType)
+        {
+        }
+
+        private static bool IsCollectionViewTypeValid(object o)
+        {
+            Type type = (Type)o;
+
+            return type == null || typeof(ICollectionView).IsAssignableFrom(type);
+        }
+
+        /// <summary>
+        /// Gets or sets the culture that is used for operations such as sorting and comparisons.
+        /// </summary>
+        /// <returns>
+        /// The culture that is used for operations such as sorting and comparisons.
+        /// </returns>
         public CultureInfo Culture
         {
             get { return _culture; }
@@ -164,34 +202,37 @@ namespace System.Windows.Data
         }
 
         /// <summary>
-        /// Gets a collection of <see cref="SortDescription"/> objects that describe
-        /// how the items in the collection are sorted in the view.
+        /// Gets or sets a collection of <see cref="SortDescription"/> objects that describes how the items in the 
+        /// collection are sorted in the view.
         /// </summary>
+        /// <returns>
+        /// A collection of <see cref="SortDescription"/> objects that describes how the items in the collection are 
+        /// sorted in the view.
+        /// </returns>
         public SortDescriptionCollection SortDescriptions
         {
             get { return _sort; }
         }
 
         /// <summary>
-        /// Gets a collection of <see cref="GroupDescription"/> objects that describe
-        /// how items in the collection are grouped in the view.
+        /// Gets or sets a collection of <see cref="GroupDescription"/> objects that describes how the items in the 
+        /// collection are grouped in the view.
         /// </summary>
+        /// <returns>
+        /// An <see cref="ObservableCollection{T}"/> of <see cref="GroupDescription"/> objects that describes how the 
+        /// items in the collection are grouped in the view.
+        /// </returns>
         public ObservableCollection<GroupDescription> GroupDescriptions
         {
             get { return _groupBy; }
         }
 
-        #endregion Public Properties
-
-        #region Public Events
-
         /// <summary>
         /// Provides filtering logic.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        /// When adding a handler to this event, the <see cref="CollectionViewSource.View"/>
-        /// property value has a <see cref="ICollectionView.CanFilter"/> property
-        /// value of false.
+        /// When adding a handler to this event, the <see cref="View"/> property value has a <see cref="ICollectionView.CanFilter"/> 
+        /// property value of false.
         /// </exception>
         public event FilterEventHandler Filter
         {
@@ -237,26 +278,59 @@ namespace System.Windows.Data
             }
         }
 
-        #endregion Public Events
+        /// <summary>
+        /// Returns the default view for the given source.
+        /// </summary>
+        /// <param name="source">
+        /// An object reference to the binding source.
+        /// </param>
+        /// <returns>
+        /// Returns an <see cref="ICollectionView"/> object that is the default view for the given source collection.
+        /// </returns>
+        public static ICollectionView GetDefaultView(object source)
+        {
+            return GetOriginalView(GetDefaultCollectionView(source, true));
+        }
 
-        #region Public Methods
+        // a version of the previous method that doesn't create the view (bug 108595)
+        private static ICollectionView LazyGetDefaultView(object source)
+        {
+            return GetOriginalView(GetDefaultCollectionView(source, false));
+        }
 
         /// <summary>
-        /// Enters a defer cycle that you can use to merge changes to the view and delay
-        /// automatic refresh.
+        /// Returns a value that indicates whether the given view is the default view for the <see cref="Source"/> collection.
         /// </summary>
+        /// <param name="view">
+        /// The view object to check.
+        /// </param>
+        /// <returns>
+        /// true if the given view is the default view for the <see cref="Source"/> collection or if the given view is null; 
+        /// otherwise, false.
+        /// </returns>
+        public static bool IsDefaultView(ICollectionView view)
+        {
+            if (view != null)
+            {
+                object source = view.SourceCollection;
+                return GetOriginalView(view) == LazyGetDefaultView(source);
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Enters a defer cycle that you can use to merge changes to the view and delay automatic refresh.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IDisposable"/> object that you can use to dispose of the calling object.
+        /// </returns>
         public IDisposable DeferRefresh()
         {
             return new DeferHelper(this);
         }
-
-        #endregion Public Methods
-
-        //
-        //  Interfaces
-        //
-
-        #region ISupportInitialize
 
         /// <summary>
         /// Signals the object that initialization is starting.
@@ -275,35 +349,9 @@ namespace System.Windows.Data
             EnsureView();
         }
 
-        #endregion ISupportInitialize
-
-        #region Protected Methods
-
-        /// <summary>
-        /// Invoked when the collection view type changes.
-        /// </summary>
-        /// <param name="oldCollectionViewType">
-        /// The old collection view type.
-        /// </param>
-        /// <param name="newCollectionViewType">
-        /// The new collection view type.
-        /// </param>
-        protected virtual void OnCollectionViewTypeChanged(Type oldCollectionViewType, Type newCollectionViewType)
-        {
-
-        }
-
-        #endregion Protected Methods
-
-        #region Internal Properties
-
-        //
-        //  Internal Properties
-        //
-
         // Returns the CollectionView currently affiliate with this CollectionViewSource.
         // This may be a CollectionViewProxy over the original view.
-        internal ICollectionView CollectionView
+        internal CollectionView CollectionView
         {
             get
             {
@@ -314,10 +362,18 @@ namespace System.Windows.Data
                     // leak prevention: re-fetch ViewRecord instead of keeping a reference to it,
                     // to be sure that we don't inadvertently keep it alive.
                     object source = Source;
+                    DataSourceProvider dataProvider = source as DataSourceProvider;
+
+                    // if the source is DataSourceProvider, use its Data instead
+                    if (dataProvider != null)
+                    {
+                        source = dataProvider.Data;
+                    }
 
                     if (source != null)
                     {
-                        ViewRecord viewRecord = GetViewRecord(source);
+                        DataBindEngine engine = DataBindEngine.CurrentDataBindEngine;
+                        ViewRecord viewRecord = engine.GetViewRecord(source, this, CollectionViewType, true, null);
                         if (viewRecord != null)
                         {
                             viewRecord.InitializeView();
@@ -326,41 +382,111 @@ namespace System.Windows.Data
                     }
                 }
 
-                return view;
+                return (CollectionView)view;
             }
         }
 
-        #endregion Internal Properties
-
-        #region Private Properties
-
-        private IDictionary<object, ViewRecord> CachedViews
+        // Return the default view for the given source.  This view is never
+        // affiliated with any CollectionViewSource.  It may be a
+        // CollectionViewProxy over the original view
+        internal static CollectionView GetDefaultCollectionView(object source, bool createView, Func<object, object> GetSourceItem = null)
         {
-            get;
+            if (!IsValidSourceForView(source))
+                return null;
+
+            DataBindEngine engine = DataBindEngine.CurrentDataBindEngine;
+            ViewRecord viewRecord = engine.GetViewRecord(source, DefaultSource, null, createView, GetSourceItem);
+
+            return (viewRecord != null) ? (CollectionView)viewRecord.View : null;
         }
 
-        #endregion Private Properties
+        /// <summary>
+        /// Return the default view for the given source.  This view is never
+        /// affiliated with any CollectionViewSource.  The internal version sets
+        /// the culture on the view from the xml:Lang of the host object.
+        /// </summary>
+        internal static CollectionView GetDefaultCollectionView(object source, DependencyObject d, Func<object, object> GetSourceItem = null)
+        {
+            CollectionView view = GetDefaultCollectionView(source, true, GetSourceItem);
 
-        #region Private Methods
+            // at first use of a view, set its culture from the xml:lang of the
+            // element that's using the view
+            if (view != null && view.Culture == null)
+            {
+                XmlLanguage language = (d != null) ? (XmlLanguage)d.GetValue(FrameworkElement.LanguageProperty) : null;
+                if (language != null)
+                {
+                    try
+                    {
+                        view.Culture = language.GetSpecificCulture();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+                }
+            }
+
+            return view;
+        }
 
         // Obtain the view affiliated with the current source.  This may create
         // a new view, or re-use an existing one.
         private void EnsureView()
         {
-            EnsureView(Source);
+            EnsureView(Source, CollectionViewType);
         }
 
-        private void EnsureView(object source)
+        private void EnsureView(object source, Type collectionViewType)
         {
             if (_isInitializing || _deferLevel > 0)
                 return;
+
+            DataSourceProvider dataProvider = source as DataSourceProvider;
+
+            // listen for DataChanged events from an DataSourceProvider
+            if (dataProvider != _dataProvider)
+            {
+                if (_dataProvider != null)
+                {
+                    if (_dataChangedListener != null)
+                    {
+                        _dataChangedListener.Detach();
+                        _dataChangedListener = null;
+                    }
+                }
+
+                _dataProvider = dataProvider;
+
+                if (_dataProvider != null)
+                {
+                    _dataChangedListener = new WeakEventListener<CollectionViewSource, DataSourceProvider, EventArgs>(this, _dataProvider)
+                    {
+                        OnEventAction = static (instance, sender, args) => instance.OnDataChanged(sender, args),
+                        OnDetachAction = static (listener, source) => source.DataChanged -= listener.OnEvent,
+                    };
+                    _dataProvider.DataChanged += _dataChangedListener.OnEvent;
+                    _dataProvider.InitialLoad();
+                }
+            }
+
+            // if the source is DataSourceProvider, use its Data instead
+            if (dataProvider != null)
+            {
+                source = dataProvider.Data;
+            }
 
             // get the view
             ICollectionView view = null;
 
             if (source != null)
             {
-                ViewRecord viewRecord = GetViewRecord(source);
+                DataBindEngine engine = DataBindEngine.CurrentDataBindEngine;
+                ViewRecord viewRecord = engine.GetViewRecord(source, this, collectionViewType, true,
+                    (object x) =>
+                    {
+                        BindingExpressionBase beb = BindingOperations.GetBindingExpressionBase(this, SourceProperty);
+                        return beb?.GetSourceItem(x);
+                    });
 
                 if (viewRecord != null)
                 {
@@ -378,70 +504,6 @@ namespace System.Windows.Data
 
             // update the View property
             SetValueInternal(ViewPropertyKey, view);
-        }
-
-        private ViewRecord GetViewRecord(object source)
-        {
-            // Order of precendence in acquiring the View:
-            // 1) If the CollectionView for this collection has been cached, then
-            //    return the cached instance.
-            // 2) If the collection is an ICollectionViewFactory use ICVF.CreateView()
-            //    from the collection
-            // 3) If the collection is an IList return a new ListCollectionView
-            // 4) If the collection is an IEnumerable, return a new EnumerableCollectionView
-            // 5) return null
-
-            // if the view already exists, just return it
-            ViewRecord viewRecord = GetExistingViewRecord(source);
-            if (viewRecord != null)
-            {
-                return viewRecord;
-            }
-
-            ICollectionView icv = null;
-
-            ICollectionViewFactory icvf = source as ICollectionViewFactory;
-            if (icvf != null)
-            {
-                // collection is a view factory - call its factory method
-                icv = icvf.CreateView();
-            }
-            else
-            {
-                // collection is not a factory - create an appropriate view
-                IList il = source as IList;
-                if (il != null)
-                {
-                    icv = new ListCollectionView(il);
-                }
-                else
-                {
-                    // collection is not IList, wrap it
-                    IEnumerable ie = source as IEnumerable;
-                    if (ie != null)
-                    {
-                        icv = new EnumerableCollectionView(ie);
-                    }
-                }
-            }
-
-            // if we got a view, add it to the tables
-            if (icv != null)
-            {
-                viewRecord = new ViewRecord(icv);
-                this.CachedViews[source] = viewRecord;
-            }
-
-            return viewRecord;
-        }
-
-        private ViewRecord GetExistingViewRecord(object source)
-        {
-            if (this.CachedViews.ContainsKey(source))
-            {
-                return this.CachedViews[source];
-            }
-            return null;
         }
 
         // Forward properties from the CollectionViewSource to the CollectionView
@@ -504,6 +566,19 @@ namespace System.Windows.Data
             }
         }
 
+        // return the original (un-proxied) view for the given view
+        private static ICollectionView GetOriginalView(ICollectionView view)
+        {
+            for (CollectionViewProxy proxy = view as CollectionViewProxy;
+                    proxy != null;
+                    proxy = view as CollectionViewProxy)
+            {
+                view = proxy.ProxiedView;
+            }
+
+            return view;
+        }
+
         private Predicate<object> FilterWrapper
         {
             get
@@ -530,6 +605,11 @@ namespace System.Windows.Data
             return args.Accepted;
         }
 
+        private void OnDataChanged(object sender, EventArgs e)
+        {
+            EnsureView();
+        }
+
         // a change occurred in one of the collections that we forward to the view
         private void OnForwardedCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -541,8 +621,7 @@ namespace System.Windows.Data
         {
             // increment the version number.  This causes the change to get applied
             // to dormant views when they become active.
-            unchecked
-            { ++_version; }
+            unchecked { ++_version; }
 
             // apply the change to the current view
             ApplyPropertiesToView(View);
@@ -562,15 +641,7 @@ namespace System.Windows.Data
             }
         }
 
-#endregion Private Methods
-
-#region Private Types
-
-        //
-        //  Private Types
-        //
-
-        private class DeferHelper : IDisposable
+        private sealed class DeferHelper : IDisposable
         {
             public DeferHelper(CollectionViewSource target)
             {
@@ -597,7 +668,7 @@ namespace System.Windows.Data
         // app adds a handler (belonging to the Window or Page) to the Filter
         // event.  This class uses a weak reference to the CollectionViewSource
         // to break the chain and avoid a leak (bug 123012)
-        private class FilterStub
+        private sealed class FilterStub
         {
             public FilterStub(CollectionViewSource parent)
             {
@@ -622,64 +693,22 @@ namespace System.Windows.Data
             private readonly WeakReference<CollectionViewSource> _parent;
         }
 
-#endregion Private Types
-
-#region Private Data
-
-        //
-        //  Private Data
-        //
-
         // properties that get forwarded to the view
-        CultureInfo _culture;
-        SortDescriptionCollection _sort;
-        ObservableCollection<GroupDescription> _groupBy;
+        private CultureInfo _culture;
+        private readonly SortDescriptionCollection _sort;
+        private readonly ObservableCollection<GroupDescription> _groupBy;
 
         // other state
-        bool _isInitializing;
-        bool _isViewInitialized; // view is initialized when it is first retrieved externally
-        int _version;       // timestamp of last change to a forwarded property
-        int _deferLevel;    // counts nested calls to BeginDefer
-        FilterStub _filterStub;    // used to support the Filter event
+        private bool _isInitializing;
+        private bool _isViewInitialized; // view is initialized when it is first retrieved externally
+        private int _version;       // timestamp of last change to a forwarded property
+        private int _deferLevel;    // counts nested calls to BeginDefer
+        private DataSourceProvider _dataProvider;  // DataSourceProvider whose DataChanged event we want
+        private FilterStub _filterStub;    // used to support the Filter event
+        private FilterEventHandler _filterHandlers; // Store the handlers for the Filter event
+        private WeakEventListener<CollectionViewSource, DataSourceProvider, EventArgs> _dataChangedListener;
 
-        // Store the handlers for the Filter event
-        private FilterEventHandler _filterHandlers;
-
-        #endregion Private Data
-    }
-
-    internal sealed class ViewRecord
-    {
-        internal ViewRecord(ICollectionView view)
-        {
-            _view = view;
-            _version = -1;
-        }
-
-        internal ICollectionView View
-        {
-            get { return _view; }
-        }
-
-        internal int Version
-        {
-            get { return _version; }
-            set { _version = value; }
-        }
-
-        internal bool IsInitialized
-        {
-            get { return _isInitialized; }
-        }
-
-        internal void InitializeView()
-        {
-            _view.MoveCurrentToFirst();
-            _isInitialized = true;
-        }
-
-        ICollectionView _view;
-        int _version;
-        bool _isInitialized = false;
+        // the placeholder source for all default views
+        private static readonly CollectionViewSource DefaultSource = new CollectionViewSource();
     }
 }

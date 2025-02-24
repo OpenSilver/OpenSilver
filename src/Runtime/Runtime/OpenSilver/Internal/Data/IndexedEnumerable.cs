@@ -1,13 +1,18 @@
-﻿// Copyright (C) 2003 by Microsoft Corporation.  All rights reserved.
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+//
+// Description: offers optimistic indexer, i.e. this[int index] { get; }
+//      for a collection implementing IEnumerable, assuming that after an initial request
+//      to read item[N], the following indices will be a sequence for index N+1, N+2 etc.
+//
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace OpenSilver.Internal.Data
@@ -26,12 +31,6 @@ namespace OpenSilver.Internal.Data
     /// </remarks>
     internal sealed class IndexedEnumerable : IEnumerable
     {
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
-
         /// <summary>
         /// Initialize indexer with IEnumerable.
         /// </summary>
@@ -56,16 +55,15 @@ namespace OpenSilver.Internal.Data
                 INotifyCollectionChanged icc = collection as INotifyCollectionChanged;
                 if (icc != null)
                 {
-                    icc.CollectionChanged += new NotifyCollectionChangedEventHandler(OnCollectionChanged);
+                    _collectionChangedListener = new WeakEventListener<IndexedEnumerable, INotifyCollectionChanged, NotifyCollectionChangedEventArgs>(this, icc)
+                    {
+                        OnEventAction = static (instance, source, args) => instance.OnCollectionChanged(source, args),
+                        OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                    };
+                    icc.CollectionChanged += _collectionChangedListener.OnEvent;
                 }
             }
         }
-
-        //------------------------------------------------------
-        //
-        //  Internal Properties/Methods
-        //
-        //------------------------------------------------------
 
         /// <summary> Determines the index of a specific value in the collection. </summary>
         ///<remarks>if a FilterCallback is set, it will be reflected in the returned index</remarks>
@@ -178,10 +176,7 @@ namespace OpenSilver.Internal.Data
                 _cachedIsEmpty = !ie.MoveNext();
 
                 IDisposable d = ie as IDisposable;
-                if (d != null)
-                {
-                    d.Dispose();
-                }
+                d?.Dispose();
 
                 if (_cachedIsEmpty.Value)
                     _cachedCount = 0;
@@ -209,7 +204,7 @@ namespace OpenSilver.Internal.Data
 
                 if (index < 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index)); // validating the index argument
+                    throw new ArgumentOutOfRangeException(nameof(index));
                 }
 
                 int moveBy = (index - _cachedIndex);
@@ -335,7 +330,11 @@ namespace OpenSilver.Internal.Data
                 INotifyCollectionChanged icc = Enumerable as INotifyCollectionChanged;
                 if (icc != null)
                 {
-                    icc.CollectionChanged -= new NotifyCollectionChangedEventHandler(OnCollectionChanged);
+                    if (_collectionChangedListener != null)
+                    {
+                        _collectionChangedListener.Detach();
+                        _collectionChangedListener = null;
+                    }
                 }
             }
 
@@ -346,12 +345,6 @@ namespace OpenSilver.Internal.Data
             _list = null;
             _filterCallback = null;
         }
-
-        //------------------------------------------------------
-        //
-        //  Private Members
-        //
-        //------------------------------------------------------
 
         private Predicate<object> FilterCallback
         {
@@ -392,7 +385,7 @@ namespace OpenSilver.Internal.Data
                 {
                     Debug.Assert(false, "EnsureCacheCurrent: _enumerator.Current failed with InvalidOperationException");
                 }
-                Debug.Assert(ItemsControl.EqualsEx(_cachedItem, current), "EnsureCacheCurrent: _cachedItem out of sync with _enumerator.Current");
+                Debug.Assert(System.Windows.Controls.ItemsControl.EqualsEx(_cachedItem, current), "EnsureCacheCurrent: _cachedItem out of sync with _enumerator.Current");
             }
 #endif // DEBUG
             return isCacheCurrent;
@@ -427,8 +420,7 @@ namespace OpenSilver.Internal.Data
         {
             // if _enumeratorVersion exceeds MaxValue, then it
             // will roll back to MinValue, and continue on from there.
-            unchecked
-            { ++_enumeratorVersion; }
+            unchecked { ++_enumeratorVersion; }
 
             DisposeEnumerator(ref _changeTracker);
             _changeTracker = _enumerable.GetEnumerator();
@@ -442,8 +434,7 @@ namespace OpenSilver.Internal.Data
         {
             // if _enumeratorVersion exceeds MaxValue, then it
             // will roll back to MinValue, and continue on from there.
-            unchecked
-            { ++_enumeratorVersion; }
+            unchecked { ++_enumeratorVersion; }
 
             DisposeEnumerator(ref _enumerator);
             ClearAllCaches();
@@ -452,10 +443,7 @@ namespace OpenSilver.Internal.Data
         private void DisposeEnumerator(ref IEnumerator ie)
         {
             IDisposable d = ie as IDisposable;
-            if (d != null)
-            {
-                d.Dispose();
-            }
+            d?.Dispose();
 
             ie = null;
         }
@@ -652,22 +640,10 @@ namespace OpenSilver.Internal.Data
             return isNativeValue;
         }
 
-        //------------------------------------------------------
-        //
-        //  Event handlers
-        //
-        //------------------------------------------------------
-
         void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             InvalidateEnumerator();
         }
-
-        //------------------------------------------------------
-        //
-        //  Private Members
-        //
-        //------------------------------------------------------
 
         private IEnumerable _enumerable;
         private IEnumerator _enumerator;
@@ -689,12 +665,9 @@ namespace OpenSilver.Internal.Data
 
         private Predicate<object> _filterCallback;
 
-        //------------------------------------------------------
-        //
-        //  Private Types
-        //
-        //------------------------------------------------------
-        private class FilteredEnumerator : IEnumerator, IDisposable
+        private WeakEventListener<IndexedEnumerable, INotifyCollectionChanged, NotifyCollectionChangedEventArgs> _collectionChangedListener;
+
+        private sealed class FilteredEnumerator : IEnumerator, IDisposable
         {
             public FilteredEnumerator(IndexedEnumerable indexedEnumerable, IEnumerable enumerable, Predicate<object> filterCallback)
             {
@@ -726,8 +699,7 @@ namespace OpenSilver.Internal.Data
                 }
                 else
                 {
-                    while ((returnValue = _enumerator.MoveNext()) && !_filterCallback(_enumerator.Current))
-                        ;
+                    while ((returnValue = _enumerator.MoveNext()) && !_filterCallback(_enumerator.Current)) ;
                 }
 
                 return returnValue;
@@ -744,10 +716,7 @@ namespace OpenSilver.Internal.Data
             public void Dispose()
             {
                 IDisposable d = _enumerator as IDisposable;
-                if (d != null)
-                {
-                    d.Dispose();
-                }
+                d?.Dispose();
                 _enumerator = null;
             }
 

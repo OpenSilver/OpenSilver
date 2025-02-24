@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
-using System.Windows.Controls;
 using System.Windows.Input;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
@@ -284,6 +283,9 @@ public abstract class BindingExpressionBase : Expression
     }
 
     internal virtual void Update() { }
+
+    // Return the object from which the given value was obtained, if possible
+    internal abstract object GetSourceItem(object newValue);
 
     /// <summary>
     /// Create a format that is suitable for String.Format

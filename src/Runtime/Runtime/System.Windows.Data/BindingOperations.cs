@@ -11,8 +11,10 @@
 *  
 \*====================================================================================*/
 
+using System.Collections;
 using System.Collections.Generic;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 
 namespace System.Windows.Data;
 
@@ -325,4 +327,116 @@ public static class BindingOperations
                storage.Entry.IsExpression &&
                storage.Entry.ModifiedValue.BaseValue is BindingExpressionBase;
     }
+
+    /// <summary>
+    /// Enables a <see cref="CollectionView"/> object to participate in synchronized access to a collection 
+    /// used on multiple threads by using a mechanism other than a simple lock.
+    /// </summary>
+    /// <param name="collection">
+    /// The collection that needs synchronized access.
+    /// </param>
+    /// <param name="context">
+    /// An object that is passed to the callback.
+    /// </param>
+    /// <param name="synchronizationCallback">
+    /// The callback that is invoked whenever access to the collection is required. You can use it to ensure 
+    /// that the collection is accessed by one thread at a time.
+    /// </param>
+    public static void EnableCollectionSynchronization(IEnumerable collection, object context, CollectionSynchronizationCallback synchronizationCallback)
+    {
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+
+        if (synchronizationCallback is null)
+        {
+            throw new ArgumentNullException(nameof(synchronizationCallback));
+        }
+
+        ViewManager.Current.RegisterCollectionSynchronizationCallback(
+            collection, context, synchronizationCallback);
+    }
+
+    /// <summary>
+    /// Enables a <see cref="CollectionView"/> object to participate in synchronized access to a collection 
+    /// used on multiple threads by using a simple locking mechanism.
+    /// </summary>
+    /// <param name="collection">
+    /// The collection that needs synchronized access.
+    /// </param>
+    /// <param name="lockObject">
+    /// The object to lock when accessing the collection.
+    /// </param>
+    public static void EnableCollectionSynchronization(IEnumerable collection, object lockObject)
+    {
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+
+        if (lockObject is null)
+        {
+            throw new ArgumentNullException(nameof(lockObject));
+        }
+
+        ViewManager.Current.RegisterCollectionSynchronizationCallback(
+            collection, lockObject, null);
+    }
+
+    /// <summary>
+    /// Remove the synchronization registered for the specified collection.
+    /// </summary>
+    /// <param name="collection">
+    /// The collection to remove synchronized access from.
+    /// </param>
+    public static void DisableCollectionSynchronization(IEnumerable collection)
+    {
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+
+        ViewManager.Current.RegisterCollectionSynchronizationCallback(
+            collection, null, null);
+    }
+
+    /// <summary>
+    /// Provides access to a collection by using the synchronization mechanism that the application specified 
+    /// when it called EnableCollectionSynchronization.
+    /// </summary>
+    /// <param name="collection">
+    /// The collection to access.
+    /// </param>
+    /// <param name="accessMethod">
+    /// The action to perform on the collection.
+    /// </param>
+    /// <param name="writeAccess">
+    /// true if accessMethod will write to the collection; otherwise, false.
+    /// </param>
+    public static void AccessCollection(IEnumerable collection, Action accessMethod, bool writeAccess)
+    {
+        ViewManager vm = ViewManager.Current ??
+            throw new InvalidOperationException(string.Format(Strings.AccessCollectionAfterShutDown, collection));
+
+        vm.AccessCollection(collection, accessMethod, writeAccess);
+    }
+
+    /// <summary>
+    /// Occurs when the data-binding system notices a collection.
+    /// </summary>
+    public static event EventHandler<CollectionRegisteringEventArgs> CollectionRegistering;
+
+    /// <summary>
+    /// Occurs when the data-binding system notices a collection view.
+    /// </summary>
+    public static event EventHandler<CollectionViewRegisteringEventArgs> CollectionViewRegistering;
+
+    // Raise the CollectionRegistering event
+    internal static void OnCollectionRegistering(IEnumerable collection, object parent) =>
+        CollectionRegistering?.Invoke(null, new CollectionRegisteringEventArgs(collection, parent));
+
+    // Raise the CollectionViewRegistering event
+    internal static void OnCollectionViewRegistering(CollectionView view) =>
+        CollectionViewRegistering?.Invoke(null, new CollectionViewRegisteringEventArgs(view));
 }

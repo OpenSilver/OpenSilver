@@ -61,6 +61,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AccessCollection for &apos;{0}&apos; collection cannot be called after shutdown..
+        /// </summary>
+        internal static string AccessCollectionAfterShutDown {
+            get {
+                return ResourceManager.GetString("AccessCollectionAfterShutDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added item does not appear at given index &apos;{0}&apos;..
         /// </summary>
         internal static string AddedItemNotAtIndex {
@@ -133,6 +142,24 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Underlying list of this CollectionView does not support filtering..
+        /// </summary>
+        internal static string BindingListCannotCustomFilter {
+            get {
+                return ResourceManager.GetString("BindingListCannotCustomFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IBindingList can sort by only one property..
+        /// </summary>
+        internal static string BindingListCanOnlySortByOneProperty {
+            get {
+                return ResourceManager.GetString("BindingListCanOnlySortByOneProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CancelEdit is not supported for the current edit item..
         /// </summary>
         internal static string CancelEditNotSupported {
@@ -165,6 +192,15 @@ namespace OpenSilver.Internal {
         internal static string CannotChangeAfterSealed {
             get {
                 return ResourceManager.GetString("CannotChangeAfterSealed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find type information on collection; property names to SortBy cannot be resolved..
+        /// </summary>
+        internal static string CannotDetermineSortByPropertiesForCollection {
+            get {
+                return ResourceManager.GetString("CannotDetermineSortByPropertiesForCollection", resourceCulture);
             }
         }
         
@@ -345,6 +381,51 @@ namespace OpenSilver.Internal {
         internal static string CollectionChangeIndexOutOfRange {
             get {
                 return ResourceManager.GetString("CollectionChangeIndexOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Synchronization callback for &apos;{0}&apos; collection is no longer available.\n This could happen if the callback is an anonymous method..
+        /// </summary>
+        internal static string CollectionView_MissingSynchronizationCallback {
+            get {
+                return ResourceManager.GetString("CollectionView_MissingSynchronizationCallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot get CollectionView of type &apos;{0}&apos; for CollectionViewSource that already uses type &apos;{1}&apos;..
+        /// </summary>
+        internal static string CollectionView_NameTypeDuplicity {
+            get {
+                return ResourceManager.GetString("CollectionView_NameTypeDuplicity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; does not have a constructor that accepts collection type &apos;{1}&apos;..
+        /// </summary>
+        internal static string CollectionView_ViewTypeInsufficient {
+            get {
+                return ResourceManager.GetString("CollectionView_ViewTypeInsufficient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; type is not a CollectionView type..
+        /// </summary>
+        internal static string CollectionView_WrongType {
+            get {
+                return ResourceManager.GetString("CollectionView_WrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CollectionViewType property can only be set during initialization..
+        /// </summary>
+        internal static string CollectionViewTypeIsInitOnly {
+            get {
+                return ResourceManager.GetString("CollectionViewTypeIsInitOnly", resourceCulture);
             }
         }
         
@@ -615,6 +696,15 @@ namespace OpenSilver.Internal {
         internal static string ImplementOtherMembersWithSort {
             get {
                 return ResourceManager.GetString("ImplementOtherMembersWithSort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IBindingList &apos;{0}&apos; has unexpected length after a &apos;{1}&apos; event.\nThis can happen if the IBindingList has been changed without raising a corresponding ListChanged event..
+        /// </summary>
+        internal static string InconsistentBindingList {
+            get {
+                return ResourceManager.GetString("InconsistentBindingList", resourceCulture);
             }
         }
         
@@ -916,6 +1006,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This type of CollectionView does not support changes to its SourceCollection from a thread different from the Dispatcher thread..
+        /// </summary>
+        internal static string MultiThreadedCollectionChangeNotSupported {
+            get {
+                return ResourceManager.GetString("MultiThreadedCollectionChangeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can only base on a Style with target type that is base type &apos;{0}&apos;..
         /// </summary>
         internal static string MustBaseOnStyleOfABaseType {
@@ -1137,6 +1236,15 @@ namespace OpenSilver.Internal {
         internal static string PropertyPathIndexWrongType {
             get {
                 return ResourceManager.GetString("PropertyPathIndexWrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; type does not have property named &apos;{1}&apos;, so cannot sort data collection..
+        /// </summary>
+        internal static string PropertyToSortByNotFoundOnType {
+            get {
+                return ResourceManager.GetString("PropertyToSortByNotFoundOnType", resourceCulture);
             }
         }
         
