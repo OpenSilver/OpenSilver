@@ -38,6 +38,7 @@ namespace System.Windows.Data
 
         private DependencyPropertyChangedListener _dataContextListener;
         private DependencyPropertyChangedListener _cvsListener;
+        private WeakEventListener<BindingExpression, DataSourceProvider, EventArgs> _dspDataChangedListener;
         private WeakEventListener<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs> _sourceErrorsChangedListener;
         private WeakEventListener<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs> _valueErrorsChangedListener;
         private INotifyDataErrorInfo _dataErrorSource;
@@ -341,10 +342,26 @@ namespace System.Windows.Data
                         _cvsListener = null;
                     }
 
+                    if (_dspDataChangedListener != null)
+                    {
+                        _dspDataChangedListener.Detach();
+                        _dspDataChangedListener = null;
+                    }
+
                     if (value is CollectionViewSource cvs)
                     {
                         _cvsListener = new DependencyPropertyChangedListener(cvs, CollectionViewSource.ViewProperty, OnCollectionViewSourceViewChanged);
                         _bindingSource = cvs.View;
+                    }
+                    else if (value is DataSourceProvider dsp)
+                    {
+                        _dspDataChangedListener = new WeakEventListener<BindingExpression, DataSourceProvider, EventArgs>(this, dsp)
+                        {
+                            OnEventAction = static (instance, source, args) => instance.OnDataChanged(source, args),
+                            OnDetachAction = static (listener, source) => source.DataChanged -= listener.OnEvent,
+                        };
+                        dsp.DataChanged += _dspDataChangedListener.OnEvent;
+                        _bindingSource = dsp.Data;
                     }
                 }
             }
@@ -353,7 +370,14 @@ namespace System.Windows.Data
         private void OnCollectionViewSourceViewChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
             _bindingSource = args.NewValue;
+            _propertyPathWalker.AttachDataItem(BindingSource, true);
+        }
 
+        private void OnDataChanged(object sender, EventArgs e)
+        {
+            var dsp = (DataSourceProvider)sender;
+
+            _bindingSource = dsp.Data;
             _propertyPathWalker.AttachDataItem(BindingSource, true);
         }
 

@@ -332,12 +332,23 @@ public class Binding : BindingBase
     public static bool IsDebuggingEnabled;
 
     /// <summary>
-    /// Gets or sets a value that indicates whether the binding ignores any <see cref="ICollectionView"/>
-    /// settings on the data source.
+    /// Gets or sets a value that indicates whether to evaluate the <see cref="Path"/> relative to the data 
+    /// item or the <see cref="DataSourceProvider"/> or <see cref="CollectionViewSource"/> object.
     /// </summary>
     /// <returns>
-    /// true if the binding binds directly to the data source; otherwise, false.
+    /// false to evaluate the path relative to the data item itself; otherwise, true. The default is false.
     /// </returns>
+    /// <remarks>
+    /// The normal behavior (when this property is false) includes special treatment for <see cref="DataSourceProvider"/>
+    /// and <see cref="CollectionViewSource"/> objects. In the first case, the binding engine evaluates the 
+    /// <see cref="Path"/> relative to the object obtained from the <see cref="DataSourceProvider.Data"/> 
+    /// property. In addition, the binding listens for the <see cref="DataSourceProvider.DataChanged"/> event 
+    /// and reacts accordingly. In the second case, the binding engine evaluates the <see cref="Path"/> relative 
+    /// to the object obtained from the <see cref="CollectionViewSource.View"/> property. In addition, the binding 
+    /// listens for changes to the the <see cref="CollectionViewSource.ViewProperty"/> dependency property and 
+    /// reacts accordingly. Setting this property to true overrides this behavior and gives the binding access to
+    /// properties of the <see cref="DataSourceProvider"/> or <see cref="CollectionViewSource"/> object itself.
+    /// </remarks>
     public bool BindsDirectlyToSource
     {
         get { return _bindsDirectlyToSource; }

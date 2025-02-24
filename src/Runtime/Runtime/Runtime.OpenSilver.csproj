@@ -106,6 +106,7 @@
     <Compile Include="System.Windows.Controls\TreeViewItem.cs" />
     <Compile Include="System.Windows.Controls\VisualStates.cs" />
     <Compile Include="System.Windows.Data\GroupDescriptionSelectorCallback.cs" />
+    <Compile Include="System.Windows.Data\DataSourceProvider.cs" />
     <Compile Include="System.Windows.Data\IMultiValueConverter.cs" />
     <Compile Include="System.Windows.Data\MultiBinding.cs" />
     <Compile Include="System.Windows.Data\MultiBindingExpression.cs" />
