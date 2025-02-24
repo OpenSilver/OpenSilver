@@ -208,7 +208,7 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
     internal static void SetTemplateNameScope(DependencyObject templatedParent, INameScope namescope)
     {
         Debug.Assert(templatedParent is IFrameworkElement);
-        templatedParent.SetValue(TemplateNameScopeProperty, namescope);
+        templatedParent.SetValueInternal(TemplateNameScopeProperty, namescope);
     }
 
     bool ISealable.CanSeal => true;

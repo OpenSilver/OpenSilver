@@ -692,7 +692,7 @@ namespace System.Windows
         internal Transform VisualTransform
         {
             get => (Transform)GetValue(VisualTransformProperty);
-            set => SetValue(VisualTransformProperty, value);
+            set => SetValueInternal(VisualTransformProperty, value);
         }
 
         private static void OnVisualTransformChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

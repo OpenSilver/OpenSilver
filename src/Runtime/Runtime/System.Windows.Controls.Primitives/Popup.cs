@@ -799,7 +799,7 @@ namespace System.Windows.Controls.Primitives
             if (placementTarget.GetValue(RegisteredPopupsField) is not List<Popup> registeredPopups)
             {
                 registeredPopups = new(1);
-                placementTarget.SetValue(RegisteredPopupsField, registeredPopups);
+                placementTarget.SetValueInternal(RegisteredPopupsField, registeredPopups);
             }
 
             if (!registeredPopups.Contains(popup))

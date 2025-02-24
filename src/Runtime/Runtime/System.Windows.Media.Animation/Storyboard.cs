@@ -646,7 +646,7 @@ public sealed class Storyboard : Timeline
         if (clocks is null)
         {
             clocks = new();
-            o.SetValue(StoryboardClockTreesField, clocks);
+            o.SetValueInternal(StoryboardClockTreesField, clocks);
         }
 
         clocks[this] = clock.WeakReference;

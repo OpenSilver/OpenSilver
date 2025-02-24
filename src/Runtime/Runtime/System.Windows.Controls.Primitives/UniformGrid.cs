@@ -44,7 +44,7 @@ namespace System.Windows.Controls.Primitives
         public int FirstColumn
         {
             get { return (int)GetValue(FirstColumnProperty); }
-            set { SetValue(FirstColumnProperty, value); }
+            set { SetValueInternal(FirstColumnProperty, value); }
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace System.Windows.Controls.Primitives
         public int Columns
         {
             get { return (int)GetValue(ColumnsProperty); }
-            set { SetValue(ColumnsProperty, value); }
+            set { SetValueInternal(ColumnsProperty, value); }
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace System.Windows.Controls.Primitives
         public int Rows
         {
             get { return (int)GetValue(RowsProperty); }
-            set { SetValue(RowsProperty, value); }
+            set { SetValueInternal(RowsProperty, value); }
         }
 
         /// <summary>
