@@ -98,7 +98,26 @@ namespace System.Windows.Data
         /// <summary>
         /// Gets the binding source object that this <see cref="BindingExpression"/> uses.
         /// </summary>
+        /// <returns>
+        /// The binding source object that this <see cref="BindingExpression"/> uses.
+        /// </returns>
         public object DataItem => BindingSource;
+
+        /// <summary>
+        /// Gets the binding source object for this <see cref="BindingExpression"/>.
+        /// </summary>
+        /// <returns>
+        /// The binding source object for this <see cref="BindingExpression"/>.
+        /// </returns>
+        public object ResolvedSource => SourceItem;
+
+        /// <summary>
+        /// Gets the name of the binding source property for this <see cref="BindingExpression"/>.
+        /// </summary>
+        /// <returns>
+        /// The name of the binding source property for this <see cref="BindingExpression"/>.
+        /// </returns>
+        public string ResolvedSourcePropertyName => SourcePropertyName;
 
         /// <summary>
         /// Sends the current binding target value to the binding source property in
@@ -328,6 +347,12 @@ namespace System.Windows.Data
             }
         }
 
+        // the item whose property changes when we UpdateSource
+        private object SourceItem => _propertyPathWalker.FinalNode.Source;
+
+        // the name of the property that changes when we UpdateSource
+        private string SourcePropertyName => _propertyPathWalker.FinalNode.PropertyName;
+
         private object BindingSource
         {
             get => _bindingSource;
@@ -388,10 +413,7 @@ namespace System.Windows.Data
                 return;
             }
 
-            UpdateNotifyDataErrors(
-                _propertyPathWalker.FinalNode.Source,
-                _propertyPathWalker.FinalNode.PropertyName,
-                value);
+            UpdateNotifyDataErrors(SourceItem, SourcePropertyName, value);
         }
 
         private void UpdateNotifyDataErrors(object source, string propertyName, object value)
@@ -640,7 +662,7 @@ namespace System.Windows.Data
 
         private void OnSourceErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            if (e.PropertyName == _propertyPathWalker.FinalNode.PropertyName)
+            if (e.PropertyName == SourcePropertyName)
             {
                 UpdateNotifyDataErrors(_dataErrorSource, e.PropertyName, DependencyProperty.UnsetValue);
             }
@@ -778,9 +800,9 @@ namespace System.Windows.Data
 
         private ValidationError GetBaseValidationError()
         {
-            if (ValidatesOnDataErrors && _propertyPathWalker.FinalNode.Source is IDataErrorInfo dataErrorInfo)
+            if (ValidatesOnDataErrors && SourceItem is IDataErrorInfo dataErrorInfo)
             {
-                string name = _propertyPathWalker.FinalNode.PropertyName;
+                string name = SourcePropertyName;
                 string error;
                 try
                 {
