@@ -691,21 +691,41 @@ internal static class DependencyObjectStore
 
         object newValue = GetEffectiveValue(newEntry, RequestFlags.FullyResolved);
 
-        // Reset old value inheritance context
-        if (oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
-        {
-            // Notes:
-            // - Inheritance context is only handled by local value
-            // - We use null instead of the actual DependencyProperty
-            // as the parameter is ignored in the current implentation.
-            d.RemoveSelfAsInheritanceContext(oldValue, null);
-        }
+        bool valueChanged = !Equals(dp, oldValue, newValue);
 
-        // Set new value inheritance context
-        if (newEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
+        // There are two cases in which we need to adjust inheritance contexts:
+        //
+        //     1.  The value pointed to this DP has changed, in which case
+        //         we need to move the context from the old value to the
+        //         new value.
+        //
+        //     2.  The value has not changed, but the ValueSource for the
+        //         property has.  (For example, we've gone from being a local
+        //         value to the result of a binding expression that just
+        //         happens to return the same DO instance.)  In which case
+        //         we may need to add or remove contexts even though we
+        //         did not raise change notifications.
+        //
+        // WPF checks FullValueSource instead of BaseValueSourceInternal because
+        // it does not want to provide an inheritance contexts if the entry is
+        // animated, coerced, or an expression. Silverlight however does not
+        // enforce this behavior for expressions and animated values, so we do
+        // not enforce it either for now.
+
+        bool oldEntryHadContext = oldEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local;
+        bool newEntryNeedsContext = newEntry.BaseValueSourceInternal == BaseValueSourceInternal.Local;
+
+        if (valueChanged || oldEntryHadContext != newEntryNeedsContext)
         {
-            // Check above
-            d.ProvideSelfAsInheritanceContext(newValue, null);
+            if (oldEntryHadContext)
+            {
+                d.RemoveSelfAsInheritanceContext(oldValue, dp);
+            }
+
+            if (newEntryNeedsContext)
+            {
+                d.ProvideSelfAsInheritanceContext(newValue, dp);
+            }
         }
 
         if (newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
@@ -717,7 +737,6 @@ internal static class DependencyObjectStore
             storage.Entry = newEntry;
         }
 
-        bool valueChanged = !Equals(dp, oldValue, newValue);
         if (valueChanged)
         {
             d.NotifyPropertyChange(
