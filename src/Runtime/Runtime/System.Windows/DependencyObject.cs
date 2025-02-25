@@ -29,7 +29,7 @@ namespace System.Windows
     /// other important Silverlight classes, such as <see cref="UIElement"/>, <see cref="Geometry"/>,
     /// <see cref="FrameworkTemplate"/>, <see cref="Style"/>, and <see cref="ResourceDictionary"/>.
     /// </summary>
-    public class DependencyObject : IDependencyObject
+    public class DependencyObject : DispatcherObject, IDependencyObject
     {
         private Dictionary<int, DependentList> _dependentListMap;
         private Dictionary<int, Storage> _effectiveValues;
@@ -700,7 +700,7 @@ namespace System.Windows
         /// <returns>
         /// The <see cref="Threading.Dispatcher"/> this object is associated with.
         /// </returns>
-        public Dispatcher Dispatcher => Dispatcher.CurrentDispatcher;
+        public new Dispatcher Dispatcher => base.Dispatcher;
 
         internal void ApplyExpression(DependencyProperty dp, Expression expression)
         {
@@ -783,20 +783,7 @@ namespace System.Windows
         /// <returns>
         /// true if the calling thread has access to this object; otherwise, false.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public bool CheckAccess()
-        {
-            bool accessAllowed = true;
-
-            var dispatcher = Dispatcher;
-
-            if (dispatcher != null)
-            {
-                accessAllowed = dispatcher.CheckAccess();
-            }
-
-            return accessAllowed;
-        }
+        public new bool CheckAccess() => base.CheckAccess();
 
         /// <summary>
         /// Returns any base value established for a Silverlight dependency property, which
