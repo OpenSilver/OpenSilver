@@ -52,6 +52,7 @@
 
     <PropertyGroup>
       <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)' == ''">resources/</Cshtml5OutputResourcesPath>
+      <ObjFolder>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)'))</ObjFolder>
     </PropertyGroup>
 
     <ItemGroup>
@@ -79,7 +80,8 @@
 
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/">
+                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/"
+                                 ObjFolder="$(ObjFolder)">
       <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedResources" />
     </ResourcesExtractorAndCopier>
 
