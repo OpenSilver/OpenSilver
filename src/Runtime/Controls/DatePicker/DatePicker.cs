@@ -818,7 +818,7 @@ namespace System.Windows.Controls
                 {
                     _outsideCanvas = new Canvas();
                     _outsidePopupCanvas = new Canvas();
-                    _outsidePopupCanvas.Background = new SolidColorBrush(Colors.Transparent);
+                    _outsidePopupCanvas.Background = Brushes.Transparent;
                     _outsideCanvas.Children.Add(this._outsidePopupCanvas);
                     _outsideCanvas.Children.Add(this._calendar);
                     _outsidePopupCanvas.MouseLeftButtonDown += new MouseButtonEventHandler(OutsidePopupCanvas_MouseLeftButtonDown);

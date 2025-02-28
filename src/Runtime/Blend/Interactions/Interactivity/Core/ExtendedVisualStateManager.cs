@@ -787,11 +787,7 @@ namespace Microsoft.Expression.Interactivity.Core
                     // ObjectAnimationUsingKeyFrames does not work for some reason - set it ASAP
                     SetDidCacheBackground(rootPanel, true);
                     TransferLocalValue(rootPanel, Panel.BackgroundProperty, CachedBackgroundProperty);
-#if __WPF__
                     rootPanel.Background = Brushes.Transparent;
-#else
-                    rootPanel.Background = new SolidColorBrush(Colors.Transparent);
-#endif
                 }
             }
 

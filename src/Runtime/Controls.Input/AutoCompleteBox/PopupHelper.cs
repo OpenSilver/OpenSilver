@@ -376,7 +376,7 @@ namespace System.Windows.Controls
                     Popup.Child = PopupChildCanvas;
 
                     OutsidePopupCanvas = new Canvas();
-                    OutsidePopupCanvas.Background = new SolidColorBrush(Colors.Transparent);
+                    OutsidePopupCanvas.Background = Brushes.Transparent;
                     OutsidePopupCanvas.MouseLeftButtonDown += OutsidePopup_MouseLeftButtonDown;
 
                     PopupChildCanvas.Children.Add(OutsidePopupCanvas);

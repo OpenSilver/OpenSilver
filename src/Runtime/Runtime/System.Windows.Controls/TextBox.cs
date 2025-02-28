@@ -227,7 +227,7 @@ namespace System.Windows.Controls
                 nameof(CaretBrush),
                 typeof(Brush),
                 typeof(TextBox),
-                new PropertyMetadata(new SolidColorBrush(Colors.Black), OnCaretBrushChanged));
+                new PropertyMetadata(Brushes.Black, OnCaretBrushChanged));
 
         /// <summary>
         /// Gets or sets the brush that is used to render the vertical bar that indicates the

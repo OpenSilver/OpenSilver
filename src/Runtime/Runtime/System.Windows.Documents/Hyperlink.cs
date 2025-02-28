@@ -26,7 +26,15 @@ namespace System.Windows.Documents;
 /// </summary>
 public sealed class Hyperlink : Span
 {
+    private static readonly SolidColorBrush _defaultMouseOverBrush;
+
     private JavaScriptCallback _clickCallback;
+
+    static Hyperlink()
+    {
+        _defaultMouseOverBrush = new SolidColorBrush(Color.FromArgb(255, 237, 110, 0));
+        _defaultMouseOverBrush.Seal();
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Hyperlink"/> class.
@@ -106,7 +114,7 @@ public sealed class Hyperlink : Span
             nameof(MouseOverForeground),
             typeof(Brush),
             typeof(Hyperlink),
-            new PropertyMetadata(new SolidColorBrush(Color.FromArgb(255, 237, 110, 0)))
+            new PropertyMetadata(_defaultMouseOverBrush)
             {
                 MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                 {

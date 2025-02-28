@@ -89,12 +89,9 @@ namespace System.Windows.Controls
         /// Identifies the <see cref="MaxLength"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxLengthProperty =
-            DependencyProperty.Register(
-                nameof(MaxLength),
-                typeof(int),
+            TextBox.MaxLengthProperty.AddOwner(
                 typeof(PasswordBox),
-                new PropertyMetadata(0, OnMaxLengthChanged),
-                MaxLengthValidateValue);
+                new PropertyMetadata(0, OnMaxLengthChanged));
 
         private static void OnMaxLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -102,17 +99,13 @@ namespace System.Windows.Controls
             pwb._textViewHost?.View.OnMaxLengthChanged((int)e.NewValue);
         }
 
-        private static bool MaxLengthValidateValue(object value) => (int)value >= 0;
-
         /// <summary>
         /// Identifies the <see cref="CaretBrush"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty CaretBrushProperty =
-            DependencyProperty.Register(
-                nameof(CaretBrush),
-                typeof(Brush),
+            TextBox.CaretBrushProperty.AddOwner(
                 typeof(PasswordBox),
-                new PropertyMetadata(new SolidColorBrush(Colors.Black), OnCaretBrushChanged));
+                new PropertyMetadata(Brushes.Black, OnCaretBrushChanged));
 
         /// <summary>
         /// Gets or sets the brush that is used to render the vertical bar that indicates the

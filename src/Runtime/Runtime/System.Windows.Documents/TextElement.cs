@@ -456,7 +456,7 @@ public abstract class TextElement : UIElement
             nameof(Foreground),
             typeof(Brush),
             typeof(TextElement),
-            new PropertyMetadata(new SolidColorBrush(Colors.Black)) { Inherits = true, });
+            new PropertyMetadata(Brushes.Black) { Inherits = true, });
 
     /// <summary>
     /// Gets or sets the <see cref="Brush"/> to apply to the content in this element.

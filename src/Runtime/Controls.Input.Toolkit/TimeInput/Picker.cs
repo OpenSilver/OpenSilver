@@ -327,7 +327,7 @@ namespace System.Windows.Controls
                     DropDownPopup.Child = _popupChildCanvas;
 
                     _outsidePopupCanvas = new Canvas();
-                    _outsidePopupCanvas.Background = new SolidColorBrush(Colors.Transparent);
+                    _outsidePopupCanvas.Background = Brushes.Transparent;
 
                     _popupChildCanvas.Children.Add(_outsidePopupCanvas);
                     _popupChildCanvas.Children.Add(PopupChild);

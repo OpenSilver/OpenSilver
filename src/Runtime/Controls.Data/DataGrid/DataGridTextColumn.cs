@@ -189,7 +189,7 @@ namespace System.Windows.Controls
             TextBox textBox = new TextBox();
             textBox.VerticalAlignment = VerticalAlignment.Stretch;
 
-            textBox.Background = new SolidColorBrush(Colors.Transparent);
+            textBox.Background = Brushes.Transparent;
 
             if (DependencyProperty.UnsetValue != ReadLocalValue(DataGridTextColumn.FontFamilyProperty))
             {
