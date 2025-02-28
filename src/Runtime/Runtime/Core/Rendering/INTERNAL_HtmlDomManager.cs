@@ -167,24 +167,12 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"{sDiv}.classList.remove('{className}')");
         }
 
-        internal static void SetVisibility(INTERNAL_HtmlDomElementReference element, Visibility visibility)
+        internal static void SetVisible(INTERNAL_HtmlDomElementReference element, bool visible)
         {
             Debug.Assert(element is not null);
 
-            switch (visibility)
-            {
-                case Visibility.Visible:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setVisible('{element.UniqueIdentifier}')");
-                    break;
-
-                case Visibility.Hidden:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setHidden('{element.UniqueIdentifier}')");
-                    break;
-
-                case Visibility.Collapsed:
-                    OpenSilver.Interop.ExecuteJavaScriptVoidAsync($"document.setCollapsed('{element.UniqueIdentifier}')");
-                    break;
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
+                $"document.setVisible('{element.UniqueIdentifier}',{(visible ? "true" : "false")})");
         }
 
         internal static void RemoveAttribute(INTERNAL_HtmlDomElementReference element, string attributeName) =>

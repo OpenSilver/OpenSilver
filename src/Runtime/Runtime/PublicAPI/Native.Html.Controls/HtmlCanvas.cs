@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Input;
 using CSHTML5.Internal;
 using CSHTML5.Native.Html.Input;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Native.Html.Controls
 {
@@ -55,6 +56,11 @@ namespace CSHTML5.Native.Html.Controls
         public List<HtmlCanvasElement> Children;
 
         private HtmlCanvasElement[] _LastPointerMove;
+
+        static HtmlCanvas()
+        {
+            IsHitTestableProperty.OverrideMetadata(typeof(HtmlCanvas), new PropertyMetadata(BooleanBoxes.TrueBox));
+        }
 
         /// <summary>
         /// Create an html5 native canvas

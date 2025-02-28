@@ -254,12 +254,12 @@ namespace CSHTML5.Internal
             // Defer rendering when the control is not visible to when becomes visible (note: when this option is enabled, we do not apply the CSS properties of the UI elements that are not visible. Those property are applied later, when the control becomes visible. This option results in improved performance.)
             bool enableDeferredRenderingOfCollapsedControls = EnableOptimizationWhereCollapsedControlsAreNotRendered;
 
-            if (enableDeferredRenderingOfCollapsedControls && child.InVisibilityCollapsedTree)
+            if (enableDeferredRenderingOfCollapsedControls && !child.IsVisible)
             {
                 child.RenderingIsDeferred = true;
                 if (child.Visibility == Visibility.Collapsed)
                 {
-                    INTERNAL_HtmlDomManager.SetVisibility(child.OuterDiv, Visibility.Collapsed);
+                    INTERNAL_HtmlDomManager.SetVisible(child.OuterDiv, false);
                 }
             }
             else

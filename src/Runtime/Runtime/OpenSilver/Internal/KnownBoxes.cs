@@ -11,22 +11,21 @@
 *  
 \*====================================================================================*/
 
+using System;
 using System.Windows;
 
 namespace OpenSilver.Internal;
 
 internal static class VisibilityBoxes
 {
-    internal static readonly object VisibleBox = Visibility.Visible;
-    internal static readonly object HiddenBox = Visibility.Hidden;
+    internal static readonly object VisibleBox = Visibility.Visible; 
     internal static readonly object CollapsedBox = Visibility.Collapsed;
 
     internal static object Box(Visibility value) =>
         value switch
         {
-            Visibility.Visible => VisibleBox,
-            Visibility.Hidden => HiddenBox,
-            _ => CollapsedBox,
+            Visibility.Collapsed => CollapsedBox,
+            _ => VisibleBox,
         };
 }
 

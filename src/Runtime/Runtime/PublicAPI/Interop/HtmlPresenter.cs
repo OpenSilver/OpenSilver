@@ -31,6 +31,7 @@ namespace CSHTML5.Native.Html.Controls
 
         static HtmlPresenter()
         {
+            IsHitTestableProperty.OverrideMetadata(typeof(HtmlPresenter), new PropertyMetadata(BooleanBoxes.TrueBox));
             FlowDirectionProperty.OverrideMetadata(
                 typeof(HtmlPresenter),
                 new FrameworkPropertyMetadata(
