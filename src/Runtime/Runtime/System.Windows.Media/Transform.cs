@@ -54,16 +54,22 @@ namespace System.Windows.Media
             return identity;
         }
 
-        internal Matrix Matrix => _matrix ??= GetMatrixCore();
+        /// <summary>
+        /// Gets the current transformation as a <see cref="Media.Matrix"/> object.
+        /// </summary>
+        /// <returns>
+        /// The current matrix transformation.
+        /// </returns>
+        public abstract Matrix Value { get; }
 
-        private protected abstract Matrix GetMatrixCore();
+        internal Matrix Matrix => _matrix ??= Value;
 
-        ///<summary>
+        /// <summary>
         /// Returns true if transformation if the transformation is definitely an identity.  There are cases where it will
         /// return false because of computational error or presence of animations (And we're interpolating through a
         /// transient identity) -- this is intentional.  This property is used internally only.  If you need to check the
         /// current matrix value for identity, use Transform.Value.Identity.
-        ///</summary>
+        /// </summary>
         internal abstract bool IsIdentity { get; }
 
         internal static bool IsIdentityTransform(Transform transform)

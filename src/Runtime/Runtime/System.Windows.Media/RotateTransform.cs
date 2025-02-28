@@ -85,11 +85,15 @@ namespace System.Windows.Media
             set => SetValueInternal(CenterYProperty, value);
         }
 
-        private protected override Matrix GetMatrixCore()
+        /// <inheritdoc />
+        public override Matrix Value
         {
-            Matrix m = new Matrix();
-            m.RotateAt(Angle, CenterX, CenterY);
-            return m;
+            get
+            {
+                var m = new Matrix();
+                m.RotateAt(Angle, CenterX, CenterY);
+                return m;
+            }
         }
 
         internal override bool IsIdentity => Angle == 0;

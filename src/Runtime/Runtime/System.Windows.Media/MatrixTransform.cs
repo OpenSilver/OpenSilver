@@ -56,7 +56,8 @@ namespace System.Windows.Media
             set => SetValueInternal(MatrixProperty, value);
         }
 
-        private protected override Matrix GetMatrixCore() => Matrix;
+        /// <inheritdoc />
+        public override Matrix Value => Matrix;
 
         internal override bool IsIdentity => Matrix.IsIdentity;
 

@@ -99,24 +99,25 @@ namespace System.Windows.Media
         /// <returns>
         /// A composite of the <see cref="Transform"/> objects in this <see cref="TransformGroup"/>.
         /// </returns>
-        public Matrix Value => Matrix;
-
-        private protected override Matrix GetMatrixCore()
+        public override Matrix Value
         {
-            List<Transform> children = Children.InternalItems;
-            if (children.Count == 0)
+            get
             {
-                return Matrix.Identity;
+                List<Transform> children = Children.InternalItems;
+                if (children.Count == 0)
+                {
+                    return Matrix.Identity;
+                }
+
+                Matrix transform = children[0].Matrix;
+
+                for (int i = 1; i < children.Count; i++)
+                {
+                    transform *= children[i].Matrix;
+                }
+
+                return transform;
             }
-
-            Matrix transform = children[0].Matrix;
-
-            for (int i = 1; i < children.Count; i++)
-            {
-                transform = Matrix.Multiply(transform, children[i].Matrix);
-            }
-
-            return transform;
         }
 
         internal override bool IsIdentity
