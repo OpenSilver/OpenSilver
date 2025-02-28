@@ -28,9 +28,9 @@ public abstract class SetterBase : DependencyObject
     /// <returns>
     /// true if this object is in an immutable state; otherwise, false.
     /// </returns>
-    public bool IsSealed => _sealed;
+    public new bool IsSealed => _sealed;
 
-    internal virtual void Seal() => _sealed = true;
+    internal new virtual void Seal() => _sealed = true;
 
     /// <summary>
     /// Subclasses need to call this method before any changes to their state.

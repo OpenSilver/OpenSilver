@@ -58,7 +58,7 @@ internal sealed class DependentList
         return _listStore.ToArray();
     }
 
-    public void Add(DependencyPropertyChangedListener expr)
+    public void Add(PropertyChangeListener expr)
     {
         // don't clean up every time.  This would make Add() cost O(N),
         // which would cause building a list to cost O(N^2).  yuck!
@@ -71,7 +71,7 @@ internal sealed class DependentList
         Add(new Dependent(expr));
     }
 
-    public void Remove(DependencyPropertyChangedListener expr)
+    public void Remove(PropertyChangeListener expr)
     {
         if (_listStore is null)
         {
@@ -80,7 +80,7 @@ internal sealed class DependentList
 
         for (int i = 0; i < _listStore.Count; i++)
         {
-            if (_listStore[i].TryGetExpr(out DependencyPropertyChangedListener ex))
+            if (_listStore[i].TryGetExpr(out PropertyChangeListener ex))
             {
                 if (ex == expr)
                 {
@@ -117,7 +117,7 @@ internal sealed class DependentList
 
         for (int i = 0; i < snapList.Length; i++)
         {
-            if (snapList[i].TryGetExpr(out DependencyPropertyChangedListener expression))
+            if (snapList[i].TryGetExpr(out PropertyChangeListener expression))
             {
                 expression.OnPropertyChanged(source, sourceArgs);
             }
@@ -207,16 +207,16 @@ internal sealed class DependentList
 
 internal readonly struct Dependent
 {
-    private readonly WeakReference<DependencyPropertyChangedListener> _wrEX;
+    private readonly WeakReference<PropertyChangeListener> _wrEX;
 
-    public Dependent(DependencyPropertyChangedListener e)
+    public Dependent(PropertyChangeListener e)
     {
         _wrEX = new(e);
     }
 
     public bool IsValid() => _wrEX.TryGetTarget(out _);
 
-    public bool TryGetExpr(out DependencyPropertyChangedListener expr) => _wrEX.TryGetTarget(out expr);
+    public bool TryGetExpr(out PropertyChangeListener expr) => _wrEX.TryGetTarget(out expr);
 
     public override bool Equals(object o)
     {
@@ -244,7 +244,7 @@ internal readonly struct Dependent
     // Write a good HashCode anyway (if not a fast one)
     public override int GetHashCode()
     {
-        _wrEX.TryGetTarget(out DependencyPropertyChangedListener ex);
+        _wrEX.TryGetTarget(out PropertyChangeListener ex);
         int hashCode = ex is null ? 0 : ex.GetHashCode();
 
         return hashCode;

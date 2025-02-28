@@ -111,6 +111,12 @@ internal static class StoryboardPathResolver
                 string.Format(Strings.Storyboard_PropertyPathMustPointToDependencyProperty, path.Path));
         }
 
+        if (target.IsSealed)
+        {
+            throw new InvalidOperationException(
+                string.Format(Strings.Storyboard_PropertyPathSealedCheckFailed, targetProperty.Name, path.Path, target));
+        }
+
         if (!UIElement.IsPropertyAnimatable(target, targetProperty))
         {
             throw new InvalidOperationException(

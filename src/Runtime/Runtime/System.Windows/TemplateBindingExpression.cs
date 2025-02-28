@@ -22,13 +22,13 @@ namespace System.Windows
     /// <summary>
     /// Supports template binding.
     /// </summary>
-    public class TemplateBindingExpression : Expression
+    public sealed class TemplateBindingExpression : Expression
     {
         private readonly IInternalControl _source;
         private readonly DependencyProperty _sourceProperty;
         private DependencyObject _target;
         private DependencyProperty _targetProperty;
-        private DependencyPropertyChangedListener _listener;
+        private PropertyChangeListener _listener;
         private bool _skipTypeCheck;
 
         internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP)
@@ -63,7 +63,7 @@ namespace System.Windows
             _targetProperty = dp;
 
             _skipTypeCheck = _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
-            _listener = new DependencyPropertyChangedListener((DependencyObject)_source, _sourceProperty, OnPropertyChanged);
+            _listener = PropertyChangeListener.CreateListener((DependencyObject)_source, _sourceProperty, OnPropertyChanged);
         }
 
         internal override void OnDetach(DependencyObject d, DependencyProperty dp)

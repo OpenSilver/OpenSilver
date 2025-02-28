@@ -24,7 +24,7 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
     private readonly Type _resolvedType;
     private readonly string _propertyName;
 
-    private DependencyPropertyChangedListener _dpListener;
+    private PropertyChangeListener _dpListener;
     private WeakEventListener<StandardPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
     private DependencyProperty _dp;
     private PropertyInfo _prop;
@@ -111,7 +111,7 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
             _propertyChangedListener = null;
         }
 
-        if (_dpListener is DependencyPropertyChangedListener listener)
+        if (_dpListener is PropertyChangeListener listener)
         {
             _dpListener = null;
             listener.Dispose();
@@ -167,7 +167,7 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
 
             if (_dp is not null)
             {
-                _dpListener = new DependencyPropertyChangedListener(sourceDO, _dp, OnPropertyChanged);
+                _dpListener = PropertyChangeListener.CreateListener(sourceDO, _dp, OnPropertyChanged);
             }
         }
     }

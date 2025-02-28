@@ -36,8 +36,8 @@ namespace System.Windows.Data
         private List<ValidationError> _notifyDataErrors;
         private object _effectiveTargetNullValue = DefaultValueObject;
 
-        private DependencyPropertyChangedListener _dataContextListener;
-        private DependencyPropertyChangedListener _cvsListener;
+        private PropertyChangeListener _dataContextListener;
+        private PropertyChangeListener _cvsListener;
         private WeakEventListener<BindingExpression, DataSourceProvider, EventArgs> _dspDataChangedListener;
         private WeakEventListener<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs> _sourceErrorsChangedListener;
         private WeakEventListener<BindingExpression, INotifyDataErrorInfo, DataErrorsChangedEventArgs> _valueErrorsChangedListener;
@@ -375,7 +375,10 @@ namespace System.Windows.Data
 
                     if (value is CollectionViewSource cvs)
                     {
-                        _cvsListener = new DependencyPropertyChangedListener(cvs, CollectionViewSource.ViewProperty, OnCollectionViewSourceViewChanged);
+                        _cvsListener = PropertyChangeListener.CreateListener(
+                            cvs,
+                            CollectionViewSource.ViewProperty,
+                            OnCollectionViewSourceViewChanged);
                         _bindingSource = cvs.View;
                     }
                     else if (value is DataSourceProvider dsp)
@@ -1024,7 +1027,7 @@ namespace System.Windows.Data
 
                 if (source is IInternalFrameworkElement sourceFE)
                 {
-                    _dataContextListener = new DependencyPropertyChangedListener(
+                    _dataContextListener = PropertyChangeListener.CreateListener(
                         sourceFE.AsDependencyObject(),
                         FrameworkElement.DataContextProperty,
                         OnDataContextChanged);

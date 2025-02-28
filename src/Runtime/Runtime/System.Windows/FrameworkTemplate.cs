@@ -143,14 +143,14 @@ public abstract class FrameworkTemplate : DependencyObject, ISealable
     /// <summary>
     /// Locks the template so it cannot be changed.
     /// </summary>
-    public void Seal() => _isSealed = true;
+    public new void Seal() => _isSealed = true;
 
     /// <summary>
     /// Gets a value that indicates whether this object is in an immutable state
     /// so it cannot be changed.
     /// </summary>
     /// <returns>true if this object is in an immutable state; otherwise, false.</returns>
-    public bool IsSealed() => _isSealed;
+    public new bool IsSealed() => _isSealed;
 
     private protected void CheckSealed()
     {

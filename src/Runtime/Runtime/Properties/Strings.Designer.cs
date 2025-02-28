@@ -367,6 +367,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot clear properties on object &apos;{0}&apos; because it is in a read-only state..
+        /// </summary>
+        internal static string ClearOnReadOnlyObjectNotAllowed {
+            get {
+                return ResourceManager.GetString("ClearOnReadOnlyObjectNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to After a CollectionChange.Add event, Items collection does not contain the added item &apos;{0}&apos;.\n This could happen if the event sender supplied incorrect information in CollectionChangedEventArgs..
         /// </summary>
         internal static string CollectionAddEventMissingItem {
@@ -687,6 +696,15 @@ namespace OpenSilver.Internal {
         internal static string HasLogicalParent {
             get {
                 return ResourceManager.GetString("HasLogicalParent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot animate the &apos;{0}&apos; property on &apos;{1}&apos; because the object is sealed or frozen..
+        /// </summary>
+        internal static string IAnimatable_CantAnimateSealedDO {
+            get {
+                return ResourceManager.GetString("IAnimatable_CantAnimateSealedDO", resourceCulture);
             }
         }
         
@@ -1438,6 +1456,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot set a property on object &apos;{0}&apos; because it is in a read-only state..
+        /// </summary>
+        internal static string SetOnReadOnlyObjectNotAllowed {
+            get {
+                return ResourceManager.GetString("SetOnReadOnlyObjectNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not valid for Setter.Value. The only supported MarkupExtension types are DynamicResourceExtension and BindingBase or derived types..
         /// </summary>
         internal static string SetterValueOfMarkupExtensionNotSupported {
@@ -1560,6 +1587,15 @@ namespace OpenSilver.Internal {
         internal static string Storyboard_PropertyPathPropertyNotFound {
             get {
                 return ResourceManager.GetString("Storyboard_PropertyPathPropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; property value in the path &apos;{1}&apos; is on an immutable instance of &apos;{2}&apos;..
+        /// </summary>
+        internal static string Storyboard_PropertyPathSealedCheckFailed {
+            get {
+                return ResourceManager.GetString("Storyboard_PropertyPathSealedCheckFailed", resourceCulture);
             }
         }
         

@@ -62,6 +62,11 @@ public partial class UIElement
                 nameof(animation));
         }
 
+        if (IsSealed)
+        {
+            throw new InvalidOperationException(string.Format(Strings.IAnimatable_CantAnimateSealedDO, dp, GetType()));
+        }
+
         if (animation is null)
         {
             DetachAnimationClock(dp, true);

@@ -62,7 +62,7 @@ public abstract class BindingExpressionBase : Expression
 
     private PrivateFlags _flags;
     private PrivateFlags _defaultFlags;
-    private DependencyPropertyChangedListener _targetPropertyListener;
+    private PropertyChangeListener _targetPropertyListener;
 
     internal BindingExpressionBase(BindingBase binding, BindingExpressionBase parent)
     {
@@ -227,7 +227,7 @@ public abstract class BindingExpressionBase : Expression
                 uie.LostFocus += new RoutedEventHandler(OnTargetLostFocus);
             }
 
-            _targetPropertyListener = new DependencyPropertyChangedListener(Target, TargetProperty, OnTargetPropertyChanged);
+            _targetPropertyListener = PropertyChangeListener.CreateListener(Target, TargetProperty, OnTargetPropertyChanged);
         }
     }
 

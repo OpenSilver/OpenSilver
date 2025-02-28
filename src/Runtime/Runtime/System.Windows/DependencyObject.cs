@@ -59,6 +59,22 @@ namespace System.Windows
         public DependencyObjectType DependencyObjectType =>
             _dType ??= DependencyObjectType.FromSystemTypeInternal(GetType());
 
+        /// <summary>
+        /// Gets a value that indicates whether this instance is currently sealed (read-only).
+        /// </summary>
+        /// <returns>
+        /// true if this instance is sealed; otherwise, false.
+        /// </returns>
+        public bool IsSealed { get; private set; }
+
+        internal void Seal()
+        {
+            // Since this object no longer changes it won't be able to notify dependents
+            _dependentListMap = null;
+
+            IsSealed = true;
+        }
+
         internal bool CanBeInheritanceContext { get; set; }
 
         internal bool IsInheritanceContextSealed { get; set; }
@@ -432,12 +448,17 @@ namespace System.Windows
         /// </exception>
         public void SetValue(DependencyProperty dp, object value)
         {
-            if (dp == null)
+            if (dp is null)
             {
                 throw new ArgumentNullException(nameof(dp));
             }
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (IsSealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.SetOnReadOnlyObjectNotAllowed, this));
+            }
 
             Storage storage = GetOrCreateStorage(dp, metadata);
 
@@ -453,12 +474,17 @@ namespace System.Windows
 
         internal void SetValueInternal(DependencyProperty dp, object value)
         {
-            if (dp == null)
+            if (dp is null)
             {
                 throw new ArgumentNullException(nameof(dp));
             }
 
             PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (IsSealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.SetOnReadOnlyObjectNotAllowed, this));
+            }
 
             Storage storage = GetOrCreateStorage(dp, metadata);
 
@@ -489,12 +515,17 @@ namespace System.Windows
         /// </exception>
         public void SetValue(DependencyPropertyKey key, object value)
         {
-            if (key == null)
+            if (key is null)
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
+
+            if (IsSealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.SetOnReadOnlyObjectNotAllowed, this));
+            }
 
             Storage storage = GetOrCreateStorage(dp, metadata);
 
@@ -510,12 +541,17 @@ namespace System.Windows
 
         internal void SetValueInternal(DependencyPropertyKey key, object value)
         {
-            if (key == null)
+            if (key is null)
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
+
+            if (IsSealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.SetOnReadOnlyObjectNotAllowed, this));
+            }
 
             Storage storage = GetOrCreateStorage(dp, metadata);
 
@@ -642,7 +678,7 @@ namespace System.Windows
         /// </exception>
         public void CoerceValue(DependencyProperty dp)
         {
-            if (dp == null)
+            if (dp is null)
             {
                 throw new ArgumentNullException(nameof(dp));
             }
@@ -760,9 +796,14 @@ namespace System.Windows
         /// </exception>
         public void ClearValue(DependencyProperty dp)
         {
-            if (dp == null)
+            if (dp is null)
             {
                 throw new ArgumentNullException(nameof(dp));
+            }
+
+            if (IsSealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.ClearOnReadOnlyObjectNotAllowed, this));
             }
 
             if (GetStorage(dp) is Storage storage)
@@ -784,12 +825,17 @@ namespace System.Windows
         /// </exception>
         public void ClearValue(DependencyPropertyKey key)
         {
-            if (key == null)
+            if (key is null)
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
             PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
+
+            if (IsSealed)
+            {
+                throw new InvalidOperationException(string.Format(Strings.ClearOnReadOnlyObjectNotAllowed, this));
+            }
 
             if (GetStorage(dp) is Storage storage)
             {
@@ -855,8 +901,11 @@ namespace System.Windows
             }
         }
 
-        internal void AddDependent(DependencyProperty dp, DependencyPropertyChangedListener dependent)
+        internal void AddDependent(DependencyProperty dp, PropertyChangeListener dependent)
         {
+            // A Sealed DependencyObject does not have a Dependents list so don't bother updating it.
+            Debug.Assert(!IsSealed);
+
             int propertyIndex = dp.GlobalIndex;
             _dependentListMap ??= new();
             if (!_dependentListMap.TryGetValue(propertyIndex, out var dependents))
@@ -866,7 +915,7 @@ namespace System.Windows
             dependents.Add(dependent);
         }
 
-        internal void RemoveDependent(DependencyProperty dp, DependencyPropertyChangedListener dependent)
+        internal void RemoveDependent(DependencyProperty dp, PropertyChangeListener dependent)
         {
             if (_dependentListMap is null)
             {

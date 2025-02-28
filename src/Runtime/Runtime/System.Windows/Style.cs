@@ -65,7 +65,7 @@ public class Style : DependencyObject, ISealable
     /// <returns>
     /// true if the style is read-only; otherwise, false.
     /// </returns>
-    public bool IsSealed => _sealed;
+    public new bool IsSealed => _sealed;
 
     /// <summary>
     /// Gets or sets the type for which the style is intended.
@@ -200,7 +200,7 @@ public class Style : DependencyObject, ISealable
     /// Locks the style so that the <see cref="TargetType"/> property or any <see cref="Setter"/>
     /// in the <see cref="Setters"/> collection cannot be changed.
     /// </summary>
-    public void Seal()
+    public new void Seal()
     {
         // 99% case - Style is already sealed.
         if (_sealed)

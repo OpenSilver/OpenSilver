@@ -221,6 +221,9 @@
   <data name="ClassTypeIllegal" xml:space="preserve">
     <value>Class handlers can be registered only for UIElement and their subtypes.</value>
   </data>
+  <data name="ClearOnReadOnlyObjectNotAllowed" xml:space="preserve">
+    <value>Cannot clear properties on object '{0}' because it is in a read-only state.</value>
+  </data>
   <data name="CollectionAddEventMissingItem" xml:space="preserve">
     <value>After a CollectionChange.Add event, Items collection does not contain the added item '{0}'.\n This could happen if the event sender supplied incorrect information in CollectionChangedEventArgs.</value>
   </data>
@@ -328,6 +331,9 @@
   </data>
   <data name="HasLogicalParent" xml:space="preserve">
     <value>Specified element is already the logical child of another element. Disconnect it first.</value>
+  </data>
+  <data name="IAnimatable_CantAnimateSealedDO" xml:space="preserve">
+    <value>Cannot animate the '{0}' property on '{1}' because the object is sealed or frozen.</value>
   </data>
   <data name="ImplementOtherMembersWithSort" xml:space="preserve">
     <value>If SortDescriptions is overridden in derived classes, then must also override '{0}'.</value>
@@ -578,6 +584,9 @@
   <data name="SetInDeferSelectionActive" xml:space="preserve">
     <value>Cannot set an item in a selection when selection is in progress. Use Add or Remove method.</value>
   </data>
+  <data name="SetOnReadOnlyObjectNotAllowed" xml:space="preserve">
+    <value>Cannot set a property on object '{0}' because it is in a read-only state.</value>
+  </data>
   <data name="SetterValueOfMarkupExtensionNotSupported" xml:space="preserve">
     <value>'{0}' is not valid for Setter.Value. The only supported MarkupExtension types are DynamicResourceExtension and BindingBase or derived types.</value>
   </data>
@@ -619,6 +628,9 @@
   </data>
   <data name="Storyboard_PropertyPathPropertyNotFound" xml:space="preserve">
     <value>Cannot resolve all property references in the property path '{0}'. Verify that applicable objects support the properties.</value>
+  </data>
+  <data name="Storyboard_PropertyPathSealedCheckFailed" xml:space="preserve">
+    <value>'{0}' property value in the path '{1}' is on an immutable instance of '{2}'.</value>
   </data>
   <data name="Storyboard_TargetNameNotDependencyObject" xml:space="preserve">
     <value>'{0}' target object Name found but the object is not a valid target type.</value>

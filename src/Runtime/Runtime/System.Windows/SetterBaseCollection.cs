@@ -33,7 +33,7 @@ public sealed class SetterBaseCollection : PresentationFrameworkCollection<Sette
     /// Returns the sealed state of this object.  If true, any attempt
     /// at modifying the state of this object will trigger an exception.
     /// </summary>
-    public bool IsSealed => _sealed;
+    public new bool IsSealed => _sealed;
 
     // Note: Even if SetterBase derives from DependencyObject, we don't use
     // the methods that are supposed to handle collections of DependencyObject
@@ -71,7 +71,7 @@ public sealed class SetterBaseCollection : PresentationFrameworkCollection<Sette
         SetItemInternal(index, value);
     }
 
-    internal void Seal()
+    internal new void Seal()
     {
         _sealed = true;
 

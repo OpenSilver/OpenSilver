@@ -1477,7 +1477,7 @@ namespace System.Windows.Controls
                 // was set via an Expression (presumably a binding).  I don't think
                 // this actually happens any more.  Just in case...
                 DependencyProperty dp = FrameworkElement.DataContextProperty;
-                Debug.Assert(container.ReadLocalValueInternal(dp) as BindingExpression == null, "DataContext set by expression (unexpectedly)");
+                Debug.Assert(container.ReadLocalValue(dp) as BindingExpression == null, "DataContext set by expression (unexpectedly)");
 #endif
 
                 container.SetValueInternal(FrameworkElement.DataContextProperty, item);
@@ -1544,7 +1544,7 @@ namespace System.Windows.Controls
                 // Some ancient code at this point handled the case when DataContext
                 // was set via an Expression (presumably a binding).  I don't think
                 // this actually happens any more.  Just in case...
-                Debug.Assert(container.ReadLocalValueInternal(dp) as BindingExpression == null, "DataContext set by expression (unexpectedly)");
+                Debug.Assert(container.ReadLocalValue(dp) as BindingExpression == null, "DataContext set by expression (unexpectedly)");
 #endif
 
                 container.ClearValue(dp);
