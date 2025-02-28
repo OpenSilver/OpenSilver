@@ -23,8 +23,8 @@
 
     <!--  charting:AreaDataPoint  -->
     <Style TargetType="charting:AreaDataPoint">
-        <Setter Property="Background" Value="Orange" />
-        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="Background" Value="{x:Static Brushes.Orange}" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.Gray}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Width" Value="4" />
@@ -88,8 +88,8 @@
                                 </RadialGradientBrush>
                             </Ellipse.Fill>
                         </Ellipse>
-                        <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="Red" />
-                        <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="White" />
+                        <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="{x:Static Brushes.Red}" />
+                        <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="{x:Static Brushes.White}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -133,8 +133,8 @@
 
     <!--  charting:BarDataPoint  -->
     <Style TargetType="charting:BarDataPoint">
-        <Setter Property="Background" Value="Orange" />
-        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="Background" Value="{x:Static Brushes.Orange}" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.Black}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
@@ -192,8 +192,8 @@
                             <Border BorderBrush="#ccffffff" BorderThickness="1">
                                 <Border BorderBrush="#77ffffff" BorderThickness="1" />
                             </Border>
-                            <Rectangle x:Name="SelectionHighlight" Fill="Red" Opacity="0" />
-                            <Rectangle x:Name="MouseOverHighlight" Fill="White" Opacity="0" />
+                            <Rectangle x:Name="SelectionHighlight" Fill="{x:Static Brushes.Red}" Opacity="0" />
+                            <Rectangle x:Name="MouseOverHighlight" Fill="{x:Static Brushes.White}" Opacity="0" />
                         </Grid>
                         <ToolTipService.ToolTip>
                             <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
@@ -206,8 +206,8 @@
 
     <!--  charting:BubbleDataPoint  -->
     <Style TargetType="charting:BubbleDataPoint">
-        <Setter Property="Background" Value="Orange" />
-        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="Background" Value="{x:Static Brushes.Orange}" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.Black}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
@@ -262,8 +262,8 @@
                                 </LinearGradientBrush>
                             </Ellipse.Fill>
                         </Ellipse>
-                        <Ellipse x:Name="SelectionHighlight" Fill="Red" Opacity="0" />
-                        <Ellipse x:Name="MouseOverHighlight" Fill="White" Opacity="0" />
+                        <Ellipse x:Name="SelectionHighlight" Fill="{x:Static Brushes.Red}" Opacity="0" />
+                        <Ellipse x:Name="MouseOverHighlight" Fill="{x:Static Brushes.White}" Opacity="0" />
                         <ToolTipService.ToolTip>
                             <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
                         </ToolTipService.ToolTip>
@@ -275,7 +275,7 @@
 
     <!--  charting:Chart  -->
     <Style TargetType="charting:Chart">
-        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.Black}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Padding" Value="10" />
@@ -607,8 +607,8 @@
 
     <!--  charting:ColumnDataPoint  -->
     <Style TargetType="charting:ColumnDataPoint">
-        <Setter Property="Background" Value="Orange" />
-        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="Background" Value="{x:Static Brushes.Orange}" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.Black}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
@@ -666,8 +666,8 @@
                             <Border BorderBrush="#ccffffff" BorderThickness="1">
                                 <Border BorderBrush="#77ffffff" BorderThickness="1" />
                             </Border>
-                            <Rectangle x:Name="SelectionHighlight" Fill="Red" Opacity="0" />
-                            <Rectangle x:Name="MouseOverHighlight" Fill="White" Opacity="0" />
+                            <Rectangle x:Name="SelectionHighlight" Fill="{x:Static Brushes.Red}" Opacity="0" />
+                            <Rectangle x:Name="MouseOverHighlight" Fill="{x:Static Brushes.White}" Opacity="0" />
                         </Grid>
                         <ToolTipService.ToolTip>
                             <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
@@ -699,7 +699,7 @@
                     <Grid>
                         <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Canvas x:Name="InsertionIndicatorContainer" IsHitTestVisible="False">
-                            <Path x:Name="InsertionIndicator" IsHitTestVisible="False" Stroke="Gray" StrokeThickness="2" />
+                            <Path x:Name="InsertionIndicator" IsHitTestVisible="False" Stroke="{x:Static Brushes.Gray}" StrokeThickness="2" />
                         </Canvas>
                         <Popup x:Name="DragPopup" IsHitTestVisible="False">
                             <Canvas x:Name="DragContainer" IsHitTestVisible="False">
@@ -740,7 +740,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="charting:DefinitionSeries">
                     <Grid x:Name="SeriesArea" Background="{TemplateBinding Background}">
-                        <chartingprimitives:DelegatingListBox x:Name="ItemContainer" Background="Transparent" BorderThickness="0">
+                        <chartingprimitives:DelegatingListBox x:Name="ItemContainer" Background="{x:Static Brushes.Transparent}" BorderThickness="0">
                             <chartingprimitives:DelegatingListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas />
@@ -777,7 +777,7 @@
         <Setter Property="MajorTickMarkStyle">
             <Setter.Value>
                 <Style TargetType="Line">
-                    <Setter Property="Stroke" Value="Black" />
+                    <Setter Property="Stroke" Value="{x:Static Brushes.Black}" />
                     <Setter Property="X2" Value="4" />
                     <Setter Property="Y2" Value="4" />
                 </Style>
@@ -786,7 +786,7 @@
         <Setter Property="GridLineStyle">
             <Setter.Value>
                 <Style TargetType="Line">
-                    <Setter Property="Stroke" Value="Gray" />
+                    <Setter Property="Stroke" Value="{x:Static Brushes.Gray}" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -820,8 +820,8 @@
 
     <!--  charting:LineDataPoint  -->
     <Style TargetType="charting:LineDataPoint">
-        <Setter Property="Background" Value="Orange" />
-        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="Background" Value="{x:Static Brushes.Orange}" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.Gray}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Width" Value="8" />
@@ -885,8 +885,8 @@
                                     </RadialGradientBrush>
                                 </Ellipse.Fill>
                             </Ellipse>
-                            <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="Red" />
-                            <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="White" />
+                            <Ellipse x:Name="SelectionHighlight" Opacity="0" Fill="{x:Static Brushes.Red}" />
+                            <Ellipse x:Name="MouseOverHighlight" Opacity="0" Fill="{x:Static Brushes.White}" />
                         </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -931,8 +931,8 @@
 
     <!--  charting:PieDataPoint  -->
     <Style TargetType="charting:PieDataPoint">
-        <Setter Property="Background" Value="Orange" />
-        <Setter Property="BorderBrush" Value="White" />
+        <Setter Property="Background" Value="{x:Static Brushes.Orange}" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.White}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="RatioStringFormat" Value="{}{0:p2}" />
@@ -987,8 +987,8 @@
                                 </StackPanel>
                             </ToolTipService.ToolTip>
                         </Path>
-                        <Path x:Name="SelectionHighlight" Data="{TemplateBinding GeometrySelection}" Fill="Red" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
-                        <Path x:Name="MouseOverHighlight" Data="{TemplateBinding GeometryHighlight}" Fill="White" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
+                        <Path x:Name="SelectionHighlight" Data="{TemplateBinding GeometrySelection}" Fill="{x:Static Brushes.Red}" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
+                        <Path x:Name="MouseOverHighlight" Data="{TemplateBinding GeometryHighlight}" Fill="{x:Static Brushes.White}" StrokeMiterLimit="1" IsHitTestVisible="False" Opacity="0" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -1021,7 +1021,7 @@
         <Setter Property="MajorTickMarkStyle">
             <Setter.Value>
                 <Style TargetType="Line">
-                    <Setter Property="Stroke" Value="Black" />
+                    <Setter Property="Stroke" Value="{x:Static Brushes.Black}" />
                     <Setter Property="X2" Value="4" />
                     <Setter Property="Y2" Value="4" />
                 </Style>
@@ -1030,7 +1030,7 @@
         <Setter Property="MinorTickMarkStyle">
             <Setter.Value>
                 <Style TargetType="Line">
-                    <Setter Property="Stroke" Value="Gray" />
+                    <Setter Property="Stroke" Value="{x:Static Brushes.Gray}" />
                     <Setter Property="X2" Value="2" />
                     <Setter Property="Y2" Value="2" />
                 </Style>
@@ -1039,7 +1039,7 @@
         <Setter Property="GridLineStyle">
             <Setter.Value>
                 <Style TargetType="Line">
-                    <Setter Property="Stroke" Value="Gray" />
+                    <Setter Property="Stroke" Value="{x:Static Brushes.Gray}" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -1056,7 +1056,7 @@
 
     <!--  charting:ScatterDataPoint  -->
     <Style TargetType="charting:ScatterDataPoint">
-        <Setter Property="Background" Value="Orange" />
+        <Setter Property="Background" Value="{x:Static Brushes.Orange}" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="BorderBrush" Value="#FF686868" />
         <Setter Property="Width" Value="8" />
@@ -1114,8 +1114,8 @@
                             <ContentControl Content="{TemplateBinding FormattedDependentValue}" />
                         </ToolTipService.ToolTip>
                             <Path Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " />
-                            <Path x:Name="MouseOverHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z  " Opacity="0" Fill="White" />
-                            <Path x:Name="SelectionHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " Fill="Red" Opacity="0" />
+                            <Path x:Name="MouseOverHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z  " Opacity="0" Fill="{x:Static Brushes.White}" />
+                            <Path x:Name="SelectionHighlight" Stretch="Fill" StrokeThickness="1" StrokeLineJoin="Round" Stroke="{x:Null}" Data="F1 M 0,50L 50,0 100,50 50,100L 0,50 Z " Fill="{x:Static Brushes.Red}" Opacity="0" />
                         </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -1129,7 +1129,7 @@
 
     <!--  datavis:Legend  -->
     <Style TargetType="datavis:Legend">
-        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderBrush" Value="{x:Static Brushes.Black}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="TitleStyle">
@@ -1196,7 +1196,7 @@
                 <datavis:TreeMapItemDefinition ValueBinding="{Binding}">
                     <datavis:TreeMapItemDefinition.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="Black" Background="Transparent" BorderThickness="1" ToolTipService.ToolTip="{Binding}">
+                            <Border BorderBrush="{x:Static Brushes.Black}" Background="{x:Static Brushes.Transparent}" BorderThickness="1" ToolTipService.ToolTip="{Binding}">
                                 <ContentControl Content="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                         </DataTemplate>

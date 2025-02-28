@@ -52,7 +52,7 @@
                             </Grid>
                             <TextBlock Padding="4,1,0,0"
                                        Text="{Binding}"
-                                       Foreground="#FFFFFFFF"
+                                       Foreground="{x:Static Brushes.White}"
                                        FontWeight="Bold" />
                         </StackPanel>
                     </Border>
@@ -114,19 +114,15 @@
                                     <Rectangle x:Name="FillColor"
                                                Opacity="0"
                                                Fill="#59F7D8DB"
-                                               IsHitTestVisible="False" />
-                                    <!-- #if WORKINPROGRESS -->
-                                    <!-- RadiusX="1"
-                                         RadiusY="1" -->
-                                    <!-- #endif -->
+                                               IsHitTestVisible="False"
+                                               RadiusX="1"
+                                               RadiusY="1" />
                                     <Rectangle x:Name="FillColor2"
                                                Opacity="0"
                                                Fill="#FFF7D8DB"
-                                               IsHitTestVisible="False" />
-                                    <!-- #if WORKINPROGRESS -->
-                                    <!-- RadiusX="1"
-                                         RadiusY="1" -->
-                                    <!-- #endif -->
+                                               IsHitTestVisible="False"
+                                               RadiusX="1"
+                                               RadiusY="1" />
                                     <ContentPresenter x:Name="ContentPresenter"
                                                       Content="{TemplateBinding Content}"
                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -135,11 +131,9 @@
                                     <Rectangle x:Name="FocusVisualElement"
                                                Stroke="#FFF7D8DB"
                                                StrokeThickness="1"
-                                               Visibility="Collapsed" />
-                                    <!-- #if WORKINPROGRESS -->
-                                    <!-- RadiusX="1"
-                                         RadiusY="1" -->
-                                    <!-- #endif -->
+                                               Visibility="Collapsed"
+                                               RadiusX="1"
+                                               RadiusY="1" />
                                 </Grid>
                             </ControlTemplate>
                         </Setter.Value>
@@ -252,11 +246,8 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentControl"
                                                                        Storyboard.TargetProperty="Foreground"
                                                                        Duration="0:0:1.5">
-                                            <DiscreteObjectKeyFrame KeyTime="0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <SolidColorBrush Color="Red" />
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{x:Static Brushes.Red}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -290,12 +281,10 @@
                                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                             FontFamily="{TemplateBinding FontFamily}"
                                             FontSize="{TemplateBinding FontSize}"
+                                            FontStretch="{TemplateBinding FontStretch}"
                                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                             IsTabStop="False" />
-                            <!--#if WORKINPROGRESS-->
-                            <!--FontStretch="{TemplateBinding FontStretch}"-->
-                            <!--#endif-->
                         </Border>
                     </Grid>
                 </ControlTemplate>
@@ -391,12 +380,8 @@
         <Setter Property="ToolTipStyle">
             <Setter.Value>
                 <Style TargetType="ToolTip">
-                    <!-- #if WORKINPROGRESS -->
-                    <!--
                     <Setter Property="Placement"
                             Value="Right" />
-                    -->
-                    <!-- #endif -->
                     <Setter Property="IsHitTestVisible"
                             Value="True" />
                     <Setter Property="MaxWidth"
@@ -444,17 +429,15 @@
                                     IsTabStop="False"
                                     Template="{TemplateBinding GlyphTemplate}"
                                     Background="#00000000"
-                                    BorderBrush="#FFFFFFFF"
+                                    BorderBrush="{x:Static Brushes.White}"
                                     BorderThickness="1"
                                     Padding="1"
                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                                 <ToolTipService.ToolTip>
                                     <ToolTip Style="{TemplateBinding ToolTipStyle}"
+                                             PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                              Content="{TemplateBinding Description}" />
-                                    <!-- #if WORKINPROGRESS -->
-                                    <!-- PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" -->
-                                    <!-- #endif -->
                                 </ToolTipService.ToolTip>
                             </Button>
                         </Border>

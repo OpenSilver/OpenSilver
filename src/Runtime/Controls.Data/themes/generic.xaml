@@ -16,8 +16,8 @@
 
     <Style TargetType="local:DataGrid">
         <Setter Property="RowBackground" Value="#AAEAEFF4" />
-        <Setter Property="AlternatingRowBackground" Value="#00FFFFFF" />
-        <Setter Property="Background" Value="#FFFFFFFF" />
+        <Setter Property="AlternatingRowBackground" Value="{x:Static Brushes.Transparent}" />
+        <Setter Property="Background" Value="{x:Static Brushes.White}" />
         <Setter Property="HeadersVisibility" Value="Column" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
@@ -227,7 +227,7 @@
     </Style>
 
     <Style TargetType="local:DataGridCell">
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Background" Value="{x:Static Brushes.Transparent}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="IsTabStop" Value="False" />
@@ -280,7 +280,7 @@
     </Style>
 
     <Style TargetType="localprimitives:DataGridColumnHeader">
-        <Setter Property="Foreground" Value="#FF000000" />
+        <Setter Property="Foreground" Value="{x:Static Brushes.Black}" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="IsTabStop" Value="False" />
@@ -466,7 +466,7 @@
                         </vsm:VisualStateManager.VisualStateGroups>
                         <localprimitives:DataGridFrozenGrid.Resources>
                             <ControlTemplate x:Key="ToggleButtonTemplate" TargetType="ToggleButton">
-                                <Grid Background="Transparent">
+                                <Grid Background="{x:Static Brushes.Transparent}">
                                     <vsm:VisualStateManager.VisualStateGroups>
                                         <vsm:VisualStateGroup x:Name="CommonStates">
                                             <vsm:VisualState x:Name="Normal"/>
@@ -523,7 +523,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <Rectangle Grid.Column="1" Grid.ColumnSpan="5" Fill="#FFFFFFFF" Height="1"/>
+                        <Rectangle Grid.Column="1" Grid.ColumnSpan="5" Fill="{x:Static Brushes.White}" Height="1"/>
                         <Rectangle Grid.Column="1" Grid.Row="1" Name="IndentSpacer" />
                         <ToggleButton Grid.Column="2" Grid.Row="1" Name="ExpanderButton" Height="15" Width="15" IsTabStop="False" Template="{StaticResource ToggleButtonTemplate}" Margin="2,0,0,0"/>
 
@@ -547,7 +547,7 @@
     <Style TargetType="localprimitives:DataGridRowHeader">
         <Setter Property="Background" Value="#99E9EEF4" />
         <Setter Property="IsTabStop" Value="False" />
-        <Setter Property="SeparatorBrush" Value="#FFFFFFFF" />
+        <Setter Property="SeparatorBrush" Value="{x:Static Brushes.White}" />
         <Setter Property="SeparatorVisibility" Value="Collapsed"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -619,7 +619,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <Border BorderBrush="#FFFFFFFF" BorderThickness="1,0,1,0" Grid.RowSpan="3" Grid.ColumnSpan="2">
+                        <Border BorderBrush="{x:Static Brushes.White}" BorderThickness="1,0,1,0" Grid.RowSpan="3" Grid.ColumnSpan="2">
                             <Grid Background="{TemplateBinding Background}">
                                 <Rectangle x:Name="RowInvalidVisualElement" Stretch="Fill" Grid.RowSpan="3" Grid.ColumnSpan="2" Fill="#FFF7D8DB" Opacity="0" />
                                 <Rectangle x:Name="BackgroundRectangle" Stretch="Fill" Grid.RowSpan="3" Grid.ColumnSpan="2" Fill="Transparent" />
@@ -722,7 +722,7 @@
                                             <vsm:VisualState x:Name="Unfocused"/>
                                         </vsm:VisualStateGroup>
                                     </vsm:VisualStateManager.VisualStateGroups>
-                                    <Border x:Name="CheckedStateOuterBorder" Background="#7FA9A9A9" BorderBrush="#00FFFFFF" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3" Opacity="0"/>
+                                    <Border x:Name="CheckedStateOuterBorder" Background="#7FA9A9A9" BorderBrush="{x:Static Brushes.Transparent}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3" Opacity="0"/>
                                     <Border x:Name="OuterBtnBorder" Background="{TemplateBinding Background}" BorderBrush="#00FFFFFF" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
                                         <Border x:Name="InnerBtnBorder" BorderBrush="#00CCD1D6" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
                                             <ContentPresenter x:Name="contentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -740,11 +740,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:DataPager">
-                    <Grid Name="Root" Background="Transparent">
+                    <Grid Name="Root" Background="{x:Static Brushes.Transparent}">
                         <Grid.Resources>
                             <SolidColorBrush x:Key="BackgroundColor" Color="#00000000"/>
-                            <SolidColorBrush x:Key="ForegroundColor" Color="#FF000000"/>
-                            <SolidColorBrush x:Key="BorderBrushColor" Color="#FFFFFFFF"/>
                             <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
                                 <Grid>
                                     <vsm:VisualStateManager.VisualStateGroups>
@@ -788,8 +786,8 @@
 
                             <Style x:Key="PagingTextBoxStyle" TargetType="TextBox">
                                 <Setter Property="BorderThickness" Value="1"/>
-                                <Setter Property="Background" Value="#FFFFFFFF"/>
-                                <Setter Property="Foreground" Value="#FF000000"/>
+                                <Setter Property="Background" Value="{x:Static Brushes.White}"/>
+                                <Setter Property="Foreground" Value="{x:Static Brushes.Black}"/>
                                 <Setter Property="Padding" Value="2, 2, 2, -1"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
@@ -1052,7 +1050,7 @@
                         <Border MinHeight="24" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" VerticalAlignment="Bottom" CornerRadius="2">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Stretch">
                                 <!--FirstPage Button-->
-                                <Button x:Name="FirstPageButton" Height="20" Width="20" Background="{StaticResource BackgroundColor}" Foreground="{StaticResource ForegroundColor}" BorderBrush="{StaticResource BorderBrushColor}" BorderThickness="1" Padding="1" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
+                                <Button x:Name="FirstPageButton" Height="20" Width="20" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
                                         <Grid Height="9" Width="8" >
                                             <Path Stretch="Fill" Data="M0,1 L1,0 L1,2 Z" Width="5" Height="9" HorizontalAlignment="Right" Fill="{TemplateBinding Foreground}"/>
@@ -1062,7 +1060,7 @@
                                 </Button>
 
                                 <!--PreviousPage Button-->
-                                <Button Name="PreviousPageButton" Background="{StaticResource BackgroundColor}" Foreground="{StaticResource ForegroundColor}" BorderBrush="{StaticResource BorderBrushColor}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
+                                <Button Name="PreviousPageButton" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
                                         <Path Stretch="Fill" Data="M0,1 L1,0 L1,2 Z" Width="5" Height="9" HorizontalAlignment="Center" Fill="{TemplateBinding Foreground}"/>
                                     </Button.Content>
@@ -1081,14 +1079,14 @@
                                 <Border x:Name="Separator2" Width="1" Background="#FFCCD1D6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0,1,0" Margin="0,3,0,3"/>
 
                                 <!--NextPage Button-->
-                                <Button x:Name="NextPageButton" Background="{StaticResource BackgroundColor}" Foreground="{StaticResource ForegroundColor}" BorderBrush="{StaticResource BorderBrushColor}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
+                                <Button x:Name="NextPageButton" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
                                         <Path Stretch="Fill" Data="M0,0 L1,1 L0,2 Z" Width="5" Height="9" HorizontalAlignment="Center" Fill="{TemplateBinding Foreground}"/>
                                     </Button.Content>
                                 </Button>
 
                                 <!--LastPage Button-->
-                                <Button x:Name="LastPageButton" Background="{StaticResource BackgroundColor}" Foreground="{StaticResource ForegroundColor}" BorderBrush="{StaticResource BorderBrushColor}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
+                                <Button x:Name="LastPageButton" Background="{StaticResource BackgroundColor}" Foreground="{x:Static Brushes.Black}" BorderBrush="{x:Static Brushes.White}" BorderThickness="1" Padding="1" Height="20" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center" Template="{StaticResource ButtonTemplate}">
                                     <Button.Content>
                                         <Grid Height="9" Width="8">
                                             <Path Stretch="Fill" Data="M0,0 L1,1 L0,2 Z" Width="5" Height="9" HorizontalAlignment="Left" Fill="{TemplateBinding Foreground}"/>

@@ -21,7 +21,7 @@
             <Setter.Value>
                 <Style TargetType="Rectangle">
                     <Setter Property="Fill"
-                            Value="White" />
+                            Value="{x:Static Brushes.White}" />
                     <Setter Property="Opacity"
                             Value="0.5" />
                 </Style>
@@ -140,7 +140,7 @@
                                           ContentTemplate="{x:Null}">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
-                                <Border Background="White"
+                                <Border Background="{x:Static Brushes.White}"
                                         BorderThickness="1"
                                         CornerRadius="2"
                                         BorderBrush="#FF718597">
@@ -282,7 +282,7 @@
                                             Orientation="Horizontal">
                                     <Path Stretch="Fill"
                                           StrokeLineJoin="Round"
-                                          Stroke="White"
+                                          Stroke="{x:Static Brushes.White}"
                                           Data="F1 M409.01999,315.047 L384,315.047 L384,305.198 L408.974,305.198 L408.974,304.444 L405.422,304.444 L407.289,299.33301 L428.44315,309.66699 L408.39801,320 L405.422,315.79999 L409.01999,315.79999 L409.01999,315.047 z"
                                           Height="10"
                                           Width="10"
@@ -316,7 +316,7 @@
                                             Orientation="Horizontal">
                                     <Path Stretch="Fill"
                                           StrokeLineJoin="Round"
-                                          Stroke="#FFFFFFFF"
+                                          Stroke="{x:Static Brushes.White}"
                                           StrokeThickness="0.1"
                                           Data="F1 M 394.667,256.833L 405.333,256.833L 405.333,267.5L 416,267.5L 416,278.167L 405.333,278.167L 405.333,288.833L 394.667,288.833L 394.667,278.167L 384,278.167L 384,267.5L 394.667,267.5L 394.667,256.833 Z "
                                           UseLayoutRounding="False"
@@ -348,7 +348,7 @@
                                     VerticalAlignment="Top">
                                 <Path Stretch="Fill"
                                       StrokeLineJoin="Round"
-                                      Stroke="White"
+                                      Stroke="{x:Static Brushes.White}"
                                       Data="F1 M924.995,614.00098 C946.44397,614.00098 965.31097,624.289 976.20599,639.84998 C987.12598,624.41699 1005.91,614.22998 1027.26,614.22998 C1060.99,614.22998 1076.9962,644.49744 1076.9962,675.88147 C1076.9962,707.26544 1060.99,727.88202 1027.26,727.88202 C1005.81,727.88202 986.94,717.59399 976.04401,702.03302 C965.125,717.466 946.33801,727.65198 924.995,727.65198 C891.26398,727.65198 863.91998,702.211 863.91998,670.82703 C863.91998,639.44299 891.26398,614.00098 924.995,614.00098 z M986.06897,670.82703 C986.06897,671.42603 986.06,672.02197 986.03998,672.617 C986.91998,693.09003 1005.04,709.43597 1027.26,709.43597 C1050.04,709.43597 1068.51,692.25299 1068.51,671.05603 C1068.51,649.85999 1050.04,632.677 1027.26,632.677 C1005.1,632.677 987.02899,648.92401 986.04797,669.31097 C986.06201,669.815 986.06897,670.32001 986.06897,670.82703 z M924.995,632.44702 C902.21301,632.44702 883.745,649.63 883.745,670.82703 C883.745,692.02301 902.21301,709.20697 924.995,709.20697 C947.14801,709.20697 965.22198,692.95801 966.20203,672.57001 C966.18799,672.06702 966.18103,671.56299 966.18103,671.05603 C966.18103,670.45801 966.19098,669.862 966.211,669.26801 C965.33197,648.79401 947.21503,632.44702 924.995,632.44702 z"
                                       Height="6"
                                       Width="9.5"
@@ -379,7 +379,7 @@
                                     Visibility="Collapsed"
                                     VerticalAlignment="Top">
                                 <Path  HorizontalAlignment="Left"
-                                       Stroke="Black"
+                                       Stroke="{x:Static Brushes.Black}"
                                        Data="M 0,5 L 10,5 L 5,0 M 0,8 L 10,8 L 5,13">
                                     <Path.Fill>
                                         <LinearGradientBrush StartPoint="0.494361,-0.312728"
@@ -451,7 +451,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:Expander">
-                    <Grid Background="Transparent">
+                    <Grid Background="{x:Static Brushes.Transparent}">
                         <Grid.Resources>
                             <LinearGradientBrush x:Key="ExpanderArrowFill"
                                                  EndPoint="0,1"
@@ -485,7 +485,7 @@
                             </LinearGradientBrush>
                             <ControlTemplate x:Key="ExpanderDownHeaderTemplate"
                                              TargetType="ToggleButton">
-                                <Grid Background="Transparent">
+                                <Grid Background="{x:Static Brushes.Transparent}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroup x:Name="CheckStates">
                                             <VisualStateGroup.Transitions>
@@ -566,7 +566,7 @@
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
                                     <Border Padding="{TemplateBinding Padding}">
-                                        <Grid Background="Transparent">
+                                        <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="19" />
                                                 <ColumnDefinition Width="*" />
@@ -605,7 +605,7 @@
                             </ControlTemplate>
                             <ControlTemplate x:Key="ExpanderUpHeaderTemplate"
                                              TargetType="ToggleButton">
-                                <Grid Background="Transparent">
+                                <Grid Background="{x:Static Brushes.Transparent}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroup x:Name="CheckStates">
                                             <VisualStateGroup.Transitions>
@@ -686,7 +686,7 @@
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
                                     <Border Padding="{TemplateBinding Padding}">
-                                        <Grid Background="Transparent">
+                                        <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="19" />
                                                 <ColumnDefinition Width="*" />
@@ -736,7 +736,7 @@
                             </ControlTemplate>
                             <ControlTemplate x:Key="ExpanderLeftHeaderTemplate"
                                              TargetType="ToggleButton">
-                                <Grid Background="Transparent">
+                                <Grid Background="{x:Static Brushes.Transparent}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroup x:Name="CheckStates">
                                             <VisualStateGroup.Transitions>
@@ -817,7 +817,7 @@
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
                                     <Border Padding="{TemplateBinding Padding}">
-                                        <Grid Background="Transparent">
+                                        <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="19" />
                                                 <RowDefinition Height="*" />
@@ -867,7 +867,7 @@
                             </ControlTemplate>
                             <ControlTemplate x:Key="ExpanderRightHeaderTemplate"
                                              TargetType="ToggleButton">
-                                <Grid Background="Transparent">
+                                <Grid Background="{x:Static Brushes.Transparent}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroup x:Name="CheckStates">
                                             <VisualStateGroup.Transitions>
@@ -948,7 +948,7 @@
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
                                     <Border Padding="{TemplateBinding Padding}">
-                                        <Grid Background="Transparent">
+                                        <Grid Background="{x:Static Brushes.Transparent}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="19" />
                                                 <RowDefinition Height="*" />
@@ -1240,7 +1240,7 @@
     <!--  controls:HeaderedContentControl  -->
     <Style TargetType="controls:HeaderedContentControl">
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static Brushes.Black}" />
         <!-- <Setter Property="FontSize" Value="11" /> -->
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
@@ -1287,7 +1287,7 @@
                                 IsHitTestVisible="False">
                             <Path x:Name="InsertionIndicator"
                                   IsHitTestVisible="False"
-                                  Stroke="Gray"
+                                  Stroke="{x:Static Brushes.Gray}"
                                   StrokeThickness="2" />
                         </Canvas>
                         <Popup x:Name="DragPopup"
@@ -1324,7 +1324,7 @@
                                 IsHitTestVisible="False">
                             <Path x:Name="InsertionIndicator"
                                   IsHitTestVisible="False"
-                                  Stroke="Gray"
+                                  Stroke="{x:Static Brushes.Gray}"
                                   StrokeThickness="2" />
                         </Canvas>
                         <Popup x:Name="DragPopup"
@@ -1361,7 +1361,7 @@
                                 IsHitTestVisible="False">
                             <Path x:Name="InsertionIndicator"
                                   IsHitTestVisible="False"
-                                  Stroke="Gray"
+                                  Stroke="{x:Static Brushes.Gray}"
                                   StrokeThickness="2" />
                         </Canvas>
                         <Popup x:Name="DragPopup"
@@ -1763,7 +1763,7 @@
                               HorizontalAlignment="Stretch"
                               VerticalAlignment="Stretch"
                               RenderTransformOrigin="0.5,0.5"
-                              Fill="#FF000000"
+                              Fill="{x:Static Brushes.Black}"
                               Stretch="Fill"
                               Data="M8.1772461,11.029181 L10.433105,11.029181 L11.700684,12.801641 L12.973633,11.029181 L15.191895,11.029181 L12.844727,13.999395 L15.21875,17.060919 L12.962891,17.060919 L11.673828,15.256231 L10.352539,17.060919 L8.1396484,17.060919 L10.519043,14.042364 z" />
                         <Rectangle x:Name="FocusVisual"
@@ -1808,7 +1808,7 @@
                                 Margin="0,2,0,2"
                                 CornerRadius="1">
                             <Border CornerRadius="1"
-                                    BorderBrush="#FFFFFFFF"
+                                    BorderBrush="{x:Static Brushes.White}"
                                     BorderThickness="2">
                                 <Grid>
                                     <Grid.RowDefinitions>

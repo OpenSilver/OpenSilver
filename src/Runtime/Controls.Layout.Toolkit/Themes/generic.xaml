@@ -16,7 +16,7 @@
         <Setter Property="BorderThickness"
                 Value="0" />
         <Setter Property="Background"
-                Value="White" />
+                Value="{x:Static Brushes.White}" />
         <Setter Property="HorizontalAlignment"
                 Value="Stretch" />
         <Setter Property="VerticalAlignment"
@@ -33,7 +33,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="layoutPrimitivesToolkit:AccordionButton">
                     <Grid Margin="{TemplateBinding Padding}"
-                          Background="Transparent">
+                          Background="{x:Static Brushes.Transparent}">
                         <vsm:VisualStateManager.VisualStateGroups>
                             <vsm:VisualStateGroup x:Name="ExpandDirectionStates">
                                 <vsm:VisualStateGroup.Transitions>
@@ -376,7 +376,7 @@
                                         BorderBrush="{TemplateBinding BorderBrush}"
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         CornerRadius="1,1,1,1" />
-                                <Grid Background="Transparent">
+                                <Grid Background="{x:Static Brushes.Transparent}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"
                                                           x:Name="cd0" />
@@ -490,7 +490,7 @@
     <!--  layoutToolkit:Accordion  -->
     <Style TargetType="layoutToolkit:Accordion">
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static Brushes.Black}" />
         <Setter Property="BorderBrush"
                 Value="#FFEAEAEA" />
         <Setter Property="HorizontalAlignment"
@@ -548,7 +548,7 @@
                                           HorizontalScrollBarVisibility="Disabled"
                                           VerticalScrollBarVisibility="Disabled"
                                           Background="{x:Null}"
-                                          BorderBrush="Transparent"
+                                          BorderBrush="{x:Static Brushes.Transparent}"
                                           Margin="0"
                                           Padding="0"
                                           BorderThickness="0">
@@ -568,7 +568,7 @@
         <Setter Property="BorderBrush"
                 Value="#FFECECEC" />
         <Setter Property="Background"
-                Value="White" />
+                Value="{x:Static Brushes.White}" />
         <Setter Property="Margin"
                 Value="0" />
         <Setter Property="Padding"
@@ -865,7 +865,7 @@
     <!--  layoutToolkit:LayoutTransformer  -->
     <Style TargetType="layoutToolkit:LayoutTransformer">
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static Brushes.Black}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="layoutToolkit:LayoutTransformer">

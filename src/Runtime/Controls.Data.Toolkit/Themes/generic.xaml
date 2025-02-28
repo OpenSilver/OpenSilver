@@ -24,7 +24,7 @@
                     <Grid>
                         <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Canvas x:Name="InsertionIndicatorContainer" IsHitTestVisible="False">
-                            <Path x:Name="InsertionIndicator" IsHitTestVisible="False" Stroke="Gray" StrokeThickness="2" />
+                            <Path x:Name="InsertionIndicator" IsHitTestVisible="False" Stroke="{x:Static Brushes.Gray}" StrokeThickness="2" />
                         </Canvas>
                         <Popup x:Name="DragPopup" IsHitTestVisible="False">
                             <Canvas x:Name="DragContainer" IsHitTestVisible="False">

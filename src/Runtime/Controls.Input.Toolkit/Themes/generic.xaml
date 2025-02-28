@@ -21,7 +21,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:ListTimePickerPopup">
-                    <Grid Background="Transparent">
+                    <Grid Background="{x:Static Brushes.Transparent}">
                         <VisualStateManager.VisualStateGroups>
                             <!-- Common States -->
                             <VisualStateGroup x:Name="CommonStates">
@@ -97,7 +97,7 @@
         <Setter Property="HorizontalAlignment"
                 Value="Stretch" />
         <Setter Property="Background"
-                Value="White" />
+                Value="{x:Static Brushes.White}" />
         <Setter Property="SliderStyle">
             <Setter.Value>
                 <Style TargetType="Slider">
@@ -220,7 +220,7 @@
                                 <Setter Property="Background"
                                         Value="#FF1F3B53" />
                                 <Setter Property="Foreground"
-                                        Value="#FF000000" />
+                                        Value="{x:Static Brushes.Black}" />
                                 <Setter Property="Padding"
                                         Value="3" />
                                 <Setter Property="BorderThickness"
@@ -377,7 +377,7 @@
                                                 <Rectangle x:Name="DisabledVisualElement"
                                                            IsHitTestVisible="false"
                                                            Opacity="0"
-                                                           Fill="#FFFFFFFF"
+                                                           Fill="{x:Static Brushes.White}"
                                                            RadiusX="3"
                                                            RadiusY="3" />
                                                 <Rectangle Margin="0.936,0.904,1.064,1.096"
@@ -398,7 +398,7 @@
                                 <Setter Property="Background"
                                         Value="#FF1F3B53" />
                                 <Setter Property="Foreground"
-                                        Value="#FF000000" />
+                                        Value="{x:Static Brushes.Black}" />
                                 <Setter Property="Padding"
                                         Value="3" />
                                 <Setter Property="BorderThickness"
@@ -524,7 +524,7 @@
                                                                   Margin="-1.25,0,0,0"
                                                                   VerticalAlignment="Top"
                                                                   Width="7.75"
-                                                                  Fill="#FF000000"
+                                                                  Fill="{x:Static Brushes.Black}"
                                                                   Stretch="Fill"
                                                                   StrokeDashCap="Round"
                                                                   StrokeEndLineCap="Round"
@@ -548,7 +548,7 @@
                                                 <Rectangle x:Name="DisabledVisualElement"
                                                            IsHitTestVisible="false"
                                                            Opacity="0"
-                                                           Fill="#FFFFFFFF"
+                                                           Fill="{x:Static Brushes.White}"
                                                            RadiusX="3"
                                                            RadiusY="3" />
                                                 <Rectangle Margin="0.936,0.904,1.064,1.096"
@@ -649,7 +649,7 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static Brushes.Transparent}" />
         <Setter Property="BorderBrush"
                 Value="#FF718597" />
         <Setter Property="PopupTemplate">
@@ -1019,7 +1019,7 @@
                                         <Rectangle x:Name="DisabledVisualElement"
                                                    IsHitTestVisible="false"
                                                    Opacity="0"
-                                                   Fill="#FFFFFFFF"
+                                                   Fill="{x:Static Brushes.White}"
                                                    RadiusX="3"
                                                    RadiusY="3" />
                                     </Grid>
@@ -1078,7 +1078,7 @@
         <Setter Property="BorderBrush"
                 Value="#FF718597" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static Brushes.Transparent}" />
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="VerticalContentAlignment"
@@ -1204,7 +1204,7 @@
                                     </Rectangle>
                                     <Rectangle Margin="1"
                                                x:Name="BackgroundGradient"
-                                               Stroke="#FFFFFFFF"
+                                               Stroke="{x:Static Brushes.White}"
                                                StrokeThickness="1"
                                                RadiusX="1"
                                                RadiusY="1">
@@ -1367,7 +1367,7 @@
                                     </Rectangle>
                                     <Rectangle Margin="1"
                                                x:Name="BackgroundGradient"
-                                               Stroke="#FFFFFFFF"
+                                               Stroke="{x:Static Brushes.White}"
                                                StrokeThickness="1"
                                                RadiusX="1"
                                                RadiusY="1">
@@ -1438,20 +1438,14 @@
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="presentationSite"
                                                                        Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <SolidColorBrush Color="Gray" />
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00"
+                                                                    Value="{x:Static Brushes.Gray}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Duration="0"
                                                                        Storyboard.TargetName="ElementContainer"
                                                                        Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <SolidColorBrush Color="Gray" />
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00"
+                                                                    Value="{x:Static Brushes.Gray}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -1511,7 +1505,7 @@
                                             Grid.Column="1">
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
-                                                <Grid Background="Transparent" />
+                                                <Grid Background="{x:Static Brushes.Transparent}" />
                                             </ControlTemplate>
                                         </Button.Template>
                                     </Button>
@@ -1553,7 +1547,7 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static Brushes.Transparent}" />
         <Setter Property="Padding"
                 Value="0" />
         <Setter Property="IsTabStop"
@@ -1650,7 +1644,7 @@
                                          Margin="0"
                                          Padding="0"
                                          IsTabStop="True"
-                                         Background="Red"
+                                         Background="{x:Static Brushes.Red}"
                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                          BorderThickness="0"
@@ -1682,7 +1676,7 @@
                                 Visibility="Collapsed"
                                 Margin="-2"
                                 IsHitTestVisible="False"
-                                BorderBrush="Red"
+                                BorderBrush="{x:Static Brushes.Red}"
                                 BorderThickness="2" />
                     </Grid>
                 </ControlTemplate>
@@ -1832,7 +1826,7 @@
     <!--  controls:Rating  -->
     <Style TargetType="controls:Rating">
         <Setter Property="Background"
-                Value="#FFFFFFFF" />
+                Value="{x:Static Brushes.White}" />
         <Setter Property="BorderBrush"
                 Value="#FF545454" />
         <Setter Property="BorderThickness"
@@ -2028,7 +2022,7 @@
                         <Border Background="#02FFFFFF"
                                 BorderThickness="0" />
                         <Path x:Name="DefaultRatingItem"
-                              Fill="White"
+                              Fill="{x:Static Brushes.White}"
                               Stretch="Fill"
                               Stroke="{TemplateBinding BorderBrush}"
                               StrokeLineJoin="Round"
@@ -2102,7 +2096,7 @@
                               VerticalAlignment="Stretch"
                               UseLayoutRounding="False"
                               Data="M15,0 L18.6,11.373603 L30,11.459046 L20.824955,18.573566 L24.270519,30 L15,23.023449 L5.7294912,30 L9.1750822,18.573566 L0,11.459046 L11.399999,11.373603 z"
-                              Fill="Gainsboro"
+                              Fill="{x:Static Brushes.Gainsboro}"
                               Opacity="0" />
                         <primitives:LinearClipper x:Name="DisabledRatingItem"
                                                   RatioVisible="{TemplateBinding DisplayValue}"
@@ -2136,7 +2130,7 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static Brushes.Transparent}" />
         <Setter Property="Height"
                 Value="22" />
         <Setter Property="IsTabStop"
@@ -2291,8 +2285,8 @@
                                VerticalOffset="0">
                             <Border x:Name="TimeHintVisualElement"
                                     IsHitTestVisible="True"
-                                    BorderBrush="Gray"
-                                    Background="White"
+                                    BorderBrush="{x:Static Brushes.Gray}"
+                                    Background="{x:Static Brushes.White}"
                                     Visibility="Collapsed"
                                     HorizontalAlignment="Left"
                                     BorderThickness="1">
@@ -2495,7 +2489,7 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static Brushes.Transparent}" />
         <Setter Property="Height"
                 Value="22" />
         <Setter Property="BorderBrush"

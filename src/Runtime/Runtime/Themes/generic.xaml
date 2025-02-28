@@ -92,7 +92,7 @@
                              CornerRadius="2" />
             <controls:Border CornerRadius="2">
                 <controls:TextBlock UseLayoutRounding="false"
-                                    Foreground="White"
+                                    Foreground="{x:Static media:Brushes.White}"
                                     Margin="8,4,8,4"
                                     MaxWidth="250"
                                     TextWrapping="Wrap"
@@ -116,7 +116,7 @@
     <!--  ContentControl  -->
     <Style TargetType="controls:ContentControl">
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
         <Setter Property="VerticalContentAlignment"
@@ -151,7 +151,7 @@
         <Setter Property="Background"
                 Value="#FF1F3B53" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="Padding"
                 Value="3" />
         <Setter Property="BorderThickness"
@@ -236,7 +236,7 @@
                         </VisualStateManager.VisualStateGroups>
                         <controls:Border x:Name="Background"
                                          CornerRadius="3"
-                                         Background="White"
+                                         Background="{x:Static media:Brushes.White}"
                                          BorderThickness="{TemplateBinding BorderThickness}"
                                          BorderBrush="{TemplateBinding BorderBrush}">
                             <controls:Grid Background="{TemplateBinding Background}"
@@ -269,7 +269,7 @@
                                                    Margin="{TemplateBinding Padding}" />
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="3"
-                                         Background="#FFFFFFFF"
+                                         Background="{x:Static media:Brushes.White}"
                                          Opacity="0"
                                          IsHitTestVisible="false" />
                         <controls:Border x:Name="FocusVisualElement"
@@ -290,7 +290,7 @@
         <Setter Property="Background"
                 Value="#FF1F3B53" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="Padding"
                 Value="3" />
         <Setter Property="BorderThickness"
@@ -390,7 +390,7 @@
                         </VisualStateManager.VisualStateGroups>
                         <controls:Border x:Name="Background"
                                          CornerRadius="3"
-                                         Background="White"
+                                         Background="{x:Static media:Brushes.White}"
                                          BorderThickness="{TemplateBinding BorderThickness}"
                                          BorderBrush="{TemplateBinding BorderBrush}">
                             <controls:Grid Background="{TemplateBinding Background}"
@@ -423,7 +423,7 @@
                                                    Margin="{TemplateBinding Padding}" />
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="3"
-                                         Background="#FFFFFFFF"
+                                         Background="{x:Static media:Brushes.White}"
                                          Opacity="0"
                                          IsHitTestVisible="false" />
                         <controls:Border x:Name="FocusVisualElement"
@@ -444,7 +444,7 @@
         <Setter Property="Background"
                 Value="#FF448DCA" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
         <Setter Property="VerticalContentAlignment"
@@ -606,7 +606,7 @@
                                              CornerRadius="1"
                                              BorderBrush="{TemplateBinding BorderBrush}"
                                              BorderThickness="{TemplateBinding BorderThickness}"
-                                             Background="#FFFFFFFF"
+                                             Background="{x:Static media:Brushes.White}"
                                              Margin="1" />
                             <controls:Border x:Name="BackgroundOverlay"
                                              Background="#FFC4DBEE"
@@ -616,20 +616,20 @@
                                              CornerRadius="1"
                                              BorderThickness="1"
                                              Margin="1"
-                                             BorderBrush="#00000000" />
+                                             BorderBrush="{x:Static media:Brushes.Transparent}" />
                             <controls:Border x:Name="BoxMiddleBackground"
                                              Width="10"
                                              Height="10"
                                              CornerRadius="1"
                                              Background="{TemplateBinding Background}"
-                                             BorderBrush="#00000000"
+                                             BorderBrush="{x:Static media:Brushes.Transparent}"
                                              BorderThickness="1" />
                             <controls:Border x:Name="BoxMiddle"
                                              Width="10"
                                              Height="10"
                                              CornerRadius="1"
                                              BorderThickness="1"
-                                             BorderBrush="#FFFFFFFF">
+                                             BorderBrush="{x:Static media:Brushes.White}">
                                 <controls:Border.Background>
                                     <media:LinearGradientBrush StartPoint="0.62,0.15"
                                                                EndPoint="0.64,0.88">
@@ -670,7 +670,7 @@
                                              Width="14"
                                              Height="14"
                                              Opacity="0"
-                                             Background="#FFFFFFFF" />
+                                             Background="{x:Static media:Brushes.White}" />
                             <controls:Border x:Name="ContentFocusVisualElement"
                                              CornerRadius="2"
                                              BorderBrush="#FF6DBDD1"
@@ -714,13 +714,13 @@
                                                HorizontalAlignment="Right"
                                                Margin="0,-4,-4,0"
                                                VerticalAlignment="Top"
-                                               Background="Transparent">
+                                               Background="{x:Static media:Brushes.Transparent}">
                                     <shapes:Path Margin="0,3,0,0"
                                                  Data="M 1,0 L5,0 A 2,2 90 0 1 7,2 L7,6 z"
                                                  Fill="#FFDC000C" />
                                     <shapes:Path Margin="0,3,0,0"
                                                  Data="M 0,0 L2,0 L 7,5 L7,7"
-                                                 Fill="#ffffff" />
+                                                 Fill="{x:Static media:Brushes.White}" />
                                 </controls:Grid>
                             </controls:Border>
 
@@ -743,7 +743,7 @@
         <Setter Property="Background"
                 Value="#FF448DCA" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
         <Setter Property="VerticalContentAlignment"
@@ -896,7 +896,7 @@
                                              Height="14"
                                              BorderBrush="{TemplateBinding BorderBrush}"
                                              BorderThickness="{TemplateBinding BorderThickness}"
-                                             Background="#FFFFFFFF"
+                                             Background="{x:Static media:Brushes.White}"
                                              Margin="1"
                                              CornerRadius="14" />
                             <controls:Border x:Name="BackgroundOverlay"
@@ -906,13 +906,13 @@
                                              Height="14"
                                              BorderThickness="1"
                                              Margin="1"
-                                             BorderBrush="#00000000"
+                                             BorderBrush="{x:Static media:Brushes.Transparent}"
                                              CornerRadius="14" />
                             <controls:Border x:Name="BoxMiddleBackground"
                                              Width="10"
                                              Height="10"
                                              Background="{TemplateBinding Background}"
-                                             BorderBrush="#00000000"
+                                             BorderBrush="{x:Static media:Brushes.Transparent}"
                                              BorderThickness="1"
                                              CornerRadius="10" />
                             <controls:Border x:Name="BoxMiddle"
@@ -920,7 +920,7 @@
                                              Height="10"
                                              BorderThickness="1"
                                              CornerRadius="10"
-                                             BorderBrush="#FFFFFFFF">
+                                             BorderBrush="{x:Static media:Brushes.White}">
                                 <controls:Border.Background>
                                     <media:LinearGradientBrush StartPoint="0.62,0.15"
                                                                EndPoint="0.64,0.88">
@@ -952,7 +952,7 @@
                                              Width="14"
                                              Height="14"
                                              Opacity="0"
-                                             Background="#FFFFFFFF"
+                                             Background="{x:Static media:Brushes.White}"
                                              CornerRadius="14" />
                             <controls:Border x:Name="ContentFocusVisualElement"
                                              BorderBrush="#FF6DBDD1"
@@ -1003,7 +1003,7 @@
                                 <controls:Border HorizontalAlignment="Right"
                                                  VerticalAlignment="Top"
                                                  Margin="0,-5,-4,0"
-                                                 Background="Transparent"
+                                                 Background="{x:Static media:Brushes.Transparent}"
                                                  Width="10"
                                                  Height="10"
                                                  CornerRadius="10" />
@@ -1027,7 +1027,7 @@
         <Setter Property="Background"
                 Value="#FF1F3B53" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="Padding"
                 Value="3" />
         <Setter Property="BorderThickness"
@@ -1112,7 +1112,7 @@
                         </VisualStateManager.VisualStateGroups>
                         <controls:Border x:Name="Background"
                                          CornerRadius="3"
-                                         Background="White"
+                                         Background="{x:Static media:Brushes.White}"
                                          BorderThickness="{TemplateBinding BorderThickness}"
                                          BorderBrush="{TemplateBinding BorderBrush}">
                             <controls:Grid Background="{TemplateBinding Background}"
@@ -1145,7 +1145,7 @@
                                                    Margin="{TemplateBinding Padding}" />
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="3"
-                                         Background="#FFFFFFFF"
+                                         Background="{x:Static media:Brushes.White}"
                                          Opacity="0"
                                          IsHitTestVisible="false" />
                         <controls:Border x:Name="FocusVisualElement"
@@ -1174,7 +1174,7 @@
         <Setter Property="VerticalContentAlignment"
                 Value="Top" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="Template">
             <Setter.Value>
                 <controls:ControlTemplate TargetType="controls:HyperlinkButton">
@@ -1368,9 +1368,9 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Background"
-                Value="#FFFFFFFF" />
+                Value="{x:Static media:Brushes.White}" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="Padding"
                 Value="2" />
         <Setter Property="BorderBrush"
@@ -1470,7 +1470,7 @@
                                                  Background="#5EC9C9C9" />
                                 <controls:Border x:Name="MouseOverBorder"
                                                  BorderThickness="1"
-                                                 BorderBrush="Transparent">
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}">
                                     <controls:ScrollViewer x:Name="ContentElement"
                                                            Padding="{TemplateBinding Padding}"
                                                            BorderThickness="0"
@@ -1524,10 +1524,10 @@
                                            HorizontalAlignment="Right"
                                            Margin="1,-4,-4,0"
                                            VerticalAlignment="Top"
-                                           Background="Transparent">
+                                           Background="{x:Static media:Brushes.Transparent}">
                                 <shapes:Path Margin="1,3,0,0"
                                              Data="M0,0L8,0L8,8z"
-                                             Fill="red" />
+                                             Fill="{x:Static media:Brushes.Red}" />
                             </controls:Grid>
                         </controls:Border>
                     </controls:Grid>
@@ -1541,9 +1541,9 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Background"
-                Value="#FFFFFFFF" />
+                Value="{x:Static media:Brushes.White}" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="Padding"
                 Value="2" />
         <Setter Property="BorderBrush">
@@ -1645,7 +1645,7 @@
                                          BorderBrush="{TemplateBinding BorderBrush}">
                             <controls:Border x:Name="MouseOverBorder"
                                              BorderThickness="1"
-                                             BorderBrush="Transparent">
+                                             BorderBrush="{x:Static media:Brushes.Transparent}">
                                 <controls:Border x:Name="ContentElement"
                                                  Margin="{TemplateBinding Padding}" />
                             </controls:Border>
@@ -1695,13 +1695,13 @@
                                            HorizontalAlignment="Right"
                                            Margin="1,-4,-4,0"
                                            VerticalAlignment="Top"
-                                           Background="Transparent">
+                                           Background="{x:Static media:Brushes.Transparent}">
                                 <shapes:Path Margin="1,3,0,0"
                                              Data="M 1,0 L6,0 A 2,2 90 0 1 8,2 L8,7 z"
                                              Fill="#FFDC000C" />
                                 <shapes:Path Margin="1,3,0,0"
                                              Data="M 0,0 L2,0 L 8,6 L8,8"
-                                             Fill="#ffffff" />
+                                             Fill="{x:Static media:Brushes.White}" />
                             </controls:Grid>
                         </controls:Border>
                     </controls:Grid>
@@ -1719,7 +1719,7 @@
         <Setter Property="VerticalContentAlignment"
                 Value="Top" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="TabNavigation"
@@ -1831,9 +1831,9 @@
                     <controls:Border x:Name="Root"
                                      BorderBrush="{TemplateBinding BorderBrush}"
                                      BorderThickness="{TemplateBinding BorderThickness}"
-                                     Background="#FFFFFFFF"
+                                     Background="{x:Static media:Brushes.White}"
                                      CornerRadius="2">
-                        <controls:Border BorderBrush="#FFFFFFFF"
+                        <controls:Border BorderBrush="{x:Static media:Brushes.White}"
                                          BorderThickness="1"
                                          Background="{TemplateBinding Background}"
                                          CornerRadius="1"
@@ -1876,9 +1876,9 @@
         <Setter Property="Padding"
                 Value="1" />
         <Setter Property="Background"
-                Value="#FFFFFFFF" />
+                Value="{x:Static media:Brushes.White}" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
         <Setter Property="VerticalContentAlignment"
@@ -1939,7 +1939,7 @@
                             <controls:ScrollViewer x:Name="ScrollViewer"
                                                    Padding="{TemplateBinding Padding}"
                                                    Background="{TemplateBinding Background}"
-                                                   BorderBrush="Transparent"
+                                                   BorderBrush="{x:Static media:Brushes.Transparent}"
                                                    BorderThickness="0"
                                                    TabNavigation="{TemplateBinding TabNavigation}">
                                 <controls:ItemsPresenter />
@@ -1978,13 +1978,13 @@
                                            HorizontalAlignment="Right"
                                            Margin="0,-4,-4,0"
                                            VerticalAlignment="Top"
-                                           Background="Transparent">
+                                           Background="{x:Static media:Brushes.Transparent}">
                                 <shapes:Path Margin="-1,3,0,0"
                                              Data="M 1,0 L6,0 A 2,2 90 0 1 8,2 L8,7 z"
                                              Fill="#FFDC000C" />
                                 <shapes:Path Margin="-1,3,0,0"
                                              Data="M 0,0 L2,0 L 8,6 L8,8"
-                                             Fill="#ffffff" />
+                                             Fill="{x:Static media:Brushes.White}" />
                             </controls:Grid>
                         </controls:Border>
                     </controls:Grid>
@@ -2146,18 +2146,18 @@
                                                              CornerRadius="3"
                                                              Background="#FF448DCA"
                                                              BorderThickness="{TemplateBinding BorderThickness}"
-                                                             BorderBrush="#00000000" />
+                                                             BorderBrush="{x:Static media:Brushes.Transparent}" />
                                             <controls:Border x:Name="BackgroundOverlay2"
                                                              Opacity="0"
                                                              CornerRadius="3"
                                                              Background="#FF448DCA"
                                                              BorderThickness="{TemplateBinding BorderThickness}"
-                                                             BorderBrush="#00000000" />
+                                                             BorderBrush="{x:Static media:Brushes.Transparent}" />
                                             <controls:Border x:Name="BackgroundGradient"
                                                              CornerRadius="2"
                                                              BorderThickness="1"
                                                              Margin="{TemplateBinding BorderThickness}"
-                                                             BorderBrush="#FFFFFFFF">
+                                                             BorderBrush="{x:Static media:Brushes.White}">
                                                 <controls:Border.Background>
                                                     <media:LinearGradientBrush StartPoint=".7,0"
                                                                                EndPoint=".7,1">
@@ -2177,13 +2177,13 @@
                                                              CornerRadius="3"
                                                              Background="#FF448DCA"
                                                              BorderThickness="{TemplateBinding BorderThickness}"
-                                                             BorderBrush="#00000000" />
+                                                             BorderBrush="{x:Static media:Brushes.Transparent}" />
                                             <controls:Border Opacity="0"
                                                              x:Name="BackgroundGradient2"
                                                              CornerRadius="2"
                                                              BorderThickness="1"
                                                              Margin="{TemplateBinding BorderThickness}"
-                                                             BorderBrush="#FFFFFFFF">
+                                                             BorderBrush="{x:Static media:Brushes.White}">
                                                 <controls:Border.Background>
                                                     <media:LinearGradientBrush StartPoint=".7,0"
                                                                                EndPoint=".7,1">
@@ -2331,7 +2331,7 @@
                         </controls:Border>
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="3"
-                                         Background="White"
+                                         Background="{x:Static media:Brushes.White}"
                                          Opacity="0"
                                          IsHitTestVisible="false" />
                         <controls:Border x:Name="FocusVisualElement"
@@ -2374,13 +2374,13 @@
                                            HorizontalAlignment="Right"
                                            Margin="1,-4,-4,0"
                                            VerticalAlignment="Top"
-                                           Background="Transparent">
+                                           Background="{x:Static media:Brushes.Transparent}">
                                 <shapes:Path Margin="1,3,0,0"
                                              Data="M 1,0 L6,0 A 2,2 90 0 1 8,2 L8,7 z"
                                              Fill="#FFDC000C" />
                                 <shapes:Path Margin="1,3,0,0"
                                              Data="M 0,0 L2,0 L 8,6 L8,8"
-                                             Fill="#ffffff" />
+                                             Fill="{x:Static media:Brushes.White}" />
                             </controls:Grid>
                         </controls:Border>
                         <primitives:Popup x:Name="Popup">
@@ -2474,7 +2474,7 @@
                                              x:Name="ProgressBarRootGradient"
                                              BorderThickness="1"
                                              Margin="{TemplateBinding BorderThickness}"
-                                             BorderBrush="#FFFFFFFF"
+                                             BorderBrush="{x:Static media:Brushes.White}"
                                              CornerRadius="1.5">
                                 <controls:Border.Background>
                                     <media:LinearGradientBrush StartPoint=".7,0"
@@ -2570,7 +2570,7 @@
                         <controls:ControlTemplate x:Key="RepeatButtonTemplate"
                                                   TargetType="primitives:RepeatButton">
                             <controls:Grid x:Name="Root"
-                                           Background="Transparent">
+                                           Background="{x:Static media:Brushes.Transparent}">
                                 <VisualStateManager.VisualStateGroups>
                                     <VisualStateGroup x:Name="CommonStates">
                                         <VisualState x:Name="Normal" />
@@ -2684,13 +2684,13 @@
                                                  CornerRadius="2"
                                                  Background="#FF448DCA"
                                                  BorderThickness="1"
-                                                 BorderBrush="#00000000" />
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}" />
                                 <controls:Border x:Name="BackgroundGradient"
                                                  Opacity="0"
                                                  CornerRadius="1"
                                                  BorderThickness="1"
                                                  Margin="1"
-                                                 BorderBrush="#FFFFFFFF">
+                                                 BorderBrush="{x:Static media:Brushes.White}">
                                     <controls:Border.Background>
                                         <media:LinearGradientBrush StartPoint=".7,0"
                                                                    EndPoint=".7,1">
@@ -2724,7 +2724,7 @@
                                 <controls:Border x:Name="DisabledElement"
                                                  Opacity="0"
                                                  CornerRadius="2"
-                                                 Background="#FFFFFFFF" />
+                                                 Background="{x:Static media:Brushes.White}" />
                             </controls:Grid>
                         </controls:ControlTemplate>
                         <controls:ControlTemplate x:Key="HorizontalDecrementTemplate"
@@ -2831,19 +2831,19 @@
                                                  CornerRadius="2"
                                                  Background="#FF448DCA"
                                                  BorderThickness="1"
-                                                 BorderBrush="#00000000" />
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}" />
                                 <controls:Border x:Name="BackgroundPressed"
                                                  Opacity="0"
                                                  CornerRadius="2"
                                                  Background="#FF448DCA"
                                                  BorderThickness="1"
-                                                 BorderBrush="#00000000" />
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}" />
                                 <controls:Border x:Name="BackgroundGradient"
                                                  Opacity="0"
                                                  CornerRadius="1"
                                                  BorderThickness="1"
                                                  Margin="1"
-                                                 BorderBrush="#FFFFFFFF">
+                                                 BorderBrush="{x:Static media:Brushes.White}">
                                     <controls:Border.Background>
                                         <media:LinearGradientBrush StartPoint=".7,0"
                                                                    EndPoint=".7,1">
@@ -2877,7 +2877,7 @@
                                 <controls:Border x:Name="DisabledElement"
                                                  Opacity="0"
                                                  CornerRadius="2"
-                                                 Background="#FFFFFFFF" />
+                                                 Background="{x:Static media:Brushes.White}" />
                             </controls:Grid>
                         </controls:ControlTemplate>
 
@@ -2986,19 +2986,19 @@
                                                  CornerRadius="2"
                                                  Background="#FF448DCA"
                                                  BorderThickness="1"
-                                                 BorderBrush="#00000000" />
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}" />
                                 <controls:Border x:Name="BackgroundPressed"
                                                  Opacity="0"
                                                  CornerRadius="2"
                                                  Background="#FF448DCA"
                                                  BorderThickness="1"
-                                                 BorderBrush="#00000000" />
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}" />
                                 <controls:Border x:Name="BackgroundGradient"
                                                  Opacity="0"
                                                  CornerRadius="1"
                                                  BorderThickness="1"
                                                  Margin="1"
-                                                 BorderBrush="#FFFFFFFF">
+                                                 BorderBrush="{x:Static media:Brushes.White}">
                                     <controls:Border.Background>
                                         <media:LinearGradientBrush StartPoint="0,.7"
                                                                    EndPoint="1,.7">
@@ -3032,7 +3032,7 @@
                                 <controls:Border x:Name="DisabledElement"
                                                  Opacity="0"
                                                  CornerRadius="2"
-                                                 Background="#FFFFFFFF" />
+                                                 Background="{x:Static media:Brushes.White}" />
                             </controls:Grid>
                         </controls:ControlTemplate>
                         <controls:ControlTemplate x:Key="VerticalDecrementTemplate"
@@ -3139,19 +3139,19 @@
                                                  CornerRadius="2"
                                                  Background="#FF448DCA"
                                                  BorderThickness="1"
-                                                 BorderBrush="#00000000" />
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}" />
                                 <controls:Border x:Name="BackgroundPressed"
                                                  Opacity="0"
                                                  CornerRadius="2"
                                                  Background="#FF448DCA"
                                                  BorderThickness="1"
-                                                 BorderBrush="#00000000" />
+                                                 BorderBrush="{x:Static media:Brushes.Transparent}" />
                                 <controls:Border x:Name="BackgroundGradient"
                                                  Opacity="0"
                                                  CornerRadius="1"
                                                  BorderThickness="1"
                                                  Margin="1"
-                                                 BorderBrush="#FFFFFFFF">
+                                                 BorderBrush="{x:Static media:Brushes.White}">
                                     <controls:Border.Background>
                                         <media:LinearGradientBrush StartPoint="0,.7"
                                                                    EndPoint="1,.7">
@@ -3185,7 +3185,7 @@
                                 <controls:Border x:Name="DisabledElement"
                                                  Opacity="0"
                                                  CornerRadius="2"
-                                                 Background="#FFFFFFFF" />
+                                                 Background="{x:Static media:Brushes.White}" />
                             </controls:Grid>
                         </controls:ControlTemplate>
 
@@ -3279,18 +3279,18 @@
                                                      CornerRadius="2"
                                                      Background="#FF448DCA"
                                                      BorderThickness="1"
-                                                     BorderBrush="#00000000" />
+                                                     BorderBrush="{x:Static media:Brushes.Transparent}" />
                                     <controls:Border x:Name="BackgroundPressed"
                                                      Opacity="0"
                                                      CornerRadius="2"
                                                      Background="#FF448DCA"
                                                      BorderThickness="1"
-                                                     BorderBrush="#00000000" />
+                                                     BorderBrush="{x:Static media:Brushes.Transparent}" />
                                     <controls:Border x:Name="BackgroundGradient"
                                                      CornerRadius="1"
                                                      BorderThickness="1"
                                                      Margin="1"
-                                                     BorderBrush="#FFFFFFFF">
+                                                     BorderBrush="{x:Static media:Brushes.White}">
                                         <controls:Border.Background>
                                             <media:LinearGradientBrush StartPoint="0,.7"
                                                                        EndPoint="1,.7">
@@ -3404,18 +3404,18 @@
                                                      CornerRadius="2"
                                                      Background="#FF448DCA"
                                                      BorderThickness="1"
-                                                     BorderBrush="#00000000" />
+                                                     BorderBrush="{x:Static media:Brushes.Transparent}" />
                                     <controls:Border x:Name="BackgroundPressed"
                                                      Opacity="0"
                                                      CornerRadius="2"
                                                      Background="#FF448DCA"
                                                      BorderThickness="1"
-                                                     BorderBrush="#00000000" />
+                                                     BorderBrush="{x:Static media:Brushes.Transparent}" />
                                     <controls:Border x:Name="BackgroundGradient"
                                                      CornerRadius="1"
                                                      BorderThickness="1"
                                                      Margin="1"
-                                                     BorderBrush="#FFFFFFFF">
+                                                     BorderBrush="{x:Static media:Brushes.White}">
                                         <controls:Border.Background>
                                             <media:LinearGradientBrush StartPoint=".7,0"
                                                                        EndPoint=".7,1">
@@ -3471,7 +3471,7 @@
                             <controls:Border controls:Grid.ColumnSpan="5"
                                              CornerRadius="1"
                                              BorderThickness="1"
-                                             BorderBrush="#00000000">
+                                             BorderBrush="{x:Static media:Brushes.Transparent}">
                                 <controls:Border.Background>
                                     <media:LinearGradientBrush StartPoint="0.5,1"
                                                                EndPoint="0.5,0">
@@ -3489,7 +3489,7 @@
                             <controls:Border controls:Grid.ColumnSpan="5"
                                              CornerRadius="1"
                                              BorderThickness="1"
-                                             BorderBrush="#00000000"
+                                             BorderBrush="{x:Static media:Brushes.Transparent}"
                                              Background="{TemplateBinding Background}" />
                             <controls:Border controls:Grid.ColumnSpan="5"
                                              CornerRadius="1"
@@ -3572,7 +3572,7 @@
                             <controls:Border controls:Grid.RowSpan="5"
                                              CornerRadius="1"
                                              BorderThickness="1"
-                                             BorderBrush="#00000000">
+                                             BorderBrush="{x:Static media:Brushes.Transparent}">
                                 <controls:Border.Background>
                                     <media:LinearGradientBrush StartPoint="1,0.5"
                                                                EndPoint="0,0.5">
@@ -3691,7 +3691,7 @@
                         <controls:ControlTemplate x:Key="RepeatButtonTemplate">
                             <controls:Grid x:Name="Root"
                                            Opacity="0"
-                                           Background="Transparent" />
+                                           Background="{x:Static media:Brushes.Transparent}" />
                         </controls:ControlTemplate>
                     </controls:ControlTemplate.Resources>
                     <controls:Grid x:Name="Root">
@@ -3754,7 +3754,7 @@
                                              Margin="5,0,5,0" />
                             <controls:Border x:Name="HorizontalTrackRectangleDisabledOverlay"
                                              Visibility="Collapsed"
-                                             Background="White"
+                                             Background="{x:Static media:Brushes.White}"
                                              Opacity=".55"
                                              controls:Grid.Column="0"
                                              controls:Grid.ColumnSpan="3"
@@ -3776,7 +3776,7 @@
                                              CornerRadius="2"
                                              Width="11"
                                              controls:Grid.Column="1"
-                                             Background="White"
+                                             Background="{x:Static media:Brushes.White}"
                                              Opacity=".55"
                                              Visibility="Collapsed" />
                             <primitives:RepeatButton x:Name="HorizontalTrackLargeChangeIncreaseRepeatButton"
@@ -3807,7 +3807,7 @@
                                              Margin="0,5,0,5" />
                             <controls:Border x:Name="VerticalTrackRectangleDisabledOverlay"
                                              Visibility="Collapsed"
-                                             Background="White"
+                                             Background="{x:Static media:Brushes.White}"
                                              Opacity=".55"
                                              controls:Grid.Row="0"
                                              controls:Grid.RowSpan="3"
@@ -3939,7 +3939,7 @@
                         </VisualStateManager.VisualStateGroups>
                         <controls:Border x:Name="Background"
                                          CornerRadius="2"
-                                         Background="White"
+                                         Background="{x:Static media:Brushes.White}"
                                          BorderThickness="{TemplateBinding BorderThickness}"
                                          BorderBrush="{TemplateBinding BorderBrush}">
                             <controls:Grid Background="{TemplateBinding Background}"
@@ -3966,7 +3966,7 @@
                         </controls:Border>
                         <controls:Border x:Name="DisabledVisualElement"
                                          CornerRadius="2"
-                                         Background="#FFFFFFFF"
+                                         Background="{x:Static media:Brushes.White}"
                                          Opacity="0"
                                          IsHitTestVisible="false" />
                         <controls:Border x:Name="FocusVisualElement"
@@ -3987,9 +3987,9 @@
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Background"
-                Value="#FFFFFFFF" />
+                Value="{x:Static media:Brushes.White}" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="Padding"
                 Value="2" />
         <Setter Property="BorderBrush">
@@ -4060,7 +4060,7 @@
                                          BorderBrush="{TemplateBinding BorderBrush}">
                             <controls:Border x:Name="MouseOverBorder"
                                              BorderThickness="1"
-                                             BorderBrush="Transparent">
+                                             BorderBrush="{x:Static media:Brushes.Transparent}">
                                 <controls:ScrollViewer x:Name="ContentElement"
                                                        Padding="{TemplateBinding Padding}"
                                                        BorderThickness="0"
@@ -4118,7 +4118,7 @@
                                              Width="1"
                                              Margin="30,2,0,2"
                                              HorizontalAlignment="Left" />
-                            <controls:Border Background="#FFFFFFFF"
+                            <controls:Border Background="{x:Static media:Brushes.White}"
                                              Width="1"
                                              Margin="31,2,0,2"
                                              HorizontalAlignment="Left" />
@@ -4139,9 +4139,9 @@
     <!--  controls:MenuItem  -->
     <Style TargetType="controls:MenuItem">
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="BorderBrush"
-                Value="Transparent" />
+                Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="Padding"
                 Value="4,3,2,3" />
         <Setter Property="Template">
@@ -4199,7 +4199,7 @@
                         </controls:Border>
                         <controls:Border x:Name="InnerBorder"
                                          CornerRadius="2"
-                                         BorderBrush="Transparent"
+                                         BorderBrush="{x:Static media:Brushes.Transparent}"
                                          BorderThickness="1"
                                          Margin="1" />
                         <controls:Grid>
@@ -4253,7 +4253,7 @@
     <!--  controls:Separator  -->
     <Style TargetType="controls:Separator">
         <Setter Property="Background"
-                Value="LightGray" />
+                Value="{x:Static media:Brushes.LightGray}" />
         <Setter Property="IsTabStop"
                 Value="False" />
         <Setter Property="Margin"
@@ -4319,7 +4319,7 @@
                             <Setter Property="Background"
                                     Value="#FF1F3B53" />
                             <Setter Property="Foreground"
-                                    Value="#FF000000" />
+                                    Value="{x:Static media:Brushes.Black}" />
                             <Setter Property="Padding"
                                     Value="3" />
                             <Setter Property="BorderThickness"
@@ -4462,7 +4462,7 @@
                                             <shapes:Path HorizontalAlignment="Center"
                                                          Margin="0,-1,0,0"
                                                          Width="9"
-                                                         Fill="#FFFFFFFF"
+                                                         Fill="{x:Static media:Brushes.White}"
                                                          Stretch="Fill"
                                                          Data="F1 M 6.742676,3.852539 L 9.110840,1.559570 L 8.910645,0.500000 L 6.838379,0.500000 L 4.902832,2.435547 L 2.967285,0.500000 L 0.895020,0.500000 L 0.694824,1.559570 L 3.062988,3.852539 L 0.527832,6.351563 L 0.689941,7.600586 L 2.967285,7.600586 L 4.897949,5.575195 L 6.854004,7.600586 L 9.115723,7.600586 L 9.277832,6.351563 L 6.742676,3.852539 Z"
                                                          x:Name="X"
@@ -4629,7 +4629,7 @@
                                              HorizontalAlignment="Stretch"
                                              Margin="-4"
                                              VerticalAlignment="Stretch" />
-                            <controls:Border Background="#FFFFFFFF"
+                            <controls:Border Background="{x:Static media:Brushes.White}"
                                              BorderThickness="{TemplateBinding BorderThickness}"
                                              BorderBrush="{TemplateBinding BorderBrush}"
                                              CornerRadius="2">
@@ -4651,7 +4651,7 @@
                                         </controls:Grid.RowDefinitions>
                                         <controls:Border x:Name="Chrome"
                                                          Width="Auto"
-                                                         BorderBrush="#FFFFFFFF"
+                                                         BorderBrush="{x:Static media:Brushes.White}"
                                                          BorderThickness="0,0,0,1">
                                             <controls:Border.Background>
                                                 <media:LinearGradientBrush EndPoint="0.5,0.528"
@@ -4727,9 +4727,9 @@
     <!--  controls:TreeView  -->
     <Style TargetType="controls:TreeView">
         <Setter Property="Background"
-                Value="#FFFFFFFF" />
+                Value="{x:Static media:Brushes.White}" />
         <Setter Property="Foreground"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
         <Setter Property="VerticalContentAlignment"
@@ -4741,7 +4741,7 @@
         <Setter Property="Padding"
                 Value="1" />
         <Setter Property="BorderBrush"
-                Value="#FF000000" />
+                Value="{x:Static media:Brushes.Black}" />
         <Setter Property="IsTabStop"
                 Value="True" />
         <Setter Property="TabNavigation"
@@ -4799,7 +4799,7 @@
                                                        HorizontalScrollBarVisibility="Auto"
                                                        VerticalScrollBarVisibility="Auto"
                                                        Background="{markup:Null}"
-                                                       BorderBrush="Transparent"
+                                                       BorderBrush="{x:Static media:Brushes.Transparent}"
                                                        BorderThickness="0"
                                                        IsTabStop="True"
                                                        TabNavigation="Once">
@@ -4828,12 +4828,12 @@
                                            HorizontalAlignment="Right"
                                            Margin="0,-4,-4,0"
                                            VerticalAlignment="Top"
-                                           Background="Transparent">
+                                           Background="{x:Static media:Brushes.Transparent}">
                                 <shapes:Path Margin="-1,3,0,0"
                                              Fill="#FFDC000C"
                                              Data="M 1,0 L6,0 A 2,2 90 0 1 8,2 L8,7 Z" />
                                 <shapes:Path Margin="-1,3,0,0"
-                                             Fill="#FFFFFFFF"
+                                             Fill="{x:Static media:Brushes.White}"
                                              Data="M 0,0 L2,0 L 8,6 L8,8" />
                             </controls:Grid>
                         </controls:Border>
@@ -4852,7 +4852,7 @@
         <Setter Property="VerticalContentAlignment"
                 Value="Top" />
         <Setter Property="Background"
-                Value="Transparent" />
+                Value="{x:Static media:Brushes.Transparent}" />
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Cursor"
@@ -4984,7 +4984,7 @@
                             <primitives:ToggleButton.Template>
                                 <controls:ControlTemplate TargetType="primitives:ToggleButton">
                                     <controls:Grid x:Name="Root"
-                                                   Background="Transparent">
+                                                   Background="{x:Static media:Brushes.Transparent}">
                                         <VisualStateManager.VisualStateGroups>
                                             <VisualStateGroup x:Name="CommonStates">
                                                 <VisualState x:Name="Normal" />
@@ -5026,7 +5026,7 @@
                                             <shapes:Path x:Name="UncheckedVisual"
                                                          Width="6"
                                                          Height="9"
-                                                         Fill="#FFFFFFFF"
+                                                         Fill="{x:Static media:Brushes.White}"
                                                          VerticalAlignment="Center"
                                                          HorizontalAlignment="Right"
                                                          Data="M 0,0 L 0,9 L 5,4.5 Z"
@@ -5144,12 +5144,12 @@
                                            HorizontalAlignment="Right"
                                            Margin="0,-4,-4,0"
                                            VerticalAlignment="Top"
-                                           Background="Transparent">
+                                           Background="{x:Static media:Brushes.Transparent}">
                                 <shapes:Path Margin="-1,3,0,0"
                                              Fill="#FFDC000C"
                                              Data="M 1,0 L6,0 A 2,2 90 0 1 8,2 L8,7 Z" />
                                 <shapes:Path Margin="-1,3,0,0"
-                                             Fill="#FFFFFFFF"
+                                             Fill="{x:Static media:Brushes.White}"
                                              Data="M 0,0 L2,0 L 8,6 L8,8" />
                             </controls:Grid>
                         </controls:Border>

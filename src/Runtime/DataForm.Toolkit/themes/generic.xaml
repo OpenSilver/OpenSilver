@@ -60,9 +60,9 @@
                                 <Setter Property="Background"
                                         Value="#00000000" />
                                 <Setter Property="Foreground"
-                                        Value="#FF000000" />
+                                        Value="{x:Static Brushes.Black}" />
                                 <Setter Property="BorderBrush"
-                                        Value="#FFFFFFFF" />
+                                        Value="{x:Static Brushes.White}" />
                                 <Setter Property="BorderThickness"
                                         Value="1" />
                                 <Setter Property="Padding"
