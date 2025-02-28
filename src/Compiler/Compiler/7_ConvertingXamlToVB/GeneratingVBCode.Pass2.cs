@@ -250,11 +250,17 @@ namespace OpenSilver.Compiler
                     switch (_reader.NodeType)
                     {
                         case XamlNodeType.StartObject:
-                            TryCatch(OnWriteStartObject, parameters);
+                            if (!ShouldSkipObject(_reader.ObjectData.Element))
+                            {
+                                TryCatch(OnWriteStartObject, parameters);
+                            }
                             break;
 
                         case XamlNodeType.EndObject:
-                            TryCatch(OnWriteEndObject, parameters);
+                            if (!ShouldSkipObject(_reader.ObjectData.Element))
+                            {
+                                TryCatch(OnWriteEndObject, parameters);
+                            }
                             break;
 
                         case XamlNodeType.StartMember:
@@ -344,6 +350,23 @@ End Sub
 
                     return finalCode;
                 }
+            }
+
+            private bool ShouldSkipObject(XElement element)
+            {
+                if (element.Attribute(InsertingMarkupNodesInXaml.GeneratedMarkupExtensionAttribute) is not null)
+                {
+                    // For these markup extensions, we resolve the value at compile time, so we don't need to
+                    // instantiate the markup extension.
+                    if (GeneratingCode.IsNullExtension(element, _settings) ||
+                        GeneratingCode.IsStaticExtension(element, _settings) ||
+                        GeneratingCode.IsTypeExtension(element, _settings))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             private void OnWriteStartObject(GeneratorContext parameters)
@@ -1114,7 +1137,7 @@ End Sub
                                     parameters.CurrentXamlContext,
                                     GeneratingCode.GetUniqueName(child)));
                             }
-                            else if (child.Name == GeneratingCode.xNamespace + "NullExtension")
+                            else if (GeneratingCode.IsNullExtension(child, _settings))
                             {
                                 //------------------------------
                                 // {x:Null}
