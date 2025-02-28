@@ -177,7 +177,7 @@ public sealed class Run : Inline
             run._foregroundChangedListener = null;
         }
 
-        if (e.NewValue is Brush newBrush)
+        if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
         {
             run._foregroundChangedListener = new(run, newBrush)
             {

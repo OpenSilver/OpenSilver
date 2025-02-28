@@ -202,7 +202,7 @@ namespace System.Windows.Controls
                 panel._backgroundChangedListener = null;
             }
 
-            if (e.NewValue is Brush newBrush)
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
                 panel._backgroundChangedListener = new(panel, newBrush)
                 {

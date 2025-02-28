@@ -196,7 +196,7 @@ namespace System.Windows.Controls
                 border._backgroundChangedListener = null;
             }
 
-            if (e.NewValue is Brush newBrush)
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
                 border._backgroundChangedListener = new(border, newBrush)
                 {
@@ -264,7 +264,7 @@ namespace System.Windows.Controls
                 border._borderBrushChangedListener = null;
             }
 
-            if (e.NewValue is Brush newBrush)
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
                 border._borderBrushChangedListener = new(border, newBrush)
                 {

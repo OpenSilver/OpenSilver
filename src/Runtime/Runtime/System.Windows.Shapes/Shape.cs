@@ -84,7 +84,7 @@ namespace System.Windows.Shapes
                 shape._fillChangedListener = null;
             }
 
-            if (e.NewValue is Brush newBrush)
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
                 shape._fillChangedListener = new(shape, newBrush)
                 {
@@ -186,7 +186,7 @@ namespace System.Windows.Shapes
                 shape._strokeChangedListener = null;
             }
 
-            if (e.NewValue is Brush newBrush)
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
                 shape._strokeChangedListener = new(shape, newBrush)
                 {

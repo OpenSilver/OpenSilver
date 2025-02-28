@@ -1035,7 +1035,7 @@ namespace System.Windows
                 uie._opacityMaskChangedListener = null;
             }
 
-            if (e.NewValue is Brush newBrush)
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
                 uie._opacityMaskChangedListener = new(uie, newBrush)
                 {

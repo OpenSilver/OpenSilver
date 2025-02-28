@@ -154,7 +154,7 @@ internal abstract partial class TextViewBase : FrameworkElement
             view._foregroundChangedListener = null;
         }
 
-        if (e.NewValue is Brush newBrush)
+        if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
         {
             view._foregroundChangedListener = new(view, newBrush)
             {

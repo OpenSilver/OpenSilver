@@ -548,7 +548,7 @@ namespace System.Windows.Controls
                 tb._foregroundChangedListener = null;
             }
 
-            if (e.NewValue is Brush newBrush)
+            if (e.NewValue is Brush newBrush && !newBrush.IsSealed)
             {
                 tb._foregroundChangedListener = new(tb, newBrush)
                 {
