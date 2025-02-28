@@ -223,7 +223,7 @@ namespace System.Windows.Media
                 _transformChangedListener = new(this, rgb)
                 {
                     OnEventAction = static (instance, sender, args) => instance.OnTransformChanged(sender, args),
-                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                    OnDetachAction = static (listener, source) => source.TransformChanged -= listener.OnEvent,
                 };
                 rgb.TransformChanged += _transformChangedListener.OnEvent;
             }
