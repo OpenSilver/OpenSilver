@@ -41,7 +41,7 @@ namespace System.Windows
         /// The size that this <see cref="UIElement"/> computed during the measure pass
         /// of the layout process.
         /// </returns>
-        public Size DesiredSize => Visibility == Visibility.Collapsed ? new Size() : _desiredSize;
+        public Size DesiredSize => IsVisible ? _desiredSize : new Size();
 
         /// <summary>
         /// Invalidates the measurement state (layout) for a <see cref="UIElement"/>.
@@ -123,12 +123,10 @@ namespace System.Windows
         /// </remarks>
         public void Measure(Size availableSize)
         {
-            if (OuterDiv is null)
+            if (OuterDiv == null)
             {
-                if (MeasureRequest is not null)
-                {
+                if (MeasureRequest != null)
                     LayoutManager.Current.MeasureQueue.Remove(this);
-                }
                 MeasureDirty = false;
                 return;
             }
@@ -145,12 +143,12 @@ namespace System.Windows
                 
                 if (neverMeasured)
                 {
-                    SwitchVisibilityIfNeeded(Visibility);
+                    SwitchVisibilityIfNeeded(IsVisible);
                 }
 
                 bool isCloseToPreviousMeasure = DoubleUtil.AreClose(availableSize, PreviousAvailableSize);
 
-                if (Visibility == Visibility.Collapsed || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (!IsVisible || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset measure request.
                     if (MeasureRequest != null)
@@ -288,12 +286,10 @@ namespace System.Windows
         /// </remarks>
         public void Arrange(Rect finalRect)
         {
-            if (OuterDiv is null)
+            if (OuterDiv == null)
             {
-                if (ArrangeRequest is not null)
-                {
+                if (ArrangeRequest != null)
                     LayoutManager.Current.ArrangeQueue.Remove(this);
-                }
                 ArrangeDirty = false;
                 return;
             }
@@ -314,7 +310,7 @@ namespace System.Windows
                             GetType().FullName));
                 }
 
-                if (Visibility == Visibility.Collapsed || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (!IsVisible || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset arrange request.
                     if (ArrangeRequest != null)
@@ -808,16 +804,6 @@ namespace System.Windows
             set { WriteFlag(CoreFlags.BypassLayoutPolicies, value); }
         }
 
-        internal uint TreeLevel
-        {
-            get => (uint)(_visualFlags & TreeLevelMask);
-            private set => _visualFlags = (_visualFlags & ~TreeLevelMask) | (VisualFlags)value;
-        }
-
-        private const VisualFlags TreeLevelMask =
-            VisualFlags.TreeLevelBit0 | VisualFlags.TreeLevelBit1 | VisualFlags.TreeLevelBit2 |
-            VisualFlags.TreeLevelBit3 | VisualFlags.TreeLevelBit4 | VisualFlags.TreeLevelBit5 |
-            VisualFlags.TreeLevelBit6 | VisualFlags.TreeLevelBit7 | VisualFlags.TreeLevelBit8 |
-            VisualFlags.TreeLevelBit9 | VisualFlags.TreeLevelBit10;
+        internal uint TreeLevel { get; set; }
     }
 }
