@@ -23,6 +23,8 @@ namespace OpenSilver.Compiler
 {
     internal static class InsertingMarkupNodesInXaml
     {
+        public const string GeneratedMarkupExtensionAttribute = "__.GeneratedMarkupExtension.__";
+
         //todo: support strings that contain commas, like in: {Binding Value, ConverterParameter = 'One, two, three, four, five, six', Mode = OneWay}
 
         internal static void InsertMarkupNodes(XDocument doc,
@@ -161,8 +163,11 @@ namespace OpenSilver.Compiler
             ConversionSettings settings)
         {
             Dictionary<string, string> listOfSubAttributes = GenerateListOfAttributesFromString(attributeValue);
-            List<XElement> elementsToAdd = new List<XElement>();
-            List<XAttribute> attributesToAdd = new List<XAttribute>();
+            var elementsToAdd = new List<XElement>();
+            var attributesToAdd = new List<XAttribute>
+            {
+                new(GeneratedMarkupExtensionAttribute, "True"),
+            };
 
             foreach (string keyString in listOfSubAttributes.Keys)
             {
