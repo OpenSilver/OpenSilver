@@ -45,7 +45,7 @@ namespace System.Windows.Shapes
         /// A <see cref="Transform"/> that is applied to the geometry of a <see cref="Shape"/>
         /// prior to when it is drawn.
         /// </returns>
-        public virtual Transform GeometryTransform => new MatrixTransform(StretchMatrix ?? Matrix.Identity);
+        public virtual Transform GeometryTransform => StretchMatrix is Matrix m ? new MatrixTransform(m) : Transform.Identity;
 
         /// <summary>
         /// Identifies the <see cref="Fill"/> dependency property.

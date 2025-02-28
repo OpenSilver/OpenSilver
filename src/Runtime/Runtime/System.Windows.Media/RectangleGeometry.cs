@@ -112,7 +112,7 @@ namespace System.Windows.Media
                 {
                     boundsRect = Rect.Empty;
                 }
-                else if (transform == null || transform.IsIdentity)
+                else if (transform == null || Transform.IsIdentityTransform(transform))
                 {
                     boundsRect = currentRect;
                 }

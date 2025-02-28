@@ -108,12 +108,7 @@ namespace System.Windows.Media
             set => SetValueInternal(CenterYProperty, value);
         }
 
-        private protected override Matrix GetMatrixCore()
-        {
-            Matrix m = new Matrix();
-            m.ScaleAt(ScaleX, ScaleY, CenterX, CenterY);
-            return m;
-        }
+        private protected override Matrix GetMatrixCore() => Matrix.CreateScaling(ScaleX, ScaleY, CenterX, CenterY);
 
         internal override bool IsIdentity => ScaleX == 1 && ScaleY == 1;
     }

@@ -798,6 +798,10 @@ public partial class FrameworkElement
         {
             Transform additionalTransform = GetFlowDirectionTransform(); // rtl
             Transform renderTransform = (Transform)GetValue(RenderTransformProperty);
+            if (renderTransform == Transform.Identity)
+            {
+                renderTransform = null;
+            }
 
             TransformGroup t = null;
 

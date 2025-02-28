@@ -187,7 +187,7 @@ public sealed class ImageBrush : TileBrush
         {
             Transform transform = ((Brush)sender).Transform;
 
-            if (transform is null || transform.IsIdentity)
+            if (transform is null || Transform.IsIdentityTransform(transform))
             {
                 INTERNAL_HtmlDomManager.RemoveAttribute(_pattern, "patternTransform");
             }
@@ -224,7 +224,7 @@ public sealed class ImageBrush : TileBrush
                 INTERNAL_HtmlDomManager.RemoveAttribute(_image, "href");
             }
 
-            if (_imageBrush.Transform is Transform t && !t.IsIdentity)
+            if (_imageBrush.Transform is Transform t && !Transform.IsIdentityTransform(t))
             {
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(_pattern, "patternTransform", MatrixTransform.MatrixToHtmlString(t.Matrix));
             }

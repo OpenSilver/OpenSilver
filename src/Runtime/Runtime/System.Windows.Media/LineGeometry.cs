@@ -86,7 +86,7 @@ namespace System.Windows.Media
 
                 Transform transform = Transform;
 
-                if (transform != null && !transform.IsIdentity)
+                if (transform != null && !Transform.IsIdentityTransform(transform))
                 {
                     rect = transform.TransformBounds(rect);
                 }

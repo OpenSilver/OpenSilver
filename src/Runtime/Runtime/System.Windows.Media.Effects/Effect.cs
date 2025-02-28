@@ -42,7 +42,7 @@ namespace System.Windows.Media.Effects
         /// The transform to apply. The default is the identity transform.
         /// </returns>
         [OpenSilver.NotImplemented]
-        protected internal virtual GeneralTransform EffectMapping => new MatrixTransform();
+        protected internal virtual GeneralTransform EffectMapping => Transform.Identity;
 
         internal event EventHandler Changed;
 

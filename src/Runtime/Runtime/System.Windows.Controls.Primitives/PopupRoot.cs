@@ -226,7 +226,7 @@ internal sealed class TransformLayer : FrameworkElement
     {
         RenderTransformProperty.OverrideMetadata(
             typeof(TransformLayer),
-            new PropertyMetadata(null, null, CoerceRenderTransform));
+            new PropertyMetadata(Media.Transform.Identity, null, CoerceRenderTransform));
 
         RenderTransformOriginProperty.OverrideMetadata(
             typeof(TransformLayer),

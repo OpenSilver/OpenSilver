@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using OpenSilver.Internal;
 
@@ -38,6 +39,21 @@ namespace System.Windows.Media
         /// </returns>
         public static Transform Parse(string source) => Parsers.ParseTransform(source, CultureInfo.InvariantCulture);
 
+        /// <summary>
+        /// Gets an identity transform.
+        /// </summary>
+        /// <returns>
+        /// An identity transform.
+        /// </returns>
+        public static Transform Identity { get; } = MakeIdentityTransform();
+
+        private static MatrixTransform MakeIdentityTransform()
+        {
+            var identity = new MatrixTransform(Matrix.Identity);
+            identity.Seal();
+            return identity;
+        }
+
         internal Matrix Matrix => _matrix ??= GetMatrixCore();
 
         private protected abstract Matrix GetMatrixCore();
@@ -49,6 +65,12 @@ namespace System.Windows.Media
         /// current matrix value for identity, use Transform.Value.Identity.
         ///</summary>
         internal abstract bool IsIdentity { get; }
+
+        internal static bool IsIdentityTransform(Transform transform)
+        {
+            Debug.Assert(transform is not null);
+            return transform == Identity || transform.IsIdentity;
+        }
 
         /// <summary>
         /// Attempts to transform the specified point and returns a value that indicates

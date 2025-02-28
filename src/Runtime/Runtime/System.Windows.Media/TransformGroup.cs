@@ -106,7 +106,7 @@ namespace System.Windows.Media
             List<Transform> children = Children.InternalItems;
             if (children.Count == 0)
             {
-                return new Matrix();
+                return Matrix.Identity;
             }
 
             Matrix transform = children[0].Matrix;

@@ -75,7 +75,7 @@ namespace System.Windows.Media
                 nameof(RelativeTransform),
                 typeof(Transform),
                 typeof(Brush),
-                null);
+                new PropertyMetadata(Transform.Identity));
 
         /// <summary>
         /// Gets or sets the transformation that is applied to the brush using relative coordinates.
@@ -98,7 +98,7 @@ namespace System.Windows.Media
                 nameof(Transform),
                 typeof(Transform),
                 typeof(Brush),
-                new PropertyMetadata(null, OnTransformChanged));
+                new PropertyMetadata(Transform.Identity, OnTransformChanged));
 
         /// <summary>
         /// Gets or sets the transformation that is applied to the brush.

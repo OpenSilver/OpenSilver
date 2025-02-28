@@ -55,7 +55,7 @@ namespace System.Windows.Media
                 nameof(Transform), 
                 typeof(Transform), 
                 typeof(Geometry), 
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(Transform.Identity));
 
         /// <summary>
         /// Gets or sets the <see cref="Media.Transform"/> object applied to a <see cref="Geometry"/>.

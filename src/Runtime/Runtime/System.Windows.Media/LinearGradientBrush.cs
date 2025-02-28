@@ -557,7 +557,7 @@ namespace System.Windows.Media
             {
                 Transform transform = ((Brush)sender).Transform;
 
-                if (transform is null || transform.IsIdentity)
+                if (transform is null || Transform.IsIdentityTransform(transform))
                 {
                     INTERNAL_HtmlDomManager.RemoveAttribute(_gradientRef, "gradientTransform");
                 }
@@ -579,7 +579,7 @@ namespace System.Windows.Media
                 string y2 = Math.Round(end.Y, 2).ToInvariantString();
                 string units = ConvertBrushMappingModeToString(_linearGradient.MappingMode);
                 string spreadMethod = ConvertSpreadMethodToString(_linearGradient.SpreadMethod);
-                string transform = _linearGradient.Transform is Transform t && !t.IsIdentity ?
+                string transform = _linearGradient.Transform is Transform t && !Transform.IsIdentityTransform(t) ?
                     MatrixTransform.MatrixToHtmlString(t.Matrix) : string.Empty;
                 string opacity = Math.Round(_linearGradient.Opacity, 2).ToInvariantString();
                 string stops = string.Join(",",

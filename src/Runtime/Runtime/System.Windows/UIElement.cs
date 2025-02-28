@@ -630,7 +630,7 @@ namespace System.Windows
                 nameof(RenderTransform),
                 typeof(Transform),
                 typeof(UIElement),
-                new PropertyMetadata(null, OnRenderTransformChanged));
+                new PropertyMetadata(Transform.Identity, OnRenderTransformChanged));
 
         /// <summary>
         /// Gets or sets transform information that affects the rendering position of a <see cref="UIElement"/>.
@@ -640,7 +640,7 @@ namespace System.Windows
         /// </returns>
         public Transform RenderTransform
         {
-            get => (Transform)GetValue(RenderTransformProperty) ?? new MatrixTransform();
+            get => (Transform)GetValue(RenderTransformProperty) ?? Transform.Identity;
             set => SetValueInternal(RenderTransformProperty, value);
         }
 
