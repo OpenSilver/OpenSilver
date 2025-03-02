@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Specialized;
 using System.Text;
 using System.Windows.Ink;
@@ -75,7 +74,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             (var outerDiv, _canvasDom) = INTERNAL_HtmlDomManager.CreateInkPresenterDomElementAndAppendIt(parentRef, this);
             return outerDiv;
         }
-        
+
         /// <summary>
         /// Gets or sets the strokes that the <see cref="InkPresenter"/> displays.
         /// </summary>
@@ -124,12 +123,12 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             var oldCollection = e.OldValue as StrokeCollection;
             if (oldCollection != null)
             {
-                oldCollection.CollectionChanged -= OnStrokeCollectionChanged;               
+                oldCollection.CollectionChanged -= OnStrokeCollectionChanged;
             }
 
             var newCollection = e.NewValue as StrokeCollection;
             if (newCollection != null)
-            {                
+            {
                 newCollection.CollectionChanged += OnStrokeCollectionChanged;
             }
 
@@ -137,7 +136,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
         }
 
         private void DrawAllStrokes()
-        {            
+        {
             ResetCanvas(RenderSize);
 
             foreach (var stroke in Strokes.InternalItems)
@@ -234,7 +233,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
                     DrawAllStrokes();
                     break;
             }
-            
+
         }
 
         private void DrawCurrentPoint()
@@ -246,9 +245,16 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
 
             string sCanvas = OpenSilver.Interop.GetVariableStringForJS(_canvasDom);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"(function(cvs) {{ const ctx = cvs.getContext('2d'); ctx.moveTo({_lastPos.X.ToInvariantString()}, {_lastPos.Y.ToInvariantString()}); ctx.lineTo({_mousePos.X.ToInvariantString()}, {_mousePos.Y.ToInvariantString()}); ctx.stroke(); }})({sCanvas})");
-            //object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
-            //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2); $0.lineTo($3, $4); $0.stroke();", context, _lastPos.X, _lastPos.Y, _mousePos.X, _mousePos.Y);
+@$"(function(cvs) {{
+  const ctx = cvs.getContext('2d');
+  ctx.strokeStyle = '{_currentStroke.DrawingAttributes.Color.ToHtmlString(1)}';
+  ctx.lineWidth = '{_currentStroke.DrawingAttributes.Width.ToInvariantString()}';
+  ctx.beginPath();
+  ctx.moveTo({_lastPos.X.ToInvariantString()}, {_lastPos.Y.ToInvariantString()});
+  ctx.lineTo({_mousePos.X.ToInvariantString()}, {_mousePos.Y.ToInvariantString()});
+  ctx.stroke();
+}})({sCanvas})");
+
             _lastPos = _mousePos;
         }
     }
