@@ -143,7 +143,14 @@ public sealed class ResourcesExtractorAndCopier : Task
                         {
                             foreach (ITaskItem reference in ResolvedReferences)
                             {
-                                storage.LoadAssembly(reference.ItemSpec);
+                                try
+                                {
+                                    storage.LoadAssembly(reference.ItemSpec);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.LogMessage($"Skipped {reference.ItemSpec} - Unable to load assembly. {ex.Message}");
+                                }
                             }
 
                             // Do the extraction and copy:
