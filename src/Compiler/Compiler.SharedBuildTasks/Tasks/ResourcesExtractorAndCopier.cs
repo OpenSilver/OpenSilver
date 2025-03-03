@@ -22,14 +22,23 @@ using System.IO;
 using System.Linq;
 using System.Resources;
 using System.Threading;
+using System.Runtime.Serialization.Json;
+using System.Security.Cryptography;
+using System.Text;
 using Mono.Cecil;
 
 namespace OpenSilver.Compiler;
 
 public sealed class ResourcesExtractorAndCopier : Task
 {
+    private const int MaxAttemptsCount = 10;
+    private const int MaxWaitTimeSeconds = 5;
+    private const string ResourcesCopierHashDictFile = "OpenSilver.ResourcesCopier.json";
+    private const string ResourcesCopierLockFile = "OpenSilver.ResourcesCopier.lock";
+
     private readonly string _sourceDir;
     private string _destinationFolder;
+    private string _baseIntermediateOutputPath;
 
     public ResourcesExtractorAndCopier()
     {
@@ -60,6 +69,25 @@ public sealed class ResourcesExtractorAndCopier : Task
     }
 
     [Required]
+    public string BaseIntermediateOutputPath
+    {
+        get => _baseIntermediateOutputPath;
+        set
+        {
+            string filePath = value;
+
+            // Get the relative path based on sourceDir
+            _baseIntermediateOutputPath = TaskHelper.CreateFullFilePath(filePath, _sourceDir);
+
+            // Make sure OutputDir always ends with Path.DirectorySeparatorChar
+            if (!_baseIntermediateOutputPath.EndsWith(string.Empty + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            {
+                _baseIntermediateOutputPath += Path.DirectorySeparatorChar;
+            }
+        }
+    }
+
+    [Required]
     public ITaskItem[] ResolvedReferences { get; set; }
 
     [Output]
@@ -85,50 +113,128 @@ public sealed class ResourcesExtractorAndCopier : Task
             Log.LogMessage($"{operationName} failed: '{nameof(DestinationFolder)}' cannot be null or empty.");
             return false;
         }
+        if (string.IsNullOrEmpty(BaseIntermediateOutputPath))
+        {
+            Log.LogMessage($"{operationName} failed: '{nameof(BaseIntermediateOutputPath)}' cannot be null or empty.");
+            return false;
+        }
 
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
         Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
         Stopwatch watch = Stopwatch.StartNew();
 
-        try
-        {
-            //------- DISPLAY THE PROGRESS -------
-            Log.LogMessage($"{operationName} started.");
+        var lockFile = Path.Combine(BaseIntermediateOutputPath, ResourcesCopierLockFile);
 
-            // Create a separate AppDomain so that the types loaded for reflection can be unloaded when done.
-            using (var storage = new MonoCecilAssemblyStorage())
+        for (var i = 0; i < MaxAttemptsCount; i++)
+        {
+            try
             {
-                foreach (ITaskItem reference in ResolvedReferences)
+                var success = false;
+                using (var fs = new FileStream(lockFile, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
                 {
-                    storage.LoadAssembly(reference.ItemSpec);
+                    try
+                    {
+                        //------- DISPLAY THE PROGRESS -------
+                        Log.LogMessage($"{operationName} started.");
+
+                        // Create a separate AppDomain so that the types loaded for reflection can be unloaded when done.
+                        using (var storage = new MonoCecilAssemblyStorage())
+                        {
+                            foreach (ITaskItem reference in ResolvedReferences)
+                            {
+                                try
+                                {
+                                    storage.LoadAssembly(reference.ItemSpec);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.LogMessage($"Skipped {reference.ItemSpec} - Unable to load assembly. {ex.Message}");
+                                }
+                            }
+
+                            // Do the extraction and copy:
+                            CopiedResources = ExtractResources(storage).ToArray();
+                        }
+
+                        //------- DISPLAY THE PROGRESS -------
+                        Log.LogMessage(
+                            $"{operationName} completed in {watch.ElapsedMilliseconds} ms.");
+
+                        success = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogMessage($"{operationName} failed after {watch.ElapsedMilliseconds} ms.");
+
+                        Log.LogErrorFromException(ex, true);
+                    }
                 }
 
-                // Do the extraction and copy:
-                CopiedResources = ExtractResources(storage).ToArray();
+                File.Delete(lockFile);
+
+                return success;
             }
+            catch (IOException)
+            {
+                // Another process is currently copying resources.
+                // We need to wait until it finishes before trying again.
+                var directoryPath = Path.GetDirectoryName(lockFile);
+                var fileName = Path.GetFileName(lockFile);
 
-            //------- DISPLAY THE PROGRESS -------
-            Log.LogMessage(
-                $"{operationName} completed in {watch.ElapsedMilliseconds} ms.");
+                using var fileDeletedEvent = new ManualResetEvent(false);
 
-            return true;
+                using var watcher = new FileSystemWatcher(directoryPath, fileName)
+                {
+                    NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
+                };
+
+                watcher.Deleted += (object sender, FileSystemEventArgs e) =>
+                {
+                    fileDeletedEvent.Set();
+                };
+
+                // Begin watching.
+                watcher.EnableRaisingEvents = true;
+
+                // Maybe already deleted
+                if (File.Exists(lockFile))
+                {
+                    fileDeletedEvent.WaitOne(TimeSpan.FromSeconds(MaxWaitTimeSeconds));
+                }
+            }
         }
-        catch (Exception ex)
+
+        Log.LogError("Failed to copy resources: Maximum retry attempts exceeded.");
+        return false;
+    }
+
+    private static void SaveDictionary(Dictionary<string, string> dictionary, string filePath)
+    {
+        var serializer = new DataContractJsonSerializer(typeof(Dictionary<string, string>));
+        using var xmlWriter = JsonReaderWriterFactory.CreateJsonWriter(new FileStream(filePath, FileMode.Create), Encoding.UTF8, true, true);
+        serializer.WriteObject(xmlWriter, dictionary);
+    }
+
+    private static Dictionary<string, string> LoadDictionary(string filePath)
+    {
+        if (!File.Exists(filePath))
         {
-            Log.LogMessage(
-                MessageImportance.High,
-                $"{operationName} failed after {watch.ElapsedMilliseconds} ms.");
-            
-            Log.LogErrorFromException(ex, true);
-
-            return false;
+            // File doesn't exist, so return an empty dictionary
+            return new Dictionary<string, string>();
         }
+
+        var serializer = new DataContractJsonSerializer(typeof(Dictionary<string, string>));
+        using var stream = new FileStream(filePath, FileMode.Open);
+        return (Dictionary<string, string>)serializer.ReadObject(stream);
     }
 
     private List<ITaskItem> ExtractResources(MonoCecilAssemblyStorage storage)
     {
         List<ITaskItem> copiedResources = new();
+
+        var resourcesHashFileName = Path.Combine(BaseIntermediateOutputPath, ResourcesCopierHashDictFile);
+        var resourcesHashDict = LoadDictionary(resourcesHashFileName);
 
         // Determine the absolute output path:
         string destinationFolder = NormalizeDirectorySeparator(DestinationFolder);
@@ -145,19 +251,47 @@ public sealed class ResourcesExtractorAndCopier : Task
             switch (compatibilityVersion)
             {
                 case 0:
-                    LegacyExtractResourcesFromAssembly(asm, destinationFolder, copiedResources);
+                    LegacyExtractResourcesFromAssembly(asm, destinationFolder, copiedResources, resourcesHashDict);
                     break;
 
                 default:
-                    ExtractResourcesFromAssembly(asm, destinationFolder, copiedResources);
+                    ExtractResourcesFromAssembly(asm, destinationFolder, copiedResources, resourcesHashDict);
                     break;
             }
         }
 
+        SaveDictionary(resourcesHashDict, resourcesHashFileName);
+
         return copiedResources;
     }
 
-    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources)
+    private string GetHash(Stream stream)
+    {
+        using (var sha256 = SHA256.Create())
+        {
+            stream.Position = 0;
+            var hashBytes = sha256.ComputeHash(stream);
+            var hashString = new StringBuilder();
+            foreach (var b in hashBytes)
+            {
+                hashString.Append(b.ToString("X2", CultureInfo.InvariantCulture));
+            }
+
+            stream.Position = 0;
+
+            return hashString.ToString();
+        }
+    }
+
+    private string GetHash(byte[] data)
+    {
+        using (var ms = new MemoryStream(data))
+        {
+            return GetHash(ms);
+        }
+    }
+
+    private void LegacyExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
     {
         string assemblyName = asm.Name.Name;
 
@@ -168,35 +302,47 @@ public sealed class ResourcesExtractorAndCopier : Task
         // Copy files:
         foreach (EmbeddedResource resource in GetManifestResources(asm))
         {
-            string fileRelativePath = ResourceIDHelper.GetResourceIDFromRelativePath(resource.Name, UriFormat.Unescaped);
+            string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(resource.Name, UriFormat.Unescaped);
             byte[] fileContent = resource.GetResourceData();
+            string hash = GetHash(fileContent);
 
             // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
             string resourcesRootDir = Path.GetFullPath(
                 Path.Combine(destinationFolder, NormalizeDirectorySeparator(OutputResourcesPath), assemblyName.ToLowerInvariant()));
 
             // Create the destination folders hierarchy if it does not already exist:
-            string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, fileRelativePath));
+            string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, resourceId));
 
-            if (destinationFile.Length >= 256)
+            if (!resourcesHashDict.ContainsKey(resourceId) || resourcesHashDict[resourceId] != hash || !File.Exists(destinationFile))
             {
-                Log.LogWarning($"Could not create the following output file because its path is too long: {destinationFile}");
-                continue;
-            }
+                // If the file is new, has been modified, or the destination file does not exist, copy it
 
-            if (!destinationFile.StartsWith(resourcesRootDir, StringComparison.OrdinalIgnoreCase))
+                if (destinationFile.Length >= 256)
+                {
+                    Log.LogWarning($"Could not create the following output file because its path is too long: {destinationFile}");
+                    continue;
+                }
+
+                if (!destinationFile.StartsWith(resourcesRootDir, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                string destinationDir = Path.GetDirectoryName(destinationFile);
+                if (!Directory.Exists(destinationDir))
+                {
+                    Directory.CreateDirectory(destinationDir);
+                }
+
+                // Create the file:
+                File.WriteAllBytes(destinationFile, fileContent);
+
+                resourcesHashDict[resourceId] = hash;
+            }
+            else
             {
-                continue;
+                Log.LogMessage($"Skipped {resourceId} - the resource did not change.");
             }
-
-            string destinationDir = Path.GetDirectoryName(destinationFile);
-            if (!Directory.Exists(destinationDir))
-            {
-                Directory.CreateDirectory(destinationDir);
-            }
-
-            // Create the file:
-            File.WriteAllBytes(destinationFile, fileContent);
 
             copiedResources.Add(new TaskItem(destinationFile));
         }
@@ -216,7 +362,7 @@ public sealed class ResourcesExtractorAndCopier : Task
         }
     }
 
-    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources)
+    private void ExtractResourcesFromAssembly(AssemblyDefinition asm, string destinationFolder, List<ITaskItem> copiedResources, Dictionary<string, string> resourcesHashDict)
     {
         if (GetResourceManifest(asm) is not EmbeddedResource manifest)
         {
@@ -237,6 +383,8 @@ public sealed class ResourcesExtractorAndCopier : Task
 
                 string resourceId = ResourceIDHelper.GetResourceIDFromRelativePath(enumerator.Key.ToString(), UriFormat.Unescaped);
 
+                string hash = GetHash(stream);
+
                 // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
                 string resourcesRootDir = Path.GetFullPath(Path.Combine(destinationFolder,
                     NormalizeDirectorySeparator(OutputResourcesPath), assemblyName.ToLowerInvariant()));
@@ -244,27 +392,38 @@ public sealed class ResourcesExtractorAndCopier : Task
                 // Create the destination folders hierarchy if it does not already exist:
                 string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, resourceId));
 
-                if (destinationFile.Length >= 256)
+                if (!resourcesHashDict.ContainsKey(resourceId) || resourcesHashDict[resourceId] != hash || !File.Exists(destinationFile))
                 {
-                    Log.LogWarning($"Could not create the following output file because its path is too long: {destinationFile}");
-                    continue;
-                }
+                    // If the file is new, has been modified, or the destination file does not exist, copy it
 
-                if (!destinationFile.StartsWith(resourcesRootDir, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+                    if (destinationFile.Length >= 256)
+                    {
+                        Log.LogWarning($"Could not create the following output file because its path is too long: {destinationFile}");
+                        continue;
+                    }
 
-                string destinationDir = Path.GetDirectoryName(destinationFile);
-                if (!Directory.Exists(destinationDir))
-                {
-                    Directory.CreateDirectory(destinationDir);
-                }
+                    if (!destinationFile.StartsWith(resourcesRootDir, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
 
-                // Create the file:
-                using (var fs = File.Create(destinationFile))
+                    string destinationDir = Path.GetDirectoryName(destinationFile);
+                    if (!Directory.Exists(destinationDir))
+                    {
+                        Directory.CreateDirectory(destinationDir);
+                    }
+
+                    // Create the file:
+                    using (var fs = File.Create(destinationFile))
+                    {
+                        stream.CopyTo(fs);
+                    }
+
+                    resourcesHashDict[resourceId] = hash;
+                }
+                else
                 {
-                    stream.CopyTo(fs);
+                    Log.LogMessage($"Skipped {resourceId} - the resource did not change.");
                 }
 
                 copiedResources.Add(new TaskItem(destinationFile));
