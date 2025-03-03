@@ -54,7 +54,7 @@ namespace CSHTML5.Internal
         /// <returns>The URI suitable to use in the HTML5 "src" property</returns>
         public static string ConvertToHtml5Path(string uri, UIElement elementThatARelativeUriIsRelativeTo = null)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 return null;
             }
@@ -128,6 +128,12 @@ namespace CSHTML5.Internal
 
         private static string ConvertFromRelativePath(string uri, UIElement relativeTo)
         {
+            // ~ means we do not want to attempt to resolve the path based on the xaml context.
+            if (uri.StartsWith("~", StringComparison.Ordinal))
+            {
+                return uri.Substring(1);
+            }
+
             if (!TryGetLocationOfXamlFile(relativeTo, out string xamlSourcePath))
             {
                 throw InvalidUriException(uri);

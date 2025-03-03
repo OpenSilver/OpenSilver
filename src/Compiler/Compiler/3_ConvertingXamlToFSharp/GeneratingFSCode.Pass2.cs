@@ -1858,23 +1858,19 @@ namespace GlobalResource
 
             private static bool IsUriAbsolute(string path)
             {
-                if (path.Contains(":"))
+                if (path.StartsWith("~"))
                 {
-                    // cf. https://stackoverflow.com/questions/1737575/are-colons-allowed-in-urls
-                    string textBeforeColon = path.Substring(0, path.IndexOf(":"));
-                    if (!textBeforeColon.Contains(@"\") && !textBeforeColon.Contains(@"/"))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return true;
                 }
-                else
+
+                int index = path.IndexOf(':');
+                if (index >= 0)
                 {
-                    return false;
+                    string scheme = path.Substring(0, index);
+                    return Uri.CheckSchemeName(scheme);
                 }
+
+                return false;
             }
 
             private bool TryResolvePathForBinding(string path, XElement element, out string resolvedPath)
