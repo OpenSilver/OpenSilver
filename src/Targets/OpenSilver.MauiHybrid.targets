@@ -41,8 +41,10 @@
 
     <PropertyGroup>
       <_IsMainBuild>true</_IsMainBuild>
-      <_IsMainBuild Condition="'$(DesignTimeBuild)' == 'true' OR '$(BuildingProject)' != 'true'">false</_IsMainBuild>
+      <_IsMainBuild Condition="'$(DesignTimeBuild)' == 'true'">false</_IsMainBuild>
+      <_IsMainBuild Condition="'$(BuildingProject)' != 'true' AND '$(TargetPlatformIdentifier)' != 'android'">false</_IsMainBuild>
     </PropertyGroup>
+
 
     <CallTarget Condition="'$(_IsMainBuild)' == 'true'" Targets="_CopyWasmResourcesMain" />
 
@@ -79,6 +81,7 @@
 
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+                                 BaseIntermediateOutputPath="$(BaseIntermediateOutputPath)"
                                  DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/">
       <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedResources" />
     </ResourcesExtractorAndCopier>

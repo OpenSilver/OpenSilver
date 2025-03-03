@@ -26,6 +26,7 @@
   <Target Name="ResourcesExtractor" AfterTargets="CoreBuild">
     <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
                                  OutputResourcesPath="resources/"
+                                 BaseIntermediateOutputPath="$(BaseIntermediateOutputPath)"
                                  DestinationFolder="$(OutputPath)/wwwroot/"/>
   </Target>
 
