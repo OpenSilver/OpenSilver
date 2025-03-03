@@ -198,6 +198,7 @@ public sealed class ResourcesExtractorAndCopier : Task
             }
         }
 
+        Log.LogError("Failed to copy resources: Maximum retry attempts exceeded.");
         return false;
     }
 
