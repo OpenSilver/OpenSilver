@@ -313,9 +313,9 @@ public sealed class ResourcesExtractorAndCopier : Task
             // Create the destination folders hierarchy if it does not already exist:
             string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, resourceId));
 
-            if (!resourcesHashDict.ContainsKey(resourceId) || resourcesHashDict[resourceId] != hash)
+            if (!resourcesHashDict.ContainsKey(resourceId) || resourcesHashDict[resourceId] != hash || !File.Exists(destinationFile))
             {
-                // The file is new or has been modified, copy it
+                // If the file is new, has been modified, or the destination file does not exist, copy it
 
                 if (destinationFile.Length >= 256)
                 {
@@ -392,9 +392,9 @@ public sealed class ResourcesExtractorAndCopier : Task
                 // Create the destination folders hierarchy if it does not already exist:
                 string destinationFile = Path.GetFullPath(Path.Combine(resourcesRootDir, resourceId));
 
-                if (!resourcesHashDict.ContainsKey(resourceId) || resourcesHashDict[resourceId] != hash)
+                if (!resourcesHashDict.ContainsKey(resourceId) || resourcesHashDict[resourceId] != hash || !File.Exists(destinationFile))
                 {
-                    // The file is new or has been modified, copy it
+                    // If the file is new, has been modified, or the destination file does not exist, copy it
 
                     if (destinationFile.Length >= 256)
                     {
