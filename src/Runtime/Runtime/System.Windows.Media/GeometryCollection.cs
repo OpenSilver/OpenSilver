@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace System.Windows.Media
@@ -24,6 +25,41 @@ namespace System.Windows.Media
         /// Initializes a new instance of the <see cref="GeometryCollection"/> class.
         /// </summary>
         public GeometryCollection() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeometryCollection"/> class with the specified collection 
+        /// of <see cref="Geometry"/> objects.
+        /// </summary>
+        /// <param name="collection">
+        /// The collection of <see cref="Geometry"/> objects that make up the <see cref="GeometryCollection"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// collection is null.
+        /// </exception>
+        public GeometryCollection(IEnumerable<Geometry> collection)
+        {
+            if (collection is null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
+
+            foreach (Geometry value in collection)
+            {
+                Add(value);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GeometryCollection"/> class with the specified capacity, or the 
+        /// number of <see cref="Geometry"/> objects the collection is initially capable of storing.
+        /// </summary>
+        /// <param name="capacity">
+        /// The number of <see cref="Geometry"/> objects that the collection is initially capable of storing.
+        /// </param>
+        public GeometryCollection(int capacity)
+            : base(capacity)
+        {
+        }
 
         internal event EventHandler Changed;
 

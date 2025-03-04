@@ -19,6 +19,27 @@ namespace System.Windows.Media
     public sealed class TranslateTransform : Transform
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TranslateTransform"/> class.
+        /// </summary>
+        public TranslateTransform() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TranslateTransform"/> class and 
+        /// specifies the displacements in the direction of the x- and y- axes.
+        /// </summary>
+        /// <param name="offsetX">
+        /// The displacement in the direction of the x-axis.
+        /// </param>
+        /// <param name="offsetY">
+        /// The displacement in the direction of the y-axis.
+        /// </param>
+        public TranslateTransform(double offsetX, double offsetY)
+        {
+            X = offsetX;
+            Y = offsetY;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="X"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty XProperty =

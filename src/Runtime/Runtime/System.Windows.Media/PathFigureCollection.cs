@@ -54,9 +54,20 @@ public sealed class PathFigureCollection : PresentationFrameworkCollection<PathF
     /// The collection of <see cref="PathFigure"/> objects which collectively make 
     /// up the geometry of the <see cref="Path"/>.
     /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// figures is null.
+    /// </exception>
     public PathFigureCollection(IEnumerable<PathFigure> figures)
-        : base(figures)
     {
+        if (figures is null)
+        {
+            throw new ArgumentNullException(nameof(figures));
+        }
+
+        foreach (PathFigure item in figures)
+        {
+            Add(item);
+        }
     }
 
     /// <summary>

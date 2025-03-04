@@ -19,19 +19,41 @@ namespace System.Windows.Media
     public sealed class LineGeometry : Geometry
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="LineGeometry"/> class that
-        /// has no length.
+        /// Initializes a new instance of the <see cref="LineGeometry"/> class that has no length.
         /// </summary>
         public LineGeometry() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LineGeometry"/> class that 
-        /// has the specified start and end points.
+        /// Initializes a new instance of the <see cref="LineGeometry"/> class that has the specified start and end points.
         /// </summary>
+        /// <param name="startPoint">
+        /// The start point of the line.
+        /// </param>
+        /// <param name="endPoint">
+        /// The end point of the line.
+        /// </param>
         public LineGeometry(Point startPoint, Point endPoint)
         {
             StartPoint = startPoint;
             EndPoint = endPoint;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LineGeometry"/> class.
+        /// </summary>
+        /// <param name="startPoint">
+        /// The start point.
+        /// </param>
+        /// <param name="endPoint">
+        /// The end point.
+        /// </param>
+        /// <param name="transform">
+        /// The transformation to apply to the line.
+        /// </param>
+        public LineGeometry(Point startPoint, Point endPoint, Transform transform)
+            : this(startPoint, endPoint)
+        {
+            Transform = transform;
         }
 
         /// <summary>

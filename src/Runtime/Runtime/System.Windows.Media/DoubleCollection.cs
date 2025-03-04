@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using OpenSilver.Internal;
@@ -23,7 +24,37 @@ namespace System.Windows.Media;
 [TypeConverter(typeof(DoubleCollectionConverter))]
 public sealed class DoubleCollection : PresentationFrameworkCollection<double>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DoubleCollection"/> class.
+    /// </summary>
     public DoubleCollection() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DoubleCollection"/> class with the specified collection of 
+    /// <see cref="double"/> values.
+    /// </summary>
+    /// <param name="collection">
+    /// The collection of <see cref="double"/> values that make up the <see cref="DoubleCollection"/>.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// collection is null.
+    /// </exception>
+    public DoubleCollection(IEnumerable<double> collection)
+        : base(collection)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DoubleCollection"/> class with the specified capacity, or the 
+    /// number of <see cref="double"/> values the collection is initially capable of storing.
+    /// </summary>
+    /// <param name="capacity">
+    /// The number of <see cref="double"/> values that the collection is initially capable of storing.
+    /// </param>
+    public DoubleCollection(int capacity)
+        : base(capacity)
+    {
+    }
 
     /// <summary>
     /// Converts a <see cref="string"/> representation of a collection of doubles into an equivalent <see cref="DoubleCollection"/>.

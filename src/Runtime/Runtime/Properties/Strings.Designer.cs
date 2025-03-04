@@ -1321,6 +1321,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rectangle cannot be empty..
+        /// </summary>
+        internal static string Rect_Empty {
+            get {
+                return ResourceManager.GetString("Rect_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collection Remove event must specify item position..
         /// </summary>
         internal static string RemovedItemNotFound {

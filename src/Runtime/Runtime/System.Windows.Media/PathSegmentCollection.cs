@@ -53,9 +53,20 @@ namespace System.Windows.Media
         /// The collection of <see cref="PathSegment"/> objects that make up the 
         /// <see cref="PathSegmentCollection"/>.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// segments is null.
+        /// </exception>
         public PathSegmentCollection(IEnumerable<PathSegment> segments)
-            : base(segments)
         {
+            if (segments is null)
+            {
+                throw new ArgumentNullException(nameof(segments));
+            }
+
+            foreach (PathSegment item in segments)
+            {
+                Add(item);
+            }
         }
 
         internal override void AddOverride(PathSegment segment)

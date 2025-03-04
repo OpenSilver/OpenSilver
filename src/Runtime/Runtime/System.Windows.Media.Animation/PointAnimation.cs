@@ -27,6 +27,92 @@ public sealed class PointAnimation : AnimationTimeline, IFromByToAnimation<Point
     public PointAnimation() { }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="PointAnimation"/> class that animates to the specified value over the 
+    /// specified duration. The starting value for the animation is the base value of the property being animated or the 
+    /// output from another animation.
+    /// </summary>
+    /// <param name="toValue">
+    /// The destination value of the animation.
+    /// </param>
+    /// <param name="duration">
+    /// The length of time the animation takes to play from start to finish, once. See the <see cref="Timeline.Duration"/> 
+    /// property for more information.
+    /// </param>
+    public PointAnimation(Point toValue, Duration duration)
+    {
+        To = toValue;
+        Duration = duration;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PointAnimation"/> class that animates to the specified value over the 
+    /// specified duration and has the specified fill behavior. The starting value for the animation is the base value of 
+    /// the property being animated or the output from another animation.
+    /// </summary>
+    /// <param name="toValue">
+    /// The destination value of the animation.
+    /// </param>
+    /// <param name="duration">
+    /// The length of time the animation takes to play from start to finish, once. See the <see cref="Timeline.Duration"/> 
+    /// property for more information.
+    /// </param>
+    /// <param name="fillBehavior">
+    /// Specifies how the animation behaves when it is not active.
+    /// </param>
+    public PointAnimation(Point toValue, Duration duration, FillBehavior fillBehavior)
+    {
+        To = toValue;
+        Duration = duration;
+        FillBehavior = fillBehavior;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PointAnimation"/> class that animates from the specified starting value 
+    /// to the specified destination value over the specified duration.
+    /// </summary>
+    /// <param name="fromValue">
+    /// The starting value of the animation.
+    /// </param>
+    /// <param name="toValue">
+    /// The destination value of the animation.
+    /// </param>
+    /// <param name="duration">
+    /// The length of time the animation takes to play from start to finish, once. See the <see cref="Timeline.Duration"/> 
+    /// property for more information.
+    /// </param>
+    public PointAnimation(Point fromValue, Point toValue, Duration duration)
+    {
+        From = fromValue;
+        To = toValue;
+        Duration = duration;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PointAnimation"/> class that animates from the specified starting value
+    /// to the specified destination value over the specified duration and has the specified fill behavior.
+    /// </summary>
+    /// <param name="fromValue">
+    /// The starting value of the animation.
+    /// </param>
+    /// <param name="toValue">
+    /// The destination value of the animation.
+    /// </param>
+    /// <param name="duration">
+    /// The length of time the animation takes to play from start to finish, once. See the <see cref="Timeline.Duration"/> 
+    /// property for more information.
+    /// </param>
+    /// <param name="fillBehavior">
+    /// Specifies how the animation behaves when it is not active.
+    /// </param>
+    public PointAnimation(Point fromValue, Point toValue, Duration duration, FillBehavior fillBehavior)
+    {
+        From = fromValue;
+        To = toValue;
+        Duration = duration;
+        FillBehavior = fillBehavior;
+    }
+
+    /// <summary>
     /// Identifies the <see cref="By"/> dependency property.
     /// </summary>
     public static readonly DependencyProperty ByProperty =

@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
+
 namespace System.Windows.Media
 {
     /// <summary>
@@ -22,6 +24,68 @@ namespace System.Windows.Media
         /// Initializes a new instance of the <see cref="EllipseGeometry"/> class.
         /// </summary>
         public EllipseGeometry() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EllipseGeometry"/> class that has a horizontal diameter equal to 
+        /// the width of the passed <see cref="Rect"/>, a vertical diameter equal to the length of the passed <see cref="Rect"/>, 
+        /// and a center point location equal to the center of the passed <see cref="Rect"/>.
+        /// </summary>
+        /// <param name="rect">
+        /// The rectangle that describes the ellipse dimensions.
+        /// </param>
+        public EllipseGeometry(Rect rect)
+        {
+            if (rect.IsEmpty)
+            {
+                throw new ArgumentException(string.Format(Strings.Rect_Empty, nameof(rect)));
+            }
+
+            RadiusX = (rect.Right - rect.X) * (1.0 / 2.0);
+            RadiusY = (rect.Bottom - rect.Y) * (1.0 / 2.0);
+            Center = new Point(rect.X + RadiusX, rect.Y + RadiusY);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EllipseGeometry"/> class as an ellipse that has a specified center 
+        /// location, x radius, and y radius.
+        /// </summary>
+        /// <param name="center">
+        /// The location of the center of the ellipse.
+        /// </param>
+        /// <param name="radiusX">
+        /// The horizontal radius of the ellipse.
+        /// </param>
+        /// <param name="radiusY">
+        /// The vertical radius of the ellipse.
+        /// </param>
+        public EllipseGeometry(Point center, double radiusX, double radiusY)
+        {
+            Center = center;
+            RadiusX = radiusX;
+            RadiusY = radiusY;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EllipseGeometry"/> class that has the specified position, size, 
+        /// and transformation.
+        /// </summary>
+        /// <param name="center">
+        /// The location of the center of the ellipse.
+        /// </param>
+        /// <param name="radiusX">
+        /// The horizontal radius of the ellipse.
+        /// </param>
+        /// <param name="radiusY">
+        /// The vertical radius of the ellipse.
+        /// </param>
+        /// <param name="transform">
+        /// The transformation to apply to the ellipse.
+        /// </param>
+        public EllipseGeometry(Point center, double radiusX, double radiusY, Transform transform)
+            : this(center, radiusX, radiusY)
+        {
+            Transform = transform;
+        }
 
         /// <summary>
         /// Identifies the <see cref="Center"/> dependency property.

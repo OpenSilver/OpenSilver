@@ -539,6 +539,9 @@
   <data name="Rect_CannotCallMethod" xml:space="preserve">
     <value>Cannot call this method on the Empty Rect.</value>
   </data>
+  <data name="Rect_Empty" xml:space="preserve">
+    <value>Rectangle cannot be empty.</value>
+  </data>
   <data name="RemovedItemNotFound" xml:space="preserve">
     <value>Collection Remove event must specify item position.</value>
   </data>

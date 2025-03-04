@@ -29,6 +29,41 @@ namespace System.Windows.Media
         /// </summary>
         public GradientStopCollection() { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GradientStopCollection"/> class that contains the 
+        /// elements in the specified collection.
+        /// </summary>
+        /// <param name="collection">
+        /// The collection to copy.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// collection is null.
+        /// </exception>
+        public GradientStopCollection(IEnumerable<GradientStop> collection)
+        {
+            if (collection is null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
+
+            foreach (GradientStop value in collection)
+            {
+                Add(value);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GradientStopCollection"/> class that is initially capable of 
+        /// storing the specified number of items.
+        /// </summary>
+        /// <param name="capacity">
+        /// The number of <see cref="GradientStop"/> objects that the collection is initially capable of storing.
+        /// </param>
+        public GradientStopCollection(int capacity)
+            : base(capacity)
+        {
+        }
+
         internal event EventHandler Changed;
 
         private void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);

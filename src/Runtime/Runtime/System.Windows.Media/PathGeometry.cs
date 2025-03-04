@@ -32,12 +32,10 @@ namespace System.Windows.Media
         public PathGeometry() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PathGeometry"/> class with 
-        /// the specified Figures.
+        /// Initializes a new instance of the <see cref="PathGeometry"/> class with the specified <see cref="Figures"/>.
         /// </summary>
         /// <param name="figures">
-        /// The Figures of the <see cref="PathGeometry"/> which describes the contents 
-        /// of the <see cref="Path"/>.
+        /// The <see cref="Figures"/> of the <see cref="PathGeometry"/> which describes the contents of the <see cref="Path"/>.
         /// </param>
         public PathGeometry(IEnumerable<PathFigure> figures)
         {
@@ -46,9 +44,40 @@ namespace System.Windows.Media
                 throw new ArgumentNullException(nameof(figures));
             }
 
-            foreach (PathFigure item in figures)
+            PathFigureCollection items = Figures;
+            foreach (PathFigure figure in figures)
             {
-                Figures.Add(item);
+                items.Add(figure);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PathGeometry"/> class with the specified <see cref="Figures"/>, 
+        /// <see cref="FillRule"/>, and <see cref="Geometry.Transform"/>.
+        /// </summary>
+        /// <param name="figures">
+        /// The <see cref="Figures"/> of the <see cref="PathGeometry"/> which describes the contents of the <see cref="Path"/>.
+        /// </param>
+        /// <param name="fillRule">
+        /// The <see cref="FillRule"/> of the <see cref="PathGeometry"/>.
+        /// </param>
+        /// <param name="transform">
+        /// The <see cref="Geometry.Transform"/> which specifies the transform applied.
+        /// </param>
+        public PathGeometry(IEnumerable<PathFigure> figures, FillRule fillRule, Transform transform)
+        {
+            if (figures is null)
+            {
+                throw new ArgumentNullException(nameof(figures));
+            }
+
+            FillRule = fillRule;
+            Transform = transform;
+
+            PathFigureCollection items = Figures;
+            foreach (PathFigure figure in figures)
+            {
+                items.Add(figure);
             }
         }
 

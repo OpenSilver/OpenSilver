@@ -20,6 +20,44 @@ namespace System.Windows.Media
     public sealed class RotateTransform : Transform
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="RotateTransform"/> class.
+        /// </summary>
+        public RotateTransform() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RotateTransform"/> class that has the specified angle, in degrees, of 
+        /// clockwise rotation. The rotation is centered on the origin, (0,0).
+        /// </summary>
+        /// <param name="angle">
+        /// The clockwise rotation angle, in degrees.
+        /// </param>
+        public RotateTransform(double angle)
+        {
+            Angle = angle;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RotateTransform"/> class that has the specified angle and center point.
+        /// </summary>
+        /// <param name="angle">
+        /// The clockwise rotation angle, in degrees. For more information, see the <see cref="Angle"/> property.
+        /// </param>
+        /// <param name="centerX">
+        /// The x-coordinate of the center point for the <see cref="RotateTransform"/>. For more information, see the <see cref="CenterX"/> 
+        /// property.
+        /// </param>
+        /// <param name="centerY">
+        /// The y-coordinate of the center point for the <see cref="RotateTransform"/>. For more information, see the <see cref="CenterY"/> 
+        /// property.
+        /// </param>
+        public RotateTransform(double angle, double centerX, double centerY)
+            : this(angle)
+        {
+            CenterX = centerX;
+            CenterY = centerY;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="Angle"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty AngleProperty =

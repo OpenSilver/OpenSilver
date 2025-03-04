@@ -19,6 +19,52 @@ namespace System.Windows.Media
     public sealed class ScaleTransform : Transform
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ScaleTransform"/> class.
+        /// </summary>
+        public ScaleTransform() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScaleTransform"/> class with the specified x- and y- scale 
+        /// factors. The scale operation is centered on (0,0).
+        /// </summary>
+        /// <param name="scaleX">
+        /// The x-axis scale factor.
+        /// </param>
+        /// <param name="scaleY">
+        /// The y-axis scale factor.
+        /// </param>
+        public ScaleTransform(double scaleX, double scaleY)
+        {
+            ScaleX = scaleX;
+            ScaleY = scaleY;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScaleTransform"/> class that has the specified scale factors 
+        /// and center point.
+        /// </summary>
+        /// <param name="scaleX">
+        /// The x-axis scale factor. For more information, see the <see cref="ScaleX"/> property.
+        /// </param>
+        /// <param name="scaleY">
+        /// The y-axis scale factor. For more information, see the <see cref="ScaleY"/> property.
+        /// </param>
+        /// <param name="centerX">
+        /// The x-coordinate of the center of this <see cref="ScaleTransform"/>. For more information, see the 
+        /// <see cref="CenterX"/> property.
+        /// </param>
+        /// <param name="centerY">
+        /// The y-coordinate of the center of this <see cref="ScaleTransform"/>. For more information, see the 
+        /// <see cref="CenterY"/> property.
+        /// </param>
+        public ScaleTransform(double scaleX, double scaleY, double centerX, double centerY)
+            : this(scaleX, scaleY)
+        {
+            CenterX = centerX;
+            CenterY = centerY;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="ScaleX"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ScaleXProperty =

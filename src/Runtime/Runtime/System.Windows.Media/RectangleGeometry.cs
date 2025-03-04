@@ -19,10 +19,60 @@ namespace System.Windows.Media
     public sealed class RectangleGeometry : Geometry
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RectangleGeometry"/> class,
-        /// and creates a rectangle with zero area.
+        /// Initializes a new instance of the <see cref="RectangleGeometry"/> class, and creates a rectangle with zero area.
         /// </summary>
         public RectangleGeometry() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RectangleGeometry"/> class and specifies its dimensions.
+        /// </summary>
+        /// <param name="rect">
+        /// A <see cref="Rect"/> structure with the rectangle's dimensions.
+        /// </param>
+        public RectangleGeometry(Rect rect)
+        {
+            Rect = rect;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RectangleGeometry"/> class.
+        /// </summary>
+        /// <param name="rect">
+        /// A <see cref="Rect"/> structure with the rectangle's dimensions.
+        /// </param>
+        /// <param name="radiusX">
+        /// The radius of the rounded corner where it connects with the upper and lower edges of the rectangle.
+        /// </param>
+        /// <param name="radiusY">
+        /// The radius of the rounded corner where it connects with the left and right edges of the rectangle.
+        /// </param>
+        public RectangleGeometry(Rect rect, double radiusX, double radiusY)
+            : this(rect)
+        {
+            RadiusX = radiusX;
+            RadiusY = radiusY;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RectangleGeometry"/> class.
+        /// </summary>
+        /// <param name="rect">
+        /// A <see cref="Rect"/> structure with the rectangle's dimensions.
+        /// </param>
+        /// <param name="radiusX">
+        /// The radius of the rounded corner where it connects with the upper and lower edges of the rectangle.
+        /// </param>
+        /// <param name="radiusY">
+        /// The radius of the rounded corner where it connects with the left and right edges of the rectangle.
+        /// </param>
+        /// <param name="transform">
+        /// The transformation to apply to the geometry.
+        /// </param>
+        public RectangleGeometry(Rect rect, double radiusX, double radiusY, Transform transform)
+            : this(rect, radiusX, radiusY)
+        {
+            Transform = transform;
+        }
 
         /// <summary>
         /// Identifies the <see cref="Rect"/> dependency property.

@@ -26,9 +26,41 @@ namespace System.Windows.Media
         /// </summary>
         public MatrixTransform() { }
 
-        internal MatrixTransform(Matrix matrix)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MatrixTransform"/> class with the specified transformation matrix.
+        /// </summary>
+        /// <param name="matrix">
+        /// The transformation matrix of the new <see cref="MatrixTransform"/>.
+        /// </param>
+        public MatrixTransform(Matrix matrix)
         {
             Matrix = matrix;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MatrixTransform"/> class with the specified transformation matrix values.
+        /// </summary>
+        /// <param name="m11">
+        /// The value at position (1, 1) in the transformation matrix.
+        /// </param>
+        /// <param name="m12">
+        /// The value at position (1, 2) in the transformation matrix.
+        /// </param>
+        /// <param name="m21">
+        /// The value at position (2, 1) in the transformation matrix.
+        /// </param>
+        /// <param name="m22">
+        /// The value at position (2, 2) in the transformation matrix.
+        /// </param>
+        /// <param name="offsetX">
+        /// The X-axis translation factor, which is located at position (3,1) in the transformation matrix.
+        /// </param>
+        /// <param name="offsetY">
+        /// The Y-axis translation factor, which is located at position (3,2) in the transformation matrix.
+        /// </param>
+        public MatrixTransform(double m11, double m12, double m21, double m22, double offsetX, double offsetY)
+        {
+            Matrix = new Matrix(m11, m12, m21, m22, offsetX, offsetY);
         }
 
         /// <summary>

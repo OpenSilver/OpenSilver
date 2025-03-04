@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Windows.Markup;
 using OpenSilver.Internal;
 
@@ -29,6 +30,39 @@ namespace System.Windows.Media
         /// Initializes a new instance of the <see cref="PathFigure"/> class.
         /// </summary>
         public PathFigure() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PathFigure"/> class with the specified <see cref="StartPoint"/>,
+        /// <see cref="Segments"/>, and <see cref="IsClosed"/> values.
+        /// </summary>
+        /// <param name="start">
+        /// The <see cref="StartPoint"/> for the <see cref="PathFigure"/>.
+        /// </param>
+        /// <param name="segments">
+        /// The <see cref="Segments"/> for the <see cref="PathFigure"/>.
+        /// </param>
+        /// <param name="closed">
+        /// The <see cref="IsClosed"/> for the <see cref="PathFigure"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// segments is null.
+        /// </exception>
+        public PathFigure(Point start, IEnumerable<PathSegment> segments, bool closed)
+        {
+            if (segments is null)
+            {
+                throw new ArgumentNullException(nameof(segments));
+            }
+
+            StartPoint = start;
+            IsClosed = closed;
+
+            PathSegmentCollection collection = Segments;
+            foreach (PathSegment item in segments)
+            {
+                collection.Add(item);
+            }
+        }
 
         /// <summary>
         /// Identifies the <see cref="IsClosed"/> dependency property.

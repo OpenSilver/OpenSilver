@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace System.Windows.Media
@@ -24,7 +25,40 @@ namespace System.Windows.Media
         /// <summary>
         /// Initializes a new instance of the <see cref="TransformCollection"/> class.
         /// </summary>
-        public TransformCollection()
+        public TransformCollection() { }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransformCollection"/> class that contains items copied from 
+        /// the specified collection of <see cref="Transform"/> objects and has the same initial capacity as the number 
+        /// of items copied.
+        /// </summary>
+        /// <param name="collection">
+        /// The collection whose items are copied to the new <see cref="TransformCollection"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// collection is null.
+        /// </exception>
+        public TransformCollection(IEnumerable<Transform> collection)
+        {
+            if (collection is null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
+
+            foreach (Transform item in collection)
+            {
+                Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransformCollection"/> class with the specified capacity.
+        /// </summary>
+        /// <param name="capacity">
+        /// The number of <see cref="Transform"/> objects that the collection is initially capable of storing.
+        /// </param>
+        public TransformCollection(int capacity)
+            : base(capacity)
         {
         }
 

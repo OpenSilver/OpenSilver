@@ -19,6 +19,54 @@ namespace System.Windows.Media
     public sealed class SkewTransform : Transform
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="SkewTransform"/> class.
+        /// </summary>
+        public SkewTransform() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SkewTransform"/> class that has the specified x- and y-axes 
+        /// angles and is centered on the origin.
+        /// </summary>
+        /// <param name="angleX">
+        /// The x-axis skew angle, which is measured in degrees counterclockwise from the y-axis. For more information, 
+        /// see the <see cref="AngleX"/> property.
+        /// </param>
+        /// <param name="angleY">
+        /// The y-axis skew angle, which is measured in degrees counterclockwise from the x-axis. For more information, 
+        /// see the <see cref="AngleY"/> property.
+        /// </param>
+        public SkewTransform(double angleX, double angleY)
+        {
+            AngleX = angleX;
+            AngleY = angleY;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SkewTransform"/> class that has the specified  x- and y-axes 
+        /// angles and center.
+        /// </summary>
+        /// <param name="angleX">
+        /// The x-axis skew angle, which is measured in degrees counterclockwise from the y-axis. For more information, 
+        /// see the <see cref="AngleX"/> property.
+        /// </param>
+        /// <param name="angleY">
+        /// The y-axis skew angle, which is measured in degrees counterclockwise from the x-axis. For more information, 
+        /// see the <see cref="AngleY"/> property.
+        /// </param>
+        /// <param name="centerX">
+        /// The x-coordinate of the transform center. For more information, see the <see cref="CenterX"/> property.
+        /// </param>
+        /// <param name="centerY">
+        /// The y-coordinate of the transform center. For more information, see the <see cref="CenterY"/> property.
+        /// </param>
+        public SkewTransform(double angleX, double angleY, double centerX, double centerY)
+            : this(angleX, angleY)
+        {
+            CenterX = centerX;
+            CenterY = centerY;
+        }
+
+        /// <summary>
         /// Identifies the <see cref="AngleX"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty AngleXProperty =
