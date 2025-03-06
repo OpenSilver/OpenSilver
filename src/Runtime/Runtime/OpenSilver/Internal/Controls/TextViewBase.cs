@@ -70,8 +70,6 @@ internal abstract partial class TextViewBase : FrameworkElement
                 MethodToUpdateDom2 = static (d, oldValue, newValue) => ((TextViewBase)d).SetForeground(oldValue as Brush, (Brush)newValue),
             });
 
-        IsHitTestableProperty.OverrideMetadata(typeof(TextViewBase), new PropertyMetadata(BooleanBoxes.TrueBox));
-
         FlowDirectionProperty.OverrideMetadata(
             typeof(TextViewBase),
             new FrameworkPropertyMetadata(

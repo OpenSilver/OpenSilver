@@ -929,6 +929,9 @@ namespace System.Windows
 
             // Raise the public changed event.
             uie.IsVisibleChanged?.Invoke(uie, e);
+
+            // Update pointer events
+            uie.CoerceIsHitTestable();
         }
 
         private static object CoerceIsVisible(DependencyObject d, object baseValue)
@@ -1127,16 +1130,14 @@ namespace System.Windows
 #region pointer-events
 
         /// <summary>
-        /// Fetches the value that pointer-events (css) should be coerced to.
+        /// Gets the value that pointer-events (css) should be coerced to.
         /// </summary>
         internal virtual bool EnablePointerEventsCore => false;
 
         internal virtual void SetPointerEvents(bool hitTestable) =>
             OuterDiv.Style.pointerEvents = hitTestable ? "auto" : "none";
 
-        // IsHitTestable should be updated exclusively with Coercion, that is why we create a read-only
-        // property and just drop the key.
-        internal static readonly DependencyProperty IsHitTestableProperty =
+        private static readonly DependencyProperty IsHitTestableProperty =
             DependencyProperty.Register(
                 nameof(IsHitTestable),
                 typeof(bool),
@@ -1151,7 +1152,7 @@ namespace System.Windows
         private static object CoerceIsHitTestable(DependencyObject d, object value)
         {
             UIElement uie = (UIElement)d;
-            return BooleanBoxes.Box(uie.EnablePointerEventsCore && uie.IsEnabled && uie.IsHitTestVisible);
+            return BooleanBoxes.Box(uie.EnablePointerEventsCore && uie.IsEnabled && uie.IsHitTestVisible && uie.IsVisible);
         }
 
         internal void CoerceIsHitTestable() => CoerceValue(IsHitTestableProperty);
