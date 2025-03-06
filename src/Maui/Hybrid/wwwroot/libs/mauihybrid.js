@@ -96,7 +96,6 @@ window._hybridRuntime = (function () {
     return {
         startAsync: async function () {
             try {
-                console.log('STARTING');
                 await Promise.all(_promises);
                 return true;
             } catch (error) {
