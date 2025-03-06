@@ -37,16 +37,18 @@ namespace OpenSilver.MauiHybrid.Threading
     /// };
     /// thread.Start();
     ///
-    /// SynchronizationContext.SetSynchronizationContext(syncContext);
-    ///
-    /// syncContext.Send(_ =>
+    /// syncContext.Post(async (_) =>
     /// {
-    ///     //This method is executed on the background thread
+    ///     // This method is executed on the background thread
     ///     Console.WriteLine($"Initial thread id: {Thread.CurrentThread.ManagedThreadId}");
-    ///     Task.Delay(10).Wait(); // Simulating an async operation
+    ///     await Task.Delay(10); // Simulating an async operation
     ///     Console.WriteLine($"Resumed on thread id: {Thread.CurrentThread.ManagedThreadId}");
     /// }, null);
     ///
+    /// // Do something on the main thread
+    /// await Task.Delay(100);
+    ///
+    /// // Stop the background thread
     /// syncContext.Stop();
     /// thread.Join();
     /// </code>
