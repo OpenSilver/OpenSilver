@@ -13,6 +13,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using OpenSilver.Internal;
 
 namespace System.Windows;
@@ -84,7 +85,7 @@ internal static class GlobalEventManager
 
         lock (Synchronized)
         {
-            routedEvents = _globalIndexToEventMap.ToArray();
+            routedEvents = RegisteredEventList.ToArray();
         }
 
         return routedEvents;
@@ -180,6 +181,9 @@ internal static class GlobalEventManager
 
             while (dType != null)
             {
+                // Ensure static constructor of type has run
+                RuntimeHelpers.RunClassConstructor(dType.SystemType.TypeHandle);
+
                 // Get the ItemList of RoutedEvents for the given DType
                 if (_dTypedRoutedEventList.TryGetValue(dType, out List<RoutedEvent> ownerRoutedEventList))
                 {
@@ -203,6 +207,9 @@ internal static class GlobalEventManager
             // Search Hashtable
             while (ownerType != null)
             {
+                // Ensure static constructor of type has run
+                RuntimeHelpers.RunClassConstructor(ownerType.TypeHandle);
+
                 // Get the ItemList of RoutedEvents for the given OwnerType
                 if (_ownerTypedRoutedEventList.TryGetValue(ownerType, out List<RoutedEvent> ownerRoutedEventList))
                 {
@@ -345,19 +352,19 @@ internal static class GlobalEventManager
             // only via static constructors. However there is no cheap way of ensuring this, without having to do a stack walk. Hence 
             // concievably people could register RoutedEvents via instance methods and therefore cause the GlobalIndex to 
             // overflow. This check will explicitly catch this error, instead of silently malfuntioning.
-            if (_globalIndexToEventMap.Count >= int.MaxValue)
+            if (RegisteredEventList.Count >= int.MaxValue)
             {
                 throw new InvalidOperationException(Strings.TooManyRoutedEvents);
             }
 
-            index = _globalIndexToEventMap.Count;
-            _globalIndexToEventMap.Add(routedEvent);
+            index = RegisteredEventList.Count;
+            RegisteredEventList.Add(routedEvent);
         }
         return index;
     }
 
     // must be used within a lock of GlobalEventManager.Synchronized
-    private static readonly List<RoutedEvent> _globalIndexToEventMap = new(100); // 
+    internal static List<RoutedEvent> RegisteredEventList { get; } = new(100);
 
     // This is an efficient  Hashtable of ItemLists keyed on DType
     // Each ItemList holds the registered RoutedEvents for that OwnerType

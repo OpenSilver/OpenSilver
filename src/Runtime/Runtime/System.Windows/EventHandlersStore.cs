@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using OpenSilver.Internal;
@@ -23,7 +24,7 @@ namespace System.Windows;
 /// <remarks>
 ///     EventHandlersStore is a hashtable of handlers for a given RoutedEvent
 /// </remarks>
-internal sealed class EventHandlersStore
+internal sealed class EventHandlersStore : IEnumerable<(int GlobalIndex, List<RoutedEventHandlerInfo> Handlers)>
 {
     private readonly Dictionary<int, List<RoutedEventHandlerInfo>> _entries;
 
@@ -74,12 +75,21 @@ internal sealed class EventHandlersStore
 
         if (_entries.TryGetValue(routedEvent.GlobalIndex, out List<RoutedEventHandlerInfo> handlers))
         {
-            for (int i = 0; i < handlers.Count; i++)
+            if (handlers.Count == 1 && handlers[0].Handler == handler)
             {
-                if (handlers[i].Handler == handler)
+                // this is the only handler for this event and it's being removed, reclaim space.
+                _entries.Remove(routedEvent.GlobalIndex);
+            }
+            else
+            {
+                // When a matching instance is found remove it
+                for (int i = 0; i < handlers.Count; i++)
                 {
-                    handlers.RemoveAt(i);
-                    break;
+                    if (handlers[i].Handler == handler)
+                    {
+                        handlers.RemoveAt(i);
+                        break;
+                    }
                 }
             }
         }
@@ -89,5 +99,38 @@ internal sealed class EventHandlersStore
     public List<RoutedEventHandlerInfo> Get(RoutedEvent routedEvent)
     {
         return _entries.TryGetValue(routedEvent.GlobalIndex, out List<RoutedEventHandlerInfo> handlers) ? handlers : null;
+    }
+
+    public Enumerator GetEnumerator() => new(this);
+
+    IEnumerator<(int, List<RoutedEventHandlerInfo>)> IEnumerable<(int GlobalIndex, List<RoutedEventHandlerInfo> Handlers)>.GetEnumerator() => GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public struct Enumerator : IEnumerator<(int GlobalIndex, List<RoutedEventHandlerInfo> Handlers)>
+    {
+        private Dictionary<int, List<RoutedEventHandlerInfo>>.Enumerator _enumerator;
+
+        public Enumerator(EventHandlersStore store)
+        {
+            _enumerator = store._entries.GetEnumerator();
+        }
+
+        public bool MoveNext() => _enumerator.MoveNext();
+
+        public (int GlobalIndex, List<RoutedEventHandlerInfo> Handlers) Current
+        {
+            get
+            {
+                KeyValuePair<int, List<RoutedEventHandlerInfo>> current = _enumerator.Current;
+                return (current.Key, current.Value);
+            }
+        }
+
+        object IEnumerator.Current => Current;
+
+        public void Dispose() => _enumerator.Dispose();
+
+        void IEnumerator.Reset() => ((IEnumerator)_enumerator).Reset();
     }
 }

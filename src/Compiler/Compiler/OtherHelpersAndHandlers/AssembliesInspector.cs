@@ -122,5 +122,11 @@ namespace OpenSilver.Compiler
 
         public PropertyDefinition GetProperty(TypeDefinition type, string name, bool staticOnly, bool publicOnly)
             => MonoCecilAssembliesInspectorImpl.FindPropertyGetterDeep(type, name, out _, staticOnly, publicOnly);
+
+        public EventDefinition GetEvent(TypeDefinition type, string eventName, bool publicOnly)
+            => MonoCecilAssembliesInspectorImpl.FindEventDeep(type, eventName, out _, publicOnly);
+
+        public MethodDefinition GetMethod(TypeDefinition type, string methodName, bool publicOnly, bool staticOnly)
+            => MonoCecilAssembliesInspectorImpl.FindMethodDeep(type, methodName, publicOnly, staticOnly, out _);
     }
 }

@@ -367,7 +367,27 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return null;
         }
 
-        private static MethodDefinition FindMethodDeep(TypeDefinition elementType,
+        internal static EventDefinition FindEventDeep(TypeDefinition elementType, string eventName,
+            out TypeReference ownerElementType, bool publicOnly)
+        {
+            ownerElementType = elementType;
+            while (ownerElementType != null)
+            {
+                var resolved = ownerElementType.ResolveOrThrow();
+                var eventDefinition = resolved.Events.FirstOrDefault(p =>
+                    string.Equals(p.Name, eventName, StringComparison.Ordinal) &&
+                    !p.AddMethod.IsStatic &&
+                    (!publicOnly || p.AddMethod.IsPublic));
+
+                if (eventDefinition != null) return eventDefinition;
+
+                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
+            }
+
+            return null;
+        }
+
+        public static MethodDefinition FindMethodDeep(TypeDefinition elementType,
             string methodName,
             bool onlyPublic,
             bool onlyStatic,

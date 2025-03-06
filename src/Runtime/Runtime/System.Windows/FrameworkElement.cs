@@ -12,6 +12,8 @@
 \*====================================================================================*/
 
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.ComponentModel;
@@ -20,8 +22,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using CSHTML5.Internal;
-using OpenSilver.Internal;
 using OpenSilver;
+using OpenSilver.Internal;
 
 namespace System.Windows
 {
@@ -576,6 +578,42 @@ namespace System.Windows
         /// Return the text that represents this object, from the User's perspective.
         /// </summary>
         internal virtual string GetPlainText() => string.Empty;
+
+        /// <summary>
+        /// Add Style event handlers to the EventRoute
+        /// </summary>
+        internal sealed override void AddToEventRouteCore(EventRoute route, RoutedEventArgs args) => AddStyleHandlersToEventRoute(this, route, args);
+
+        // Add Style event handlers to the EventRoute
+        private static void AddStyleHandlersToEventRoute(FrameworkElement fe, EventRoute route, RoutedEventArgs args)
+        {
+            Debug.Assert(fe is not null);
+
+            DependencyObject source = fe;
+
+            // Fetch selfStyle
+            Style selfStyle = fe.Style;
+
+            // Add TargetType EventHandlers to the route. Notice that ThemeStyle
+            // cannot have EventHandlers and hence are ignored here.
+            if (selfStyle is not null && selfStyle.EventHandlersStore is EventHandlersStore store)
+            {
+                List<RoutedEventHandlerInfo> handlers = store.Get(args.RoutedEvent);
+                AddStyleHandlersToEventRoute(route, source, handlers);
+            }
+        }
+
+        // This is a helper that will facilitate adding a given array of handlers to the route
+        private static void AddStyleHandlersToEventRoute(EventRoute route, DependencyObject source, List<RoutedEventHandlerInfo> handlers)
+        {
+            if (handlers is not null)
+            {
+                foreach (RoutedEventHandlerInfo handler in handlers)
+                {
+                    route.Add(source, handler.Handler, handler.InvokeHandledEventsToo);
+                }
+            }
+        }
 
         #region Cursor
 

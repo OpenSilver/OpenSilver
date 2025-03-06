@@ -37,6 +37,16 @@ public class Style : DependencyObject, ISealable
     internal new Dictionary<int, object> EffectiveValues { get; private set; }
 
     /// <summary>
+    /// Store all the event handlers for this Style TargetType
+    /// </summary>
+    internal EventHandlersStore EventHandlersStore { get; private set; }
+
+    /// <summary>
+    /// Does the current style or any of its template children have event setters, ignoring event triggers.
+    /// </summary>
+    internal bool HasEventSetters { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Style"/> class.
     /// </summary>
     public Style()
@@ -315,9 +325,9 @@ public class Style : DependencyObject, ISealable
         // by ProcessSelfStyle in the next step. The EventSetters for the current
         // and all the basedOn styles are merged into the EventHandlersStore on the
         // current style.
-        (PropertyValue[] propertyValues, int length) = ProcessSetters();
+        ReadOnlySpan<PropertyValue> propertyValues = ProcessSetters();
 
-        int initialCapacity = Math.Max(length, _basedOn?.EffectiveValues.Count ?? 0);
+        int initialCapacity = Math.Max(propertyValues.Length, _basedOn?.EffectiveValues.Count ?? 0);
         Dictionary<int, object> effectiveValues = new(initialCapacity);
 
         // Walk down to bottom of based-on chain
@@ -328,13 +338,28 @@ public class Style : DependencyObject, ISealable
             {
                 effectiveValues[propertyValue.Key] = propertyValue.Value;
             }
+
+            if (_basedOn.EventHandlersStore is not null)
+            {
+                foreach ((int globalIndex, List<RoutedEventHandlerInfo> handlers) in _basedOn.EventHandlersStore)
+                {
+                    RoutedEvent routedEvent = GlobalEventManager.RegisteredEventList[globalIndex];
+
+                    EventHandlersStore ??= new EventHandlersStore();
+                    foreach (RoutedEventHandlerInfo info in handlers)
+                    {
+                        EventHandlersStore.AddRoutedEventHandler(routedEvent, info.Handler, info.InvokeHandledEventsToo);
+                    }
+
+                    HasEventSetters = true;
+                }
+            }
         }
 
         // Merge in "self" PropertyValues while walking back up the tree
         // "Based-on" style "self" rules are always added first (lower priority)
-        for (int i = 0; i < length; i++)
+        foreach (PropertyValue propertyValue in propertyValues)
         {
-            PropertyValue propertyValue = propertyValues[i];
             effectiveValues[propertyValue.PropertyIndex] = propertyValue.ValueInternal;
         }
 
@@ -345,7 +370,7 @@ public class Style : DependencyObject, ISealable
     // an EventHandlersStore for easy and fast retrieval during event routing. Also adds
     // an entry in the EventDependents list for EventhandlersStore holding the TargetType's
     // events.
-    private (PropertyValue[] PropertyValues, int Length) ProcessSetters()
+    private ReadOnlySpan<PropertyValue> ProcessSetters()
     {
         Debug.Assert(_setters is not null && _setters.InternalCount > 0);
 
@@ -362,9 +387,20 @@ public class Style : DependencyObject, ISealable
             {
                 UpdatePropertyValueList(setter.Property, setter.Value, propertyValues, ref length);
             }
+            else
+            {
+                Debug.Assert(setterBase is EventSetter, "Unsupported SetterBase subclass in style triggers ({0})", setterBase.GetType().ToString());
+
+                var eventSetter = (EventSetter)setterBase;
+
+                EventHandlersStore ??= new EventHandlersStore();
+                EventHandlersStore.AddRoutedEventHandler(eventSetter.Event, eventSetter.Handler, eventSetter.HandledEventsToo);
+
+                HasEventSetters = true;
+            }
         }
 
-        return (propertyValues, length);
+        return propertyValues.AsSpan(0, length);
 
         // Given a set of values for the PropertyValue struct, put that in
         // to the PropertyValueList, overwriting any existing entry.

@@ -178,6 +178,9 @@
   <data name="CannotGroupView" xml:space="preserve">
     <value>'{0}' view does not support grouping.</value>
   </data>
+  <data name="CannotHaveEventHandlersInThemeStyle" xml:space="preserve">
+    <value>Cannot set event handlers within a theme Style.</value>
+  </data>
   <data name="CannotHaveOverridesDefaultStyleInThemeStyle" xml:space="preserve">
     <value>Cannot set OverridesDefaultStyle property in the default Style.</value>
   </data>

@@ -313,7 +313,15 @@ namespace System.Windows
                     }
                 }
             }
+
+            // Allow FrameworkElememnt to add event handlers in styles
+            AddToEventRouteCore(route, e);
         }
+
+        /// <summary>
+        /// This virtual method is to be overridden in FrameworkElement to be able to add handlers for styles
+        /// </summary>
+        internal virtual void AddToEventRouteCore(EventRoute route, RoutedEventArgs args) { }
 
         #region Pointer moved event
 

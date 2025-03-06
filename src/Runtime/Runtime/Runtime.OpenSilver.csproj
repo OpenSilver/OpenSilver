@@ -163,6 +163,7 @@
     <Compile Include="System.Windows.Threading\DispatcherObject.cs" />
     <Compile Include="System.Windows\DynamicResourceExtension.cs" />
     <Compile Include="System.Windows\EventManager.cs" />
+    <Compile Include="System.Windows\EventSetter.cs" />
     <Compile Include="System.Windows\ExitEventArgs.cs" />
     <Compile Include="System.Windows\FrameworkElement.Resources.cs" />
     <Compile Include="System.Windows\GlobalEventManager.cs" />

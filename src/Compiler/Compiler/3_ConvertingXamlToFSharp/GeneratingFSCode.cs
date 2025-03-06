@@ -30,36 +30,30 @@ namespace OpenSilver.Compiler
 
             private readonly List<ComponentConnectorEntry> _entries = new List<ComponentConnectorEntry>();
 
-            public int Connect(string componentType, string eventName, string handlerName)
+            public int ConnectEventHandler(string componentType, string eventName, string handlerType, string handlerName)
             {
                 int componentId = _entries.Count;
-                _entries.Add(new ComponentConnectorEntry
-                {
-                    componentType = componentType,
-                    eventName = eventName,
-                    handlerName = handlerName,
-                });
-
+                _entries.Add(new EventEntry(componentId, componentType, eventName, handlerType, handlerName));
                 return componentId;
             }
 
-            public int Connect(string componentType, string ownerType, string eventName, string handlerName)
+            public int ConnectAttachedEventHandler(string componentType, string ownerType, string eventName, string handlerType, string handlerName)
             {
                 int componentId = _entries.Count;
-                _entries.Add(new ComponentConnectorEntry
-                {
-                    componentType = componentType,
-                    ownerType = ownerType,
-                    eventName = eventName,
-                    handlerName = handlerName,
-                });
+                _entries.Add(new AttachedEventEntry(componentId, componentType, ownerType, eventName, handlerType, handlerName));
+                return componentId;
+            }
 
+            public int ConnectEventSetterHandler(string handlerType, string handlerName)
+            {
+                int componentId = _entries.Count;
+                _entries.Add(new EventSetterEntry(componentId, handlerType, handlerName));
                 return componentId;
             }
 
             public override string ToString()
             {
-                StringBuilder builder = new StringBuilder();
+                var builder = new StringBuilder();
 
                 builder.Append(' ', 4).AppendLine("interface global.OpenSilver.Internal.Xaml.IComponentConnector with")
                     .Append(' ', 4 * 2).AppendLine("[<global.System.Diagnostics.DebuggerNonUserCode>]")
@@ -70,18 +64,10 @@ namespace OpenSilver.Compiler
                 {
                     builder.Append(' ', 4 * 3).AppendLine($"match {componentIdParam} with");
 
-                    for (int componentId = 0; componentId < _entries.Count; componentId++)
+                    foreach (ComponentConnectorEntry entry in _entries)
                     {
-                        ComponentConnectorEntry eventEntry = _entries[componentId];
-                        builder.Append(' ', 4 * 4).AppendLine($"| {componentId} ->");
-                        if (string.IsNullOrEmpty(eventEntry.ownerType))
-                        {
-                            builder.Append(' ', 4 * 5).AppendLine($"{RuntimeHelperClass}.RegisterEventHandler(\"{eventEntry.handlerName}\", \"{eventEntry.eventName}\", {targetParam}, this)");
-                        }
-                        else
-                        {
-                            builder.Append(' ', 4 * 5).AppendLine($"{RuntimeHelperClass}.RegisterAttachedEventHandler(\"{eventEntry.handlerName}\", typeof<{eventEntry.ownerType}>, \"{eventEntry.eventName}\", {targetParam}, this)");
-                        }
+                        builder.Append(' ', 4 * 4).AppendLine($"| {entry.ComponentId} ->");
+                        builder.Append(' ', 4 * 5).AppendLine(entry.ToString());
                     }
 
                     builder.Append(' ', 4 * 4).AppendLine("| _ -> ()");
@@ -94,12 +80,80 @@ namespace OpenSilver.Compiler
                 return builder.ToString();
             }
 
-            private struct ComponentConnectorEntry
+            private abstract class ComponentConnectorEntry
             {
-                public string componentType;
-                public string ownerType;
-                public string eventName;
-                public string handlerName;
+                protected ComponentConnectorEntry(int componentId)
+                {
+                    ComponentId = componentId;
+                }
+
+                public int ComponentId { get; }
+
+                public abstract override string ToString();
+            }
+
+            private sealed class EventEntry : ComponentConnectorEntry
+            {
+                private readonly string _componentType;
+                private readonly string _eventName;
+                private readonly string _handlerName;
+                private readonly string _handlerType;
+
+                public EventEntry(int componentId, string componentType, string eventName, string handlerType, string handlerName)
+                    : base(componentId)
+                {
+                    _componentType = componentType;
+                    _eventName = eventName;
+                    _handlerType = handlerType;
+                    _handlerName = handlerName;
+                }
+
+                public override string ToString()
+                {
+                    return $"({targetParam} :?> {_componentType}).{_eventName}.AddHandler({RuntimeHelperClass}.CreateDelegate<{_handlerType}>(\"{_handlerName}\", this))";
+                }
+            }
+
+            private sealed class AttachedEventEntry : ComponentConnectorEntry
+            {
+                private readonly string _componentType;
+                private readonly string _ownerType;
+                private readonly string _eventName;
+                private readonly string _handlerType;
+                private readonly string _handlerName;
+
+                public AttachedEventEntry(int componentId, string componentType, string ownerType, string eventName, string handlerType, string handlerName)
+                    : base(componentId)
+                {
+                    _componentType = componentType;
+                    _ownerType = ownerType;
+                    _eventName = eventName;
+                    _handlerType = handlerType;
+                    _handlerName = handlerName;
+                }
+
+                public override string ToString()
+                {
+                    return $"{_ownerType}.Add{_eventName}Handler(({targetParam} :?> {_componentType}), {RuntimeHelperClass}.CreateDelegate<{_handlerType}>(\"{_handlerName}\", this))";
+                }
+            }
+
+            private sealed class EventSetterEntry : ComponentConnectorEntry
+            {
+                private readonly string _handlerType;
+                private readonly string _handlerName;
+
+                public EventSetterEntry(int componentId, string handlerType, string handlerName)
+                    : base(componentId)
+                {
+                    _handlerType = handlerType;
+                    _handlerName = handlerName;
+                }
+
+                public override string ToString()
+                {
+                    return $"({targetParam} :?> global.System.Windows.EventSetter).Handler <- {RuntimeHelperClass}.CreateDelegate<{_handlerType}>(\"{_handlerName}\", this)";
+                }
             }
         }
 

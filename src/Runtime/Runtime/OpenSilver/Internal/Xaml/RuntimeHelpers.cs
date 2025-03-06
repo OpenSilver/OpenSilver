@@ -132,6 +132,15 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static RoutedEvent RoutedEventFromName(string name, Type ownerType)
+        {
+            Debug.Assert(name is not null);
+            Debug.Assert(ownerType is not null);
+
+            return EventManager.GetRoutedEventFromName(name, ownerType);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
             Debug.Assert(dependencyObject is IFrameworkElement);
@@ -153,6 +162,18 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static T CreateDelegate<T>(string handlerName, object firstArgument)
+            where T : Delegate
+        {
+            Debug.Assert(handlerName is not null);
+            Debug.Assert(firstArgument is not null);
+
+            MethodInfo methodInfo = firstArgument.GetType().GetMethod(handlerName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            return (T)Delegate.CreateDelegate(typeof(T), firstArgument, methodInfo);
+        }
+
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterEventHandler(string handlerName, string eventName, object target, object firstArgument)
         {
             try
@@ -170,6 +191,7 @@ namespace OpenSilver.Internal.Xaml
             }
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterAttachedEventHandler(string handlerName, Type ownerType, string eventName, object target, object firstArgument)
         {

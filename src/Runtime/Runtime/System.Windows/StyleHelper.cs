@@ -34,7 +34,14 @@ namespace System.Windows
         //
         internal static void UpdateStyleCache(FrameworkElement fe, Style oldStyle, Style newStyle, ref Style styleCache)
         {
-            SealStyle(fe, newStyle);
+            if (newStyle is not null)
+            {
+                // We have a new style.  Make sure it's targeting the right
+                // type, and then seal it.
+
+                newStyle.CheckTargetType(fe);
+                newStyle.Seal();
+            }
 
             styleCache = newStyle;
 
@@ -47,7 +54,21 @@ namespace System.Windows
         //
         internal static void UpdateThemeStyleCache(FrameworkElement fe, Style oldStyle, Style newStyle, ref Style themeStyleCache)
         {
-            SealStyle(fe, newStyle);
+            if (newStyle is not null)
+            {
+                // We have a new style.  Make sure it's targeting the right
+                // type, and then seal it.
+
+                newStyle.CheckTargetType(fe);
+                newStyle.Seal();
+
+                // Check if the theme style has EventHandlers set on the target tag or in its setter collection.
+                // We do not support EventHandlers in a ThemeStyle
+                if (newStyle.HasEventSetters)
+                {
+                    throw new InvalidOperationException(Strings.CannotHaveEventHandlersInThemeStyle);
+                }
+            }
 
             themeStyleCache = newStyle;
 
@@ -56,7 +77,14 @@ namespace System.Windows
 
         internal static void UpdateImplicitStyleCache(FrameworkElement fe, Style oldStyle, Style newStyle, ref Style implicitStyleCache)
         {
-            SealStyle(fe, newStyle);
+            if (newStyle is not null)
+            {
+                // We have a new style.  Make sure it's targeting the right
+                // type, and then seal it.
+
+                newStyle.CheckTargetType(fe);
+                newStyle.Seal();
+            }
 
             implicitStyleCache = newStyle;
 
@@ -147,18 +175,6 @@ namespace System.Windows
             }
 
             return newThemeStyle;
-        }
-
-        internal static void SealStyle(FrameworkElement fe, Style style)
-        {
-            if (style != null)
-            {
-                // We have a new style.  Make sure it's targeting the right
-                // type, and then seal it.
-
-                style.CheckTargetType(fe);
-                style.Seal();
-            }
         }
 
         //

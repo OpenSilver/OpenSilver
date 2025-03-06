@@ -241,6 +241,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot set event handlers within a theme Style..
+        /// </summary>
+        internal static string CannotHaveEventHandlersInThemeStyle {
+            get {
+                return ResourceManager.GetString("CannotHaveEventHandlersInThemeStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot set OverridesDefaultStyle property in the default Style..
         /// </summary>
         internal static string CannotHaveOverridesDefaultStyleInThemeStyle {

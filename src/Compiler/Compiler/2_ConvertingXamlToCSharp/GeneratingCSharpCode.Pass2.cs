@@ -367,16 +367,34 @@ namespace OpenSilver.Compiler
             {
                 XElement element = _reader.ObjectData.Element;
 
-                // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
-                bool isElementInRootNamescope = elementThatIsRootOfTheCurrentNamescope.Parent == null;
-
                 // Check if the element is the root element:
                 string elementTypeInCSharp = GetCSharpEquivalentOfXamlTypeAsString(
                     element.Name,
                     out string namespaceName,
                     out string localTypeName,
                     out string assemblyNameIfAny);
+
+                // Some special cases
+                if (elementTypeInCSharp == $"global::{_settings.Metadata.SystemWindowsNS}.EventSetter")
+                {
+                    WriteEventSetter(parameters);
+
+                    // EventSetter only support the Event, Handler and HandledEventsToo properties. WriteEventSetter
+                    // already takes care of these properties, so we just skip everything.
+                    while (_reader.Read())
+                    {
+                        if (_reader.NodeType == XamlNodeType.EndObject && _reader.ObjectData.Element == element)
+                        {
+                            break;
+                        }
+                    }
+
+                    return;
+                }
+
+                // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
+                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
+                bool isElementInRootNamescope = elementThatIsRootOfTheCurrentNamescope.Parent == null;
 
                 bool isRootElement = IsElementTheRootElement(element);
                 bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
@@ -601,7 +619,7 @@ namespace OpenSilver.Compiler
                                                 string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3});",
                                                     RuntimeHelperClass,
                                                     parameters.CurrentXamlContext,
-                                                    parameters.ComponentConnector.Connect(elementTypeInCSharp, attributeLocalName, attributeValue),
+                                                    parameters.ComponentConnector.ConnectEventHandler(elementTypeInCSharp, attributeLocalName, attributeValue),
                                                     elementUniqueNameOrThisKeyword)
                                             );
 
@@ -620,7 +638,6 @@ namespace OpenSilver.Compiler
                                                 //we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
                                                 if (element.Parent != null && element.Parent.Parent != null && element.Parent.Parent.Name.LocalName == "Style")
                                                 {
-
                                                     if (attributeLocalName == "Property")
                                                     {
                                                         // Style setter property:
@@ -779,7 +796,7 @@ namespace OpenSilver.Compiler
                                             string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3});",
                                                 RuntimeHelperClass,
                                                 parameters.CurrentXamlContext,
-                                                parameters.ComponentConnector.Connect(elementTypeInCSharp, ownerType, memberName, attributeValue),
+                                                parameters.ComponentConnector.ConnectAttachedEventHandler(elementTypeInCSharp, ownerType, memberName, attributeValue),
                                                 elementUniqueNameOrThisKeyword));
                                     }
                                     break;
@@ -797,6 +814,104 @@ namespace OpenSilver.Compiler
                 {
                     parameters.PopScope();
                 }
+            }
+
+            private void WriteEventSetter(GeneratorContext parameters)
+            {
+                XElement eventSetter = _reader.ObjectData.Element;
+
+                // we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
+                if (eventSetter.Parent is null || eventSetter.Parent.Parent is null || eventSetter.Parent.Parent.Name.LocalName != "Style")
+                {
+                    throw new XamlParseException("\"<EventSetter/>\" tags can only be declared inside a <Style/>.");
+                }
+
+                XElement style = eventSetter.Parent.Parent;
+                XAttribute eventAttribute = eventSetter.Attribute("Event"); // required
+                XAttribute handlerAttribute = eventSetter.Attribute("Handler"); // required
+                XAttribute handledEventsTooAttribute = eventSetter.Attribute("HandledEventsToo");
+
+                if (eventAttribute is null || handlerAttribute is null)
+                {
+                    throw new XamlParseException("\"EventSetter\" must declare an \"Event\" and a \"Handler\".", eventSetter);
+                }
+
+                // First, find the event
+                string eventName, namespaceName, typeName, assemblyName;
+
+                string eventAttributeValue = GetAttributeValue(eventAttribute);
+
+                int index = eventAttributeValue.IndexOf('.');
+                if (index >= 0)
+                {
+                    GetClrNamespaceAndLocalName(eventAttributeValue.Substring(0, index), eventSetter, out namespaceName, out typeName, out assemblyName);
+                    eventName = eventAttributeValue.Substring(index + 1);
+                }
+                else
+                {
+                    index = eventAttributeValue.IndexOf(':');
+                    if (index >= 0)
+                    {
+                        // WPF ignore everything before the ':'
+                        eventName = eventAttributeValue.Substring(index + 1);
+                    }
+                    else
+                    {
+                        eventName = eventAttributeValue;
+                    }
+
+                    if (style.Attribute("TargetType") is XAttribute targetType)
+                    {
+                        GetClrNamespaceAndLocalName(targetType.Value, style, out namespaceName, out typeName, out assemblyName);
+                    }
+                    else
+                    {
+                        namespaceName = _settings.Metadata.SystemWindowsNS;
+                        typeName = "FrameworkElement";
+                        assemblyName = "OpenSilver";
+                    }
+                }
+
+                string handlerTypeString;
+
+                TypeDefinition ownerType = _reflectionOnSeparateAppDomain.GetTypeDefinition(namespaceName, typeName, assemblyName);
+                string ownerTypeString = ownerType.ConvertToString(SupportedLanguage.CSharp);
+
+                if (_reflectionOnSeparateAppDomain.GetEvent(ownerType, eventName, false) is EventDefinition eventDefinition)
+                {
+                    handlerTypeString = eventDefinition.EventType.ConvertToString(SupportedLanguage.CSharp);
+                }
+                else if (_reflectionOnSeparateAppDomain.GetMethod(ownerType, $"Add{eventName}Handler", false, true) is MethodDefinition addHandlerMethodDefinition &&
+                    addHandlerMethodDefinition.Parameters.Count == 2)
+                {
+                    handlerTypeString = addHandlerMethodDefinition.Parameters[1].ParameterType.ConvertToString(SupportedLanguage.CSharp);
+                }
+                else
+                {
+                    throw new XamlParseException($"Cannot find the Style Event '{eventName}' on the type '{ownerTypeString}'.", eventSetter);
+                }
+
+                // Start generating the code
+                int componentId = parameters.ComponentConnector.ConnectEventSetterHandler("global::" + handlerTypeString, GetAttributeValue(handlerAttribute));
+
+                string eventSetterName = GeneratingCode.GetUniqueName(eventSetter);
+
+                parameters.StringBuilder.AppendLine(
+                    $"global::{_settings.Metadata.SystemWindowsNS}.EventSetter {eventSetterName} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new global::{_settings.Metadata.SystemWindowsNS}.EventSetter());");
+
+                parameters.StringBuilder.AppendLine(
+                    $"{eventSetterName}.Event = {RuntimeHelperClass}.RoutedEventFromName(\"{eventName}\", typeof(global::{ownerTypeString}));");
+
+                parameters.StringBuilder.AppendLine(
+                    $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {eventSetterName});");
+
+                if (handledEventsTooAttribute is not null)
+                {
+                    string value = _settings.SystemTypes.ConvertFromInvariantString(GetAttributeValue(handledEventsTooAttribute), "system.boolean");
+                    parameters.StringBuilder.AppendLine($"{eventSetterName}.HandledEventsToo = {value};");
+                }
+
+                parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteEndObject({parameters.CurrentXamlContext});");
             }
 
             private void OnWriteEndObject(GeneratorContext parameters)
