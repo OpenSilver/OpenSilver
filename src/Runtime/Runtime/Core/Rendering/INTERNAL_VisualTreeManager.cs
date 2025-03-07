@@ -14,7 +14,9 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using OpenSilver;
@@ -26,6 +28,24 @@ namespace CSHTML5.Internal
     {
         internal static bool EnablePerformanceLogging;
         internal static bool EnableOptimizationWhereCollapsedControlsAreNotRendered = true;
+
+        internal static void DetachPopupRoot(PopupRoot popupRoot)
+        {
+            Debug.Assert(popupRoot is not null);
+
+            if (IsElementInVisualTree(popupRoot))
+            {
+                // Remove the element from the DOM:
+                INTERNAL_HtmlDomManager.RemoveNodeNative(popupRoot.OuterDiv);
+
+                // Detach Element  
+                UnloadSubTree(popupRoot);
+            }
+            else
+            {
+                UnloadVisual(popupRoot);
+            }
+        }
 
         public static void DetachVisualChildIfNotNull(UIElement child, UIElement parent)
         {

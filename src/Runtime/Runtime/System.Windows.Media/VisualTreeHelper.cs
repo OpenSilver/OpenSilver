@@ -58,12 +58,12 @@ namespace System.Windows.Media
         /// <returns>The parent object of the reference object in the visual tree.</returns>
         public static DependencyObject GetParent(DependencyObject reference)
         {
-            if (reference is IInternalUIElement uie)
+            return reference switch
             {
-                return uie.VisualParent;
-            }
-
-            return null;
+                UIElement uie => GetParent(uie),
+                IInternalUIElement iuie => iuie.VisualParent,
+                _ => null,
+            };
         }
 
         /// <summary>
@@ -73,12 +73,12 @@ namespace System.Windows.Media
         /// <returns>The parent object of the reference object in the visual tree.</returns>
         public static DependencyObject GetParent(IDependencyObject reference)
         {
-            if (reference is IInternalUIElement uie)
+            return reference switch
             {
-                return uie.VisualParent;
-            }
-
-            return null;
+                UIElement uie => GetParent(uie),
+                IInternalUIElement iuie => iuie.VisualParent,
+                _ => null,
+            };
         }
 
         /// <summary>
@@ -90,7 +90,14 @@ namespace System.Windows.Media
         /// <returns>
         /// The parent object of the reference object in the visual tree.
         /// </returns>
-        public static DependencyObject GetParent(UIElement reference) => reference?.InternalVisualParent;
+        public static DependencyObject GetParent(UIElement reference)
+        {
+            if (reference is null || reference.IsVisualTreeRoot)
+            {
+                return null;
+            }
+            return reference.InternalVisualParent;
+        }
 
         /// <summary>
         /// Returns the number of children that exist in an object's child collection in the visual tree.

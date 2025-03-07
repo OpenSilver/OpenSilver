@@ -259,22 +259,15 @@ public partial class UIElement
     {
         Debug.Assert(uie is not null);
 
-        // We try to get the ancestor in 3 differents ways. We cannot only rely on
-        // the visual tree because popups create a disconnection in the visual tree.
-        // This method helps "reconnect" the visual tree.
+        // PopupRoots are contained inside a Window, but are not considered as visual children.
+        // This method helps reconnecting the popup root to its window.
         //
         // (1) Get the regular visual parent
-        // (2) Get the an informal visual parent when the element is the root of a popup
-        // (3) Get the containing window (if different from the element itself)
+        // (2) Get the containing window (if different from the element itself)
 
-        if (uie.VisualParent is UIElement parent)
+        if (uie.InternalVisualParent is UIElement parent)
         {
             return parent;
-        }
-
-        if (uie is FrameworkElement fe && fe.Parent is Popup popup)
-        {
-            return popup.PopupRoot?.HiddenVisualParent;
         }
 
         Window window = Window.GetWindow(uie);

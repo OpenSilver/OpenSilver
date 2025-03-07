@@ -490,7 +490,7 @@ namespace System.Windows.Controls
                 // -------------------------------------------
 
                 // Get Framework Parent (priority to logical parent)
-                fe = (fe.Parent ?? fe.InternalVisualParent) as FrameworkElement;
+                fe = (fe.Parent ?? VisualTreeHelper.GetParent(fe)) as FrameworkElement;
             }
 
             return resource;

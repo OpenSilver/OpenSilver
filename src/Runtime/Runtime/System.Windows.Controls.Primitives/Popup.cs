@@ -207,20 +207,31 @@ namespace System.Windows.Controls.Primitives
         private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
-            var newContent = (UIElement)e.NewValue;
-            var oldContent = (UIElement)e.OldValue;
-            if (oldContent != null)
+
+            if (e.OldValue is UIElement oldChild)
             {
-                popup.RemoveLogicalChild(oldContent);
-            }
-            if (newContent != null)
-            {
-                popup.AddLogicalChild(newContent);
+                // Disconnect the old child from the visual tree immediately, because it would be
+                // unsafe to maintain it connected after the IsVisualTreeRoot flag has been cleared.
+                if (popup._popupRoot is not null)
+                {
+                    popup._popupRoot.Child = null;
+                }
+
+                oldChild.IsVisualTreeRoot = false;
+
+                popup.RemoveLogicalChild(oldChild);
             }
 
-            if (popup._popupRoot != null)
+            if (e.NewValue is UIElement newChild)
             {
-                popup._popupRoot.Child = newContent;
+                popup.AddLogicalChild(newChild);
+
+                newChild.IsVisualTreeRoot = true;
+
+                if (popup._popupRoot is not null)
+                {
+                    popup._popupRoot.Child = newChild;
+                }
             }
 
             popup.Reposition();

@@ -222,6 +222,8 @@ namespace System.Windows
         /// </summary>
         internal void AddVisualChild(IInternalUIElement child)
         {
+            Debug.Assert(child is null || child is not UIElement);
+
             if (child == null)
             {
                 return;
@@ -250,6 +252,8 @@ namespace System.Windows
         /// </summary>
         internal void RemoveVisualChild(IInternalUIElement child)
         {
+            Debug.Assert(child is null || child is not UIElement);
+
             if (child == null || child.VisualParent == null)
             {
                 return;
@@ -525,7 +529,7 @@ namespace System.Windows
                 // The content tree uses the "logical" links.  But not all
                 // "logical" links lead to a content tree.
                 //
-                DependencyObject parent = VisualTreeHelper.GetParent(uie);
+                DependencyObject parent = uie.InternalVisualParent;
                 if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
                 {
                     return BooleanBoxes.Box(uie.IsEnabledCore);
@@ -945,7 +949,7 @@ namespace System.Windows
                 bool constraintAllowsVisible;
 
                 // Our parent can constrain us.
-                if (VisualTreeHelper.GetParent(uie) is UIElement parent)
+                if (uie.InternalVisualParent is UIElement parent)
                 {
                     constraintAllowsVisible = parent.IsVisible;
                 }
@@ -1102,7 +1106,7 @@ namespace System.Windows
             // if our parent is true, but we can always be false.
             if ((bool)baseValue)
             {
-                DependencyObject parent = VisualTreeHelper.GetParent(uie);
+                DependencyObject parent = uie.InternalVisualParent;
                 if (parent == null || (bool)parent.GetValue(IsHitTestVisibleProperty))
                 {
                     return BooleanBoxes.TrueBox;
@@ -1298,6 +1302,12 @@ namespace System.Windows
 
 #endregion ForceInherit property support
 
+        internal bool IsVisualTreeRoot
+        {
+            get => ReadVisualFlag(VisualFlags.IsVisualTreeRoot);
+            set => WriteVisualFlag(VisualFlags.IsVisualTreeRoot, value);
+        }
+
         internal bool ReadFlag(CoreFlags field)
         {
             return (_flags & field) != 0;
@@ -1442,6 +1452,7 @@ namespace System.Windows
 
         //// IsLayoutIslandRoot indicates that this Visual is a root of Element Layout Island.
         //IsLayoutIslandRoot = 0x00040000,
+        IsVisualTreeRoot = 0x00040000,
 
         //// UseLayoutRounding indicates that layout rounding should be applied during Measure/Arrange for this UIElement.
         //UseLayoutRounding = 0x00080000,

@@ -13,6 +13,7 @@
 
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Xaml.Markup;
 using OpenSilver.Internal;
 
@@ -290,7 +291,7 @@ public partial class FrameworkElement
                 }
             }
 
-            fe = (fe.Parent ?? fe.VisualParent) as FrameworkElement;
+            fe = (fe.Parent ?? VisualTreeHelper.GetParent(fe)) as FrameworkElement;
 
             // If the current element that has been searched is the boundary element
             // then we need to progress no further

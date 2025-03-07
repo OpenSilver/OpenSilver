@@ -17,11 +17,10 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using CSHTML5.Internal;
-using OpenSilver.Internal;
 
 namespace System.Windows.Controls.Primitives;
 
-internal sealed class PopupRoot : UIElement
+internal sealed class PopupRoot : FrameworkElement
 {
     private static readonly HashSet<PopupRoot> _popupRoots = new();
 
@@ -41,6 +40,7 @@ internal sealed class PopupRoot : UIElement
         _popup = popup;
 
         _transformLayer = new TransformLayer();
+        AddVisualChild(_transformLayer);
 
         SetLayoutBindings();
     }
@@ -57,8 +57,6 @@ internal sealed class PopupRoot : UIElement
 
     internal Popup Popup => _popup;
 
-    internal FrameworkElement HiddenVisualParent => _transformLayer;
-
     internal void Show()
     {
         if (!_popupRoots.Add(this))
@@ -69,12 +67,12 @@ internal sealed class PopupRoot : UIElement
         IsOpen = true;
 
         OuterDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(this);
+        _isLoaded = true;
         IsConnectedToLiveTree = true;
         UpdateIsVisible();
+        PropagateResumeLayout(null, this);
 
-        PropagateResumeLayout(this, _transformLayer);
         INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_transformLayer, this);
-        _transformLayer.UpdateIsVisible();
 
         SetLayoutSize();
     }
@@ -88,13 +86,9 @@ internal sealed class PopupRoot : UIElement
 
         IsOpen = false;
 
-        PropagateSuspendLayout(_transformLayer);
-        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_transformLayer, this);
-        _transformLayer.UpdateIsVisible();
-
-        INTERNAL_HtmlDomManager.RemoveNodeNative(OuterDiv);
-        OuterDiv = null;
-        IsConnectedToLiveTree = false;
+        INTERNAL_VisualTreeManager.DetachPopupRoot(this);
+        UpdateIsVisible();
+        PropagateSuspendLayout(this);
     }
 
     internal void SetPosition(double x, double y) => _transformLayer.SetPosition(x, y);
@@ -190,26 +184,38 @@ internal sealed class PopupRoot : UIElement
 
     private void SetLayoutBindings()
     {
-        _transformLayer.SetBinding(FrameworkElement.WidthProperty,
-            new Binding { Path = new PropertyPath(FrameworkElement.WidthProperty), Source = _popup });
-        _transformLayer.SetBinding(FrameworkElement.HeightProperty,
-            new Binding { Path = new PropertyPath(FrameworkElement.HeightProperty), Source = _popup });
-        _transformLayer.SetBinding(FrameworkElement.MaxHeightProperty,
-            new Binding { Path = new PropertyPath(FrameworkElement.MaxHeightProperty), Source = _popup });
-        _transformLayer.SetBinding(FrameworkElement.HorizontalAlignmentProperty,
+        _transformLayer.SetBinding(WidthProperty,
+            new Binding { Path = new PropertyPath(WidthProperty), Source = _popup });
+        _transformLayer.SetBinding(HeightProperty,
+            new Binding { Path = new PropertyPath(HeightProperty), Source = _popup });
+        _transformLayer.SetBinding(MaxHeightProperty,
+            new Binding { Path = new PropertyPath(MaxHeightProperty), Source = _popup });
+        _transformLayer.SetBinding(HorizontalAlignmentProperty,
             new Binding { Path = new PropertyPath(Popup.HorizontalContentAlignmentProperty), Source = _popup });
-        _transformLayer.SetBinding(FrameworkElement.VerticalAlignmentProperty,
+        _transformLayer.SetBinding(VerticalAlignmentProperty,
             new Binding { Path = new PropertyPath(Popup.VerticalContentAlignmentProperty), Source = _popup });
-        _transformLayer.SetBinding(FrameworkElement.FlowDirectionProperty,
-            new Binding { Path = new PropertyPath(FrameworkElement.FlowDirectionProperty), Source = _popup });
+        _transformLayer.SetBinding(FlowDirectionProperty,
+            new Binding { Path = new PropertyPath(FlowDirectionProperty), Source = _popup });
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        _transformLayer.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        return _transformLayer.DesiredSize;
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        _transformLayer.Arrange(new Rect(finalSize));
+        return finalSize;
     }
 
     private void SetLayoutSize()
     {
-        _transformLayer.InvalidateMeasure();
-        _transformLayer.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        _transformLayer.Arrange(new Rect(new Point(), _transformLayer.DesiredSize));
-        _transformLayer.UpdateLayout();
+        InvalidateMeasure();
+        Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        Arrange(new Rect(new Point(), DesiredSize));
+        UpdateLayout();
     }
 
     // If the popup has a placement target, and the latter is in the visual tree,
@@ -265,8 +271,8 @@ internal sealed class TransformLayer : FrameworkElement
 
             _child = value;
 
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
             AddVisualChild(_child);
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this, 0);
 
             InvalidateMeasure();
         }
@@ -313,31 +319,6 @@ internal sealed class TransformLayer : FrameworkElement
     }
 
     internal void SetPosition(double x, double y) => _translateTransform.Matrix = Matrix.CreateTranslation(x, y);
-
-    private new void AddVisualChild(UIElement child)
-    {
-        if (child is null) return;
-
-        if (child.InternalVisualParent is not null)
-        {
-            throw new ArgumentException(Strings.UIElement_HasParent);
-        }
-
-        HasVisualChildren = true;
-
-        PropagateResumeLayout(this, child);
-        SynchronizeForceInheritProperties(child, this);
-    }
-
-    private new void RemoveVisualChild(UIElement child)
-    {
-        if (child is null) return;
-
-        HasVisualChildren = false;
-
-        PropagateSuspendLayout(child);
-        SynchronizeForceInheritProperties(child, this);
-    }
 
     private static object CoerceRenderTransform(DependencyObject d, object value) => ((TransformLayer)d)._renderTransform;
 

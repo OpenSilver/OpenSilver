@@ -613,13 +613,7 @@ namespace System.Windows
 
         internal void InvalidateParentArrange() => GetLayoutParent(this)?.InvalidateArrange();
 
-        internal static UIElement GetLayoutParent(UIElement element)
-            => VisualTreeHelper.GetParent(element) switch
-            {
-                UIElement uie => uie,
-                null when element is FrameworkElement fe && fe.Parent is Popup popup => popup.PopupRoot?.HiddenVisualParent,
-                _ => null,
-            };
+        internal static UIElement GetLayoutParent(UIElement element) => element.InternalVisualParent as UIElement;
 
         private void Render()
         {

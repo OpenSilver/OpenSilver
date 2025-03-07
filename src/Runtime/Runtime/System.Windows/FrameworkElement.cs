@@ -308,7 +308,7 @@ namespace System.Windows
         {
             if (!ShouldLookupImplicitStyles)
             {
-                var parent = (Parent ?? InternalVisualParent) as FrameworkElement;
+                var parent = (Parent ?? VisualTreeHelper.GetParent(this)) as FrameworkElement;
                 if (parent is not null && parent.ShouldLookupImplicitStyles)
                 {
                     ShouldLookupImplicitStyles = true;
