@@ -804,6 +804,26 @@ namespace System.Windows
             set { WriteFlag(CoreFlags.BypassLayoutPolicies, value); }
         }
 
-        internal uint TreeLevel { get; set; }
+        internal uint TreeLevel
+        {
+            get { return (uint)(_visualFlags & TreeLevelMask); }
+            private set
+            {
+                const uint TreeLevelLimit = 2047;
+
+                if (value > TreeLevelLimit)
+                {
+                    throw new InvalidOperationException(string.Format(Strings.LayoutManager_DeepRecursion, TreeLevelLimit));
+                }
+
+                _visualFlags = (_visualFlags & ~TreeLevelMask) | (VisualFlags)value;
+            }
+        }
+
+        private const VisualFlags TreeLevelMask =
+            VisualFlags.TreeLevelBit0 | VisualFlags.TreeLevelBit1 | VisualFlags.TreeLevelBit2 |
+            VisualFlags.TreeLevelBit3 | VisualFlags.TreeLevelBit4 | VisualFlags.TreeLevelBit5 |
+            VisualFlags.TreeLevelBit6 | VisualFlags.TreeLevelBit7 | VisualFlags.TreeLevelBit8 |
+            VisualFlags.TreeLevelBit9 | VisualFlags.TreeLevelBit10;
     }
 }

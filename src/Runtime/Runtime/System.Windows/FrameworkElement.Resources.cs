@@ -217,7 +217,7 @@ public partial class FrameworkElement
 
         while (fe is not null)
         {
-            if (loopCount > MAX_ELEMENTS_IN_ROUTE)
+            if (loopCount > LayoutManager.LayoutRecursionLimit)
             {
                 // We suspect a loop here because the loop count
                 // has exceeded the MAX_TREE_DEPTH expected

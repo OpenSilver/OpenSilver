@@ -853,6 +853,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Layout recursion reached allowed limit to avoid stack overflow: &apos;{0}&apos;. Either the tree contains a loop or is too deep..
+        /// </summary>
+        internal static string LayoutManager_DeepRecursion {
+            get {
+                return ResourceManager.GetString("LayoutManager_DeepRecursion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; string cannot be converted to Length..
         /// </summary>
         internal static string LengthFormatError {

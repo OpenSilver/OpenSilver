@@ -383,6 +383,9 @@
   <data name="ItemsSourceInUse" xml:space="preserve">
     <value>Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.</value>
   </data>
+  <data name="LayoutManager_DeepRecursion" xml:space="preserve">
+    <value>Layout recursion reached allowed limit to avoid stack overflow: '{0}'. Either the tree contains a loop or is too deep.</value>
+  </data>
   <data name="LengthFormatError" xml:space="preserve">
     <value>'{0}' string cannot be converted to Length.</value>
   </data>
