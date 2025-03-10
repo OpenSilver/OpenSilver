@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
@@ -20,7 +19,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using OpenSilver;
-using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
@@ -271,20 +269,17 @@ namespace CSHTML5.Internal
             // RENDER THE ELEMENTS BY APPLYING THE CSS PROPERTIES:
             //--------------------------------------------------------
 
-            // Defer rendering when the control is not visible to when becomes visible (note: when this option is enabled, we do not apply the CSS properties of the UI elements that are not visible. Those property are applied later, when the control becomes visible. This option results in improved performance.)
-            bool enableDeferredRenderingOfCollapsedControls = EnableOptimizationWhereCollapsedControlsAreNotRendered;
-
-            if (enableDeferredRenderingOfCollapsedControls && !child.IsVisible)
+            if (EnableOptimizationWhereCollapsedControlsAreNotRendered && child.IsInCollapsedTree)
             {
                 child.IsRenderingSuspended = true;
                 if (child.Visibility == Visibility.Collapsed)
                 {
-                    INTERNAL_HtmlDomManager.SetVisible(child.OuterDiv, false);
+                    INTERNAL_HtmlDomManager.SetVisibility(child.OuterDiv, Visibility.Collapsed);
                 }
             }
             else
             {
-                RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
+                child.RenderVisual();
             }
 
             //--------------------------------------------------------
@@ -296,122 +291,6 @@ namespace CSHTML5.Internal
         }
 
         public static bool IsElementInVisualTree(UIElement element) => element.IsConnectedToLiveTree && !element.IsUnloading;
-
-        internal static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(UIElement uie)
-        {
-            //--------------------------------------------------------------
-            // RAISE "PROPERTYCHANGED" FOR ALL THE PROPERTIES THAT HAVE 
-            // A VALUE THAT HAS BEEN SET, INCLUDING ATTACHED PROPERTIES, 
-            // AND CALL THE "METHOD TO UPDATE DOM"
-            //--------------------------------------------------------------
-
-            // This is used to force a redraw of all the properties that are 
-            // set on the object (including Attached Properties!). For 
-            // example, if a Border has a colored background, this is the 
-            // moment when that color will be applied. Properties that have 
-            // no value set by the user are not concerned (their default 
-            // state is rendered elsewhere).
-
-            if (uie.EffectiveValuesCount > 0)
-            {
-                // we copy the Dictionary so that the foreach doesn't break when 
-                // we modify a DependencyProperty inside the Changed of another 
-                // one (which causes it to be added to the Dictionary).
-                // we exclude properties where source is set to default because
-                // it means they have been set at some point, and unset afterward,
-                // so we should not call the PropertyChanged callback.
-
-                Storage[] storages = ArrayPool<Storage>.Shared.Rent(uie.EffectiveValuesCount);
-                int length = 0;
-                foreach (KeyValuePair<int, Storage> kvp in uie.EffectiveValues)
-                {
-                    if (kvp.Value.Entry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
-                    {
-                        continue;
-                    }
-
-                    storages[length++] = kvp.Value;
-                }
-
-                Span<Storage> span = storages.AsSpan(0, length);
-                try
-                {
-                    foreach (Storage storage in span)
-                    {
-                        DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
-                        if (dp.GetMetadata(uie.DependencyObjectType) is not PropertyMetadata metadata)
-                        {
-                            continue;
-                        }
-
-                        object value = null;
-                        bool valueWasRetrieved = false;
-
-                        //--------------------------------------------------
-                        // Call "MethodToUpdateDom"
-                        //--------------------------------------------------
-                        if (metadata.MethodToUpdateDom != null)
-                        {
-                            if (!valueWasRetrieved)
-                            {
-                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
-                                valueWasRetrieved = true;
-                            }
-
-                            // Call the "Method to update DOM"
-                            metadata.MethodToUpdateDom(uie, value);
-                        }
-
-                        if (metadata.MethodToUpdateDom2 != null)
-                        {
-                            if (!valueWasRetrieved)
-                            {
-                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
-                                valueWasRetrieved = true;
-                            }
-
-                            // DependencyProperty.UnsetValue for the old value signify that
-                            // the old value should be ignored.
-                            metadata.MethodToUpdateDom2(
-                                uie,
-                                DependencyProperty.UnsetValue,
-                                value);
-                        }
-
-                        //--------------------------------------------------
-                        // Call PropertyChanged
-                        //--------------------------------------------------
-
-                        if (metadata.PropertyChangedCallback != null
-#pragma warning disable CS0618 // Type or member is obsolete
-                            && metadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
-#pragma warning restore CS0618 // Type or member is obsolete
-                        {
-                            if (!valueWasRetrieved)
-                            {
-                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
-                                valueWasRetrieved = true;
-                            }
-
-                            // Raise the "PropertyChanged" event
-                            metadata.PropertyChangedCallback(
-                                uie,
-                                new DependencyPropertyChangedEventArgs(value, value, dp, metadata));
-                        }
-                    }
-                }
-                finally
-                {
-                    ArrayPool<Storage>.Shared.Return(storages, false);
-                    span.Clear();
-                }
-            }
-
-            if (uie.IsHitTestable)
-            {
-                uie.SetPointerEvents(true);
-            }
-        }
 
         /// <summary>
         /// Returns the first child of the specified type (recursively).

@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Buffers;
 using System.Collections.Generic;
 using System.Windows.Media.Effects;
 using System.Diagnostics;
@@ -755,9 +756,9 @@ namespace System.Windows
         // it is not significant.
         //-------------------------------------------------------------------
 
-#endregion
+        #endregion
 
-#region Visibility
+        #region Visibility
 
         private Visibility VisibilityCache
         {
@@ -767,6 +768,10 @@ namespace System.Windows
                 {
                     return Visibility.Visible;
                 }
+                else if (ReadVisualFlag(VisualFlags.VisibilityCache_TakesSpace))
+                {
+                    return Visibility.Hidden;
+                }
                 else
                 {
                     return Visibility.Collapsed;
@@ -774,16 +779,23 @@ namespace System.Windows
             }
             set
             {
-                Debug.Assert(value == Visibility.Visible || value == Visibility.Collapsed);
+                Debug.Assert(value == Visibility.Visible || value == Visibility.Hidden || value == Visibility.Collapsed);
 
                 switch (value)
                 {
                     case Visibility.Visible:
                         WriteVisualFlag(VisualFlags.VisibilityCache_Visible, true);
+                        WriteVisualFlag(VisualFlags.VisibilityCache_TakesSpace, false);
+                        break;
+
+                    case Visibility.Hidden:
+                        WriteVisualFlag(VisualFlags.VisibilityCache_Visible, false);
+                        WriteVisualFlag(VisualFlags.VisibilityCache_TakesSpace, true);
                         break;
 
                     case Visibility.Collapsed:
                         WriteVisualFlag(VisualFlags.VisibilityCache_Visible, false);
+                        WriteVisualFlag(VisualFlags.VisibilityCache_TakesSpace, false);
                         break;
                 }
             }
@@ -795,8 +807,8 @@ namespace System.Windows
         /// </summary>
         public Visibility Visibility
         {
-            get { return VisibilityCache; }
-            set { SetValueInternal(VisibilityProperty, value); }
+            get => VisibilityCache;
+            set => SetValueInternal(VisibilityProperty, VisibilityBoxes.Box(value));
         }
 
         /// <summary>
@@ -807,11 +819,12 @@ namespace System.Windows
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(UIElement),
-                new PropertyMetadata(VisibilityBoxes.VisibleBox, OnVisibilityChanged, CoerceVisibility)
+                new PropertyMetadata(VisibilityBoxes.VisibleBox, OnVisibilityChanged)
                 {
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                        INTERNAL_HtmlDomManager.SetVisible(((UIElement)d).OuterDiv, (Visibility)newValue == Visibility.Visible),
-                });
+                        INTERNAL_HtmlDomManager.SetVisibility(((UIElement)d).OuterDiv, (Visibility)newValue),
+                },
+                ValidateVisibility);
 
         private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -819,26 +832,35 @@ namespace System.Windows
             Visibility newVisibility = (Visibility)e.NewValue;
 
             uie.VisibilityCache = newVisibility;
+            uie.SwitchVisibilityIfNeeded(newVisibility);
+
+            uie.UpdateIsInCollapsedTreeCache();
 
             // The IsVisible property depends on this property.
             uie.UpdateIsVisibleCache();
         }
 
-        private static object CoerceVisibility(DependencyObject d, object baseValue)
+        private static bool ValidateVisibility(object o)
         {
-            Visibility visibility = (Visibility)baseValue;
-            return VisibilityBoxes.Box(visibility);
+            var value = (Visibility)o;
+            return value == Visibility.Visible || value == Visibility.Hidden || value == Visibility.Collapsed;
         }
 
-        private void SwitchVisibilityIfNeeded(bool isVisible)
+        private void SwitchVisibilityIfNeeded(Visibility visibility)
         {
-            if (isVisible)
+            switch (visibility)
             {
-                EnsureVisible();
-            }
-            else
-            {
-                EnsureInvisible();
+                case Visibility.Visible:
+                    EnsureVisible();
+                    break;
+
+                case Visibility.Hidden:
+                    EnsureInvisible(false);
+                    break;
+
+                case Visibility.Collapsed:
+                    EnsureInvisible(true);
+                    break;
             }
         }
 
@@ -848,22 +870,56 @@ namespace System.Windows
             {
                 WriteFlag(CoreFlags.IsCollapsed, false);
 
-                //invalidate parent if needed
+                // invalidate parent if needed
                 InvalidateParentMeasure();
 
-                //make sure element has been rendered
+                // make sure element has been rendered
                 InvalidateVisual();
             }
         }
 
-        private void EnsureInvisible()
+        private void EnsureInvisible(bool collapsed)
         {
-            if (!ReadFlag(CoreFlags.IsCollapsed))
+            if (ReadFlag(CoreFlags.IsCollapsed) != collapsed)
             {
-                WriteFlag(CoreFlags.IsCollapsed, true);
+                WriteFlag(CoreFlags.IsCollapsed, collapsed);
 
-                //invalidate parent
+                // invalidate parent
                 InvalidateParentMeasure();
+            }
+        }
+
+        internal bool IsInCollapsedTree
+        {
+            get => ReadVisualFlag(VisualFlags.IsInCollapsedTree);
+            private set => WriteVisualFlag(VisualFlags.IsInCollapsedTree, value);
+        }
+
+        private void UpdateIsInCollapsedTreeCache()
+        {
+            bool isInCollapsedTree = InternalVisualParent is UIElement parent && parent.IsInCollapsedTree;
+            Rec(this, isInCollapsedTree);
+
+            static void Rec(UIElement uie, bool isInCollapsedTree)
+            {
+                if (!isInCollapsedTree)
+                {
+                    isInCollapsedTree = uie.ReadFlag(CoreFlags.IsCollapsed);
+                }
+
+                if (uie.IsInCollapsedTree != isInCollapsedTree)
+                {
+                    uie.IsInCollapsedTree = isInCollapsedTree;
+
+                    int count = uie.VisualChildrenCount;
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (uie.GetVisualChild(i) is UIElement child)
+                        {
+                            Rec(child, isInCollapsedTree);
+                        }
+                    }
+                }
             }
         }
 
@@ -900,18 +956,6 @@ namespace System.Windows
         private static void OnIsVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement uie = (UIElement)d;
-            bool isVisible = (bool)e.NewValue;
-
-            if (isVisible)
-            {
-                if (uie.IsRenderingSuspended)
-                {
-                    uie.IsRenderingSuspended = false;
-                    INTERNAL_VisualTreeManager.RenderElementsAndRaiseChangedEventOnAllDependencyProperties(uie);
-                }
-            }
-
-            uie.SwitchVisibilityIfNeeded(isVisible);
 
             // Invalidate the children so that they will inherit the new value.
             uie.InvalidateForceInheritPropertyOnChildren(e.Property);
@@ -1147,7 +1191,7 @@ namespace System.Windows
 
         private static readonly DependencyProperty IsHitTestableProperty = IsHitTestablePropertyKey.DependencyProperty;
 
-        internal bool IsHitTestable => ReadVisualFlag(VisualFlags.IsHitTestable);
+        private bool IsHitTestable => ReadVisualFlag(VisualFlags.IsHitTestable);
 
         private static object GetIsHitTestable(DependencyObject d) => BooleanBoxes.Box(((UIElement)d).IsHitTestable);
 
@@ -1289,6 +1333,11 @@ namespace System.Windows
             {
                 uie.UpdateIsVisibleCache();
             }
+
+            if (parent is UIElement parentUIE && parentUIE.IsInCollapsedTree)
+            {
+                uie.UpdateIsInCollapsedTreeCache();
+            }
         }
 
         internal void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
@@ -1310,7 +1359,7 @@ namespace System.Windows
             }
         }
 
-#endregion ForceInherit property support
+        #endregion ForceInherit property support
 
         internal bool IsLoadedCache
         {
@@ -1340,6 +1389,132 @@ namespace System.Windows
         {
             get => ReadVisualFlag(VisualFlags.IsVisualTreeRoot);
             set => WriteVisualFlag(VisualFlags.IsVisualTreeRoot, value);
+        }
+
+        internal void RenderVisual()
+        {
+            if (EffectiveValuesCount > 0)
+            {
+                // we copy the Dictionary so that the foreach doesn't break when 
+                // we modify a DependencyProperty inside the Changed of another 
+                // one (which causes it to be added to the Dictionary).
+                // we exclude properties where source is set to default because
+                // it means they have been set at some point, and unset afterward,
+                // so we should not call the PropertyChanged callback.
+
+                Storage[] storages = ArrayPool<Storage>.Shared.Rent(EffectiveValuesCount);
+                int length = 0;
+                foreach (KeyValuePair<int, Storage> kvp in EffectiveValues)
+                {
+                    if (kvp.Value.Entry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default)
+                    {
+                        continue;
+                    }
+
+                    storages[length++] = kvp.Value;
+                }
+
+                Span<Storage> span = storages.AsSpan(0, length);
+                try
+                {
+                    foreach (Storage storage in span)
+                    {
+                        DependencyProperty dp = DependencyProperty.RegisteredPropertyList[storage.PropertyIndex];
+                        if (dp.GetMetadata(DependencyObjectType) is not PropertyMetadata metadata)
+                        {
+                            continue;
+                        }
+
+                        object value = null;
+                        bool valueWasRetrieved = false;
+
+                        //--------------------------------------------------
+                        // Call "MethodToUpdateDom"
+                        //--------------------------------------------------
+                        if (metadata.MethodToUpdateDom is not null)
+                        {
+                            if (!valueWasRetrieved)
+                            {
+                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                valueWasRetrieved = true;
+                            }
+
+                            // Call the "Method to update DOM"
+                            metadata.MethodToUpdateDom(this, value);
+                        }
+
+                        if (metadata.MethodToUpdateDom2 is not null)
+                        {
+                            if (!valueWasRetrieved)
+                            {
+                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                valueWasRetrieved = true;
+                            }
+
+                            // DependencyProperty.UnsetValue for the old value signify that
+                            // the old value should be ignored.
+                            metadata.MethodToUpdateDom2(
+                                this,
+                                DependencyProperty.UnsetValue,
+                                value);
+                        }
+
+                        //--------------------------------------------------
+                        // Call PropertyChanged
+                        //--------------------------------------------------
+
+                        if (metadata.PropertyChangedCallback is not null
+#pragma warning disable CS0618 // Type or member is obsolete
+                            && metadata.CallPropertyChangedWhenLoadedIntoVisualTree != WhenToCallPropertyChangedEnum.Never)
+#pragma warning restore CS0618 // Type or member is obsolete
+                        {
+                            if (!valueWasRetrieved)
+                            {
+                                value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
+                                valueWasRetrieved = true;
+                            }
+
+                            // Raise the "PropertyChanged" event
+                            metadata.PropertyChangedCallback(
+                                this,
+                                new DependencyPropertyChangedEventArgs(value, value, dp, metadata));
+                        }
+                    }
+                }
+                finally
+                {
+                    ArrayPool<Storage>.Shared.Return(storages, false);
+                    span.Clear();
+                }
+            }
+
+            if (IsHitTestable)
+            {
+                SetPointerEvents(true);
+            }
+        }
+
+        private static void ResumeRendering(UIElement uie)
+        {
+            if (uie.ReadFlag(CoreFlags.IsCollapsed))
+            {
+                return;
+            }
+
+            if (uie.IsRenderingSuspended)
+            {
+                uie.IsRenderingSuspended = false;
+                uie.RenderVisual();
+
+                int count = uie.VisualChildrenCount;
+                for (int i = 0; i < count; i++)
+                {
+                    if (uie.GetVisualChild(i) is UIElement child)
+                    {
+                        ResumeRendering(child);
+                    }
+                }
+            }
         }
 
         internal bool ReadFlag(CoreFlags field) => (_flags & field) != 0;
@@ -1465,24 +1640,28 @@ namespace System.Windows
 
         // These bits together make up UIElement.VisibilityCache
         VisibilityCache_Visible = 0x00010000,
+        VisibilityCache_TakesSpace = 0x00020000,
 
         // Indicates if the visual has any children. Avoids calls to visualchildrencount while checking for presence of children.
-        HasChildren = 0x00020000,
+        HasChildren = 0x00040000,
 
         // Indicates if rendering is suspended for this Visual. Rendering is suspended when an element is inside a collapsed
         // visual tree.
-        IsRenderingSuspended = 0x00040000,
+        IsRenderingSuspended = 0x00080000,
+
+        // Indicates if this Visual is in a collapsed visual tree.
+        IsInCollapsedTree = 0x00100000,
 
         // Indicates if this Visual is connected to the render tree.
-        IsConnectedToLiveTree = 0x00080000,
+        IsConnectedToLiveTree = 0x00200000,
 
         // Indicates if this Visual has been loaded into the render tree. (see FrameworkElement.IsLoaded).
-        IsLoadedCache = 0x00100000,
+        IsLoadedCache = 0x00400000,
 
         // Indicates if this Visual is being detached from the render tree.
-        IsUnloading = 0x00200000,
+        IsUnloading = 0x00800000,
 
         // Indicates if this Visual can be the target of pointer events.
-        IsHitTestable = 0x00400000,
+        IsHitTestable = 0x01000000,
     }
 }

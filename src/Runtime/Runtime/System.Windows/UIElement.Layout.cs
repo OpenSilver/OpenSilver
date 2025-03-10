@@ -13,8 +13,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 using System.Windows.Threading;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
@@ -41,7 +39,7 @@ namespace System.Windows
         /// The size that this <see cref="UIElement"/> computed during the measure pass
         /// of the layout process.
         /// </returns>
-        public Size DesiredSize => IsVisible ? _desiredSize : new Size();
+        public Size DesiredSize => Visibility == Visibility.Collapsed ? new Size() : _desiredSize;
 
         /// <summary>
         /// Invalidates the measurement state (layout) for a <see cref="UIElement"/>.
@@ -143,12 +141,12 @@ namespace System.Windows
                 
                 if (neverMeasured)
                 {
-                    SwitchVisibilityIfNeeded(IsVisible);
+                    SwitchVisibilityIfNeeded(Visibility);
                 }
 
                 bool isCloseToPreviousMeasure = DoubleUtil.AreClose(availableSize, PreviousAvailableSize);
 
-                if (!IsVisible || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (Visibility == Visibility.Collapsed || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset measure request.
                     if (MeasureRequest != null)
@@ -175,6 +173,9 @@ namespace System.Windows
                 {
                     return;
                 }
+
+                //ensure that all properties that may affect layout are properly rendered
+                ResumeRendering(this);
 
                 NeverMeasured = false;
                 Size prevSize = _desiredSize;
@@ -310,7 +311,7 @@ namespace System.Windows
                             GetType().FullName));
                 }
 
-                if (!IsVisible || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                if (Visibility == Visibility.Collapsed || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
                     //reset arrange request.
                     if (ArrangeRequest != null)
@@ -421,7 +422,7 @@ namespace System.Windows
                     if (sizeChanged || RenderingInvalidated || firstArrange)
                     {
                         // Render with new size & location
-                        Render();
+                        RenderLayout();
                         RenderingInvalidated = false;
                     }
                 }
@@ -615,7 +616,7 @@ namespace System.Windows
 
         internal static UIElement GetLayoutParent(UIElement element) => element.InternalVisualParent as UIElement;
 
-        private void Render()
+        private void RenderLayout()
         {
             if (!BypassLayoutPolicies)
             {

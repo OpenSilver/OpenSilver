@@ -53,6 +53,10 @@ body {
     display: none !important;
 }
 
+.uielement-hidden {
+    opacity: 0 !important;
+}
+
 .uielement-unarranged {
     opacity: 0 !important;
 }

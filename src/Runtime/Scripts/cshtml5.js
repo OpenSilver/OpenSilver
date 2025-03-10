@@ -835,14 +835,26 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
     window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
 };
 
-document.setVisible = function (id, visible) {
+document.setVisible = function (id) {
     const element = document.getElementById(id);
     if (element) {
-        if (visible) {
-            element.classList.remove('uielement-collapsed')
-        } else {
-            element.classList.add('uielement-collapsed')
-        }
+        element.classList.remove('uielement-collapsed', 'uielement-hidden');
+    }
+};
+
+document.setCollapsed = function (id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.classList.remove('uielement-hidden');
+        element.classList.add('uielement-collapsed');
+    }
+};
+
+document.setHidden = function (id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.classList.remove('uielement-collapsed');
+        element.classList.add('uielement-hidden');
     }
 };
 
