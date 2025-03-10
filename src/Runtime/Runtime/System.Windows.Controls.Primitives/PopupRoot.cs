@@ -69,6 +69,7 @@ internal sealed class PopupRoot : UIElement
         IsOpen = true;
 
         OuterDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(this);
+        _isLoaded = true;
         IsConnectedToLiveTree = true;
         UpdateIsVisible();
 
@@ -94,6 +95,7 @@ internal sealed class PopupRoot : UIElement
 
         INTERNAL_HtmlDomManager.RemoveNodeNative(OuterDiv);
         OuterDiv = null;
+        _isLoaded = false;
         IsConnectedToLiveTree = false;
     }
 
