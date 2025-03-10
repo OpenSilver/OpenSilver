@@ -67,9 +67,9 @@ internal sealed class PopupRoot : FrameworkElement
         IsOpen = true;
 
         OuterDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(this);
-        _isLoaded = true;
+        IsLoadedCache = true;
         IsConnectedToLiveTree = true;
-        UpdateIsVisible();
+        UpdateIsVisibleCache();
         PropagateResumeLayout(null, this);
 
         INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_transformLayer, this);
@@ -87,7 +87,7 @@ internal sealed class PopupRoot : FrameworkElement
         IsOpen = false;
 
         INTERNAL_VisualTreeManager.DetachPopupRoot(this);
-        UpdateIsVisible();
+        UpdateIsVisibleCache();
         PropagateSuspendLayout(this);
     }
 

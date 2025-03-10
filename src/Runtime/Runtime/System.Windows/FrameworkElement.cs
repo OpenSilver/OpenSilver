@@ -411,13 +411,7 @@ namespace System.Windows
         /// <summary>
         /// Gets a value that indicates whether this element is in the Visual Tree, that is, if it has been loaded for presentation.
         /// </summary>
-        public bool IsLoaded
-        {
-            get
-            {
-                return _isLoaded;
-            }
-        }
+        public bool IsLoaded => IsLoadedCache;
 
         internal bool IsLoadedInResourceDictionary { get; set; }
 

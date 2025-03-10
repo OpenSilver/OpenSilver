@@ -125,9 +125,9 @@ namespace System.Windows
             InputManager.Current.RegisterRoot(RootDomElement);
 
             // Set the window as "loaded":
-            _isLoaded = true;
+            IsLoadedCache = true;
             IsConnectedToLiveTree = true;
-            UpdateIsVisible();
+            UpdateIsVisibleCache();
 
             TextMeasurementService = new TextMeasurementService(this);
 
@@ -180,7 +180,7 @@ namespace System.Windows
 
         protected void OnContentChanged(object oldContent, object newContent)
         {
-            if (_isLoaded)
+            if (IsLoadedCache)
             {
                 // Attach the child UI element:
                 UIElement newChild = newContent as UIElement;

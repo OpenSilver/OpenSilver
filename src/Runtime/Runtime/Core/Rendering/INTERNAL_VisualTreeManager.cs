@@ -137,7 +137,7 @@ namespace CSHTML5.Internal
 
                 // Call the "Unloaded" event: (note: in XAML, the "unloaded" event of the parent is called
                 // before the "unloaded" event of the children)
-                element._isLoaded = false;
+                element.IsLoadedCache = false;
 
                 if (element is FrameworkElement fe)
                 {
@@ -153,7 +153,7 @@ namespace CSHTML5.Internal
             element.IsUnloading = false;
             element.OuterDiv = null;
             element.VisualChildrenInformation = null;
-            element.RenderingIsDeferred = false;
+            element.IsRenderingSuspended = false;
         }
 
         public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent, int index = -1)
@@ -253,7 +253,7 @@ namespace CSHTML5.Internal
             childFE?.LoadResources();
 
             // Tell the control that it is now present into the visual tree:
-            child._isLoaded = true;
+            child.IsLoadedCache = true;
 
             // Raise the "OnAttached" event:
             child.INTERNAL_OnAttachedToVisualTree(); // IMPORTANT: Must be done BEFORE "RaiseChangedEventOnAllDependencyProperties" (for example, the ItemsControl uses this to initialize its visual)
@@ -276,7 +276,7 @@ namespace CSHTML5.Internal
 
             if (enableDeferredRenderingOfCollapsedControls && !child.IsVisible)
             {
-                child.RenderingIsDeferred = true;
+                child.IsRenderingSuspended = true;
                 if (child.Visibility == Visibility.Collapsed)
                 {
                     INTERNAL_HtmlDomManager.SetVisible(child.OuterDiv, false);
@@ -290,7 +290,7 @@ namespace CSHTML5.Internal
             //--------------------------------------------------------
             // RAISE THE "LOADED" EVENT:
             //--------------------------------------------------------
-            
+
             // Raise the "Loaded" event: (note: in XAML, the "loaded" event of the children is called before the "loaded" event of the parent)
             childFE?.RaiseLoadedEvent();
         }
@@ -343,7 +343,7 @@ namespace CSHTML5.Internal
                         {
                             continue;
                         }
-                        
+
                         object value = null;
                         bool valueWasRetrieved = false;
 
@@ -392,7 +392,7 @@ namespace CSHTML5.Internal
                                 value = DependencyObjectStore.GetEffectiveValue(storage.Entry, RequestFlags.FullyResolved);
                                 valueWasRetrieved = true;
                             }
-                            
+
                             // Raise the "PropertyChanged" event
                             metadata.PropertyChangedCallback(
                                 uie,

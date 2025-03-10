@@ -44,10 +44,10 @@ namespace CSHTML5.Native.Html.Printing
         {
             if (element != null)
             {
-                if (element._isLoaded)
+                if (element.IsLoadedCache)
                 {
                     // Remove the class "section-to-print" from the previous print area:
-                    if (CurrentPrintArea != null && CurrentPrintArea._isLoaded)
+                    if (CurrentPrintArea != null && CurrentPrintArea.IsLoadedCache)
                         OpenSilver.Interop.ExecuteJavaScriptVoid(
                             $"{OpenSilver.Interop.GetVariableStringForJS(CurrentPrintArea.OuterDiv)}.classList.remove(\"section-to-print\")");
 
@@ -104,7 +104,7 @@ namespace CSHTML5.Native.Html.Printing
             var previousPrintArea = CurrentPrintArea;
 
             // Check whether the element is already in the Visual Tree:
-            if (element._isLoaded)
+            if (element.IsLoadedCache)
             {
                 //---------------------------------------------------
                 // The element is already in the Visual Tree.
