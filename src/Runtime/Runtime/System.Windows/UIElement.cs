@@ -871,7 +871,7 @@ namespace System.Windows
                 WriteFlag(CoreFlags.IsCollapsed, false);
 
                 // invalidate parent if needed
-                InvalidateParentMeasure();
+                SignalDesiredSizeChange();
 
                 // make sure element has been rendered
                 InvalidateVisual();
@@ -885,7 +885,15 @@ namespace System.Windows
                 WriteFlag(CoreFlags.IsCollapsed, collapsed);
 
                 // invalidate parent
-                InvalidateParentMeasure();
+                SignalDesiredSizeChange();
+            }
+        }
+
+        private void SignalDesiredSizeChange()
+        {
+            if (GetLayoutParent(this) is UIElement p)
+            {
+                p.OnChildDesiredSizeChanged(this);
             }
         }
 

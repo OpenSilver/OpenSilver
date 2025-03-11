@@ -946,24 +946,35 @@ namespace System.Windows
 
             if (e.Metadata is FrameworkPropertyMetadata metadata)
             {
-                if (metadata.AffectsMeasure)
+                bool affectsParentMeasure = metadata.AffectsParentMeasure;
+                bool affectsParentArrange = metadata.AffectsParentArrange;
+                bool affectsMeasure = metadata.AffectsMeasure;
+                bool affectsArrange = metadata.AffectsArrange;
+
+                if (affectsParentArrange || affectsParentMeasure)
+                {
+                    if (GetLayoutParent(this) is UIElement layoutParent)
+                    {
+                        if (affectsParentMeasure)
+                        {
+                            layoutParent.InvalidateMeasure();
+                        }
+
+                        if (affectsParentArrange)
+                        {
+                            layoutParent.InvalidateArrange();
+                        }
+                    }
+                }
+
+                if (affectsMeasure)
                 {
                     InvalidateMeasure();
                 }
 
-                if (metadata.AffectsArrange)
+                if (affectsArrange)
                 {
                     InvalidateArrange();
-                }
-
-                if (metadata.AffectsParentMeasure)
-                {
-                    InvalidateParentMeasure();
-                }
-
-                if (metadata.AffectsParentArrange)
-                {
-                    InvalidateParentArrange();
                 }
             }
 

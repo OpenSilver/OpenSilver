@@ -316,7 +316,16 @@ public partial class FrameworkElement
 
     internal virtual double ActualHeightInternal => RenderSize.Height;
 
-    internal sealed override Size MeasureCore(Size availableSize)
+    /// <summary>
+    /// Implements basic measure-pass layout system behavior for <see cref="FrameworkElement"/>.
+    /// </summary>
+    /// <param name="availableSize">
+    /// The available size that the parent element can give to the child elements.
+    /// </param>
+    /// <returns>
+    /// The desired size of this element in layout.
+    /// </returns>
+    protected sealed override Size MeasureCore(Size availableSize)
     {
         //build the visual tree from styles first
         if (!ApplyTemplate() && TemplateChild is not null)
@@ -436,7 +445,14 @@ public partial class FrameworkElement
     /// </returns>
     protected virtual Size MeasureOverride(Size availableSize) => new Size(0, 0);
 
-    internal sealed override void ArrangeCore(Rect finalRect)
+    /// <summary>
+    /// Implements <see cref="UIElement.ArrangeCore(Rect)"/> (defined as virtual in <see cref="UIElement"/>) 
+    /// and seals the implementation.
+    /// </summary>
+    /// <param name="finalRect">
+    /// The final area within the parent that this element should use to arrange itself and its children.
+    /// </param>
+    protected sealed override void ArrangeCore(Rect finalRect)
     {
         if (BypassLayoutPolicies)
         {
@@ -825,11 +841,7 @@ public partial class FrameworkElement
                     bool hasOrigin = origin.X != 0d || origin.Y != 0d;
                     if (hasOrigin)
                     {
-                        var backOrigin = new TranslateTransform
-                        {
-                            X = -origin.X,
-                            Y = -origin.Y,
-                        };
+                        var backOrigin = new TranslateTransform(-origin.X, -origin.Y);
                         t.Children.Add(backOrigin);
                     }
 
@@ -838,11 +850,7 @@ public partial class FrameworkElement
 
                     if (hasOrigin)
                     {
-                        var forwardOrigin = new TranslateTransform
-                        {
-                            X = origin.X,
-                            Y = origin.Y,
-                        };
+                        var forwardOrigin = new TranslateTransform(origin.X, origin.Y);
                         t.Children.Add(forwardOrigin);
                     }
                 }

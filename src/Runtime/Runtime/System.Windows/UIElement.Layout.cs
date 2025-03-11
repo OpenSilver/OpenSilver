@@ -43,6 +43,23 @@ namespace System.Windows
         public Size DesiredSize => Visibility == Visibility.Collapsed ? new Size() : _desiredSize;
 
         /// <summary>
+        /// Gets a value indicating whether the current size returned by layout measure is valid.
+        /// </summary>
+        /// <returns>
+        /// true if the measure pass of layout returned a valid and current value; otherwise, false.
+        /// </returns>
+        public bool IsMeasureValid => !MeasureDirty;
+
+        /// <summary>
+        /// Gets a value indicating whether the computed size and position of child elements in this 
+        /// element's layout are valid.
+        /// </summary>
+        /// <returns>
+        /// true if the size and position of layout are valid; otherwise, false.
+        /// </returns>
+        public bool IsArrangeValid => !ArrangeDirty;
+
+        /// <summary>
         /// Invalidates the measurement state (layout) for a <see cref="UIElement"/>.
         /// </summary>
         public void InvalidateMeasure()
@@ -242,21 +259,30 @@ namespace System.Windows
 
                 _desiredSize = desiredSize;
 
-                if (!MeasureDuringArrange && !DoubleUtil.AreClose(prevSize, desiredSize))
+                // Contrary to WPF, Silverlight invalidates the parent when Measure in called during Arrange.
+                if (/* !MeasureDuringArrange && */
+                    !DoubleUtil.AreClose(prevSize, desiredSize))
                 {
-                    UIElement parent = GetLayoutParent(this);
-                    if (parent != null && !parent.MeasureInProgress)
+                    UIElement p = GetLayoutParent(this);
+                    if (p != null && !p.MeasureInProgress)
                     {
-                        parent.InvalidateMeasure();
+                        p.OnChildDesiredSizeChanged(this);
                     }
                 }
             }
         }
 
-        internal virtual Size MeasureCore(Size availableSize)
-        {
-            return new Size(0, 0);
-        }
+        /// <summary>
+        /// When overridden in a derived class, provides measurement logic for sizing this element 
+        /// properly, with consideration of the size of any child element content.
+        /// </summary>
+        /// <param name="availableSize">
+        /// The available size that the parent element can allocate for the child.
+        /// </param>
+        /// <returns>
+        /// The desired size of this element in layout.
+        /// </returns>
+        protected virtual Size MeasureCore(Size availableSize) => new(0, 0);
 
         /// <summary>
         /// Positions child objects and determines a size for a <see cref="UIElement"/>.
@@ -339,8 +365,6 @@ namespace System.Windows
                         //we are not in the UpdateLayout loop but rather in manual sequence of Measure/Arrange
                         //(like in HwndSource when new RootVisual is attached) so there are no loops and there could be
                         //measure-dirty elements left after previous single Measure pass) - so need to use cached constraint
-                        Size previousDesiredSizeInArrange = DesiredSize;
-                        
                         if (NeverMeasured)
                         {
                             Measure(finalRect.Size);
@@ -348,12 +372,6 @@ namespace System.Windows
                         else
                         {
                             Measure(PreviousAvailableSize);
-                        }
-
-                        if (!DoubleUtil.AreClose(previousDesiredSizeInArrange, DesiredSize))
-                        {
-                            InvalidateParentMeasure();
-                            InvalidateParentArrange();
                         }
                     }
                     finally
@@ -430,7 +448,13 @@ namespace System.Windows
             }
         }
 
-        internal virtual void ArrangeCore(Rect finalRect)
+        /// <summary>
+        /// Defines the template for WPF core-level arrange layout definition.
+        /// </summary>
+        /// <param name="finalRect">
+        /// The final area within the parent that element should use to arrange itself and its child elements.
+        /// </param>
+        protected virtual void ArrangeCore(Rect finalRect)
         {
             // Set the element size.
             RenderSize = finalRect.Size;
@@ -476,6 +500,14 @@ namespace System.Windows
         {
             return null;
         }
+
+        /// <summary>
+        /// Supports layout behavior when a child element is resized.
+        /// </summary>
+        /// <param name="child">
+        /// The child element that is being resized.
+        /// </param>
+        protected virtual void OnChildDesiredSizeChanged(UIElement child) => InvalidateMeasure();
 
         /// <summary>
         /// Occurs when the layout of the various visual elements associated with the current <see cref="Dispatcher"/> changes.
@@ -646,14 +678,7 @@ namespace System.Windows
         /// Ensures that all positions of child objects of a <see cref="UIElement"/> are
         /// properly updated for layout.
         /// </summary>
-        public void UpdateLayout()
-        {
-            LayoutManager.Current.UpdateLayout();
-        }
-
-        internal void InvalidateParentMeasure() => GetLayoutParent(this)?.InvalidateMeasure();
-
-        internal void InvalidateParentArrange() => GetLayoutParent(this)?.InvalidateArrange();
+        public void UpdateLayout() => LayoutManager.Current.UpdateLayout();
 
         internal static UIElement GetLayoutParent(UIElement element) => element.InternalVisualParent as UIElement;
 
@@ -769,10 +794,6 @@ namespace System.Windows
         internal LayoutManager.LayoutQueue.Request ArrangeRequest;
 
         internal SizeChangedInfo SizeChangedInfo;
-
-        internal bool IsMeasureValid => !MeasureDirty;
-
-        internal bool IsArrangeValid => !ArrangeDirty;
 
         private bool RenderingInvalidated
         {
