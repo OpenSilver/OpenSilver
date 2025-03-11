@@ -13,6 +13,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Media;
 using System.Windows.Threading;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
@@ -429,7 +430,47 @@ namespace System.Windows
             }
         }
 
-        internal virtual void ArrangeCore(Rect finalRect) { }
+        internal virtual void ArrangeCore(Rect finalRect)
+        {
+            // Set the element size.
+            RenderSize = finalRect.Size;
+
+            VisualOffset = new Vector(finalRect.X, finalRect.Y);
+
+            // Set transform to reflect the offset of finalRect - parents that have multiple children
+            // pass offset in the finalRect to communicate the location of this child withing the parent.
+            Transform renderTransform = (Transform)GetValue(RenderTransformProperty);
+            if (renderTransform == Transform.Identity)
+            {
+                renderTransform = null;
+            }
+
+            if (renderTransform is not null)
+            {
+                // render transform + layout offset, create a collection
+                var t = new TransformGroup();
+
+                Point origin = RenderTransformOrigin;
+                bool hasOrigin = origin.X != 0d || origin.Y != 0d;
+                if (hasOrigin)
+                {
+                    t.Children.Add(new TranslateTransform(-(finalRect.Width * origin.X), -(finalRect.Height * origin.Y)));
+                }
+
+                t.Children.Add(renderTransform);
+
+                if (hasOrigin)
+                {
+                    t.Children.Add(new TranslateTransform(finalRect.Width * origin.X, finalRect.Height * origin.Y));
+                }
+
+                VisualTransform = t;
+            }
+            else
+            {
+                VisualTransform = null;
+            }
+        }
 
         internal virtual Rect? GetLayoutClip(Size layoutSlotSize)
         {
