@@ -97,6 +97,23 @@ public partial class FrameworkElement
     }
 
     /// <summary>
+    /// Searches for a resource with the specified name and sets up a resource reference to it for the specified property.
+    /// </summary>
+    /// <param name="dp">
+    /// The property to which the resource is bound.
+    /// </param>
+    /// <param name="name">
+    /// The name of the resource.
+    /// </param>
+    /// <remarks>
+    /// A resource reference is similar to the use of a <see cref="DynamicResourceExtension"/> Markup Extension in markup.
+    /// The resource reference creates an internal expression that supplies the value of the specified property on a run-time 
+    /// deferred basis. The expression will be re-evaluated whenever the resource dictionary indicates a changed value through 
+    /// internal events, or whenever the current element is reparented (a parent change would change the dictionary lookup path).
+    /// </remarks>
+    public void SetResourceReference(DependencyProperty dp, object name) => SetValue(dp, new ResourceReferenceExpression(name));
+
+    /// <summary>
     /// Searches for a resource with the specified key, and throws an exception if the requested resource is not found.
     /// </summary>
     /// <param name="resourceKey">
