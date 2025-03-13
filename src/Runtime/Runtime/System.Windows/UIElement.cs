@@ -1122,8 +1122,8 @@ namespace System.Windows
         /// </summary>
         public bool IsHitTestVisible
         {
-            get { return (bool)GetValue(IsHitTestVisibleProperty); }
-            set { SetValueInternal(IsHitTestVisibleProperty, value); }
+            get => (bool)GetValue(IsHitTestVisibleProperty);
+            set => SetValueInternal(IsHitTestVisibleProperty, value);
         }
 
         /// <summary>
@@ -1139,6 +1139,9 @@ namespace System.Windows
         private static void OnIsHitTestVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement uie = (UIElement)d;
+
+            // Raise the public changed event.
+            uie.IsHitTestVisibleChanged?.Invoke(uie, e);
 
             // Invalidate the children so that they will inherit the new value.
             uie.InvalidateForceInheritPropertyOnChildren(e.Property);
@@ -1173,6 +1176,11 @@ namespace System.Windows
                 return BooleanBoxes.FalseBox;
             }
         }
+
+        /// <summary>
+        /// Occurs when the value of the <see cref="IsHitTestVisible"/> dependency property changes on this element.
+        /// </summary>
+        public event DependencyPropertyChangedEventHandler IsHitTestVisibleChanged;
 
 #endregion
 
