@@ -38,7 +38,7 @@ namespace System.Windows.Controls
             SizeChanged += new SizeChangedEventHandler(OnSizeChanged);
         }
 
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e) => ResetCanvas(e.NewSize);
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e) => DrawAllStrokes();
 
         private void ResetCanvas(Size renderSize)
         {
@@ -63,8 +63,6 @@ ctx.msImageSmoothingEnabled = true;
 ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 cvs.style.width = {width} + 'px';
 cvs.style.height = {height} + 'px';
-ctx.strokeStyle = '#222222';
-ctx.lineWidth = '4';
 ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
         }
 
@@ -156,6 +154,10 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             string sCanvas = OpenSilver.Interop.GetVariableStringForJS(_canvasDom);
             var sb = new StringBuilder();
             sb.AppendLine($"(function(cvs) {{ const ctx = cvs.getContext('2d');");
+            sb.AppendLine($"ctx.strokeStyle = '{stroke.DrawingAttributes.Color.ToHtmlString(1)}';");
+            sb.AppendLine($@"ctx.lineWidth = '{stroke.DrawingAttributes.Width.ToInvariantString()}';");
+            sb.AppendLine($"ctx.beginPath();");
+
             var firstPoint = points[0];
             sb.AppendLine($"ctx.moveTo({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()});");
 
