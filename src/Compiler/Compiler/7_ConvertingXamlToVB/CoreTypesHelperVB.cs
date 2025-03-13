@@ -119,25 +119,27 @@ namespace OpenSilver.Compiler
             }
         }
 
+        private static readonly char[] _repeatBehaviorConverterIterationCharacter = ['x', 'X'];
+
         internal static string ConvertToRepeatBehavior(string source, string destinationType)
         {
-            const char _iterationCharacter = 'x';
+            string stringValue = source.Trim();
 
-            string stringValue = source.Trim().ToLowerInvariant();
-
-            if (stringValue == "forever")
+            if (string.Equals(stringValue, "Forever", StringComparison.OrdinalIgnoreCase))
             {
-                return string.Format($"{destinationType}.Forever");
+                return $"{destinationType}.Forever";
             }
             else if (stringValue.Length > 0 &&
-                     stringValue[stringValue.Length - 1] == _iterationCharacter)
+                     char.ToLowerInvariant(stringValue[stringValue.Length - 1]) == _repeatBehaviorConverterIterationCharacter[0])
             {
-                string stringDoubleValue = stringValue.TrimEnd(_iterationCharacter);
+                string stringDoubleValue = stringValue.TrimEnd(_repeatBehaviorConverterIterationCharacter);
 
-                return $"New {destinationType}({stringDoubleValue.TrimEnd()})";
+                return $"New {destinationType}({SystemTypesHelper.VisualBasic.ConvertFromInvariantString(stringDoubleValue, "system.double")})";
             }
 
-            return SystemTypesHelper.VisualBasic.ConvertFromInvariantString(stringValue, "system.timespan");
+            string timeSpanValue = SystemTypesHelper.VisualBasic.ConvertFromInvariantString(stringValue, "system.timespan");
+
+            return $"New {destinationType}({timeSpanValue})";
         }
 
         internal static string ConvertToKeySpline(string source, string destinationType, string pointTypeName)

@@ -21,7 +21,7 @@ namespace System.Windows.Media.Animation;
 /// </summary>
 public sealed class RepeatBehaviorConverter : TypeConverter
 {
-    private static readonly char[] _iterationCharacter = new char[] { 'x' };
+    private static readonly char[] _iterationCharacter = ['x', 'X'];
 
     /// <summary>
     /// Determines whether or not conversion from a specified data type is possible.
@@ -73,14 +73,13 @@ public sealed class RepeatBehaviorConverter : TypeConverter
         if (stringValue != null)
         {
             stringValue = stringValue.Trim();
-            stringValue = stringValue.ToLowerInvariant();
 
-            if (stringValue == "forever")
+            if (string.Equals(stringValue, "Forever", StringComparison.OrdinalIgnoreCase))
             {
                 return RepeatBehavior.Forever;
             }
-            else if (stringValue.Length > 0
-                && stringValue[stringValue.Length - 1] == _iterationCharacter[0])
+            else if (stringValue.Length > 0 &&
+                     char.ToLowerInvariant(stringValue[stringValue.Length - 1]) == _iterationCharacter[0])
             {
                 string stringDoubleValue = stringValue.TrimEnd(_iterationCharacter);
 
