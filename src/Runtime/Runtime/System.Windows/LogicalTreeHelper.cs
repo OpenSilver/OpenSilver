@@ -118,6 +118,31 @@ public static class LogicalTreeHelper
     }
 
     /// <summary>
+    /// Returns the collection of immediate child objects of the specified <see cref="UIElement"/>
+    /// by processing the logical tree.
+    /// </summary>
+    /// <param name="current">
+    /// The object from which to start processing the logical tree.
+    /// </param>
+    /// <returns>
+    /// The enumerable collection of immediate child objects starting from current in the logical tree.
+    /// </returns>
+    public static IEnumerable GetChildren(UIElement current)
+    {
+        if (current is null)
+        {
+            throw new ArgumentNullException(nameof(current));
+        }
+
+        if (current is FrameworkElement fe)
+        {
+            return EnumeratorWrapper.Create(fe.LogicalChildren);
+        }
+
+        return EnumeratorWrapper.Empty;
+    }
+
+    /// <summary>
     /// Returns the collection of immediate child objects of the specified <see cref="FrameworkElement"/>
     /// by processing the logical tree.
     /// </summary>
@@ -170,6 +195,30 @@ public static class LogicalTreeHelper
     /// <returns>
     /// The requested parent object.
     /// </returns>
+    public static DependencyObject GetParent(UIElement current)
+    {
+        if (current is null)
+        {
+            throw new ArgumentNullException(nameof(current));
+        }
+
+        if (current is FrameworkElement fe)
+        {
+            return fe.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Returns the parent object of the specified object by processing the logical tree.
+    /// </summary>
+    /// <param name="current">
+    /// The object to find the parent object for.
+    /// </param>
+    /// <returns>
+    /// The requested parent object.
+    /// </returns>
     public static DependencyObject GetParent(FrameworkElement current)
     {
         if (current is null)
@@ -190,7 +239,7 @@ public static class LogicalTreeHelper
         return EmptyEnumerator.Instance;
     }
 
-    private class EnumeratorWrapper : IEnumerable
+    private sealed class EnumeratorWrapper : IEnumerable
     {
         private readonly IEnumerator _enumerator;
 
