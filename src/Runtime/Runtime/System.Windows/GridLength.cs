@@ -22,10 +22,10 @@ namespace System.Windows
     /// unit types.
     /// </summary>
     [TypeConverter(typeof(GridLengthConverter))]
-    public struct GridLength
+    public readonly struct GridLength
     {
-        private double _unitValue;      //  unit value storage
-        private GridUnitType _unitType; //  unit type storage
+        private readonly double _unitValue;      //  unit value storage
+        private readonly GridUnitType _unitType; //  unit type storage
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GridLength"/> structure using the
@@ -212,6 +212,6 @@ namespace System.Windows
         /// <summary>
         /// Get a copy of the current instance of <see cref="GridLength"/>.
         /// </summary>
-        public GridLength Clone() => new GridLength() { _unitType = _unitType, _unitValue = _unitValue };
+        public GridLength Clone() => new GridLength(_unitValue, _unitType);
     }
 }

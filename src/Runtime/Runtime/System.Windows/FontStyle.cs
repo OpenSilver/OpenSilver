@@ -20,7 +20,7 @@ namespace System.Windows
     /// Represents the style of a font face (for instance, as normal or italic).
     /// </summary>
     [TypeConverter(typeof(FontStyleConverter))]
-    public struct FontStyle : IFormattable
+    public readonly struct FontStyle : IFormattable
     {
         private readonly int _style;
 

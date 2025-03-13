@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
 using OpenSilver.Internal;
 
 namespace System.Windows
@@ -18,10 +19,10 @@ namespace System.Windows
     /// <summary>
     /// Represents the duration of time that a <see cref="Media.Animation.Timeline"/> is active.
     /// </summary>
-    public struct Duration
+    public readonly struct Duration
     {
-        private TimeSpan _timeSpan;
-        private DurationType _durationType;
+        private readonly TimeSpan _timeSpan;
+        private readonly DurationType _durationType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Duration"/> structure with the
@@ -44,13 +45,19 @@ namespace System.Windows
             _timeSpan = timeSpan;
         }
 
+        private Duration(DurationType type)
+        {
+            Debug.Assert(type == DurationType.Automatic || type == DurationType.Forever);
+            _durationType = type;
+        }
+
         /// <summary>
         /// Gets a <see cref="Duration"/> value that is automatically determined.
         /// </summary>
         /// <value>
         /// A <see cref="Duration"/> initialized to an automatic value.
         /// </value>
-        public static Duration Automatic => new Duration { _durationType = DurationType.Automatic };
+        public static Duration Automatic => new(DurationType.Automatic);
 
         /// <summary>
         /// Gets a <see cref="Duration"/> value that represents an infinite interval.
@@ -58,7 +65,7 @@ namespace System.Windows
         /// <value>
         /// A <see cref="Duration"/> initialized to a forever value.
         /// </value>
-        public static Duration Forever => new Duration { _durationType = DurationType.Forever };
+        public static Duration Forever => new(DurationType.Forever);
 
         /// <summary>
         /// Gets a value that indicates if this <see cref="Duration"/> represents a <see cref="TimeSpan"/>

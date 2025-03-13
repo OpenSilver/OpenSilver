@@ -22,7 +22,7 @@ namespace System.Windows
     /// aspect ratio of that font.
     /// </summary>
     [TypeConverter(typeof(FontStretchConverter))]
-    public struct FontStretch : IFormattable
+    public readonly struct FontStretch : IFormattable
     {
         private readonly int _stretch;
 

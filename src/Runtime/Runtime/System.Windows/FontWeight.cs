@@ -22,7 +22,7 @@ namespace System.Windows
     /// the strokes.
     /// </summary>
     [TypeConverter(typeof(FontWeightConverter))]
-    public struct FontWeight : IFormattable
+    public readonly struct FontWeight : IFormattable
     {
         private readonly int _weight;
 

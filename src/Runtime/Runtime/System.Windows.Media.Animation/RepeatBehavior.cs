@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 using OpenSilver.Internal;
 
@@ -21,11 +22,11 @@ namespace System.Windows.Media.Animation;
 /// Describes how a <see cref="Timeline"/> repeats its simple duration.
 /// </summary>
 [TypeConverter(typeof(RepeatBehaviorConverter))]
-public struct RepeatBehavior : IFormattable
+public readonly struct RepeatBehavior : IFormattable
 {
-    private double _iterationCount;
-    private TimeSpan _repeatDuration;
-    private RepeatBehaviorType _type;
+    private readonly double _iterationCount;
+    private readonly TimeSpan _repeatDuration;
+    private readonly RepeatBehaviorType _type;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RepeatBehavior"/>
@@ -75,6 +76,13 @@ public struct RepeatBehavior : IFormattable
         _type = RepeatBehaviorType.Duration;
     }
 
+    private RepeatBehavior(RepeatBehaviorType behaviorType)
+    {
+        Debug.Assert(behaviorType == RepeatBehaviorType.Forever);
+
+        _type = behaviorType;
+    }
+
     /// <summary>
     /// Gets a <see cref="RepeatBehavior"/> that specifies an infinite
     /// number of repetitions.
@@ -83,10 +91,7 @@ public struct RepeatBehavior : IFormattable
     {
         get
         {
-            RepeatBehavior forever = new RepeatBehavior();
-            forever._type = RepeatBehaviorType.Forever;
-
-            return forever;
+            return new RepeatBehavior(RepeatBehaviorType.Forever);
         }
     }
 
