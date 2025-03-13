@@ -127,4 +127,6 @@ public class UIPropertyMetadata : PropertyMetadata
         get { return ReadFlag(MetadataFlags.UI_IsAnimationProhibitedID); }
         set { CheckSealed(); WriteFlag(MetadataFlags.UI_IsAnimationProhibitedID, value); }
     }
+
+    internal override PropertyMetadata CreateInstance() => new UIPropertyMetadata();
 }
