@@ -8,9 +8,9 @@
     <repository type="git" url="$RepositoryUrl$" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
-    <description>OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</description>
-    <copyright>Copyright (c) 2024, Userware. All rights reserved.</copyright>
-    <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
+    <description>OpenSilver is a modern cross-platform reimplementation of WPF and Silverlight that enables .NET developers to build apps for web (WebAssembly), mobile and desktop (MAUI Hybrid) using C# and XAML.</description>
+    <copyright>Copyright (c) 2025, Userware. All rights reserved.</copyright>
+    <tags>silverlight wpf webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
     <icon>images\OpenSilver_icon.png</icon>
 
     <dependencies>
