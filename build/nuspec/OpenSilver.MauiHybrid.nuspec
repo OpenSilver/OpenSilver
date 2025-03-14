@@ -8,9 +8,9 @@
     <repository type="git" url="$RepositoryUrl$" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
-    <description>OpenSilver.MauiHybrid enables OpenSilver applications to run seamlessly on Windows, macOS, Android, and iOS.</description>
+    <description>OpenSilver is a modern cross-platform reimplementation of WPF and Silverlight that enables .NET developers to build apps for web (WebAssembly), mobile and desktop (MAUI Hybrid) using C# and XAML.</description>
     <copyright>Copyright (c) 2025, Userware. All rights reserved.</copyright>
-    <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono windows android macos ios maui hybrid</tags>
+    <tags>silverlight wpf webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono windows android macos ios maui hybrid</tags>
     <icon>images/OpenSilver_icon.png</icon>
     <dependencies>
       <group targetFramework=".NET8.0">
