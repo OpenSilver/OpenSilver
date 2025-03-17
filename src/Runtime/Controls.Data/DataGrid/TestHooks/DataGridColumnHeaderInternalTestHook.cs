@@ -3,6 +3,8 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+#if DEBUG
+
 namespace System.Windows.Controls.Primitives
 {
     public partial class DataGridColumnHeader
@@ -63,3 +65,5 @@ namespace System.Windows.Controls.Primitives
         }
     }
 }
+
+#endif

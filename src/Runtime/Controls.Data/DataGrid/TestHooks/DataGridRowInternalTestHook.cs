@@ -3,6 +3,8 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+#if DEBUG
+
 using System.Windows.Controls.Primitives;
 using OpenSilver.Internal;
 
@@ -72,9 +74,7 @@ namespace System.Windows.Controls
             }
             #endregion
         }
-
-
-
-
     }
 }
+
+#endif
