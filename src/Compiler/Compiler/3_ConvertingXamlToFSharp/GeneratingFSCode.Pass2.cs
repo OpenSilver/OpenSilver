@@ -2216,6 +2216,7 @@ namespace GlobalResource
             {
                 return attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
                        attributeName == InsertingImplicitNodes.InitializedFromStringAttribute ||
+                       attributeName == InsertingMarkupNodesInXaml.GeneratedMarkupExtensionAttribute ||
                        attributeName == GeneratingPathInXaml.PathInXamlAttribute;
             }
 
