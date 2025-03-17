@@ -471,16 +471,9 @@ namespace System.Windows.Controls
         /// <param name="e">Property changed args.</param>
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            Debug.Assert(e.NewValue is bool, "New value should be a Boolean!");
-            bool isEnabled = (bool)e.NewValue;
             ContentControl header = GetContentControl(IsSelected, TabStripPlacement);
             if (header != null)
             {
-                if (!isEnabled)
-                {
-                    _isMouseOver = false;
-                }
-
                 UpdateVisualState();
             }
         }
@@ -557,7 +550,7 @@ namespace System.Windows.Controls
             {
                 VisualStates.GoToState(this, useTransitions, VisualStates.StateDisabled, VisualStates.StateNormal);
             }
-            else if (_isMouseOver && !IsSelected)
+            else if (IsMouseOver && !IsSelected)
             {
                 VisualStates.GoToState(this, useTransitions, VisualStates.StateMouseOver, VisualStates.StateNormal);
             }
@@ -623,7 +616,6 @@ namespace System.Windows.Controls
         /// <param name="e">The MouseEventArgs.</param>
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            _isMouseOver = false;
             UpdateVisualState();
         }
 
@@ -634,7 +626,6 @@ namespace System.Windows.Controls
         /// <param name="e">The MouseEventArgs.</param>
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            _isMouseOver = true;
             UpdateVisualState();
         }
 
@@ -898,11 +889,6 @@ namespace System.Windows.Controls
         /// Inherited code: Requires comment.
         /// </summary>
         internal const string ElementHeaderRightUnselectedName = "HeaderRightUnselected";
-
-        /// <summary>
-        /// Gets or sets a value indicating whether Inherited code: Requires comment.
-        /// </summary>
-        private bool _isMouseOver;
 
         /// <summary>
         /// Inherited code: Requires comment.

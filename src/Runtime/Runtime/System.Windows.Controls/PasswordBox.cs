@@ -383,7 +383,7 @@ namespace System.Windows.Controls
             {
                 VisualStateManager.GoToState(this, VisualStates.StateDisabled, false);
             }
-            else if (IsPointerOver)
+            else if (IsMouseOver)
             {
                 VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
             }

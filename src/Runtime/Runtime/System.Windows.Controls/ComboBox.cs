@@ -53,7 +53,6 @@ namespace System.Windows.Controls
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
         private ScrollViewer _scrollHost;
-        private bool _isMouseOver;
 
         static ComboBox()
         {
@@ -68,15 +67,7 @@ namespace System.Windows.Controls
         public ComboBox()
         {
             DefaultStyleKey = typeof(ComboBox);
-            IsEnabledChanged += (o, e) =>
-            {
-                if (!(bool)e.NewValue)
-                {
-                    _isMouseOver = false;
-                }
-
-                UpdateVisualStates();
-            };
+            IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
         /// <inheritdoc />
@@ -394,7 +385,6 @@ namespace System.Windows.Controls
         protected override void OnMouseEnter(MouseEventArgs e)
         {
             base.OnMouseEnter(e);
-            _isMouseOver = true;
             UpdateVisualStates();
         }
 
@@ -408,7 +398,6 @@ namespace System.Windows.Controls
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-            _isMouseOver = false;
             UpdateVisualStates();
         }
 
@@ -797,7 +786,7 @@ namespace System.Windows.Controls
             {
                 VisualStateManager.GoToState(this, VisualStates.StateDisabled, false);
             }
-            else if (_isMouseOver)
+            else if (IsMouseOver)
             {
                 VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
             }

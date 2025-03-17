@@ -228,11 +228,6 @@ namespace System.Windows.Controls
         /// <param name="e">Property changed args</param>
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (!IsEnabled)
-            {
-                IsMouseOver = false;
-            }
-
             UpdateVisualState();
         }
 
@@ -291,7 +286,6 @@ namespace System.Windows.Controls
         protected override void OnMouseEnter(MouseEventArgs e)
         {
             base.OnMouseEnter(e);
-            IsMouseOver = true;
             if ((Orientation == Orientation.Horizontal && ElementHorizontalThumb != null && !ElementHorizontalThumb.IsDragging) ||
                 (Orientation == Orientation.Vertical && ElementVerticalThumb != null && !ElementVerticalThumb.IsDragging))
             {
@@ -308,7 +302,6 @@ namespace System.Windows.Controls
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-            IsMouseOver = false;
             if ((Orientation == Orientation.Horizontal && ElementHorizontalThumb != null && !ElementHorizontalThumb.IsDragging) ||
                 (Orientation == Orientation.Vertical && ElementVerticalThumb != null && !ElementVerticalThumb.IsDragging))
             {
@@ -625,11 +618,6 @@ namespace System.Windows.Controls
         /// </summary>
         internal virtual Thumb ElementVerticalThumb { get; set; }
         internal const string ElementVerticalThumbName = "VerticalThumb";
-
-        /// <summary> 
-        /// Whether the mouse is currently over the control
-        /// </summary> 
-        internal bool IsMouseOver { get; set; }
 
         /// <summary> 
         /// Accumulates drag offsets in case the mouse drags off the end of the track.

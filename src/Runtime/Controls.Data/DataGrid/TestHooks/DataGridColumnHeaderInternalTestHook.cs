@@ -59,14 +59,6 @@ namespace System.Windows.Controls.Primitives
                 this._columnHeader.OnMouseEnter(mousePosition);
             }
 
-            /// <summary>
-            /// Exposes the private OnMouseLeave method through the TestHook
-            /// </summary>
-            internal void OnMouseLeave()
-            {
-                this._columnHeader.OnMouseLeave();
-            }
-
             #endregion
         }
     }

@@ -826,7 +826,5 @@ namespace System.Windows
         internal virtual UIElement MouseTarget => this;
 
         internal virtual UIElement KeyboardTarget => this;
-
-        internal bool IsPointerOver { get; set; }
     }
 }

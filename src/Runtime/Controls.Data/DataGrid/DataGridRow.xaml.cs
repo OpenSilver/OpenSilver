@@ -535,7 +535,7 @@ namespace System.Windows.Controls
             private set;
         }
 
-        internal bool IsMouseOver
+        internal new bool IsMouseOver
         {
             get
             {

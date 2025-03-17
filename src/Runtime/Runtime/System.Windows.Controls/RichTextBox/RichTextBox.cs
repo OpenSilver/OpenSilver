@@ -905,7 +905,7 @@ namespace System.Windows.Controls
             {
                 VisualStateManager.GoToState(this, VisualStates.StateReadOnly, false);
             }
-            else if (IsPointerOver)
+            else if (IsMouseOver)
             {
                 VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
             }

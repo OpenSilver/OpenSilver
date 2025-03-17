@@ -189,12 +189,6 @@ namespace System.Windows.Controls.Primitives
 
         #region Private Properties
 
-        private bool IsMouseOver
-        {
-            get;
-            set;
-        }
-
         private bool IsPressed
         {
             get;
@@ -652,7 +646,6 @@ namespace System.Windows.Controls.Primitives
                 return;
             }
 
-            this.OnMouseLeave();
             ApplyState(true);
         }
 
@@ -838,16 +831,7 @@ namespace System.Windows.Controls.Primitives
         /// <param name="mousePosition">mouse position relative to the DataGridColumnHeader</param>
         private void OnMouseEnter(Point mousePosition)
         {
-            this.IsMouseOver = true;
             this.SetDragCursor(mousePosition);
-        }
-
-        /// <summary>
-        /// Sets up the DataGridColumnHeader for the MouseLeave event
-        /// </summary>
-        private void OnMouseLeave()
-        {
-            this.IsMouseOver = false;
         }
 
         private void OnMouseMove_BeginReorder(Point mousePosition)

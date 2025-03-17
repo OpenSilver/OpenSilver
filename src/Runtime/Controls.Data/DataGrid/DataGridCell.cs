@@ -189,7 +189,7 @@ namespace System.Windows.Controls
             }
         }
 
-        private bool IsMouseOver
+        private new bool IsMouseOver
         {
             get
             {

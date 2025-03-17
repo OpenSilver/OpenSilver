@@ -121,17 +121,10 @@ namespace System.Windows.Controls.Primitives
             private set => SetValueInternal(IsFocusedPropertyKey, value);
         }
 
-        private static readonly DependencyPropertyKey IsMouseOverPropertyKey =
-            DependencyProperty.RegisterReadOnly(
-                nameof(IsMouseOver),
-                typeof(bool),
-                typeof(ButtonBase),
-                new PropertyMetadata(BooleanBoxes.FalseBox));
-
         /// <summary>
         /// Identifies the <see cref="IsMouseOver"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsMouseOverProperty = IsMouseOverPropertyKey.DependencyProperty;
+        public new static readonly DependencyProperty IsMouseOverProperty = UIElement.IsMouseOverProperty;
 
         /// <summary>
         /// Gets a value indicating whether the mouse pointer is located over this button control.
@@ -140,11 +133,7 @@ namespace System.Windows.Controls.Primitives
         /// true to indicate the mouse pointer is over the button control, otherwise false.
         /// The default is false.
         /// </returns>
-        public bool IsMouseOver
-        {
-            get => (bool)GetValue(IsMouseOverProperty);
-            private set => SetValueInternal(IsMouseOverPropertyKey, value);
-        }
+        public new bool IsMouseOver => base.IsMouseOver;
 
         private static readonly DependencyPropertyKey IsPressedPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -441,8 +430,6 @@ namespace System.Windows.Controls.Primitives
         {
             base.OnMouseEnter(e);
 
-            IsMouseOver = true;
-
             _suspendStateChanges = true;
             try
             {
@@ -463,8 +450,6 @@ namespace System.Windows.Controls.Primitives
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-
-            IsMouseOver = false;
 
             _suspendStateChanges = true;
 
@@ -684,7 +669,6 @@ namespace System.Windows.Controls.Primitives
                 if (!IsEnabled)
                 {
                     IsPressed = false;
-                    IsMouseOver = false;
                     _isMouseCaptured = false;
                     _isSpaceKeyDown = false;
                     _isMouseLeftButtonDown = false;

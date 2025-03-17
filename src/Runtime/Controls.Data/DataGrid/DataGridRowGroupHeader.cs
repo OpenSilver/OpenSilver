@@ -211,12 +211,6 @@ namespace System.Windows.Controls
             }
         }
 
-        private bool IsMouseOver
-        {
-            get;
-            set;
-        }
-
         internal bool IsRecycled
         {
             get;
@@ -511,7 +505,6 @@ namespace System.Windows.Controls
                 return;
             }
 
-            this.IsMouseOver = true;
             ApplyState(true /*useTransitions*/);
         }
 
@@ -523,7 +516,6 @@ namespace System.Windows.Controls
                 return;
             }
 
-            this.IsMouseOver = false;
             ApplyState(true /*useTransitions*/);
         }
 

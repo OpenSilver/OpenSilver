@@ -87,13 +87,6 @@ namespace System.Windows.Controls
         /// <param name="e">Property changed args.</param>
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            Debug.Assert(e.NewValue is bool, "The new value should be a boolean!");
-            bool isEnabled = (bool)e.NewValue;
-
-            if (!isEnabled)
-            {
-                _isMouseOver = false;
-            }
             ChangeVisualState();
         }
 
@@ -120,11 +113,6 @@ namespace System.Windows.Controls
         private GridResizeDirection _currentGridResizeDirection = GridResizeDirection.Auto;
 
         /// <summary>
-        /// Holds the state for whether the mouse is over the control or not.
-        /// </summary>
-        private bool _isMouseOver;
-
-        /// <summary>
         /// Default increment parameter.
         /// </summary>
         private const double DragIncrement = 1.0;
@@ -149,14 +137,11 @@ namespace System.Windows.Controls
             _dragValidator.DragCompletedEvent += new EventHandler<DragCompletedEventArgs>(DragValidator_DragCompletedEvent);
             this.MouseEnter += delegate(object sender, MouseEventArgs e)
             {
-                _isMouseOver = true;
                 ChangeVisualState();
             };
 
             this.MouseLeave += delegate(object sender, MouseEventArgs e)
             {
-                _isMouseOver = false;
-
                 // Only change the visual state if we're not currently resizing,
                 // the visual state will get updated when the resize operation
                 // comples
@@ -263,7 +248,7 @@ namespace System.Windows.Controls
             {
                 VisualStates.GoToState(this, useTransitions, VisualStates.StateDisabled, VisualStates.StateNormal);
             }
-            else if (_isMouseOver)
+            else if (IsMouseOver)
             {
                 VisualStates.GoToState(this, useTransitions, VisualStates.StateMouseOver, VisualStates.StateNormal);
             }

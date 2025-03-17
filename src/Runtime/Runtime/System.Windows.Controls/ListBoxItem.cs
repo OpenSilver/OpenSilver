@@ -103,14 +103,12 @@ namespace System.Windows.Controls
 #pragma warning restore CS0618 // Type or member is obsolete
             }
 
-            this.IsMouseOver = true;
             this.UpdateVisualStates();
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-            this.IsMouseOver = false;
             this.UpdateVisualStates();
         }
 
@@ -187,8 +185,6 @@ namespace System.Windows.Controls
                 VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
             }
         }
-
-        internal bool IsMouseOver { get; private set; }
 
         internal bool IsFocused { get; private set; }
     }

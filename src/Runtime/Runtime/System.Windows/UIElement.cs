@@ -1194,16 +1194,18 @@ namespace System.Windows
         internal virtual void SetPointerEvents(bool hitTestable) =>
             OuterDiv.Style.pointerEvents = hitTestable ? "auto" : "none";
 
+        private static readonly ReadOnlyPropertyMetadata _isHitTestableMetadata =
+            new(BooleanBoxes.FalseBox, GetIsHitTestable)
+            {
+                MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetPointerEvents((bool)newValue),
+            };
+
         private static readonly DependencyPropertyKey IsHitTestablePropertyKey =
             DependencyProperty.RegisterReadOnly(
                 nameof(IsHitTestable),
                 typeof(bool),
                 typeof(UIElement),
-                new ReadOnlyPropertyMetadata(BooleanBoxes.FalseBox, GetIsHitTestable)
-                {
-                    CoerceValueCallback = CoerceIsHitTestable,
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ((UIElement)d).SetPointerEvents((bool)newValue),
-                });
+                _isHitTestableMetadata);
 
         private static readonly DependencyProperty IsHitTestableProperty = IsHitTestablePropertyKey.DependencyProperty;
 
@@ -1211,16 +1213,30 @@ namespace System.Windows
 
         private static object GetIsHitTestable(DependencyObject d) => BooleanBoxes.Box(((UIElement)d).IsHitTestable);
 
-        private static object CoerceIsHitTestable(DependencyObject d, object value)
+        internal void CoerceIsHitTestable()
         {
-            UIElement uie = (UIElement)d;
-            return BooleanBoxes.Box(uie.EnablePointerEventsCore && uie.IsEnabled && uie.IsHitTestVisible && uie.IsVisible);
+            bool isHitTestable = EnablePointerEventsCore && IsEnabled && IsHitTestVisible && IsVisible;
+
+            if (IsHitTestable != isHitTestable)
+            {
+                WriteVisualFlag(VisualFlags.IsHitTestable, isHitTestable);
+
+                if (!isHitTestable && IsMouseOver)
+                {
+                    ClearValue(IsMouseOverPropertyKey);
+                }
+
+                NotifyPropertyChange(
+                    new DependencyPropertyChangedEventArgs(
+                        BooleanBoxes.Box(!isHitTestable),
+                        BooleanBoxes.Box(isHitTestable),
+                        IsHitTestableProperty,
+                        _isHitTestableMetadata));
+            }
         }
 
-        internal void CoerceIsHitTestable() => CoerceValue(IsHitTestableProperty);
-
         #endregion pointer-events
-        
+
         private static readonly DependencyProperty UseSystemFocusVisualsProperty =
             DependencyProperty.Register(
                 nameof(UseSystemFocusVisuals),
@@ -1278,6 +1294,32 @@ namespace System.Windows
         /// Releases pointer captures for capture of one specific pointer by this UIElement.
         /// </summary>
         public void ReleaseMouseCapture() => InputManager.Current.ReleaseMouseCapture(this);
+
+        internal static readonly DependencyPropertyKey IsMouseOverPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsMouseOver),
+                typeof(bool),
+                typeof(UIElement),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsMouseOverChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsMouseOver"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsMouseOverProperty = IsMouseOverPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets a value indicating whether the mouse pointer is located over this element (including child elements 
+        /// in the visual tree). This is a dependency property.
+        /// </summary>
+        /// <returns>
+        /// true if mouse pointer is over the element or its child elements; otherwise, false. The default is false.
+        /// </returns>
+        public bool IsMouseOver => ReadFlag(CoreFlags.IsMouseOverCache);
+
+        private static void OnIsMouseOverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((UIElement)d).WriteFlag(CoreFlags.IsMouseOverCache, (bool)e.NewValue);
+        }
 
         #endregion
 
@@ -1588,7 +1630,7 @@ namespace System.Windows
         IsCollapsed = 0x00000200,
         //IsKeyboardFocusWithinCache = 0x00000400,
         //IsKeyboardFocusWithinChanged = 0x00000800,
-        //IsMouseOverCache = 0x00001000,
+        IsMouseOverCache = 0x00001000,
         //IsMouseOverChanged = 0x00002000,
         //IsMouseCaptureWithinCache = 0x00004000,
         //IsMouseCaptureWithinChanged = 0x00008000,

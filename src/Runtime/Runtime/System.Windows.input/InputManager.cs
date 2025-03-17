@@ -266,9 +266,9 @@ internal sealed class InputManager
 
         static void RaiseMouseLeave(UIElement uie)
         {
-            if (uie.IsPointerOver)
+            if (uie.IsMouseOver)
             {
-                uie.IsPointerOver = false;
+                uie.ClearValue(UIElement.IsMouseOverPropertyKey);
 
                 RaiseUserInitiatedEvent(uie, new MouseEventArgs
                 {
@@ -609,7 +609,7 @@ internal sealed class InputManager
     {
         if (uie.MouseTarget is UIElement mouseTarget)
         {
-            mouseTarget.IsPointerOver = true;
+            mouseTarget.SetValueInternal(UIElement.IsMouseOverPropertyKey, true);
 
             ProcessPointerEvent(mouseTarget, UIElement.MouseEnterEvent, parameters);
         }
@@ -619,7 +619,7 @@ internal sealed class InputManager
     {
         if (uie.MouseTarget is UIElement mouseTarget)
         {
-            mouseTarget.IsPointerOver = false;
+            mouseTarget.ClearValue(UIElement.IsMouseOverPropertyKey);
 
             ProcessPointerEvent(mouseTarget, UIElement.MouseLeaveEvent, parameters);
         }

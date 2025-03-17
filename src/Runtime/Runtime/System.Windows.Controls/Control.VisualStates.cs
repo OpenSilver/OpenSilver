@@ -81,7 +81,6 @@ namespace System.Windows.Controls
         private sealed class VisualStateUpdater
         {
             private readonly Control _owner;
-            private bool _isMouseOver = false;
             private bool _isPressed = false;
             private bool _isFocused = false;
 
@@ -150,13 +149,11 @@ namespace System.Windows.Controls
 
             private void OnMouseEnter(object sender, MouseEventArgs e)
             {
-                _isMouseOver = true;
                 UpdateVisualStates(false);
             }
 
             private void OnMouseLeave(object sender, MouseEventArgs e)
             {
-                _isMouseOver = false;
                 UpdateVisualStates(false);
             }
 
@@ -194,7 +191,7 @@ namespace System.Windows.Controls
                 {
                     VisualStateManager.GoToState(_owner, VisualStates.StatePressed, useTransitions);
                 }
-                else if (_isMouseOver)
+                else if (_owner.IsMouseOver)
                 {
                     VisualStateManager.GoToState(_owner, VisualStates.StateMouseOver, useTransitions);
                 }

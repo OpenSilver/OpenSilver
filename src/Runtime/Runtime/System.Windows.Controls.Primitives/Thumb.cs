@@ -210,7 +210,6 @@ namespace System.Windows.Controls.Primitives
 
             if (IsEnabled)
             {
-                _isMouseOver = true;
                 UpdateVisualState();
             }
         }
@@ -222,7 +221,6 @@ namespace System.Windows.Controls.Primitives
 
             if (IsEnabled)
             {
-                _isMouseOver = false;
                 UpdateVisualState();
             }
         }
@@ -297,7 +295,7 @@ namespace System.Windows.Controls.Primitives
             {
                 GoToState(useTransitions, VisualStates.StatePressed);
             }
-            else if (_isMouseOver)
+            else if (IsMouseOver)
             {
                 GoToState(useTransitions, VisualStates.StateMouseOver);
             }
@@ -339,17 +337,8 @@ namespace System.Windows.Controls.Primitives
 
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (!IsEnabled)
-            {
-                _isMouseOver = false;
-            }
             UpdateVisualState();
         }
-
-        /// <summary>
-        /// Whether the mouse is currently over the control 
-        /// </summary>
-        private bool _isMouseOver;
 
         /// <summary> 
         /// Origin of the thumb's drag operation.
