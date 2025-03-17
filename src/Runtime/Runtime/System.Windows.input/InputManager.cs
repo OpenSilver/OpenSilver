@@ -146,7 +146,6 @@ internal sealed class InputManager
     private MouseButton _lastButton;
     private int _clickCount;
     private int _lastClickTime;
-    private WeakReference<UIElement> _lastClickTarget;
     private bool _mouseLeftDown;
 
     private InputManager()
@@ -416,11 +415,11 @@ internal sealed class InputManager
         {
             case EVENTS.POINTER_LEFT_DOWN:
                 _mouseLeftDown = true;
-                RefreshClickCount(null, MouseButton.Left, Environment.TickCount, new Point());
+                RefreshClickCount(MouseButton.Left, Environment.TickCount, new Point());
                 break;
 
             case EVENTS.POINTER_RIGHT_DOWN:
-                RefreshClickCount(null, MouseButton.Right, Environment.TickCount, new Point());
+                RefreshClickCount(MouseButton.Right, Environment.TickCount, new Point());
                 break;
 
             case EVENTS.POINTER_LEFT_UP:
@@ -811,7 +810,7 @@ internal sealed class InputManager
 
         if (refreshClickCount)
         {
-            e.ClickCount = RefreshClickCount(uie, button, timeStamp, e.GetPosition(null));
+            e.ClickCount = RefreshClickCount(button, timeStamp, e.GetPosition(null));
         }
 
         if (closeToolTips)
@@ -850,16 +849,14 @@ internal sealed class InputManager
         }
     }
 
-    private int RefreshClickCount(UIElement target, MouseButton button, int timeStamp, Point ptClient)
+    private int RefreshClickCount(MouseButton button, int timeStamp, Point ptClient)
     {
-        _clickCount = CalculateClickCount(target, button, timeStamp, ptClient);
+        _clickCount = CalculateClickCount(button, timeStamp, ptClient);
 
         if (_clickCount == 1)
         {
             // we need to reset out data, since this is the start of the click count process...
             _lastButton = button;
-            _lastClickTarget ??= new WeakReference<UIElement>(null);
-            _lastClickTarget.SetTarget(target);
         }
 
         _lastClick = ptClient;
@@ -868,11 +865,10 @@ internal sealed class InputManager
         return _clickCount;
     }
 
-    private int CalculateClickCount(UIElement uie, MouseButton button, int timeStamp, Point downPt)
+    private int CalculateClickCount(MouseButton button, int timeStamp, Point downPt)
     {
         if (timeStamp - _lastClickTime < _doubleClickDeltaTime // How long since the last click?
               && _lastButton == button // Is this the same mouse button as the last click?
-              && IsSameTarget(uie) // Is it the same element as the last click?
               && IsSameSpot(downPt)) // Is the delta coordinates of this click close enough to the last click?
         {
             return _clickCount + 1;
@@ -888,13 +884,5 @@ internal sealed class InputManager
         // Is the delta coordinates of this click close enough to the last click?
         return (Math.Abs(newPosition.X - _lastClick.X) < _doubleClickDeltaX) &&
                (Math.Abs(newPosition.Y - _lastClick.Y) < _doubleClickDeltaY);
-    }
-
-    private bool IsSameTarget(UIElement target)
-    {
-        return target != null &&
-            _lastClickTarget != null &&
-            _lastClickTarget.TryGetTarget(out UIElement uie) &&
-            target == uie;
     }
 }
