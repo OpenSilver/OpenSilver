@@ -13,6 +13,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 namespace System.Windows.Media.Animation;
 
@@ -20,7 +21,7 @@ namespace System.Windows.Media.Animation;
 /// This class is used by a spline key frame to define animation progress.
 /// </summary>
 [TypeConverter(typeof(KeySplineConverter))]
-public sealed class KeySpline : DependencyObject
+public sealed class KeySpline : DependencyObject, IFormattable
 {
     // constants
     private const double accuracy = .001;   // 1/3 the desired accuracy in X
@@ -46,10 +47,40 @@ public sealed class KeySpline : DependencyObject
     /// </summary>
     public KeySpline() { }
 
-    internal KeySpline(double x1, double y1, double x2, double y2)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeySpline"/> class with the specified coordinates for the control points.
+    /// </summary>
+    /// <param name="x1">
+    /// The x-coordinate for the <see cref="ControlPoint1"/> of the <see cref="KeySpline"/>.
+    /// </param>
+    /// <param name="y1">
+    /// The y-coordinate for the <see cref="ControlPoint1"/> of the <see cref="KeySpline"/>.
+    /// </param>
+    /// <param name="x2">
+    /// The x-coordinate for the <see cref="ControlPoint2"/> of the <see cref="KeySpline"/>.
+    /// </param>
+    /// <param name="y2">
+    /// The y-coordinate for the <see cref="ControlPoint2"/> of the <see cref="KeySpline"/>.
+    /// </param>
+    public KeySpline(double x1, double y1, double x2, double y2)
     {
         ControlPoint1 = new Point(x1, y1);
         ControlPoint2 = new Point(x2, y2);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeySpline"/> class with the specified control points.
+    /// </summary>
+    /// <param name="controlPoint1">
+    /// The control point for the <see cref="ControlPoint1"/> of the <see cref="KeySpline"/>.
+    /// </param>
+    /// <param name="controlPoint2">
+    /// The control point for the <see cref="ControlPoint2"/> of the <see cref="KeySpline"/>.
+    /// </param>
+    public KeySpline(Point controlPoint1, Point controlPoint2)
+    {
+        ControlPoint1 = controlPoint1;
+        ControlPoint2 = controlPoint2;
     }
 
     private static readonly DependencyProperty ControlPoint1Property =
@@ -98,11 +129,15 @@ public sealed class KeySpline : DependencyObject
     }
 
     /// <summary>
-    /// Calculates spline progress from a linear progress.
+    /// Calculates spline progress from a supplied linear progress.
     /// </summary>
-    /// <param name="linearProgress">the linear progress</param>
-    /// <returns>the spline progress</returns>
-    internal double GetSplineProgress(double linearProgress)
+    /// <param name="linearProgress">
+    /// The linear progress to evaluate.
+    /// </param>
+    /// <returns>
+    /// The calculated spline progress.
+    /// </returns>
+    public double GetSplineProgress(double linearProgress)
     {
         if (_isDirty)
         {
@@ -119,6 +154,34 @@ public sealed class KeySpline : DependencyObject
 
             return GetBezierValue(_By, _Cy, _parameter);
         }
+    }
+
+    /// <summary>
+    /// Creates a string representation of this instance of <see cref="KeySpline"/> based on the current culture.
+    /// </summary>
+    /// <returns>
+    /// A string representation of this <see cref="KeySpline"/>.
+    /// </returns>
+    public override string ToString() => InternalConvertToString(null, null);
+
+    /// <summary>
+    /// Creates a string representation of this <see cref="KeySpline"/> based on the supplied <see cref="IFormatProvider"/>.
+    /// </summary>
+    /// <param name="formatProvider">
+    /// The format provider to use. If provider is null, the current culture is used.
+    /// </param>
+    /// <returns>
+    /// A string representation of this instance of <see cref="KeySpline"/>.
+    /// </returns>
+    public string ToString(IFormatProvider formatProvider) => InternalConvertToString(null, formatProvider);
+
+    /// <inheritdoc />
+    string IFormattable.ToString(string format, IFormatProvider formatProvider) => InternalConvertToString(format, formatProvider);
+
+    private string InternalConvertToString(string format, IFormatProvider formatProvider)
+    {
+        char separator = TokenizerHelper.GetNumericListSeparator(formatProvider);
+        return $"{ControlPoint1.ConvertToString(format, formatProvider)}{separator}{ControlPoint2.ConvertToString(format, formatProvider)}";
     }
 
     /// <summary>

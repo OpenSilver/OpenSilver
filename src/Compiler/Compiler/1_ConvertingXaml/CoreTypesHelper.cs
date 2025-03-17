@@ -33,7 +33,7 @@ namespace OpenSilver.Compiler
         {
             if (IsCoreAssemblyOrNull(assemblyName))
             {
-                return SupportedCoreTypes.ContainsKey(typeFullName.ToLower());
+                return SupportedCoreTypes.ContainsKey(typeFullName);
             }
 
             return false;
@@ -41,15 +41,13 @@ namespace OpenSilver.Compiler
 
         public string ConvertFromInvariantString(string source, string typeFullName)
         {
-            if (SupportedCoreTypes.TryGetValue(typeFullName.ToLower(), out var converter))
+            if (SupportedCoreTypes.TryGetValue(typeFullName, out var converter))
             {
                 Debug.Assert(converter != null);
                 return converter(source);
             }
 
-            throw new InvalidOperationException(
-                $"Cannot find a converter for type '{typeFullName}'"
-            );
+            throw new InvalidOperationException($"Cannot find a converter for type '{typeFullName}'");
         }
 
         private static bool IsCoreAssemblyOrNull(string assemblyName)
