@@ -138,7 +138,18 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 if (!string.IsNullOrEmpty(type.Namespace)) result.Append(type.Namespace + ".");
             }
 
-            result.Append(type.Name);
+            if (compilerType == SupportedLanguage.FSharp &&
+                type.GetElementType() is TypeReference elementType &&
+                elementType.Scope.Name == "FSharp.Core" &&
+                elementType.FullName == "Microsoft.FSharp.Control.FSharpHandler`1")
+            {
+                // Because of the CompiledNameAttribute, we need to replace this type, because FSharpHandler is not known at compile time.
+                result.Append("Handler`1");
+            }
+            else
+            {
+                result.Append(type.Name);
+            }
 
             if (type is not GenericInstanceType genericInstanceType)
             {
