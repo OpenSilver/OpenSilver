@@ -77,7 +77,13 @@ internal abstract class TimelineClock
                 }
                 else
                 {
-                    return MultiplyTimeSpan(iterationDuration.TimeSpan, repeatBehavior.Count);
+                    double scalingFactor = repeatBehavior.Count;
+                    if (Timeline.AutoReverse)
+                    {
+                        scalingFactor *= 2;
+                    }
+
+                    return MultiplyTimeSpan(iterationDuration.TimeSpan, scalingFactor);
                 }
             }
             else if (repeatBehavior.HasDuration)
@@ -384,19 +390,45 @@ internal abstract class TimelineClock
             return;
         }
 
-        int nbIterations = (int)Math.DivRem(localTime.Ticks, iterationDuration.TimeSpan.Ticks, out long currentTimeTicks);
-        if (CurrentState == ClockState.Filling && currentTimeTicks == 0)
+        int iteration = (int)Math.DivRem(localTime.Ticks, iterationDuration.TimeSpan.Ticks, out long ticks);
+        if (CurrentState == ClockState.Filling && ticks == 0)
         {
-            CurrentIteration = nbIterations;
-            CurrentTime = iterationDuration.TimeSpan;
+            TimeSpan time = iterationDuration.TimeSpan;
+            double progress = 1;
+
+            if (Timeline.AutoReverse)
+            {
+                if ((iteration & 1) == 0) // We are on a reversing segment
+                {
+                    progress = 0;
+                    time = TimeSpan.Zero;
+                }
+                iteration /= 2;
+            }
+
+            CurrentIteration = iteration;
+            CurrentTime = time;
+            CurrentProgress = progress;
         }
         else
         {
-            CurrentIteration = nbIterations + 1;
-            CurrentTime = TimeSpan.FromTicks(currentTimeTicks);
-        }
+            TimeSpan time = TimeSpan.FromTicks(ticks);
+            double progress = Math.Min((double)time.Ticks / iterationDuration.TimeSpan.Ticks, 1.0);
 
-        CurrentProgress = Math.Min((double)CurrentTime.Ticks / iterationDuration.TimeSpan.Ticks, 1.0);
+            if (Timeline.AutoReverse)
+            {
+                if ((iteration & 1) == 1) // We are on a reversing segment
+                {
+                    progress = 1 - progress;
+                    time = iterationDuration.TimeSpan - time;
+                }
+                iteration /= 2;
+            }
+
+            CurrentIteration = iteration + 1;
+            CurrentTime = time;
+            CurrentProgress = progress;
+        }
     }
 
     private void ResetCachedStateToStopped()

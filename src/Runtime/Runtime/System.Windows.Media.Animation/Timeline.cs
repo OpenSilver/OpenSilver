@@ -36,13 +36,12 @@ public abstract partial class Timeline : DependencyObject
     /// <summary>
     /// Identifies the <see cref="AutoReverse"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty AutoReverseProperty =
         DependencyProperty.Register(
             nameof(AutoReverse),
             typeof(bool),
             typeof(Timeline),
-            null);
+            new PropertyMetadata(BooleanBoxes.FalseBox));
 
     /// <summary>
     /// Gets or sets a value that indicates whether the timeline plays in reverse after
@@ -52,7 +51,6 @@ public abstract partial class Timeline : DependencyObject
     /// true if the timeline plays in reverse at the end of each iteration; otherwise,
     /// false. The default value is false.
     /// </returns>
-    [OpenSilver.NotImplemented]
     public bool AutoReverse
     {
         get => (bool)GetValue(AutoReverseProperty);
