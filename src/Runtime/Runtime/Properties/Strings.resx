@@ -662,6 +662,9 @@
   <data name="TemplateFindNameInInvalidElement" xml:space="preserve">
     <value>This operation is valid only on elements that have this template applied.</value>
   </data>
+  <data name="Timing_InvalidArgFinitePositive" xml:space="preserve">
+    <value>Property value must be finite and greater than zero.</value>
+  </data>
   <data name="Timing_InvalidArgNonNegative" xml:space="preserve">
     <value>Property value must be greater than or equal to zero or indefinite.</value>
   </data>

@@ -32,6 +32,8 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
 
     public T GetCurrentValue(T initialValue, DependencyProperty dp, TimelineClock clock)
     {
+        Debug.Assert(clock.CurrentState != ClockState.Stopped);
+
         if (_animation.KeyFrames is null)
         {
             return initialValue;
@@ -47,6 +49,7 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
             return initialValue;
         }
 
+        TimeSpan currentTime = clock.CurrentTime.Value;
         int keyFrameCount = _sortedResolvedKeyFrames.Length;
         int maxKeyFrameIndex = keyFrameCount - 1;
 
@@ -60,14 +63,14 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
         // currentResolvedKeyFrameIndex will be greater than maxKeyFrameIndex 
         // if we are past the last key frame.
         while (currentResolvedKeyFrameIndex < keyFrameCount
-               && clock.CurrentTime > _sortedResolvedKeyFrames[currentResolvedKeyFrameIndex]._resolvedKeyTime)
+               && currentTime > _sortedResolvedKeyFrames[currentResolvedKeyFrameIndex]._resolvedKeyTime)
         {
             currentResolvedKeyFrameIndex++;
         }
 
         // If there are multiple key frames at the same key time, be sure to go to the last one.
         while (currentResolvedKeyFrameIndex < maxKeyFrameIndex
-               && clock.CurrentTime == _sortedResolvedKeyFrames[currentResolvedKeyFrameIndex + 1]._resolvedKeyTime)
+               && currentTime == _sortedResolvedKeyFrames[currentResolvedKeyFrameIndex + 1]._resolvedKeyTime)
         {
             currentResolvedKeyFrameIndex++;
         }
@@ -77,7 +80,7 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
             // Past the last key frame.
             currentIterationValue = GetResolvedKeyFrameValue(maxKeyFrameIndex);
         }
-        else if (clock.CurrentTime == _sortedResolvedKeyFrames[currentResolvedKeyFrameIndex]._resolvedKeyTime)
+        else if (currentTime == _sortedResolvedKeyFrames[currentResolvedKeyFrameIndex]._resolvedKeyTime)
         {
             // Exactly on a key frame.
             currentIterationValue = GetResolvedKeyFrameValue(currentResolvedKeyFrameIndex);
@@ -103,7 +106,7 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
                 // currentTime.TotalMilliseconds                                  = current segment time
                 // _sortedResolvedKeyFrames[0]._resolvedKeyTime.TotalMilliseconds = current segment duration
 
-                currentSegmentProgress = clock.CurrentTime.TotalMilliseconds
+                currentSegmentProgress = currentTime.TotalMilliseconds
                                        / _sortedResolvedKeyFrames[0]._resolvedKeyTime.TotalMilliseconds;
             }
             else
@@ -113,7 +116,7 @@ internal sealed class KeyFramesAnimator<T> : IValueAnimator<T>
 
                 fromValue = GetResolvedKeyFrameValue(previousResolvedKeyFrameIndex);
 
-                TimeSpan segmentCurrentTime = clock.CurrentTime - previousResolvedKeyTime;
+                TimeSpan segmentCurrentTime = currentTime - previousResolvedKeyTime;
                 TimeSpan segmentDuration = _sortedResolvedKeyFrames[currentResolvedKeyFrameIndex]._resolvedKeyTime - previousResolvedKeyTime;
 
                 currentSegmentProgress = segmentCurrentTime.TotalMilliseconds

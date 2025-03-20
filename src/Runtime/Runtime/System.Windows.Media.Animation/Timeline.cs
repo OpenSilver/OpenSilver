@@ -19,7 +19,7 @@ namespace System.Windows.Media.Animation;
 /// <summary>
 /// Defines a segment of time.
 /// </summary>
-public abstract partial class Timeline : DependencyObject
+public abstract class Timeline : DependencyObject
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Timeline"/> class.
@@ -158,30 +158,47 @@ public abstract partial class Timeline : DependencyObject
     /// <summary>
     /// Identifies for the <see cref="SpeedRatio"/> dependency property.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public static readonly DependencyProperty SpeedRatioProperty =
         DependencyProperty.Register(
             nameof(SpeedRatio),
             typeof(double),
             typeof(Timeline),
-            new PropertyMetadata(1d));
+            new PropertyMetadata(1.0),
+            ValidateSpeedRatio);
 
     /// <summary>
     /// Gets or sets the rate, relative to its parent, at which time progresses for this
     /// <see cref="Timeline"/>.
     /// </summary>
     /// <returns>
-    /// A finite value greater than 0 that specifies the rate at which time progresses
-    /// for this timeline, relative to the speed of the timeline's parent. If this timeline
-    /// is a root timeline, specifies the default timeline speed. The value is expressed
-    /// as a factor where 1 represents normal speed, 2 is double speed, 0.5 is half speed,
-    /// and so on. The default value is 1.
+    /// A finite value greater than 0 that describes the rate at which time progresses for
+    /// this timeline, relative to the speed of the timeline's parent or, if this is a root 
+    /// timeline, the default timeline speed. The default value is 1.
     /// </returns>
-    [OpenSilver.NotImplemented]
+    /// <exception cref="ArgumentException">
+    /// <see cref="SpeedRatio"/> is less than 0 or is not a finite value.
+    /// </exception>
+    /// <remarks>
+    /// A timeline's <see cref="SpeedRatio"/> setting does not have an effect on its <see cref="BeginTime"/>;
+    /// that time is relative to the timeline's parent or, if the timeline is a root timeline,
+    /// the moment at which the timeline's clock was begun.
+    /// </remarks>
     public double SpeedRatio
     {
         get => (double)GetValue(SpeedRatioProperty);
         set => SetValueInternal(SpeedRatioProperty, value);
+    }
+
+    private static bool ValidateSpeedRatio(object value)
+    {
+        double newValue = (double)value;
+
+        if (newValue <= 0 || newValue > double.MaxValue || double.IsNaN(newValue))
+        {
+            throw new ArgumentException(string.Format(Strings.Timing_InvalidArgFinitePositive), nameof(value));
+        }
+
+        return true;
     }
 
     /// <summary>

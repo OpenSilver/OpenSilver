@@ -208,6 +208,36 @@ public sealed class Storyboard : Timeline
     }
 
     /// <summary>
+    /// Retrieves the current global speed of the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <returns>
+    /// The current global speed, or 0 if the clock is stopped.
+    /// </returns>
+    public double GetCurrentGlobalSpeed() => GetCurrentGlobalSpeedImpl(this) ?? 0;
+
+    /// <summary>
+    /// Retrieves the current global speed of the clock that was created for this <see cref="Storyboard"/>.
+    /// </summary>
+    /// <param name="containingObject">
+    /// The object specified when the <see cref="Begin(FrameworkElement, bool)"/> method was called. This object contains 
+    /// the clock objects that were created for this storyboard and its children.
+    /// </param>
+    /// <returns>
+    /// The current global speed, or null if the clock is stopped.
+    /// </returns>
+    public double? GetCurrentGlobalSpeed(FrameworkElement containingObject) => GetCurrentGlobalSpeedImpl(containingObject);
+
+    private double? GetCurrentGlobalSpeedImpl(DependencyObject containingObject)
+    {
+        if (GetStoryboardClock(containingObject, true) is TimelineClock clock)
+        {
+            return clock.CurrentGlobalSpeed;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Retrieves the current iteration of the clock that was created for this <see cref="Storyboard"/>.
     /// </summary>
     /// <returns>
@@ -826,7 +856,7 @@ public sealed class Storyboard : Timeline
         {
             foreach (TimelineClock clock in _children)
             {
-                clock.OnFrame(CurrentTime);
+                clock.OnFrame(CurrentTime ?? TimeSpan.Zero);
             }
         }
 

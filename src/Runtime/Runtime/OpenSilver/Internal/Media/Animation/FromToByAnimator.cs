@@ -30,7 +30,9 @@ internal sealed class FromToByAnimator<T> : IValueAnimator<T>
 
     T IValueAnimator<T>.GetCurrentValue(T initialValue, DependencyProperty dp, TimelineClock clock)
     {
-        double progress = clock.CurrentProgress;
+        Debug.Assert(clock.CurrentState != ClockState.Stopped);
+
+        double progress = clock.CurrentProgress.Value;
 
         if (_owner.EasingFunction is IEasingFunction easingFunction)
         {

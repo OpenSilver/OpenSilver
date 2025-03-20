@@ -1690,6 +1690,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Property value must be finite and greater than zero..
+        /// </summary>
+        internal static string Timing_InvalidArgFinitePositive {
+            get {
+                return ResourceManager.GetString("Timing_InvalidArgFinitePositive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property value must be greater than or equal to zero or indefinite..
         /// </summary>
         internal static string Timing_InvalidArgNonNegative {

@@ -40,15 +40,17 @@ internal abstract class TimelineClock
 
     public virtual IEnumerable<TimelineClock> Children => Enumerable.Empty<TimelineClock>();
 
-    public TimeSpan CurrentTime { get; private set; }
+    public TimeSpan? CurrentTime { get; private set; }
 
     public bool IsPaused => IsInteractivelyPaused;
 
-    public double CurrentProgress { get; private set; }
+    public double? CurrentProgress { get; private set; }
 
-    public int CurrentIteration { get; private set; }
+    public int? CurrentIteration { get; private set; }
 
     public ClockState CurrentState { get; private set; }
+
+    public double? CurrentGlobalSpeed { get; private set; }
 
     public abstract Duration IterationDuration { get; }
 
@@ -77,7 +79,7 @@ internal abstract class TimelineClock
                 }
                 else
                 {
-                    double scalingFactor = repeatBehavior.Count;
+                    double scalingFactor = repeatBehavior.Count / Timeline.SpeedRatio;
                     if (Timeline.AutoReverse)
                     {
                         scalingFactor *= 2;
@@ -216,7 +218,12 @@ internal abstract class TimelineClock
             return;
         }
 
-        UpdateLocalState(frameTime);
+        ComputeLocalState(frameTime);
+
+        if (CurrentState == ClockState.Active)
+        {
+            ComputeCurrentSpeed();
+        }
 
         OnFrameCore();
 
@@ -269,6 +276,12 @@ internal abstract class TimelineClock
     {
         get => ReadFlag(ClockFlags.IsActive);
         set => SetFlag(ClockFlags.IsActive, value);
+    }
+
+    private bool IsBackwardsProgressingGlobal
+    {
+        get => ReadFlag(ClockFlags.IsBackwardsProgressingGlobal);
+        set => SetFlag(ClockFlags.IsBackwardsProgressingGlobal, value);
     }
 
     private bool IsInteractivelyPaused
@@ -340,7 +353,7 @@ internal abstract class TimelineClock
 
     private TimeSpan GetAdjustedTime(TimeSpan currentTime) => currentTime - BeginTime;
 
-    private void UpdateLocalState(TimeSpan frameTime)
+    private void ComputeLocalState(TimeSpan frameTime)
     {
         TimeSpan localTime = GetAdjustedTime(frameTime);
 
@@ -355,11 +368,12 @@ internal abstract class TimelineClock
                 return;
             }
 
-            CurrentState = ClockState.Filling;
+            ResetCachedStateToFilling();
             localTime = effectiveDuration.TimeSpan;
         }
         else
         {
+            IsBackwardsProgressingGlobal = _parent is not null && _parent.IsBackwardsProgressingGlobal;
             CurrentState = ClockState.Active;
         }
 
@@ -390,7 +404,7 @@ internal abstract class TimelineClock
             return;
         }
 
-        int iteration = (int)Math.DivRem(localTime.Ticks, iterationDuration.TimeSpan.Ticks, out long ticks);
+        int iteration = (int)Math.DivRem(MultiplyTimeSpan(localTime, Timeline.SpeedRatio).Ticks, iterationDuration.TimeSpan.Ticks, out long ticks);
         if (CurrentState == ClockState.Filling && ticks == 0)
         {
             TimeSpan time = iterationDuration.TimeSpan;
@@ -421,6 +435,7 @@ internal abstract class TimelineClock
                 {
                     progress = 1 - progress;
                     time = iterationDuration.TimeSpan - time;
+                    IsBackwardsProgressingGlobal = !IsBackwardsProgressingGlobal;
                 }
                 iteration /= 2;
             }
@@ -431,12 +446,44 @@ internal abstract class TimelineClock
         }
     }
 
+    private void ComputeCurrentSpeed()
+    {
+        Debug.Assert(_parent is null || _parent.CurrentState != ClockState.Stopped);
+        Debug.Assert(CurrentState == ClockState.Active);  // Must be active at this point
+
+        if (IsInteractivelyPaused)
+        {
+            CurrentGlobalSpeed = 0;
+        }
+        else
+        {
+            double? parentGlobalSpeed = _parent is not null ? _parent.CurrentGlobalSpeed : 1.0;
+            double localSpeed = Timeline.SpeedRatio;
+            if (IsBackwardsProgressingGlobal)  // Negate speed if we are on a backwards arc of an autoreversing timeline
+            {
+                localSpeed = -localSpeed;
+            }
+
+            // Get global speed by multiplying by parent global speed
+            CurrentGlobalSpeed = localSpeed * parentGlobalSpeed;
+        }
+    }
+
     private void ResetCachedStateToStopped()
     {
-        CurrentIteration = 0;
-        CurrentTime = TimeSpan.Zero;
-        CurrentProgress = 0;
+        IsBackwardsProgressingGlobal = false;
+        CurrentGlobalSpeed = null;
+        CurrentIteration = null;
+        CurrentTime = null;
+        CurrentProgress = null;
         CurrentState = ClockState.Stopped;
+    }
+
+    private void ResetCachedStateToFilling()
+    {
+        IsBackwardsProgressingGlobal = false;
+        CurrentGlobalSpeed = 0;
+        CurrentState = ClockState.Filling;
     }
 
     private void SetCompletedForRoot()
@@ -479,6 +526,12 @@ internal abstract class TimelineClock
     private static TimeSpan MultiplyTimeSpan(TimeSpan timeSpan, double factor) =>
         TimeSpan.FromTicks((long)(factor * timeSpan.Ticks + 0.5));
 
+    /// <summary>
+    /// Helper for more elegant code dividing a TimeSpan by a double
+    /// </summary>
+    private TimeSpan DivideTimeSpan(TimeSpan timeSpan, double factor) =>
+        MultiplyTimeSpan(timeSpan, 1 / factor);
+
     private bool ReadFlag(ClockFlags flag) => (_flags & flag) != 0;
 
     private void SetFlag(ClockFlags flag, bool value)
@@ -506,11 +559,12 @@ internal abstract class TimelineClock
     {
         IsRoot = 1 << 0,
         IsActive = 1 << 1,
-        IsInteractivelyPaused = 1 << 2,
-        IsInteractivelyStopped = 1 << 3,
-        NextFrameRequested = 1 << 4,
-        CompletedEventRaised = 1 << 5,
-        IsCompleted = 1 << 6,
-        HasControllableRoot = 1 << 7,
+        IsBackwardsProgressingGlobal = 1 << 2,
+        IsInteractivelyPaused = 1 << 3,
+        IsInteractivelyStopped = 1 << 4,
+        NextFrameRequested = 1 << 5,
+        CompletedEventRaised = 1 << 6,
+        IsCompleted = 1 << 7,
+        HasControllableRoot = 1 << 8,
     }
 }
