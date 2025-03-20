@@ -158,14 +158,17 @@ namespace OpenSilver.Photino.Runner
                 if (typeValue == ResponseMessageType)
                 {
                     var id = root.GetProperty(IdKey).GetInt32();
-                    var res = root.GetProperty(ResultKey);
-                    if (res is JsonElement je)
+                    if (_communication.TryRemove(it, out var tcs))
                     {
-                        _communication[id].SetResult(GetValueFromJsonElement(je));
-                    }
-                    else
-                    {
-                        _communication[id].SetResult(res);
+                        var res = root.GetProperty(ResultKey);
+                        if (res is JsonElement je)
+                        {
+                            tcs.SetResult(GetValueFromJsonElement(je));
+                        }
+                        else
+                        {
+                            tcs.SetResult(res);
+                        }
                     }
                 }
                 else if (typeValue == InvokeDotNetMessageType)
