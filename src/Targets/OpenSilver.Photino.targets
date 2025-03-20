@@ -1,0 +1,96 @@
+﻿<!-- 
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildThisFileDirectory)/OpenSilver.SharedBuildTasks.Config.targets" />
+
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)../tools/$(_OpenSilverCompilerSharedBuildTasksAssemblyName).dll" TaskName="OpenSilver.Compiler.ResourcesExtractorAndCopier" />
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)../tools/$(_OpenSilverCompilerSharedBuildTasksAssemblyName).dll" TaskName="OpenSilver.Compiler.Updates" />
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <Target Name="_RunBuildUpdates" BeforeTargets="Build">
+
+    <PropertyGroup>
+      <SkipOpenSilverUpdates Condition="'$(SkipOpenSilverUpdates)' == ''">false</SkipOpenSilverUpdates>
+      <IDE Condition="'$(IDE)' == '' And '$(BuildingInsideVisualStudio)' == 'true'">VisualStudio</IDE>
+    </PropertyGroup>
+
+    <Updates Condition="'$(PkgOpenSilver)' != '' And '$(SkipOpenSilverUpdates)' == 'false'" PackagePath="$(PkgOpenSilver)" IDE="$(IDE)" />
+
+  </Target>
+
+  <Target Name="_CopyWasmResources"
+          BeforeTargets="CopyAdditionalFiles"
+          DependsOnTargets="ResolveAssemblyReferences">
+
+    <PropertyGroup>
+      <_IsMainBuild>true</_IsMainBuild>
+      <_IsMainBuild Condition="'$(DesignTimeBuild)' == 'true' OR '$(BuildingProject)' != 'true'">false</_IsMainBuild>
+    </PropertyGroup>
+
+
+    <CallTarget Condition="'$(_IsMainBuild)' == 'true'" Targets="_CopyWasmResourcesMain" />
+
+  </Target>
+
+  <Target Name="_CopyWasmResourcesMain">
+
+    <PropertyGroup>
+      <Cshtml5OutputResourcesPath Condition="'$(Cshtml5OutputResourcesPath)' == ''">resources/</Cshtml5OutputResourcesPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <!--
+      Exclude all resources that have been copied during previous build to avoid duplicated resources error.
+      For each file, we include relative and absolute paths. Currently Blazor targets use relative path, we 
+      do this in case it changes in future versions.
+      -->
+      <_OpenSilverOldStaticWebAssets Include="wwwroot/libs/**/*" />
+      <_OpenSilverOldStaticWebAssets Include="wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
+      <_OpenSilverOldStaticWebAssets Include="$(MSBuildProjectDirectory)/wwwroot/libs/**/*" />
+      <_OpenSilverOldStaticWebAssets Include="$(MSBuildProjectDirectory)/wwwroot/$(Cshtml5OutputResourcesPath)/**/*" />
+      <Content Remove="@(_OpenSilverOldStaticWebAssets)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_OpenSilverScripts Include="$(MSBuildThisFileDirectory)../content/**/*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_OpenSilverScripts)"
+          SkipUnchangedFiles="true"
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/libs/">
+      <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedFiles" />
+    </Copy>
+
+    <ResourcesExtractorAndCopier ResolvedReferences="@(ReferencePath)"
+                                 OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+                                 BaseIntermediateOutputPath="$(BaseIntermediateOutputPath)"
+                                 DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/">
+      <Output ItemName="_OpenSilverStaticWebAssets" TaskParameter="CopiedResources" />
+    </ResourcesExtractorAndCopier>
+
+    <ItemGroup>
+      <Content Include="@(_OpenSilverStaticWebAssets)">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+  </Target>
+
+</Project>
