@@ -67,43 +67,43 @@ namespace OpenSilver.Compiler
             element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
 
         public static bool IsDataTemplate(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "DataTemplate", settings.Metadata.SystemWindowsNS, settings.AssemblyName);
+            IsXElementOfType(element, "DataTemplate", KnownNamespaces.SystemWindows, settings.AssemblyName);
 
         public static bool IsItemsPanelTemplate(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "ItemsPanelTemplate", settings.Metadata.SystemWindowsControlsNS, settings.AssemblyName);
+            IsXElementOfType(element, "ItemsPanelTemplate", KnownNamespaces.SystemWindowsControls, settings.AssemblyName);
 
         public static bool IsControlTemplate(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "ControlTemplate", settings.Metadata.SystemWindowsControlsNS, settings.AssemblyName);
+            IsXElementOfType(element, "ControlTemplate", KnownNamespaces.SystemWindowsControls, settings.AssemblyName);
 
         public static bool IsBinding(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Binding", settings.Metadata.SystemWindowsDataNS, settings.AssemblyName);
+            IsXElementOfType(element, "Binding", KnownNamespaces.SystemWindowsData, settings.AssemblyName);
 
         public static bool IsStyle(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Style", settings.Metadata.SystemWindowsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Style", KnownNamespaces.SystemWindows, settings.AssemblyName);
 
         public static bool IsTextBlock(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "TextBlock", settings.Metadata.SystemWindowsControlsNS, settings.AssemblyName);
+            IsXElementOfType(element, "TextBlock", KnownNamespaces.SystemWindowsControls, settings.AssemblyName);
 
         public static bool IsRun(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Run", settings.Metadata.SystemWindowsDocumentsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Run", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
 
         public static bool IsSpan(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Span", settings.Metadata.SystemWindowsDocumentsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Span", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
 
         public static bool IsItalic(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Italic", settings.Metadata.SystemWindowsDocumentsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Italic", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
 
         public static bool IsUnderline(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Underline", settings.Metadata.SystemWindowsDocumentsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Underline", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
 
         public static bool IsBold(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Bold", settings.Metadata.SystemWindowsDocumentsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Bold", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
 
         public static bool IsHyperlink(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Hyperlink", settings.Metadata.SystemWindowsDocumentsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Hyperlink", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
 
         public static bool IsParagraph(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Paragraph", settings.Metadata.SystemWindowsDocumentsNS, settings.AssemblyName);
+            IsXElementOfType(element, "Paragraph", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
 
         private static bool IsXElementOfType(XElement element, string typeName, string namespaceName, string processedAssemblyName)
         {
@@ -128,7 +128,7 @@ namespace OpenSilver.Compiler
             return false;
         }
 
-        public static bool IsNullExtension(XElement element, ConversionSettings settings)
+        public static bool IsNullExtension(XElement element)
         {
             if (element.Name.LocalName != "NullExtension")
             {
@@ -142,13 +142,12 @@ namespace OpenSilver.Compiler
                 return true;
             }
 
-            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
-                element.Name.NamespaceName, settings.EnableImplicitAssemblyRedirection);
+            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(element.Name.NamespaceName);
 
             return ns == "System.Windows.Markup" && assemblyName == "OpenSilver";
         }
 
-        public static bool IsStaticExtension(XElement element, ConversionSettings settings)
+        public static bool IsStaticExtension(XElement element)
         {
             if (element.Name.LocalName != "StaticExtension")
             {
@@ -162,13 +161,12 @@ namespace OpenSilver.Compiler
                 return true;
             }
 
-            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
-                element.Name.NamespaceName, settings.EnableImplicitAssemblyRedirection);
+            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(element.Name.NamespaceName);
 
             return ns == "System.Windows.Markup" && assemblyName == "OpenSilver";
         }
 
-        public static bool IsTypeExtension(XElement element, ConversionSettings settings)
+        public static bool IsTypeExtension(XElement element)
         {
             if (element.Name.LocalName != "TypeExtension")
             {
@@ -182,14 +180,13 @@ namespace OpenSilver.Compiler
                 return true;
             }
 
-            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
-                element.Name.NamespaceName, settings.EnableImplicitAssemblyRedirection);
+            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(element.Name.NamespaceName);
 
             return ns == "System.Windows.Markup" && assemblyName == "OpenSilver";
         }
 
 
-        public static bool IsDynamicResourceExtension(XElement element, ConversionSettings settings)
+        public static bool IsDynamicResourceExtension(XElement element)
         {
             if (element.Name.LocalName != "DynamicResourceExtension")
             {
@@ -202,8 +199,7 @@ namespace OpenSilver.Compiler
                 return true;
             }
 
-            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
-                element.Name.NamespaceName, settings.EnableImplicitAssemblyRedirection);
+            (string ns, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(element.Name.NamespaceName);
 
             return ns == "System.Windows" && assemblyName == "OpenSilver";
         }

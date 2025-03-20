@@ -26,27 +26,21 @@ namespace OpenSilver.Compiler
             private readonly XamlReader _reader;
             private readonly ConversionSettings _settings;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
-            private readonly string _assemblyNameWithoutExtension;
-            private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             
             public GeneratorPass1(XDocument doc,
-                string assemblyNameWithoutExtension,
                 string fileNameWithPathRelativeToProjectRoot,
-                AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings)
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
-                _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
-                _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
             }
 
             public string Generate() => GenerateImpl();
 
             private string GenerateImpl()
             {
-                GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
+                GetClassInformationFromXaml(_reader.Document, _settings.Inspector,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
                 string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
 
@@ -73,7 +67,7 @@ namespace OpenSilver.Compiler
                         string name = xNameAttr.Value;
                         if (!string.IsNullOrWhiteSpace(name))
                         {
-                            string fieldModifier = _settings.Metadata.FieldModifier;
+                            string fieldModifier = "internal";
                             XAttribute fieldModifierAttr = element.Attribute(GeneratingCode.xNamespace + "FieldModifier");
                             if (fieldModifierAttr != null)
                             {
@@ -96,8 +90,8 @@ namespace OpenSilver.Compiler
                 {
                     // Create the "IntializeComponent()" method:
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"global::{_settings.Metadata.SystemWindowsNS}.Application",
-                        _assemblyNameWithoutExtension,
+                        $"global::{KnownNamespaces.SystemWindows}.Application",
+                        _settings.AssemblyName,
                         _fileNameWithPathRelativeToProjectRoot,
                         new List<string>());
 
@@ -119,8 +113,8 @@ namespace OpenSilver.Compiler
                         "throw new global::System.NotImplementedException();",
                         "throw new global::System.NotImplementedException();",
                         Enumerable.Empty<string>(),
-                        $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
-                        _assemblyNameWithoutExtension,
+                        $"global::{KnownNamespaces.SystemWindows}.UIElement",
+                        _settings.AssemblyName,
                         _fileNameWithPathRelativeToProjectRoot);
 
                     string finalCode = $@"
@@ -138,8 +132,8 @@ namespace OpenSilver.Compiler
                         "throw new global::System.NotImplementedException();",
                         "throw new global::System.NotImplementedException();",
                         Enumerable.Empty<string>(),
-                        $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
-                        _assemblyNameWithoutExtension,
+                        $"global::{KnownNamespaces.SystemWindows}.UIElement",
+                        _settings.AssemblyName,
                         _fileNameWithPathRelativeToProjectRoot);
 
                     return finalCode;
@@ -171,12 +165,11 @@ namespace OpenSilver.Compiler
             {
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     xName,
-                    _settings.EnableImplicitAssemblyRedirection,
                     out namespaceName,
                     out typeName,
                     out assemblyName);
 
-                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                return _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                     namespaceName,
                     typeName,
                     assemblyName,

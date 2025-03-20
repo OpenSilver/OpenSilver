@@ -20,8 +20,12 @@ using System.Text;
 
 namespace OpenSilver.Compiler
 {
-    internal sealed class SLCoreTypesConverterCS : CoreTypesConverterBase
+    internal sealed class CoreTypesConverterCS : CoreTypesConverterBase
     {
+        public const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
+        private static readonly char[] _separators = [',', ' '];
+        private static readonly char[] _repeatBehaviorConverterIterationCharacter = ['x', 'X'];
+
         protected override Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }
             = GetSupportedCoreTypes();
 
@@ -44,57 +48,50 @@ namespace OpenSilver.Compiler
         {
             return new Dictionary<string, Func<string, string>>(29, StringComparer.OrdinalIgnoreCase)
             {
-                ["system.windows.input.cursor"] = CoreTypesHelper.ConvertToCursor,
-                ["system.windows.media.animation.keytime"] = CoreTypesHelper.ConvertToKeyTime,
-                ["system.windows.media.animation.repeatbehavior"] = CoreTypesHelper.ConvertToRepeatBehavior,
-                ["system.windows.media.animation.keyspline"] = CoreTypesHelper.ConvertToKeySpline,
-                ["system.windows.media.brush"] = CoreTypesHelper.ConvertToBrush,
-                ["system.windows.media.solidcolorbrush"] = CoreTypesHelper.ConvertToBrush,
-                ["system.windows.media.color"] = CoreTypesHelper.ConvertToColor,
-                ["system.windows.media.doublecollection"] = CoreTypesHelper.ConvertToDoubleCollection,
-                ["system.windows.media.fontfamily"] = CoreTypesHelper.ConvertToFontFamily,
-                ["system.windows.media.geometry"] = CoreTypesHelper.ConvertToGeometry,
-                ["system.windows.media.pathgeometry"] = CoreTypesHelper.ConvertToPathGeometry,
-                ["system.windows.media.matrix"] = CoreTypesHelper.ConvertToMatrix,
-                ["system.windows.media.pointcollection"] = CoreTypesHelper.ConvertToPointCollection,
-                ["system.windows.media.transform"] = CoreTypesHelper.ConvertToTransform,
-                ["system.windows.media.matrixtransform"] = CoreTypesHelper.ConvertToTransform,
-                ["system.windows.media.cachemode"] = CoreTypesHelper.ConvertToCacheMode,
-                ["system.windows.cornerradius"] = CoreTypesHelper.ConvertToCornerRadius,
-                ["system.windows.duration"] = CoreTypesHelper.ConvertToDuration,
-                ["system.windows.fontweight"] = CoreTypesHelper.ConvertToFontWeight,
-                ["system.windows.gridlength"] = CoreTypesHelper.ConvertToGridLength,
-                ["system.windows.point"] = CoreTypesHelper.ConvertToPoint,
-                ["system.windows.propertypath"] = CoreTypesHelper.ConvertToPropertyPath,
-                ["system.windows.rect"] = CoreTypesHelper.ConvertToRect,
-                ["system.windows.size"] = CoreTypesHelper.ConvertToSize,
-                ["system.windows.thickness"] = CoreTypesHelper.ConvertToThickness,
-                ["system.windows.fontstretch"] = CoreTypesHelper.ConvertToFontStretch,
-                ["system.windows.fontstyle"] = CoreTypesHelper.ConvertToFontStyle,
-                ["system.windows.textdecorationcollection"] = CoreTypesHelper.ConvertToTextDecorationCollection,
-                ["system.windows.media.imagesource"] = CoreTypesHelper.ConvertToImageSource,
-                ["system.windows.vector"] = CoreTypesHelper.ConvertToVector,
+                ["system.windows.input.cursor"] = ConvertToCursor,
+                ["system.windows.media.animation.keytime"] = ConvertToKeyTime,
+                ["system.windows.media.animation.repeatbehavior"] = ConvertToRepeatBehavior,
+                ["system.windows.media.animation.keyspline"] = ConvertToKeySpline,
+                ["system.windows.media.brush"] = ConvertToBrush,
+                ["system.windows.media.solidcolorbrush"] = ConvertToBrush,
+                ["system.windows.media.color"] = ConvertToColor,
+                ["system.windows.media.doublecollection"] = ConvertToDoubleCollection,
+                ["system.windows.media.fontfamily"] = ConvertToFontFamily,
+                ["system.windows.media.geometry"] = ConvertToGeometry,
+                ["system.windows.media.pathgeometry"] = ConvertToPathGeometry,
+                ["system.windows.media.matrix"] = ConvertToMatrix,
+                ["system.windows.media.pointcollection"] = ConvertToPointCollection,
+                ["system.windows.media.transform"] = ConvertToTransform,
+                ["system.windows.media.matrixtransform"] = ConvertToTransform,
+                ["system.windows.media.cachemode"] = ConvertToCacheMode,
+                ["system.windows.cornerradius"] = ConvertToCornerRadius,
+                ["system.windows.duration"] = ConvertToDuration,
+                ["system.windows.fontweight"] = ConvertToFontWeight,
+                ["system.windows.gridlength"] = ConvertToGridLength,
+                ["system.windows.point"] = ConvertToPoint,
+                ["system.windows.propertypath"] = ConvertToPropertyPath,
+                ["system.windows.rect"] = ConvertToRect,
+                ["system.windows.size"] = ConvertToSize,
+                ["system.windows.thickness"] = ConvertToThickness,
+                ["system.windows.fontstretch"] = ConvertToFontStretch,
+                ["system.windows.fontstyle"] = ConvertToFontStyle,
+                ["system.windows.textdecorationcollection"] = ConvertToTextDecorationCollection,
+                ["system.windows.media.imagesource"] = ConvertToImageSource,
+                ["system.windows.vector"] = ConvertToVector,
             };
         }
-    }
-
-    internal static class CoreTypesHelper
-    {
-        public const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
-        private static readonly char[] _separators = [',', ' '];
-        private static readonly char[] _repeatBehaviorConverterIterationCharacter = ['x', 'X'];
 
         public static string ConvertFromInvariantStringHelper(string source, string destinationType)
         {
             return $"{RuntimeHelperClass}.ConvertFromInvariantString<{destinationType}>({Escape(source)})";
         }
 
-        internal static string ConvertToCursor(string source)
+        private static string ConvertToCursor(string source)
         {
             return $"global::System.Windows.Input.Cursors.{source}";
         }
 
-        internal static string ConvertToKeyTime(string source)
+        private static string ConvertToKeyTime(string source)
         {
             string stringValue = source.Trim();
 
@@ -118,7 +115,7 @@ namespace OpenSilver.Compiler
             }
         }
 
-        internal static string ConvertToRepeatBehavior(string source)
+        private static string ConvertToRepeatBehavior(string source)
         {
             string stringValue = source.Trim();
 
@@ -139,7 +136,7 @@ namespace OpenSilver.Compiler
             return $"new global::System.Windows.Media.Animation.RepeatBehavior({timeSpanValue})";
         }
 
-        internal static string ConvertToKeySpline(string source)
+        private static string ConvertToKeySpline(string source)
         {
             if (string.IsNullOrEmpty(source))
             {
@@ -155,12 +152,12 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.Media.Animation.KeySpline");
         }
 
-        internal static string ConvertToBrush(string source)
+        private static string ConvertToBrush(string source)
         {
             return $"new global::System.Windows.Media.SolidColorBrush({ConvertToColor(source)})";
         }
 
-        internal static string ConvertToColor(string source)
+        private static string ConvertToColor(string source)
         {
             const int s_zeroChar = (int)'0';
             const int s_aLower = (int)'a';
@@ -335,7 +332,7 @@ namespace OpenSilver.Compiler
             return ParseColor(source);
         }
 
-        internal static string ConvertToDoubleCollection(string source)
+        private static string ConvertToDoubleCollection(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -357,24 +354,24 @@ namespace OpenSilver.Compiler
             return sb.ToString();
         }
 
-        internal static string ConvertToFontFamily(string source)
+        private static string ConvertToFontFamily(string source)
         {
             string fontName = Escape(source.Trim());
 
             return $"new global::System.Windows.Media.FontFamily({fontName})";
         }
 
-        internal static string ConvertToGeometry(string source)
+        private static string ConvertToGeometry(string source)
         {
             return ConvertFromInvariantStringHelper(source, "global::System.Windows.Media.Geometry");
         }
 
-        internal static string ConvertToPathGeometry(string source)
+        private static string ConvertToPathGeometry(string source)
         {
             return ConvertFromInvariantStringHelper(source, "global::System.Windows.Media.PathGeometry");
         }
 
-        internal static string ConvertToMatrix(string source)
+        private static string ConvertToMatrix(string source)
         {
             if (source == "Identity")
             {
@@ -392,7 +389,7 @@ namespace OpenSilver.Compiler
         }
 
         // "global::System.Windows.Media.PointCollection", "global::System.Windows.Point"
-        internal static string ConvertToPointCollection(string source)
+        private static string ConvertToPointCollection(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -418,12 +415,12 @@ namespace OpenSilver.Compiler
             return sb.ToString();
         }
 
-        internal static string ConvertToTransform(string source)
+        private static string ConvertToTransform(string source)
         {
             return $"new global::System.Windows.Media.MatrixTransform({ConvertToMatrix(source)})";
         }
 
-        internal static string ConvertToCacheMode(string source)
+        private static string ConvertToCacheMode(string source)
         {
             if (source.Equals("BitmapCache", StringComparison.OrdinalIgnoreCase))
             {
@@ -433,7 +430,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.Media.CacheMode");
         }
 
-        internal static string ConvertToCornerRadius(string source)
+        private static string ConvertToCornerRadius(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -449,7 +446,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.CornerRadius");
         }
 
-        internal static string ConvertToDuration(string source)
+        private static string ConvertToDuration(string source)
         {
             string stringValue = source.Trim();
 
@@ -467,7 +464,7 @@ namespace OpenSilver.Compiler
             }
         }
 
-        internal static string ConvertToFontWeight(string source)
+        private static string ConvertToFontWeight(string source)
         {
             if (Enum.TryParse(source, true, out FontWeightsCode fontCode))
             {
@@ -485,7 +482,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.FontWeight");
         }
 
-        internal static string ConvertToGridLength(string source)
+        private static string ConvertToGridLength(string source)
         {
             static string ReadDouble(string seq, string defaultValue)
             {
@@ -548,7 +545,7 @@ namespace OpenSilver.Compiler
             return $"new global::System.Windows.GridLength({value}, {unit})";
         }
 
-        internal static string ConvertToPoint(string source)
+        private static string ConvertToPoint(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -560,17 +557,17 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.Point");
         }
 
-        internal static string ConvertPointHelper(string x, string y)
+        private static string ConvertPointHelper(string x, string y)
         {
             return $"new global::System.Windows.Point({x}, {y})";
         }
 
-        internal static string ConvertToPropertyPath(string source)
+        private static string ConvertToPropertyPath(string source)
         {
             return $"new global::System.Windows.PropertyPath({Escape(source)})";
         }
 
-        internal static string ConvertToRect(string source)
+        private static string ConvertToRect(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -582,7 +579,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.Rect");
         }
 
-        internal static string ConvertToSize(string source)
+        private static string ConvertToSize(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -594,7 +591,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.Size");
         }
 
-        internal static string ConvertToThickness(string source)
+        private static string ConvertToThickness(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -613,7 +610,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.Thickness");
         }
 
-        internal static string ConvertToFontStretch(string source)
+        private static string ConvertToFontStretch(string source)
         {
             string stringValue = source.Trim();
             if (stringValue.Equals("UltraCondensed", StringComparison.OrdinalIgnoreCase))
@@ -656,7 +653,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.FontStretch");
         }
 
-        internal static string ConvertToFontStyle(string source)
+        private static string ConvertToFontStyle(string source)
         {
             if (source.Equals("Normal", StringComparison.OrdinalIgnoreCase))
             {
@@ -674,7 +671,7 @@ namespace OpenSilver.Compiler
             throw GetConvertException(source, "System.Windows.FontStyle");
         }
 
-        internal static string ConvertToTextDecorationCollection(string source)
+        private static string ConvertToTextDecorationCollection(string source)
         {
             switch (source.Trim().ToLower())
             {
@@ -694,7 +691,7 @@ namespace OpenSilver.Compiler
             }
         }
 
-        internal static string ConvertToImageSource(string source)
+        private static string ConvertToImageSource(string source)
         {
             string uriKind;
             if (source.Contains(":/"))
@@ -709,7 +706,7 @@ namespace OpenSilver.Compiler
             return $"new global::System.Windows.Media.Imaging.BitmapImage(new global::System.Uri({Escape(source)}, {uriKind}))";
         }
 
-        internal static string ConvertToVector(string source)
+        private static string ConvertToVector(string source)
         {
             string[] split = source.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
 

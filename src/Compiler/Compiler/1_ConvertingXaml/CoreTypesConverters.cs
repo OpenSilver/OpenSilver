@@ -16,10 +16,10 @@ namespace OpenSilver.Compiler
 {
     internal static class CoreTypesConverters
     {
-        public static ICoreTypesConverter CSharp { get; } = new SLCoreTypesConverterCS();
+        public static ICoreTypesConverter CSharp { get; } = new CoreTypesConverterCS();
 
-        public static ICoreTypesConverter VisualBasic { get; } = new SLCoreTypesConverterVB();
+        public static ICoreTypesConverter VisualBasic { get; } = new CoreTypesConverterVB();
 
-        public static ICoreTypesConverter FSharp { get; } = new SLCoreTypesConverterFS();
+        public static ICoreTypesConverter FSharp { get; } = new CoreTypesConverterFS();
     }
 }

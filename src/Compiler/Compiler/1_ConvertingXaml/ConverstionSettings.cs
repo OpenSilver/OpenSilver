@@ -12,45 +12,31 @@
 *  
 \*====================================================================================*/
 
-namespace OpenSilver.Compiler
+namespace OpenSilver.Compiler;
+
+internal sealed class ConversionSettings
 {
-    internal sealed class ConversionSettings
+    public ConversionSettings(
+        string assemblyName,
+        AssembliesInspector inspector,
+        ICoreTypesConverter coreTypes,
+        SystemTypesHelper systemTypes,
+        XamlPreprocessorOptions options)
     {
-        private ConversionSettings(
-            string assemblyName,
-            IMetadata metadata,
-            ICoreTypesConverter coreTypes,
-            SystemTypesHelper systemTypes,
-            bool enableImplicitAssemblyRedirection,
-            XamlPreprocessorOptions options)
-        {
-            AssemblyName = assemblyName;
-            Metadata = metadata;
-            CoreTypes = coreTypes;
-            SystemTypes = systemTypes;
-            EnableImplicitAssemblyRedirection = enableImplicitAssemblyRedirection;
-            Options = options;
-        }
-
-        public static ConversionSettings CreateCSharpSettings(string assembly, XamlPreprocessorOptions options) =>
-            new(assembly, MetadatasCS.Silverlight, CoreTypesConverters.CSharp, SystemTypesHelper.CSharp, true, options);
-
-        public static ConversionSettings CreateVisualBasicSettings(string assembly, XamlPreprocessorOptions options) =>
-            new(assembly, MetadatasVB.Silverlight, CoreTypesConverters.VisualBasic, SystemTypesHelper.VisualBasic, true, options);
-
-        public static ConversionSettings CreateFSharpSettings(string assembly, XamlPreprocessorOptions options) =>
-            new(assembly, MetadatasFS.Silverlight, CoreTypesConverters.FSharp, SystemTypesHelper.FSharp, true, options);
-
-        public string AssemblyName { get; }
-
-        public IMetadata Metadata { get; }
-
-        public ICoreTypesConverter CoreTypes { get; }
-
-        public SystemTypesHelper SystemTypes { get; }
-
-        public bool EnableImplicitAssemblyRedirection { get; }
-
-        public XamlPreprocessorOptions Options { get; }
+        AssemblyName = assemblyName;
+        Inspector = inspector;
+        CoreTypes = coreTypes;
+        SystemTypes = systemTypes;
+        Options = options;
     }
+
+    public string AssemblyName { get; }
+
+    public AssembliesInspector Inspector { get; }
+
+    public ICoreTypesConverter CoreTypes { get; }
+
+    public SystemTypesHelper SystemTypes { get; }
+
+    public XamlPreprocessorOptions Options { get; }
 }

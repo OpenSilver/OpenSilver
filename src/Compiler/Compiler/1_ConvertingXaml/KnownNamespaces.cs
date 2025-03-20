@@ -14,19 +14,14 @@
 
 using System;
 
-namespace OpenSilver.Compiler
+namespace OpenSilver.Compiler;
+
+internal static class KnownNamespaces
 {
-    internal interface IMetadata
-    {
-        string FieldModifier { get; }
-
-        string SystemWindowsDLL { get; }
-
-        string SystemWindowsNS { get; }
-        string SystemWindowsDataNS { get; }
-        string SystemWindowsDocumentsNS { get; }
-        string SystemWindowsControlsNS { get; }
-        string SystemWindowsMediaNS { get; }
-        string SystemWindowsMediaAnimationNS { get; }
-    }
+    public const string SystemWindows = "System.Windows";
+    public const string SystemWindowsData = "System.Windows.Data";
+    public const string SystemWindowsDocuments = "System.Windows.Documents";
+    public const string SystemWindowsControls = "System.Windows.Controls";
+    public const string SystemWindowsMedia = "System.Windows.Media";
+    public const string SystemWindowsMediaAnimation = "System.Windows.Media.Animation";
 }

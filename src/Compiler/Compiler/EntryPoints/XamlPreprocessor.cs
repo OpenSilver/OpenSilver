@@ -39,7 +39,8 @@ namespace OpenSilver.Compiler
 
         private readonly Stopwatch _watch;
         private AssembliesInspector _assembliesInspector;
-        private SupportedLanguage _language;
+        private SupportedLanguage _supportedLanguage = SupportedLanguage.Unknown;
+        private string _language;
         private XamlPreprocessorOptions _options;
 
         private AssembliesInspector AssembliesInspector => _assembliesInspector ??= LoadAssemblies();
@@ -50,7 +51,15 @@ namespace OpenSilver.Compiler
         }
 
         [Required]
-        public string Language { get; set; }
+        public string Language
+        {
+            get => _language;
+            set
+            {
+                _language = value;
+                _supportedLanguage = LanguageHelpers.GetLanguage(_language);
+            }
+        }
 
         [Required]
         public ITaskItem[] PageFiles { get; set; }
@@ -100,8 +109,7 @@ namespace OpenSilver.Compiler
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
-            _language = LanguageHelpers.GetLanguage(Language);
-            if (_language == SupportedLanguage.Unknown)
+            if (_supportedLanguage == SupportedLanguage.Unknown)
             {
                 Log.LogError($"'{Language}' is not a supported language (C#, Visual Basic and F#).");
                 return false;
@@ -198,7 +206,7 @@ namespace OpenSilver.Compiler
 
         private AssembliesInspector LoadAssemblies()
         {
-            var inspector = new AssembliesInspector(_language);
+            var inspector = new AssembliesInspector(_supportedLanguage);
 
             foreach (ITaskItem reference in ResolvedReferences)
             {
@@ -228,16 +236,14 @@ namespace OpenSilver.Compiler
         private string GenerateCode(string xaml, string sourceFile, string fileIdentity, XamlPreprocessorOptions options)
         {
             string generatedCode = string.Empty;
-            switch (_language)
+            switch (_supportedLanguage)
             {
                 case SupportedLanguage.CSharp:
                     generatedCode = ConvertingXamlToCSharp.Convert(
                         xaml,
                         sourceFile,
                         fileIdentity,
-                        AssemblyName,
-                        AssembliesInspector,
-                        options,
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverters.CSharp, SystemTypesHelper.CSharp, options),
                         !IsSecondPass);
 
                     generatedCode = CreateCSHeaderContainingHash(xaml)
@@ -251,10 +257,8 @@ namespace OpenSilver.Compiler
                         xaml,
                         sourceFile,
                         fileIdentity,
-                        AssemblyName,
                         RootNamespace,
-                        AssembliesInspector,
-                        options,
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverters.VisualBasic, SystemTypesHelper.VisualBasic, options),
                         !IsSecondPass);
 
                     generatedCode = CreateVBHeaderContainingHash(xaml)
@@ -268,10 +272,8 @@ namespace OpenSilver.Compiler
                         xaml,
                         sourceFile,
                         fileIdentity,
-                        AssemblyName,
                         RootNamespace,
-                        AssembliesInspector,
-                        options,
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverters.FSharp, SystemTypesHelper.FSharp, options),
                         !IsSecondPass);
 
                     generatedCode = CreateFSHeaderContainingHash(xaml)
@@ -342,7 +344,7 @@ namespace OpenSilver.Compiler
         }
 
         private string GetExtension() =>
-            _language switch
+            _supportedLanguage switch
             {
                 SupportedLanguage.CSharp => "cs",
                 SupportedLanguage.VBNet => "vb",

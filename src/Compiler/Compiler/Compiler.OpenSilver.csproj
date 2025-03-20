@@ -34,7 +34,7 @@
     <Compile Include="1_ConvertingXaml\GeneratingPathInXaml.cs" />
     <Compile Include="1_ConvertingXaml\GeneratingUniqueNames.cs" />
     <Compile Include="1_ConvertingXaml\GettingInformationAboutAXamlType.cs" />
-    <Compile Include="1_ConvertingXaml\IMetadata.cs" />
+    <Compile Include="1_ConvertingXaml\KnownNamespaces.cs" />
     <Compile Include="1_ConvertingXaml\InsertingImplicitNodes.cs" />
     <Compile Include="1_ConvertingXaml\InsertingMarkupNodesInXaml.cs" />
     <Compile Include="1_ConvertingXaml\SupportedLanguage.cs" />
@@ -47,14 +47,12 @@
     <Compile Include="1_ConvertingXaml\XamlReader.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass1.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />
-    <Compile Include="2_ConvertingXamlToCSharp\IMetadataCS.cs" />
     <Compile Include="Helpers\XDocumentHelper.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\ConvertingXamlToFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\CoreTypesHelperFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.Pass1.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\GeneratingFSCode.Pass2.cs" />
-    <Compile Include="3_ConvertingXamlToFSharp\IMetadataFS.cs" />
     <Compile Include="3_ConvertingXamlToFSharp\SystemTypesHelperFS.cs" />
     <Compile Include="EntryPoints\UpdateIncludesInFSharpProjectFile.cs" />
     <Compile Include="EntryPoints\ResourceClassifier.cs" />
@@ -74,7 +72,6 @@
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingXamlToCSharp.cs" />
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.Pass1.cs" />
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.Pass2.cs" />
-    <Compile Include="7_ConvertingXamlToVB\IMetadataVB.cs" />
     <Compile Include="7_ConvertingXamlToVB\CoreTypesHelperVB.cs" />
     <Compile Include="7_ConvertingXamlToVB\SystemTypesHelperVB.cs" />
     <Compile Include="7_ConvertingXamlToVB\GeneratingVBCode.cs" />

@@ -26,19 +26,17 @@ namespace OpenSilver.Compiler
         public const string InitializedFromStringAttribute = "__.InitializeFromString.__";
 
         public static void InsertImplicitNodes(XDocument doc,
-            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettings settings,
             string globalPrefix)
         {
             var indexesMapper = new Stack<List<int>>();
-            TraverseNextElement(doc.Root, 0, indexesMapper, reflectionOnSeparateAppDomain, settings, globalPrefix);
+            TraverseNextElement(doc.Root, 0, indexesMapper, settings, globalPrefix);
         }
 
         private static void TraverseNextElement(
             XElement currentElement, 
             int currentElementIndex, 
             /*Stack<Dictionary<int, int>> indexesMapper*/ Stack<List<int>> indexesMapper,
-            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettings settings,
             string globalPrefix)
         {
@@ -93,11 +91,10 @@ namespace OpenSilver.Compiler
                     // Find out the name of the default children property (aka "ContentProperty") of the current element:
                     GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                         currentElement.Name,
-                        settings.EnableImplicitAssemblyRedirection,
                         out string namespaceName,
                         out string localName,
                         out string assemblyNameIfAny);
-                    var contentPropertyName = reflectionOnSeparateAppDomain.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
+                    var contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
                     XElement contentWrapper = currentElement;
                     
                     if (contentPropertyName != null)
@@ -138,12 +135,11 @@ namespace OpenSilver.Compiler
                     // Get information about the element namespace and assembly
                     GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                         currentElement.Name,
-                        settings.EnableImplicitAssemblyRedirection,
                         out string namespaceName,
                         out string localName,
                         out string assemblyNameIfAny);
 
-                    string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                    string elementTypeInCSharp = settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                             namespaceName, localName, assemblyNameIfAny, false
                     );
                                     
@@ -155,7 +151,7 @@ namespace OpenSilver.Compiler
                         // later in the process. Example: "<sys:Double>50</sys:Double>"
                         // becomes "Double x = 50;"
                     }
-                    else if (reflectionOnSeparateAppDomain.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny) ||
+                    else if (settings.Inspector.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny) ||
                              settings.CoreTypes.IsSupportedCoreType(elementTypeInCSharp.Substring(globalPrefix.Length), assemblyNameIfAny))
                     {
                         // Add the attribute that will tell the compiler to later
@@ -189,10 +185,7 @@ namespace OpenSilver.Compiler
                             // cf. http://stackoverflow.com/questions/1279859/how-to-replace-multiple-white-spaces-with-one-white-space
                             contentValue = Regex.Replace(contentValue, @"\s{2,}", " ");
 
-                            string contentPropertyName = 
-                                reflectionOnSeparateAppDomain.GetContentPropertyName(
-                                    namespaceName, localName, assemblyNameIfAny
-                                );
+                            string contentPropertyName = settings.Inspector.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
 
                             if (!string.IsNullOrEmpty(contentPropertyName))
                             {
@@ -298,7 +291,7 @@ namespace OpenSilver.Compiler
                 int i = 0;
                 foreach (var childElements in children)
                 {
-                    TraverseNextElement(childElements, i, indexesMapper, reflectionOnSeparateAppDomain, settings, globalPrefix);
+                    TraverseNextElement(childElements, i, indexesMapper, settings, globalPrefix);
                     ++i;
                 }
                 indexesMapper.Pop();

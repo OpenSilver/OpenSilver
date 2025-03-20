@@ -27,17 +27,12 @@ namespace OpenSilver.Compiler
 
         //todo: support strings that contain commas, like in: {Binding Value, ConverterParameter = 'One, two, three, four, five, six', Mode = OneWay}
 
-        internal static void InsertMarkupNodes(XDocument doc,
-            AssembliesInspector reflectionOnSeparateAppDomain,
-            ConversionSettings settings)
+        internal static void InsertMarkupNodes(XDocument doc, ConversionSettings settings)
         {
-            TraverseNextElement(doc.Root, doc.Root.GetDefaultNamespace(), reflectionOnSeparateAppDomain, settings);
+            TraverseNextElement(doc.Root, doc.Root.GetDefaultNamespace(), settings);
         }
 
-        private static void TraverseNextElement(XElement currentElement,
-            XNamespace lastDefaultNamespace,
-            AssembliesInspector reflectionOnSeparateAppDomain,
-            ConversionSettings settings)
+        private static void TraverseNextElement(XElement currentElement, XNamespace lastDefaultNamespace, ConversionSettings settings)
         {
             XNamespace currentDefaultNamespace = currentElement.GetDefaultNamespace();
             if (currentDefaultNamespace == XNamespace.None)
@@ -86,9 +81,8 @@ namespace OpenSilver.Compiler
                                 currentElement.Name + ("." + currentAttributeName),
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
-                                reflectionOnSeparateAppDomain,
-                                currentElement,
-                                settings));
+                                settings.Inspector,
+                                currentElement));
                         }
                         else // currentAttribute is an attached property
                         {
@@ -96,9 +90,8 @@ namespace OpenSilver.Compiler
                                 "{" + currentAttributeNamespaceName + "}" + currentAttributeTypeName + "." + currentAttributeName,
                                 currentAttributeValueEscaped,
                                 currentDefaultNamespace,
-                                reflectionOnSeparateAppDomain,
-                                currentElement,
-                                settings));
+                                settings.Inspector,
+                                currentElement));
                         }
                         currentAttribute.Remove();
                     }
@@ -108,7 +101,7 @@ namespace OpenSilver.Compiler
             // Recursion:
             foreach (var childElements in currentElement.Elements())
             {
-                TraverseNextElement(childElements, currentDefaultNamespace, reflectionOnSeparateAppDomain, settings);
+                TraverseNextElement(childElements, currentDefaultNamespace, settings);
             }
         }
 
@@ -159,8 +152,7 @@ namespace OpenSilver.Compiler
             string attributeValue,
             XNamespace lastDefaultNamespace,
             AssembliesInspector reflectionOnSeparateAppDomain,
-            XElement currentElement,
-            ConversionSettings settings)
+            XElement currentElement)
         {
             Dictionary<string, string> listOfSubAttributes = GenerateListOfAttributesFromString(attributeValue);
             var elementsToAdd = new List<XElement>();
@@ -206,7 +198,7 @@ namespace OpenSilver.Compiler
                         currentSubAttributeWithoutUselessPart = currentSubAttributeWithoutUselessPart.Remove(currentSubAttributeWithoutUselessPart.Length - 1, 1); //to remove the '}' at the end
 
                         // We add the suffix "Extension" to the markup extension name (unless it is a Binding or RelativeSource). For example, "StaticResource" becomes "StaticResourceExtension":
-                        if (ShouldAddExtension(nextClassName, currentElement, reflectionOnSeparateAppDomain, settings))
+                        if (ShouldAddExtension(nextClassName, currentElement, reflectionOnSeparateAppDomain))
                         {
                             // this is a trick, we need to check if :
                             // - type named 'MyCurrentMarkupExtensionName' exist.
@@ -231,8 +223,7 @@ namespace OpenSilver.Compiler
                             currentSubAttributeWithoutUselessPart,
                             lastDefaultNamespace,
                             reflectionOnSeparateAppDomain,
-                            currentElement,
-                            settings);
+                            currentElement);
                         XElement subXElement1 = subXElement;
                         if (!nodeName.LocalName.Contains('.'))
                         {
@@ -256,7 +247,6 @@ namespace OpenSilver.Compiler
                     {
                         GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                             nodeName,
-                            settings.EnableImplicitAssemblyRedirection,
                             out string namespaceName,
                             out string localName,
                             out string assemblyNameIfAny);
@@ -498,11 +488,7 @@ namespace OpenSilver.Compiler
             });
         }
 
-        private static bool ShouldAddExtension(
-            string name,
-            XElement currentElement,
-            AssembliesInspector reflectionOnSeparateAppDomain,
-            ConversionSettings settings)
+        private static bool ShouldAddExtension(string name, XElement currentElement, AssembliesInspector reflectionOnSeparateAppDomain)
         {
             string typeName;
             XNamespace xmlns;
@@ -521,8 +507,7 @@ namespace OpenSilver.Compiler
 
             if (xmlns != null)
             {
-                (string clrNS, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(
-                    xmlns.NamespaceName, settings.EnableImplicitAssemblyRedirection);
+                (string clrNS, string assemblyName) = GettingInformationAboutXamlTypes.GetClrNamespaceAndAssembly(xmlns.NamespaceName);
 
                 return reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(clrNS, typeName, assemblyName) == null;
             }

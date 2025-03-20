@@ -41,7 +41,7 @@ namespace OpenSilver.Compiler
             if (!currentElement.Name.LocalName.Contains("."))
             {
                 // Generate unique name
-                string uniqueName = GenerateUniqueName(currentElement);
+                string uniqueName = GenerateUniqueName(currentElement.Name.LocalName);
 
                 // Assign unique name
                 currentElement.SetAttributeValue(UniqueNameAttribute, uniqueName);
@@ -54,28 +54,17 @@ namespace OpenSilver.Compiler
             }
         }
 
-        private static string GenerateUniqueName(XElement element)
+        internal static string GenerateUniqueName(string str)
         {
-            string guidAsString = Guid.NewGuid().ToString("N"); // Example: 00000000000000000000000000000000
-            string prefix = element.Name.LocalName;
-            
+            ReadOnlySpan<char> prefix = str.AsSpan();
+
             if (prefix.Length > 30)
             {
-                prefix = prefix.Substring(0, 30);
+                prefix = prefix.Slice(0, 30);
             }
 
-            prefix = char.ToLower(prefix[0]) + prefix.Substring(1);     // Because of f# warning, makes lower the first letter
-            return $"{prefix}_{guidAsString}"; // Example: Button_4541C363579C48A981219C392BF8ACD5
-        }
-
-        internal static string GenerateUniqueNameFromString(string str)
-        {
-            Guid guid = Guid.NewGuid();
-            string guidAsString = guid.ToString("N"); // Example: 00000000000000000000000000000000
-            string prefix = str;
-            if (prefix.Length > 30)
-                prefix = prefix.Substring(0, 30);
-            return prefix + "_" + guidAsString; // Example: Button_4541C363579C48A981219C392BF8ACD5
+            // Because of f# warning, makes the first letter lower case
+            return $"{char.ToLower(prefix[0])}{prefix.Slice(1)}_{Guid.NewGuid():N}"; // Example: Button_4541C363579C48A981219C392BF8ACD5
         }
     }
 }

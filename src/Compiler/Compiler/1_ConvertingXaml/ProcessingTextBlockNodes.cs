@@ -37,16 +37,15 @@ namespace OpenSilver.Compiler
         // we do not surround it with a <Run> for performance optimization.
         //------------------------------------------------------------
 
-        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain, ConversionSettings settings)
+        public static void Process(XDocument doc, ConversionSettings settings)
         {
-            TraverseNextNode(doc.Root, 1, null, reflectionOnSeparateAppDomain, settings);
+            TraverseNextNode(doc.Root, 1, null, settings);
         }
 
         static void TraverseNextNode(
             XNode currentNode,
             int siblingNodesCount,
             XElement parentElement,
-            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettings settings)
         {
             if (currentNode is XText)
@@ -74,7 +73,7 @@ namespace OpenSilver.Compiler
                 int childNodesCount = childNodes.Count;
                 for (int i = 0; i < childNodesCount; i++)
                 {
-                    TraverseNextNode(childNodes[i], childNodesCount, ((XElement)currentNode), reflectionOnSeparateAppDomain, settings);
+                    TraverseNextNode(childNodes[i], childNodesCount, ((XElement)currentNode), settings);
                 }
             }
         }

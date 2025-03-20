@@ -36,7 +36,7 @@ namespace OpenSilver.Compiler
                 protected GeneratorScope(string rootElement)
                 {
                     Root = rootElement;
-                    XamlContext = GeneratingUniqueNames.GenerateUniqueNameFromString("xamlContext");
+                    XamlContext = GeneratingUniqueNames.GenerateUniqueName("xamlContext");
                 }
 
                 public string Root { get; }
@@ -46,9 +46,9 @@ namespace OpenSilver.Compiler
                 public StringBuilder StringBuilder { get; } = new StringBuilder();
 
                 public abstract void RegisterName(string name, string scopedElement);
-                
+
                 protected abstract string ToStringCore();
-                
+
                 public sealed override string ToString() => ToStringCore();
 
                 public static string AddSpacesToLines(string input, string spaces)
@@ -74,8 +74,8 @@ namespace OpenSilver.Compiler
             {
                 private readonly Dictionary<string, string> _namescope;
 
-                public RootScope(string rootElementName, bool createNameScope) 
-                    : base(rootElementName) 
+                public RootScope(string rootElementName, bool createNameScope)
+                    : base(rootElementName)
                 {
                     StringBuilder.AppendLine($"let {XamlContext} = {RuntimeHelperClass}.Create_XamlContext()");
                     if (createNameScope)
@@ -95,7 +95,7 @@ namespace OpenSilver.Compiler
                 protected override string ToStringCore()
                 {
                     StringBuilder builder = new StringBuilder();
-                    
+
                     builder.Append(StringBuilder.ToString());
                     AppendNamescope(builder);
 
@@ -148,12 +148,9 @@ namespace OpenSilver.Compiler
 
             private sealed class FrameworkTemplateScope : GeneratorScope
             {
-                private readonly IMetadata _metadata;
-
-                public FrameworkTemplateScope(string templateName, string templateRoot, IMetadata metadata)
+                public FrameworkTemplateScope(string templateName, string templateRoot)
                     : base(templateRoot)
                 {
-                    _metadata = metadata;
                     Name = templateName;
                     TemplateOwner = $"templateOwner_{templateName}";
                     MethodName = $"Create_{templateName}";
@@ -174,7 +171,7 @@ namespace OpenSilver.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"    static member private {MethodName} ({TemplateOwner}: global.{_metadata.SystemWindowsNS}.IFrameworkElement) ({XamlContext}: {XamlContextClass}): global.{_metadata.SystemWindowsNS}.IFrameworkElement =")
+                    builder.AppendLine($"    static member private {MethodName} ({TemplateOwner}: global.{KnownNamespaces.SystemWindows}.IFrameworkElement) ({XamlContext}: {XamlContextClass}): global.{KnownNamespaces.SystemWindows}.IFrameworkElement =")
                         .Append(AddSpacesToLines(StringBuilder.ToString(), "        "));
                     builder.AppendLine($"        {Root}");
 
@@ -188,7 +185,7 @@ namespace OpenSilver.Compiler
 
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
-                public readonly List<string> ResultingMembersForNamedElements = new List<string>(); 
+                public readonly List<string> ResultingMembersForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
                 public readonly ComponentConnectorBuilderFS ComponentConnector = new ComponentConnectorBuilderFS();
 
@@ -222,50 +219,42 @@ namespace OpenSilver.Compiler
 
             private readonly string _sourceFile;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
-            private readonly string _assemblyNameWithoutExtension;
-            private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
 
             public GeneratorPass2(XDocument doc,
                 string sourceFile,
                 string fileNameWithPathRelativeToProjectRoot,
-                string assemblyNameWithoutExtension,
-                AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings)
             {
                 _reader = new XamlReader(doc);
                 _settings = settings;
                 _sourceFile = sourceFile;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
-                _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
-                _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
             }
 
             public string Generate() => GenerateImpl(new GeneratorContext());
 
             private string GenerateImpl(GeneratorContext parameters)
             {
-                parameters.GenerateFieldsForNamedElements = 
-                    !_reflectionOnSeparateAppDomain.IsAssignableFrom(
-                        _settings.Metadata.SystemWindowsNS, "ResourceDictionary",
-                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName) 
+                parameters.GenerateFieldsForNamedElements =
+                    !_settings.Inspector.IsAssignableFrom(
+                        KnownNamespaces.SystemWindows, "ResourceDictionary",
+                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
                     &&
-                    !_reflectionOnSeparateAppDomain.IsAssignableFrom(
-                        _settings.Metadata.SystemWindowsNS, "Application",
+                    !_settings.Inspector.IsAssignableFrom(
+                        KnownNamespaces.SystemWindows, "Application",
                         _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName);
 
                 parameters.PushScope(
                     new RootScope(GeneratingCode.GetUniqueName(_reader.Document.Root),
-                        _reflectionOnSeparateAppDomain.IsAssignableFrom(
-                            _settings.Metadata.SystemWindowsNS, "IFrameworkElement",
-                            _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
-                    )
-                );
+                        _settings.Inspector.IsAssignableFrom(
+                            KnownNamespaces.SystemWindows, "IFrameworkElement",
+                            _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)));
 
                 string rootElementName = GeneratingCode.GetUniqueName(_reader.Document.Root);
                 string absoluteSourceUri =
                     _fileNameWithPathRelativeToProjectRoot.Contains(';') ?
                     _fileNameWithPathRelativeToProjectRoot :
-                    "/" + _assemblyNameWithoutExtension + ";component/" + _fileNameWithPathRelativeToProjectRoot;
+                    $"/{_settings.AssemblyName};component/{_fileNameWithPathRelativeToProjectRoot}";
 
                 // factoryName needs at OnWriteStartMember
                 _factoryName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
@@ -307,7 +296,7 @@ namespace OpenSilver.Compiler
                 }
 
                 // Get general information about the class:
-                GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
+                GetClassInformationFromXaml(_reader.Document, _settings.Inspector,
                     out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
 
                 string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
@@ -318,8 +307,8 @@ namespace OpenSilver.Compiler
 
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"global.{_settings.Metadata.SystemWindowsNS}.Application",
-                        _assemblyNameWithoutExtension,
+                        $"global.{KnownNamespaces.SystemWindows}.Application",
+                        _settings.AssemblyName,
                         _fileNameWithPathRelativeToProjectRoot,
                         parameters.ResultingFindNameCalls);
 
@@ -354,8 +343,8 @@ namespace OpenSilver.Compiler
                         parameters.CurrentScope.ToString(),
                         $"        global.CSHTML5.Internal.TypeInstantiationHelper.Instantiate(System.Type.GetType(\"{behindClassTypeName}\")) :?> {componentTypeFullName}",
                         parameters.ResultingMethods,
-                        $"global.{_settings.Metadata.SystemWindowsNS}.UIElement",
-                        _assemblyNameWithoutExtension,
+                        $"global.{KnownNamespaces.SystemWindows}.UIElement",
+                        _settings.AssemblyName,
                         _fileNameWithPathRelativeToProjectRoot);
 
                     string finalCode;
@@ -387,8 +376,8 @@ namespace global
                         parameters.CurrentScope.ToString(),
                         string.Join(Environment.NewLine, $"        let {rootElementName} = new {baseType}()", $"        {_factoryName}.LoadComponentImpl({rootElementName})", $"        {rootElementName}"),
                         parameters.ResultingMethods,
-                        $"global.{_settings.Metadata.SystemWindowsNS}.UIElement",
-                        _assemblyNameWithoutExtension,
+                        $"global.{KnownNamespaces.SystemWindows}.UIElement",
+                        _settings.AssemblyName,
                         _fileNameWithPathRelativeToProjectRoot);
 
                     if (!string.IsNullOrEmpty(namespaceStringIfAny))
@@ -415,9 +404,9 @@ namespace GlobalResource
                 {
                     // For these markup extensions, we resolve the value at compile time, so we don't need to
                     // instantiate the markup extension.
-                    if (GeneratingCode.IsNullExtension(element, _settings) ||
-                        GeneratingCode.IsStaticExtension(element, _settings) ||
-                        GeneratingCode.IsTypeExtension(element, _settings))
+                    if (GeneratingCode.IsNullExtension(element) ||
+                        GeneratingCode.IsStaticExtension(element) ||
+                        GeneratingCode.IsTypeExtension(element))
                     {
                         return true;
                     }
@@ -431,14 +420,14 @@ namespace GlobalResource
                 XElement element = _reader.ObjectData.Element;
 
                 // Check if the element is the root element:
-                string elementTypeInCSharp = GetCSharpEquivalentOfXamlTypeAsString(
+                string elementType = GetCSharpEquivalentOfXamlTypeAsString(
                     element.Name,
                     out string namespaceName,
                     out string localTypeName,
                     out string assemblyNameIfAny);
 
                 // Some special cases
-                if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsNS}.EventSetter")
+                if (elementType == $"global.{KnownNamespaces.SystemWindows}.EventSetter")
                 {
                     WriteEventSetter(parameters);
 
@@ -456,12 +445,11 @@ namespace GlobalResource
                 }
 
                 // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
-                bool isElementInRootNamescope = elementThatIsRootOfTheCurrentNamescope.Parent == null;
+                bool isElementInRootNamescope = GetRootOfCurrentNamescopeForRuntime(element).Parent == null;
 
                 bool isRootElement = IsElementTheRootElement(element);
                 bool isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(
-                    elementTypeInCSharp.Substring("global.".Length), assemblyNameIfAny
+                    elementType.Substring("global.".Length), assemblyNameIfAny
                 );
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
@@ -469,14 +457,14 @@ namespace GlobalResource
                 // Add the constructor (in case of object) or a direct initialization (in case
                 // of system type or "isInitializeFromString" or referenced ResourceDictionary)
                 // (unless this is the root element)
-                string elementUniqueNameOrThisKeyword = GeneratingCode.GetUniqueName(element);
+                string elementUid = GeneratingCode.GetUniqueName(element);
 
                 bool isInNewScope = false;
                 GeneratorScope rootScope = parameters.CurrentScope;
 
                 if (isRootElement)
                 {
-                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword}) |> ignore");
+                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUid}) |> ignore");
                 }
                 else
                 {
@@ -500,9 +488,9 @@ namespace GlobalResource
                         parameters.StringBuilder.AppendLine(
                             string.Format(
                                 "let {0}: {1} = {3}.XamlContext_WriteStartObject({4}, {2})",
-                                elementUniqueNameOrThisKeyword,
-                                elementTypeInCSharp,
-                                _settings.SystemTypes.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global.".Length)),
+                                elementUid,
+                                elementType,
+                                _settings.SystemTypes.ConvertFromInvariantString(directContent, elementType.Substring("global.".Length)),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
                             )
@@ -517,15 +505,15 @@ namespace GlobalResource
                         string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
 
                         bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
-                            elementTypeInCSharp.Substring("global.".Length), assemblyNameIfAny
+                            elementType.Substring("global.".Length), assemblyNameIfAny
                         );
 
                         string preparedValue = ConvertFromInvariantString(
-                            stringValue, elementTypeInCSharp, isKnownCoreType, isKnownSystemType);
+                            stringValue, elementType, isKnownCoreType, isKnownSystemType);
 
                         parameters.StringBuilder.AppendLine(
-                            string.Format("let {0} = {2}.XamlContext_WriteStartObject({3}, {1})", 
-                                elementUniqueNameOrThisKeyword, 
+                            string.Format("let {0} = {2}.XamlContext_WriteStartObject({3}, {1})",
+                                elementUid,
                                 preparedValue,
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
@@ -538,16 +526,16 @@ namespace GlobalResource
                         {
                             isInNewScope = true;
 
-                            var objectScope = new NewObjectScope(elementUniqueNameOrThisKeyword, elementTypeInCSharp);
+                            var objectScope = new NewObjectScope(elementUid, elementType);
 
                             parameters.StringBuilder.AppendLine(
-                                $"let {elementUniqueNameOrThisKeyword} = {_factoryName}.{objectScope.MethodName}({parameters.CurrentXamlContext})");
+                                $"let {elementUid} = {_factoryName}.{objectScope.MethodName}({parameters.CurrentXamlContext})");
 
                             parameters.PushScope(objectScope);
                         }
 
                         parameters.StringBuilder.AppendLine(
-                            $"let {elementUniqueNameOrThisKeyword} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new {elementTypeInCSharp}())");
+                            $"let {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new {elementType}())");
 
                         if (IsResourceDictionaryCreatedFromSource(element))
                         {
@@ -557,33 +545,33 @@ namespace GlobalResource
                             string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(
                                 element.Attribute("Source").Value,
                                 _fileNameWithPathRelativeToProjectRoot,
-                                _assemblyNameWithoutExtension);
+                                _settings.AssemblyName);
                             string loadTypeFullName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
 
                             parameters.StringBuilder.AppendLine(
-                                $"((new GlobalResource.{loadTypeFullName}()) :> {IXamlComponentLoaderClass}).LoadComponent({elementUniqueNameOrThisKeyword})");
+                                $"((new GlobalResource.{loadTypeFullName}()) :> {IXamlComponentLoaderClass}).LoadComponent({elementUid})");
                         }
                     }
                 }
 
                 // Set templated parent if any
                 if (rootScope is FrameworkTemplateScope &&
-                    _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
+                    _settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                 {
                     parameters.StringBuilder.AppendLine(
-                        $"{RuntimeHelperClass}.XamlContext_SetTemplatedParent({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword})");
+                        $"{RuntimeHelperClass}.XamlContext_SetTemplatedParent({parameters.CurrentXamlContext}, {elementUid})");
                 }
 
-                if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsMediaAnimationNS, "Timeline", element.Name.NamespaceName, element.Name.LocalName))
+                if (_settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindowsMediaAnimation, "Timeline", element.Name.NamespaceName, element.Name.LocalName))
                 {
-                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword})");
+                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUid})");
                 }
 
-                if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IUIElement", element.Name.NamespaceName, element.Name.LocalName))
+                if (_settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "IUIElement", element.Name.NamespaceName, element.Name.LocalName))
                 {
                     string xamlPath = element.Attribute(GeneratingPathInXaml.PathInXamlAttribute)?.Value ?? string.Empty;
-                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUniqueNameOrThisKeyword}, \"{xamlPath}\")");
-                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetFilePath({elementUniqueNameOrThisKeyword}, \"{_sourceFile}\")");
+                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetPathInXaml({elementUid}, \"{xamlPath}\")");
+                    parameters.StringBuilder.AppendLine($"{XamlDesignerBridgeClass}.SetFilePath({elementUid}, \"{_sourceFile}\")");
                 }
 
                 // Add the attributes:
@@ -594,15 +582,15 @@ namespace GlobalResource
                     //-------------
 
                     string attributeValue = GetAttributeValue(attribute);
-                    string attributeLocalName = attribute.Name.LocalName;
+                    string attributeName = attribute.Name.LocalName;
 
                     // Skip the utility attributes:
-                    if (!IsReservedAttribute(attributeLocalName)
+                    if (!IsReservedAttribute(attributeName)
                         && !attribute.IsNamespaceDeclaration)
                     {
                         // Verify that the attribute is not an attached property:
                         //todo: This test does not work 100% of the time. For example if we have <Grid Column="1" ..../> the compiler thinks that Column is a normal property whereas it actually is an attached property.
-                        bool isAttachedMember = attributeLocalName.Contains(".");
+                        bool isAttachedMember = attributeName.Contains(".");
                         if (!isAttachedMember)
                         {
                             bool isXNameAttr = GeneratingCode.IsXNameAttribute(attribute);
@@ -617,7 +605,7 @@ namespace GlobalResource
                                 // Add the code to register the name, etc.
                                 if (isElementInRootNamescope && parameters.GenerateFieldsForNamedElements)
                                 {
-                                    string fieldModifier = _settings.Metadata.FieldModifier;
+                                    string fieldModifier = "let mutable";
                                     XAttribute attr = element.Attribute(GeneratingCode.xNamespace + "FieldModifier");
                                     if (attr != null)
                                     {
@@ -635,34 +623,34 @@ namespace GlobalResource
         with get() = {fieldNameLocal}
         and set(value) = {fieldNameLocal} <- value
 ");
-                                    parameters.ResultingFindNameCalls.Add($"this.{fieldName} <- this.FindName(\"{name}\") :?> {elementTypeInCSharp}");
+                                    parameters.ResultingFindNameCalls.Add($"this.{fieldName} <- this.FindName(\"{name}\") :?> {elementType}");
                                 }
 
                                 if (isXNameAttr)
                                 {
-                                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "DependencyObject",
+                                    if (_settings.Inspector.IsAssignableFrom(KnownNamespaces.SystemWindows, "DependencyObject",
                                         element.Name.NamespaceName, element.Name.LocalName))
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                            $"{elementUniqueNameOrThisKeyword}.SetValue(global.{_settings.Metadata.SystemWindowsNS}.FrameworkElement.NameProperty, \"{name}\")");                                        
+                                            $"{elementUid}.SetValue(global.{KnownNamespaces.SystemWindows}.FrameworkElement.NameProperty, \"{name}\")");
                                     }
                                 }
                                 else
                                 {
-                                    if (_reflectionOnSeparateAppDomain.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny))
+                                    if (_settings.Inspector.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny))
                                     {
-                                        parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.Name <- \"{name}\"");
+                                        parameters.StringBuilder.AppendLine($"{elementUid}.Name <- \"{name}\"");
                                     }
                                 }
 
-                                rootScope.RegisterName(name, elementUniqueNameOrThisKeyword);
+                                rootScope.RegisterName(name, elementUid);
                             }
-                            else if (IsEventTriggerRoutedEventProperty(elementTypeInCSharp, attributeLocalName))
+                            else if (IsEventTriggerRoutedEventProperty(elementType, attributeName))
                             {
                                 // TODO Check that 'attributeLocalName' is effectively the LoadedEvent routed event.
                                 // Silverlight only allows the FrameworkElement.LoadedEvent as value for the EventTrigger.RoutedEvent
                                 // property, so for now we assume the xaml is always valid.
-                                parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent <- global.{_settings.Metadata.SystemWindowsNS}.FrameworkElement.LoadedEvent");
+                                parameters.StringBuilder.AppendLine($"{elementUid}.RoutedEvent <- global.{KnownNamespaces.SystemWindows}.FrameworkElement.LoadedEvent");
                             }
                             else if (string.IsNullOrEmpty(attribute.Name.NamespaceName) || attribute.Name.NamespaceName == element.Name.NamespaceName)
                             {
@@ -676,7 +664,7 @@ namespace GlobalResource
                                 {
                                     // Check if the attribute corresponds to a Property, an Event, etc.:
                                     string memberName = attribute.Name.LocalName;
-                                    MemberTypes memberType = _reflectionOnSeparateAppDomain.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
+                                    MemberTypes memberType = _settings.Inspector.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
                                     switch (memberType)
                                     {
                                         case MemberTypes.Event:
@@ -685,8 +673,8 @@ namespace GlobalResource
                                             // C# EVENT
                                             //------------
 
-                                            EventDefinition eventDefinition = _reflectionOnSeparateAppDomain.GetEvent(
-                                                _reflectionOnSeparateAppDomain.GetTypeDefinition(namespaceName, localTypeName, assemblyNameIfAny),
+                                            EventDefinition eventDefinition = _settings.Inspector.GetEvent(
+                                                _settings.Inspector.GetTypeDefinition(namespaceName, localTypeName, assemblyNameIfAny),
                                                 memberName,
                                                 false);
                                             string handlerType = $"global.{eventDefinition.EventType.ConvertToString(SupportedLanguage.FSharp)}";
@@ -695,8 +683,8 @@ namespace GlobalResource
                                                 string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3})",
                                                     RuntimeHelperClass,
                                                     parameters.CurrentXamlContext,
-                                                    parameters.ComponentConnector.ConnectEventHandler(elementTypeInCSharp, attributeLocalName, handlerType, attributeValue),
-                                                    elementUniqueNameOrThisKeyword)
+                                                    parameters.ComponentConnector.ConnectEventHandler(elementType, attributeName, handlerType, attributeValue),
+                                                    elementUid)
                                             );
 
                                             break;
@@ -708,19 +696,19 @@ namespace GlobalResource
                                             //------------
 
                                             // Generate the code for instantiating the attribute value:
-                                            string codeForInstantiatingTheAttributeValue;
-                                            if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsNS}.Setter")
+                                            string value;
+                                            if (elementType == $"global.{KnownNamespaces.SystemWindows}.Setter")
                                             {
                                                 //we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
                                                 if (element.Parent != null && element.Parent.Parent != null && element.Parent.Parent.Name.LocalName == "Style")
                                                 {
 
-                                                    if (attributeLocalName == "Property")
+                                                    if (attributeName == "Property")
                                                     {
                                                         // Style setter property:
-                                                        codeForInstantiatingTheAttributeValue = GenerateCodeForSetterProperty(element.Parent.Parent, attributeValue); //todo: support attached properties used in a Setter
+                                                        value = GenerateCodeForSetterProperty(element.Parent.Parent, attributeValue); //todo: support attached properties used in a Setter
                                                     }
-                                                    else if (attributeLocalName == "Value")
+                                                    else if (attributeName == "Value")
                                                     {
                                                         var property = element.Attribute("Property");
                                                         if (property != null)
@@ -733,7 +721,7 @@ namespace GlobalResource
                                                             //string[] splittedTypeName = splittedStr[splittedStr.Length - 1].Split('.');
                                                             //XName typeName = XName.Get(splittedTypeName[splittedTypeName.Length - 1], splittedStr[0]); 
                                                             string propertyName = isSetterForAttachedProperty ? property.Value.Split('.')[1] : property.Value;
-                                                            codeForInstantiatingTheAttributeValue = GenerateCodeForInstantiatingAttributeValue(name,
+                                                            value = GenerateCodeForInstantiatingAttributeValue(name,
                                                                 propertyName,
                                                                 isSetterForAttachedProperty,
                                                                 attributeValue,
@@ -748,14 +736,14 @@ namespace GlobalResource
                                                 else
                                                     throw new XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
                                             }
-                                            else if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsDataNS}.Binding"
+                                            else if (elementType == $"global.{KnownNamespaces.SystemWindowsData}.Binding"
                                                 && memberName == "Path")
                                             {
                                                 if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
                                                 {
                                                     parameters.StringBuilder.AppendLine(
                                                         string.Format("{0}.XamlPath <- {1}",
-                                                            elementUniqueNameOrThisKeyword,
+                                                            elementUid,
                                                             _settings.SystemTypes.ConvertFromInvariantString(resolvedPath, "System.String")
                                                         )
                                                     );
@@ -764,7 +752,7 @@ namespace GlobalResource
                                                 XName typeName = element.Name;
                                                 string propertyName = attribute.Name.LocalName;
 
-                                                codeForInstantiatingTheAttributeValue =
+                                                value =
                                                     GenerateCodeForInstantiatingAttributeValue(
                                                         typeName,
                                                         propertyName,
@@ -773,21 +761,21 @@ namespace GlobalResource
                                                         element
                                                     );
                                             }
-                                            else if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsNS}.TemplateBindingExtension"
+                                            else if (elementType == $"global.{KnownNamespaces.SystemWindows}.TemplateBindingExtension"
                                                 && memberName == "Path")
                                             {
                                                 ResolvePathForTemplateBinding(attributeValue, element, out string typeName, out string propertyName);
                                                 parameters.StringBuilder.AppendLine(
                                                     string.Format("{0}.DependencyPropertyName <- {1}",
-                                                        elementUniqueNameOrThisKeyword,
+                                                        elementUid,
                                                         _settings.SystemTypes.ConvertFromInvariantString(propertyName, "System.String")));
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
-                                                        $"{elementUniqueNameOrThisKeyword}.DependencyPropertyOwnerType <- typeof<{typeName}>");
+                                                        $"{elementUid}.DependencyPropertyOwnerType <- typeof<{typeName}>");
                                                 }
 
-                                                codeForInstantiatingTheAttributeValue = null;
+                                                value = null;
                                             }
                                             else
                                             {
@@ -798,7 +786,7 @@ namespace GlobalResource
                                                 XName typeName = element.Name;
                                                 string propertyName = attribute.Name.LocalName;
 
-                                                codeForInstantiatingTheAttributeValue =
+                                                value =
                                                     GenerateCodeForInstantiatingAttributeValue(
                                                         typeName,
                                                         propertyName,
@@ -809,12 +797,12 @@ namespace GlobalResource
                                             }
 
                                             // Append the statement:
-                                            if (codeForInstantiatingTheAttributeValue != null)
+                                            if (value != null)
                                             {
                                                 parameters.StringBuilder.AppendLine(
                                                     string.Format(
                                                         "{0}.{1} <- {2}",
-                                                        elementUniqueNameOrThisKeyword, attributeLocalName, codeForInstantiatingTheAttributeValue
+                                                        elementUid, attributeName, value
                                                     )
                                                 );
                                             }
@@ -839,13 +827,12 @@ namespace GlobalResource
 
                             GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                                 ownerTypeXName,
-                                _settings.EnableImplicitAssemblyRedirection,
                                 out string ownerTypeNamespace,
                                 out string ownerTypeName,
                                 out string ownerTypeAssemblyName);
 
                             (MemberTypes memberType, MethodDefinition method, TypeReference declaringType) =
-                                _reflectionOnSeparateAppDomain.GetAttachedMemberType(
+                                _settings.Inspector.GetAttachedMemberType(
                                     memberName, ownerTypeNamespace, ownerTypeName, ownerTypeAssemblyName);
 
                             switch (memberType)
@@ -861,7 +848,7 @@ namespace GlobalResource
                                             element);
 
                                         parameters.StringBuilder.AppendLine(
-                                            $"{ownerType}.Set{memberName}({elementUniqueNameOrThisKeyword}, {value})");
+                                            $"{ownerType}.Set{memberName}({elementUid}, {value})");
                                     }
                                     break;
 
@@ -874,8 +861,8 @@ namespace GlobalResource
                                             string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3})",
                                                 RuntimeHelperClass,
                                                 parameters.CurrentXamlContext,
-                                                parameters.ComponentConnector.ConnectAttachedEventHandler(elementTypeInCSharp, ownerType, memberName, handlerType, attributeValue),
-                                                elementUniqueNameOrThisKeyword));
+                                                parameters.ComponentConnector.ConnectAttachedEventHandler(elementType, ownerType, memberName, handlerType, attributeValue),
+                                                elementUid));
                                     }
                                     break;
 
@@ -944,7 +931,7 @@ namespace GlobalResource
                     }
                     else
                     {
-                        namespaceName = _settings.Metadata.SystemWindowsNS;
+                        namespaceName = KnownNamespaces.SystemWindows;
                         typeName = "FrameworkElement";
                         assemblyName = "OpenSilver";
                     }
@@ -952,14 +939,14 @@ namespace GlobalResource
 
                 string handlerTypeString;
 
-                TypeDefinition ownerType = _reflectionOnSeparateAppDomain.GetTypeDefinition(namespaceName, typeName, assemblyName);
+                TypeDefinition ownerType = _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName);
                 string ownerTypeString = ownerType.ConvertToString(SupportedLanguage.FSharp);
 
-                if (_reflectionOnSeparateAppDomain.GetEvent(ownerType, eventName, false) is EventDefinition eventDefinition)
+                if (_settings.Inspector.GetEvent(ownerType, eventName, false) is EventDefinition eventDefinition)
                 {
                     handlerTypeString = $"global.{eventDefinition.EventType.ConvertToString(SupportedLanguage.FSharp)}";
                 }
-                else if (_reflectionOnSeparateAppDomain.GetMethod(ownerType, $"Add{eventName}Handler", false, true) is MethodDefinition addHandlerMethodDefinition &&
+                else if (_settings.Inspector.GetMethod(ownerType, $"Add{eventName}Handler", false, true) is MethodDefinition addHandlerMethodDefinition &&
                        addHandlerMethodDefinition.Parameters.Count == 2)
                 {
                     handlerTypeString = addHandlerMethodDefinition.Parameters[1].ParameterType.ConvertToString(SupportedLanguage.FSharp);
@@ -975,7 +962,7 @@ namespace GlobalResource
                 string eventSetterName = GeneratingCode.GetUniqueName(eventSetter);
 
                 parameters.StringBuilder.AppendLine(
-                    $"let {eventSetterName}: global.{_settings.Metadata.SystemWindowsNS}.EventSetter = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new global.{_settings.Metadata.SystemWindowsNS}.EventSetter())");
+                    $"let {eventSetterName}: global.{KnownNamespaces.SystemWindows}.EventSetter = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, new global.{KnownNamespaces.SystemWindows}.EventSetter())");
 
                 parameters.StringBuilder.AppendLine(
                     $"{eventSetterName}.Event <- {RuntimeHelperClass}.RoutedEventFromName(\"{eventName}\", typeof<global.{ownerTypeString}>)");
@@ -1006,7 +993,7 @@ namespace GlobalResource
                 string typeName = member.Name.LocalName.Substring(0, idx);
                 string propertyName = member.Name.LocalName.Substring(idx + 1);
 
-                if (_reflectionOnSeparateAppDomain.IsFrameworkTemplateTemplateProperty(propertyName, member.Name.NamespaceName, typeName))
+                if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, member.Name.NamespaceName, typeName))
                 {
                     if (member.Elements().Count() > 1)
                     {
@@ -1015,10 +1002,7 @@ namespace GlobalResource
 
                     string frameworkTemplateName = GeneratingCode.GetUniqueName(element);
 
-                    FrameworkTemplateScope scope = new FrameworkTemplateScope(
-                        frameworkTemplateName,
-                        GeneratingCode.GetUniqueName(member.Elements().First()),
-                        _settings.Metadata);
+                    var scope = new FrameworkTemplateScope(frameworkTemplateName, GeneratingCode.GetUniqueName(member.Elements().First()));
 
                     parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, {_factoryName}.{scope.MethodName})");
 
@@ -1034,13 +1018,13 @@ namespace GlobalResource
                 GetClrNamespaceAndLocalName(element.Name, out _, out _, out string assemblyNameIfAny);
 
                 // Get information about the parent element (to which the property applies) and the element itself:
-                var parentElement = element.Parent;
-                string parentElementUniqueNameOrThisKeyword = GeneratingCode.GetUniqueName(parentElement);
+                XElement parent = element.Parent;
+                string parentUid = GeneratingCode.GetUniqueName(parent);
                 string typeName = element.Name.LocalName.Split('.')[0];
                 string propertyName = element.Name.LocalName.Split('.')[1];
                 XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
 
-                if (_reflectionOnSeparateAppDomain.IsFrameworkTemplateTemplateProperty(propertyName, element.Name.NamespaceName, typeName))
+                if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, element.Name.NamespaceName, typeName))
                 {
                     // TODO move call to RuntimeHelpers.SetTemplateContent(...) here
                     parameters.PopScope();
@@ -1048,6 +1032,7 @@ namespace GlobalResource
                 else
                 {
                     XElement child = _reader.MemberData.Value;
+                    string childUid = GeneratingCode.GetUniqueName(child);
 
                     bool isAttachedProperty = IsPropertyAttached(element);
 
@@ -1061,20 +1046,20 @@ namespace GlobalResource
                         string codeToAccessTheEnumerable;
                         if (isAttachedProperty)
                         {
-                            string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                            string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                 elementName.Namespace.NamespaceName,
                                 elementName.LocalName,
                                 assemblyNameIfAny);
 
                             codeToAccessTheEnumerable = string.Format(
                                 "{0}.Get{1}({2})",
-                                elementTypeInCSharp,
+                                elementType,
                                 propertyName,
-                                parentElementUniqueNameOrThisKeyword);
+                                parentUid);
                         }
                         else
                         {
-                            codeToAccessTheEnumerable = parentElementUniqueNameOrThisKeyword + "." + propertyName;
+                            codeToAccessTheEnumerable = parentUid + "." + propertyName;
                         }
 
                         if (IsPropertyOrFieldADictionary(element, isAttachedProperty))
@@ -1083,24 +1068,24 @@ namespace GlobalResource
                             if (isImplicitStyle)
                             {
                                 // System.Collections.IDictionary
-                                parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add(typeof<{childKey}>, {GeneratingCode.GetUniqueName(child)}) |> ignore");
+                                parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add(typeof<{childKey}>, {childUid}) |> ignore");
                             }
                             else if (isImplicitDataTemplate)
                             {
-                                string key = $"new global.{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof<{childKey}>)";
+                                string key = $"new global.{KnownNamespaces.SystemWindows}.DataTemplateKey(typeof<{childKey}>)";
                                 // System.Collections.IDictionary
-                                parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add({key}, {GeneratingCode.GetUniqueName(child)}) |> ignore");
+                                parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add({key}, {childUid}) |> ignore");
                             }
                             else
                             {
                                 // System.Collections.IDictionary
-                                parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add(\"{childKey}\", {GeneratingCode.GetUniqueName(child)}) |> ignore");
+                                parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add(\"{childKey}\", {childUid}) |> ignore");
                             }
                         }
                         else
                         {
                             // System.Collections.IList
-                            parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add({GeneratingCode.GetUniqueName(child)}) |> ignore");
+                            parameters.StringBuilder.AppendLine($"{codeToAccessTheEnumerable}.Add({childUid}) |> ignore");
                         }
                     }
                     else
@@ -1109,7 +1094,6 @@ namespace GlobalResource
                         // PROPERTY TYPE IS NOT A COLLECTION
                         //------------------------
 
-                        string childUniqueName = GeneratingCode.GetUniqueName(child);
                         // Note about "RelativeSource": even though it inherits from "MarkupExtension", we do not was
                         // to consider "RelativeSource" as a markup extension for the compilation because it is only
                         // meant to be used WITHIN another markup extension (sort of a "nested" markup extension),
@@ -1118,12 +1102,12 @@ namespace GlobalResource
                         {
                             if (isAttachedProperty)
                             {
-                                string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
-                                parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, {3})", elementTypeInCSharp, propertyName, parentElementUniqueNameOrThisKeyword, childUniqueName)); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
+                                string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
+                                parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, {3})", elementType, propertyName, parentUid, childUid)); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
                             }
                             else
                             {
-                                parameters.StringBuilder.AppendLine(string.Format("{0}.{1} <- {2}", parentElementUniqueNameOrThisKeyword, propertyName, childUniqueName));
+                                parameters.StringBuilder.AppendLine(string.Format("{0}.{1} <- {2}", parentUid, propertyName, childUid));
                             }
                         }
                         else
@@ -1131,8 +1115,6 @@ namespace GlobalResource
                             //------------------------------
                             // MARKUP EXTENSIONS:
                             //------------------------------
-
-                            XElement parent = element.Parent;
 
                             if (child.Name.LocalName == "StaticResource" || child.Name.LocalName == "StaticResourceExtension" || child.Name.LocalName == "ThemeResourceExtension") //todo: see if there are other elements than StaticResource that need the parents //todo: check namespace as well?
                             {
@@ -1146,11 +1128,10 @@ namespace GlobalResource
                                 // Attached property
                                 if (isAttachedProperty)
                                 {
-                                    string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                                        element.Name.NamespaceName, splittedLocalName[0], assemblyNameIfAny
-                                    );
+                                    string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
+                                        element.Name.NamespaceName, splittedLocalName[0], assemblyNameIfAny);
 
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                    _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         element.Name.NamespaceName,
                                         splittedLocalName[0],
@@ -1165,19 +1146,19 @@ namespace GlobalResource
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
                                             "{0}.Set{1}({2}, ({4}.CallProvideValue({5}, {6}) :?> {3}))",
-                                            elementTypeInCSharp,
+                                            elementType,
                                             propertyName,
-                                            GeneratingCode.GetUniqueName(parent),
+                                            parentUid,
                                             "global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
                                             parameters.CurrentXamlContext,
-                                            childUniqueName
+                                            childUid
                                         )
                                     );
                                 }
                                 else
                                 {
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                    _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
@@ -1192,12 +1173,12 @@ namespace GlobalResource
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
                                             "{0}.{1} <- ({3}.CallProvideValue({4}, {5}) :?> {2})",
-                                            GeneratingCode.GetUniqueName(parent),
+                                            parentUid,
                                             propertyName,
                                             "global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
                                             RuntimeHelperClass,
                                             parameters.CurrentXamlContext,
-                                            childUniqueName
+                                            childUid
                                         )
                                     );
                                 }
@@ -1209,18 +1190,18 @@ namespace GlobalResource
                                 //------------------------------
 
                                 bool isDependencyProperty =
-                                    _reflectionOnSeparateAppDomain.GetField(
+                                    _settings.Inspector.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _assemblyNameWithoutExtension) != null;
+                                        _settings.AssemblyName) != null;
 
                                 string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
                                 string propertyTypeName;
                                 if (!isAttachedProperty)
                                 {
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
+                                    _settings.Inspector.GetPropertyOrFieldInfo(propertyName,
                                                                                          parent.Name.Namespace.NamespaceName,
                                                                                          parent.Name.LocalName,
                                                                                          out propertyDeclaringTypeName,
@@ -1231,7 +1212,7 @@ namespace GlobalResource
                                 }
                                 else
                                 {
-                                    _reflectionOnSeparateAppDomain.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
+                                    _settings.Inspector.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
                                         out propertyDeclaringTypeName,
@@ -1244,43 +1225,43 @@ namespace GlobalResource
                                 // Check if the property is of type "Binding/MultiBinding" (or "BindingBase"), in which 
                                 // case we should directly assign the value instead of calling "SetBinding"
                                 bool isPropertyOfTypeBinding =
-                                    propertyTypeFullName == $"global.{_settings.Metadata.SystemWindowsDataNS}.{child.Name.LocalName}" ||
-                                    propertyTypeFullName == $"global.{_settings.Metadata.SystemWindowsDataNS}.BindingBase";
+                                    propertyTypeFullName == $"global.{KnownNamespaces.SystemWindowsData}.{child.Name.LocalName}" ||
+                                    propertyTypeFullName == $"global.{KnownNamespaces.SystemWindowsData}.BindingBase";
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} <- {2}", parentElementUniqueNameOrThisKeyword, propertyName, GeneratingCode.GetUniqueName(child)));
+                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} <- {2}", parentUid, propertyName, childUid));
                                 }
                                 else
                                 {
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
                                             "global.{3}.BindingOperations.SetBinding({0}, {1}, {2}) |> ignore",
-                                            parentElementUniqueNameOrThisKeyword,
+                                            parentUid,
                                             propertyDeclaringTypeName + "." + propertyName + "Property",
-                                            GeneratingCode.GetUniqueName(child),
-                                            _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
+                                            childUid,
+                                            KnownNamespaces.SystemWindowsData)); //we add the container itself since we couldn't add it inside the while
                                 }
                             }
-                            else if (GeneratingCode.IsDynamicResourceExtension(child, _settings))
+                            else if (GeneratingCode.IsDynamicResourceExtension(child))
                             {
                                 //------------------------------
                                 // {DynamicResource}
                                 //------------------------------
 
                                 string dependencyPropertyName =
-                                    _reflectionOnSeparateAppDomain.GetField(
+                                    _settings.Inspector.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _assemblyNameWithoutExtension);
+                                        _settings.AssemblyName);
 
                                 string propertyDeclaringTypeName;
                                 string propertyTypeNamespace;
                                 string propertyTypeName;
                                 if (!isAttachedProperty)
                                 {
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(propertyName,
+                                    _settings.Inspector.GetPropertyOrFieldInfo(propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
                                         out propertyDeclaringTypeName,
@@ -1291,7 +1272,7 @@ namespace GlobalResource
                                 }
                                 else
                                 {
-                                    _reflectionOnSeparateAppDomain.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
+                                    _settings.Inspector.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
                                         out propertyDeclaringTypeName,
@@ -1302,64 +1283,64 @@ namespace GlobalResource
 
                                 if (dependencyPropertyName is null)
                                 {
-                                    string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                    string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
                                         assemblyNameIfAny);
 
-                                    if (elementTypeInCSharp == $"global.{_settings.Metadata.SystemWindowsNS}.Setter" && propertyName == "Value")
+                                    if (elementType == $"global.{KnownNamespaces.SystemWindows}.Setter" && propertyName == "Value")
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                            $"{parentElementUniqueNameOrThisKeyword}.{propertyName} <- {GeneratingCode.GetUniqueName(child)}");
+                                            $"{parentUid}.{propertyName} <- {childUid}");
                                     }
                                     else
                                     {
                                         throw new XamlParseException(
-                                            $"A 'DynamicResourceExtension' cannot be set on the '{propertyName}' property of type '{elementTypeInCSharp.Substring("global.".Length)}'. A 'DynamicResourceExtension' can only be set on a DependencyProperty of a DependencyObject, or the Setter.Value property.",
+                                            $"A 'DynamicResourceExtension' cannot be set on the '{propertyName}' property of type '{elementType.Substring("global.".Length)}'. A 'DynamicResourceExtension' can only be set on a DependencyProperty of a DependencyObject, or the Setter.Value property.",
                                             element);
                                     }
                                 }
                                 else
                                 {
-                                    string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
+                                    string markupValue = GeneratingUniqueNames.GenerateUniqueName("tmp");
                                     string propertyTypeFullName = string.IsNullOrEmpty(propertyTypeNamespace) ?
                                         $"global.{propertyTypeName}" :
                                         $"global.{propertyTypeNamespace}.{propertyTypeName}";
 
                                     parameters.StringBuilder
                                         .AppendLine($"let mutable {markupValue}: obj = null")
-                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dependencyPropertyName}, {childUniqueName}, ref {markupValue})) then");
+                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentUid}, {dependencyPropertyName}, {childUid}, ref {markupValue})) then");
 
                                     if (!isAttachedProperty)
                                     {
                                         parameters.StringBuilder
-                                            .AppendLine($"    {parentElementUniqueNameOrThisKeyword}.{propertyName} <- ({markupValue} :?> {propertyTypeFullName})");
+                                            .AppendLine($"    {parentUid}.{propertyName} <- ({markupValue} :?> {propertyTypeFullName})");
                                     }
                                     else
                                     {
                                         parameters.StringBuilder
-                                            .AppendLine($"    {propertyDeclaringTypeName}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, ({markupValue} :?> {propertyTypeFullName}))");
+                                            .AppendLine($"    {propertyDeclaringTypeName}.Set{propertyName}({parentUid}, ({markupValue} :?> {propertyTypeFullName}))");
                                     }
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
                             {
                                 var dependencyPropertyName =
-                                    _reflectionOnSeparateAppDomain.GetField(
+                                    _settings.Inspector.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
-                                        _assemblyNameWithoutExtension);
+                                        _settings.AssemblyName);
 
                                 parameters.StringBuilder.AppendLine(string.Format(
                                     "{0}.SetValue({1}, {2}.CallProvideValue({3}, {4}))",
-                                    parentElementUniqueNameOrThisKeyword,
+                                    parentUid,
                                     dependencyPropertyName,
                                     RuntimeHelperClass,
                                     parameters.CurrentXamlContext,
-                                    GeneratingCode.GetUniqueName(child)));
+                                    childUid));
                             }
-                            else if (GeneratingCode.IsNullExtension(child, _settings))
+                            else if (GeneratingCode.IsNullExtension(child))
                             {
                                 //------------------------------
                                 // {x:Null}
@@ -1367,22 +1348,22 @@ namespace GlobalResource
 
                                 if (isAttachedProperty)
                                 {
-                                    string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, null)", elementTypeInCSharp, propertyName, parentElementUniqueNameOrThisKeyword));
+                                    string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
+                                    parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, null)", elementType, propertyName, parentUid));
                                 }
                                 else
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} <- null", parentElementUniqueNameOrThisKeyword, propertyName));
+                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} <- null", parentUid, propertyName));
                                 }
                                 //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new global.System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
                             }
-                            else if (GeneratingCode.IsStaticExtension(child, _settings))
+                            else if (GeneratingCode.IsStaticExtension(child))
                             {
                                 string staticMemberName = ResolveStaticExtension(child);
 
                                 if (isAttachedProperty)
                                 {
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                    _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         element.Name.NamespaceName,
                                         typeName,
@@ -1393,17 +1374,17 @@ namespace GlobalResource
                                         assemblyNameIfAny,
                                         isAttached: true);
 
-                                    string type = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                    string type = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
                                         assemblyNameIfAny);
 
                                     parameters.StringBuilder.AppendLine(
-                                        $"{type}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, ({staticMemberName} :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
+                                        $"{type}.Set{propertyName}({parentUid}, ({staticMemberName} :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                 }
                                 else
                                 {
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                    _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         parent.Name.NamespaceName,
                                         parent.Name.LocalName,
@@ -1415,16 +1396,16 @@ namespace GlobalResource
                                         isAttached: false);
 
                                     parameters.StringBuilder.AppendLine(
-                                        $"{parentElementUniqueNameOrThisKeyword}.{propertyName} <- ({staticMemberName} :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)}");
+                                        $"{parentUid}.{propertyName} <- ({staticMemberName} :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)}");
                                 }
                             }
-                            else if (GeneratingCode.IsTypeExtension(child, _settings))
+                            else if (GeneratingCode.IsTypeExtension(child))
                             {
                                 string resolvedTypeName = ResolveTypeExtension(child);
 
                                 if (isAttachedProperty)
                                 {
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                    _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         element.Name.NamespaceName,
                                         typeName,
@@ -1435,17 +1416,17 @@ namespace GlobalResource
                                         assemblyNameIfAny,
                                         isAttached: true);
 
-                                    string type = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                    string type = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                         elementName.Namespace.NamespaceName,
                                         elementName.LocalName,
                                         assemblyNameIfAny);
 
                                     parameters.StringBuilder.AppendLine(
-                                        $"{type}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, (typeof<{resolvedTypeName}> :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
+                                        $"{type}.Set{propertyName}({parentUid}, (typeof<{resolvedTypeName}> :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                 }
                                 else
                                 {
-                                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                    _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         parent.Name.NamespaceName,
                                         parent.Name.LocalName,
@@ -1457,7 +1438,7 @@ namespace GlobalResource
                                         isAttached: false);
 
                                     parameters.StringBuilder.AppendLine(
-                                        $"{parentElementUniqueNameOrThisKeyword}.{propertyName} <- (typeof<{resolvedTypeName}> :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)}");
+                                        $"{parentUid}.{propertyName} <- (typeof<{resolvedTypeName}> :> obj) :?> {GetFullTypeName(propertyTypeNS, propertyTypeName)}");
                                 }
                             }
                             else
@@ -1478,7 +1459,7 @@ namespace GlobalResource
                                     propertyOwnerTypeName = parent.Name.LocalName;
                                 }
 
-                                _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                                _settings.Inspector.GetPropertyOrFieldTypeInfo(
                                     propertyName,
                                     propertyOwnerTypeNS,
                                     propertyOwnerTypeName,
@@ -1489,51 +1470,51 @@ namespace GlobalResource
                                     assemblyNameIfAny,
                                     isAttachedProperty);
 
-                                string dpName = _reflectionOnSeparateAppDomain.GetField(
+                                string dpName = _settings.Inspector.GetField(
                                     propertyName + "Property",
                                     propertyOwnerTypeNS,
                                     propertyOwnerTypeName,
-                                    _assemblyNameWithoutExtension);
+                                    _settings.AssemblyName);
 
                                 if (dpName != null)
                                 {
-                                    string markupValue = GeneratingUniqueNames.GenerateUniqueNameFromString("tmp");
+                                    string markupValue = GeneratingUniqueNames.GenerateUniqueName("tmp");
                                     string propertyTypeFullName = GetFullTypeName(propertyTypeNS, propertyTypeName);
 
                                     parameters.StringBuilder
                                         .AppendLine($"let mutable {markupValue}: obj = null")
-                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentElementUniqueNameOrThisKeyword}, {dpName}, {childUniqueName}, ref {markupValue})) then");
+                                        .AppendLine($"if not ({RuntimeHelperClass}.TrySetMarkupExtension({parentUid}, {dpName}, {childUid}, ref {markupValue})) then");
 
                                     if (isAttachedProperty)
                                     {
-                                        string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                        string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
 
                                         parameters.StringBuilder
-                                            .AppendLine($"    {elementTypeInCSharp}.Set{propertyName}({parentElementUniqueNameOrThisKeyword}, ({markupValue} :?> {propertyTypeFullName}))");
+                                            .AppendLine($"    {elementType}.Set{propertyName}({parentUid}, ({markupValue} :?> {propertyTypeFullName}))");
                                     }
                                     else
                                     {
                                         parameters.StringBuilder
-                                            .AppendLine($"    {parentElementUniqueNameOrThisKeyword}.{propertyName} <- ({markupValue} :?> {propertyTypeFullName})");
+                                            .AppendLine($"    {parentUid}.{propertyName} <- ({markupValue} :?> {propertyTypeFullName})");
                                     }
                                 }
                                 else
                                 {
                                     if (isAttachedProperty)
                                     {
-                                        string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                        string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
 
                                         string markupExtension = string.Format(
                                             "({1} :> {0}).ProvideValue(new global.System.ServiceProvider({2}, null))",
-                                            IMarkupExtensionClass, childUniqueName, GeneratingCode.GetUniqueName(parent));
+                                            IMarkupExtensionClass, childUid, parentUid);
 
                                         parameters.StringBuilder.AppendLine(
                                             string.Format("{0}.Set{1}({2}, ({4} :> {3})",
-                                                          elementTypeInCSharp,
+                                                          elementType,
                                                           propertyName,
-                                                          parentElementUniqueNameOrThisKeyword,
+                                                          parentUid,
                                                           GetFullTypeName(propertyTypeNS, propertyTypeName),
                                                           markupExtension));
                                     }
@@ -1542,11 +1523,11 @@ namespace GlobalResource
                                         parameters.StringBuilder.AppendLine(
                                             string.Format(
                                                 "{0}.{1} = ((({4} :> {3}).ProvideValue(new global.System.ServiceProvider({0}, null)) :> {2})",
-                                                GeneratingCode.GetUniqueName(parent),
+                                                parentUid,
                                                 propertyName,
                                                 GetFullTypeName(propertyTypeNS, propertyTypeName),
                                                 IMarkupExtensionClass,
-                                                childUniqueName));
+                                                childUid));
                                     }
                                 }
                             }
@@ -1558,9 +1539,10 @@ namespace GlobalResource
             private void OnWriteEndMemberCollection(GeneratorContext parameters)
             {
                 XElement target = _reader.MemberData.Target;
-                XElement child = _reader.MemberData.Value;
+                string targetUid = GeneratingCode.GetUniqueName(target);
 
-                string targetUniqueName = GeneratingCode.GetUniqueName(target);
+                XElement child = _reader.MemberData.Value;
+                string childUid = GeneratingCode.GetUniqueName(child);
 
                 if (IsElementADictionary(target))
                 {
@@ -1568,24 +1550,24 @@ namespace GlobalResource
                     if (isImplicitStyle)
                     {
                         // System.Collections.IDictionary
-                        parameters.StringBuilder.AppendLine($"{targetUniqueName}.Add(typeof<{childKey}>, {GeneratingCode.GetUniqueName(child)}) |> ignore");
+                        parameters.StringBuilder.AppendLine($"{targetUid}.Add(typeof<{childKey}>, {childUid}) |> ignore");
                     }
                     else if (isImplicitDataTemplate)
                     {
-                        string key = $"new global.{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof<{childKey}>)";
+                        string key = $"new global.{KnownNamespaces.SystemWindows}.DataTemplateKey(typeof<{childKey}>)";
                         // System.Collections.IDictionary
-                        parameters.StringBuilder.AppendLine($"{targetUniqueName}.Add({key}, {GeneratingCode.GetUniqueName(child)}) |> ignore");
+                        parameters.StringBuilder.AppendLine($"{targetUid}.Add({key}, {childUid}) |> ignore");
                     }
                     else
                     {
                         // System.Collections.IDictionary
-                        parameters.StringBuilder.AppendLine($"{targetUniqueName}.Add(\"{childKey}\", {GeneratingCode.GetUniqueName(child)}) |> ignore");
+                        parameters.StringBuilder.AppendLine($"{targetUid}.Add(\"{childKey}\", {childUid}) |> ignore");
                     }
                 }
                 else
                 {
                     // System.Collections.IList
-                    parameters.StringBuilder.AppendLine($"{targetUniqueName}.Add({GeneratingCode.GetUniqueName(child)}) |> ignore");
+                    parameters.StringBuilder.AppendLine($"{targetUid}.Add({childUid}) |> ignore");
                 }
             }
 
@@ -1622,7 +1604,7 @@ namespace GlobalResource
                         string typeName = currentElement.Parent.Name.LocalName.Substring(0, index);
                         string propertyName = currentElement.Parent.Name.LocalName.Substring(index + 1);
 
-                        if (_reflectionOnSeparateAppDomain.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName))
+                        if (_settings.Inspector.IsFrameworkTemplateTemplateProperty(propertyName, namespaceName, typeName))
                         {
                             return currentElement;
                         }
@@ -1641,14 +1623,14 @@ namespace GlobalResource
 
             private bool IsClassTheApplicationClass(string className)
             {
-                return className == $"global.{_settings.Metadata.SystemWindowsNS}.Application";
+                return className == $"global.{KnownNamespaces.SystemWindows}.Application";
             }
 
             private bool IsResourceDictionaryCreatedFromSource(XElement element)
             {
                 if (element.Attribute("Source") != null)
                 {
-                    return _reflectionOnSeparateAppDomain.IsResourceDictionarySourcePropertyVisible(
+                    return _settings.Inspector.IsResourceDictionarySourcePropertyVisible(
                         element.Name.NamespaceName, element.Name.LocalName);
                 }
 
@@ -1658,7 +1640,7 @@ namespace GlobalResource
             private string GenerateCodeForSetterProperty(XElement styleElement, string attributeValue)
             {
                 bool isAttachedProperty = attributeValue.Contains(".");
-                string elementTypeInCSharp, dependencyPropertyName;
+                string elementType, dependencyPropertyName;
                 bool hasNamespace;
                 string namespaceName, propertyName;
                 // Check for namespace/prefix
@@ -1685,7 +1667,7 @@ namespace GlobalResource
                         out string elementNamespaceName,
                         out string elementLocalTypeName,
                         out string _);
-                    elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                    elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                         elementNamespaceName,
                         elementLocalTypeName);
 
@@ -1693,10 +1675,10 @@ namespace GlobalResource
                 }
                 else
                 {
-                    elementTypeInCSharp = GetCSharpFullTypeNameFromTargetTypeString(styleElement);
+                    elementType = GetCSharpFullTypeNameFromTargetTypeString(styleElement);
                     dependencyPropertyName = attributeValue + "Property"; //todo: handle the case where the DependencyProperty name is not the name of the property followed by "Property" (at least improve the error message)
                 }
-                return string.Format("{0}.{1}", elementTypeInCSharp, dependencyPropertyName);
+                return string.Format("{0}.{1}", elementType, dependencyPropertyName);
             }
 
             private XName GetCSharpXNameFromTargetTypeOrAttachedPropertyString(XElement setterElement, bool isAttachedProperty)
@@ -1749,7 +1731,7 @@ namespace GlobalResource
                 }
 
                 GetClrNamespaceAndLocalName(attributeTypeString, currentXElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
-                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny);
+                return _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny);
             }
 
             private string GetCSharpFullTypeNameFromTargetTypeString(XElement styleElement, bool isDataType = false)
@@ -1763,13 +1745,13 @@ namespace GlobalResource
                     out string namespaceName,
                     out string localTypeName,
                     out string assemblyNameIfAny);
-                string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                     namespaceName,
                     localTypeName,
                     assemblyNameIfAny,
                     ifTypeNotFoundTryGuessing: false);
 
-                return elementTypeInCSharp;
+                return elementType;
             }
 
             private string GetCSharpFullTypeName(string typeString, XElement elementWhereTheTypeIsUsed)
@@ -1779,13 +1761,13 @@ namespace GlobalResource
                     out string namespaceName,
                     out string localTypeName,
                     out string assemblyNameIfAny);
-                string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                     namespaceName,
                     localTypeName,
                     assemblyNameIfAny,
                     ifTypeNotFoundTryGuessing: false);
 
-                return elementTypeInCSharp;
+                return elementType;
             }
 
             private string GetElementXKey(XElement element,
@@ -1837,7 +1819,7 @@ namespace GlobalResource
 
                 if (isAttachedProperty)
                 {
-                    _reflectionOnSeparateAppDomain.GetMethodReturnValueTypeInfo(
+                    _settings.Inspector.GetMethodReturnValueTypeInfo(
                         "Get" + propertyName,
                         namespaceName,
                         localTypeName,
@@ -1849,7 +1831,7 @@ namespace GlobalResource
                 }
                 else
                 {
-                    _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
+                    _settings.Inspector.GetPropertyOrFieldTypeInfo(
                         propertyName,
                         namespaceName,
                         localTypeName,
@@ -1878,7 +1860,7 @@ namespace GlobalResource
                         string[] split = value.Split(new char[] { ',' });
                         for (int i = 0; i < split.Length; i++)
                         {
-                            string fieldName = _reflectionOnSeparateAppDomain.GetEnumValue(
+                            string fieldName = _settings.Inspector.GetEnumValue(
                                 split[i].Trim(),
                                 valueNamespaceName,
                                 valueLocalTypeName,
@@ -1894,7 +1876,7 @@ namespace GlobalResource
                     }
                     else
                     {
-                        string fieldName = _reflectionOnSeparateAppDomain.GetEnumValue(
+                        string fieldName = _settings.Inspector.GetEnumValue(
                             value.Trim(),
                             valueNamespaceName,
                             valueLocalTypeName,
@@ -1929,7 +1911,7 @@ namespace GlobalResource
 
                     bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
                         valueTypeFullName.Substring("global.".Length), valueAssemblyName);
-                    
+
                     if (isAttachedProperty)
                     {
                         return ConvertFromInvariantString(
@@ -1937,7 +1919,7 @@ namespace GlobalResource
                     }
                     else
                     {
-                        string declaringTypeName = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                        string declaringTypeName = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                             namespaceName, localTypeName, assemblyNameIfAny);
 
                         return ConvertFromInvariantString(
@@ -1958,7 +1940,7 @@ namespace GlobalResource
                     || parentXName.LocalName == "HyperlinkButton";
 
                 // We change relative paths into absolute paths in case of <Image> controls and other controls that have the "Source" property:
-                if ((valueTypeFullName == $"global.{_settings.Metadata.SystemWindowsMediaNS}.ImageSource"
+                if ((valueTypeFullName == $"global.{KnownNamespaces.SystemWindowsMedia}.ImageSource"
                     || valueTypeFullName == "global.System.Uri"
                     || (propertyName == "FontFamily" && path.Contains('.')))
                     && !IsFrameOrUriMappingSpecialCase
@@ -1974,7 +1956,7 @@ namespace GlobalResource
                         string pathRelativeToProjectRoot = Path.Combine(relativePathOfTheCurrentFile.Replace('\\', '/'), path.Replace('\\', '/')).Replace('\\', '/');
 
                         // Surround the path with the assembly name to make it an absolute path in the form: "/assemblyName;component/FolderName/FileName.xaml"
-                        path = "/" + _assemblyNameWithoutExtension + ";component/" + pathRelativeToProjectRoot;
+                        path = $"/{_settings.AssemblyName};component/{pathRelativeToProjectRoot}";
                     }
                 }
             }
@@ -2096,7 +2078,7 @@ namespace GlobalResource
                         out string localTypeName,
                         out string assemblyName);
 
-                    string assemblyQualifiedName = _reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(
+                    string assemblyQualifiedName = _settings.Inspector.GetAssemblyQualifiedNameOfXamlType(
                         namespaceName, localTypeName, assemblyName
                     );
 
@@ -2185,7 +2167,7 @@ namespace GlobalResource
                 }
                 else
                 {
-                    preparedValue = CoreTypesHelperFS.ConvertFromInvariantStringHelper(value, type);
+                    preparedValue = CoreTypesConverterFS.ConvertFromInvariantStringHelper(value, type);
                 }
 
                 return preparedValue;
@@ -2210,7 +2192,7 @@ namespace GlobalResource
             }
 
             private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)
-                => propertyName == "RoutedEvent" && typeFullName == $"global.{_settings.Metadata.SystemWindowsNS}.EventTrigger";
+                => propertyName == "RoutedEvent" && typeFullName == $"global.{KnownNamespaces.SystemWindows}.EventTrigger";
 
             private static bool IsReservedAttribute(string attributeName)
             {
@@ -2246,7 +2228,7 @@ namespace GlobalResource
                     var typeLocalName = split[0];
                     var propertyOrFieldName = split[1];
                     GetClrNamespaceAndLocalName(propertyElement.Parent.Name, out string parentNamespaceName, out string parentLocalTypeName, out string parentAssemblyIfAny);
-                    return _reflectionOnSeparateAppDomain.IsPropertyAttached(propertyOrFieldName, namespaceName, typeLocalName, parentNamespaceName, parentLocalTypeName, assemblyNameIfAny);
+                    return _settings.Inspector.IsPropertyAttached(propertyOrFieldName, namespaceName, typeLocalName, parentNamespaceName, parentLocalTypeName, assemblyNameIfAny);
                 }
 
                 return false;
@@ -2259,14 +2241,14 @@ namespace GlobalResource
                     string methodName = "Get" + propertyElement.Name.LocalName.Split('.')[1]; // In case of attached property, we check the return type of the method "GetPROPERTYNAME()". For example, in case of "Grid.Row", we check the return type of the method "Grid.GetRow()".
                     XName elementName = propertyElement.Name.Namespace + propertyElement.Name.LocalName.Split('.')[0]; // eg. if the propertyElement is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
                     GetClrNamespaceAndLocalName(elementName, out string namespaceName, out string localName, out string assemblyNameIfAny);
-                    return _reflectionOnSeparateAppDomain.DoesMethodReturnACollection(methodName, namespaceName, localName, assemblyNameIfAny);
+                    return _settings.Inspector.DoesMethodReturnACollection(methodName, namespaceName, localName, assemblyNameIfAny);
                 }
                 else
                 {
                     var propertyOrFieldName = propertyElement.Name.LocalName.Split('.')[1];
                     var parentElement = propertyElement.Parent;
                     GetClrNamespaceAndLocalName(parentElement.Name, out string parentNamespaceName, out string parentLocalName, out string parentAssemblyNameIfAny);
-                    return _reflectionOnSeparateAppDomain.IsPropertyOrFieldACollection(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
+                    return _settings.Inspector.IsPropertyOrFieldACollection(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
                 }
             }
 
@@ -2303,34 +2285,34 @@ namespace GlobalResource
                     string methodName = "Get" + propertyElement.Name.LocalName.Split('.')[1]; // In case of attached property, we check the return type of the method "GetPROPERTYNAME()". For example, in case of "Grid.Row", we check the return type of the method "Grid.GetRow()".
                     XName elementName = propertyElement.Name.Namespace + propertyElement.Name.LocalName.Split('.')[0]; // eg. if the propertyElement is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
                     GetClrNamespaceAndLocalName(elementName, out string namespaceName, out string localName, out string assemblyNameIfAny);
-                    return _reflectionOnSeparateAppDomain.DoesMethodReturnADictionary(methodName, namespaceName, localName, assemblyNameIfAny);
+                    return _settings.Inspector.DoesMethodReturnADictionary(methodName, namespaceName, localName, assemblyNameIfAny);
                 }
                 else
                 {
                     var propertyOrFieldName = propertyElement.Name.LocalName.Split('.')[1];
                     var parentElement = propertyElement.Parent;
                     GetClrNamespaceAndLocalName(parentElement.Name, out string parentNamespaceName, out string parentLocalName, out string parentAssemblyNameIfAny);
-                    return _reflectionOnSeparateAppDomain.IsPropertyOrFieldADictionary(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
+                    return _settings.Inspector.IsPropertyOrFieldADictionary(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
                 }
             }
 
             private bool IsElementADictionary(XElement element)
             {
                 GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
-                return _reflectionOnSeparateAppDomain.IsElementADictionary(elementNameSpace, elementLocalName, assemblyNameIfAny);
+                return _settings.Inspector.IsElementADictionary(elementNameSpace, elementLocalName, assemblyNameIfAny);
             }
 
             private bool IsElementAMarkupExtension(XElement element)
             {
                 GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
-                return _reflectionOnSeparateAppDomain.IsElementAMarkupExtension(elementNameSpace, elementLocalName, assemblyNameIfAny);
+                return _settings.Inspector.IsElementAMarkupExtension(elementNameSpace, elementLocalName, assemblyNameIfAny);
             }
 
             private bool IsTypeAssignableFrom(XName elementOfTypeToAssignFrom, XName elementOfTypeToAssignTo, bool isAttached = false)
             {
                 GetClrNamespaceAndLocalName(elementOfTypeToAssignFrom, out string nameSpaceOfTypeToAssignFrom, out string nameOfTypeToAssignFrom, out string assemblyNameOfTypeToAssignFrom);
                 GetClrNamespaceAndLocalName(elementOfTypeToAssignTo, out string nameSpaceOfTypeToAssignTo, out string nameOfTypeToAssignTo, out string assemblyNameOfTypeToAssignTo);
-                return _reflectionOnSeparateAppDomain.IsTypeAssignableFrom(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom, nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo, isAttached);
+                return _settings.Inspector.IsTypeAssignableFrom(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom, nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo, isAttached);
             }
 
             private void GetClrNamespaceAndLocalName(
@@ -2361,7 +2343,6 @@ namespace GlobalResource
             private void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
                 => GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     xName,
-                    _settings.EnableImplicitAssemblyRedirection,
                     out namespaceName,
                     out localName,
                     out assemblyNameIfAny);
@@ -2375,12 +2356,11 @@ namespace GlobalResource
             {
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     xName,
-                    _settings.EnableImplicitAssemblyRedirection,
                     out namespaceName,
                     out typeName,
                     out assemblyName);
 
-                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                return _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                     namespaceName,
                     typeName,
                     assemblyName,
@@ -2441,15 +2421,15 @@ namespace GlobalResource
 
                 if (type.IsEnum)
                 {
-                    return _reflectionOnSeparateAppDomain.GetEnumValue(type, fieldString, false, false);
+                    return _settings.Inspector.GetEnumValue(type, fieldString, false, false);
                 }
 
-                if (_reflectionOnSeparateAppDomain.GetField(type, fieldString, true, true) is FieldDefinition staticField)
+                if (_settings.Inspector.GetField(type, fieldString, true, true) is FieldDefinition staticField)
                 {
                     return $"global.{staticField.DeclaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticField.Name}";
                 }
 
-                if (_reflectionOnSeparateAppDomain.GetProperty(type, fieldString, true, true) is PropertyDefinition staticProperty)
+                if (_settings.Inspector.GetProperty(type, fieldString, true, true) is PropertyDefinition staticProperty)
                 {
                     return $"global.{staticProperty.DeclaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticProperty.Name}";
                 }
@@ -2479,7 +2459,7 @@ namespace GlobalResource
 
                 GetClrNamespaceAndLocalName(value, element, out string namespaceName, out string typeName, out string assemblyName);
 
-                return _reflectionOnSeparateAppDomain.GetTypeDefinition(namespaceName, typeName, assemblyName);
+                return _settings.Inspector.GetTypeDefinition(namespaceName, typeName, assemblyName);
             }
         }
     }

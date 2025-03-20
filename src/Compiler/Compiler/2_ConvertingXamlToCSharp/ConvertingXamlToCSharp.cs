@@ -22,13 +22,9 @@ namespace OpenSilver.Compiler
             string xaml,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
-            string assemblyNameWithoutExtension,
-            AssembliesInspector reflectionOnSeparateAppDomain,
-            XamlPreprocessorOptions options,
+            ConversionSettings settings,
             bool isFirstPass)
         {
-            ConversionSettings settings = ConversionSettings.CreateCSharpSettings(assemblyNameWithoutExtension, options);
-
             // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it
             // could be badly formatted and not be parsable using XDocument.Parse.
             xaml = ProcessingHtmlPresenterNodes.Process(xaml);
@@ -41,16 +37,16 @@ namespace OpenSilver.Compiler
                 GeneratingPathInXaml.ProcessDocument(doc);
 
                 // Process the "TextBlock" and "Span" nodes in order to surround direct text content with "<Run>" tags:
-                ProcessingTextBlockNodes.Process(doc, reflectionOnSeparateAppDomain, settings);
+                ProcessingTextBlockNodes.Process(doc, settings);
 
-                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings, "global::");
+                InsertingImplicitNodes.InsertImplicitNodes(doc, settings, "global::");
 
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into
                 // "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
-                ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain, settings);
+                ProcessingContentPresenterNodes.Process(doc, settings);
 
                 // Convert markup extensions into XDocument nodes:
-                InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain, settings);
+                InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, settings);
             }
 
             // Generate unique names for XAML elements:
@@ -61,8 +57,6 @@ namespace OpenSilver.Compiler
                 doc,
                 sourceFile,
                 fileNameWithPathRelativeToProjectRoot,
-                assemblyNameWithoutExtension,
-                reflectionOnSeparateAppDomain,
                 isFirstPass,
                 settings);
         }

@@ -158,7 +158,7 @@ namespace OpenSilver.Compiler
             }
         }
 
-        public static (string NamespaceName, string AssemblyName) GetClrNamespaceAndAssembly(string ns, bool enableImplicitAssemblyRedirect)
+        public static (string NamespaceName, string AssemblyName) GetClrNamespaceAndAssembly(string ns)
         {
             if (ns.StartsWith(Using, StringComparison.OrdinalIgnoreCase))
             {
@@ -167,10 +167,7 @@ namespace OpenSilver.Compiler
             else if (ns.StartsWith(ClrNamespace, StringComparison.OrdinalIgnoreCase))
             {
                 ParseClrNamespaceDeclaration(ns, out string clrNamespace, out string assemblyName);
-                if (enableImplicitAssemblyRedirect)
-                {
-                    FixNamespaceForCompatibility(ref assemblyName, ref clrNamespace);
-                }
+                FixNamespaceForCompatibility(ref assemblyName, ref clrNamespace);
                 return (clrNamespace, assemblyName);
             }
             else if (string.IsNullOrEmpty(ns))
@@ -185,13 +182,12 @@ namespace OpenSilver.Compiler
 
         public static void GetClrNamespaceAndLocalName(
             XName xName,
-            bool enableImplicitAssemblyRedirect,
             out string namespaceName,
             out string localName,
             out string assemblyNameIfAny)
         {
             localName = xName.LocalName;
-            (namespaceName, assemblyNameIfAny) = GetClrNamespaceAndAssembly(xName.NamespaceName, enableImplicitAssemblyRedirect);
+            (namespaceName, assemblyNameIfAny) = GetClrNamespaceAndAssembly(xName.NamespaceName);
         }
 
         public static void ParseClrNamespaceDeclaration(string input, out string ns, out string assemblyNameIfAny)

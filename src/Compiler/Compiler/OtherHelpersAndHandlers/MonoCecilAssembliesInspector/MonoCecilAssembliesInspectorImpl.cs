@@ -109,7 +109,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         private readonly Dictionary<string, TypeDefinition> _typeNameToType = new();
 
         private readonly SupportedLanguage _compilerType;
-        private readonly IMetadata _metadata;
         private readonly SystemTypesHelper _systemTypesHelper;
 
         public MonoCecilAssembliesInspectorImpl(SupportedLanguage compilerType)
@@ -117,17 +116,14 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             _compilerType = compilerType;
             if (_compilerType == SupportedLanguage.CSharp)
             {
-                _metadata = MetadatasCS.Silverlight;
                 _systemTypesHelper = SystemTypesHelper.CSharp;
             }
             else if (_compilerType == SupportedLanguage.VBNet)
             {
-                _metadata = MetadatasVB.Silverlight;
                 _systemTypesHelper = SystemTypesHelper.VisualBasic;
             }
             else if (_compilerType == SupportedLanguage.FSharp)
             {
-                _metadata = MetadatasFS.Silverlight;
                 _systemTypesHelper = SystemTypesHelper.FSharp;
             }
             else
@@ -490,7 +486,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         private TypeDefinition GetDependencyObjectType()
         {
-            return FindType(_metadata.SystemWindowsNS, DependencyObj, Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR);
+            return FindType(KnownNamespaces.SystemWindows, DependencyObj, Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR);
         }
 
         public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName,
@@ -563,7 +559,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             return FindPropertyDeep(type, TemplatePropertyName, out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == FrameworkTemplateName &&
-                prop.DeclaringType.Namespace == _metadata.SystemWindowsNS &&
+                prop.DeclaringType.Namespace == KnownNamespaces.SystemWindows &&
                 prop.DeclaringType.Module.Assembly.Name.Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
         }
 
@@ -573,7 +569,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             return FindPropertyDeep(type, "Source", out _) is PropertyDefinition prop &&
                 prop.DeclaringType.Name == ResourceDictionaryName &&
-                prop.DeclaringType.Namespace == _metadata.SystemWindowsNS &&
+                prop.DeclaringType.Namespace == KnownNamespaces.SystemWindows &&
                 prop.DeclaringType.Module.Assembly.Name.Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
         }
 

@@ -156,8 +156,6 @@ namespace OpenSilver.Compiler
         public static string GenerateCode(XDocument doc,
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
-            string assemblyNameWithoutExtension,
-            AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
             ConversionSettings settings)
         {
@@ -165,9 +163,7 @@ namespace OpenSilver.Compiler
             if (isFirstPass)
             {
                 generator = new GeneratorPass1(doc,
-                    assemblyNameWithoutExtension,
                     fileNameWithPathRelativeToProjectRoot,
-                    reflectionOnSeparateAppDomain,
                     settings);
             }
             else
@@ -175,8 +171,6 @@ namespace OpenSilver.Compiler
                 generator = new GeneratorPass2(doc,
                     sourceFile,
                     fileNameWithPathRelativeToProjectRoot,
-                    assemblyNameWithoutExtension,
-                    reflectionOnSeparateAppDomain,
                     settings);
             }
 
