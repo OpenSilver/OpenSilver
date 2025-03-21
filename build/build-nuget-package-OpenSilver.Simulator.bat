@@ -14,15 +14,7 @@ IF "%~1" == "" (
 	SET PackageVersion=%1
 )
 
-rem Get the current date and time:
-FOR /F "tokens=2" %%i IN ('date /t') DO SET currentdate=%%i
-SET currenttime=%time%
-
 FOR /F "delims=" %%a IN ('powershell -Command "[guid]::NewGuid().ToString('N')"') DO SET BUILD_UUID=%%a
-
-rem Create a Version.txt file with the date:
-MD %BUILD_DIR%\temp
-ECHO OpenSilver.Simulator %PackageVersion% (%currentdate% %currenttime%)> %BUILD_DIR%\temp\Version.txt
 
 ECHO. 
 ECHO %ESC%[95mBuilding %ESC%[0mOpenSilver.Simulator %ESC%[0m

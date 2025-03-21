@@ -14,10 +14,6 @@ IF "%~1" == "" (
 	SET PackageVersion=%1
 )
 
-rem Get the current date and time:
-FOR /F "tokens=2" %%i IN ('date /t') DO SET currentdate=%%i
-SET currenttime=%time%
-
 FOR /F "delims=" %%a IN ('powershell -Command "[guid]::NewGuid().ToString('N')"') DO SET BUILD_UUID=%%a
 
 ECHO.
