@@ -115,7 +115,9 @@ namespace OpenSilver.Compiler
                     int indexOfClosingBracket = value.IndexOf('}');
                     if (indexOfClosingBracket < 0)
                     {
-                        throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use \"{{}}\" to escape '{{'.", attribute.Name), GeneratingCode.GetLineNumber(attribute.Parent), -1);
+                        throw new XamlParseException(
+                            $"Invalid value for attribute '{attribute.Name}'. Use \"{{}}\" to escape '{{'.",
+                            GeneratingCode.GetLineNumber(attribute.Parent), -1);
                     }
                     string contentBetweenBrackets = value.Substring(1, indexOfClosingBracket - 1);
                     if (string.IsNullOrEmpty(contentBetweenBrackets)) //handle special case where '{' is escaped with "{}"
@@ -132,7 +134,9 @@ namespace OpenSilver.Compiler
                         }
                         else
                         {
-                            throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use {} to escape '{'.", attribute.Name), GeneratingCode.GetLineNumber(attribute.Parent), -1);
+                            throw new XamlParseException(
+                                $"Invalid value for attribute '{attribute.Name}'. Use {{}} to escape '{{'.",
+                                GeneratingCode.GetLineNumber(attribute.Parent), -1);
                         }
                     }
                 }
@@ -311,13 +315,13 @@ namespace OpenSilver.Compiler
                     else
                     {
                         // Unknown prefix.
-                        throw new XamlParseException(string.Format("Unknown prefix '{0}' in '{1}'", prefix, nameThatMayHaveAPrefix));
+                        throw new XamlParseException($"Unknown prefix '{prefix}' in '{nameThatMayHaveAPrefix}'");
                     }
                 }
                 else
                 {
                     // Empty prefix.
-                    throw new XamlParseException(string.Format("Empty prefix in '{1}'", prefix, nameThatMayHaveAPrefix));
+                    throw new XamlParseException($"Empty prefix in '{nameThatMayHaveAPrefix}'");
                 }
             }
             else

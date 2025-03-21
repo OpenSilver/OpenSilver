@@ -192,9 +192,7 @@ namespace OpenSilver.Compiler
                                 // Verify that the attribute is not already set
                                 if (currentElement.Attribute(contentPropertyName) != null)
                                 {
-                                    throw new XamlParseException(
-                                        string.Format("The property '{0}' is set more than once.", contentPropertyName)
-                                    );
+                                    throw new XamlParseException($"The property '{contentPropertyName}' is set more than once.");
                                 }
 
                                 // SPECIAL CASE: If we are in a TextBlock, we want to set the
@@ -213,9 +211,7 @@ namespace OpenSilver.Compiler
                             }
                             else
                             {
-                                throw new XamlParseException(
-                                    string.Format("The element '{0}' does not support direct content.", currentElement.Name)
-                                );
+                                throw new XamlParseException($"The element '{currentElement.Name}' does not support direct content.");
                             }
                         }
                     }

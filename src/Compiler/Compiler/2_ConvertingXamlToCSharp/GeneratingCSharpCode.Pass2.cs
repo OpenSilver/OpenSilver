@@ -422,16 +422,9 @@ namespace OpenSilver.Compiler
                             directContent = _settings.SystemTypes.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
+                        string preparedValue = _settings.SystemTypes.ConvertFromInvariantString(directContent, elementType.Substring("global::".Length));
                         parameters.StringBuilder.AppendLine(
-                            string.Format(
-                                "{1} {0} = {3}.XamlContext_WriteStartObject({4}, {2});",
-                                elementUid,
-                                elementType,
-                                _settings.SystemTypes.ConvertFromInvariantString(directContent, elementType.Substring("global::".Length)),
-                                RuntimeHelperClass,
-                                parameters.CurrentXamlContext
-                            )
-                        );
+                            $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue});");
                     }
                     else if (isInitializeTypeFromString)
                     {
@@ -449,13 +442,7 @@ namespace OpenSilver.Compiler
                             stringValue, elementType, isKnownCoreType, isKnownSystemType);
 
                         parameters.StringBuilder.AppendLine(
-                            string.Format("var {0} = {2}.XamlContext_WriteStartObject({3}, {1});",
-                                elementUid,
-                                preparedValue,
-                                RuntimeHelperClass,
-                                parameters.CurrentXamlContext
-                            )
-                        );
+                            $"var {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue});");
                     }
                     else
                     {
@@ -552,7 +539,7 @@ namespace OpenSilver.Compiler
                                     // add '@' to handle cases where x:Name is a forbidden word (for instance 'this'
                                     // or any other c# keyword)
                                     string fieldName = "@" + name;
-                                    parameters.ResultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementType, fieldName));
+                                    parameters.ResultingFieldsForNamedElements.Add($"{fieldModifier} {elementType} {fieldName};");
                                     parameters.ResultingFindNameCalls.Add($"this.{fieldName} = (({elementType})(this.FindName(\"{name}\")));");
                                 }
 
@@ -603,13 +590,9 @@ namespace OpenSilver.Compiler
                                             // C# EVENT
                                             //------------
 
+                                            int componentId = parameters.ComponentConnector.ConnectEventHandler(elementType, attributeName, attributeValue);
                                             parameters.StringBuilder.AppendLine(
-                                                string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3});",
-                                                    RuntimeHelperClass,
-                                                    parameters.CurrentXamlContext,
-                                                    parameters.ComponentConnector.ConnectEventHandler(elementType, attributeName, attributeValue),
-                                                    elementUid)
-                                            );
+                                                $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid});");
 
                                             break;
                                         case MemberTypes.Field:
@@ -664,34 +647,26 @@ namespace OpenSilver.Compiler
                                             {
                                                 if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
                                                 {
-                                                    parameters.StringBuilder.AppendLine(
-                                                        string.Format("{0}.XamlPath = {1};",
-                                                            elementUid,
-                                                            _settings.SystemTypes.ConvertFromInvariantString(resolvedPath, "System.String")
-                                                        )
-                                                    );
+                                                    string xamlPath = _settings.SystemTypes.ConvertFromInvariantString(resolvedPath, "System.String");
+                                                    parameters.StringBuilder.AppendLine($"{elementUid}.XamlPath = {xamlPath};");
                                                 }
 
                                                 XName typeName = element.Name;
                                                 string propertyName = attribute.Name.LocalName;
 
-                                                value =
-                                                    GenerateCodeForInstantiatingAttributeValue(
-                                                        typeName,
-                                                        propertyName,
-                                                        isAttachedMember,
-                                                        attributeValue,
-                                                        element
-                                                    );
+                                                value = GenerateCodeForInstantiatingAttributeValue(
+                                                    typeName,
+                                                    propertyName,
+                                                    isAttachedMember,
+                                                    attributeValue,
+                                                    element);
                                             }
-                                            else if (elementType == $"global::{KnownNamespaces.SystemWindows}.TemplateBindingExtension"
-                                                && memberName == "Path")
+                                            else if (elementType == $"global::{KnownNamespaces.SystemWindows}.TemplateBindingExtension" && memberName == "Path")
                                             {
                                                 ResolvePathForTemplateBinding(attributeValue, element, out string typeName, out string propertyName);
                                                 parameters.StringBuilder.AppendLine(
-                                                    string.Format("{0}.DependencyPropertyName = {1};",
-                                                        elementUid,
-                                                        _settings.SystemTypes.ConvertFromInvariantString(propertyName, "System.String")));
+                                                    $"{elementUid}.DependencyPropertyName = {_settings.SystemTypes.ConvertFromInvariantString(propertyName, "System.String")};");
+
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
@@ -709,25 +684,18 @@ namespace OpenSilver.Compiler
                                                 XName typeName = element.Name;
                                                 string propertyName = attribute.Name.LocalName;
 
-                                                value =
-                                                    GenerateCodeForInstantiatingAttributeValue(
-                                                        typeName,
-                                                        propertyName,
-                                                        isAttachedMember,
-                                                        attributeValue,
-                                                        element
-                                                    );
+                                                value = GenerateCodeForInstantiatingAttributeValue(
+                                                    typeName,
+                                                    propertyName,
+                                                    isAttachedMember,
+                                                    attributeValue,
+                                                    element);
                                             }
 
                                             // Append the statement:
                                             if (value != null)
                                             {
-                                                parameters.StringBuilder.AppendLine(
-                                                    string.Format(
-                                                        "{0}.{1} = {2};",
-                                                        elementUid, attributeName, value
-                                                    )
-                                                );
+                                                parameters.StringBuilder.AppendLine($"{elementUid}.{attributeName} = {value};");
                                             }
 
                                             break;
@@ -778,13 +746,10 @@ namespace OpenSilver.Compiler
                                 case MemberTypes.Event:
                                     {
                                         string ownerType = $"global::{declaringType.ConvertToString(SupportedLanguage.CSharp)}";
+                                        int componentId = parameters.ComponentConnector.ConnectAttachedEventHandler(elementType, ownerType, memberName, attributeValue);
 
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3});",
-                                                RuntimeHelperClass,
-                                                parameters.CurrentXamlContext,
-                                                parameters.ComponentConnector.ConnectAttachedEventHandler(elementType, ownerType, memberName, attributeValue),
-                                                elementUid));
+                                            $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid});");
                                     }
                                     break;
 
@@ -973,15 +938,11 @@ namespace OpenSilver.Compiler
                                 elementName.LocalName,
                                 assemblyNameIfAny);
 
-                            codeToAccessTheEnumerable = string.Format(
-                                "{0}.Get{1}({2})",
-                                elementType,
-                                propertyName,
-                                parentUid);
+                            codeToAccessTheEnumerable = $"{elementType}.Get{propertyName}({parentUid})";
                         }
                         else
                         {
-                            codeToAccessTheEnumerable = parentUid + "." + propertyName;
+                            codeToAccessTheEnumerable = $"{parentUid}.{propertyName}";
                         }
 
                         if (IsPropertyOrFieldADictionary(element, isAttachedProperty))
@@ -1022,11 +983,12 @@ namespace OpenSilver.Compiler
                             if (isAttachedProperty)
                             {
                                 string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
-                                parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, {3});", elementType, propertyName, parentUid, childUid)); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
+                                parameters.StringBuilder.AppendLine(
+                                    $"{elementType}.Set{propertyName}({parentUid}, {childUid});"); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
                             }
                             else
                             {
-                                parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2};", parentUid, propertyName, childUid));
+                                parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = {childUid};");
                             }
                         }
                         else
@@ -1059,21 +1021,11 @@ namespace OpenSilver.Compiler
                                         out _,
                                         out _,
                                         assemblyNameIfAny,
-                                        isAttached: true
-                                    );
+                                        isAttached: true);
 
+                                    string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
                                     parameters.StringBuilder.AppendLine(
-                                        string.Format(
-                                            "{0}.Set{1}({2}, ({3})({4}.CallProvideValue({5}, {6})));",
-                                            elementType,
-                                            propertyName,
-                                            parentUid,
-                                            "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                            RuntimeHelperClass,
-                                            parameters.CurrentXamlContext,
-                                            childUid
-                                        )
-                                    );
+                                        $"{elementType}.Set{propertyName}({parentUid}, ({propertyType})({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid})));");
                                 }
                                 else
                                 {
@@ -1086,20 +1038,11 @@ namespace OpenSilver.Compiler
                                         out _,
                                         out _,
                                         assemblyNameIfAny,
-                                        isAttached: false
-                                    );
+                                        isAttached: false);
 
+                                    string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
                                     parameters.StringBuilder.AppendLine(
-                                        string.Format(
-                                            "{0}.{1} = ({2}){3}.CallProvideValue({4}, {5});",
-                                            parentUid,
-                                            propertyName,
-                                            "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                            RuntimeHelperClass,
-                                            parameters.CurrentXamlContext,
-                                            childUid
-                                        )
-                                    );
+                                        $"{parentUid}.{propertyName} = ({propertyType}){RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid});");
                                 }
                             }
                             else if (child.Name.LocalName == "Binding" || child.Name.LocalName == "MultiBinding")
@@ -1149,17 +1092,13 @@ namespace OpenSilver.Compiler
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2};", parentUid, propertyName, childUid));
+                                    parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = {childUid};");
                                 }
                                 else
                                 {
+                                    string dpFullName = $"{propertyDeclaringTypeName}.{propertyName}Property";
                                     parameters.StringBuilder.AppendLine(
-                                        string.Format(
-                                            "global::{3}.BindingOperations.SetBinding({0}, {1}, {2});",
-                                            parentUid,
-                                            propertyDeclaringTypeName + "." + propertyName + "Property",
-                                            childUid,
-                                            KnownNamespaces.SystemWindowsData)); //we add the container itself since we couldn't add it inside the while
+                                        $"global::{KnownNamespaces.SystemWindowsData}.BindingOperations.SetBinding({parentUid}, {dpFullName}, {childUid});");
                                 }
                             }
                             else if (GeneratingCode.IsDynamicResourceExtension(child))
@@ -1247,20 +1186,15 @@ namespace OpenSilver.Compiler
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
                             {
-                                var dependencyPropertyName =
+                                var dpName =
                                     _settings.Inspector.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
                                         _settings.AssemblyName);
 
-                                parameters.StringBuilder.AppendLine(string.Format(
-                                    "{0}.SetValue({1}, {2}.CallProvideValue({3}, {4}));",
-                                    parentUid,
-                                    dependencyPropertyName,
-                                    RuntimeHelperClass,
-                                    parameters.CurrentXamlContext,
-                                    childUid));
+                                parameters.StringBuilder.AppendLine(
+                                    $"{parentUid}.SetValue({dpName}, {RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}));");
                             }
                             else if (GeneratingCode.IsNullExtension(child))
                             {
@@ -1271,11 +1205,11 @@ namespace OpenSilver.Compiler
                                 if (isAttachedProperty)
                                 {
                                     string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, null);", elementType, propertyName, parentUid));
+                                    parameters.StringBuilder.AppendLine($"{elementType}.Set{propertyName}({parentUid}, null);");
                                 }
                                 else
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = null;", parentUid, propertyName));
+                                    parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = null;");
                                 }
                                 //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new global::System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
                             }
@@ -1431,28 +1365,16 @@ namespace OpenSilver.Compiler
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
 
-                                        string markupExtension = string.Format(
-                                            "(({0}){1}).ProvideValue(new global::System.ServiceProvider({2}, null))",
-                                            IMarkupExtensionClass, childUid, parentUid);
+                                        string markupExtension = 
+                                            $"(({IMarkupExtensionClass}){childUid}).ProvideValue(new global::System.ServiceProvider({parentUid}, null))";
 
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format("{0}.Set{1}({2}, ({3}){4});",
-                                                          elementType,
-                                                          propertyName,
-                                                          parentUid,
-                                                          GetFullTypeName(propertyTypeNS, propertyTypeName),
-                                                          markupExtension));
+                                            $"{elementType}.Set{propertyName}({parentUid}, ({GetFullTypeName(propertyTypeNS, propertyTypeName)}){markupExtension});");
                                     }
                                     else
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format(
-                                                "{0}.{1} = ({2})(({3}){4}).ProvideValue(new global::System.ServiceProvider({0}, null));",
-                                                parentUid,
-                                                propertyName,
-                                                GetFullTypeName(propertyTypeNS, propertyTypeName),
-                                                IMarkupExtensionClass,
-                                                childUid));
+                                            $"{parentUid}.{propertyName} = ({GetFullTypeName(propertyTypeNS, propertyTypeName)})(({IMarkupExtensionClass}){childUid}).ProvideValue(new global::System.ServiceProvider({parentUid}, null));");
                                     }
                                 }
                             }
@@ -1600,7 +1522,7 @@ namespace OpenSilver.Compiler
                     elementType = GetCSharpFullTypeNameFromTargetTypeString(styleElement);
                     dependencyPropertyName = attributeValue + "Property"; //todo: handle the case where the DependencyProperty name is not the name of the property followed by "Property" (at least improve the error message)
                 }
-                return string.Format("{0}.{1}", elementType, dependencyPropertyName);
+                return $"{elementType}.{dependencyPropertyName}";
             }
 
             private XName GetCSharpXNameFromTargetTypeOrAttachedPropertyString(XElement setterElement, bool isAttachedProperty)
@@ -1764,12 +1686,7 @@ namespace OpenSilver.Compiler
                         assemblyNameIfAny);
                 }
 
-                string valueTypeFullName = string.Format(
-                    "global::{0}{1}{2}",
-                    valueNamespaceName,
-                    string.IsNullOrEmpty(valueNamespaceName) ? string.Empty : ".",
-                    valueLocalTypeName
-                );
+                string valueTypeFullName = GetFullTypeName(valueNamespaceName, valueLocalTypeName);
 
                 // Generate the code or instantiating the attribute
                 if (isValueEnum)
@@ -1814,7 +1731,7 @@ namespace OpenSilver.Compiler
                 {
                     string typeFullName = GetCSharpFullTypeName(value, elementWhereTheTypeIsUsed);
 
-                    return string.Format("typeof({0})", typeFullName);
+                    return $"typeof({typeFullName})";
                 }
                 else
                 {
@@ -2103,14 +2020,8 @@ namespace OpenSilver.Compiler
                 bool isKnownCoreType,
                 bool isKnownSystemType)
             {
-                return string.Format(
-                    "{0}.GetPropertyValue<{1}>(typeof({2}), {3}, {4}, () => {5})",
-                    RuntimeHelperClass,
-                    propertyType,
-                    propertyDeclaringType,
-                    EscapeString(propertyName),
-                    EscapeString(value),
-                    ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType));
+                string fallbackValue = ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType);
+                return $"{RuntimeHelperClass}.GetPropertyValue<{propertyType}>(typeof({propertyDeclaringType}), {EscapeString(propertyName)}, {EscapeString(value)}, () => {fallbackValue})";
             }
 
             private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)

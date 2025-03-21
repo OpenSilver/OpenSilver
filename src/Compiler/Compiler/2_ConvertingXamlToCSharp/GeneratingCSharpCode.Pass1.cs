@@ -78,10 +78,7 @@ namespace OpenSilver.Compiler
                             // or any other c# keyword)
                             string fieldName = "@" + name;
                             resultingFieldsForNamedElements.Add(
-                                string.Format("{0} {1} {2};",
-                                    fieldModifier,
-                                    GetCSharpEquivalentOfXamlTypeAsString(element.Name, true),
-                                    fieldName));
+                                $"{fieldModifier} {GetCSharpEquivalentOfXamlTypeAsString(element.Name, true)} {fieldName};");
                         }
                     }
                 }

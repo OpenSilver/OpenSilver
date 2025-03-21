@@ -428,16 +428,9 @@ End Sub
                             directContent = _settings.SystemTypes.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
+                        string preparedValue = _settings.SystemTypes.ConvertFromInvariantString(directContent, elementType.Substring("Global.".Length));
                         parameters.StringBuilder.AppendLine(
-                            string.Format(
-                                "Dim {0} As {1} = {3}.XamlContext_WriteStartObject({4}, {2})",
-                                elementUid,
-                                elementType,
-                                _settings.SystemTypes.ConvertFromInvariantString(directContent, elementType.Substring("Global.".Length)),
-                                RuntimeHelperClass,
-                                parameters.CurrentXamlContext
-                            )
-                        );
+                            $"Dim {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue})");
                     }
                     else if (isInitializeTypeFromString)
                     {
@@ -455,13 +448,7 @@ End Sub
                             stringValue, elementType, isKnownCoreType, isKnownSystemType);
 
                         parameters.StringBuilder.AppendLine(
-                            string.Format("Dim {0} = {2}.XamlContext_WriteStartObject({3}, {1})",
-                                elementUid,
-                                preparedValue,
-                                RuntimeHelperClass,
-                                parameters.CurrentXamlContext
-                            )
-                        );
+                            $"Dim {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue})");
                     }
                     else
                     {
@@ -558,7 +545,7 @@ End Sub
                                     // add '[]' to handle cases where x:Name is a forbidden word (for instance 'Me'
                                     // or any other VB keyword)
                                     string fieldName = $"[{name}]";
-                                    parameters.ResultingFieldsForNamedElements.Add(string.Format("{0} WithEvents {1} As {2}", fieldModifier, fieldName, elementType));
+                                    parameters.ResultingFieldsForNamedElements.Add($"{fieldModifier} WithEvents {fieldName} As {elementType}");
                                     parameters.ResultingFindNameCalls.Add($"Me.{fieldName} = (CType(Me.FindName(\"{name}\"), {elementType}))");
                                 }
 
@@ -609,13 +596,9 @@ End Sub
                                             // C# EVENT
                                             //------------
 
+                                            int componentId = parameters.ComponentConnector.ConnectEventHandler(elementType, attributeName, attributeValue);
                                             parameters.StringBuilder.AppendLine(
-                                                string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3})",
-                                                    RuntimeHelperClass,
-                                                    parameters.CurrentXamlContext,
-                                                    parameters.ComponentConnector.ConnectEventHandler(elementType, attributeName, attributeValue),
-                                                    elementUid)
-                                            );
+                                                $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid})");
 
                                             break;
                                         case MemberTypes.Field:
@@ -671,34 +654,26 @@ End Sub
                                             {
                                                 if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
                                                 {
-                                                    parameters.StringBuilder.AppendLine(
-                                                        string.Format("{0}.XamlPath = {1}",
-                                                            elementUid,
-                                                            _settings.SystemTypes.ConvertFromInvariantString(resolvedPath, "System.String")
-                                                        )
-                                                    );
+                                                    string xamlPath = _settings.SystemTypes.ConvertFromInvariantString(resolvedPath, "System.String");
+                                                    parameters.StringBuilder.AppendLine($"{elementUid}.XamlPath = {xamlPath}");
                                                 }
 
                                                 XName typeName = element.Name;
                                                 string propertyName = attribute.Name.LocalName;
 
-                                                value =
-                                                    GenerateCodeForInstantiatingAttributeValue(
-                                                        typeName,
-                                                        propertyName,
-                                                        isAttachedMember,
-                                                        attributeValue,
-                                                        element
-                                                    );
+                                                value = GenerateCodeForInstantiatingAttributeValue(
+                                                    typeName,
+                                                    propertyName,
+                                                    isAttachedMember,
+                                                    attributeValue,
+                                                    element);
                                             }
                                             else if (elementType == $"Global.{KnownNamespaces.SystemWindows}.TemplateBindingExtension"
                                                 && memberName == "Path")
                                             {
                                                 ResolvePathForTemplateBinding(attributeValue, element, out string typeName, out string propertyName);
                                                 parameters.StringBuilder.AppendLine(
-                                                    string.Format("{0}.DependencyPropertyName = {1}",
-                                                        elementUid,
-                                                        _settings.SystemTypes.ConvertFromInvariantString(propertyName, "System.String")));
+                                                    $"{elementUid}.DependencyPropertyName = {_settings.SystemTypes.ConvertFromInvariantString(propertyName, "System.String")}");
                                                 if (typeName != null)
                                                 {
                                                     parameters.StringBuilder.AppendLine(
@@ -729,12 +704,7 @@ End Sub
                                             // Append the statement:
                                             if (value != null)
                                             {
-                                                parameters.StringBuilder.AppendLine(
-                                                    string.Format(
-                                                        "{0}.{1} = {2}",
-                                                        elementUid, attributeName, value
-                                                    )
-                                                );
+                                                parameters.StringBuilder.AppendLine($"{elementUid}.{attributeName} = {value}");
                                             }
 
                                             break;
@@ -786,12 +756,9 @@ End Sub
                                     {
                                         string ownerType = $"Global.{declaringType.ConvertToString(SupportedLanguage.VBNet)}";
 
+                                        int componentId = parameters.ComponentConnector.ConnectAttachedEventHandler(elementType, ownerType, memberName, attributeValue);
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3})",
-                                                RuntimeHelperClass,
-                                                parameters.CurrentXamlContext,
-                                                parameters.ComponentConnector.ConnectAttachedEventHandler(elementType, ownerType, memberName, attributeValue),
-                                                elementUid));
+                                            $"{RuntimeHelperClass}.XamlContext_SetConnectionId({parameters.CurrentXamlContext}, {componentId}, {elementUid})");
                                     }
                                     break;
 
@@ -980,15 +947,11 @@ End Sub
                                 elementName.LocalName,
                                 assemblyNameIfAny);
 
-                            codeToAccessTheEnumerable = string.Format(
-                                "{0}.Get{1}({2})",
-                                elementType,
-                                propertyName,
-                                parentUid);
+                            codeToAccessTheEnumerable = $"{elementType}.Get{propertyName}({parentUid})";
                         }
                         else
                         {
-                            codeToAccessTheEnumerable = parentUid + "." + propertyName;
+                            codeToAccessTheEnumerable = $"{parentUid}.{propertyName}";
                         }
 
                         if (IsPropertyOrFieldADictionary(element, isAttachedProperty))
@@ -1029,11 +992,12 @@ End Sub
                             if (isAttachedProperty)
                             {
                                 string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
-                                parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, {3})", elementType, propertyName, parentUid, childUid)); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
+                                parameters.StringBuilder.AppendLine(
+                                    $"{elementType}.Set{propertyName}({parentUid}, {childUid})"); // eg. MyCustomGridClass.SetRow(grid32877267T6, int45628789434);
                             }
                             else
                             {
-                                parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2}", parentUid, propertyName, childUid));
+                                parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = {childUid}");
                             }
                         }
                         else
@@ -1069,18 +1033,9 @@ End Sub
                                         isAttached: true
                                     );
 
+                                    string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
                                     parameters.StringBuilder.AppendLine(
-                                        string.Format(
-                                            "{0}.Set{1}({2}, CType({4}.CallProvideValue({5}, {6}), {3}))",
-                                            elementType,
-                                            propertyName,
-                                            parentUid,
-                                            "Global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                            RuntimeHelperClass,
-                                            parameters.CurrentXamlContext,
-                                            childUid
-                                        )
-                                    );
+                                        $"{elementType}.Set{propertyName}({parentUid}, CType({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}), {propertyType}))");
                                 }
                                 else
                                 {
@@ -1096,17 +1051,9 @@ End Sub
                                         isAttached: false
                                     );
 
+                                    string propertyType = GetFullTypeName(propertyNamespaceName, propertyLocalTypeName);
                                     parameters.StringBuilder.AppendLine(
-                                        string.Format(
-                                            "{0}.{1} = CType({3}.CallProvideValue({4}, {5}), {2})",
-                                            parentUid,
-                                            propertyName,
-                                            "Global." + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                            RuntimeHelperClass,
-                                            parameters.CurrentXamlContext,
-                                            childUid
-                                        )
-                                    );
+                                        $"{parentUid}.{propertyName} = CType({RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}), {propertyType})");
                                 }
                             }
                             else if (child.Name.LocalName == "Binding" || child.Name.LocalName == "MultiBinding")
@@ -1156,17 +1103,13 @@ End Sub
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = {2}", parentUid, propertyName, childUid));
+                                    parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = {childUid}");
                                 }
                                 else
                                 {
+                                    string dpFullName = $"{propertyDeclaringTypeName}.{propertyName}Property";
                                     parameters.StringBuilder.AppendLine(
-                                        string.Format(
-                                            "Global.{3}.BindingOperations.SetBinding({0}, {1}, {2})",
-                                            parentUid,
-                                            propertyDeclaringTypeName + "." + propertyName + "Property",
-                                            childUid,
-                                            KnownNamespaces.SystemWindowsData)); //we add the container itself since we couldn't add it inside the while
+                                        $"Global.{KnownNamespaces.SystemWindowsData}.BindingOperations.SetBinding({parentUid}, {dpFullName}, {childUid})");
                                 }
                             }
                             else if (GeneratingCode.IsDynamicResourceExtension(child))
@@ -1253,20 +1196,15 @@ End Sub
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
                             {
-                                var dependencyPropertyName =
+                                var dpName =
                                     _settings.Inspector.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
                                         _settings.AssemblyName);
 
-                                parameters.StringBuilder.AppendLine(string.Format(
-                                    "{0}.SetValue({1}, {2}.CallProvideValue({3}, {4}))",
-                                    parentUid,
-                                    dependencyPropertyName,
-                                    RuntimeHelperClass,
-                                    parameters.CurrentXamlContext,
-                                    childUid));
+                                parameters.StringBuilder.AppendLine(
+                                    $"{parentUid}.SetValue({dpName}, {RuntimeHelperClass}.CallProvideValue({parameters.CurrentXamlContext}, {childUid}))");
                             }
                             else if (GeneratingCode.IsNullExtension(child))
                             {
@@ -1277,11 +1215,11 @@ End Sub
                                 if (isAttachedProperty)
                                 {
                                     string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(elementName.Namespace.NamespaceName, elementName.LocalName, assemblyNameIfAny);
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2}, Nothing)", elementType, propertyName, parentUid));
+                                    parameters.StringBuilder.AppendLine($"{elementType}.Set{propertyName}({parentUid}, Nothing)");
                                 }
                                 else
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.{1} = Nothing", parentUid, propertyName));
+                                    parameters.StringBuilder.AppendLine($"{parentUid}.{propertyName} = Nothing");
                                 }
                                 //todo-perfs: avoid generating the line "var NullExtension_cfb65e0262594ddb87d60d8e776ce142 = new Global.System.Windows.Markup.NullExtension();", which is never used. Such a line is generated when the user code contains a {x:Null} markup extension.
                             }
@@ -1436,28 +1374,16 @@ End Sub
                                         string elementType = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                                             propertyOwnerTypeNS, propertyOwnerTypeName, assemblyNameIfAny);
 
-                                        string markupExtension = string.Format(
-                                            "CType({1},{0}).ProvideValue(New Global.System.ServiceProvider({2}, Nothing))",
-                                            IMarkupExtensionClass, childUid, parentUid);
+                                        string markupExtension = 
+                                            $"CType({childUid},{IMarkupExtensionClass}).ProvideValue(New Global.System.ServiceProvider({parentUid}, Nothing))";
 
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format("{0}.Set{1}({2}, CType({4},{3})",
-                                                          elementType,
-                                                          propertyName,
-                                                          parentUid,
-                                                          GetFullTypeName(propertyTypeNS, propertyTypeName),
-                                                          markupExtension));
+                                            $"{elementType}.Set{propertyName}({parentUid}, CType({markupExtension},{GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                     }
                                     else
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format(
-                                                "{0}.{1} = CType((CType({4},{3}).ProvideValue(New Global.System.ServiceProvider({0}, Nothing)),{2})",
-                                                parentUid,
-                                                propertyName,
-                                                GetFullTypeName(propertyTypeNS, propertyTypeName),
-                                                IMarkupExtensionClass,
-                                                childUid));
+                                            $"{parentUid}.{propertyName} = CType((CType({childUid}, {IMarkupExtensionClass}).ProvideValue(New Global.System.ServiceProvider({parentUid}, Nothing)), {GetFullTypeName(propertyTypeNS, propertyTypeName)})");
                                     }
                                 }
                             }
@@ -1605,7 +1531,7 @@ End Sub
                     elementType = GetCSharpFullTypeNameFromTargetTypeString(styleElement);
                     dependencyPropertyName = attributeValue + "Property"; //todo: handle the case where the DependencyProperty name is not the name of the property followed by "Property" (at least improve the error message)
                 }
-                return string.Format("{0}.{1}", elementType, dependencyPropertyName);
+                return $"{elementType}.{dependencyPropertyName}";
             }
 
             private XName GetCSharpXNameFromTargetTypeOrAttachedPropertyString(XElement setterElement, bool isAttachedProperty)
@@ -1769,12 +1695,7 @@ End Sub
                         assemblyNameIfAny);
                 }
 
-                string valueTypeFullName = string.Format(
-                    "Global.{0}{1}{2}",
-                    valueNamespaceName,
-                    string.IsNullOrEmpty(valueNamespaceName) ? string.Empty : ".",
-                    valueLocalTypeName
-                );
+                string valueTypeFullName = GetFullTypeName(valueNamespaceName, valueLocalTypeName);
 
                 // Generate the code or instantiating the attribute
                 if (isValueEnum)
@@ -1819,7 +1740,7 @@ End Sub
                 {
                     string typeFullName = GetCSharpFullTypeName(value, elementWhereTheTypeIsUsed);
 
-                    return string.Format("GetType({0})", typeFullName);
+                    return $"GetType({typeFullName})";
                 }
                 else
                 {
@@ -2108,14 +2029,8 @@ End Sub
                 bool isKnownCoreType,
                 bool isKnownSystemType)
             {
-                return string.Format(
-                    "{0}.GetPropertyValue(Of {1})(GetType({2}), {3}, {4}, Function() {5})",
-                    RuntimeHelperClass,
-                    propertyType,
-                    propertyDeclaringType,
-                    EscapeString(propertyName),
-                    EscapeString(value),
-                    ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType));
+                string fallbackValue = ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType);
+                return $"{RuntimeHelperClass}.GetPropertyValue(Of {propertyType})(GetType({propertyDeclaringType}), {EscapeString(propertyName)}, {EscapeString(value)}, Function() {fallbackValue})";
             }
 
             private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)

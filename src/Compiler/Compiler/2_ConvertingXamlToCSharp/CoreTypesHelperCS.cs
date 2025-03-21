@@ -253,10 +253,11 @@ namespace OpenSilver.Compiler
                     b = b + b * 16;
                 }
 
-                return string.Format(
-                    CultureInfo.InvariantCulture,
-                    "global::System.Windows.Media.Color.FromArgb((byte){0}, (byte){1}, (byte){2}, (byte){3})",
-                    a, r, g, b);
+                string A = a.ToString(CultureInfo.InvariantCulture);
+                string R = r.ToString(CultureInfo.InvariantCulture);
+                string G = g.ToString(CultureInfo.InvariantCulture);
+                string B = b.ToString(CultureInfo.InvariantCulture);
+                return $"global::System.Windows.Media.Color.FromArgb((byte){A}, (byte){R}, (byte){G}, (byte){B})";
             }
 
             static string ParseScRgbColor(string trimmedColor)
@@ -272,23 +273,18 @@ namespace OpenSilver.Compiler
 
                 if (split.Length == 3)
                 {
-                    return string.Format(
-                        CultureInfo.InvariantCulture,
-                        "global::System.Windows.Media.Color.FromScRgb({0}F, {1}F, {2}F, {3}F)",
-                        1.0f,
-                        Convert.ToSingle(split[0], CultureInfo.InvariantCulture),
-                        Convert.ToSingle(split[1], CultureInfo.InvariantCulture),
-                        Convert.ToSingle(split[2], CultureInfo.InvariantCulture));
+                    string r = Convert.ToSingle(split[0], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    string g = Convert.ToSingle(split[1], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    string b = Convert.ToSingle(split[2], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    return $"global::System.Windows.Media.Color.FromScRgb(1F, {r}F, {g}F, {b}F)";
                 }
                 else if (split.Length == 4)
                 {
-                    return string.Format(
-                        CultureInfo.InvariantCulture,
-                        "global::System.Windows.Media.Color.FromScRgb({0}F, {1}F, {2}F, {3}F)",
-                        Convert.ToSingle(split[0], CultureInfo.InvariantCulture),
-                        Convert.ToSingle(split[1], CultureInfo.InvariantCulture),
-                        Convert.ToSingle(split[2], CultureInfo.InvariantCulture),
-                        Convert.ToSingle(split[3], CultureInfo.InvariantCulture));
+                    string a = Convert.ToSingle(split[0], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    string r = Convert.ToSingle(split[1], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    string g = Convert.ToSingle(split[2], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    string b = Convert.ToSingle(split[3], CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+                    return $"global::System.Windows.Media.Color.FromScRgb({a}F, {r}F, {g}F, {b}F)";
                 }
 
                 throw new FormatException("Token is not valid.");
@@ -316,13 +312,11 @@ namespace OpenSilver.Compiler
                     {
                         uint color = (uint)namedColor;
 
-                        return string.Format(
-                            CultureInfo.InvariantCulture,
-                            "global::System.Windows.Media.Color.FromArgb((byte){0}, (byte){1}, (byte){2}, (byte){3})",
-                            (color >> 0x18) & 0xff,
-                            (color >> 0x10) & 0xff,
-                            (color >> 8) & 0xff,
-                            color & 0xff);
+                        string a = ((color >> 0x18) & 0xff).ToString(CultureInfo.InvariantCulture);
+                        string r = ((color >> 0x10) & 0xff).ToString(CultureInfo.InvariantCulture);
+                        string g = ((color >> 8) & 0xff).ToString(CultureInfo.InvariantCulture);
+                        string b = (color & 0xff).ToString(CultureInfo.InvariantCulture);
+                        return $"global::System.Windows.Media.Color.FromArgb((byte){a}, (byte){r}, (byte){g}, (byte){b})";
                     }
                 }
 

@@ -84,11 +84,7 @@ namespace OpenSilver.Compiler
                             // or any other VB keyword)
                             string fieldName = $"[{name}]";
                             resultingFieldsForNamedElements.Add(
-                                string.Format(
-                                    "    {0} WithEvents {1} As {2}",
-                                    fieldModifier,
-                                    fieldName,
-                                    GetCSharpEquivalentOfXamlTypeAsString(element.Name, true)));
+                                $"    {fieldModifier} WithEvents {fieldName} As {GetCSharpEquivalentOfXamlTypeAsString(element.Name, true)}");
                         }
                     }
                 }
