@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace OpenSilver.Compiler
 {
@@ -22,12 +23,12 @@ namespace OpenSilver.Compiler
     {
         bool IsSupportedCoreType(string typeFullName, string assemblyName);
 
-        string ConvertFromInvariantString(string source, string typeFullName);
+        string ConvertFromInvariantString(string source, string typeFullName, XElement context);
     }
 
     internal abstract class CoreTypesConverterBase : ICoreTypesConverter
     {
-        protected abstract Dictionary<string, Func<string, string>> SupportedCoreTypes { get; }
+        protected abstract Dictionary<string, Func<XElement, string, string>> SupportedCoreTypes { get; }
 
         public bool IsSupportedCoreType(string typeFullName, string assemblyName)
         {
@@ -39,12 +40,12 @@ namespace OpenSilver.Compiler
             return false;
         }
 
-        public string ConvertFromInvariantString(string source, string typeFullName)
+        public string ConvertFromInvariantString(string source, string typeFullName, XElement context)
         {
             if (SupportedCoreTypes.TryGetValue(typeFullName, out var converter))
             {
                 Debug.Assert(converter != null);
-                return converter(source);
+                return converter(context, source);
             }
 
             throw new InvalidOperationException($"Cannot find a converter for type '{typeFullName}'");

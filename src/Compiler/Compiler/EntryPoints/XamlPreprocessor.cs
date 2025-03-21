@@ -39,11 +39,27 @@ namespace OpenSilver.Compiler
 
         private readonly Stopwatch _watch;
         private AssembliesInspector _assembliesInspector;
+        private ICoreTypesConverter _coreTypesConverter;
         private SupportedLanguage _supportedLanguage = SupportedLanguage.Unknown;
         private string _language;
         private XamlPreprocessorOptions _options;
 
         private AssembliesInspector AssembliesInspector => _assembliesInspector ??= LoadAssemblies();
+
+        private ICoreTypesConverter CoreTypesConverter
+        {
+            get
+            {
+                return _coreTypesConverter ??=
+                    _supportedLanguage switch
+                    {
+                        SupportedLanguage.CSharp => new CoreTypesConverterCS(AssembliesInspector, AssemblyName),
+                        SupportedLanguage.VBNet => new CoreTypesConverterVB(AssembliesInspector, AssemblyName),
+                        SupportedLanguage.FSharp => new CoreTypesConverterFS(AssembliesInspector, AssemblyName),
+                        _ => throw new InvalidOperationException($"'{Language}' is not a supported language (C#, Visual Basic and F#)."),
+                    };
+            }
+        }
 
         public XamlPreprocessor()
         {
@@ -243,7 +259,7 @@ namespace OpenSilver.Compiler
                         xaml,
                         sourceFile,
                         fileIdentity,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverters.CSharp, SystemTypesHelper.CSharp, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.CSharp, options),
                         !IsSecondPass);
 
                     generatedCode = CreateCSHeaderContainingHash(xaml)
@@ -258,7 +274,7 @@ namespace OpenSilver.Compiler
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverters.VisualBasic, SystemTypesHelper.VisualBasic, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.VisualBasic, options),
                         !IsSecondPass);
 
                     generatedCode = CreateVBHeaderContainingHash(xaml)
@@ -273,7 +289,7 @@ namespace OpenSilver.Compiler
                         sourceFile,
                         fileIdentity,
                         RootNamespace,
-                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverters.FSharp, SystemTypesHelper.FSharp, options),
+                        new ConversionSettings(AssemblyName, AssembliesInspector, CoreTypesConverter, SystemTypesHelper.FSharp, options),
                         !IsSecondPass);
 
                     generatedCode = CreateFSHeaderContainingHash(xaml)

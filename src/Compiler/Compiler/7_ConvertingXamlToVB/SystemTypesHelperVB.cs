@@ -50,7 +50,9 @@ namespace OpenSilver.Compiler
 
             if (fullTypeName.StartsWith(Nullable) && IsCoreLibraryOrNull(assembly))
             {
-                underlyingType = fullTypeName.Substring(Nullable.Length, fullTypeName.Length - Nullable.Length - 1);
+                int startIndex = Nullable.Length + "Global.".Length;
+
+                underlyingType = fullTypeName.Substring(startIndex, fullTypeName.Length - startIndex - 1);
                 return true;
             }
 

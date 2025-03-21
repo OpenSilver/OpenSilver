@@ -66,44 +66,44 @@ namespace OpenSilver.Compiler
         internal static string GetUniqueName(XElement element) =>
             element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
 
-        public static bool IsDataTemplate(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "DataTemplate", KnownNamespaces.SystemWindows, settings.AssemblyName);
+        public static bool IsDataTemplate(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "DataTemplate", KnownNamespaces.SystemWindows, assemblyName);
 
-        public static bool IsItemsPanelTemplate(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "ItemsPanelTemplate", KnownNamespaces.SystemWindowsControls, settings.AssemblyName);
+        public static bool IsItemsPanelTemplate(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "ItemsPanelTemplate", KnownNamespaces.SystemWindowsControls, assemblyName);
 
-        public static bool IsControlTemplate(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "ControlTemplate", KnownNamespaces.SystemWindowsControls, settings.AssemblyName);
+        public static bool IsControlTemplate(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "ControlTemplate", KnownNamespaces.SystemWindowsControls, assemblyName);
 
-        public static bool IsBinding(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Binding", KnownNamespaces.SystemWindowsData, settings.AssemblyName);
+        public static bool IsBinding(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Binding", KnownNamespaces.SystemWindowsData, assemblyName);
 
-        public static bool IsStyle(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Style", KnownNamespaces.SystemWindows, settings.AssemblyName);
+        public static bool IsStyle(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Style", KnownNamespaces.SystemWindows, assemblyName);
 
-        public static bool IsTextBlock(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "TextBlock", KnownNamespaces.SystemWindowsControls, settings.AssemblyName);
+        public static bool IsTextBlock(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "TextBlock", KnownNamespaces.SystemWindowsControls, assemblyName);
 
-        public static bool IsRun(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Run", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
+        public static bool IsRun(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Run", KnownNamespaces.SystemWindowsDocuments, assemblyName);
 
-        public static bool IsSpan(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Span", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
+        public static bool IsSpan(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Span", KnownNamespaces.SystemWindowsDocuments, assemblyName);
 
-        public static bool IsItalic(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Italic", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
+        public static bool IsItalic(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Italic", KnownNamespaces.SystemWindowsDocuments, assemblyName);
 
-        public static bool IsUnderline(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Underline", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
+        public static bool IsUnderline(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Underline", KnownNamespaces.SystemWindowsDocuments, assemblyName);
 
-        public static bool IsBold(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Bold", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
+        public static bool IsBold(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Bold", KnownNamespaces.SystemWindowsDocuments, assemblyName);
 
-        public static bool IsHyperlink(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Hyperlink", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
+        public static bool IsHyperlink(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Hyperlink", KnownNamespaces.SystemWindowsDocuments, assemblyName);
 
-        public static bool IsParagraph(XElement element, ConversionSettings settings) =>
-            IsXElementOfType(element, "Paragraph", KnownNamespaces.SystemWindowsDocuments, settings.AssemblyName);
+        public static bool IsParagraph(XElement element, string assemblyName) =>
+            IsXElementOfType(element, "Paragraph", KnownNamespaces.SystemWindowsDocuments, assemblyName);
 
         private static bool IsXElementOfType(XElement element, string typeName, string namespaceName, string processedAssemblyName)
         {

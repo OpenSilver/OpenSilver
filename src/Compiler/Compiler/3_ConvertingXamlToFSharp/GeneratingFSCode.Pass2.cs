@@ -498,11 +498,10 @@ namespace GlobalResource
                         string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
 
                         bool isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(
-                            elementType.Substring("global.".Length), assemblyNameIfAny
-                        );
+                            elementType.Substring("global.".Length), assemblyNameIfAny);
 
                         string preparedValue = ConvertFromInvariantString(
-                            stringValue, elementType, isKnownCoreType, isKnownSystemType);
+                            stringValue, element, elementType, isKnownCoreType, isKnownSystemType);
 
                         parameters.StringBuilder.AppendLine(
                             $"let {elementUid} = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {preparedValue})");
@@ -631,13 +630,6 @@ namespace GlobalResource
                                 }
 
                                 rootScope.RegisterName(name, elementUid);
-                            }
-                            else if (IsEventTriggerRoutedEventProperty(elementType, attributeName))
-                            {
-                                // TODO Check that 'attributeLocalName' is effectively the LoadedEvent routed event.
-                                // Silverlight only allows the FrameworkElement.LoadedEvent as value for the EventTrigger.RoutedEvent
-                                // property, so for now we assume the xaml is always valid.
-                                parameters.StringBuilder.AppendLine($"{elementUid}.RoutedEvent <- global.{KnownNamespaces.SystemWindows}.FrameworkElement.LoadedEvent");
                             }
                             else if (string.IsNullOrEmpty(attribute.Name.NamespaceName) || attribute.Name.NamespaceName == element.Name.NamespaceName)
                             {
@@ -1709,12 +1701,12 @@ namespace GlobalResource
                 {
                     return element.Attribute(GeneratingCode.xNamespace + "Name").Value;
                 }
-                else if (GeneratingCode.IsStyle(element, _settings))
+                else if (GeneratingCode.IsStyle(element, _settings.AssemblyName))
                 {
                     isImplicitStyle = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element);
                 }
-                else if (GeneratingCode.IsDataTemplate(element, _settings) && element.Attribute("DataType") != null)
+                else if (GeneratingCode.IsDataTemplate(element, _settings.AssemblyName) && element.Attribute("DataType") != null)
                 {
                     isImplicitDataTemplate = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true);
@@ -1834,15 +1826,17 @@ namespace GlobalResource
                     if (isAttachedProperty)
                     {
                         return ConvertFromInvariantString(
-                            value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+                            value, elementWhereTheTypeIsUsed, valueTypeFullName, isKnownCoreType, isKnownSystemType);
                     }
                     else
                     {
                         string declaringTypeName = _settings.Inspector.GetCSharpEquivalentOfXamlTypeAsString(
                             namespaceName, localTypeName, assemblyNameIfAny);
+                        string fallbackValue = ConvertFromInvariantString(
+                            value, elementWhereTheTypeIsUsed, valueTypeFullName, isKnownCoreType, isKnownSystemType);
 
-                        return ConvertFromInvariantString(
-                            declaringTypeName, propertyName, value, valueTypeFullName, isKnownCoreType, isKnownSystemType);
+                        return XamlContextGetPropertyValue(
+                            declaringTypeName, propertyName, value, valueTypeFullName, fallbackValue);
                     }
                 }
             }
@@ -2048,64 +2042,43 @@ namespace GlobalResource
                 }
             }
 
-            private string ConvertFromInvariantString(string value, string type, bool isKnownCoreType, bool isKnownSystemType)
+            private string ConvertFromInvariantString(string value, XElement context, string type, bool isKnownCoreType, bool isKnownSystemType)
             {
-                if (_settings.SystemTypes.IsNullableType(type.Substring("global.".Length), null, out string underlyingType))
-                {
-                    string typeName = underlyingType.Substring("global.".Length);
+                type = type.Substring("global.".Length);
 
-                    return ConvertFromInvariantStringHelper(value,
-                        underlyingType,
-                        _settings.CoreTypes.IsSupportedCoreType(typeName, null),
-                        _settings.SystemTypes.IsSupportedSystemType(typeName, null),
-                        true);
-                }
-                else
+                if (_settings.SystemTypes.IsNullableType(type, null, out string underlyingType))
                 {
-                    return ConvertFromInvariantStringHelper(value, type, isKnownCoreType, isKnownSystemType, false);
-                }
-            }
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        return "null";
+                    }
 
-            private string ConvertFromInvariantStringHelper(string value, string type, bool isKnownCoreType, bool isKnownSystemType, bool isNullable)
-            {
-                string preparedValue;
-
-                if (isNullable && string.IsNullOrEmpty(value))
-                {
-                    preparedValue = "null";
+                    type = underlyingType;
+                    isKnownCoreType = _settings.CoreTypes.IsSupportedCoreType(type, null);
+                    isKnownSystemType = _settings.SystemTypes.IsSupportedSystemType(type, null);
                 }
-                else if (isKnownCoreType)
+
+                if (isKnownCoreType)
                 {
-                    preparedValue = _settings.CoreTypes.ConvertFromInvariantString(
-                        value, type.Substring("global.".Length));
+                    return _settings.CoreTypes.ConvertFromInvariantString(value, type, context);
                 }
                 else if (isKnownSystemType)
                 {
-                    preparedValue = _settings.SystemTypes.ConvertFromInvariantString(
-                        value, type.Substring("global.".Length));
-                }
-                else
-                {
-                    preparedValue = CoreTypesConverterFS.ConvertFromInvariantStringHelper(value, type);
+                    return _settings.SystemTypes.ConvertFromInvariantString(value, type);
                 }
 
-                return preparedValue;
+                return CoreTypesConverterFS.ConvertFromInvariantStringHelper(value, type);
             }
 
-            private string ConvertFromInvariantString(
+            private string XamlContextGetPropertyValue(
                 string propertyDeclaringType,
                 string propertyName,
                 string value,
                 string propertyType,
-                bool isKnownCoreType,
-                bool isKnownSystemType)
+                string fallbackValue)
             {
-                string fallbackValue = ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType);
                 return $"{RuntimeHelperClass}.GetPropertyValue<{propertyType}>(typeof<{propertyDeclaringType}>, {EscapeString(propertyName)}, {EscapeString(value)}, fun() -> {fallbackValue})";
             }
-
-            private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)
-                => propertyName == "RoutedEvent" && typeFullName == $"global.{KnownNamespaces.SystemWindows}.EventTrigger";
 
             private static bool IsReservedAttribute(string attributeName)
             {
@@ -2180,7 +2153,7 @@ namespace GlobalResource
                 XElement child = element.Elements().First();
 
                 return !IsTypeAssignableFrom(child.Name, element.Name, isAttachedProperty) &&
-                    !GeneratingCode.IsBinding(child, _settings) &&
+                    !GeneratingCode.IsBinding(child, _settings.AssemblyName) &&
                     child.Name.LocalName != "StaticResource" &&
                     child.Name.LocalName != "StaticResourceExtension" &&
                     child.Name.LocalName != "TemplateBinding" &&
@@ -2228,32 +2201,22 @@ namespace GlobalResource
                 return _settings.Inspector.IsTypeAssignableFrom(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom, nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo, isAttached);
             }
 
-            private void GetClrNamespaceAndLocalName(
-                string typeAsStringInsideAXamlAttribute,
-                XElement elementWhereTheTypeIsUsed,
+            private static void GetClrNamespaceAndLocalName(
+                string typeAsString,
+                XElement element,
                 out string namespaceName,
                 out string localName,
                 out string assemblyNameIfAny)
             {
-                XNamespace xNamespace = null;
-                if (typeAsStringInsideAXamlAttribute.Contains(':'))
-                {
-                    string[] splitted = typeAsStringInsideAXamlAttribute.Split(':');
-                    string prefix = splitted[0];
-                    typeAsStringInsideAXamlAttribute = splitted[1];
-                    xNamespace = elementWhereTheTypeIsUsed.GetNamespaceOfPrefix(prefix);
-                }
-                if (xNamespace == null)
-                {
-                    xNamespace = elementWhereTheTypeIsUsed.GetDefaultNamespace();
-                }
-
-                XName name = xNamespace + typeAsStringInsideAXamlAttribute;
-
-                GetClrNamespaceAndLocalName(name, out namespaceName, out localName, out assemblyNameIfAny);
+                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    typeAsString,
+                    element,
+                    out namespaceName,
+                    out localName,
+                    out assemblyNameIfAny);
             }
 
-            private void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
+            private static void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
                 => GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
                     xName,
                     out namespaceName,

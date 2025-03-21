@@ -197,7 +197,7 @@ namespace OpenSilver.Compiler
 
                                 // SPECIAL CASE: If we are in a TextBlock, we want to set the
                                 // property "TextBlock.Text" instead of "TextBlock.Inlines"
-                                if (GeneratingCode.IsTextBlock(currentElement, settings) || GeneratingCode.IsRun(currentElement, settings))
+                                if (GeneratingCode.IsTextBlock(currentElement, settings.AssemblyName) || GeneratingCode.IsRun(currentElement, settings.AssemblyName))
                                 {
                                     contentPropertyName = "Text";
                                 }

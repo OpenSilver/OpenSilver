@@ -693,7 +693,7 @@
                                                       Placement="Right"
                                                       PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                         <controls:ToolTip.Triggers>
-                                            <EventTrigger RoutedEvent="Canvas.Loaded">
+                                            <EventTrigger RoutedEvent="controls:Canvas.Loaded">
                                                 <EventTrigger.Actions>
                                                     <animation:BeginStoryboard>
                                                         <animation:Storyboard>
@@ -972,7 +972,7 @@
                                                       Placement="Right"
                                                       PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                         <controls:ToolTip.Triggers>
-                                            <EventTrigger RoutedEvent="Canvas.Loaded">
+                                            <EventTrigger RoutedEvent="controls:Canvas.Loaded">
                                                 <EventTrigger.Actions>
                                                     <animation:BeginStoryboard>
                                                         <animation:Storyboard>
@@ -1502,7 +1502,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
@@ -1674,7 +1674,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
@@ -1957,7 +1957,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>
@@ -2353,7 +2353,7 @@
                                                   PlacementTarget="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}"
                                                   DataContext="{data:Binding RelativeSource={data:RelativeSource TemplatedParent}}">
                                     <controls:ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="Canvas.Loaded">
+                                        <EventTrigger RoutedEvent="controls:Canvas.Loaded">
                                             <EventTrigger.Actions>
                                                 <animation:BeginStoryboard>
                                                     <animation:Storyboard>

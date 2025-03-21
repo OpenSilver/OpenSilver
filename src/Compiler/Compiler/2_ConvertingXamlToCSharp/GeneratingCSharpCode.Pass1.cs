@@ -142,9 +142,9 @@ namespace OpenSilver.Compiler
                 while (element.Parent != null)
                 {
                     XElement parent = element.Parent;
-                    if (GeneratingCode.IsDataTemplate(parent, _settings) ||
-                        GeneratingCode.IsItemsPanelTemplate(parent, _settings) ||
-                        GeneratingCode.IsControlTemplate(parent, _settings))
+                    if (GeneratingCode.IsDataTemplate(parent, _settings.AssemblyName) ||
+                        GeneratingCode.IsItemsPanelTemplate(parent, _settings.AssemblyName) ||
+                        GeneratingCode.IsControlTemplate(parent, _settings.AssemblyName))
                     {
                         return parent;
                     }

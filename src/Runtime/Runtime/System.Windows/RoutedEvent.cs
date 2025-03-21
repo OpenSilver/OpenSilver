@@ -11,11 +11,15 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+using System.Windows.Markup;
+
 namespace System.Windows;
 
 /// <summary>
 /// Represents and identifies a routed event and declares its characteristics.
 /// </summary>
+[TypeConverter(typeof(RoutedEventConverter))]
 public sealed class RoutedEvent
 {
     // Constructor for a RoutedEvent (is internal to the EventManager and is onvoked when a new RoutedEvent is registered)

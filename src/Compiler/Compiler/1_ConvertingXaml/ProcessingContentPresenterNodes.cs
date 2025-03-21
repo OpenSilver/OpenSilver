@@ -41,7 +41,7 @@ namespace OpenSilver.Compiler
             bool isInsideControlTemplate,
             ConversionSettings settings)
         {
-            if (GeneratingCode.IsControlTemplate(currentElement, settings))
+            if (GeneratingCode.IsControlTemplate(currentElement, settings.AssemblyName))
             {
                 isInsideControlTemplate = true;
             }

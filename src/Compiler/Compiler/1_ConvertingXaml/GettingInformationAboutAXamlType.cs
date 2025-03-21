@@ -190,6 +190,30 @@ namespace OpenSilver.Compiler
             (namespaceName, assemblyNameIfAny) = GetClrNamespaceAndAssembly(xName.NamespaceName);
         }
 
+        public static void GetClrNamespaceAndLocalName(
+            string typeAsString,
+            XElement element,
+            out string namespaceName,
+            out string localName,
+            out string assemblyNameIfAny)
+        {
+            XName name;
+
+            int index = typeAsString.IndexOf(':');
+            if (index > -1)
+            {
+                string prefix = typeAsString.Substring(0, index);
+                XNamespace xNamespace = element.GetNamespaceOfPrefix(prefix);
+                name = xNamespace.GetName(typeAsString.Substring(index + 1));
+            }
+            else
+            {
+                name = element.GetDefaultNamespace().GetName(typeAsString);
+            }
+
+            GetClrNamespaceAndLocalName(name, out namespaceName, out localName, out assemblyNameIfAny);
+        }
+
         public static void ParseClrNamespaceDeclaration(string input, out string ns, out string assemblyNameIfAny)
         {
             assemblyNameIfAny = null;
