@@ -21,7 +21,7 @@ using System.Collections.Concurrent;
 
 namespace OpenSilver.Photino.Runner
 {
-    public class PhotinoRunner(PhotinoWindow window)
+    class PhotinoRunner(PhotinoWindow window)
     {
         private const string IdKey = "id";
         private const string TypeKey = "type";
@@ -138,7 +138,7 @@ namespace OpenSilver.Photino.Runner
             );
         }
 
-        public async Task<T> RunApplicationAsync<T>(Func<Task<T>> createAppDelegate) where T : System.Windows.Application
+        public async void RunApplicationAsync<T>(Func<Task<T>> createAppDelegate) where T : System.Windows.Application
         {
             ArgumentNullException.ThrowIfNull(createAppDelegate);
 
@@ -158,7 +158,7 @@ namespace OpenSilver.Photino.Runner
                 if (typeValue == ResponseMessageType)
                 {
                     var id = root.GetProperty(IdKey).GetInt32();
-                    if (_communication.TryRemove(it, out var tcs))
+                    if (_communication.TryRemove(id, out var tcs))
                     {
                         var res = root.GetProperty(ResultKey);
                         if (res is JsonElement je)
@@ -203,15 +203,6 @@ namespace OpenSilver.Photino.Runner
                     tcs.SetException(ex);
                 }
             }, null);
-
-            var result = await tcs.Task;
-            return result;
         }
-
-        public Task<T> RunApplicationAsync<T>(Func<T> createAppDelegate) where T : System.Windows.Application
-            => RunApplicationAsync(() => Task.FromResult(createAppDelegate()));
-
-        public Task<T> RunApplicationAsync<T>() where T : System.Windows.Application, new()
-            => RunApplicationAsync(() => new T());
     }
 }
