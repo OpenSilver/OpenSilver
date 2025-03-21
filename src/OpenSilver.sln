@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Targets", "Targets", "{09E9
 		Targets\OpenSilver.Common.targets = Targets\OpenSilver.Common.targets
 		Targets\OpenSilver.GenerateAssemblyInfo.targets = Targets\OpenSilver.GenerateAssemblyInfo.targets
 		Targets\OpenSilver.MauiHybrid.targets = Targets\OpenSilver.MauiHybrid.targets
+		Targets\OpenSilver.Photino.targets = Targets\OpenSilver.Photino.targets
 		Targets\OpenSilver.Simulator.targets = Targets\OpenSilver.Simulator.targets
 		Targets\OpenSilver.targets = Targets\OpenSilver.targets
 		Targets\OpenSilver.WebAssembly.targets = Targets\OpenSilver.WebAssembly.targets
@@ -133,6 +134,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Maui", "Maui", "{67E1D2D9-7BEC-4877-8063-856599E14B1D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.MauiHybrid", "Maui\Hybrid\OpenSilver.MauiHybrid.csproj", "{20251DFC-AF96-47D7-9E2E-907AE2257B1B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Photino", "Photino", "{F8B103FD-CFD6-43EB-B77E-B36654A3B7FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSilver.Photino", "Photino\OpenSilver.Photino\OpenSilver.Photino.csproj", "{A9CF6D29-F35A-436E-94BE-DE64A4631551}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -310,6 +315,10 @@ Global
 		{20251DFC-AF96-47D7-9E2E-907AE2257B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20251DFC-AF96-47D7-9E2E-907AE2257B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20251DFC-AF96-47D7-9E2E-907AE2257B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9CF6D29-F35A-436E-94BE-DE64A4631551}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9CF6D29-F35A-436E-94BE-DE64A4631551}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9CF6D29-F35A-436E-94BE-DE64A4631551}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9CF6D29-F35A-436E-94BE-DE64A4631551}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -365,6 +374,7 @@ Global
 		{C57535EA-4837-4C68-B389-3E3E7F16DEF0} = {14B7A75E-0BDD-45A3-A645-9FEABE7811E1}
 		{839A56F5-C47E-4569-9A3A-9443EA8A262E} = {8869C7C7-58A9-4FC1-A5EA-E303AE1807EB}
 		{20251DFC-AF96-47D7-9E2E-907AE2257B1B} = {67E1D2D9-7BEC-4877-8063-856599E14B1D}
+		{A9CF6D29-F35A-436E-94BE-DE64A4631551} = {F8B103FD-CFD6-43EB-B77E-B36654A3B7FB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FB0300F-DF9A-4DA8-9696-71A376DEA84B}

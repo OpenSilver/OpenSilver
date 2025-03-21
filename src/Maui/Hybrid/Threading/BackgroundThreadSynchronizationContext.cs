@@ -86,7 +86,7 @@ namespace OpenSilver.MauiHybrid.Threading
         /// </summary>
         public void RunMessageLoop()
         {
-            _threadId = Thread.CurrentThread.ManagedThreadId;
+            _threadId = Environment.CurrentManagedThreadId;
 
             while (_running)
             {
@@ -123,7 +123,7 @@ namespace OpenSilver.MauiHybrid.Threading
         /// </summary>
         public bool CheckAccess()
         {
-            return _threadId == Thread.CurrentThread.ManagedThreadId;
+            return _threadId == Environment.CurrentManagedThreadId;
         }
     }
 }
