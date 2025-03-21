@@ -1060,6 +1060,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a type derived from FrameworkElement..
+        /// </summary>
+        internal static string NamedObjectMustBeFrameworkElement {
+            get {
+                return ResourceManager.GetString("NamedObjectMustBeFrameworkElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot register duplicate Name &apos;{0}&apos; in this scope..
         /// </summary>
         internal static string NameScopeDuplicateNamesNotAllowed {
@@ -1546,6 +1555,33 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; object Name found but it is not a BeginStoryboard object..
+        /// </summary>
+        internal static string Storyboard_BeginStoryboardNameNotFound {
+            get {
+                return ResourceManager.GetString("Storyboard_BeginStoryboardNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BeginStoryboardName required to find the target of this action..
+        /// </summary>
+        internal static string Storyboard_BeginStoryboardNameRequired {
+            get {
+                return ResourceManager.GetString("Storyboard_BeginStoryboardNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; BeginStoryboard does not have an associated Storyboard object..
+        /// </summary>
+        internal static string Storyboard_BeginStoryboardNoStoryboard {
+            get {
+                return ResourceManager.GetString("Storyboard_BeginStoryboardNoStoryboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; name cannot be found in the name scope of &apos;{1}&apos;..
         /// </summary>
         internal static string Storyboard_NameNotFound {
@@ -1645,6 +1681,15 @@ namespace OpenSilver.Internal {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TimeSeekOrigin value is not valid..
+        /// </summary>
+        internal static string Storyboard_UnrecognizedTimeSeekOrigin {
+            get {
+                return ResourceManager.GetString("Storyboard_UnrecognizedTimeSeekOrigin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parameter cannot be a zero-length string..
         /// </summary>
         internal static string StringEmpty {
@@ -1677,6 +1722,15 @@ namespace OpenSilver.Internal {
         internal static string StyleValueOfExpressionNotSupported {
             get {
                 return ResourceManager.GetString("StyleValueOfExpressionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find a FrameworkElement with Name &apos;{0}&apos;..
+        /// </summary>
+        internal static string TargetNameNotFound {
+            get {
+                return ResourceManager.GetString("TargetNameNotFound", resourceCulture);
             }
         }
         

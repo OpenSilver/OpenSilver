@@ -18,6 +18,8 @@ namespace System.Windows;
 
 public partial class FrameworkElement : IInternalFrameworkElement
 {
+    bool IInternalFrameworkElement.IsInitialized => IsInitialized;
+
     bool IInternalFrameworkElement.HasLogicalChildren
     {
         get => HasLogicalChildren;

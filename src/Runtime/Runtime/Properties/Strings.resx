@@ -452,6 +452,9 @@
   <data name="MustBaseOnStyleOfABaseType" xml:space="preserve">
     <value>Can only base on a Style with target type that is base type '{0}'.</value>
   </data>
+  <data name="NamedObjectMustBeFrameworkElement" xml:space="preserve">
+    <value>'{0}' is not a type derived from FrameworkElement.</value>
+  </data>
   <data name="NameScopeDuplicateNamesNotAllowed" xml:space="preserve">
     <value>Cannot register duplicate Name '{0}' in this scope.</value>
   </data>
@@ -614,6 +617,15 @@
   <data name="SourceNotSet" xml:space="preserve">
     <value>Must set Source in RoutedEventArgs before building event route or invoking handlers.</value>
   </data>
+  <data name="Storyboard_BeginStoryboardNameNotFound" xml:space="preserve">
+    <value>'{0}' object Name found but it is not a BeginStoryboard object.</value>
+  </data>
+  <data name="Storyboard_BeginStoryboardNameRequired" xml:space="preserve">
+    <value>BeginStoryboardName required to find the target of this action.</value>
+  </data>
+  <data name="Storyboard_BeginStoryboardNoStoryboard" xml:space="preserve">
+    <value>'{0}' BeginStoryboard does not have an associated Storyboard object.</value>
+  </data>
   <data name="Storyboard_NameNotFound" xml:space="preserve">
     <value>'{0}' name cannot be found in the name scope of '{1}'.</value>
   </data>
@@ -647,6 +659,9 @@
   <data name="Storyboard_TargetPropertyRequired" xml:space="preserve">
     <value>Must specify TargetProperty for '{0}'.</value>
   </data>
+  <data name="Storyboard_UnrecognizedTimeSeekOrigin" xml:space="preserve">
+    <value>TimeSeekOrigin value is not valid.</value>
+  </data>
   <data name="StringEmpty" xml:space="preserve">
     <value>Parameter cannot be a zero-length string.</value>
   </data>
@@ -658,6 +673,9 @@
   </data>
   <data name="StyleValueOfExpressionNotSupported" xml:space="preserve">
     <value>Expression type is not a valid Style value.</value>
+  </data>
+  <data name="TargetNameNotFound" xml:space="preserve">
+    <value>Cannot find a FrameworkElement with Name '{0}'.</value>
   </data>
   <data name="TemplateFindNameInInvalidElement" xml:space="preserve">
     <value>This operation is valid only on elements that have this template applied.</value>

@@ -16,7 +16,7 @@ using System.Windows.Media.Animation;
 namespace System.Windows
 {
     /// <summary>
-    /// Serves as the base class for <see cref="BeginStoryboard"/>.
+    /// Describes an action to perform for a trigger.
     /// </summary>
     public abstract class TriggerAction : DependencyObject
     {

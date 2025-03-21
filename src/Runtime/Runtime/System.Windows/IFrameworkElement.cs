@@ -43,6 +43,8 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     void OnAncestorChangedInternal(TreeChangeInfo info);
 
+    bool IsInitialized { get; }
+
     bool HasLogicalChildren { get; set; }
 
     bool IsLogicalChildrenIterationInProgress { get; set; }

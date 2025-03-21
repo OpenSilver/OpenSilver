@@ -13,79 +13,77 @@
 
 using System.Diagnostics;
 
-namespace System.Windows
+namespace System.Windows;
+
+/// <summary>
+/// Represents a collection of <see cref="EventTrigger"/> objects.
+/// </summary>
+public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerBase>
 {
-    /// <summary>
-    /// Represents a collection of <see cref="EventTrigger"/> objects.
-    /// </summary>
-    public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerBase>
+    private readonly IInternalFrameworkElement _owner;
+
+    internal TriggerCollection() { }
+
+    internal TriggerCollection(IInternalFrameworkElement owner)
     {
-        private readonly IInternalFrameworkElement _owner;
+        Debug.Assert(owner is not null);
+        _owner = owner;
+    }
 
-        internal TriggerCollection() { }
+    private bool IsInitialized => _owner is not null && _owner.IsInitialized;
 
-        internal TriggerCollection(IInternalFrameworkElement owner)
+    internal override void AddOverride(TriggerBase value)
+    {
+        AddDependencyObjectInternal(value);
+        
+        if (IsInitialized)
         {
-            Debug.Assert(owner is not null);
-            _owner = owner;
+            EventTrigger.ProcessOneTrigger(_owner, value);
         }
+    }
 
-        internal override void AddOverride(TriggerBase value)
+    internal override void ClearOverride()
+    {
+        if (IsInitialized)
         {
-            AddDependencyObjectInternal(value);
-            
-            if (_owner != null)
-            {
-                EventTrigger.ProcessOneTrigger(_owner, value);
-            }
+            EventTrigger.DisconnectAllTriggers(_owner);
         }
+        
+        ClearDependencyObjectInternal();
+    }
 
-        internal override void ClearOverride()
+    internal override void InsertOverride(int index, TriggerBase value)
+    {
+        InsertDependencyObjectInternal(index, value);
+
+        if (IsInitialized)
         {
-            if (_owner != null)
-            {
-                EventTrigger.DisconnectAllTriggers(_owner);
-            }
-            
-            ClearDependencyObjectInternal();
+            EventTrigger.ProcessOneTrigger(_owner, value);
         }
+    }
 
-        internal override void InsertOverride(int index, TriggerBase value)
+    internal override void RemoveAtOverride(int index)
+    {
+        TriggerBase trigger = GetItemInternal(index);
+        RemoveAtDependencyObjectInternal(index);
+
+        if (IsInitialized)
         {
-            InsertDependencyObjectInternal(index, value);
-
-            if (_owner != null)
-            {
-                EventTrigger.ProcessOneTrigger(_owner, value);
-            }
+            EventTrigger.DisconnectOneTrigger(_owner, trigger);
         }
+    }
 
-        internal override void RemoveAtOverride(int index)
+    internal override TriggerBase GetItemOverride(int index) => GetItemInternal(index);
+
+    internal override void SetItemOverride(int index, TriggerBase value)
+    {
+        TriggerBase oldTrigger = GetItemInternal(index);
+        SetItemDependencyObjectInternal(index, value);
+        
+        if (IsInitialized)
         {
-            TriggerBase trigger = GetItemInternal(index);
-            RemoveAtDependencyObjectInternal(index);
-
-            if (_owner != null)
-            {
-                EventTrigger.DisconnectOneTrigger(_owner, trigger);
-            }
-        }
-
-        internal override TriggerBase GetItemOverride(int index)
-        {
-            return GetItemInternal(index);
-        }
-
-        internal override void SetItemOverride(int index, TriggerBase value)
-        {
-            TriggerBase oldTrigger = GetItemInternal(index);
-            SetItemDependencyObjectInternal(index, value);
-            
-            if (_owner != null)
-            {
-                EventTrigger.DisconnectOneTrigger(_owner, oldTrigger);
-                EventTrigger.ProcessOneTrigger(_owner, value);
-            }
+            EventTrigger.DisconnectOneTrigger(_owner, oldTrigger);
+            EventTrigger.ProcessOneTrigger(_owner, value);
         }
     }
 }
