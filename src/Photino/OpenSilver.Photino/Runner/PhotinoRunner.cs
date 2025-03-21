@@ -21,7 +21,7 @@ using System.Collections.Concurrent;
 
 namespace OpenSilver.Photino.Runner
 {
-    class PhotinoRunner(PhotinoWindow window)
+    internal sealed class PhotinoRunner(PhotinoWindow window)
     {
         private const string IdKey = "id";
         private const string TypeKey = "type";
@@ -38,9 +38,9 @@ namespace OpenSilver.Photino.Runner
         private static bool _isRunApplicationCalled;
 
         private int _idCounter = 0;
-        private ConcurrentDictionary<int, TaskCompletionSource<object?>> _communication = new();
+        private readonly ConcurrentDictionary<int, TaskCompletionSource<object?>> _communication = new();
 
-        private TaskCompletionSource<bool> _jsStarted = new();
+        private readonly TaskCompletionSource<bool> _jsStarted = new();
 
         private static readonly Lazy<OnCallbackSimulator> _onCallbackSimulator =
             new(() => new OnCallbackSimulator());

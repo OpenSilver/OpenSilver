@@ -13,9 +13,9 @@
 
 namespace OpenSilver.Photino.JavaScript
 {
-    internal class PhotinoExecutionHandler : DotNetForHtml5.IJavaScriptExecutionHandler
+    internal sealed class PhotinoExecutionHandler : DotNetForHtml5.IJavaScriptExecutionHandler
     {
-        private int _mainThreadId;
+        private readonly int _mainThreadId;
 
         private readonly Action<Action> _dispatcherAction;
         private readonly Func<string, Task<object?>> _executeScriptAsyncAction;

@@ -18,7 +18,4 @@
     <ProjectReference Include="..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Threading\" />
-  </ItemGroup>
 </Project>
