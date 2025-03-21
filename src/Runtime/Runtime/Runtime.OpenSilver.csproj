@@ -165,6 +165,7 @@
     <Compile Include="System.Windows\EventManager.cs" />
     <Compile Include="System.Windows\EventSetter.cs" />
     <Compile Include="System.Windows\ExitEventArgs.cs" />
+    <Compile Include="System.Windows\FrameworkElement.Initialization.cs" />
     <Compile Include="System.Windows\FrameworkElement.Resources.cs" />
     <Compile Include="System.Windows\GlobalEventManager.cs" />
     <Compile Include="System.Windows\HierarchicalDataTemplate.cs" />

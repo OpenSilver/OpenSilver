@@ -33,7 +33,7 @@ namespace System.Windows
     /// object tree, and object lifetime feature areas.
     /// </summary>
     [RuntimeNameProperty(nameof(Name))]
-    public abstract partial class FrameworkElement : UIElement, IResourceDictionaryOwner
+    public abstract partial class FrameworkElement : UIElement, ISupportInitialize, IResourceDictionaryOwner
     {
         #region Inheritance Context
 
@@ -64,6 +64,9 @@ namespace System.Windows
 
         internal override void OnInheritanceContextChangedCore(EventArgs args)
         {
+            // Initialize, if not already done
+            TryFireInitialized();
+
             IInternalFrameworkElement oldMentor = InheritedParent;
             IInternalFrameworkElement newMentor = FindMentor(InheritanceContext);
 
@@ -138,6 +141,9 @@ namespace System.Windows
                 TreeWalkHelper.InvalidateOnTreeChange(this, parent, newParent is not null);
             }
 
+            // Initialize, if not already done.
+            TryFireInitialized();
+
             base.OnVisualParentChanged(oldParent);
         }
 
@@ -199,6 +205,11 @@ namespace System.Windows
                 {
                     throw new InvalidOperationException(Strings.CannotModifyLogicalChildrenDuringTreeWalk);
                 }
+
+                // Now that the child is going to be added, the FE construction is considered finished,
+                // so we do not expect a change of InheritanceBehavior property,
+                // so we can pick up properties from styles and resources.
+                TryFireInitialized();
 
                 HasLogicalChildren = true;
 
@@ -268,6 +279,10 @@ namespace System.Windows
 
             DependencyObject parent = newParent ?? oldParent;
             TreeWalkHelper.InvalidateOnTreeChange(this, parent, newParent is not null);
+
+            // If no one has called BeginInit then mark the element initialized and fire Initialized event
+            // (non-parser programmatic tree building scenario)
+            TryFireInitialized();
         }
 
         /// <summary>
@@ -1221,10 +1236,10 @@ namespace System.Windows
         // free bit = 0x00004000,
 
         // Has this instance been initialized
-        //IsInitialized = 0x00008000,
+        IsInitialized = 0x00008000,
 
         // Set on BeginInit and reset on EndInit
-        //InitPending = 0x00010000,
+        InitPending = 0x00010000,
 
         //IsResourceParentValid = 0x00020000,
         IsStyleSetFromGenerator = 0x00040000, // free bit

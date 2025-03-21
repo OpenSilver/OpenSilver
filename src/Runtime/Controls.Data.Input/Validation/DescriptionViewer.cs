@@ -253,7 +253,7 @@ namespace System.Windows.Controls
         private static void OnPropertyPathPropertyChanged(DependencyObject depObj, DependencyPropertyChangedEventArgs e)
         {
             DescriptionViewer dv = depObj as DescriptionViewer;
-            if (dv != null && dv.Initialized)
+            if (dv != null && dv._initialized)
             {
                 dv.LoadMetadata(false);
                 // Changing the PropertyPath sometimes requires an update for the validation state, since it might be stale.
@@ -330,14 +330,6 @@ namespace System.Windows.Controls
         {
             get;
             set;
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the control has been initialized.
-        /// </summary>
-        internal bool Initialized
-        {
-            get { return this._initialized; }
         }
 
         #endregion Properties

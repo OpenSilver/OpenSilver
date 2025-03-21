@@ -48,7 +48,6 @@ namespace System.Windows.Controls
         private ValidationItemCollection _errors;
         private ListBox _errorsListBox;
         private ContentControl _headerContentControl;
-        private bool _initialized;
         private FrameworkElement _registeredParent;
         private Dictionary<ValidationError, ValidationSummaryItem> _validationSummaryItemDictionary;
 
@@ -426,14 +425,6 @@ namespace System.Windows.Controls
         public ReadOnlyObservableCollection<ValidationSummaryItem> DisplayedErrors
         {
             get { return new ReadOnlyObservableCollection<ValidationSummaryItem>(this._displayedErrors); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the ValidationSummary is initialized.
-        /// </summary>
-        internal bool Initialized
-        {
-            get { return this._initialized; }
         }
 
         /// <summary>
@@ -967,7 +958,6 @@ namespace System.Windows.Controls
                 }
             }
             this.Loaded -= new RoutedEventHandler(this.ValidationSummary_Loaded);
-            this._initialized = true;
         }
 
         private void ValidationSummary_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
