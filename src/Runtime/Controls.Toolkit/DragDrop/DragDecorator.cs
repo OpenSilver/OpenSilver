@@ -104,12 +104,16 @@ namespace System.Windows.Controls
             }
         }
 
+        static DragDecorator()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DragDecorator), new PropertyMetadata(typeof(DragDecorator)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the DragDecorator.
+        /// Initializes a new instance of the <see cref="DragDecorator"/> class.
         /// </summary>
         public DragDecorator()
         {
-            this.DefaultStyleKey = typeof(DragDecorator);
             this.Loaded +=
                 delegate
                 {

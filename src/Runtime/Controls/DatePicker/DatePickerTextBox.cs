@@ -29,12 +29,16 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         private const string ElementContentName = "Watermark";
 
+        static DatePickerTextBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DatePickerTextBox), new PropertyMetadata(typeof(DatePickerTextBox)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DatePickerTextBox" /> class.
         /// </summary>
         public DatePickerTextBox()
         {
-            DefaultStyleKey = typeof(DatePickerTextBox);
             SetDefaults();
 
             this.MouseEnter += OnMouseEnter;

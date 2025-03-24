@@ -424,12 +424,16 @@ namespace System.Windows.Controls
         /// </summary>
         private bool _ignoreIsModalChanged;
 
+        static ChildWindow()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ChildWindow), new PropertyMetadata(typeof(ChildWindow)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ChildWindow" /> class.
         /// </summary>
         public ChildWindow()
         {
-            this.DefaultStyleKey = typeof(ChildWindow);
             this.InteractionState = WindowInteractionState.NotResponding;
         }
 

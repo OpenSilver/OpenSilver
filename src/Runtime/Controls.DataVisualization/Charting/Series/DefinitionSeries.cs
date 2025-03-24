@@ -110,18 +110,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         private bool _synchronizingSelectedItems;
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Performs one-time initialization of DefinitionSeries data.
-        /// </summary>
         static DefinitionSeries()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(DefinitionSeries), new FrameworkPropertyMetadata(typeof(DefinitionSeries)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DefinitionSeries), new PropertyMetadata(typeof(DefinitionSeries)));
         }
-#endif
 
         /// <summary>
-        /// Initializes a new instance of the DefinitionSeries class.
+        /// Initializes a new instance of the <see cref="DefinitionSeries"/> class.
         /// </summary>
         protected DefinitionSeries()
         {
@@ -129,8 +124,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
             _seriesAreaChildrenListAdapter.Collection = _seriesDefinitions;
             _selectedItems.CollectionChanged += new NotifyCollectionChangedEventHandler(SelectedItemsCollectionChanged);
             DataItems = new ObservableCollection<DataItem>();
-
-            this.DefaultStyleKey = typeof(DefinitionSeries);
         }
 
         /// <summary>

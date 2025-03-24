@@ -336,13 +336,15 @@ namespace System.Windows.Controls
         }
 #endregion public Style TimeButtonStyle
 
+        static RangeTimePickerPopup()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(RangeTimePickerPopup), new PropertyMetadata(typeof(RangeTimePickerPopup)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RangeTimePickerPopup"/> class.
         /// </summary>
-        public RangeTimePickerPopup()
-        {
-            DefaultStyleKey = typeof(RangeTimePickerPopup);
-        }
+        public RangeTimePickerPopup() { }
 
         /// <summary>
         /// Builds the visual tree for the RangeTimePickerPopup control when a 

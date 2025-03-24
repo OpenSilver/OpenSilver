@@ -323,13 +323,15 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         private Globalization.Calendar _calendar = new GregorianCalendar();
 
+        static CalendarItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CalendarItem), new PropertyMetadata(typeof(CalendarItem)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CalendarItem" /> class.
         /// </summary>
-        public CalendarItem()
-        {
-            DefaultStyleKey = typeof(CalendarItem);
-        }
+        public CalendarItem() { }
 
         #region Templating
         /// <summary>

@@ -473,19 +473,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         private UIElement SliceElement { get; set; }
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the PieDataPoint class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static PieDataPoint()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(PieDataPoint), new FrameworkPropertyMetadata(typeof(PieDataPoint)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PieDataPoint), new PropertyMetadata(typeof(PieDataPoint)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the PieDataPoint class.
+        /// Initializes a new instance of the <see cref="PieDataPoint"/> class.
         /// </summary>
         public PieDataPoint()
         {
@@ -499,8 +493,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     PieSeries.UpdatePieDataPointGeometry(this, e.NewSize.Width, e.NewSize.Height);
                 };
             }
-
-            DefaultStyleKey = typeof(PieDataPoint);
         }
 
         /// <summary>

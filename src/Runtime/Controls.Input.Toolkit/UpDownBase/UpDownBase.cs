@@ -82,12 +82,16 @@ namespace System.Windows.Controls
         }
         #endregion public Style SpinnerStyle
 
+        static UpDownBase()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(UpDownBase), new PropertyMetadata(typeof(UpDownBase)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the UpDownBase class.
+        /// Initializes a new instance of the <see cref="UpDownBase"/> class.
         /// </summary>
         internal UpDownBase()
         {
-            DefaultStyleKey = typeof(UpDownBase);
             Interaction = new InteractionHelper(this);
         }
 

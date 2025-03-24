@@ -55,6 +55,11 @@ namespace System.Windows.Controls.Primitives
 
         #endregion Data
 
+        static DataGridColumnHeader()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridColumnHeader), new PropertyMetadata(typeof(DataGridColumnHeader)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Primitives.DataGridColumnHeader" /> class. 
         /// </summary>
@@ -66,8 +71,6 @@ namespace System.Windows.Controls.Primitives
             this.MouseMove += new MouseEventHandler(DataGridColumnHeader_MouseMove);
             this.MouseEnter += new MouseEventHandler(DataGridColumnHeader_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridColumnHeader_MouseLeave);
-
-            DefaultStyleKey = typeof(DataGridColumnHeader);
         }
 
         #region Dependency Properties

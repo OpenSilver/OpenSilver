@@ -56,6 +56,7 @@ namespace System.Windows.Controls
 
         static ComboBox()
         {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(typeof(ComboBox)));
             IsSelectionActivePropertyKey.OverrideMetadata(
                 typeof(ComboBox),
                 new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
@@ -66,7 +67,6 @@ namespace System.Windows.Controls
         /// </summary>
         public ComboBox()
         {
-            DefaultStyleKey = typeof(ComboBox);
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 

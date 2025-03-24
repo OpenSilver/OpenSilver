@@ -1226,14 +1226,16 @@ namespace System.Windows.Controls
             }
         }
 
+        static AutoCompleteBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(AutoCompleteBox), new PropertyMetadata(typeof(AutoCompleteBox)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.AutoCompleteBox" /> class.
+        /// Initializes a new instance of the <see cref="T:System.Windows.Controls.AutoCompleteBox" /> class.
         /// </summary>
         public AutoCompleteBox()
         {
-            DefaultStyleKey = typeof(AutoCompleteBox);
-            
             Loaded += (sender, e) => ApplyTemplate();
             IsEnabledChanged += ControlIsEnabledChanged;
 

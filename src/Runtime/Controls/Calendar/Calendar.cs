@@ -1423,12 +1423,16 @@ namespace System.Windows.Controls
         /// </summary>
         internal event MouseButtonEventHandler DayButtonMouseUp;
 
+        static Calendar()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Calendar), new PropertyMetadata(typeof(Calendar)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Calendar" /> class.
         /// </summary>
         public Calendar()
         {
-            DefaultStyleKey = typeof(Calendar);
             UpdateDisplayDate(this, this.DisplayDate, DateTime.MinValue);
             GotFocus += new RoutedEventHandler(Calendar_GotFocus);
             LostFocus += new RoutedEventHandler(Calendar_LostFocus);

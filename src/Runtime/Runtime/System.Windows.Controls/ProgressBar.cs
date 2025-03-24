@@ -24,7 +24,7 @@ namespace System.Windows.Controls
     [TemplatePart(Name = ProgressBarTrackName, Type = typeof(FrameworkElement))]
     [TemplateVisualState(Name = StateIndeterminate, GroupName = VisualStates.GroupCommon)]
     [TemplateVisualState(Name = StateDeterminate, GroupName = VisualStates.GroupCommon)]
-    public partial class ProgressBar : RangeBase
+    public class ProgressBar : RangeBase
     {
         private const string ProgressBarIndicatorName = "ProgressBarIndicator";
         private const string ProgressBarTrackName = "ProgressBarTrack";
@@ -34,13 +34,15 @@ namespace System.Windows.Controls
         private FrameworkElement _track;
         private FrameworkElement _indicator;
 
+        static ProgressBar()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ProgressBar), new PropertyMetadata(typeof(ProgressBar)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProgressBar"/> class.
         /// </summary>
-        public ProgressBar()
-        {
-            DefaultStyleKey = typeof(ProgressBar);
-        }
+        public ProgressBar() { }
 
         /// <summary>
         /// Identifies the <see cref="IsIndeterminate"/> dependency property.

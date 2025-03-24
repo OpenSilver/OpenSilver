@@ -549,15 +549,19 @@ namespace System.Windows.Controls
         /// </summary>
         public event RoutedEventHandler Unselected;
 
+        static AccordionItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(AccordionItem), new PropertyMetadata(typeof(AccordionItem)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the AccordionItem class.
+        /// Initializes a new instance of the <see cref="AccordionItem"/> class.
         /// </summary>
         public AccordionItem()
         {
             // initialize to no action.
             ScheduledAction = AccordionAction.None;
 
-            DefaultStyleKey = typeof(AccordionItem);
             _interaction = new InteractionHelper(this);
         }
 

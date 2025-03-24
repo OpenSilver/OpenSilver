@@ -182,6 +182,11 @@ namespace System.Windows.Controls
 
         #endregion Data
 
+        static DataGridRow()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridRow), new PropertyMetadata(typeof(DataGridRow)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGridRow" /> class. 
         /// </summary>
@@ -206,8 +211,6 @@ namespace System.Windows.Controls
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRow_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridRow_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridRow_MouseLeave);
-
-            DefaultStyleKey = typeof(DataGridRow);
         }
 
         #region Dependency Properties

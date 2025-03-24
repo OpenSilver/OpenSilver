@@ -29,10 +29,15 @@ namespace System.Windows.Controls
     {
 #region Constructor
 
-        public ContentControl()
+        static ContentControl()
         {
-            this.DefaultStyleKey = typeof(ContentControl);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ContentControl), new PropertyMetadata(typeof(ContentControl)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentControl" /> class.
+        /// </summary>
+        public ContentControl() { }
 
 #endregion Constructor
 

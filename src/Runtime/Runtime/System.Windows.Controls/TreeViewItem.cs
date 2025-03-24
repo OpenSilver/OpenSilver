@@ -621,13 +621,16 @@ namespace System.Windows.Controls
         /// </summary>
         public event RoutedEventHandler Unselected;
 
+        static TreeViewItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeViewItem), new PropertyMetadata(typeof(TreeViewItem)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TreeViewItem" /> class.
+        /// Initializes a new instance of the <see cref="TreeViewItem" /> class.
         /// </summary>
         public TreeViewItem()
         {
-            DefaultStyleKey = typeof(TreeViewItem);
             Interaction = new InteractionHelper(this);
         }
 

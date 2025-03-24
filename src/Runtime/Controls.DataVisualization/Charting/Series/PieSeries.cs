@@ -70,18 +70,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         private IEnumerator<ResourceDictionary> _resourceDictionaryEnumerator;
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the PieSeries class.
-        /// </summary>
         static PieSeries()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(PieSeries), new FrameworkPropertyMetadata(typeof(PieSeries)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PieSeries), new PropertyMetadata(typeof(PieSeries)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the PieSeries class.
+        /// Initializes a new instance of the <see cref="PieSeries"/> class.
         /// </summary>
         public PieSeries()
         {
@@ -90,8 +85,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
             {
                 OnResourceDictionariesChanged(EventArgs.Empty);
             };
-
-            this.DefaultStyleKey = typeof(PieSeries);
         }
 
         /// <summary>

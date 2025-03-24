@@ -29,14 +29,18 @@ namespace System.Windows.Controls
         /// <summary>
         /// Timer used to delay the initial display and avoid flickering.
         /// </summary>
-        private DispatcherTimer _displayAfterTimer;
+        private readonly DispatcherTimer _displayAfterTimer;
+
+        static BusyIndicator()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(BusyIndicator), new PropertyMetadata(typeof(BusyIndicator)));
+        }
 
         /// <summary>
-        /// Instantiates a new instance of the BusyIndicator control.
+        /// Instantiates a new instance of the <see cref="BusyIndicator"/> control.
         /// </summary>
         public BusyIndicator()
         {
-            DefaultStyleKey = typeof(BusyIndicator);
             _displayAfterTimer = new DispatcherTimer();
             Loaded += delegate
             {

@@ -479,19 +479,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </returns>
         protected abstract IEnumerable<UnitValue> GetMajorGridLineCoordinates(Size availableSize);
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the DisplayAxis class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static DisplayAxis()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(DisplayAxis), new FrameworkPropertyMetadata(typeof(DisplayAxis)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DisplayAxis), new PropertyMetadata(typeof(DisplayAxis)));
         }
 
-#endif
         /// <summary>
-        /// Instantiates a new instance of the DisplayAxis class.
+        /// Instantiates a new instance of the <see cref="DisplayAxis"/> class.
         /// </summary>
         protected DisplayAxis()
         {
@@ -507,8 +501,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
             this.TitleLayoutTransformControl.VerticalAlignment = VerticalAlignment.Center;
 
             this.SizeChanged += new SizeChangedEventHandler(DisplayAxisSizeChanged);
-
-            this.DefaultStyleKey = typeof(DisplayAxis);
         }
 
         /// <summary>

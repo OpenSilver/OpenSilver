@@ -69,12 +69,16 @@ namespace System.Windows.Controls
 
 #region	Constructors
 
+        static ValidationSummary()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ValidationSummary), new PropertyMetadata(typeof(ValidationSummary)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the ValidationSummary class.
+        /// Initializes a new instance of the <see cref="ValidationSummary"/> class.
         /// </summary>
         public ValidationSummary()
         {
-            this.DefaultStyleKey = typeof(ValidationSummary);
             this._errors = new ValidationItemCollection();
             this._validationSummaryItemDictionary = new Dictionary<ValidationError, ValidationSummaryItem>();
             this._displayedErrors = new ValidationItemCollection();

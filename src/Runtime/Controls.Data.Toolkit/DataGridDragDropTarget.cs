@@ -33,13 +33,15 @@ namespace System.Windows.Controls
             get { return Content as DataGrid; }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the DataGridDragDropTarget class.
-        /// </summary>
-        public DataGridDragDropTarget()
+        static DataGridDragDropTarget()
         {
-            this.DefaultStyleKey = typeof(DataGridDragDropTarget);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridDragDropTarget), new PropertyMetadata(typeof(DataGridDragDropTarget)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataGridDragDropTarget"/> class.
+        /// </summary>
+        public DataGridDragDropTarget() { }
 
         /// <summary>
         /// Returns a value indicating whether an item can be added to the

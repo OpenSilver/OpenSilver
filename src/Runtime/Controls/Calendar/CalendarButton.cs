@@ -104,13 +104,17 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public event MouseButtonEventHandler CalendarButtonMouseUp;
 
+        static CalendarButton()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CalendarButton), new PropertyMetadata(typeof(CalendarButton)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CalendarButton" /> class.
         /// </summary>
         public CalendarButton()
             : base()
         {
-            DefaultStyleKey = typeof(CalendarButton);
             IsTabStop = false;
             Loaded += OnLoad;
 

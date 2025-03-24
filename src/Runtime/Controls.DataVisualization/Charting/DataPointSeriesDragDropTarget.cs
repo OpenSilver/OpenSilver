@@ -34,13 +34,15 @@ namespace System.Windows.Controls.DataVisualization.Charting
             get { return this.Content as Chart; }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the DataPointSeriesDragDropTarget.
-        /// </summary>
-        public DataPointSeriesDragDropTarget()
+        static DataPointSeriesDragDropTarget()
         {
-            this.DefaultStyleKey = typeof(DataPointSeriesDragDropTarget);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataPointSeriesDragDropTarget), new PropertyMetadata(typeof(DataPointSeriesDragDropTarget)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref=" DataPointSeriesDragDropTarget"/> class.
+        /// </summary>
+        public DataPointSeriesDragDropTarget() { }
 
         /// <summary>
         /// Ensures that the content property is set to a Chart object.

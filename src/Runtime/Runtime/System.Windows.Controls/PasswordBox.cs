@@ -43,9 +43,16 @@ namespace System.Windows.Controls
         private FrameworkElement _contentElement;
         private ITextViewHost<PasswordBoxView> _textViewHost;
 
+        static PasswordBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PasswordBox), new PropertyMetadata(typeof(PasswordBox)));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PasswordBox"/> class.
+        /// </summary>
         public PasswordBox()
         {
-            DefaultStyleKey = typeof(PasswordBox);
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 

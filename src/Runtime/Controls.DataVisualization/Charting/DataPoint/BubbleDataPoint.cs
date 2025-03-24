@@ -130,25 +130,14 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
         #endregion public double ActualSize
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the BubbleDataPoint class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static BubbleDataPoint()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(BubbleDataPoint), new FrameworkPropertyMetadata(typeof(BubbleDataPoint)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(BubbleDataPoint), new PropertyMetadata(typeof(BubbleDataPoint)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the bubble data point.
+        /// Initializes a new instance of the <see cref="BubbleDataPoint"/> class.
         /// </summary>
-        public BubbleDataPoint()
-        {
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(BubbleDataPoint);
-#endif
-        }
+        public BubbleDataPoint() { }
     }
 }

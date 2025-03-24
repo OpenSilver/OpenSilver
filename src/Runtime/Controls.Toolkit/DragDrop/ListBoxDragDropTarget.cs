@@ -31,13 +31,15 @@ namespace System.Windows.Controls
             get { return Content as ListBox; }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the ListBoxDragDropTarget class.
-        /// </summary>
-        public ListBoxDragDropTarget()
+        static ListBoxDragDropTarget()
         {
-            this.DefaultStyleKey = typeof(ListBoxDragDropTarget);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBoxDragDropTarget), new PropertyMetadata(typeof(ListBoxDragDropTarget)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ListBoxDragDropTarget"/> class.
+        /// </summary>
+        public ListBoxDragDropTarget() { }
 
         /// <summary>
         /// Adds all selected items when drag operation begins.

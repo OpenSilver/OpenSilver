@@ -38,13 +38,15 @@ namespace System.Windows.Controls
     {
         #region Constructor
 
+        static RadioButton()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(RadioButton), new PropertyMetadata(typeof(RadioButton)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RadioButton"/> class.
         /// </summary>
-        public RadioButton()
-        {
-            this.DefaultStyleKey = typeof(RadioButton);
-        }
+        public RadioButton() { }
 
         #endregion Constructor
 

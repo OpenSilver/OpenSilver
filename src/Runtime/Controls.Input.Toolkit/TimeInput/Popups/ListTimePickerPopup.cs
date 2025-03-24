@@ -206,6 +206,11 @@ namespace System.Windows.Controls
         }
 #endregion public ItemSelectionHelper<KeyValuePair<string, DateTime?>> TimeItemsSelection
 
+        static ListTimePickerPopup()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ListTimePickerPopup), new PropertyMetadata(typeof(ListTimePickerPopup)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ListTimePickerPopup"/> class.
         /// </summary>
@@ -215,8 +220,6 @@ namespace System.Windows.Controls
             {
                 Items = new ObservableCollection<KeyValuePair<string, DateTime?>>()
             };
-
-            DefaultStyleKey = typeof(ListTimePickerPopup);
         }
 
         /// <summary>

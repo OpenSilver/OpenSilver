@@ -75,25 +75,17 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 new PropertyMetadata(null));
         #endregion public string FormattedContent
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the AxisLabel class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static AxisLabel()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(AxisLabel), new FrameworkPropertyMetadata(typeof(AxisLabel)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(AxisLabel), new PropertyMetadata(typeof(AxisLabel)));
         }
 
-#endif     
         /// <summary>
-        /// Instantiates a new instance of the AxisLabel class.
+        /// Instantiates a new instance of the <see cref="AxisLabel"/> class.
         /// </summary>
         public AxisLabel()
         {
             this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = StringFormat ?? "{0}" });
-
-            this.DefaultStyleKey = typeof(AxisLabel);
         }
 
         /// <summary>

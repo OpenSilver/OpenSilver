@@ -135,19 +135,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
             }
         }
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the RangeAxis class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static RangeAxis()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(RangeAxis), new FrameworkPropertyMetadata(typeof(RangeAxis)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(RangeAxis), new PropertyMetadata(typeof(RangeAxis)));
         }
 
-#endif
         /// <summary>
-        /// Instantiates a new instance of the RangeAxis class.
+        /// Instantiates a new instance of the <see cref="RangeAxis"/> class.
         /// </summary>
         protected RangeAxis()
         {
@@ -165,8 +159,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 UpdateActualRange();
             };
             SizeChanged += handler;
-
-            this.DefaultStyleKey = typeof(RangeAxis);
         }
 
         /// <summary>

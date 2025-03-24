@@ -1539,13 +1539,16 @@ namespace System.Windows.Controls
         /// </summary>
         internal event MouseButtonEventHandler DayButtonMouseUp;
 
+        static GlobalCalendar()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(GlobalCalendar), new PropertyMetadata(typeof(GlobalCalendar)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.GlobalCalendar" /> class.
+        /// Initializes a new instance of the <see cref="GlobalCalendar" /> class.
         /// </summary>
         public GlobalCalendar()
         {
-            DefaultStyleKey = typeof(GlobalCalendar);
             DisplayDate = DateTime.Today;
             GotFocus += new RoutedEventHandler(Calendar_GotFocus);
             LostFocus += new RoutedEventHandler(Calendar_LostFocus);

@@ -11,12 +11,14 @@ namespace System.Windows.Controls
     /// <QualityBand>Preview</QualityBand>
     public class Separator : Control
     {
-        /// <summary>
-        /// Initializes a new instance of the Separator class.
-        /// </summary>
-        public Separator()
+        static Separator()
         {
-            DefaultStyleKey = typeof(Separator);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Separator), new PropertyMetadata(typeof(Separator)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Separator"/> class.
+        /// </summary>
+        public Separator() { }
     }
 }

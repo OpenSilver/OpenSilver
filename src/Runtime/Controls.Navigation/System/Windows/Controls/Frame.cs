@@ -46,12 +46,16 @@ namespace System.Windows.Controls
 
 #region Constructors
 
+        static Frame()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Frame), new PropertyMetadata(typeof(Frame)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Frame" /> class. 
         /// </summary>
         public Frame()
         {
-            this.DefaultStyleKey = typeof(Frame);
             this.Loaded += new RoutedEventHandler(this.Frame_Loaded);
             this._navigationService = new NavigationService(this);
         }

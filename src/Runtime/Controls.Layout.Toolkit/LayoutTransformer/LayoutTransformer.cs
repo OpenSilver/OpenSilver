@@ -105,14 +105,16 @@ namespace System.Windows.Controls
         /// </summary>
         private Size _childActualSize = Size.Empty;
 
+        static LayoutTransformer()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutTransformer), new PropertyMetadata(typeof(LayoutTransformer)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the LayoutTransformer class.
+        /// Initializes a new instance of the <see cref="LayoutTransformer"/> class.
         /// </summary>
         public LayoutTransformer()
         {
-            // Associated default style
-            DefaultStyleKey = typeof(LayoutTransformer);
-
             // Can't tab to LayoutTransformer
             IsTabStop = false;
 #if SILVERLIGHT

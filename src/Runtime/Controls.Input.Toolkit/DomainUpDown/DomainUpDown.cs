@@ -564,12 +564,16 @@ namespace System.Windows.Controls
 
         #endregion public DataTemplate ItemTemplate
 
+        static DomainUpDown()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DomainUpDown), new PropertyMetadata(typeof(DomainUpDown)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainUpDown"/> class.
         /// </summary>
         public DomainUpDown()
         {
-            DefaultStyleKey = typeof(DomainUpDown);
             Interaction = new InteractionHelper(this);
 
             _items = new ObservableObjectCollection();

@@ -367,12 +367,16 @@ namespace System.Windows.Controls
         private string formatString = "F0";
         #endregion DecimalPlaces
 
+        static NumericUpDown()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(NumericUpDown), new PropertyMetadata(typeof(NumericUpDown)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the NumericUpDown class.
+        /// Initializes a new instance of the <see cref="NumericUpDown"/> class.
         /// </summary>
         public NumericUpDown() : base()
         {
-            DefaultStyleKey = typeof(NumericUpDown);
             Interaction = new InteractionHelper(this);
         }
 

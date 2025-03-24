@@ -123,6 +123,11 @@ namespace System.Windows.Controls
         /// </summary>
         public event EventHandler<SelectionChangedEventArgs> SelectedDateChanged;
 
+        static DatePicker()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DatePicker), new PropertyMetadata(typeof(DatePicker)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DatePicker" /> class.
         /// </summary>
@@ -136,7 +141,6 @@ namespace System.Windows.Controls
             this.GotFocus += new RoutedEventHandler(DatePicker_GotFocus);
             this.LostFocus += new RoutedEventHandler(DatePicker_LostFocus);
             this.BlackoutDates = this._calendar.BlackoutDates;
-            DefaultStyleKey = typeof(DatePicker);
         }
 
         /// <summary>

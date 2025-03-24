@@ -633,26 +633,18 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 new PropertyMetadata(TimeSpan.FromSeconds(0.5)));
         #endregion public TimeSpan TransitionDuration
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the DataPointSeries class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static DataPointSeries()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataPointSeries), new FrameworkPropertyMetadata(typeof(DataPointSeries)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataPointSeries), new PropertyMetadata(typeof(DataPointSeries)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the DataPointSeries class.
+        /// Initializes a new instance of the <see cref="DataPointSeries"/> class.
         /// </summary>
         protected DataPointSeries()
         {
             ClipGeometry = new RectangleGeometry();
             Clip = ClipGeometry;
-
-            this.DefaultStyleKey = typeof(DataPointSeries);
         }
 
         /// <summary>

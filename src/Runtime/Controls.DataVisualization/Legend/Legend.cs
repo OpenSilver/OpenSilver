@@ -16,26 +16,18 @@ namespace System.Windows.Controls.DataVisualization
     [StyleTypedProperty(Property = "TitleStyle", StyleTargetType = typeof(Title))]
     public partial class Legend : HeaderedItemsControl
     {
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the Legend class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static Legend()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(Legend), new FrameworkPropertyMetadata(typeof(Legend)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Legend), new PropertyMetadata(typeof(Legend)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the Legend class.
+        /// Initializes a new instance of the <see cref="Legend"/> class.
         /// </summary>
         public Legend()
         {
             // By default, the Visibility property should follow ContentVisibility - but users can override it
             SetBinding(VisibilityProperty, new Binding("ContentVisibility") { Source = this });
-
-            DefaultStyleKey = typeof(Legend);
         }
 
         /// <summary>

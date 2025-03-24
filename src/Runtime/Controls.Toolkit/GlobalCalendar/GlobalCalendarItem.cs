@@ -326,15 +326,15 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         private DateTime _currentMonth;
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.Primitives.GlobalCalendarItem" />
-        /// class.
-        /// </summary>
-        public GlobalCalendarItem()
+        static GlobalCalendarItem()
         {
-            DefaultStyleKey = typeof(GlobalCalendarItem);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(GlobalCalendarItem), new PropertyMetadata(typeof(GlobalCalendarItem)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GlobalCalendarItem" /> class.
+        /// </summary>
+        public GlobalCalendarItem() { }
 
         #region Templating
         /// <summary>

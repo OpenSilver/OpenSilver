@@ -334,13 +334,16 @@ namespace System.Windows.Controls
         /// </summary>
         public event RoutedPropertyChangedEventHandler<object> SelectedItemChanged;
 
+        static TreeView()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeView), new PropertyMetadata(typeof(TreeView)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TreeView" /> class.
+        /// Initializes a new instance of the <see cref="TreeView" /> class.
         /// </summary>
         public TreeView()
         {
-            DefaultStyleKey = typeof(TreeView);
             ItemsControlHelper = new ItemsControlHelper(this);
             Interaction = new InteractionHelper(this);
         }

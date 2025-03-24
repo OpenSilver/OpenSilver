@@ -109,6 +109,11 @@ namespace System.Windows.Controls.Primitives
             fe.SetValueInternal(DebounceProperty, (TimeSpan?)debounce);
         }
 
+        static ScrollBar()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollBar), new PropertyMetadata(typeof(ScrollBar)));
+        }
+
         /// <summary> 
         /// Initializes a new instance of the <see cref="ScrollBar"/> class.
         /// </summary> 
@@ -116,7 +121,6 @@ namespace System.Windows.Controls.Primitives
         {
             SizeChanged += delegate { UpdateTrackLayout(GetTrackLength()); };
 
-            DefaultStyleKey = typeof(ScrollBar);
             IsEnabledChanged += OnIsEnabledChanged;
         }
 

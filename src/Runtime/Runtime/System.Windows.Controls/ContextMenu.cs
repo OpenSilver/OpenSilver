@@ -33,13 +33,15 @@ public class ContextMenu : MenuBase
     /// </summary>
     private bool _settingIsOpen;
 
+    static ContextMenu()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(ContextMenu), new PropertyMetadata(typeof(ContextMenu)));
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ContextMenu"/> class.
     /// </summary>
-    public ContextMenu()
-    {
-        DefaultStyleKey = typeof(ContextMenu);
-    }
+    public ContextMenu() { }
 
     /// <summary>
     /// Identifies the <see cref="HorizontalOffset"/> dependency property.

@@ -137,12 +137,16 @@ namespace System.Windows.Controls
             typeof(MenuItem),
             new PropertyMetadata(null));
 
+        static MenuItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(MenuItem), new PropertyMetadata(typeof(MenuItem)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the MenuItem class.
+        /// Initializes a new instance of the <see cref="MenuItem"/> class.
         /// </summary>
         public MenuItem()
         {
-            DefaultStyleKey = typeof(MenuItem);
             UpdateIsEnabled();
         }
 

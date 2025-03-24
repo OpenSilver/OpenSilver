@@ -37,6 +37,7 @@ namespace System.Windows.Controls
 
         static ListBox()
         {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBox), new PropertyMetadata(typeof(ListBox)));
             IsSelectionActivePropertyKey.OverrideMetadata(
                 typeof(ListBox),
                 new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
@@ -45,10 +46,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBox"/> class.
         /// </summary>
-        public ListBox()
-        {
-            DefaultStyleKey = typeof(ListBox);
-        }
+        public ListBox() { }
 
         /// <inheritdoc />
         protected internal override bool HandlesScrolling => true;

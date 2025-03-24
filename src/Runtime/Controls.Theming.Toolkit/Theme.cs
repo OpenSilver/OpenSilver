@@ -36,12 +36,16 @@ namespace System.Windows.Controls.Theming
         /// </summary>
         private static Uri _applicationThemeUri;
 
+        static Theme()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Theme), new PropertyMetadata(typeof(Theme)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the Theme class.
+        /// Initializes a new instance of the <see cref="Theme"/> class.
         /// </summary>
         public Theme()
         {
-            DefaultStyleKey = typeof(Theme);
             ThemeResources = new ResourceDictionary();
         }
 

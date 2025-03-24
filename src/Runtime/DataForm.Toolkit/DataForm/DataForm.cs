@@ -1070,12 +1070,16 @@ namespace System.Windows.Controls
 
 #region Constructors
 
+        static DataForm()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataForm), new PropertyMetadata(typeof(DataForm)));
+        }
+
         /// <summary>
         /// Constructs a new instance of DataForm.
         /// </summary>
         public DataForm()
         {
-            this.DefaultStyleKey = typeof(DataForm);
             this._readOnlyContentsNew = new Dictionary<Type, FrameworkElement>();
             this._readOnlyContentsOld = new Dictionary<Type, FrameworkElement>();
             this._editContentsNew = new Dictionary<Type, FrameworkElement>();

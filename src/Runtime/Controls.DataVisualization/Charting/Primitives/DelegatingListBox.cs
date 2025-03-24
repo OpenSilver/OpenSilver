@@ -37,25 +37,15 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
         /// </summary>
         public Action<DependencyObject, object> ClearContainerForItem { get; set; }
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes static members of the DelegatingListBox class.
-        /// </summary>
         static DelegatingListBox()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(DelegatingListBox), new FrameworkPropertyMetadata(typeof(DelegatingListBox)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DelegatingListBox), new PropertyMetadata(typeof(DelegatingListBox)));
         }
-#endif
 
         /// <summary>
-        /// Initializes a new instance of the DelegatingListBox class.
+        /// Initializes a new instance of the <see cref="DelegatingListBox"/> class.
         /// </summary>
-        public DelegatingListBox()
-        {
-#if SILVERLIGHT
-            DefaultStyleKey = typeof(DelegatingListBox);
-#endif
-        }
+        public DelegatingListBox() { }
 
         /// <summary>
         /// Determines if the specified item is (or is eligible to be) its own container.

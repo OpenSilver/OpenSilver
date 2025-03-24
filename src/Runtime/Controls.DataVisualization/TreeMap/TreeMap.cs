@@ -359,8 +359,13 @@ namespace System.Windows.Controls.DataVisualization
         }
         #endregion
 
+        static TreeMap()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeMap), new PropertyMetadata(typeof(TreeMap)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the TreeMap class.
+        /// Initializes a new instance of the <see cref="TreeMap"/> class.
         /// </summary>
         public TreeMap()
         {
@@ -369,8 +374,6 @@ namespace System.Windows.Controls.DataVisualization
             SetValue(InterpolatorsProperty, new ObservableCollection<Interpolator>());
             (Interpolators as ObservableCollection<Interpolator>).CollectionChanged += 
                 new NotifyCollectionChangedEventHandler(OnInterpolatorsCollectionChanged);
-
-            DefaultStyleKey = typeof(TreeMap);
         }
 
         /// <summary>

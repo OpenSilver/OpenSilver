@@ -28,12 +28,16 @@ namespace System.Windows.Controls
     {
         private const string ChildElementName = "Child";
 
+        static Viewbox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Viewbox), new PropertyMetadata(typeof(Viewbox)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Viewbox" /> class.
         /// </summary>
         public Viewbox()
         {
-            DefaultStyleKey = typeof(Viewbox);
             IsTabStop = false;
             SizeChanged += OnSizeChanged;
         }

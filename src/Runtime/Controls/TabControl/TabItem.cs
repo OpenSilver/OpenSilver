@@ -40,6 +40,11 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
     public class TabItem : ContentControl
     {
+        static TabItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TabItem), new PropertyMetadata(typeof(TabItem)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TabItem" /> class.
         /// </summary>
@@ -52,7 +57,6 @@ namespace System.Windows.Controls
             GotFocus += delegate { IsFocused = true; };
             LostFocus += delegate { IsFocused = false; };
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-            DefaultStyleKey = typeof(TabItem);
         }
 
         /// <summary>

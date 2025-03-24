@@ -731,13 +731,16 @@ namespace System.Windows.Controls
 
 #endregion public object TimeHintContent
 
+        static TimeUpDown()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TimeUpDown), new PropertyMetadata(typeof(TimeUpDown)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TimeUpDown"/> class.
         /// </summary>
         public TimeUpDown()
         {
-            DefaultStyleKey = typeof(TimeUpDown);
-
             _timeCoercionHelper = new TimeCoercionHelper(this);
         }
 

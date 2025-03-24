@@ -48,6 +48,11 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
     public class TabControl : ItemsControl
     {
+        static TabControl()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TabControl), new PropertyMetadata(typeof(TabControl)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TabControl" /> class.
         /// </summary>
@@ -57,7 +62,6 @@ namespace System.Windows.Controls
             KeyDown += delegate (object sender, KeyEventArgs e) { OnKeyDown(e); };
             SelectionChanged += delegate (object sender, SelectionChangedEventArgs e) { OnSelectionChanged(e); };
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-            DefaultStyleKey = typeof(TabControl);
         }
 
         /// <summary>

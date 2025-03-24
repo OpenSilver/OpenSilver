@@ -703,12 +703,16 @@ namespace System.Windows.Controls
         /// </summary>
         public event NotifyCollectionChangedEventHandler SelectedItemsChanged;
 
+        static Accordion()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Accordion), new PropertyMetadata(typeof(Accordion)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Accordion"/> class.
         /// </summary>
         public Accordion()
         {
-            DefaultStyleKey = typeof(Accordion);
             ItemsControlHelper = new ItemsControlHelper(this);
 
             ObservableCollection<object> items = new ObservableCollection<object>();

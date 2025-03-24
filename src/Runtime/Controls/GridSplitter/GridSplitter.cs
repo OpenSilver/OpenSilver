@@ -121,7 +121,12 @@ namespace System.Windows.Controls
         /// Default increment parameter.
         /// </summary>
         private const double KeyboardIncrement = 10.0;
-        
+
+        static GridSplitter()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(GridSplitter), new PropertyMetadata(typeof(GridSplitter)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the
         /// <see cref="T:System.Windows.Controls.GridSplitter" /> class.
@@ -160,8 +165,6 @@ namespace System.Windows.Controls
             {
                 ChangeVisualState();
             };
-
-            DefaultStyleKey = typeof(GridSplitter);
         }
 
         /// <summary>

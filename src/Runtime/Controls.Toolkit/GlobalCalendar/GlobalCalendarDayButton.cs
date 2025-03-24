@@ -202,15 +202,17 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         public event MouseButtonEventHandler CalendarDayButtonMouseUp;
 
+        static GlobalCalendarDayButton()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(GlobalCalendarDayButton), new PropertyMetadata(typeof(GlobalCalendarDayButton)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:System.Windows.Controls.Primitives.GlobalCalendarDayButton" />
-        /// class.
+        /// Initializes a new instance of the <see cref="GlobalCalendarDayButton" /> class.
         /// </summary>
         public GlobalCalendarDayButton()
             : base()
         {
-            DefaultStyleKey = typeof(GlobalCalendarDayButton);
             IsTabStop = false;
             Loaded += OnLoad;
 

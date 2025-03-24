@@ -51,12 +51,16 @@ namespace System.Windows.Controls
         private int _notificationsSuspended;
         private int _changesCount;
 
+        static RichTextBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(RichTextBox), new PropertyMetadata(typeof(RichTextBox)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextBox"/> class.
         /// </summary>
         public RichTextBox()
         {
-            DefaultStyleKey = typeof(RichTextBox);
             SetValueInternal(BlocksPropertyKey, new BlockCollection(this));
             Selection = new TextSelection(this);
             ContentStart = new TextPointer(this, 0, LogicalDirection.Backward);

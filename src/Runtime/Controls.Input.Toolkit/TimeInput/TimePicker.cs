@@ -982,13 +982,17 @@ namespace System.Windows.Controls
         public event EventHandler<UpDownParseErrorEventArgs> ParseError;
 #endregion
 
+        static TimePicker()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TimePicker), new PropertyMetadata(typeof(TimePicker)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TimePicker"/> 
         /// class.
         /// </summary>
         public TimePicker()
         {
-            DefaultStyleKey = typeof(TimePicker);
             _timeCoercionHelper = new TimeCoercionHelper(this);
         }
 

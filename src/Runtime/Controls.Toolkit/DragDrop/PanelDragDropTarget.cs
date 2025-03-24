@@ -13,13 +13,15 @@ namespace System.Windows.Controls
     /// <QualityBand>Experimental</QualityBand>
     public class PanelDragDropTarget : DragDropTarget<Panel, UIElement>
     {
-        /// <summary>
-        /// Initializes a new instance of the PanelDragDropTarget class.
-        /// </summary>
-        public PanelDragDropTarget()
+        static PanelDragDropTarget()
         {
-            this.DefaultStyleKey = typeof(PanelDragDropTarget);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PanelDragDropTarget), new PropertyMetadata(typeof(PanelDragDropTarget)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PanelDragDropTarget"/> class.
+        /// </summary>
+        public PanelDragDropTarget() { }
 
         /// <summary>
         /// Removes data from an ItemsControl.

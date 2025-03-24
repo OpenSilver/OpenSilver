@@ -423,13 +423,16 @@ namespace System.Windows.Controls
 
         #region Constructors
 
+        static DataPager()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataPager), new PropertyMetadata(typeof(DataPager)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the DataPager class.
         /// </summary>
         public DataPager()
         {
-            this.DefaultStyleKey = typeof(DataPager);
-
             // Listening to the IsEnabled changes so the DataPager states can be updated accordingly.
             this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.OnDataPagerIsEnabledChanged);
 

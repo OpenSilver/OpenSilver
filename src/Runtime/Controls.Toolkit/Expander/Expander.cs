@@ -225,13 +225,16 @@ namespace System.Windows.Controls
         /// </summary>
         public event RoutedEventHandler Collapsed;
 
+        static Expander()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Expander), new PropertyMetadata(typeof(Expander)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="Expander" /> class.
+        /// Initializes a new instance of the <see cref="Expander" /> class.
         /// </summary>
         public Expander()
         {
-            DefaultStyleKey = typeof(Expander);
             Interaction = new InteractionHelper(this);
         }
 

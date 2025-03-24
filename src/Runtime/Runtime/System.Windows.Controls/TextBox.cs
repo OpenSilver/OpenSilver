@@ -57,9 +57,16 @@ namespace System.Windows.Controls
         private FrameworkElement _contentElement;
         private ITextViewHost<TextBoxView> _textViewHost;
 
+        static TextBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBox), new PropertyMetadata(typeof(TextBox)));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TextBox"/> class.
+        /// </summary>
         public TextBox()
         {
-            DefaultStyleKey = typeof(TextBox);
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 

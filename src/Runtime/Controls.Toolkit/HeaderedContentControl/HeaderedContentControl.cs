@@ -106,13 +106,15 @@ namespace System.Windows.Controls
         }
 #endregion public DataTemplate HeaderTemplate
 
+        static HeaderedContentControl()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(HeaderedContentControl), new PropertyMetadata(typeof(HeaderedContentControl)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderedContentControl" /> class.
         /// </summary>
-        public HeaderedContentControl()
-        {
-            DefaultStyleKey = typeof(HeaderedContentControl);
-        }
+        public HeaderedContentControl() { }
 
         /// <summary>
         /// Called when the value of the <see cref="HeaderedContentControl.Header" />

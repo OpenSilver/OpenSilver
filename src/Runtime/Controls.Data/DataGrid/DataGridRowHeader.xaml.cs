@@ -198,6 +198,11 @@ namespace System.Windows.Controls.Primitives
 
         #endregion Data
 
+        static DataGridRowHeader()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridRowHeader), new PropertyMetadata(typeof(DataGridRowHeader)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Primitives.DataGridRowHeader" /> class. 
         /// </summary>
@@ -206,7 +211,6 @@ namespace System.Windows.Controls.Primitives
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridRowHeader_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridRowHeader_MouseLeave);
-            DefaultStyleKey = typeof(DataGridRowHeader);
         }
 
         #region Dependency Properties

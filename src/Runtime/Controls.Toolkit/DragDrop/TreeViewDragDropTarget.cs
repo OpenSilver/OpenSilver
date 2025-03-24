@@ -61,13 +61,16 @@ namespace System.Windows.Controls
 
         #endregion public int ExpandNodeDelay
 
+        static TreeViewDragDropTarget()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeViewDragDropTarget), new PropertyMetadata(typeof(TreeViewDragDropTarget)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the TreeViewDragDropTarget class.
+        /// Initializes a new instance of the <see cref="TreeViewDragDropTarget"/> class.
         /// </summary>
         public TreeViewDragDropTarget()
         {
-            this.DefaultStyleKey = typeof(TreeViewDragDropTarget);
-
             _dragHelper = new DragDropHelper(this);
         }
 

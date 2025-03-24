@@ -256,13 +256,15 @@ namespace System.Windows.Controls
         public event RoutedEventHandler TransitionCompleted;
         #endregion Events
 
+        static TransitioningContentControl()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TransitioningContentControl), new PropertyMetadata(typeof(TransitioningContentControl)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TransitioningContentControl"/> class.
         /// </summary>
-        public TransitioningContentControl()
-        {
-            DefaultStyleKey = typeof(TransitioningContentControl);
-        }
+        public TransitioningContentControl() { }
 
         /// <summary>
         /// Builds the visual tree for the TransitioningContentControl control 

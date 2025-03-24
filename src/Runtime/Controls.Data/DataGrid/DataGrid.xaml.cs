@@ -300,6 +300,11 @@ namespace System.Windows.Controls
 
         #endregion Events
 
+        static DataGrid()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGrid), new PropertyMetadata(typeof(DataGrid)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGrid" /> class.
         /// </summary>
@@ -344,8 +349,6 @@ namespace System.Windows.Controls
             this.CurrentCellCoordinates = new DataGridCellCoordinates(-1, -1);
 
             this.RowGroupHeaderHeightEstimate = DATAGRID_defaultRowHeight;
-
-            DefaultStyleKey = typeof(DataGrid);
         }
 
         #region Dependency Properties

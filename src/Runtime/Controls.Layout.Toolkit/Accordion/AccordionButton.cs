@@ -37,14 +37,15 @@ namespace System.Windows.Controls.Primitives
         internal AccordionItem ParentAccordionItem { get; set; }
         #endregion Parent AccordionItem
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AccordionButton"/> 
-        /// class.
-        /// </summary>
-        public AccordionButton()
+        static AccordionButton()
         {
-            DefaultStyleKey = typeof(AccordionButton);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(AccordionButton), new PropertyMetadata(typeof(AccordionButton)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccordionButton"/> class.
+        /// </summary>
+        public AccordionButton() { }
 
         /// <inheritdoc />
         public override void OnApplyTemplate()

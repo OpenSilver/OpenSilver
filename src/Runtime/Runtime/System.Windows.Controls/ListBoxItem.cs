@@ -33,13 +33,17 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = "AfterLoaded", GroupName = "LayoutStates")]
     public class ListBoxItem : SelectorItem
     {
+        static ListBoxItem()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBoxItem), new PropertyMetadata(typeof(ListBoxItem)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBoxItem"/> class.
         /// </summary>
         public ListBoxItem()
         {
             IsEnabledChanged += (o, e) => UpdateVisualStates();
-            DefaultStyleKey = typeof(ListBoxItem);
         }
 
         /// <summary>

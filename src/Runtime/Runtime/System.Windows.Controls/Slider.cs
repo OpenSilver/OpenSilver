@@ -29,6 +29,11 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
     public class Slider : RangeBase
     {
+        static Slider()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Slider), new PropertyMetadata(typeof(Slider)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Slider"/> class.
         /// </summary> 
@@ -36,7 +41,6 @@ namespace System.Windows.Controls
         {
             SizeChanged += delegate { UpdateTrackLayout(); };
 
-            DefaultStyleKey = typeof(Slider);
             IsEnabledChanged += OnIsEnabledChanged;
         }
 

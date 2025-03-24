@@ -66,26 +66,15 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 null);
         #endregion public Style PathStyle
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the AreaSeries class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static AreaSeries()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(AreaSeries), new FrameworkPropertyMetadata(typeof(AreaSeries)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(AreaSeries), new PropertyMetadata(typeof(AreaSeries)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the AreaSeries class.
+        /// Initializes a new instance of the <see cref="AreaSeries"/> class.
         /// </summary>
-        public AreaSeries()
-        {
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(AreaSeries);
-#endif
-        }
+        public AreaSeries() { }
 
         /// <summary>
         /// Acquire a horizontal linear axis and a vertical linear axis.

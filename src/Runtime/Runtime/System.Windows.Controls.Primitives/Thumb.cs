@@ -21,12 +21,16 @@ namespace System.Windows.Controls.Primitives
     [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
     public sealed class Thumb : Control
     {
+        static Thumb()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Thumb), new PropertyMetadata(typeof(Thumb)));
+        }
+
         /// <summary> 
         /// Initializes a new instance of the <see cref="Thumb"/> class.
         /// </summary> 
         public Thumb()
         {
-            DefaultStyleKey = typeof(Thumb);
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
         }
 

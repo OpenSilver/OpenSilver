@@ -39,12 +39,16 @@ namespace System.Windows.Controls
 
 #region Constructors
 
+        static DescriptionViewer()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DescriptionViewer), new PropertyMetadata(typeof(DescriptionViewer)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the DescriptionViewer class.
+        /// Initializes a new instance of the <see cref="DescriptionViewer"/> class.
         /// </summary>
         public DescriptionViewer()
         {
-            this.DefaultStyleKey = typeof(DescriptionViewer);
             // Set binding to self for DataContext change notifications
             this.SetBinding(DescriptionViewer.DataContextProperty, new Binding());
             this.Loaded += new RoutedEventHandler(this.DescriptionViewer_Loaded);

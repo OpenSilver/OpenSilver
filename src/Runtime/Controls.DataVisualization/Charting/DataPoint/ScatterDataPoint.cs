@@ -17,24 +17,14 @@ namespace System.Windows.Controls.DataVisualization.Charting
     [TemplateVisualState(Name = DataPoint.StateRevealHidden, GroupName = DataPoint.GroupRevealStates)]
     public partial class ScatterDataPoint : DataPoint
     {
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the ScatterDataPoint class.
-        /// </summary>
         static ScatterDataPoint()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ScatterDataPoint), new FrameworkPropertyMetadata(typeof(ScatterDataPoint)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ScatterDataPoint), new PropertyMetadata(typeof(ScatterDataPoint)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the ScatterDataPoint class.
+        /// Initializes a new instance of the <see cref="ScatterDataPoint"/> class.
         /// </summary>
-        public ScatterDataPoint()
-        {
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(ScatterDataPoint);
-#endif
-        }
+        public ScatterDataPoint() { }
     }
 }

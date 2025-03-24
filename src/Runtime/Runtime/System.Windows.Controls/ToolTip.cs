@@ -25,14 +25,15 @@ namespace System.Windows.Controls
         private Popup _parentPopup;
         private FrameworkElement _owner;
 
-        /// <summary>
-        /// Initializes a new instance of the ToolTip class.
-        /// </summary>
-        public ToolTip()
+        static ToolTip()
         {
-            // Set default style:
-            this.DefaultStyleKey = typeof(ToolTip);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ToolTip), new PropertyMetadata(typeof(ToolTip)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ToolTip"/> class.
+        /// </summary>
+        public ToolTip() { }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the ToolTip is visible. True if the ToolTip is visible; otherwise, false. The default is false.

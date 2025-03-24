@@ -136,13 +136,15 @@ namespace System.Windows.Controls
         }
         #endregion public object Content
 
-        /// <summary>
-        /// Initializes a new instance of the ButtonSpinner class.
-        /// </summary>
-        public ButtonSpinner() : base()
+        static ButtonSpinner()
         {
-            DefaultStyleKey = typeof(ButtonSpinner);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ButtonSpinner), new PropertyMetadata(typeof(ButtonSpinner)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ButtonSpinner"/> class.
+        /// </summary>
+        public ButtonSpinner() { }
 
         /// <summary>
         /// Builds the visual tree for the ButtonSpinner control when a new 

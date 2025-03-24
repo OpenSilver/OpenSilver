@@ -32,13 +32,15 @@ namespace System.Windows.Controls.Primitives
     {
         #region Constructor
 
+        static ToggleButton()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleButton), new PropertyMetadata(typeof(ToggleButton)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ToggleButton"/> class.
         /// </summary>
-        public ToggleButton() : base()
-        {
-            this.DefaultStyleKey = typeof(ToggleButton);
-        }
+        public ToggleButton() { }
 
         #endregion Constructor
 

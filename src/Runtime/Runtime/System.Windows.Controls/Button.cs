@@ -33,10 +33,15 @@ namespace System.Windows.Controls
     /// </example>
     public partial class Button : ButtonBase
     {
-        public Button()
+        static Button()
         {
-            DefaultStyleKey = typeof(Button);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Button), new PropertyMetadata(typeof(Button)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Button"/> class.
+        /// </summary>
+        public Button() { }
 
         /// <summary>
         /// Returns a <see cref="ButtonAutomationPeer"/> for use by the Silverlight automation 

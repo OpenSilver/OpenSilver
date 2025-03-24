@@ -406,12 +406,16 @@ namespace System.Windows.Controls
         /// </summary>
         public event RoutedPropertyChangedEventHandler<bool> DropDownClosed;
 
+        static Picker()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Picker), new PropertyMetadata(typeof(Picker)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Picker"/> class.
         /// </summary>
         protected Picker()
         {
-            DefaultStyleKey = typeof(Picker);
             Interaction = new InteractionHelper(this);
 
             IsEnabledChanged += ControlIsEnabledChanged;

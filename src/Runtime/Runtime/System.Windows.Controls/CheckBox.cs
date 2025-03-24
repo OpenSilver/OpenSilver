@@ -50,13 +50,15 @@ namespace System.Windows.Controls
     [TemplateVisualState(Name = "InvalidUnfocused", GroupName = "ValidationStates")]
     public class CheckBox : ToggleButton
     {
+        static CheckBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CheckBox), new PropertyMetadata(typeof(CheckBox)));
+        }
+
         /// <summary>
         /// Initializes a new instance of <see cref="CheckBox"/> class.
         /// </summary>
-        public CheckBox()
-        {
-            DefaultStyleKey = typeof(CheckBox);
-        }
+        public CheckBox() { }
 
         /// <summary>
         /// Returns a <see cref="CheckBoxAutomationPeer"/> for use by the Silverlight automation 

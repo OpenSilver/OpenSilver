@@ -39,13 +39,15 @@ namespace System.Windows.Controls;
 [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
 public class HyperlinkButton : ButtonBase
 {
+    static HyperlinkButton()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(HyperlinkButton), new PropertyMetadata(typeof(HyperlinkButton)));
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="HyperlinkButton"/> class.
     /// </summary>
-    public HyperlinkButton()
-    {
-        DefaultStyleKey = typeof(HyperlinkButton);
-    }
+    public HyperlinkButton() { }
 
     /// <summary>
     /// Provides handling for the <see cref="ButtonBase.Click"/> event.

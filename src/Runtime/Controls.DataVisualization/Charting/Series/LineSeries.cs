@@ -66,26 +66,15 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 null);
         #endregion public Style PolylineStyle
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the LineSeries class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static LineSeries()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(LineSeries), new FrameworkPropertyMetadata(typeof(LineSeries)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(LineSeries), new PropertyMetadata(typeof(LineSeries)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the LineSeries class.
+        /// Initializes a new instance of the <see cref="LineSeries"/> class.
         /// </summary>
-        public LineSeries()
-        {
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(LineSeries);
-#endif
-        }
+        public LineSeries() { }
 
         /// <summary>
         /// Acquire a horizontal linear axis and a vertical linear axis.

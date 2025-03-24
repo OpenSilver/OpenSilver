@@ -368,24 +368,16 @@ namespace System.Windows.Controls
 
         #endregion public double? Value
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the ColumnDataPoint class.
-        /// </summary>
         static Rating()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(Rating), new FrameworkPropertyMetadata(typeof(Rating)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Rating), new PropertyMetadata(typeof(Rating)));
         }
 
-#endif    
         /// <summary>
-        /// Initializes a new instance of the Rating control.
+        /// Initializes a new instance of the <see cref="Rating"/> control.
         /// </summary>
         public Rating()
         {
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(Rating);
-#endif
             this.Interaction = new InteractionHelper(this);
 
             this.ItemsControlHelper = new ItemsControlHelper(this);

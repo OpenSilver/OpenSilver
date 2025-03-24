@@ -17,24 +17,14 @@ namespace System.Windows.Controls.DataVisualization.Charting
     [TemplateVisualState(Name = DataPoint.StateRevealHidden, GroupName = DataPoint.GroupRevealStates)]
     public partial class ColumnDataPoint : DataPoint
     {
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the ColumnDataPoint class.
-        /// </summary>
         static ColumnDataPoint()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ColumnDataPoint), new FrameworkPropertyMetadata(typeof(ColumnDataPoint)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ColumnDataPoint), new PropertyMetadata(typeof(ColumnDataPoint)));
         }
 
-#endif    
         /// <summary>
-        /// Initializes a new instance of the ColumnDataPoint class.
+        /// Initializes a new instance of the <see cref="ColumnDataPoint"/> class.
         /// </summary>
-        public ColumnDataPoint()
-        {
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(ColumnDataPoint);
-#endif
-        }
+        public ColumnDataPoint() { }
     }
 }

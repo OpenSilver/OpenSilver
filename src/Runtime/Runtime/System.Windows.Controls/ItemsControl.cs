@@ -43,13 +43,15 @@ namespace System.Windows.Controls
 
         #region Contructor
 
-        /// <summary>
-        /// Initializes a new instance of the ItemsControl class.
-        /// </summary>
-        public ItemsControl()
+        static ItemsControl()
         {
-            this.DefaultStyleKey = typeof(ItemsControl);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ItemsControl), new PropertyMetadata(typeof(ItemsControl)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ItemsControl"/> class.
+        /// </summary>
+        public ItemsControl() { }
 
         #endregion Constructor
 

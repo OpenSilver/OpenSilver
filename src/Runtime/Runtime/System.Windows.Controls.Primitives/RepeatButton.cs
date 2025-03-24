@@ -33,16 +33,14 @@ namespace System.Windows.Controls.Primitives
 
         static RepeatButton()
         {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(RepeatButton), new PropertyMetadata(typeof(RepeatButton)));
             ClickModeProperty.OverrideMetadata(typeof(RepeatButton), new PropertyMetadata(ClickMode.Press));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RepeatButton"/> class.
         /// </summary>
-        public RepeatButton()
-        {
-            DefaultStyleKey = typeof(RepeatButton);
-        }
+        public RepeatButton() { }
 
         /// <summary>
         /// Identifies the <see cref="Delay"/> dependency property.

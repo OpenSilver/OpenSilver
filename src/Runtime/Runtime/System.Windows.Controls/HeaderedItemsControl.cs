@@ -149,14 +149,15 @@ namespace System.Windows.Controls
         public new static readonly DependencyProperty ItemContainerStyleProperty = ItemsControl.ItemContainerStyleProperty;
         #endregion public Style ItemContainerStyle
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="HeaderedItemsControl" /> class.
-        /// </summary>
-        public HeaderedItemsControl()
+        static HeaderedItemsControl()
         {
-            DefaultStyleKey = typeof(HeaderedItemsControl);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(HeaderedItemsControl), new PropertyMetadata(typeof(HeaderedItemsControl)));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HeaderedItemsControl" /> class.
+        /// </summary>
+        public HeaderedItemsControl() { }
 
         /// <summary>
         /// Called when the value of the

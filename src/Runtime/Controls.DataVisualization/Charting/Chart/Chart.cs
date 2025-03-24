@@ -325,19 +325,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 null);
         #endregion public Style TitleStyle
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the Chart class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
         static Chart()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(Chart), new FrameworkPropertyMetadata(typeof(Chart)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Chart), new PropertyMetadata(typeof(Chart)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the Chart class.
+        /// Initializes a new instance of the <see cref="Chart"/> class.
         /// </summary>
         public Chart()
         {
@@ -372,8 +366,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
             {
                 OnResourceDictionariesChanged(EventArgs.Empty);
             };
-
-            DefaultStyleKey = typeof(Chart);
         }
 
         /// <summary>

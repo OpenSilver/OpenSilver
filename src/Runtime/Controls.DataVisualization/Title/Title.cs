@@ -11,24 +11,14 @@ namespace System.Windows.Controls.DataVisualization
     /// <QualityBand>Preview</QualityBand>
     public partial class Title : ContentControl
     {
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the Title class.
-        /// </summary>
         static Title()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(Title), new FrameworkPropertyMetadata(typeof(Title)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Title), new PropertyMetadata(typeof(Title)));
         }
 
-#endif
         /// <summary>
-        /// Initializes a new instance of the Title class.
+        /// Initializes a new instance of the <see cref="Title"/> class.
         /// </summary>
-        public Title()
-        {
-#if SILVERLIGHT
-            DefaultStyleKey = typeof(Title);
-#endif
-        }
+        public Title() { }
     }
 }

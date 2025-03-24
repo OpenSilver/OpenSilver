@@ -45,12 +45,16 @@ namespace System.Windows.Controls
 
         #region Constructors
 
+        static Label()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Label), new PropertyMetadata(typeof(Label)));
+        }
+
         /// <summary>
-        /// Initializes a new instance of the Label class.
+        /// Initializes a new instance of the <see cref="Label"/> class.
         /// </summary>
         public Label()
         {
-            this.DefaultStyleKey = typeof(Label);
             this._errors = new List<ValidationError>();
 
             // Set binding to self for DataContext change notifications

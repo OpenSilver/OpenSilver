@@ -40,12 +40,16 @@ namespace System.Windows.Controls
         private Panel _rootElement;
         private double _totalIndent;
 
+        static DataGridRowGroupHeader()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridRowGroupHeader), new PropertyMetadata(typeof(DataGridRowGroupHeader)));
+        }
+
         /// <summary>
         /// Constructs a DataGridRowGroupHeader
         /// </summary>
         public DataGridRowGroupHeader()
         {
-            DefaultStyleKey = typeof(DataGridRowGroupHeader);
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
         }
 

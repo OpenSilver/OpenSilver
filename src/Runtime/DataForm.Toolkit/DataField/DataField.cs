@@ -516,12 +516,16 @@ namespace System.Windows.Controls
 
 #region Constructors
 
+        static DataField()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DataField), new PropertyMetadata(typeof(DataField)));
+        }
+
         /// <summary>
         /// Constructs a new instance of Field.
         /// </summary>
         public DataField()
         {
-            this.DefaultStyleKey = typeof(DataField);
             this._lostFocusFired = new Dictionary<TextBox, bool>();
             this.Loaded += new RoutedEventHandler(this.OnDataFieldLoaded);
         }

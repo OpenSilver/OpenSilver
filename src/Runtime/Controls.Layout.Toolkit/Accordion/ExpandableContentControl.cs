@@ -418,12 +418,16 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
+        static ExpandableContentControl()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ExpandableContentControl), new PropertyMetadata(typeof(ExpandableContentControl)));
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpandableContentControl"/> class.
         /// </summary>
         public ExpandableContentControl()
         {
-            DefaultStyleKey = typeof(ExpandableContentControl);
             _clippingRectangle = new RectangleGeometry();
             Clip = _clippingRectangle;
         }
