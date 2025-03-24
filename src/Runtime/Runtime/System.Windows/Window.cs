@@ -12,11 +12,13 @@
 \*====================================================================================*/
 
 using System.Diagnostics;
+using System.Collections;
 using System.ComponentModel;
 using System.Windows.Markup;
 using System.Windows.Input;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 using OpenSilver.Internal.Controls.Primitives;
 
 namespace System.Windows
@@ -30,6 +32,7 @@ namespace System.Windows
         static Window()
         {
             KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(Window), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
+            EventManager.RegisterClassHandler<Window>(GotFocusEvent, new RoutedEventHandler(OnGotFocus), true);
         }
 
         private IDisposable _resizeObserver;
@@ -47,16 +50,31 @@ namespace System.Windows
             }
 
             PopupService.TrackMousePosition(this);
-
-            GotFocus += new RoutedEventHandler(OnGotFocus);
         }
 
         ~Window() => _resizeObserver?.Dispose();
 
         internal TextMeasurementService TextMeasurementService { get; private set; }
 
+        /// <inheritdoc />
+        protected internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                if (Content is not FrameworkElement content)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                // otherwise, its logical children is its visual children
+                return new SingleChildEnumerator(content);
+            }
+        }
+
+        /// <inheritdoc />
         protected override int VisualChildrenCount => Content is null ? 0 : 1;
 
+        /// <inheritdoc />
         protected override UIElement GetVisualChild(int index)
         {
             UIElement content = Content;
@@ -132,17 +150,16 @@ namespace System.Windows
             TextMeasurementService = new TextMeasurementService(this);
 
             // Attach the window content, if any:
-            object content = Content;
-            if (content != null)
+            if (Content is FrameworkElement content)
             {
-                OnContentChanged(null, content);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(content, this);
             }
 
             // Raise the "Loaded" event:
             RaiseLoadedEvent();
         }
 
-        private void OnGotFocus(object sender, RoutedEventArgs e) => Current = this;
+        private static void OnGotFocus(object sender, RoutedEventArgs e) => Current = (Window)sender;
 
         #region Bounds and SizeChanged event
 
@@ -178,29 +195,9 @@ namespace System.Windows
 
         #endregion
 
-        protected void OnContentChanged(object oldContent, object newContent)
-        {
-            if (IsLoadedCache)
-            {
-                // Attach the child UI element:
-                UIElement newChild = newContent as UIElement;
-                UIElement oldChild = oldContent as UIElement;
-
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
-                RemoveVisualChild(oldChild);
-                AddVisualChild(newChild);
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the content of the Window.
-        /// </summary>
-        public FrameworkElement Content
-        {
-            get { return (FrameworkElement)GetValue(ContentProperty); }
-            set { SetValueInternal(ContentProperty, value); }
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected void OnContentChanged(object oldContent, object newContent) { }
 
         /// <summary>
         /// Identifies the <see cref="Content"/> dependency property.
@@ -212,10 +209,30 @@ namespace System.Windows
                 typeof(Window),
                 new PropertyMetadata(null, OnContentChanged));
 
+        /// <summary>
+        /// Gets or sets the content of the <see cref="Window"/>.
+        /// </summary>
+        public FrameworkElement Content
+        {
+            get => (FrameworkElement)GetValue(ContentProperty);
+            set => SetValueInternal(ContentProperty, value);
+        }
+
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var window = (Window)d;
-            window.OnContentChanged(e.OldValue, e.NewValue);
+            var newChild = e.NewValue as UIElement;
+            var oldChild = e.OldValue as UIElement;
+
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, window);
+
+            window.RemoveVisualChild(oldChild);
+            window.RemoveLogicalChild(oldChild);
+            window.AddLogicalChild(newChild);
+            window.AddVisualChild(newChild);
+
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, window);
+
             window.SetLayoutSize();
         }
 
@@ -334,6 +351,7 @@ namespace System.Windows
 
         }
 
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size availableSize)
         {
             availableSize = Bounds.Size;
@@ -345,6 +363,7 @@ namespace System.Windows
             return availableSize;
         }
 
+        /// <inheritdoc />
         protected override Size ArrangeOverride(Size finalSize)
         {
             finalSize = Bounds.Size;
