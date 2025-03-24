@@ -36,15 +36,13 @@ namespace System.Windows.Controls
         static ListBoxItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ListBoxItem), new PropertyMetadata(typeof(ListBoxItem)));
+            IsEnabledProperty.OverrideMetadata(typeof(ListBoxItem), new PropertyMetadata(OnVisualStatePropertyChanged));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBoxItem"/> class.
         /// </summary>
-        public ListBoxItem()
-        {
-            IsEnabledChanged += (o, e) => UpdateVisualStates();
-        }
+        public ListBoxItem() { }
 
         /// <summary>
         /// Identifies the <see cref="IsSelected"/> dependency property.
@@ -144,7 +142,7 @@ namespace System.Windows.Controls
             }
         }
 
-        internal override void UpdateVisualStates()
+        internal override void UpdateVisualStates(bool useTransitions)
         {
             // Change to the correct state in the Interaction group
             if (!IsEnabled)
@@ -152,15 +150,15 @@ namespace System.Windows.Controls
                 // [copied from SL code]
                 // If our child is a control then we depend on it displaying a proper "disabled" state.  If it is not a control
                 // (ie TextBlock, Border, etc) then we will use our visuals to show a disabled state.
-                VisualStateManager.GoToState(this, Content is Control ? VisualStates.StateNormal : VisualStates.StateDisabled, false);
+                VisualStateManager.GoToState(this, Content is Control ? VisualStates.StateNormal : VisualStates.StateDisabled, useTransitions);
             }
             else if (IsMouseOver)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
+                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateNormal, false);
+                VisualStateManager.GoToState(this, VisualStates.StateNormal, useTransitions);
             }
 
             // Change to the correct state in the Selection group
@@ -168,7 +166,7 @@ namespace System.Windows.Controls
             {
                 if (ParentSelector != null && Selector.GetIsSelectionActive(ParentSelector))
                 {
-                    VisualStateManager.GoToState(this, VisualStates.StateSelected, false);
+                    VisualStateManager.GoToState(this, VisualStates.StateSelected, useTransitions);
                 }
                 else
                 {
@@ -177,16 +175,16 @@ namespace System.Windows.Controls
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateUnselected, false);
+                VisualStateManager.GoToState(this, VisualStates.StateUnselected, useTransitions);
             }
 
             if (IsFocused)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, useTransitions);
             }
         }
 

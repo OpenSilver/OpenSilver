@@ -42,16 +42,15 @@ namespace System.Windows.Controls
 
         static DataGridRowGroupHeader()
         {
+            EventManager.RegisterClassHandler<DataGridRowGroupHeader>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridRowGroupHeader), new PropertyMetadata(typeof(DataGridRowGroupHeader)));
         }
 
         /// <summary>
-        /// Constructs a DataGridRowGroupHeader
+        /// Constructs a <see cref="DataGridRowGroupHeader"/>.
         /// </summary>
-        public DataGridRowGroupHeader()
-        {
-            this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
-        }
+        public DataGridRowGroupHeader() { }
 
         #region Dependency Properties
 
@@ -369,23 +368,24 @@ namespace System.Windows.Controls
             }
         }
 
-        private void DataGridRowGroupHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private static void DataGridRowGroupHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (this.OwningGrid != null)
+            var header = (DataGridRowGroupHeader)sender;
+            if (header.OwningGrid != null)
             {
-                if (this.OwningGrid.IsDoubleClickRecordsClickOnCall(this) && !e.Handled)
+                if (header.OwningGrid.IsDoubleClickRecordsClickOnCall(header) && !e.Handled)
                 {
-                    ToggleExpandCollapse(this.RowGroupInfo.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible, true);
+                    header.ToggleExpandCollapse(header.RowGroupInfo.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible, true);
                     e.Handled = true;
                 }
                 else
                 {
-                    if (!e.Handled && this.OwningGrid.IsTabStop)
+                    if (!e.Handled && header.OwningGrid.IsTabStop)
                     {
-                        bool success = this.OwningGrid.Focus();
+                        bool success = header.OwningGrid.Focus();
                         Debug.Assert(success);
                     }
-                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, this.OwningGrid.CurrentColumnIndex, this.RowGroupInfo.Slot, false /*allowEdit*/);
+                    e.Handled = header.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, header.OwningGrid.CurrentColumnIndex, header.RowGroupInfo.Slot, false /*allowEdit*/);
                 }
             }
         }

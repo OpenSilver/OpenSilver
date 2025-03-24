@@ -112,6 +112,7 @@ namespace System.Windows.Controls.Primitives
         static ScrollBar()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ScrollBar), new PropertyMetadata(typeof(ScrollBar)));
+            IsEnabledProperty.OverrideMetadata(typeof(ScrollBar), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary> 
@@ -120,8 +121,6 @@ namespace System.Windows.Controls.Primitives
         public ScrollBar()
         {
             SizeChanged += delegate { UpdateTrackLayout(GetTrackLength()); };
-
-            IsEnabledChanged += OnIsEnabledChanged;
         }
 
         /// <summary> 
@@ -356,11 +355,11 @@ namespace System.Windows.Controls.Primitives
         /// <summary> 
         /// Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender"></param> 
+        /// <param name="d"></param> 
         /// <param name="e">Property changed args</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UpdateVisualState();
+            ((ScrollBar)d).UpdateVisualState();
         }
 
         /// <summary> 

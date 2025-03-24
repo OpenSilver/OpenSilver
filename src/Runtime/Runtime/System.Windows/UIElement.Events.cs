@@ -800,6 +800,9 @@ namespace System.Windows
                 typeof(MouseEventHandler),
                 typeof(UIElement));
 
+        /// <summary>
+        /// Occurs when the <see cref="UIElement"/> loses mouse capture.
+        /// </summary>
         public event MouseEventHandler LostMouseCapture
         {
             add => AddHandler(LostMouseCaptureEvent, value, false);

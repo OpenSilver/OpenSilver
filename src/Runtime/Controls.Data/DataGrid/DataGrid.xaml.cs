@@ -302,7 +302,13 @@ namespace System.Windows.Controls
 
         static DataGrid()
         {
+            EventManager.RegisterClassHandler<DataGrid>(KeyDownEvent, new KeyEventHandler(DataGrid_KeyDown));
+            EventManager.RegisterClassHandler<DataGrid>(KeyUpEvent, new KeyEventHandler(DataGrid_KeyUp));
+            EventManager.RegisterClassHandler<DataGrid>(GotFocusEvent, new RoutedEventHandler(DataGrid_GotFocus));
+            EventManager.RegisterClassHandler<DataGrid>(LostFocusEvent, new RoutedEventHandler(DataGrid_LostFocus));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGrid), new PropertyMetadata(typeof(DataGrid)));
+            IsEnabledProperty.OverrideMetadata(typeof(DataGrid), new PropertyMetadata(DataGrid_IsEnabledChanged));
         }
 
         /// <summary>
@@ -312,11 +318,6 @@ namespace System.Windows.Controls
         public DataGrid()
         {
             this.TabNavigation = KeyboardNavigationMode.Once;
-            this.KeyDown += new KeyEventHandler(DataGrid_KeyDown);
-            this.KeyUp += new KeyEventHandler(DataGrid_KeyUp);
-            this.GotFocus += new RoutedEventHandler(DataGrid_GotFocus);
-            this.LostFocus += new RoutedEventHandler(DataGrid_LostFocus);
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(DataGrid_IsEnabledChanged);
 
             this._loadedRows = new List<DataGridRow>();
             this._lostFocusActions = new Queue<Action>();
@@ -4696,18 +4697,19 @@ namespace System.Windows.Controls
             }
         }
 
-        private void DataGrid_GotFocus(object sender, RoutedEventArgs e)
+        private static void DataGrid_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (!this.ContainsFocus)
+            var dataGrid = (DataGrid)sender;
+            if (!dataGrid.ContainsFocus)
             {
-                this.ContainsFocus = true;
-                ApplyDisplayedRowsState(this.DisplayData.FirstScrollingSlot, this.DisplayData.LastScrollingSlot);
-                if (this.CurrentColumnIndex != -1 && this.IsSlotVisible(this.CurrentSlot))
+                dataGrid.ContainsFocus = true;
+                dataGrid.ApplyDisplayedRowsState(dataGrid.DisplayData.FirstScrollingSlot, dataGrid.DisplayData.LastScrollingSlot);
+                if (dataGrid.CurrentColumnIndex != -1 && dataGrid.IsSlotVisible(dataGrid.CurrentSlot))
                 {
-                    DataGridRow row = this.DisplayData.GetDisplayedElement(this.CurrentSlot) as DataGridRow;
+                    DataGridRow row = dataGrid.DisplayData.GetDisplayedElement(dataGrid.CurrentSlot) as DataGridRow;
                     if (row != null)
                     {
-                        row.Cells[this.CurrentColumnIndex].ApplyCellState(true /*animate*/);
+                        row.Cells[dataGrid.CurrentColumnIndex].ApplyCellState(true /*animate*/);
                     }
                 }
             }
@@ -4715,61 +4717,62 @@ namespace System.Windows.Controls
             // Keep track of which row contains the newly focused element
             DataGridRow focusedRow = null;
             DependencyObject focusedElement = e.OriginalSource as DependencyObject;
-            _focusedObject = focusedElement;
+            dataGrid._focusedObject = focusedElement;
             while (focusedElement != null)
             {
                 focusedRow = focusedElement as DataGridRow;
-                if (focusedRow != null && focusedRow.OwningGrid == this && _focusedRow != focusedRow)
+                if (focusedRow != null && focusedRow.OwningGrid == dataGrid && dataGrid._focusedRow != focusedRow)
                 {
-                    ResetFocusedRow();
-                    _focusedRow = focusedRow.Visibility == Visibility.Visible ? focusedRow : null;
+                    dataGrid.ResetFocusedRow();
+                    dataGrid._focusedRow = focusedRow.Visibility == Visibility.Visible ? focusedRow : null;
                     break;
                 }
                 focusedElement = VisualTreeHelper.GetParent(focusedElement);
             }
 
             // If the DataGrid itself got focus, we actually want the automation focus to be on the current element
-            if (e.OriginalSource == this && AutomationPeer.ListenerExists(AutomationEvents.AutomationFocusChanged))
+            if (e.OriginalSource == dataGrid && AutomationPeer.ListenerExists(AutomationEvents.AutomationFocusChanged))
             {
-                DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(this) as DataGridAutomationPeer;
+                DataGridAutomationPeer peer = DataGridAutomationPeer.FromElement(dataGrid) as DataGridAutomationPeer;
                 if (peer != null)
                 {
-                    peer.RaiseAutomationFocusChangedEvent(this.CurrentSlot, this.CurrentColumnIndex);
+                    peer.RaiseAutomationFocusChangedEvent(dataGrid.CurrentSlot, dataGrid.CurrentColumnIndex);
                 }
             }
         }
 
-        private void DataGrid_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void DataGrid_IsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UpdateDisabledVisual();
+            ((DataGrid)d).UpdateDisabledVisual();
         }
 
-        private void DataGrid_KeyDown(object sender, KeyEventArgs e)
+        private static void DataGrid_KeyDown(object sender, KeyEventArgs e)
         {
             if (!e.Handled)
             {
-                e.Handled = ProcessDataGridKey(e);
+                e.Handled = ((DataGrid)sender).ProcessDataGridKey(e);
             }
         }
 
-        private void DataGrid_KeyUp(object sender, KeyEventArgs e)
+        private static void DataGrid_KeyUp(object sender, KeyEventArgs e)
         {
-
-            if (e.Key == Key.Tab && this.CurrentColumnIndex != -1 && e.OriginalSource == this)
+            var dataGrid = (DataGrid)sender;
+            if (e.Key == Key.Tab && dataGrid.CurrentColumnIndex != -1 && e.OriginalSource == dataGrid)
             {
-                bool success = ScrollSlotIntoView(this.CurrentColumnIndex, this.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/);
+                bool success = dataGrid.ScrollSlotIntoView(dataGrid.CurrentColumnIndex, dataGrid.CurrentSlot, false /*forCurrentCellChange*/, true /*forceHorizontalScroll*/);
                 Debug.Assert(success);
-                if (this.CurrentColumnIndex != -1 && this.SelectedItem == null)
+                if (dataGrid.CurrentColumnIndex != -1 && dataGrid.SelectedItem == null)
                 {
-                    SetRowSelection(this.CurrentSlot, true /*isSelected*/, true /*setAnchorSlot*/);
+                    dataGrid.SetRowSelection(dataGrid.CurrentSlot, true /*isSelected*/, true /*setAnchorSlot*/);
                 }
             }
         }
 
-        private void DataGrid_LostFocus(object sender, RoutedEventArgs e)
+        private static void DataGrid_LostFocus(object sender, RoutedEventArgs e)
         {
-            _focusedObject = null;
-            if (this.ContainsFocus)
+            var dataGrid = (DataGrid)sender;
+            dataGrid._focusedObject = null;
+            if (dataGrid.ContainsFocus)
             {
                 bool focusLeftDataGrid = true;
                 bool dataGridWillReceiveRoutedEvent = true;
@@ -4778,7 +4781,7 @@ namespace System.Windows.Controls
 
                 while (focusedDependencyObject != null)
                 {
-                    if (focusedDependencyObject == this)
+                    if (focusedDependencyObject == dataGrid)
                     {
                         focusLeftDataGrid = false;
                         break;
@@ -4805,19 +4808,19 @@ namespace System.Windows.Controls
 
                 if (focusLeftDataGrid)
                 {
-                    this.ContainsFocus = false;
-                    if (this.EditingRow != null)
+                    dataGrid.ContainsFocus = false;
+                    if (dataGrid.EditingRow != null)
                     {
-                        CommitEdit(DataGridEditingUnit.Row, true /*exitEditingMode*/);
+                        dataGrid.CommitEdit(DataGridEditingUnit.Row, true /*exitEditingMode*/);
                     }
-                    ResetFocusedRow();
-                    ApplyDisplayedRowsState(this.DisplayData.FirstScrollingSlot, this.DisplayData.LastScrollingSlot);
-                    if (this.CurrentColumnIndex != -1 && this.IsSlotVisible(this.CurrentSlot))
+                    dataGrid.ResetFocusedRow();
+                    dataGrid.ApplyDisplayedRowsState(dataGrid.DisplayData.FirstScrollingSlot, dataGrid.DisplayData.LastScrollingSlot);
+                    if (dataGrid.CurrentColumnIndex != -1 && dataGrid.IsSlotVisible(dataGrid.CurrentSlot))
                     {
-                        DataGridRow row = this.DisplayData.GetDisplayedElement(this.CurrentSlot) as DataGridRow;
+                        DataGridRow row = dataGrid.DisplayData.GetDisplayedElement(dataGrid.CurrentSlot) as DataGridRow;
                         if (row != null)
                         {
-                            row.Cells[this.CurrentColumnIndex].ApplyCellState(true /*animate*/);
+                            row.Cells[dataGrid.CurrentColumnIndex].ApplyCellState(true /*animate*/);
                         }
                     }
                 }
@@ -4826,7 +4829,7 @@ namespace System.Windows.Controls
                     FrameworkElement focusedElement = focusedObject as FrameworkElement;
                     if (focusedElement != null)
                     {
-                        focusedElement.LostFocus += new RoutedEventHandler(ExternalEditingElement_LostFocus);
+                        focusedElement.LostFocus += new RoutedEventHandler(dataGrid.ExternalEditingElement_LostFocus);
                     }
                 }
             }

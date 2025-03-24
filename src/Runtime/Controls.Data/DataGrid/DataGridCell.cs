@@ -45,18 +45,17 @@ namespace System.Windows.Controls
 
         static DataGridCell()
         {
+            EventManager.RegisterClassHandler<DataGridCell>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridCell_MouseLeftButtonDown), true);
+            EventManager.RegisterClassHandler<DataGridCell>(MouseEnterEvent, new MouseEventHandler(DataGridCell_MouseEnter));
+            EventManager.RegisterClassHandler<DataGridCell>(MouseLeaveEvent, new MouseEventHandler(DataGridCell_MouseLeave));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridCell), new PropertyMetadata(typeof(DataGridCell)));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataGridCell"/> class.
         /// </summary>
-        public DataGridCell()
-        {
-            this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridCell_MouseLeftButtonDown), true);
-            this.MouseEnter += new MouseEventHandler(DataGridCell_MouseEnter);
-            this.MouseLeave += new MouseEventHandler(DataGridCell_MouseLeave);
-        }
+        public DataGridCell() { }
 
         #region Dependency Properties
 
@@ -387,38 +386,41 @@ namespace System.Windows.Controls
 
 
         #region Private Methods
-        private void DataGridCell_MouseEnter(object sender, MouseEventArgs e)
+        private static void DataGridCell_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (this.OwningRow != null)
+            var cell = (DataGridCell)sender;
+            if (cell.OwningRow != null)
             {
-                this.IsMouseOver = true;
+                cell.IsMouseOver = true;
             }
         }
 
-        private void DataGridCell_MouseLeave(object sender, MouseEventArgs e)
+        private static void DataGridCell_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (this.OwningRow != null)
+            var cell = (DataGridCell)sender;
+            if (cell.OwningRow != null)
             {
-                this.IsMouseOver = false;
+                cell.IsMouseOver = false;
             }
         }
 
-        private void DataGridCell_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private static void DataGridCell_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             // OwningGrid is null for TopLeftHeaderCell and TopRightHeaderCell because they have no OwningRow
-            if (this.OwningGrid != null)
+            var cell = (DataGridCell)sender;
+            if (cell.OwningGrid != null)
             {
-                if (!e.Handled && this.OwningGrid.IsTabStop)
+                if (!e.Handled && cell.OwningGrid.IsTabStop)
                 {
-                    bool success = this.OwningGrid.Focus();
+                    bool success = cell.OwningGrid.Focus();
                     Debug.Assert(success);
                 }
-                if (this.OwningRow != null)
+                if (cell.OwningRow != null)
                 {
                     Debug.Assert(sender is DataGridCell);
-                    Debug.Assert(sender == this);
-                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, this.ColumnIndex, this.OwningRow.Slot, !e.Handled);
-                    this.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
+                    Debug.Assert(sender == cell);
+                    e.Handled = cell.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, cell.ColumnIndex, cell.OwningRow.Slot, !e.Handled);
+                    cell.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
                 }
             }
         }

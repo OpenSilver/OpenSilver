@@ -42,22 +42,20 @@ namespace System.Windows.Controls
     {
         static TabItem()
         {
+            EventManager.RegisterClassHandler<TabItem>(GotFocusEvent, new RoutedEventHandler(OnGotFocus));
+            EventManager.RegisterClassHandler<TabItem>(LostFocusEvent, new RoutedEventHandler(OnLostFocus));
+            EventManager.RegisterClassHandler<TabItem>(MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
+            EventManager.RegisterClassHandler<TabItem>(MouseLeaveEvent, new MouseEventHandler(OnMouseLeave));
+            EventManager.RegisterClassHandler<TabItem>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseLeftButtonDown));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TabItem), new PropertyMetadata(typeof(TabItem)));
+            IsEnabledProperty.OverrideMetadata(typeof(TabItem), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TabItem" /> class.
         /// </summary>
-        public TabItem()
-            : base()
-        {
-            MouseLeftButtonDown += new MouseButtonEventHandler(OnMouseLeftButtonDown);
-            MouseEnter += new MouseEventHandler(OnMouseEnter);
-            MouseLeave += new MouseEventHandler(OnMouseLeave);
-            GotFocus += delegate { IsFocused = true; };
-            LostFocus += delegate { IsFocused = false; };
-            IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-        }
+        public TabItem() { }
 
         /// <summary>
         /// Builds the visual tree for the <see cref="TabItem" /> when a new template
@@ -469,16 +467,17 @@ namespace System.Windows.Controls
         /// <summary>
         /// Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender">
+        /// <param name="d">
         /// Control that triggers this property change.
         /// </param>
         /// <param name="e">Property changed args.</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ContentControl header = GetContentControl(IsSelected, TabStripPlacement);
+            var tabItem = (TabItem)d;
+            ContentControl header = tabItem.GetContentControl(tabItem.IsSelected, tabItem.TabStripPlacement);
             if (header != null)
             {
-                UpdateVisualState();
+                tabItem.UpdateVisualState();
             }
         }
 
@@ -618,9 +617,9 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The MouseEventArgs.</param>
-        private void OnMouseLeave(object sender, MouseEventArgs e)
+        private static void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            UpdateVisualState();
+            ((TabItem)sender).UpdateVisualState();
         }
 
         /// <summary>
@@ -628,9 +627,9 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The MouseEventArgs.</param>
-        private void OnMouseEnter(object sender, MouseEventArgs e)
+        private static void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            UpdateVisualState();
+            ((TabItem)sender).UpdateVisualState();
         }
 
         /// <summary>
@@ -638,14 +637,25 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The MouseButtonEventArgs.</param>
-        private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private static void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (IsEnabled && TabControlParent != null && !IsSelected && !e.Handled)
+            var tabItem = (TabItem)sender;
+            if (tabItem.IsEnabled && tabItem.TabControlParent != null && !tabItem.IsSelected && !e.Handled)
             {
-                IsTabStop = true;
-                e.Handled = Focus();
-                TabControlParent.SelectedIndex = TabControlParent.Items.IndexOf(this);
+                tabItem.IsTabStop = true;
+                e.Handled = tabItem.Focus();
+                tabItem.TabControlParent.SelectedIndex = tabItem.TabControlParent.Items.IndexOf(tabItem);
             }
+        }
+
+        private static void OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            ((TabItem)sender).IsFocused = true;
+        }
+
+        private static void OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            ((TabItem)sender).IsFocused = false;
         }
 
         /// <summary>

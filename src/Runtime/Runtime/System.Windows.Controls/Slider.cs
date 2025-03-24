@@ -32,6 +32,7 @@ namespace System.Windows.Controls
         static Slider()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Slider), new PropertyMetadata(typeof(Slider)));
+            IsEnabledProperty.OverrideMetadata(typeof(Slider), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
@@ -40,8 +41,6 @@ namespace System.Windows.Controls
         public Slider()
         {
             SizeChanged += delegate { UpdateTrackLayout(); };
-
-            IsEnabledChanged += OnIsEnabledChanged;
         }
 
         /// <summary>
@@ -228,11 +227,11 @@ namespace System.Windows.Controls
         /// <summary> 
         /// Called when the IsEnabled property changes.
         /// </summary> 
-        /// <param name="sender">Source of the event </param>
+        /// <param name="d">Source of the event </param>
         /// <param name="e">Property changed args</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UpdateVisualState();
+            ((Slider)d).UpdateVisualState();
         }
 
         /// <summary>

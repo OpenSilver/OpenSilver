@@ -31,7 +31,13 @@ namespace System.Windows.Controls.Primitives
 
         static DatePickerTextBox()
         {
+            EventManager.RegisterClassHandler<DatePickerTextBox>(MouseEnterEvent, new MouseEventHandler(OnMouseEnter));
+            EventManager.RegisterClassHandler<DatePickerTextBox>(MouseLeaveEvent, new MouseEventHandler(OnMouseLeave));
+            EventManager.RegisterClassHandler<DatePickerTextBox>(GotFocusEvent, new RoutedEventHandler(OnGotFocus));
+            EventManager.RegisterClassHandler<DatePickerTextBox>(LostFocusEvent, new RoutedEventHandler(OnLostFocus));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DatePickerTextBox), new PropertyMetadata(typeof(DatePickerTextBox)));
+            IsEnabledProperty.OverrideMetadata(typeof(DatePickerTextBox), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
@@ -41,13 +47,8 @@ namespace System.Windows.Controls.Primitives
         {
             SetDefaults();
 
-            this.MouseEnter += OnMouseEnter;
-            this.MouseLeave += OnMouseLeave;
             this.Loaded += OnLoaded;
-            this.LostFocus += OnLostFocus;
-            this.GotFocus += OnGotFocus;
             this.TextChanged += OnTextChanged;
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
         }
 
         /// <summary>
@@ -199,38 +200,41 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void OnGotFocus(object sender, RoutedEventArgs e)
+        private static void OnGotFocus(object sender, RoutedEventArgs e)
         {
-            if (IsEnabled)
-            {
-                HasFocusInternal = true;
+            var textbox = (DatePickerTextBox)sender;
 
-                if (!string.IsNullOrEmpty(this.Text))
+            if (textbox.IsEnabled)
+            {
+                textbox.HasFocusInternal = true;
+
+                if (!string.IsNullOrEmpty(textbox.Text))
                 {
-                    Select(0, this.Text.Length);
+                    textbox.Select(0, textbox.Text.Length);
                 }
 
-                ChangeVisualState();
+                textbox.ChangeVisualState();
             }
         }
 
         /// <summary>
         /// Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender">Sender object.</param>
+        /// <param name="d">Sender object.</param>
         /// <param name="e">Property changed args.</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Debug.Assert(e.NewValue is bool, "The new value should be a boolean!");
+            DatePickerTextBox textbox = (DatePickerTextBox)d;
             bool isEnabled = (bool)e.NewValue;
 
-            IsReadOnly = !isEnabled;
+            textbox.IsReadOnly = !isEnabled;
             if (!isEnabled)
             {
-                IsHovered = false;
+                textbox.IsHovered = false;
             }
 
-            ChangeVisualState();
+            textbox.ChangeVisualState();
         }
 
         /// <summary>
@@ -238,10 +242,12 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void OnLostFocus(object sender, RoutedEventArgs e)
+        private static void OnLostFocus(object sender, RoutedEventArgs e)
         {
-            HasFocusInternal = false;
-            ChangeVisualState();
+            var textbox = (DatePickerTextBox)sender;
+
+            textbox.HasFocusInternal = false;
+            textbox.ChangeVisualState();
         }
 
         /// <summary>
@@ -249,13 +255,15 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void OnMouseEnter(object sender, MouseEventArgs e)
+        private static void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            IsHovered = true;
+            var textbox = (DatePickerTextBox)sender;
 
-            if (!HasFocusInternal)
+            textbox.IsHovered = true;
+
+            if (!textbox.HasFocusInternal)
             {
-                ChangeVisualState();
+                textbox.ChangeVisualState();
             }
         }
 
@@ -264,13 +272,15 @@ namespace System.Windows.Controls.Primitives
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void OnMouseLeave(object sender, MouseEventArgs e)
+        private static void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            IsHovered = false;
+            var textbox = (DatePickerTextBox)sender;
 
-            if (!HasFocusInternal)
+            textbox.IsHovered = false;
+
+            if (!textbox.HasFocusInternal)
             {
-                ChangeVisualState();
+                textbox.ChangeVisualState();
             }
         }
 

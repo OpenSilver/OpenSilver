@@ -74,9 +74,14 @@ namespace System.Windows.Controls
             }
         }
 
-        internal void GoToState(string state) => VisualStateManager.GoToState(this, state, true);
+        internal virtual void UpdateVisualStates(bool useTransitions) => _visualStatesUpdater?.UpdateVisualStates(true);
 
-        internal virtual void UpdateVisualStates() => _visualStatesUpdater?.UpdateVisualStates(true);
+        internal void UpdateVisualStates() => UpdateVisualStates(true);
+
+        internal static void OnVisualStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((Control)d).UpdateVisualStates();
+        }
 
         private sealed class VisualStateUpdater
         {

@@ -57,21 +57,20 @@ namespace System.Windows.Controls.Primitives
 
         static DataGridColumnHeader()
         {
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(LostMouseCaptureEvent, new MouseEventHandler(DataGridColumnHeader_LostMouseCapture));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonDown));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonUp));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseMoveEvent, new MouseEventHandler(DataGridColumnHeader_MouseMove));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseEnterEvent, new MouseEventHandler(DataGridColumnHeader_MouseEnter));
+            EventManager.RegisterClassHandler<DataGridColumnHeader>(MouseLeaveEvent, new MouseEventHandler(DataGridColumnHeader_MouseLeave));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridColumnHeader), new PropertyMetadata(typeof(DataGridColumnHeader)));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Primitives.DataGridColumnHeader" /> class. 
         /// </summary>
-        public DataGridColumnHeader()
-        {
-            this.LostMouseCapture += new MouseEventHandler(DataGridColumnHeader_LostMouseCapture);
-            this.MouseLeftButtonDown += new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonDown);
-            this.MouseLeftButtonUp += new MouseButtonEventHandler(DataGridColumnHeader_MouseLeftButtonUp);
-            this.MouseMove += new MouseEventHandler(DataGridColumnHeader_MouseMove);
-            this.MouseEnter += new MouseEventHandler(DataGridColumnHeader_MouseEnter);
-            this.MouseLeave += new MouseEventHandler(DataGridColumnHeader_MouseLeave);
-        }
+        public DataGridColumnHeader() { }
 
         #region Dependency Properties
 
@@ -625,76 +624,85 @@ namespace System.Windows.Controls.Primitives
             return column.ActualCanUserResize;
         }
 
-        private void DataGridColumnHeader_LostMouseCapture(object sender, MouseEventArgs e)
+        private static void DataGridColumnHeader_LostMouseCapture(object sender, MouseEventArgs e)
         {
-            this.OnLostMouseCapture();
+            ((DataGridColumnHeader)sender).OnLostMouseCapture();
         }
 
-        private void DataGridColumnHeader_MouseEnter(object sender, MouseEventArgs e)
+        private static void DataGridColumnHeader_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (!this.IsEnabled)
+            var header = (DataGridColumnHeader)sender;
+
+            if (!header.IsEnabled)
             {
                 return;
             }
 
-            Point mousePosition = e.GetPosition(this);
-            this.OnMouseEnter(mousePosition);
-            ApplyState(true);
+            Point mousePosition = e.GetPosition(header);
+            header.OnMouseEnter(mousePosition);
+            header.ApplyState(true);
         }
 
-        private void DataGridColumnHeader_MouseLeave(object sender, MouseEventArgs e)
+        private static void DataGridColumnHeader_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (!this.IsEnabled)
+            var header = (DataGridColumnHeader)sender;
+
+            if (!header.IsEnabled)
             {
                 return;
             }
 
-            ApplyState(true);
+            header.ApplyState(true);
         }
 
-        private void DataGridColumnHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private static void DataGridColumnHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (this.OwningColumn == null || e.Handled || !this.IsEnabled)
+            var header = (DataGridColumnHeader)sender;
+
+            if (header.OwningColumn == null || e.Handled || !header.IsEnabled)
             {
                 return;
             }
-            Point mousePosition = e.GetPosition(this);
+            Point mousePosition = e.GetPosition(header);
             bool handled = e.Handled;
-            OnMouseLeftButtonDown(ref handled, mousePosition);
+            header.OnMouseLeftButtonDown(ref handled, mousePosition);
             e.Handled = handled;
 
-            ApplyState(true);
+            header.ApplyState(true);
         }
 
-        private void DataGridColumnHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private static void DataGridColumnHeader_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            var header = (DataGridColumnHeader)sender;
 
-            if (this.OwningColumn == null || e.Handled || !this.IsEnabled)
+            if (header.OwningColumn == null || e.Handled || !header.IsEnabled)
             {
                 return;
             }
 
-            Point mousePosition = e.GetPosition(this);
-            Point mousePositionHeaders = e.GetPosition(this.OwningGrid.ColumnHeaders);
+            Point mousePosition = e.GetPosition(header);
+            Point mousePositionHeaders = e.GetPosition(header.OwningGrid.ColumnHeaders);
             bool handled = e.Handled;
-            OnMouseLeftButtonUp(ref handled, mousePosition, mousePositionHeaders);
+            header.OnMouseLeftButtonUp(ref handled, mousePosition, mousePositionHeaders);
             e.Handled = handled;
 
-            ApplyState(true);
+            header.ApplyState(true);
         }
 
-        private void DataGridColumnHeader_MouseMove(object sender, MouseEventArgs e)
+        private static void DataGridColumnHeader_MouseMove(object sender, MouseEventArgs e)
         {
-            if (this.OwningGrid == null || !this.IsEnabled)
+            var header = (DataGridColumnHeader)sender;
+
+            if (header.OwningGrid == null || !header.IsEnabled)
             {
                 return;
             }
 
-            Point mousePosition = e.GetPosition(this);
-            Point mousePositionHeaders = e.GetPosition(this.OwningGrid.ColumnHeaders);
+            Point mousePosition = e.GetPosition(header);
+            Point mousePositionHeaders = e.GetPosition(header.OwningGrid.ColumnHeaders);
 
             bool handled = false;
-            OnMouseMove(ref handled, mousePosition, mousePositionHeaders);
+            header.OnMouseMove(ref handled, mousePosition, mousePositionHeaders);
         }
 
         /// <summary>

@@ -51,6 +51,7 @@ namespace System.Windows.Controls
         static TabControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TabControl), new PropertyMetadata(typeof(TabControl)));
+            IsEnabledProperty.OverrideMetadata(typeof(TabControl), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
@@ -59,8 +60,6 @@ namespace System.Windows.Controls
         public TabControl()
         {
             SelectedIndex = -1;
-            KeyDown += delegate (object sender, KeyEventArgs e) { OnKeyDown(e); };
-            IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
         }
 
         /// <summary>
@@ -433,13 +432,13 @@ namespace System.Windows.Controls
         /// <summary>
         /// Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender">
+        /// <param name="d">
         /// Control that triggers this property change.
         /// </param>
         /// <param name="e">Property changed args.</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UpdateVisualState();
+            ((TabControl)d).UpdateVisualState();
         }
 
         /// <summary>

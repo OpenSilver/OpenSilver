@@ -125,7 +125,11 @@ namespace System.Windows.Controls
 
         static DatePicker()
         {
+            EventManager.RegisterClassHandler<DatePicker>(GotFocusEvent, new RoutedEventHandler(DatePicker_GotFocus));
+            EventManager.RegisterClassHandler<DatePicker>(LostFocusEvent, new RoutedEventHandler(DatePicker_LostFocus));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DatePicker), new PropertyMetadata(typeof(DatePicker)));
+            IsEnabledProperty.OverrideMetadata(typeof(DatePicker), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
@@ -134,12 +138,9 @@ namespace System.Windows.Controls
         public DatePicker()
         {
             InitializeCalendar();
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
             this.FirstDayOfWeek = DateTimeHelper.GetCurrentDateFormat().FirstDayOfWeek;
             this._defaultText = string.Empty;
             this.DisplayDate = DateTime.Today;
-            this.GotFocus += new RoutedEventHandler(DatePicker_GotFocus);
-            this.LostFocus += new RoutedEventHandler(DatePicker_LostFocus);
             this.BlackoutDates = this._calendar.BlackoutDates;
         }
 
@@ -490,11 +491,11 @@ namespace System.Windows.Controls
         /// <summary>
         /// Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender">Sender object.</param>
+        /// <param name="d">Sender object.</param>
         /// <param name="e">Property changed args.</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UpdateDisabledVisual();
+            ((DatePicker)d).UpdateDisabledVisual();
         }
 
         #region IsTodayHighlighted
@@ -1078,7 +1079,7 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void DatePicker_LostFocus(object sender, RoutedEventArgs e)
+        private static void DatePicker_LostFocus(object sender, RoutedEventArgs e)
         {
             DatePicker dp = sender as DatePicker;
             Debug.Assert(dp != null, "The DatePicker should not be null!");
@@ -1088,7 +1089,7 @@ namespace System.Windows.Controls
             {
                 dp.IsDropDownOpen = false;
             }
-            SetSelectedDate();
+            dp.SetSelectedDate();
         }
 
         /// <summary>
@@ -1096,13 +1097,13 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void DatePicker_GotFocus(object sender, RoutedEventArgs e)
+        private static void DatePicker_GotFocus(object sender, RoutedEventArgs e)
         {
             DatePicker dp = sender as DatePicker;
             Debug.Assert(dp != null, "The DatePicker should not be null!");
-            if (this.IsEnabled && this._textBox != null)
+            if (dp.IsEnabled && dp._textBox != null)
             {
-                this._textBox.Focus();
+                dp._textBox.Focus();
             }
         }
 

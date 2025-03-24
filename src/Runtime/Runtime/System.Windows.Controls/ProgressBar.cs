@@ -154,9 +154,9 @@ namespace System.Windows.Controls
             SetProgressBarIndicatorLength();
         }
 
-        internal override void UpdateVisualStates()
+        internal override void UpdateVisualStates(bool useTransitions)
         {
-            VisualStateManager.GoToState(this, IsIndeterminate ? StateIndeterminate : StateDeterminate, true);
+            VisualStateManager.GoToState(this, IsIndeterminate ? StateIndeterminate : StateDeterminate, useTransitions);
         }
 
         private void OnTrackSizeChanged(object sender, SizeChangedEventArgs e)

@@ -1425,7 +1425,12 @@ namespace System.Windows.Controls
 
         static Calendar()
         {
+            EventManager.RegisterClassHandler<Calendar>(GotFocusEvent, new RoutedEventHandler(Calendar_GotFocus));
+            EventManager.RegisterClassHandler<Calendar>(LostFocusEvent, new RoutedEventHandler(Calendar_LostFocus));
+            EventManager.RegisterClassHandler<Calendar>(MouseLeftButtonUpEvent, new MouseButtonEventHandler(Calendar_MouseLeftButtonUp));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Calendar), new PropertyMetadata(typeof(Calendar)));
+            IsEnabledProperty.OverrideMetadata(typeof(Calendar), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
@@ -1434,10 +1439,6 @@ namespace System.Windows.Controls
         public Calendar()
         {
             UpdateDisplayDate(this, this.DisplayDate, DateTime.MinValue);
-            GotFocus += new RoutedEventHandler(Calendar_GotFocus);
-            LostFocus += new RoutedEventHandler(Calendar_LostFocus);
-            IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-            MouseLeftButtonUp += new MouseButtonEventHandler(Calendar_MouseLeftButtonUp);
             BlackoutDates = new CalendarBlackoutDatesCollection(this);
             SelectedDates = new SelectedDatesCollection(this);
             RemovedItems = new Collection<DateTime>();
@@ -1564,16 +1565,17 @@ namespace System.Windows.Controls
         /// <summary>
         ///  Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender">Sender object.</param>
+        /// <param name="d">Sender object.</param>
         /// <param name="e">Property changed args.</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Debug.Assert(e.NewValue is bool, "NewValue should be a boolean!");
+            Calendar calendar = (Calendar)d;
             bool isEnabled = (bool) e.NewValue;
 
-            if (MonthControl != null)
+            if (calendar.MonthControl != null)
             {
-                MonthControl.UpdateDisabledGrid(isEnabled);
+                calendar.MonthControl.UpdateDisabledGrid(isEnabled);
             }
         }
 
@@ -1978,11 +1980,12 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void Calendar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private static void Calendar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!HasFocusInternal)
+            var c = (Calendar)sender;
+            if (!c.HasFocusInternal)
             {
-                Focus();
+                c.Focus();
             }
         }
 
@@ -2644,41 +2647,41 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment 1.</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void Calendar_GotFocus(object sender, RoutedEventArgs e)
+        private static void Calendar_GotFocus(object sender, RoutedEventArgs e)
         {
             Calendar c = sender as Calendar;
             Debug.Assert(c != null, "c should not be null!");
-            HasFocusInternal = true;
+            c.HasFocusInternal = true;
 
-            switch (DisplayMode)
+            switch (c.DisplayMode)
             {
                 case CalendarMode.Month:
                     {
                         DateTime focusDate;
-                        if (LastSelectedDate.HasValue && DateTimeHelper.CompareYearMonth(DisplayDateInternal, LastSelectedDate.Value) == 0)
+                        if (c.LastSelectedDate.HasValue && DateTimeHelper.CompareYearMonth(c.DisplayDateInternal, c.LastSelectedDate.Value) == 0)
                         {
-                            focusDate = LastSelectedDate.Value;
+                            focusDate = c.LastSelectedDate.Value;
                         }
                         else
                         {
-                            focusDate = DisplayDate;
-                            LastSelectedDate = DisplayDate;
+                            focusDate = c.DisplayDate;
+                            c.LastSelectedDate = c.DisplayDate;
                         }
                         Debug.Assert(focusDate != null, "focusDate should not be null!");
-                        FocusButton = FindDayButtonFromDay(focusDate);
+                        c.FocusButton = c.FindDayButtonFromDay(focusDate);
 
-                        if (FocusButton != null)
+                        if (c.FocusButton != null)
                         {
-                            FocusButton.IsCurrent = true;
+                            c.FocusButton.IsCurrent = true;
                         }
                         break;
                     }
                 case CalendarMode.Year:
                 case CalendarMode.Decade:
                     {
-                        if (this.FocusCalendarButton != null)
+                        if (c.FocusCalendarButton != null)
                         {
-                            FocusCalendarButton.IsCalendarButtonFocused = true;
+                            c.FocusCalendarButton.IsCalendarButtonFocused = true;
                         }
                         break;
                     }
@@ -2690,28 +2693,28 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment1 .</param>
         /// <param name="e">Inherited code: Requires comment 2.</param>
-        private void Calendar_LostFocus(object sender, RoutedEventArgs e)
+        private static void Calendar_LostFocus(object sender, RoutedEventArgs e)
         {
             Calendar c = sender as Calendar;
             Debug.Assert(c != null, "c should not be null!");
-            HasFocusInternal = false;
+            c.HasFocusInternal = false;
 
-            switch (DisplayMode)
+            switch (c.DisplayMode)
             {
                 case CalendarMode.Month:
                     {
-                        if (FocusButton != null)
+                        if (c.FocusButton != null)
                         {
-                            FocusButton.IsCurrent = false;
+                            c.FocusButton.IsCurrent = false;
                         }
                         break;
                     }
                 case CalendarMode.Year:
                 case CalendarMode.Decade:
                     {
-                        if (FocusCalendarButton != null)
+                        if (c.FocusCalendarButton != null)
                         {
-                            FocusCalendarButton.IsCalendarButtonFocused = false;
+                            c.FocusCalendarButton.IsCalendarButtonFocused = false;
                         }
                         break;
                     }

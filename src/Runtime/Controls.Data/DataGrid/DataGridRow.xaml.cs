@@ -184,6 +184,10 @@ namespace System.Windows.Controls
 
         static DataGridRow()
         {
+            EventManager.RegisterClassHandler<DataGridRow>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRow_MouseLeftButtonDown), true);
+            EventManager.RegisterClassHandler<DataGridRow>(MouseEnterEvent, new MouseEventHandler(DataGridRow_MouseEnter));
+            EventManager.RegisterClassHandler<DataGridRow>(MouseLeaveEvent, new MouseEventHandler(DataGridRow_MouseLeave));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridRow), new PropertyMetadata(typeof(DataGridRow)));
         }
 
@@ -207,10 +211,6 @@ namespace System.Windows.Controls
             this.Cells = new DataGridCellCollection(this);
             this.Cells.CellAdded += new EventHandler<DataGridCellEventArgs>(DataGridCellCollection_CellAdded);
             this.Cells.CellRemoved += new EventHandler<DataGridCellEventArgs>(DataGridCellCollection_CellRemoved);
-
-            this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRow_MouseLeftButtonDown), true);
-            this.MouseEnter += new MouseEventHandler(DataGridRow_MouseEnter);
-            this.MouseLeave += new MouseEventHandler(DataGridRow_MouseLeave);
         }
 
         #region Dependency Properties
@@ -1328,28 +1328,30 @@ namespace System.Windows.Controls
             }
         }
         
-        private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
+        private static void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
         {
-            this.IsMouseOver = true;
+            ((DataGridRow)sender).IsMouseOver = true;
         }
 
-        private void DataGridRow_MouseLeave(object sender, MouseEventArgs e)
+        private static void DataGridRow_MouseLeave(object sender, MouseEventArgs e)
         {
-            this.IsMouseOver = false;
+            ((DataGridRow)sender).IsMouseOver = false;
         }
 
-        private void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private static void DataGridRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (this.OwningGrid != null)
+            var row = (DataGridRow)sender;
+
+            if (row.OwningGrid != null)
             {
-                this.OwningGrid.IsDoubleClickRecordsClickOnCall(this);
-                if (this.OwningGrid.UpdatedStateOnMouseLeftButtonDown)
+                row.OwningGrid.IsDoubleClickRecordsClickOnCall(row);
+                if (row.OwningGrid.UpdatedStateOnMouseLeftButtonDown)
                 {
-                    this.OwningGrid.UpdatedStateOnMouseLeftButtonDown = false;
+                    row.OwningGrid.UpdatedStateOnMouseLeftButtonDown = false;
                 }
                 else
                 {
-                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, this.Slot, false);
+                    e.Handled = row.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, row.Slot, false);
                 }
             }
         }

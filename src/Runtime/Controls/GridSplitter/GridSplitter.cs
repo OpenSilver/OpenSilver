@@ -83,11 +83,11 @@ namespace System.Windows.Controls
         /// <summary>
         /// Called when the IsEnabled property changes.
         /// </summary>
-        /// <param name="sender">Sender object.</param>
+        /// <param name="d">Sender object.</param>
         /// <param name="e">Property changed args.</param>
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ChangeVisualState();
+            ((GridSplitter)d).ChangeVisualState();
         }
 
         /// <summary>
@@ -124,7 +124,14 @@ namespace System.Windows.Controls
 
         static GridSplitter()
         {
+            EventManager.RegisterClassHandler<GridSplitter>(KeyDownEvent, new KeyEventHandler(GridSplitter_KeyDown));
+            EventManager.RegisterClassHandler<GridSplitter>(MouseEnterEvent, new MouseEventHandler(GridSplitter_MouseEnter));
+            EventManager.RegisterClassHandler<GridSplitter>(MouseLeaveEvent, new MouseEventHandler(GridSplitter_MouseLeave));
+            EventManager.RegisterClassHandler<GridSplitter>(GotFocusEvent, new RoutedEventHandler(GridSplitter_GotFocus));
+            EventManager.RegisterClassHandler<GridSplitter>(LostFocusEvent, new RoutedEventHandler(GridSplitter_LostFocus));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(GridSplitter), new PropertyMetadata(typeof(GridSplitter)));
+            IsEnabledProperty.OverrideMetadata(typeof(GridSplitter), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
@@ -133,38 +140,11 @@ namespace System.Windows.Controls
         /// </summary>
         public GridSplitter()
         {
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-            this.KeyDown += new KeyEventHandler(GridSplitter_KeyDown);
             this.LayoutUpdated += delegate { UpdateTemplateOrientation(); };
             _dragValidator = new DragValidator(this);
             _dragValidator.DragStartedEvent += new EventHandler<DragStartedEventArgs>(DragValidator_DragStartedEvent);
             _dragValidator.DragDeltaEvent += new EventHandler<DragDeltaEventArgs>(DragValidator_DragDeltaEvent);
             _dragValidator.DragCompletedEvent += new EventHandler<DragCompletedEventArgs>(DragValidator_DragCompletedEvent);
-            this.MouseEnter += delegate(object sender, MouseEventArgs e)
-            {
-                ChangeVisualState();
-            };
-
-            this.MouseLeave += delegate(object sender, MouseEventArgs e)
-            {
-                // Only change the visual state if we're not currently resizing,
-                // the visual state will get updated when the resize operation
-                // comples
-                if (ResizeDataInternal == null)
-                {
-                    ChangeVisualState();
-                }
-            };
-
-            this.GotFocus += delegate(object sender, RoutedEventArgs e)
-            {
-                ChangeVisualState();
-            };
-
-            this.LostFocus += delegate(object sender, RoutedEventArgs e)
-            {
-                ChangeVisualState();
-            };
         }
 
         /// <summary>
@@ -358,38 +338,68 @@ namespace System.Windows.Controls
         /// </summary>
         /// <param name="sender">Inherited code: Requires comment.</param>
         /// <param name="e">Inherited code: Requires comment 1.</param>
-        internal void GridSplitter_KeyDown(object sender, KeyEventArgs e)
+        private static void GridSplitter_KeyDown(object sender, KeyEventArgs e)
         {
+            var gridSplitter = (GridSplitter)sender;
+
             switch (e.Key)
             {
                 case Key.Left:
-                    e.Handled = KeyboardMoveSplitter(FlipForRTL(-KeyboardIncrement), 0.0);
+                    e.Handled = gridSplitter.KeyboardMoveSplitter(gridSplitter.FlipForRTL(-KeyboardIncrement), 0.0);
                     return;
 
                 case Key.Up:
-                    e.Handled = KeyboardMoveSplitter(0.0, -KeyboardIncrement);
+                    e.Handled = gridSplitter.KeyboardMoveSplitter(0.0, -KeyboardIncrement);
                     return;
 
                 case Key.Right:
-                    e.Handled = KeyboardMoveSplitter(FlipForRTL(KeyboardIncrement), 0.0);
+                    e.Handled = gridSplitter.KeyboardMoveSplitter(gridSplitter.FlipForRTL(KeyboardIncrement), 0.0);
                     return;
 
                 case Key.Down:
-                    e.Handled = KeyboardMoveSplitter(0.0, KeyboardIncrement);
+                    e.Handled = gridSplitter.KeyboardMoveSplitter(0.0, KeyboardIncrement);
                     break;
 
                 case Key.Escape:
-                    if (ResizeDataInternal == null)
+                    if (gridSplitter.ResizeDataInternal == null)
                     {
                         break;
                     }
-                    CancelResize();
+                    gridSplitter.CancelResize();
                     e.Handled = true;
                     return;
 
                 default:
                     return;
             }
+        }
+
+        private static void GridSplitter_MouseEnter(object sender, MouseEventArgs e)
+        {
+            ((GridSplitter)sender).ChangeVisualState();
+        }
+
+        private static void GridSplitter_MouseLeave(object sender, MouseEventArgs e)
+        {
+            var gridSplitter = (GridSplitter)sender;
+
+            // Only change the visual state if we're not currently resizing,
+            // the visual state will get updated when the resize operation
+            // comples
+            if (gridSplitter.ResizeDataInternal == null)
+            {
+                gridSplitter.ChangeVisualState();
+            }
+        }
+
+        private static void GridSplitter_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ((GridSplitter)sender).ChangeVisualState();
+        }
+
+        private static void GridSplitter_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ((GridSplitter)sender).ChangeVisualState();
         }
 
         /// <summary>

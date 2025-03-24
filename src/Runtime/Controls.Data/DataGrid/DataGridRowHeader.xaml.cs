@@ -200,18 +200,17 @@ namespace System.Windows.Controls.Primitives
 
         static DataGridRowHeader()
         {
+            EventManager.RegisterClassHandler<DataGridRowHeader>(MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
+            EventManager.RegisterClassHandler<DataGridRowHeader>(MouseEnterEvent, new MouseEventHandler(DataGridRowHeader_MouseEnter));
+            EventManager.RegisterClassHandler<DataGridRowHeader>(MouseLeaveEvent, new MouseEventHandler(DataGridRowHeader_MouseLeave));
+
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridRowHeader), new PropertyMetadata(typeof(DataGridRowHeader)));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Primitives.DataGridRowHeader" /> class. 
         /// </summary>
-        public DataGridRowHeader()
-        {
-            this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
-            this.MouseEnter += new MouseEventHandler(DataGridRowHeader_MouseEnter);
-            this.MouseLeave += new MouseEventHandler(DataGridRowHeader_MouseLeave);
-        }
+        public DataGridRowHeader() { }
 
         #region Dependency Properties
 
@@ -497,37 +496,40 @@ namespace System.Windows.Controls.Primitives
 
         #region Private Methods
 
-        private void DataGridRowHeader_MouseEnter(object sender, MouseEventArgs e)
+        private static void DataGridRowHeader_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (this.OwningRow != null)
+            var rowHeader = (DataGridRowHeader)sender;
+            if (rowHeader.OwningRow != null)
             {
-                this.OwningRow.IsMouseOver = true;
+                rowHeader.OwningRow.IsMouseOver = true;
             }
         }
 
-        private void DataGridRowHeader_MouseLeave(object sender, MouseEventArgs e)
+        private static void DataGridRowHeader_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (this.OwningRow != null)
+            var rowHeader = (DataGridRowHeader)sender;
+            if (rowHeader.OwningRow != null)
             {
-                this.OwningRow.IsMouseOver = false;
+                rowHeader.OwningRow.IsMouseOver = false;
             }
         }
 
-        private void DataGridRowHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private static void DataGridRowHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (this.OwningGrid != null)
+            var rowHeader = (DataGridRowHeader)sender;
+            if (rowHeader.OwningGrid != null)
             {
-                if (!e.Handled && this.OwningGrid.IsTabStop)
+                if (!e.Handled && rowHeader.OwningGrid.IsTabStop)
                 {
-                    bool success = this.OwningGrid.Focus();
+                    bool success = rowHeader.OwningGrid.Focus();
                     Debug.Assert(success);
                 }
-                if (this.OwningRow != null)
+                if (rowHeader.OwningRow != null)
                 {
                     Debug.Assert(sender is DataGridRowHeader);
-                    Debug.Assert(sender == this);
-                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, this.Slot, false);
-                    this.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
+                    Debug.Assert(sender == rowHeader);
+                    e.Handled = rowHeader.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, rowHeader.Slot, false);
+                    rowHeader.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
                 }
             }
         }

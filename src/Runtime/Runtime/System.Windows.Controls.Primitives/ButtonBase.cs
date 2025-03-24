@@ -34,6 +34,7 @@ namespace System.Windows.Controls.Primitives
         static ButtonBase()
         {
             KeyboardNavigation.AcceptsReturnProperty.OverrideMetadata(typeof(ButtonBase), new FrameworkPropertyMetadata(BooleanBoxes.TrueBox));
+            IsEnabledProperty.OverrideMetadata(typeof(ButtonBase), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary>
@@ -43,7 +44,6 @@ namespace System.Windows.Controls.Primitives
         {
             // Attach the necessary events to their virtual counterparts
             Loaded += delegate { UpdateVisualState(false); };
-            IsEnabledChanged += OnIsEnabledChanged;
         }
 
         /// <summary>
@@ -607,36 +607,36 @@ namespace System.Windows.Controls.Primitives
         {
             if (!_suspendStateChanges)
             {
-                UpdateVisualStates();
+                UpdateVisualStates(useTransitions);
             }
         }
 
-        internal override void UpdateVisualStates()
+        internal override void UpdateVisualStates(bool useTransitions)
         {
             if (!IsEnabled)
             {
-                GoToState(VisualStates.StateDisabled);
+                VisualStateManager.GoToState(this, VisualStates.StateDisabled, useTransitions);
             }
             else if (IsPressed)
             {
-                GoToState(VisualStates.StatePressed);
+                VisualStateManager.GoToState(this, VisualStates.StatePressed, useTransitions);
             }
             else if (IsMouseOver)
             {
-                GoToState(VisualStates.StateMouseOver);
+                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, useTransitions);
             }
             else
             {
-                GoToState(VisualStates.StateNormal);
+                VisualStateManager.GoToState(this, VisualStates.StateNormal, useTransitions);
             }
 
             if (IsFocused)
             {
-                GoToState(VisualStates.StateFocused);
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, useTransitions);
             }
             else
             {
-                GoToState(VisualStates.StateUnfocused);
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, useTransitions);
             }
         }
 
@@ -660,24 +660,26 @@ namespace System.Windows.Controls.Primitives
             _isMouseCaptured = false;
         }
 
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            _suspendStateChanges = true;
+            var button = (ButtonBase)d;
+
+            button._suspendStateChanges = true;
 
             try
             {
-                if (!IsEnabled)
+                if (!button.IsEnabled)
                 {
-                    IsPressed = false;
-                    _isMouseCaptured = false;
-                    _isSpaceKeyDown = false;
-                    _isMouseLeftButtonDown = false;
+                    button.IsPressed = false;
+                    button._isMouseCaptured = false;
+                    button._isSpaceKeyDown = false;
+                    button._isMouseLeftButtonDown = false;
                 }
             }
             finally
             {
-                _suspendStateChanges = false;
-                UpdateVisualState();
+                button._suspendStateChanges = false;
+                button.UpdateVisualState();
             }
         }
 

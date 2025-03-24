@@ -426,6 +426,8 @@ namespace System.Windows.Controls
         static DataPager()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DataPager), new PropertyMetadata(typeof(DataPager)));
+            // Listening to the IsEnabled changes so the DataPager states can be updated accordingly.
+            IsEnabledProperty.OverrideMetadata(typeof(DataPager), new PropertyMetadata(OnDataPagerIsEnabledChanged));
         }
 
         /// <summary>
@@ -433,9 +435,6 @@ namespace System.Windows.Controls
         /// </summary>
         public DataPager()
         {
-            // Listening to the IsEnabled changes so the DataPager states can be updated accordingly.
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.OnDataPagerIsEnabledChanged);
-
             // Binding the DataPager.Foreground property, one way, to the PrivateForeground property
             Binding foregroundBinding = new Binding("Foreground");
             foregroundBinding.Source = this;
@@ -1290,11 +1289,11 @@ namespace System.Windows.Controls
         /// <summary>
         /// Handles the notifications for the DataPager.IsEnabled changes
         /// </summary>
-        /// <param name="sender">DataPager that changed its IsEnabled property</param>
+        /// <param name="d">DataPager that changed its IsEnabled property</param>
         /// <param name="e">The DependencyPropertyChangedEventArgs for this event.</param>
-        private void OnDataPagerIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnDataPagerIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            this.UpdateCommonState();
+            ((DataPager)d).UpdateCommonState();
         }
 
         /// <summary>

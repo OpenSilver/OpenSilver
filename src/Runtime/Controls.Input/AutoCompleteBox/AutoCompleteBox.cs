@@ -1234,6 +1234,7 @@ namespace System.Windows.Controls
         static AutoCompleteBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AutoCompleteBox), new PropertyMetadata(typeof(AutoCompleteBox)));
+            IsEnabledProperty.OverrideMetadata(typeof(AutoCompleteBox), new PropertyMetadata(ControlIsEnabledChanged));
         }
 
         /// <summary>
@@ -1242,7 +1243,6 @@ namespace System.Windows.Controls
         public AutoCompleteBox()
         {
             Loaded += (sender, e) => ApplyTemplate();
-            IsEnabledChanged += ControlIsEnabledChanged;
 
             Interaction = new InteractionHelper(this);
 
@@ -1588,14 +1588,14 @@ namespace System.Windows.Controls
         /// <summary>
         /// Handle the change of the IsEnabled property.
         /// </summary>
-        /// <param name="sender">The source object.</param>
+        /// <param name="d">The source object.</param>
         /// <param name="e">The event data.</param>
-        private void ControlIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void ControlIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             bool isEnabled = (bool)e.NewValue;
             if (!isEnabled)
             {
-                IsDropDownOpen = false;
+                ((AutoCompleteBox)d).IsDropDownOpen = false;
             }
         }
 

@@ -49,6 +49,8 @@ internal sealed class RichTextBoxView : TextViewBase
 
     static RichTextBoxView()
     {
+        IsEnabledProperty.OverrideMetadata(typeof(RichTextBoxView), new PropertyMetadata(OnIsEnabledChanged));
+
         Block.LineHeightProperty.AddOwner(
             typeof(RichTextBoxView),
             new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsMeasure)
@@ -69,7 +71,6 @@ internal sealed class RichTextBoxView : TextViewBase
     public RichTextBoxView(RichTextBox rtb)
         : base(rtb)
     {
-        IsEnabledChanged += (o, e) => SetEnable(!IsReadOnly);
     }
 
     internal new RichTextBox Host => (RichTextBox)base.Host;
@@ -796,6 +797,12 @@ internal sealed class RichTextBoxView : TextViewBase
     }
 
     internal void OnIsReadOnlyChanged() => SetEnable(!IsReadOnly);
+
+    private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var richTextBoxView = (RichTextBoxView)d;
+        richTextBoxView.SetEnable(!richTextBoxView.IsReadOnly);
+    }
 
     internal void OnIsSpellCheckEnabledChanged(bool isSpellCheckEnabled)
     {

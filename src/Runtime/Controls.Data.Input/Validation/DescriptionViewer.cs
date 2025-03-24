@@ -42,6 +42,7 @@ namespace System.Windows.Controls
         static DescriptionViewer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DescriptionViewer), new PropertyMetadata(typeof(DescriptionViewer)));
+            IsEnabledProperty.OverrideMetadata(typeof(DescriptionViewer), new PropertyMetadata(DescriptionViewer_IsEnabledChanged));
         }
 
         /// <summary>
@@ -52,7 +53,6 @@ namespace System.Windows.Controls
             // Set binding to self for DataContext change notifications
             this.SetBinding(DescriptionViewer.DataContextProperty, new Binding());
             this.Loaded += new RoutedEventHandler(this.DescriptionViewer_Loaded);
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.DescriptionViewer_IsEnabledChanged);
             if (DesignerProperties.IsInDesignTool)
             {
                 this.Description = typeof(DescriptionViewer).Name;
@@ -390,11 +390,11 @@ namespace System.Windows.Controls
         /// <summary>
         /// IsEnabled property change handler
         /// </summary>
-        /// <param name="sender">The DescriptionViewer that had its IsEnabled value changed.</param>
+        /// <param name="d">The DescriptionViewer that had its IsEnabled value changed.</param>
         /// <param name="e">The DependencyPropertyChangedEventArgs for this event.</param>
-        private void DescriptionViewer_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void DescriptionViewer_IsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            this.UpdateCommonState();
+            ((DescriptionViewer)d).UpdateCommonState();
         }
 
         /// <summary>

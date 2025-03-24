@@ -57,6 +57,7 @@ namespace System.Windows.Controls
         static ComboBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(typeof(ComboBox)));
+            IsEnabledProperty.OverrideMetadata(typeof(ComboBox), new PropertyMetadata(OnVisualStatePropertyChanged));
             IsSelectionActivePropertyKey.OverrideMetadata(
                 typeof(ComboBox),
                 new PropertyMetadata(BooleanBoxes.FalseBox, OnIsSelectionActiveChanged));
@@ -65,10 +66,7 @@ namespace System.Windows.Controls
         /// <summary>
         /// Initializes a new instance of the ComboBox class.
         /// </summary>
-        public ComboBox()
-        {
-            IsEnabledChanged += (o, e) => UpdateVisualStates();
-        }
+        public ComboBox() { }
 
         /// <inheritdoc />
         protected internal override bool HandlesScrolling => true;
@@ -780,32 +778,32 @@ namespace System.Windows.Controls
             private set { SetValueInternal(IsSelectionBoxHighlightedProperty, value); }
         }
 
-        internal override void UpdateVisualStates()
+        internal override void UpdateVisualStates(bool useTransitions)
         {
             if (!IsEnabled)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateDisabled, false);
+                VisualStateManager.GoToState(this, VisualStates.StateDisabled, useTransitions);
             }
             else if (IsMouseOver)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
+                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateNormal, false);
+                VisualStateManager.GoToState(this, VisualStates.StateNormal, useTransitions);
             }
 
             if (!GetIsSelectionActive(this))
             {
-                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, useTransitions);
             }
             else if (IsDropDownOpen)
             {
-                VisualStateManager.GoToState(this, FocusedDropDownState, false);
+                VisualStateManager.GoToState(this, FocusedDropDownState, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, useTransitions);
             }
         }
     }

@@ -72,6 +72,7 @@ namespace System.Windows.Controls
         static ValidationSummary()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ValidationSummary), new PropertyMetadata(typeof(ValidationSummary)));
+            IsEnabledProperty.OverrideMetadata(typeof(ValidationSummary), new PropertyMetadata(ValidationSummary_IsEnabledChanged));
         }
 
         /// <summary>
@@ -84,7 +85,6 @@ namespace System.Windows.Controls
             this._displayedErrors = new ValidationItemCollection();
             this._errors.CollectionChanged += new NotifyCollectionChangedEventHandler(this.Errors_CollectionChanged);
             this.Loaded += new RoutedEventHandler(this.ValidationSummary_Loaded);
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.ValidationSummary_IsEnabledChanged);
             if (DesignerProperties.IsInDesignTool)
             {
                 this.Errors.Add(new ValidationSummaryItem(resources.ValidationSummarySampleError, typeof(ValidationSummaryItem).Name, ValidationSummaryItemType.ObjectError, null, null));
@@ -964,9 +964,9 @@ namespace System.Windows.Controls
             this.Loaded -= new RoutedEventHandler(this.ValidationSummary_Loaded);
         }
 
-        private void ValidationSummary_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void ValidationSummary_IsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            this.UpdateCommonState(true);
+            ((ValidationSummary)d).UpdateCommonState(true);
         }
 
         private void ValidationSummaryItem_PropertyChanged(object sender, PropertyChangedEventArgs e)

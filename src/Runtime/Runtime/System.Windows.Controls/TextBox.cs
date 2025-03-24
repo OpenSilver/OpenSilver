@@ -60,15 +60,13 @@ namespace System.Windows.Controls
         static TextBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBox), new PropertyMetadata(typeof(TextBox)));
+            IsEnabledProperty.OverrideMetadata(typeof(TextBox), new PropertyMetadata(OnVisualStatePropertyChanged));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextBox"/> class.
         /// </summary>
-        public TextBox()
-        {
-            IsEnabledChanged += (o, e) => UpdateVisualStates();
-        }
+        public TextBox() { }
 
         internal sealed override INTERNAL_HtmlDomElementReference GetFocusTarget()
             => _textViewHost?.View?.OuterDiv ?? base.GetFocusTarget();
@@ -870,32 +868,32 @@ namespace System.Windows.Controls
             _textViewHost?.View.SetSelectionRange(start, start + length);
         }
 
-        internal override void UpdateVisualStates()
+        internal override void UpdateVisualStates(bool useTransitions)
         {
             if (!IsEnabled)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateDisabled, false);
+                VisualStateManager.GoToState(this, VisualStates.StateDisabled, useTransitions);
             }
             else if (IsReadOnly)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateReadOnly, false);
+                VisualStateManager.GoToState(this, VisualStates.StateReadOnly, useTransitions);
             }
             else if (IsMouseOver)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
+                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateNormal, false);
+                VisualStateManager.GoToState(this, VisualStates.StateNormal, useTransitions);
             }
 
             if (_isFocused)
             {
-                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, useTransitions);
             }
             else
             {
-                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, useTransitions);
             }
         }
 

@@ -245,23 +245,24 @@ namespace System.Windows.Controls.Primitives
 
         #region Internal Methods
 
-        internal override void UpdateVisualStates()
+        internal override void UpdateVisualStates(bool useTransitions)
         {
-            base.UpdateVisualStates();
+            base.UpdateVisualStates(useTransitions);
+
             // Update the Check state group
             var isChecked = IsChecked;
             if (isChecked == true)
             {
-                VisualStateManager.GoToState(this, "Checked", true);
+                VisualStateManager.GoToState(this, "Checked", useTransitions);
             }
             else if (isChecked == false)
             {
-                VisualStateManager.GoToState(this, "Unchecked", true);
+                VisualStateManager.GoToState(this, "Unchecked", useTransitions);
             }
             else
             {
                 // isChecked is null
-                VisualStates.GoToState(this, true, "Indeterminate", "Unchecked");
+                VisualStates.GoToState(this, useTransitions, "Indeterminate", "Unchecked");
             }
         }
 

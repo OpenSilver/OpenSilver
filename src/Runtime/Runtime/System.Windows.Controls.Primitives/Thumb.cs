@@ -24,15 +24,13 @@ namespace System.Windows.Controls.Primitives
         static Thumb()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Thumb), new PropertyMetadata(typeof(Thumb)));
+            IsEnabledProperty.OverrideMetadata(typeof(Thumb), new PropertyMetadata(OnIsEnabledChanged));
         }
 
         /// <summary> 
         /// Initializes a new instance of the <see cref="Thumb"/> class.
         /// </summary> 
-        public Thumb()
-        {
-            IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-        }
+        public Thumb() { }
 
         /// <summary>
         /// Occurs when a <see cref="Thumb"/> control receives logical focus and 
@@ -339,9 +337,9 @@ namespace System.Windows.Controls.Primitives
                 canceled));
         }
 
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UpdateVisualState();
+            ((Thumb)d).UpdateVisualState();
         }
 
         /// <summary> 

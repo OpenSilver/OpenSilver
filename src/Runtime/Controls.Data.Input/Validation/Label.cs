@@ -48,6 +48,7 @@ namespace System.Windows.Controls
         static Label()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Label), new PropertyMetadata(typeof(Label)));
+            IsEnabledProperty.OverrideMetadata(typeof(Label), new PropertyMetadata(Label_IsEnabledChanged));
         }
 
         /// <summary>
@@ -60,7 +61,6 @@ namespace System.Windows.Controls
             // Set binding to self for DataContext change notifications
             this.SetBinding(Label.DataContextProperty, new Binding());
             this.Loaded += new RoutedEventHandler(this.Label_Loaded);
-            this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.Label_IsEnabledChanged);
 
             // Metadata can be consumed as long as the Content is still null.
             this._canContentUseMetaData = this.Content == null;
@@ -342,11 +342,11 @@ namespace System.Windows.Controls
         /// <summary>
         /// IsEnabled property change handler
         /// </summary>
-        /// <param name="sender">The Label that had its IsEnabled value changed.</param>
+        /// <param name="d">The Label that had its IsEnabled value changed.</param>
         /// <param name="e">The DependencyPropertyChangedEventArgs for this event.</param>
-        private void Label_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void Label_IsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            this.UpdateCommonState();
+            ((Label)d).UpdateCommonState();
         }
 
         /// <summary>
