@@ -250,11 +250,9 @@ namespace System.Windows.Controls
             }
             else
             {
-                Collection<DateTime> addedItems = new Collection<DateTime>();
-                Collection<DateTime> removedItems = new Collection<DateTime>();
                 int monthDifference = DateTimeHelper.CompareYearMonth(this[index], _owner.DisplayDateInternal);
+                object removedItem = this[index];
 
-                removedItems.Add(this[index]);
                 base.RemoveItem(index);
 
                 // The event fires after SelectedDate changes
@@ -270,7 +268,7 @@ namespace System.Windows.Controls
                     }
                 }
 
-                _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+                _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItem, null));
 
                 if (monthDifference < 2 && monthDifference > -2)
                 {
@@ -300,8 +298,6 @@ namespace System.Windows.Controls
 
             if (!Contains(item))
             {
-                Collection<DateTime> addedItems = new Collection<DateTime>();
-                Collection<DateTime> removedItems = new Collection<DateTime>();
 
                 if (index >= Count)
                 {
@@ -311,16 +307,16 @@ namespace System.Windows.Controls
                 {
                     if (item != null && DateTime.Compare(this[index], item) != 0 && Calendar.IsValidDateSelection(_owner, item))
                     {
-                        removedItems.Add(this[index]);
+                        object removedItem = this[index];
                         base.SetItem(index, item);
-                        addedItems.Add(item);
+                        object addedItem = item;
 
                         // The event fires after SelectedDate changes
                         if (index == 0 && !(_owner.SelectedDate.HasValue && DateTime.Compare(_owner.SelectedDate.Value, item) == 0))
                         {
                             _owner.SelectedDate = item;
                         }
-                        _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+                        _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItem, addedItem));
 
                         int monthDifference = DateTimeHelper.CompareYearMonth(item, _owner.DisplayDateInternal);
 

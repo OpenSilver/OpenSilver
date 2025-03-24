@@ -689,6 +689,12 @@ namespace System.Windows.Controls
             }
 
             // Fire the SelectionChanged event
+
+#if SILVERLIGHT
+            source.OnSelectionChanged(new SelectionChangedEventArgs(
+                e.OldValue,
+                e.NewValue));
+#else
             List<object> removed = new List<object>();
             if (e.OldValue != null)
             {
@@ -702,11 +708,10 @@ namespace System.Windows.Controls
             }
 
             source.OnSelectionChanged(new SelectionChangedEventArgs(
-#if !SILVERLIGHT
                 SelectionChangedEvent,
-#endif
                 removed,
                 added));
+#endif
         }
 
 #if !SILVERLIGHT

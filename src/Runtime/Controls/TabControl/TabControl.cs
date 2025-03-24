@@ -60,7 +60,6 @@ namespace System.Windows.Controls
         {
             SelectedIndex = -1;
             KeyDown += delegate (object sender, KeyEventArgs e) { OnKeyDown(e); };
-            SelectionChanged += delegate (object sender, SelectionChangedEventArgs e) { OnSelectionChanged(e); };
             IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
         }
 
@@ -336,15 +335,12 @@ namespace System.Windows.Controls
                 }
             }
 
+            var args = new SelectionChangedEventArgs(oldItem, newItem);
+
+            OnSelectionChanged(args);
+
             // Fire SelectionChanged Event
-            SelectionChangedEventHandler handler = SelectionChanged;
-            if (handler != null)
-            {
-                SelectionChangedEventArgs args = new SelectionChangedEventArgs(
-                    (oldItem == null ? new List<TabItem> { } : new List<TabItem> { oldItem }),
-                    (newItem == null ? new List<TabItem> { } : new List<TabItem> { newItem }));
-                handler(this, args);
-            }
+            SelectionChanged?.Invoke(this, args);
         }
 
         /// <summary>

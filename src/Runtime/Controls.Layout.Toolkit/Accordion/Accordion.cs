@@ -321,13 +321,11 @@ namespace System.Windows.Controls
 
             object oldValue = e.OldValue;
             object newValue = e.NewValue;
-            object[] newValues = newValue == null ? new object[0] : new[] { newValue };
-            object[] oldValues = oldValue == null ? new object[0] : new[] { oldValue };
 
             if (oldValue != null && oldValue.Equals(newValue))
             {
                 // when value types are used as items, there is a possibility of getting a change notification.
-                source.OnSelectedItemChanged(new SelectionChangedEventArgs(oldValues, newValues));
+                source.OnSelectedItemChanged(new SelectionChangedEventArgs(oldValue, newValue));
                 return;
             }
 
@@ -359,7 +357,7 @@ namespace System.Windows.Controls
                     source.SelectedIndex = currentIndex;
                 }
 
-                source.OnSelectedItemChanged(new SelectionChangedEventArgs(oldValues, newValues));
+                source.OnSelectedItemChanged(new SelectionChangedEventArgs(oldValue, newValue));
             }
         }
 

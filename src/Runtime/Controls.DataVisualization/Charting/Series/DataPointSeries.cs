@@ -484,6 +484,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
             // Fire SelectionChanged (if appropriate)
             if (!_processingOnSelectedItemPropertyChanged && (oldValue != newValue))
             {
+#if SILVERLIGHT
+                SelectionChangedEventHandler handler = SelectionChanged;
+                if (null != handler)
+                {
+                    handler(this, new SelectionChangedEventArgs(oldValue, newValue));
+                }
+#else
                 IList oldValues = new List<object>();
                 if (oldValue != null)
                 {
@@ -494,13 +501,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 {
                     newValues.Add(newValue);
                 }
-#if SILVERLIGHT
-                SelectionChangedEventHandler handler = SelectionChanged;
-                if (null != handler)
-                {
-                    handler(this, new SelectionChangedEventArgs(oldValues, newValues));
-                }
-#else
                 RaiseEvent(new SelectionChangedEventArgs(SelectionChangedEvent, oldValues, newValues));
 #endif
             }

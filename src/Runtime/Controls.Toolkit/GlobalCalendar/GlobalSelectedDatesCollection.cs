@@ -252,11 +252,9 @@ namespace System.Windows.Controls
             }
             else
             {
-                Collection<DateTime> addedItems = new Collection<DateTime>();
-                Collection<DateTime> removedItems = new Collection<DateTime>();
                 int monthDifference = _owner.Info.GetMonthDifference(this[index], _owner.DisplayDateInternal);
+                object removedItem = this[index];
 
-                removedItems.Add(this[index]);
                 base.RemoveItem(index);
 
                 // The event fires after SelectedDate changes
@@ -272,7 +270,7 @@ namespace System.Windows.Controls
                     }
                 }
 
-                _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+                _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItem, null));
 
                 if (monthDifference < 2 && monthDifference > -2)
                 {
@@ -302,9 +300,6 @@ namespace System.Windows.Controls
 
             if (!Contains(item))
             {
-                Collection<DateTime> addedItems = new Collection<DateTime>();
-                Collection<DateTime> removedItems = new Collection<DateTime>();
-
                 if (index >= Count)
                 {
                     base.SetItem(index, item);
@@ -313,16 +308,16 @@ namespace System.Windows.Controls
                 {
                     if (item != null && _owner.Info.Compare(this[index], item) != 0 && GlobalCalendar.IsValidDateSelection(_owner, item))
                     {
-                        removedItems.Add(this[index]);
+                        object removedItem = this[index];
                         base.SetItem(index, item);
-                        addedItems.Add(item);
+                        object addedItem = item;
 
                         // The event fires after SelectedDate changes
                         if (index == 0 && !(_owner.SelectedDate != null && _owner.Info.Compare(_owner.SelectedDate.Value, item) == 0))
                         {
                             _owner.SelectedDate = item;
                         }
-                        _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
+                        _owner.OnSelectedDatesCollectionChanged(new SelectionChangedEventArgs(removedItem, addedItem));
 
                         int monthDifference = _owner.Info.GetMonthDifference(item, _owner.DisplayDateInternal);
                         if (monthDifference < 2 && monthDifference > -2)

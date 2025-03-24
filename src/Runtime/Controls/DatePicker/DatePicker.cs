@@ -1261,20 +1261,10 @@ namespace System.Windows.Controls
             EventHandler<SelectionChangedEventArgs> handler = this.SelectedDateChanged;
             if (null != handler)
             {
-                Collection<DateTime> addedItems = new Collection<DateTime>();
-                Collection<DateTime> removedItems = new Collection<DateTime>();
+                object addedItem = addedDate.HasValue ? addedDate.Value : null; 
+                object removedItem = removedDate.HasValue ? removedDate.Value : null; 
 
-                if (addedDate.HasValue)
-                {
-                    addedItems.Add(addedDate.Value);
-                }
-
-                if (removedDate.HasValue)
-                {
-                    removedItems.Add(removedDate.Value);
-                }
-
-                handler(this, new SelectionChangedEventArgs(removedItems, addedItems));
+                handler(this, new SelectionChangedEventArgs(removedItem, addedItem));
             }
 
             DatePickerAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(this) as DatePickerAutomationPeer;
