@@ -209,36 +209,40 @@ namespace System.Windows.Controls
         public const string GroupValidation = "ValidationStates";
         #endregion GroupValidation
 
-        /// <summary>
-        /// Use VisualStateManager to change the visual state of the control.
-        /// </summary>
-        /// <param name="control">
-        /// Control whose visual state is being changed.
-        /// </param>
-        /// <param name="useTransitions">
-        /// true to use transitions when updating the visual state, false to
-        /// snap directly to the new visual state.
-        /// </param>
-        /// <param name="stateNames">
-        /// Ordered list of state names and fallback states to transition into.
-        /// Only the first state to be found will be used.
-        /// </param>
-        public static void GoToState(Control control, bool useTransitions, params string[] stateNames)
+        public static void GoToState(Control control, bool useTransitions, string stateName)
         {
             Debug.Assert(control != null);
 
-            if (stateNames == null)
+            VisualStateManager.GoToState(control, stateName, useTransitions);
+        }
+
+        public static void GoToState(Control control, bool useTransitions, string stateName1, string stateName2)
+        {
+            Debug.Assert(control != null);
+
+            if (VisualStateManager.GoToState(control, stateName1, useTransitions))
             {
                 return;
             }
 
-            foreach (string name in stateNames)
+            VisualStateManager.GoToState(control, stateName2, useTransitions);
+        }
+
+        public static void GoToState(Control control, bool useTransitions, string stateName1, string stateName2, string stateName3)
+        {
+            Debug.Assert(control != null);
+
+            if (VisualStateManager.GoToState(control, stateName1, useTransitions))
             {
-                if (VisualStateManager.GoToState(control, name, useTransitions))
-                {
-                    break;
-                }
+                return;
             }
+
+            if (VisualStateManager.GoToState(control, stateName2, useTransitions))
+            {
+                return;
+            }
+
+            VisualStateManager.GoToState(control, stateName3, useTransitions);
         }
     }
 }

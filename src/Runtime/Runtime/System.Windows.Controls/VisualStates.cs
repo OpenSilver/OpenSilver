@@ -410,23 +410,81 @@ namespace System.Windows.Controls
         /// A value indicating whether to use transitions when updating the
         /// visual state, or to snap directly to the new visual state.
         /// </param>
-        /// <param name="stateNames">
-        /// Ordered list of state names and fallback states to transition into.
-        /// Only the first state to be found will be used.
+        /// <param name="stateName">
+        /// The state to transition to.
         /// </param>
-        public static void GoToState(Control control, bool useTransitions, params string[] stateNames)
+        public static void GoToState(Control control, bool useTransitions, string stateName)
         {
-            Debug.Assert(control != null, "control should not be null!");
-            Debug.Assert(stateNames != null, "stateNames should not be null!");
-            Debug.Assert(stateNames.Length > 0, "stateNames should not be empty!");
+            Debug.Assert(control != null);
 
-            foreach (string name in stateNames)
+            VisualStateManager.GoToState(control, stateName, useTransitions);
+        }
+
+        /// <summary>
+        /// Use VisualStateManager to change the visual state of the control.
+        /// </summary>
+        /// <param name="control">
+        /// Control whose visual state is being changed.
+        /// </param>
+        /// <param name="useTransitions">
+        /// A value indicating whether to use transitions when updating the
+        /// visual state, or to snap directly to the new visual state.
+        /// </param>
+        /// <param name="stateName1">
+        /// The first state to transition to.
+        /// </param>
+        /// <param name="stateName2">
+        /// The second state to transition to. It will only be attempted if it did
+        /// not find stateName1.
+        /// </param>
+        public static void GoToState(Control control, bool useTransitions, string stateName1, string stateName2)
+        {
+            Debug.Assert(control != null);
+
+            if (VisualStateManager.GoToState(control, stateName1, useTransitions))
             {
-                if (VisualStateManager.GoToState(control, name, useTransitions))
-                {
-                    break;
-                }
+                return;
             }
+
+            VisualStateManager.GoToState(control, stateName2, useTransitions);
+        }
+
+        /// <summary>
+        /// Use VisualStateManager to change the visual state of the control.
+        /// </summary>
+        /// <param name="control">
+        /// Control whose visual state is being changed.
+        /// </param>
+        /// <param name="useTransitions">
+        /// A value indicating whether to use transitions when updating the
+        /// visual state, or to snap directly to the new visual state.
+        /// </param>
+        /// <param name="stateName1">
+        /// The first state to transition to.
+        /// </param>
+        /// <param name="stateName2">
+        /// The second state to transition to. It will only be attempted if it did
+        /// not find stateName1.
+        /// </param>
+        /// <param name="stateName3">
+        /// The third state to transition to. It will only be attempted if it did
+        /// not find stateName1 and stateName2.
+        /// </param>
+        public static void GoToState(Control control, bool useTransitions, string stateName1, string stateName2, string stateName3)
+        {
+            Debug.Assert(control != null);
+
+            if (VisualStateManager.GoToState(control, stateName1, useTransitions))
+            {
+                return;
+            }
+
+            if (VisualStateManager.GoToState(control, stateName2, useTransitions))
+            {
+                return;
+            }
+
+            VisualStateManager.GoToState(control, stateName3, useTransitions);
         }
 
         /// <summary>
