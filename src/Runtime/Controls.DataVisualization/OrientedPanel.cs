@@ -422,7 +422,7 @@ namespace System.Windows.Controls.DataVisualization
         /// </summary>
         private void UpdateActualLength()
         {
-            this.SetBinding(ActualLengthProperty, new Binding((Orientation == Orientation.Horizontal) ? "ActualWidth" : "ActualHeight") { Source = this });
+            this.SetBinding(ActualLengthProperty, new Binding((Orientation == Orientation.Horizontal) ? ActualWidthProperty : ActualHeightProperty) { Source = this });
         }
 
         /// <summary>

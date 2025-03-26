@@ -66,7 +66,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 foreach (SeriesDefinition newDefinition in newItems.CastWrapper<SeriesDefinition>())
                 {
                     Shape dataShape = CreateDataShape();
-                    dataShape.SetBinding(Shape.StyleProperty, new Binding("ActualDataShapeStyle") { Source = newDefinition });
+                    dataShape.SetBinding(Shape.StyleProperty, new Binding(SeriesDefinition.ActualDataShapeStyleProperty) { Source = newDefinition });
                     SeriesDefinitionShapes[newDefinition] = dataShape;
                 }
                 SynchronizeSeriesDefinitionShapes(null, newItems.CastWrapper<SeriesDefinition>());

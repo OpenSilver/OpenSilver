@@ -98,12 +98,33 @@ public class Binding : BindingBase
     /// </exception>
     public Binding(string path)
     {
-        if (path == null)
+        if (path is null)
         {
             throw new ArgumentNullException(nameof(path));
         }
 
         Path = new PropertyPath(path);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Binding"/> class with a single
+    /// <see cref="DependencyProperty"/> for the data source.
+    /// </summary>
+    /// <param name="dp">
+    /// The <see cref="DependencyProperty"/> for the source of the binding.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="dp"/> is null.
+    /// </exception>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public Binding(DependencyProperty dp)
+    {
+        if (dp is null)
+        {
+            throw new ArgumentNullException(nameof(dp));
+        }
+
+        Path = new PropertyPath(dp);
     }
 
     /// <summary>

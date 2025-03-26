@@ -867,9 +867,8 @@ namespace System.Windows.Controls
             Button c = new Button();
             c.SetBinding(
                 StyleProperty,
-                new Binding()
+                new Binding(TimeButtonStyleProperty)
                 {
-                    Path = new PropertyPath("TimeButtonStyle"),
                     Source = this
                 });
             c.VerticalAlignment = VerticalAlignment.Top;

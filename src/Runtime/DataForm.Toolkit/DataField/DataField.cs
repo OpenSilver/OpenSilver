@@ -1222,9 +1222,9 @@ namespace System.Windows.Controls
 
             Grid labelGrid = new Grid();
             this.InternalLabel = new Label();
-            this.InternalLabel.SetBinding(Controls.Label.PropertyPathProperty, new Binding("PropertyPath") { Source = this });
-            this.InternalLabel.SetBinding(Controls.Label.VisibilityProperty, new Binding("LabelVisibility") { Source = this });
-            this.InternalLabel.SetBinding(Controls.Label.ForegroundProperty, new Binding("Foreground") { Source = this });
+            this.InternalLabel.SetBinding(Controls.Label.PropertyPathProperty, new Binding(PropertyPathProperty) { Source = this });
+            this.InternalLabel.SetBinding(Controls.Label.VisibilityProperty, new Binding(LabelVisibilityProperty) { Source = this });
+            this.InternalLabel.SetBinding(Controls.Label.ForegroundProperty, new Binding(ForegroundProperty) { Source = this });
             this.SetLabelContent();
 
             this.SetIsReadOnlyIfNotOverridden();
@@ -1267,7 +1267,7 @@ namespace System.Windows.Controls
             }
 
             // Make the label grid have the same horizontal alignment as the label.
-            labelGrid.SetBinding(FrameworkElement.HorizontalAlignmentProperty, new Binding("HorizontalAlignment") { Source = this.InternalLabel });
+            labelGrid.SetBinding(FrameworkElement.HorizontalAlignmentProperty, new Binding(HorizontalAlignmentProperty) { Source = this.InternalLabel });
             grid.Children.Add(labelGrid);
 
             this.InternalLabel.MouseLeftButtonDown += new MouseButtonEventHandler(this.OnLabelMouseLeftButtonDown);
@@ -1301,8 +1301,8 @@ namespace System.Windows.Controls
             }
 
             this.DescriptionViewer = new DescriptionViewer();
-            this.DescriptionViewer.SetBinding(DescriptionViewer.PropertyPathProperty, new Binding("PropertyPath") { Source = this });
-            this.DescriptionViewer.SetBinding(DescriptionViewer.VisibilityProperty, new Binding("DescriptionViewerVisibility") { Source = this });
+            this.DescriptionViewer.SetBinding(DescriptionViewer.PropertyPathProperty, new Binding(PropertyPathProperty) { Source = this });
+            this.DescriptionViewer.SetBinding(DescriptionViewer.VisibilityProperty, new Binding(DescriptionViewerVisibilityProperty) { Source = this });
             this.SetDescriptionContent();
 
             oldPanel = VisualTreeHelper.GetParent(this.DescriptionViewer) as Panel;
@@ -1847,11 +1847,11 @@ namespace System.Windows.Controls
 
             if (parentDataForm != null)
             {
-                this.SetBinding(DataField.DataFormModeProperty, new Binding("Mode") { Source = parentDataForm });
-                this.SetBinding(DataField.DataFormLabelPositionProperty, new Binding("LabelPosition") { Source = parentDataForm });
-                this.SetBinding(DataField.DataFormDescriptionViewerPositionProperty, new Binding("DescriptionViewerPosition") { Source = parentDataForm });
-                this.SetBinding(DataField.StyleProperty, new Binding("DataFieldStyle") { Source = parentDataForm });
-                this.SetBinding(DataField.ForegroundProperty, new Binding("Foreground") { Source = parentDataForm });
+                this.SetBinding(DataField.DataFormModeProperty, new Binding(DataForm.ModeProperty) { Source = parentDataForm });
+                this.SetBinding(DataField.DataFormLabelPositionProperty, new Binding(DataForm.LabelPositionProperty) { Source = parentDataForm });
+                this.SetBinding(DataField.DataFormDescriptionViewerPositionProperty, new Binding(DataForm.DescriptionViewerPositionProperty) { Source = parentDataForm });
+                this.SetBinding(DataField.StyleProperty, new Binding(DataForm.DataFieldStyleProperty) { Source = parentDataForm });
+                this.SetBinding(DataField.ForegroundProperty, new Binding(ForegroundProperty) { Source = parentDataForm });
                 parentDataForm.Fields.Add(this);
             }
         }

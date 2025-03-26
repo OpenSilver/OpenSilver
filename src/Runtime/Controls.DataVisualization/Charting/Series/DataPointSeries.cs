@@ -754,8 +754,8 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected virtual LegendItem CreateLegendItem(DataPointSeries owner)
         {
             LegendItem legendItem = new LegendItem() { Owner = owner };
-            legendItem.SetBinding(LegendItem.StyleProperty, new Binding(ActualLegendItemStyleName) { Source = this });
-            legendItem.SetBinding(LegendItem.ContentProperty, new Binding(TitleName) { Source = this });
+            legendItem.SetBinding(LegendItem.StyleProperty, new Binding(DataPointSingleSeriesWithAxes.ActualLegendItemStyleProperty) { Source = this });
+            legendItem.SetBinding(LegendItem.ContentProperty, new Binding(TitleProperty) { Source = this });
             return legendItem;
         }
 

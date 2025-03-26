@@ -185,17 +185,17 @@ internal sealed class PopupRoot : FrameworkElement
     private void SetLayoutBindings()
     {
         _transformLayer.SetBinding(WidthProperty,
-            new Binding { Path = new PropertyPath(WidthProperty), Source = _popup });
+            new Binding(WidthProperty) { Source = _popup });
         _transformLayer.SetBinding(HeightProperty,
-            new Binding { Path = new PropertyPath(HeightProperty), Source = _popup });
+            new Binding(HeightProperty) { Source = _popup });
         _transformLayer.SetBinding(MaxHeightProperty,
-            new Binding { Path = new PropertyPath(MaxHeightProperty), Source = _popup });
+            new Binding(MaxHeightProperty) { Source = _popup });
         _transformLayer.SetBinding(HorizontalAlignmentProperty,
-            new Binding { Path = new PropertyPath(Popup.HorizontalContentAlignmentProperty), Source = _popup });
+            new Binding(Popup.HorizontalContentAlignmentProperty) { Source = _popup });
         _transformLayer.SetBinding(VerticalAlignmentProperty,
-            new Binding { Path = new PropertyPath(Popup.VerticalContentAlignmentProperty), Source = _popup });
+            new Binding(Popup.VerticalContentAlignmentProperty) { Source = _popup });
         _transformLayer.SetBinding(FlowDirectionProperty,
-            new Binding { Path = new PropertyPath(FlowDirectionProperty), Source = _popup });
+            new Binding(FlowDirectionProperty) { Source = _popup });
     }
 
     protected override Size MeasureOverride(Size availableSize)

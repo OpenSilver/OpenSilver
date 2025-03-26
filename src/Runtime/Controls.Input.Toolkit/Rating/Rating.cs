@@ -607,7 +607,7 @@ namespace System.Windows.Controls
             object defaultForegroundValue = ratingItem.ReadLocalValue(Control.ForegroundProperty);
             if (defaultForegroundValue == DependencyProperty.UnsetValue)
             {
-                ratingItem.SetBinding(Control.ForegroundProperty, new Binding("Foreground") { Source = this });
+                ratingItem.SetBinding(Control.ForegroundProperty, new Binding(ForegroundProperty) { Source = this });
             }
 
             ratingItem.IsReadOnly = this.IsReadOnly;

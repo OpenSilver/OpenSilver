@@ -547,8 +547,8 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 _itemContainer.Clip = _clipGeometry;
                 _itemContainer.SizeChanged += new SizeChangedEventHandler(ItemContainerSizeChanged);
                 _itemContainer.SelectionChanged += new SelectionChangedEventHandler(ItemContainerSelectionChanged);
-                _itemContainer.SetBinding(Selector.SelectedIndexProperty, new Binding("SelectedIndex") { Source = this, Mode = BindingMode.TwoWay });
-                _itemContainer.SetBinding(Selector.SelectedItemProperty, new Binding("SelectedItem") { Source = this, Mode = BindingMode.TwoWay, Converter = new SelectedItemToDataItemConverter(DataItems) });
+                _itemContainer.SetBinding(Selector.SelectedIndexProperty, new Binding(SelectedIndexProperty) { Source = this, Mode = BindingMode.TwoWay });
+                _itemContainer.SetBinding(Selector.SelectedItemProperty, new Binding(SelectedItemProperty) { Source = this, Mode = BindingMode.TwoWay, Converter = new SelectedItemToDataItemConverter(DataItems) });
             }
 
             // Synchronize selection state with new ItemContainer
@@ -569,7 +569,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             dataPoint.DataContext = dataItem.Value;
             dataPoint.SetBinding(DataPoint.DependentValueProperty, dataItem.SeriesDefinition.DependentValueBinding);
             dataPoint.SetBinding(DataPoint.IndependentValueProperty, dataItem.SeriesDefinition.IndependentValueBinding);
-            dataPoint.SetBinding(DataPoint.StyleProperty, new Binding("ActualDataPointStyle") { Source = dataItem.SeriesDefinition });
+            dataPoint.SetBinding(DataPoint.StyleProperty, new Binding(SeriesDefinition.ActualDataPointStyleProperty) { Source = dataItem.SeriesDefinition });
             dataPoint.DependentValueChanged += new RoutedPropertyChangedEventHandler<IComparable>(DataPointDependentValueChanged);
             dataPoint.ActualDependentValueChanged += new RoutedPropertyChangedEventHandler<IComparable>(DataPointActualDependentValueChanged);
             dataPoint.IndependentValueChanged += new RoutedPropertyChangedEventHandler<object>(DataPointIndependentValueChanged);
@@ -578,10 +578,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
             dataPoint.DefinitionSeriesIsSelectionEnabledHandling = true;
             ContentControl container = (ContentControl)element;
             dataItem.Container = container;
-            Binding selectionEnabledBinding = new Binding("SelectionMode") { Source = this, Converter = new SelectionModeToSelectionEnabledConverter() };
+            Binding selectionEnabledBinding = new Binding(SelectionModeProperty) { Source = this, Converter = new SelectionModeToSelectionEnabledConverter() };
             container.SetBinding(ContentControl.IsTabStopProperty, selectionEnabledBinding);
             dataPoint.SetBinding(DataPoint.IsSelectionEnabledProperty, selectionEnabledBinding);
-            dataPoint.SetBinding(DataPoint.IsSelectedProperty, new Binding("IsSelected") { Source = container, Mode = BindingMode.TwoWay });
+            dataPoint.SetBinding(DataPoint.IsSelectedProperty, new Binding(ListBoxItem.IsSelectedProperty) { Source = container, Mode = BindingMode.TwoWay });
             dataPoint.Visibility = Visibility.Collapsed;
             dataPoint.State = DataPointState.Showing;
             PrepareDataPoint(dataPoint);

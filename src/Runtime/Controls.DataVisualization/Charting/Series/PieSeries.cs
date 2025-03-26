@@ -157,9 +157,9 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 pieDataPoint.PaletteResources = null;
             }
             pieDataPoint.ActualDataPointStyle = DataPointStyle ?? pieDataPoint.Resources[DataPointStyleName] as Style;
-            pieDataPoint.SetBinding(PieDataPoint.StyleProperty, new Binding(PieDataPoint.ActualDataPointStyleName) { Source = pieDataPoint });
+            pieDataPoint.SetBinding(PieDataPoint.StyleProperty, new Binding(PieDataPoint.ActualDataPointStyleProperty) { Source = pieDataPoint });
             pieDataPoint.ActualLegendItemStyle = LegendItemStyle ?? (pieDataPoint.Resources[LegendItemStyleName] as Style);
-            legendItem.SetBinding(LegendItem.StyleProperty, new Binding(ActualLegendItemStyleName) { Source = pieDataPoint });
+            legendItem.SetBinding(LegendItem.StyleProperty, new Binding(PieDataPoint.ActualLegendItemStyleProperty) { Source = pieDataPoint });
 
             _dataPointLegendItems[dataPoint] = legendItem;
             LegendItems.Add(legendItem);
@@ -374,7 +374,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 PlotArea.Children.Add(legendDataPoint);
                 PlotArea.Children.Remove(legendDataPoint);
             }
-            legendDataPoint.SetBinding(DataPoint.StyleProperty, new Binding(PieDataPoint.ActualDataPointStyleName) { Source = dataPoint });
+            legendDataPoint.SetBinding(DataPoint.StyleProperty, new Binding(PieDataPoint.ActualDataPointStyleProperty) { Source = dataPoint });
             legendItem.DataContext = legendDataPoint;
             return legendItem;
         }

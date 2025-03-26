@@ -65,8 +65,8 @@ namespace System.Windows.Controls.DataVisualization.Charting
         public SeriesDefinition()
         {
             _legendItem = new LegendItem { Owner = this };
-            _legendItem.SetBinding(LegendItem.ContentProperty, new Binding("ActualTitle") { Source = this });
-            _legendItem.SetBinding(LegendItem.StyleProperty, new Binding("ActualLegendItemStyle") { Source = this });
+            _legendItem.SetBinding(LegendItem.ContentProperty, new Binding(ActualTitleProperty) { Source = this });
+            _legendItem.SetBinding(LegendItem.StyleProperty, new Binding(ActualLegendItemStyleProperty) { Source = this });
             _legendItems.Add(_legendItem);
         }
 
@@ -572,7 +572,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     contentControl.Content = legendItemDataPoint;
                     contentControl.Content = null;
 #endif
-                    legendItemDataPoint.SetBinding(DataPoint.StyleProperty, new Binding("ActualDataPointStyle") { Source = this });
+                    legendItemDataPoint.SetBinding(DataPoint.StyleProperty, new Binding(ActualDataPointStyleProperty) { Source = this });
                     _legendItem.DataContext = legendItemDataPoint;
                 }
             }

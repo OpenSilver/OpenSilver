@@ -44,16 +44,16 @@ namespace System.Windows.Controls.DataVisualization.Charting.Compatible
         /// </summary>
         public BarSeries()
         {
-            SetBinding(DefinitionSeries.DependentAxisProperty, new Binding("DependentRangeAxis") { Source = this });
-            SetBinding(DefinitionSeries.SelectionModeProperty, new Binding("IsSelectionEnabled") { Source = this, Converter = new System.Windows.Controls.DataVisualization.Charting.Compatible.SelectionEnabledToSelectionModeConverter() });
+            SetBinding(DefinitionSeries.DependentAxisProperty, new Binding(DependentRangeAxisProperty) { Source = this });
+            SetBinding(DefinitionSeries.SelectionModeProperty, new Binding(IsSelectionEnabledProperty) { Source = this, Converter = new SelectionEnabledToSelectionModeConverter() });
             _definition = new SeriesDefinition();
-            _definition.SetBinding(SeriesDefinition.ItemsSourceProperty, new Binding("ItemsSource") { Source = this });
-            _definition.SetBinding(SeriesDefinition.TitleProperty, new Binding("Title") { Source = this });
-            _definition.SetBinding(SeriesDefinition.DataPointStyleProperty, new Binding(DataPointStyleName) { Source = this });
-            _definition.SetBinding(SeriesDefinition.LegendItemStyleProperty, new Binding(LegendItemStyleName) { Source = this });
-            _definition.SetBinding(SeriesDefinition.TransitionDurationProperty, new Binding("TransitionDuration") { Source = this });
+            _definition.SetBinding(SeriesDefinition.ItemsSourceProperty, new Binding(ItemsSourceProperty) { Source = this });
+            _definition.SetBinding(SeriesDefinition.TitleProperty, new Binding(TitleProperty) { Source = this });
+            _definition.SetBinding(SeriesDefinition.DataPointStyleProperty, new Binding(DataPointStyleProperty) { Source = this });
+            _definition.SetBinding(SeriesDefinition.LegendItemStyleProperty, new Binding(LegendItemStyleProperty) { Source = this });
+            _definition.SetBinding(SeriesDefinition.TransitionDurationProperty, new Binding(TransitionDurationProperty) { Source = this });
 #if !NO_EASING_FUNCTIONS
-            _definition.SetBinding(SeriesDefinition.TransitionEasingFunctionProperty, new Binding("TransitionEasingFunction") { Source = this });
+            _definition.SetBinding(SeriesDefinition.TransitionEasingFunctionProperty, new Binding(TransitionEasingFunctionProperty) { Source = this });
 #endif
             // For compatibility
             DependentValueBinding = new Binding();

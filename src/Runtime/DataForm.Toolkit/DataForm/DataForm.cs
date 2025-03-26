@@ -2484,7 +2484,7 @@ namespace System.Windows.Controls
 
                 if (this.CommitButtonStyle != null)
                 {
-                    this._commitButton.SetBinding(ButtonBase.StyleProperty, new Binding("CommitButtonStyle") { Source = this });
+                    this._commitButton.SetBinding(ButtonBase.StyleProperty, new Binding(CommitButtonStyleProperty) { Source = this });
                 }
 
                 this.SetCommitButtonVisibility();
@@ -2508,7 +2508,7 @@ namespace System.Windows.Controls
 
                 if (this.CancelButtonStyle != null)
                 {
-                    this._cancelButton.SetBinding(ButtonBase.StyleProperty, new Binding("CancelButtonStyle") { Source = this });
+                    this._cancelButton.SetBinding(ButtonBase.StyleProperty, new Binding(CancelButtonStyleProperty) { Source = this });
                 }
 
                 this.SetCancelButtonVisibility();

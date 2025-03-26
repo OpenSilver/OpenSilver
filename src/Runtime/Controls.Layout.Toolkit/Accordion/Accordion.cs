@@ -806,7 +806,7 @@ namespace System.Windows.Controls
                 {
                     accordionItem.SetBinding(
                         ContentControl.ContentTemplateProperty,
-                        new Binding("ContentTemplate")
+                        new Binding(ContentTemplateProperty)
                         {
                             Source = this,
                             Mode = BindingMode.OneWay
@@ -818,7 +818,7 @@ namespace System.Windows.Controls
                 {
                     accordionItem.SetBinding(
                         HeaderedContentControl.HeaderTemplateProperty,
-                        new Binding("ItemTemplate")
+                        new Binding(ItemTemplateProperty)
                         {
                             Source = this,
                             Mode = BindingMode.OneWay
@@ -830,7 +830,7 @@ namespace System.Windows.Controls
                 {
                     accordionItem.SetBinding(
                         AccordionItem.AccordionButtonStyleProperty,
-                        new Binding(AccordionButtonStyleName)
+                        new Binding(AccordionButtonStyleProperty)
                         {
                             Source = this,
                             Mode = BindingMode.OneWay

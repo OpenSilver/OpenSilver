@@ -436,7 +436,7 @@ namespace System.Windows.Controls
         public DataPager()
         {
             // Binding the DataPager.Foreground property, one way, to the PrivateForeground property
-            Binding foregroundBinding = new Binding("Foreground");
+            Binding foregroundBinding = new Binding(ForegroundProperty);
             foregroundBinding.Source = this;
             this.SetBinding(DataPager.PrivateForegroundProperty, foregroundBinding);
         }

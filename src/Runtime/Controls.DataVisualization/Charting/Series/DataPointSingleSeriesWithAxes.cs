@@ -99,7 +99,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the ActualLegendItemStyle dependency property.
         /// </summary>
-        protected static readonly DependencyProperty ActualLegendItemStyleProperty =
+        protected internal static readonly DependencyProperty ActualLegendItemStyleProperty =
             DependencyProperty.Register(
                 ActualLegendItemStyleName,
                 typeof(Style),
@@ -246,7 +246,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 PlotArea.Children.Add(dataPoint);
                 PlotArea.Children.Remove(dataPoint);
             }
-            dataPoint.SetBinding(DataPoint.StyleProperty, new Binding(ActualDataPointStyleName) { Source = this });
+            dataPoint.SetBinding(DataPoint.StyleProperty, new Binding(ActualDataPointStyleProperty) { Source = this });
             // Start DataContext null to avoid Binding warnings in the output window
             LegendItem.DataContext = null;
 
@@ -302,7 +302,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </param>
         protected override void PrepareDataPoint(DataPoint dataPoint, object dataContext)
         {
-            dataPoint.SetBinding(DataPoint.StyleProperty, new Binding(ActualDataPointStyleName) { Source = this });
+            dataPoint.SetBinding(DataPoint.StyleProperty, new Binding(ActualDataPointStyleProperty) { Source = this });
             base.PrepareDataPoint(dataPoint, dataContext);
         }
 

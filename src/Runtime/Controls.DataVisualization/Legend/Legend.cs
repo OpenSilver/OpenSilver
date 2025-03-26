@@ -27,7 +27,7 @@ namespace System.Windows.Controls.DataVisualization
         public Legend()
         {
             // By default, the Visibility property should follow ContentVisibility - but users can override it
-            SetBinding(VisibilityProperty, new Binding("ContentVisibility") { Source = this });
+            SetBinding(VisibilityProperty, new Binding(ContentVisibilityProperty) { Source = this });
         }
 
         /// <summary>
