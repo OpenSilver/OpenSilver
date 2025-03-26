@@ -82,25 +82,23 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
 
     internal override void OnUpdateValue()
     {
-        object value;
         if (_dp is not null)
         {
-            value = ((DependencyObject)Source).GetValue(_dp);
+            UpdateValueAndIsBroken(((DependencyObject)Source).GetValue(_dp), false);
         }
         else if (_prop is not null)
         {
-            value = _prop.GetValue(Source);
+            UpdateValueAndIsBroken(_prop.GetValue(Source), false);
         }
         else if (_field is not null)
         {
-            value = _field.GetValue(Source);
+            UpdateValueAndIsBroken(_field.GetValue(Source), false);
         }
         else
         {
-            value = DependencyProperty.UnsetValue;
+            UpdateValueAndIsBroken(DependencyProperty.UnsetValue, true);
         }
 
-        UpdateValueAndIsBroken(value, CheckIsBroken());
     }
 
     internal override void OnSourceChanged(object oldValue, object newValue)
@@ -181,6 +179,4 @@ internal sealed class StandardPropertyPathNode : PropertyPathNode
             UpdateValue(true);
         }
     }
-
-    private bool CheckIsBroken() => Source is null || (_prop is null && _field is null && _dp is null);
 }

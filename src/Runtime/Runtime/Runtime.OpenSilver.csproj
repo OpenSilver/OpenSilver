@@ -32,6 +32,7 @@
     <Compile Include="OpenSilver\Internal\Data\CultureSensitiveComparer.cs" />
     <Compile Include="OpenSilver\Internal\Data\DataBindEngine.cs" />
     <Compile Include="OpenSilver\Internal\Data\DataBindOperation.cs" />
+    <Compile Include="OpenSilver\Internal\Data\DependencyPropertyPathNode.cs" />
     <Compile Include="OpenSilver\Internal\Data\SortFieldComparer.cs" />
     <Compile Include="OpenSilver\Internal\Data\TypeHelper.cs" />
     <Compile Include="OpenSilver\Internal\Data\ViewManager.cs" />

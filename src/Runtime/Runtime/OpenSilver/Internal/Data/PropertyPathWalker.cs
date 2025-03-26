@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Windows;
 using System.Windows.Data;
 
 namespace OpenSilver.Internal.Data;
@@ -23,7 +24,20 @@ internal sealed class PropertyPathWalker
 
     internal PropertyPathWalker(BindingExpression bindExpr)
     {
-        (_head, _tail) = ParsePath(bindExpr);
+        Binding binding = bindExpr.ParentBinding;
+
+        if (binding.XamlPath is string xamlPath)
+        {
+            (_head, _tail) = ParsePath(bindExpr, xamlPath);
+        }
+        else if (binding.Path.DependencyProperty is DependencyProperty dp)
+        {
+            _head = _tail = new DependencyPropertyPathNode(bindExpr, dp);
+        }
+        else
+        {
+            (_head, _tail) = ParsePath(bindExpr, binding.Path.Path ?? string.Empty);
+        }
     }
 
     internal bool IsEmpty => _head is SourcePropertyNode;
@@ -53,11 +67,8 @@ internal sealed class PropertyPathWalker
 
     internal void DetachDataItem() => _head.SetSource(null, false);
 
-    private static (IPropertyPathNode head, IPropertyPathNode tail) ParsePath(BindingExpression bindExpr)
+    private static (IPropertyPathNode head, IPropertyPathNode tail) ParsePath(BindingExpression bindExpr, string path)
     {
-        Binding binding = bindExpr.ParentBinding;
-        string path = binding.XamlPath ?? binding.Path.Path ?? string.Empty;
-
         IPropertyPathNode head = null;
         IPropertyPathNode tail = null;
 
