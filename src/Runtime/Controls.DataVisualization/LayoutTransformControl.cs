@@ -106,7 +106,7 @@ namespace System.Windows.Controls.DataVisualization
             OpenSilver.Internal.Xaml.RuntimeHelpers.SetTemplateContent(
                 template,
                 OpenSilver.Internal.Xaml.RuntimeHelpers.Create_XamlContext(),
-                static (owner, context) =>
+                static (IFrameworkElement owner, OpenSilver.Internal.Xaml.Context.XamlContext context) =>
                 {
                     var layoutRoot = OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_WriteStartObject(context, new Grid());
                     OpenSilver.Internal.Xaml.RuntimeHelpers.XamlContext_SetTemplatedParent(context, layoutRoot);
