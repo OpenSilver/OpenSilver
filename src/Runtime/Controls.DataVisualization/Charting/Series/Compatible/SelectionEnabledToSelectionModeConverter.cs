@@ -11,8 +11,10 @@ namespace System.Windows.Controls.DataVisualization.Charting.Compatible
     /// <summary>
     /// Converts from a true/false value indicating whether selection is enabled to a SeriesSelectionMode.
     /// </summary>
-    internal class SelectionEnabledToSelectionModeConverter : IValueConverter
+    internal sealed class SelectionEnabledToSelectionModeConverter : IValueConverter
     {
+        internal static readonly SelectionEnabledToSelectionModeConverter Default = new();
+
         /// <summary>
         /// Initializes a new instance of the SelectionEnabledToSelectionModeConverter class.
         /// </summary>
@@ -31,7 +33,7 @@ namespace System.Windows.Controls.DataVisualization.Charting.Compatible
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             SeriesSelectionMode selectionMode = SeriesSelectionMode.None;
-            if ((value is bool) && (bool)value)
+            if ((value is bool enabled) && enabled)
             {
                 selectionMode = SeriesSelectionMode.Single;
             }

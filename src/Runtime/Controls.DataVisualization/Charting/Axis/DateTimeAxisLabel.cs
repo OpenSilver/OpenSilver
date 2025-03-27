@@ -398,28 +398,28 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 switch (IntervalType)
                 {
                     case DateTimeIntervalType.Years:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = YearsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = YearsIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     case DateTimeIntervalType.Months:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = MonthsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = MonthsIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     case DateTimeIntervalType.Weeks:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = WeeksIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = WeeksIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     case DateTimeIntervalType.Days:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = DaysIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = DaysIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     case DateTimeIntervalType.Hours:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = HoursIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = HoursIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     case DateTimeIntervalType.Minutes:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = MinutesIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = MinutesIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     case DateTimeIntervalType.Seconds:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = SecondsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = SecondsIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     case DateTimeIntervalType.Milliseconds:
-                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = MillisecondsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = MillisecondsIntervalStringFormat ?? StringFormat ?? "{0}" });
                         break;
                     default:
                         base.UpdateFormattedContent();

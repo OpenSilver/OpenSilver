@@ -85,7 +85,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         public AxisLabel()
         {
-            this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = StringFormat ?? "{0}" });
+            this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = StringFormat ?? "{0}" });
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         protected virtual void UpdateFormattedContent()
         {
-            this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = StringFormat ?? "{0}" });
+            this.SetBinding(FormattedContentProperty, new Binding { Converter = StringFormatConverter.Default, ConverterParameter = StringFormat ?? "{0}" });
         }
     }
 }

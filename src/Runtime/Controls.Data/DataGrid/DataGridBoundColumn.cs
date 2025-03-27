@@ -160,7 +160,7 @@ namespace System.Windows.Controls
 
                         if (this._binding.Converter == null)
                         {
-                            this._binding.Converter = new DataGridValueConverter();
+                            this._binding.Converter = DataGridValueConverter.Default;
                         }
 
                         // Setup the binding for validation

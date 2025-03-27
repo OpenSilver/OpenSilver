@@ -578,7 +578,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             dataPoint.DefinitionSeriesIsSelectionEnabledHandling = true;
             ContentControl container = (ContentControl)element;
             dataItem.Container = container;
-            Binding selectionEnabledBinding = new Binding(SelectionModeProperty) { Source = this, Converter = new SelectionModeToSelectionEnabledConverter() };
+            Binding selectionEnabledBinding = new Binding(SelectionModeProperty) { Source = this, Converter = SelectionModeToSelectionEnabledConverter.Default };
             container.SetBinding(ContentControl.IsTabStopProperty, selectionEnabledBinding);
             dataPoint.SetBinding(DataPoint.IsSelectionEnabledProperty, selectionEnabledBinding);
             dataPoint.SetBinding(DataPoint.IsSelectedProperty, new Binding(ListBoxItem.IsSelectedProperty) { Source = container, Mode = BindingMode.TwoWay });
@@ -1492,8 +1492,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Converts from a SeriesSelectionMode to a true/false value indicating whether selection is enabled.
         /// </summary>
-        private class SelectionModeToSelectionEnabledConverter : IValueConverter
+        private sealed class SelectionModeToSelectionEnabledConverter : IValueConverter
         {
+            internal static readonly SelectionModeToSelectionEnabledConverter Default = new();
+
             /// <summary>
             /// Initializes a new instance of the SelectionModeToSelectionEnabledConverter class.
             /// </summary>
@@ -1512,9 +1514,9 @@ namespace System.Windows.Controls.DataVisualization.Charting
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
                 bool isSelectionEnabled = false;
-                if (value is SeriesSelectionMode)
+                if (value is SeriesSelectionMode mode)
                 {
-                    isSelectionEnabled = !(SeriesSelectionMode.None == (SeriesSelectionMode)value);
+                    isSelectionEnabled = SeriesSelectionMode.None != mode;
                 }
                 return isSelectionEnabled;
             }

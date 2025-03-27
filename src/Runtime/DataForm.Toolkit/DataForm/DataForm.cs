@@ -2933,7 +2933,7 @@ namespace System.Windows.Controls
 
                                     if (binding.Converter == null)
                                     {
-                                        binding.Converter = new DataFormValueConverter();
+                                        binding.Converter = DataFormValueConverter.Default;
                                     }
 
                                     element.SetBinding(dependencyProperty, binding);
@@ -3850,7 +3850,7 @@ namespace System.Windows.Controls
                         Mode = BindingMode.TwoWay,
                         ValidatesOnExceptions = true,
                         NotifyOnValidationError = true,
-                        Converter = propertyType.IsEnum ? new DataFormToStringConverter() : null
+                        Converter = propertyType.IsEnum ? DataFormToStringConverter.Default : null
                     });
             }
             else
@@ -3860,7 +3860,7 @@ namespace System.Windows.Controls
                     new Binding(propertyName)
                     {
                         Mode = BindingMode.OneWay,
-                        Converter = propertyType.IsEnum ? new DataFormToStringConverter() : null
+                        Converter = propertyType.IsEnum ? DataFormToStringConverter.Default : null
                     });
 
                 newField.IsReadOnly = true;

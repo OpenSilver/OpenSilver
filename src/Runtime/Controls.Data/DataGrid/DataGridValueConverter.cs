@@ -8,8 +8,10 @@ using System.Windows.Data;
 
 namespace System.Windows.Controls
 {
-    internal class DataGridValueConverter : IValueConverter
+    internal sealed class DataGridValueConverter : IValueConverter
     {
+        internal static readonly DataGridValueConverter Default = new();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value;

@@ -54,7 +54,7 @@ namespace System.Windows.Controls.DataVisualization.Charting.Compatible
         public AreaSeries()
         {
             SetBinding(DefinitionSeries.DependentAxisProperty, new Binding(DependentRangeAxisProperty) { Source = this });
-            SetBinding(DefinitionSeries.SelectionModeProperty, new Binding(IsSelectionEnabledProperty) { Source = this, Converter = new SelectionEnabledToSelectionModeConverter() });
+            SetBinding(DefinitionSeries.SelectionModeProperty, new Binding(IsSelectionEnabledProperty) { Source = this, Converter = SelectionEnabledToSelectionModeConverter.Default });
             _definition = new SeriesDefinition();
             _definition.SetBinding(SeriesDefinition.ItemsSourceProperty, new Binding(ItemsSourceProperty) { Source = this });
             _definition.SetBinding(SeriesDefinition.TitleProperty, new Binding(TitleProperty) { Source = this });

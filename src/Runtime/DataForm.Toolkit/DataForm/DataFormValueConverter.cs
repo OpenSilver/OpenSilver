@@ -18,6 +18,8 @@ namespace System.Windows.Controls
     /// <QualityBand>Preview</QualityBand>
     public class DataFormValueConverter : IValueConverter
     {
+        internal static readonly DataFormValueConverter Default = new();
+
         /// <summary>
         /// Converts forwards.
         /// </summary>
@@ -43,8 +45,7 @@ namespace System.Windows.Controls
         {
             if (targetType != null && IsNullableType(targetType))
             {
-                String strValue = value as String;
-                if (strValue != null && strValue.Length == 0)
+                if (value is string strValue && strValue.Length == 0)
                 {
                     return null;
                 }

@@ -18,6 +18,8 @@ namespace System.Windows.Controls
     /// <QualityBand>Preview</QualityBand>
     public class DataFormToStringConverter : IValueConverter
     {
+        internal static readonly DataFormToStringConverter Default = new();
+
         /// <summary>
         /// Converts forwards.
         /// </summary>

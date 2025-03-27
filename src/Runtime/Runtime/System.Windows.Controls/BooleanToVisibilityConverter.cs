@@ -13,13 +13,14 @@
 
 using System.Windows.Data;
 using System.Globalization;
+using OpenSilver.Internal;
 
 namespace System.Windows.Controls
 {
     /// <summary>
     /// Convert between boolean and visibility
     /// </summary>
-    public partial class BooleanToVisibilityConverter : IValueConverter
+    public class BooleanToVisibilityConverter : IValueConverter
     {
         /// <summary>
         /// Convert bool or Nullable&lt;bool&gt; to Visibility
@@ -31,16 +32,13 @@ namespace System.Windows.Controls
         /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool booleanValue = false;
-            if (value is bool)
+            bool booleanValue = value switch
             {
-                booleanValue = (bool)value;
-            }
-            else if (value is bool?)
-            {
-                booleanValue = (bool?)value ?? false;
-            }
-            return booleanValue ? Visibility.Visible : Visibility.Collapsed;
+                bool b => b,
+                _ => false,
+            };
+
+            return booleanValue ? VisibilityBoxes.VisibleBox : VisibilityBoxes.CollapsedBox;
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace System.Windows.Controls
         /// <returns></returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is Visibility visibility && visibility == Visibility.Visible;
+            return BooleanBoxes.Box(value is Visibility visibility && visibility == Visibility.Visible);
         }
     }
 }

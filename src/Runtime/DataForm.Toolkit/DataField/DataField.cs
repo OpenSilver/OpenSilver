@@ -1900,7 +1900,7 @@ namespace System.Windows.Controls
 
                             if (binding.Converter == null)
                             {
-                                binding.Converter = new DataFormValueConverter();
+                                binding.Converter = DataFormValueConverter.Default;
                             }
 
                             element.SetBinding(dependencyProperty, binding);

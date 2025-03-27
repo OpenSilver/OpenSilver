@@ -13,6 +13,8 @@ namespace System.Windows.Controls.DataVisualization
     /// </summary>
     public class StringFormatConverter : IValueConverter
     {
+        internal static readonly StringFormatConverter Default = new();
+
         /// <summary>
         /// Converts a value to a string by formatting it.
         /// </summary>
