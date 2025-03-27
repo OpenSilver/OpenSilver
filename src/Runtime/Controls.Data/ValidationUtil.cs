@@ -60,47 +60,7 @@ namespace System.Windows.Controls
         /// <returns>The cloned Binding</returns>
         public static Binding CloneBinding(Binding source)
         {
-            Binding clone = new Binding();
-
-            if (source == null)
-            {
-                return clone;
-            }
-
-            clone.BindsDirectlyToSource = source.BindsDirectlyToSource;
-            clone.Converter = source.Converter;
-            clone.ConverterCulture = source.ConverterCulture;
-            clone.ConverterParameter = source.ConverterParameter;
-            clone.FallbackValue = source.FallbackValue;
-            clone.Mode = source.Mode;
-            clone.NotifyOnValidationError = source.NotifyOnValidationError;
-            clone.Path = source.Path;
-            clone.StringFormat = source.StringFormat;
-            clone.TargetNullValue = source.TargetNullValue;
-            clone.UpdateSourceTrigger = source.UpdateSourceTrigger;
-            clone.ValidatesOnExceptions = source.ValidatesOnExceptions;
-            clone.ValidatesOnDataErrors = source.ValidatesOnDataErrors;
-            clone.ValidatesOnNotifyDataErrors = source.ValidatesOnNotifyDataErrors;
-
-            // Binding keeps track of which of the three setters for
-            // ElementName, RelativeSource, and Source have been called.
-            // Calling any two of the setters, even if the value passed in is null,
-            // will raise an exception.  For that reason, we must check for null
-            // for these properties to ensure that we only call the setter when we should.
-            if (source.ElementName != null)
-            {
-                clone.ElementName = source.ElementName;
-            }
-            else if (source.RelativeSource != null)
-            {
-                clone.RelativeSource = source.RelativeSource;
-            }
-            else if (source.Source != null)
-            {
-                clone.Source = source.Source;
-            }
-
-            return clone;
+            return new Binding(source);
         }
 
         /// <summary>

@@ -51,7 +51,7 @@ namespace System.Windows.Controls
         public DescriptionViewer()
         {
             // Set binding to self for DataContext change notifications
-            this.SetBinding(DescriptionViewer.DataContextProperty, new Binding());
+            this.SetBinding(DescriptionViewer.DataContextProperty, Binding.Empty);
             this.Loaded += new RoutedEventHandler(this.DescriptionViewer_Loaded);
             if (DesignerProperties.IsInDesignTool)
             {

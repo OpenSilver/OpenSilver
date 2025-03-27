@@ -197,9 +197,11 @@ public abstract class BindingBase : MarkupExtension
     internal BindingExpressionBase CreateBindingExpression(
         DependencyObject targetObject, DependencyProperty targetProperty, BindingExpressionBase owner)
     {
-        _isSealed = true;
+        Seal();
         return CreateBindingExpressionOverride(targetObject, targetProperty, owner);
     }
+
+    internal void Seal() => _isSealed = true;
 
     /// <summary>
     /// Checks if the given IProvideValueTarget can receive

@@ -152,6 +152,19 @@ public class Binding : BindingBase
     }
 
     /// <summary>
+    /// An immutable <see cref="Binding"/> with en empty <see cref="Path"/>.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static readonly Binding Empty = CreateEmptyBinding();
+
+    private static Binding CreateEmptyBinding()
+    {
+        var binding = new Binding();
+        binding.Seal();
+        return binding;
+    }
+
+    /// <summary>
     /// Gets or sets the converter object that is called by the binding engine to modify the data as 
     /// it is passed between the source and target, or vice versa.
     /// </summary>

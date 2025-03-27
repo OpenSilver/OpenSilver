@@ -59,7 +59,7 @@ namespace System.Windows.Controls
             this._errors = new List<ValidationError>();
 
             // Set binding to self for DataContext change notifications
-            this.SetBinding(Label.DataContextProperty, new Binding());
+            this.SetBinding(Label.DataContextProperty, Binding.Empty);
             this.Loaded += new RoutedEventHandler(this.Label_Loaded);
 
             // Metadata can be consumed as long as the Content is still null.

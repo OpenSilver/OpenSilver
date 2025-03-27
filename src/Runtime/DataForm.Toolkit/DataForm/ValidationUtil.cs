@@ -30,48 +30,7 @@ namespace System.Windows.Controls
         /// <returns>The copied Binding.</returns>
         public static Binding CopyBinding(Binding source)
         {
-            Binding copy = new Binding();
-
-            if (source == null)
-            {
-                return copy;
-            }
-
-            copy.Converter = source.Converter;
-            copy.ConverterCulture = source.ConverterCulture;
-            copy.ConverterParameter = source.ConverterParameter;
-            copy.FallbackValue = source.FallbackValue;
-            copy.Mode = source.Mode;
-            copy.NotifyOnValidationError = source.NotifyOnValidationError;
-            copy.Path = source.Path;
-            copy.StringFormat = source.StringFormat;
-            copy.TargetNullValue = source.TargetNullValue;
-            copy.UpdateSourceTrigger = source.UpdateSourceTrigger;
-            copy.ValidatesOnExceptions = source.ValidatesOnExceptions;
-            copy.BindsDirectlyToSource = source.BindsDirectlyToSource;
-            copy.ValidatesOnDataErrors = source.ValidatesOnDataErrors;
-            copy.ValidatesOnNotifyDataErrors = source.ValidatesOnNotifyDataErrors;
-
-            // Binding keeps track of which of the three setters for
-            // ElementName, RelativeSource, and Source have been called.
-            // Calling any two of the setters, even if the value passed in is null,
-            // will raise an exception.  For that reason, we must check for null
-            // for these properties to ensure that we only call the setter when we should.
-            if (source.ElementName != null)
-            {
-                copy.ElementName = source.ElementName;
-            }
-            else if (source.RelativeSource != null)
-            {
-                copy.RelativeSource = source.RelativeSource;
-            }
-            else if (source.Source != null)
-            {
-                copy.Source = source.Source;
-            }
-
-
-            return copy;
+            return new Binding(source);
         }
 
         /// <summary>

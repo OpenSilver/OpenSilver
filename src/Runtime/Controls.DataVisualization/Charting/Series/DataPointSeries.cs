@@ -1191,7 +1191,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
             if (DependentValueBinding == null)
             {
-                dataPoint.SetBinding(DataPoint.DependentValueProperty, new Binding());
+                dataPoint.SetBinding(DataPoint.DependentValueProperty, Binding.Empty);
             }
             else
             {
