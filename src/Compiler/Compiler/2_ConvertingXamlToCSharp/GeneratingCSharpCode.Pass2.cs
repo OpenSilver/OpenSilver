@@ -2220,14 +2220,22 @@ namespace OpenSilver.Compiler
                     return _settings.Inspector.GetEnumValue(type, fieldString, false, false);
                 }
 
-                if (_settings.Inspector.GetField(type, fieldString, true, true) is FieldDefinition staticField)
+                FieldDefinition staticField;
+                PropertyDefinition staticProperty;
+                TypeReference declaringType;
+
+                (staticField, declaringType) = _settings.Inspector.GetField(type, fieldString, true, true);
+
+                if (staticField is not null)
                 {
-                    return $"global::{staticField.DeclaringType.ConvertToString(SupportedLanguage.CSharp)}.{staticField.Name}";
+                    return $"global::{declaringType.ConvertToString(SupportedLanguage.CSharp)}.{staticField.Name}";
                 }
 
-                if (_settings.Inspector.GetProperty(type, fieldString, true, true) is PropertyDefinition staticProperty)
+                (staticProperty, declaringType) = _settings.Inspector.GetProperty(type, fieldString, true, true);
+
+                if (staticProperty is not null)
                 {
-                    return $"global::{staticProperty.DeclaringType.ConvertToString(SupportedLanguage.CSharp)}.{staticProperty.Name}";
+                    return $"global::{declaringType.ConvertToString(SupportedLanguage.CSharp)}.{staticProperty.Name}";
                 }
 
                 throw new XamlParseException(

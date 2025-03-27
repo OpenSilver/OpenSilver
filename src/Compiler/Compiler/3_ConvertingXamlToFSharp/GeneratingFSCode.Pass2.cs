@@ -2300,14 +2300,22 @@ namespace GlobalResource
                     return _settings.Inspector.GetEnumValue(type, fieldString, false, false);
                 }
 
-                if (_settings.Inspector.GetField(type, fieldString, true, true) is FieldDefinition staticField)
+                FieldDefinition staticField;
+                PropertyDefinition staticProperty;
+                TypeReference declaringType;
+
+                (staticField, declaringType) = _settings.Inspector.GetField(type, fieldString, true, true);
+
+                if (staticField is not null)
                 {
-                    return $"global.{staticField.DeclaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticField.Name}";
+                    return $"global.{declaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticField.Name}";
                 }
 
-                if (_settings.Inspector.GetProperty(type, fieldString, true, true) is PropertyDefinition staticProperty)
+                (staticProperty, declaringType) = _settings.Inspector.GetProperty(type, fieldString, true, true);
+
+                if (staticProperty is not null)
                 {
-                    return $"global.{staticProperty.DeclaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticProperty.Name}";
+                    return $"global.{declaringType.ConvertToString(SupportedLanguage.FSharp)}.{staticProperty.Name}";
                 }
 
                 throw new XamlParseException(
