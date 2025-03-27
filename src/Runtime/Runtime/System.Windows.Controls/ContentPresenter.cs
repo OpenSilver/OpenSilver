@@ -501,53 +501,6 @@ namespace System.Windows.Controls
             }
         }
 
-        private class UseContentTemplate : DataTemplate
-        {
-            internal override bool BuildVisualTree(IFrameworkElement container)
-            {
-                ContentPresenter cp = (ContentPresenter)container;
-                FrameworkElement child = cp.Content as FrameworkElement;
-                if (child != null)
-                {
-                    if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-                    {
-                        parent.TemplateChild = null;
-                    }
-                }
-
-                cp.TemplateChild = child;
-
-                return true;
-            }
-        }
-
-        private class DefaultTemplate : DataTemplate
-        {
-            internal override bool BuildVisualTree(IFrameworkElement container)
-            {
-                ContentPresenter cp = (ContentPresenter)container;
-                FrameworkElement result = DefaultExpansion(cp.Content, cp);
-
-                cp.TemplateChild = result;
-
-                return result != null;
-            }
-
-            private FrameworkElement DefaultExpansion(object content, ContentPresenter container)
-            {
-                if (content == null)
-                {
-                    return null;
-                }
-
-                TextBlock textBlock = new TextBlock();
-                textBlock.SetTemplatedParent(new(container));
-                textBlock.SetBinding(TextBlock.TextProperty, new Binding());
-
-                return textBlock;
-            }
-        }
-
         /// <inheritdoc/>
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -580,6 +533,53 @@ namespace System.Windows.Controls
                 }
             }
             return finalSize;
+        }
+
+        private sealed class UseContentTemplate : DataTemplate
+        {
+            internal override bool BuildVisualTree(IFrameworkElement container)
+            {
+                ContentPresenter cp = (ContentPresenter)container;
+                FrameworkElement child = cp.Content as FrameworkElement;
+                if (child is not null)
+                {
+                    if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
+                    {
+                        parent.TemplateChild = null;
+                    }
+                }
+
+                cp.TemplateChild = child;
+
+                return true;
+            }
+        }
+
+        private sealed class DefaultTemplate : DataTemplate
+        {
+            internal override bool BuildVisualTree(IFrameworkElement container)
+            {
+                ContentPresenter cp = (ContentPresenter)container;
+                FrameworkElement result = DefaultExpansion(cp.Content, cp);
+
+                cp.TemplateChild = result;
+
+                return result != null;
+            }
+
+            private FrameworkElement DefaultExpansion(object content, ContentPresenter container)
+            {
+                if (content is null)
+                {
+                    return null;
+                }
+
+                var textBlock = new TextBlock();
+                textBlock.SetTemplatedParent(new(container));
+                textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
+
+                return textBlock;
+            }
         }
     }
 }

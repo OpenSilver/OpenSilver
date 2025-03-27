@@ -55,7 +55,7 @@ namespace System.Windows.Controls
                     {
                         var textBlock = new TextBlock();
                         textBlock.SetTemplatedParent(context.TemplateOwnerReference);
-                        textBlock.SetBinding(TextBlock.TextProperty, new Binding());
+                        textBlock.SetBinding(TextBlock.TextProperty, Binding.Empty);
 
                         return textBlock;
                     }),
@@ -884,6 +884,8 @@ namespace System.Windows.Controls
                 return _emptyPathTemplate;
             }
 
+            var binding = new Binding(displayMemberPath);
+
             return new DataTemplate
             {
                 Template = new TemplateContent(
@@ -892,7 +894,7 @@ namespace System.Windows.Controls
                     {
                         var textBlock = new TextBlock();
                         textBlock.SetTemplatedParent(context.TemplateOwnerReference);
-                        textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath));
+                        textBlock.SetBinding(TextBlock.TextProperty, binding);
 
                         return textBlock;
                     })

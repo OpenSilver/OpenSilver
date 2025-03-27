@@ -54,7 +54,7 @@ namespace System.Windows.Controls
             this._errors = new List<ValidationError>();
 
             // Set binding to self for DataContext change notifications
-            this.SetBinding(Label.DataContextProperty, new Binding());
+            this.SetBinding(Label.DataContextProperty, Binding.Empty);
             this.Loaded += new RoutedEventHandler(this.Label_Loaded);
             this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.Label_IsEnabledChanged);
 

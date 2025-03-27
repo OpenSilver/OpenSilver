@@ -221,7 +221,7 @@ namespace System.Windows.Controls
                         grid.SetTemplatedParent(context.TemplateOwnerReference);
                         var tb = new TextBlock();
                         tb.SetTemplatedParent(context.TemplateOwnerReference);
-                        tb.SetBinding(TextBlock.TextProperty, new Binding());
+                        tb.SetBinding(TextBlock.TextProperty, Binding.Empty);
                         grid.Children.Add(tb);
                         return grid;
                     });

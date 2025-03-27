@@ -46,7 +46,7 @@ namespace System.Windows.Controls
         {
             this.DefaultStyleKey = typeof(DescriptionViewer);
             // Set binding to self for DataContext change notifications
-            this.SetBinding(DescriptionViewer.DataContextProperty, new Binding());
+            this.SetBinding(DescriptionViewer.DataContextProperty, Binding.Empty);
             this.Loaded += new RoutedEventHandler(this.DescriptionViewer_Loaded);
             this.IsEnabledChanged += new DependencyPropertyChangedEventHandler(this.DescriptionViewer_IsEnabledChanged);
             if (DesignerProperties.IsInDesignTool)
