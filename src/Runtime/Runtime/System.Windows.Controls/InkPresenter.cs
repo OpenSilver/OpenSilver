@@ -62,6 +62,8 @@ namespace System.Windows.Controls
                   ctx.mozImageSmoothingEnabled = true;
                   ctx.msImageSmoothingEnabled = true;
                   ctx.scale(zoom, zoom);
+                  ctx.lineCap = 'round';
+                  ctx.lineJoin = 'round';
                 })({{sCanvas}})
                 """);
         }
