@@ -101,8 +101,12 @@ namespace System.Windows.Controls
             {              
                 _owner.IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
 
-                var groups = (Collection<VisualStateGroup>)_owner.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty);
-                if (groups != null)
+                if (_owner.StateGroupsRoot is not FrameworkElement stateGroupsRoot)
+                {
+                    return;
+                }
+
+                if (VisualStateManager.GetVisualStateGroupsInternal(stateGroupsRoot) is var groups)
                 {
                     bool hasMouseOverState = false;
                     bool hasPressedState = false;

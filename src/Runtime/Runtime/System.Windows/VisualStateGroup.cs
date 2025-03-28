@@ -61,7 +61,7 @@ namespace System.Windows
         /// <returns>
         /// The collection of mutually exclusive <see cref="VisualState"/> objects.
         /// </returns>
-        public IList States => _states ??= new Collection<VisualState>(new VisualStatesCollection(this));
+        public IList States => _states ??= new(new VisualStatesCollection(this));
 
         /// <summary>
         /// Gets the collection of <see cref="VisualTransition"/> objects.
@@ -70,13 +70,14 @@ namespace System.Windows
         /// The collection of <see cref="VisualTransition"/> objects.
         /// </returns>
         [OpenSilver.NotImplemented]
-        public IList Transitions => _transitions ??= new Collection<VisualTransition>(new VisualTransitionsCollection(this));
+        public IList Transitions => _transitions ??= new(new VisualTransitionsCollection(this));
 
         internal VisualState GetState(string stateName)
         {
-            for (int stateIndex = 0; stateIndex < States.Count; ++stateIndex)
+            Collection<VisualState> states = _states;
+            for (int stateIndex = 0; stateIndex < states.Count; ++stateIndex)
             {
-                VisualState state = (VisualState)States[stateIndex];
+                VisualState state = states[stateIndex];
                 if (state.Name == stateName)
                 {
                     return state;
