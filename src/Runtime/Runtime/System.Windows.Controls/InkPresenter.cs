@@ -11,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Specialized;
-using System.Text;
 using System.Windows.Ink;
 using System.Windows.Input;
 using CSHTML5.Internal;
@@ -39,7 +37,7 @@ namespace System.Windows.Controls
             SizeChanged += new SizeChangedEventHandler(OnSizeChanged);
         }
 
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e) => ResetCanvas(e.NewSize);
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e) => DrawAllStrokes();
 
         private void ResetCanvas(Size renderSize)
         {
@@ -53,20 +51,19 @@ namespace System.Windows.Controls
             string width = Math.Ceiling(renderSize.Width).ToInvariantString();
             string height = Math.Ceiling(renderSize.Height).ToInvariantString();
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-@$"(function(cvs) {{
-cvs.width = {width} * window.devicePixelRatio;
-cvs.height = {height} * window.devicePixelRatio;
-let ctx = cvs.getContext('2d');
-ctx.imageSmoothingEnabled = true;
-ctx.webkitImageSmoothingEnabled = true;
-ctx.mozImageSmoothingEnabled = true;
-ctx.msImageSmoothingEnabled = true;
-ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-cvs.style.width = {width} + 'px';
-cvs.style.height = {height} + 'px';
-ctx.strokeStyle = '#222222';
-ctx.lineWidth = '4';
-ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
+                $$"""
+                (function(cvs) {
+                  const zoom = window.devicePixelRatio;
+                  cvs.width = {{width}} * zoom;
+                  cvs.height = {{height}} * zoom;
+                  const ctx = cvs.getContext('2d');
+                  ctx.imageSmoothingEnabled = true;
+                  ctx.webkitImageSmoothingEnabled = true;
+                  ctx.mozImageSmoothingEnabled = true;
+                  ctx.msImageSmoothingEnabled = true;
+                  ctx.scale(zoom, zoom);
+                })({{sCanvas}})
+                """);
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -75,7 +72,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             (var outerDiv, _canvasDom) = INTERNAL_HtmlDomManager.CreateInkPresenterDomElementAndAppendIt(parentRef, this);
             return outerDiv;
         }
-        
+
         /// <summary>
         /// Gets or sets the strokes that the <see cref="InkPresenter"/> displays.
         /// </summary>
@@ -124,12 +121,12 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             var oldCollection = e.OldValue as StrokeCollection;
             if (oldCollection != null)
             {
-                oldCollection.CollectionChanged -= OnStrokeCollectionChanged;               
+                oldCollection.CollectionChanged -= OnStrokeCollectionChanged;
             }
 
             var newCollection = e.NewValue as StrokeCollection;
             if (newCollection != null)
-            {                
+            {
                 newCollection.CollectionChanged += OnStrokeCollectionChanged;
             }
 
@@ -137,7 +134,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
         }
 
         private void DrawAllStrokes()
-        {            
+        {
             ResetCanvas(RenderSize);
 
             foreach (var stroke in Strokes.InternalItems)
@@ -155,8 +152,12 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             }
 
             string sCanvas = OpenSilver.Interop.GetVariableStringForJS(_canvasDom);
-            var sb = new StringBuilder();
-            sb.AppendLine($"(function(cvs) {{ const ctx = cvs.getContext('2d');");
+            var sb = StringBuilderCache.Acquire();
+            sb.AppendLine("(function(cvs) { const ctx = cvs.getContext('2d');");
+            sb.AppendLine($"ctx.strokeStyle = '{stroke.DrawingAttributes.Color.ToHtmlString(1)}';");
+            sb.AppendLine($"ctx.lineWidth = '{stroke.DrawingAttributes.Width.ToInvariantString()}';");
+            sb.AppendLine("ctx.beginPath();");
+
             var firstPoint = points[0];
             sb.AppendLine($"ctx.moveTo({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()});");
 
@@ -166,7 +167,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
             }
 
             sb.AppendLine($"ctx.stroke(); }})({sCanvas})");
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(sb.ToString());
+            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(StringBuilderCache.GetStringAndRelease(sb));
         }
 
 
@@ -234,7 +235,7 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
                     DrawAllStrokes();
                     break;
             }
-            
+
         }
 
         private void DrawCurrentPoint()
@@ -246,9 +247,18 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas})");
 
             string sCanvas = OpenSilver.Interop.GetVariableStringForJS(_canvasDom);
             OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                $"(function(cvs) {{ const ctx = cvs.getContext('2d'); ctx.moveTo({_lastPos.X.ToInvariantString()}, {_lastPos.Y.ToInvariantString()}); ctx.lineTo({_mousePos.X.ToInvariantString()}, {_mousePos.Y.ToInvariantString()}); ctx.stroke(); }})({sCanvas})");
-            //object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
-            //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2); $0.lineTo($3, $4); $0.stroke();", context, _lastPos.X, _lastPos.Y, _mousePos.X, _mousePos.Y);
+                $$"""
+                (function(cvs) {
+                  const ctx = cvs.getContext('2d');
+                  ctx.strokeStyle = '{{_currentStroke.DrawingAttributes.Color.ToHtmlString(1)}}';
+                  ctx.lineWidth = '{{_currentStroke.DrawingAttributes.Width.ToInvariantString()}}';
+                  ctx.beginPath();
+                  ctx.moveTo({{_lastPos.X.ToInvariantString()}}, {{_lastPos.Y.ToInvariantString()}});
+                  ctx.lineTo({{_mousePos.X.ToInvariantString()}}, {{_mousePos.Y.ToInvariantString()}});
+                  ctx.stroke();
+                })({{sCanvas}})
+                """);
+
             _lastPos = _mousePos;
         }
     }
